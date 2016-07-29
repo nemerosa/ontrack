@@ -506,7 +506,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
     wrappers {
         injectPasswords()
         credentialsBinding {
-            usernamePassword 'GITHUB_USER', 'GITHUB_PASSWORD', 'jenkins'
+            usernamePassword 'GITHUB_USER', 'GITHUB_PASSWORD', PROJECT_SCM_CREDENTIALS
         }
     }
     extractDeliveryArtifacts delegate

@@ -54,7 +54,7 @@ prepareGhPages.dependsOn sitePrepare
 
 githubPages {
     deleteExistingFiles = false
-    // repoUri = project.properties.ontrackGitHubUri
+    repoUri = project.properties.ontrackGitHubUri
     credentials.username = project.properties.ontrackGitHubUser
     credentials.password = project.properties.ontrackGitHubPassword
     targetBranch = project.properties.ontrackGitHubPages
