@@ -21,7 +21,8 @@ GitHub and JIRA are supported as ticketing systems.
 
 ontrack can integrate with Jenkins and Artifactory.
 
-Full documentation available in the [Wiki](https://github.com/nemerosa/ontrack/wiki).
+The documentation and its distribution is currently being refactored. You can access its current version 
+[here](https://nemerosa.github.io/ontrack/release/latest/doc/index.html).
 
 Contributions are welcome:
 
