@@ -142,6 +142,7 @@ build
         }
     }
     publishers {
+        buildDescription '', '${VERSION_DISPLAY}', '', ''
         archiveJunit("**/build/test-results/*.xml")
         archiveArtifacts {
             pattern 'build/distributions/ontrack-*-delivery.zip'
@@ -205,6 +206,7 @@ ciAcceptanceTest
 '''
     }
     publishers {
+        buildDescription '', '${VERSION}', '', ''
         archiveJunit('*-tests.xml')
         if (release) {
             downstreamParameterized {
@@ -241,7 +243,7 @@ ciAcceptanceTest
             }
         }
         // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ACCEPTANCE'
     }
 }
 
