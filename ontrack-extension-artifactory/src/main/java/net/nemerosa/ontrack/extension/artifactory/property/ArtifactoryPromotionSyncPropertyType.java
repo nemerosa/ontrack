@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.artifactory.ArtifactoryExtensionFeature;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
-import net.nemerosa.ontrack.extension.artifactory.service.ArtifactoryPromotionSyncService;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
@@ -13,7 +12,6 @@ import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
@@ -29,13 +27,11 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
         implements ConfigurationPropertyType<ArtifactoryConfiguration, ArtifactoryPromotionSyncProperty> {
 
     private final ArtifactoryConfigurationService configurationService;
-    private final ArtifactoryPromotionSyncService artifactoryPromotionSyncService;
 
     @Autowired
-    public ArtifactoryPromotionSyncPropertyType(ArtifactoryExtensionFeature extensionFeature, ArtifactoryConfigurationService configurationService, ArtifactoryPromotionSyncService artifactoryPromotionSyncService) {
+    public ArtifactoryPromotionSyncPropertyType(ArtifactoryExtensionFeature extensionFeature, ArtifactoryConfigurationService configurationService) {
         super(extensionFeature);
         this.configurationService = configurationService;
-        this.artifactoryPromotionSyncService = artifactoryPromotionSyncService;
     }
 
     @Override
@@ -145,13 +141,4 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
         );
     }
 
-    @Override
-    public void onPropertyChanged(ProjectEntity entity, ArtifactoryPromotionSyncProperty value) {
-        artifactoryPromotionSyncService.scheduleArtifactoryBuildSync((Branch) entity);
-    }
-
-    @Override
-    public void onPropertyDeleted(ProjectEntity entity, ArtifactoryPromotionSyncProperty oldValue) {
-        artifactoryPromotionSyncService.unscheduleArtifactoryBuildSync((Branch) entity);
-    }
 }

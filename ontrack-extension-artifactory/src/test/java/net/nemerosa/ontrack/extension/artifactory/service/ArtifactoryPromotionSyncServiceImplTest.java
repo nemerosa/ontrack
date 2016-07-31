@@ -55,9 +55,8 @@ public class ArtifactoryPromotionSyncServiceImplTest {
                 structureService,
                 propertyService,
                 artifactoryClientFactory,
-                jobScheduler,
                 configurationService,
-                securityService);
+                artifactoryConfProperties, securityService);
 
         // Fake Artifactory client
         artifactoryClient = mock(ArtifactoryClient.class);
@@ -145,8 +144,8 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         Property<ArtifactoryPromotionSyncProperty> property = Property.of(
                 new ArtifactoryPromotionSyncPropertyType(
                         new ArtifactoryExtensionFeature(),
-                        null,
-                        artifactoryPromotionSyncService),
+                        null
+                ),
                 new ArtifactoryPromotionSyncProperty(
                         null,
                         "",
