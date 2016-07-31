@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.artifactory.service;
 
 import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.extension.artifactory.ArtifactoryConfProperties;
 import net.nemerosa.ontrack.extension.artifactory.ArtifactoryExtensionFeature;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
@@ -8,9 +9,6 @@ import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfi
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
-import net.nemerosa.ontrack.job.Job;
-import net.nemerosa.ontrack.job.JobScheduler;
-import net.nemerosa.ontrack.job.Schedule;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
@@ -18,7 +16,9 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -32,31 +32,28 @@ public class ArtifactoryPromotionSyncServiceImplTest {
     private PromotionLevel promotionLevel;
     PropertyService propertyService;
     private Build build;
-    private JobScheduler jobScheduler;
-    private ArtifactoryPromotionSyncService artifactoryPromotionSyncService;
 
     @Before
     public void setup() {
         structureService = mock(StructureService.class);
         propertyService = mock(PropertyService.class);
         ArtifactoryClientFactory artifactoryClientFactory = mock(ArtifactoryClientFactory.class);
-        artifactoryPromotionSyncService = mock(ArtifactoryPromotionSyncService.class);
-        jobScheduler = mock(JobScheduler.class);
         ArtifactoryConfigurationService configurationService = mock(ArtifactoryConfigurationService.class);
+        ArtifactoryConfProperties artifactoryConfProperties = new ArtifactoryConfProperties();
 
         SecurityService securityService = mock(SecurityService.class);
         doAnswer(invocation -> {
-            Runnable run = (Runnable) invocation.getArguments()[0];
-            run.run();
-            return null;
-        }).when(securityService).asAdmin(any(Runnable.class));
+            Supplier run = (Supplier) invocation.getArguments()[0];
+            return run.get();
+        }).when(securityService).asAdmin(any(Supplier.class));
 
         service = new ArtifactoryPromotionSyncServiceImpl(
                 structureService,
                 propertyService,
                 artifactoryClientFactory,
                 configurationService,
-                artifactoryConfProperties, securityService);
+                artifactoryConfProperties,
+                securityService);
 
         // Fake Artifactory client
         artifactoryClient = mock(ArtifactoryClient.class);
@@ -157,8 +154,7 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         when(structureService.getProjectList()).thenReturn(Collections.singletonList(project));
         when(structureService.getBranchesForProject(project.getId())).thenReturn(Collections.singletonList(branch));
         // Gets the list of jobs
-        service.start();
-        verify(jobScheduler, times(1)).schedule(any(Job.class), eq(Schedule.everyMinutes(10)));
+        assertEquals(1, service.collectJobRegistrations().count());
     }
 
     @Test
@@ -169,8 +165,7 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         when(structureService.getProjectList()).thenReturn(Collections.singletonList(project));
         when(structureService.getBranchesForProject(project.getId())).thenReturn(Collections.singletonList(branch));
         // Gets the list of jobs
-        service.start();
-        verifyZeroInteractions(jobScheduler);
+        assertEquals(0, service.collectJobRegistrations().count());
     }
 
 }
