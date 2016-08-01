@@ -1,0 +1,9 @@
+For example,
+
+[source,groovy]
+----
+def build = ontrack.branch('project', 'branch').build('123', '', true)
+----
+
+Settings the `getIfExists` parameter to `true` will return the build if it already exists, and will fail if set
+to `false`.

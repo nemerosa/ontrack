@@ -8,4 +8,7 @@ dependencies {
     compile project(':ontrack-extension-issues')
 
     testCompile libraries.groovy
+    testCompile project(':ontrack-it-utils')
+    testRuntime project(':ontrack-service')
+    testRuntime project(':ontrack-repository-impl')
 }

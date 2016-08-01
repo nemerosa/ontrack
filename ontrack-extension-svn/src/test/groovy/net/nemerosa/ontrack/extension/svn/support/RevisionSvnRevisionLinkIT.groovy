@@ -68,7 +68,7 @@ class RevisionSvnRevisionLinkIT extends AbstractServiceTestSupport {
          * Definition of the repository
          */
 
-        def configuration = SVNTestUtils.repository().configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
         def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
         def repository = SVNRepository.of(repositoryId, configuration, null)
 

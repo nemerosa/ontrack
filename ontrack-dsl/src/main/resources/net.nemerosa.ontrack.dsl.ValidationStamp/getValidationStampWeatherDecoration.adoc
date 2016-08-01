@@ -1,0 +1,12 @@
+The "weather" of the validation stamp is the status of the last 4 builds having been validated for this
+validation stamp on the corresponding branch.
+
+The returned object contains two attributes:
+
+* `weather` which can have one of the following values:
+** `sunny`
+** `sunAndClouds`
+** `clouds`
+** `rain`
+** `storm`
+* `text` - a display text for the weather type

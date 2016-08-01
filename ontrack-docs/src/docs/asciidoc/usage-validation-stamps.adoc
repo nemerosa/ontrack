@@ -1,0 +1,59 @@
+[[validation-stamps]]
+=== Managing validation stamps
+
+[[validation-stamps-auto]]
+==== Auto creation of validation stamps
+
+Creating the validation stamps for each branch, or making sure they are
+always up to date, can be a non trivial task. Having mechanisms like cloning
+or <<templates,templates>> can help, but then one must still make sure
+the list of validation stamps in the template is up to date and than the
+template is regularly synchronized.
+
+Another approach is to allow projects to create automatically the validation
+stamps on demand, whenever a build is validated. This must of course be
+authorised at project level and a list of predefined validation stamps must be
+maintained globally.
+
+[[validation-stamps-auto-predefined]]
+===== Predefined validation stamps
+
+The management of predefined validation stamps is accessible to any
+_Administrator_, in his user menu.
+
+He can create, edit and delete predefined validation stamps, and associate
+images with them.
+
+NOTE: Deleting a predefined validation stamp has no impact on the ones which
+were created from it in the branches. No link is kept between the validation
+stamps in the branches and the predefined ones.
+
+[[validation-stamps-auto-projects]]
+===== Configuring projects
+
+By default, a project does not authorise the automatic creation of a validation
+stamp. In case one attempts to validate a build using a non existing validation
+stamp, an error would be thrown.
+
+In order to enable this feature on a project, add the _Auto validation stamps_
+property to the project and set _Auto creation_ to _Yes_.
+
+Disabling the auto creation can be done either by setting _Auto creation_ to
+_No_ or by removing the property altogether.
+
+
+[[validation-stamps-auto-creation]]
+===== Auto creation of validation stamps
+
+When the auto creation is enabled, build validations using a validation stamp
+name will follow this procedure:
+
+* if the validation stamp is already defined in the branch, it is of
+  course used
+* if the validation stamp is predefined, it is used to create a new one on
+  the branch and is then used
+* in any other case, an error is displayed
+
+IMPORTANT: The auto creation of validation stamps is available only through the
+<<dsl,DSL>> or through the API. It is not accessible through the GUI, where
+only the validation stamps of the branch can be selected for a build validation.

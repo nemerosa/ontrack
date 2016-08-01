@@ -18,8 +18,6 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
-import org.junit.AfterClass
-import org.junit.BeforeClass
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.annotation.ProfileValueSourceConfiguration
@@ -28,18 +26,6 @@ import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 
 @ProfileValueSourceConfiguration(SVNProfileValueSource)
 class SVNDownloadIT extends AbstractServiceTestSupport {
-
-    private static SVNTestRepo repo
-
-    @BeforeClass
-    static void 'SVN repository: start'() {
-        repo = SVNTestRepo.get('SVNDownloadIT')
-    }
-
-    @AfterClass
-    static void 'SVN repository: stop'() {
-        repo.stop()
-    }
 
     @Autowired
     private SVNService svnService
@@ -63,81 +49,84 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
     @Test
     void 'SVN Download'() {
 
-        /**
-         * Preparation of a repository with a few commits on the trunk
-         */
+        SVNTestRepo.withSvnRepo('SVNDownloadIT') { SVNTestRepo repo ->
 
-        repo.mkdir 'SVNDownload/trunk', 'Trunk'
-        repo.file 'SVNDownload/trunk/folder/file1', 'Content 1', 'Commit file'
-        repo.copy 'SVNDownload/trunk', 'SVNDownload/branches/v1', 'Branch 1'
-        repo.file 'SVNDownload/trunk/folder/file1', 'Content 2', 'Commit file'
+            /**
+             * Preparation of a repository with a few commits on the trunk
+             */
 
-        /**
-         * Definition of the repository
-         */
+            repo.mkdir 'SVNDownload/trunk', 'Trunk'
+            repo.file 'SVNDownload/trunk/folder/file1', 'Content 1', 'Commit file'
+            repo.copy 'SVNDownload/trunk', 'SVNDownload/branches/v1', 'Branch 1'
+            repo.file 'SVNDownload/trunk/folder/file1', 'Content 2', 'Commit file'
 
-        def configuration = SVNTestUtils.repository().configuration
-        def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
-        def repository = SVNRepository.of(repositoryId, configuration, null)
+            /**
+             * Definition of the repository
+             */
 
-        /**
-         * Saves the configuration
-         */
+            def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
+            def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
+            def repository = SVNRepository.of(repositoryId, configuration, null)
 
-        asUser().with(GlobalSettings).call {
-            configuration = svnConfigurationService.newConfiguration(configuration)
-        }
+            /**
+             * Saves the configuration
+             */
 
-        /**
-         * Indexation of this repository
-         */
+            asUser().with(GlobalSettings).call {
+                configuration = svnConfigurationService.newConfiguration(configuration)
+            }
 
-        asUser().with(GlobalSettings).call {
-            ((IndexationServiceImpl) indexationService).indexFromLatest(repository, { println it })
-        }
+            /**
+             * Indexation of this repository
+             */
 
-        /**
-         * Branch with this configuration
-         */
+            asUser().with(GlobalSettings).call {
+                ((IndexationServiceImpl) indexationService).indexFromLatest(repository, { println it })
+            }
 
-        // Creates a project and branches
-        Project project = doCreateProject()
-        Branch branch1 = doCreateBranch(project, nd("branch1", ""))
-        Branch trunk = doCreateBranch(project, nd("trunk", ""))
+            /**
+             * Branch with this configuration
+             */
 
-        // Configures the project
-        asUser().with(project, ProjectEdit).call {
-            propertyService.editProperty(
-                    project,
-                    SVNProjectConfigurationPropertyType,
-                    new SVNProjectConfigurationProperty(configuration, '/SVNDownload/trunk')
-            )
-            // ...  & the branches
-            propertyService.editProperty(
-                    branch1,
-                    SVNBranchConfigurationPropertyType,
-                    new SVNBranchConfigurationProperty(
-                            '/SVNDownload/branches/v1',
-                            TagNameSvnRevisionLink.DEFAULT
-                    )
-            )
-            propertyService.editProperty(
-                    trunk,
-                    SVNBranchConfigurationPropertyType,
-                    new SVNBranchConfigurationProperty(
-                            '/SVNDownload/trunk',
-                            TagNameSvnRevisionLink.DEFAULT
-                    )
-            )
-        }
+            // Creates a project and branches
+            Project project = doCreateProject()
+            Branch branch1 = doCreateBranch(project, nd("branch1", ""))
+            Branch trunk = doCreateBranch(project, nd("trunk", ""))
 
-        /**
-         * Downloads the files for two different branches
-         */
+            // Configures the project
+            asUser().with(project, ProjectEdit).call {
+                propertyService.editProperty(
+                        project,
+                        SVNProjectConfigurationPropertyType,
+                        new SVNProjectConfigurationProperty(configuration, '/SVNDownload/trunk')
+                )
+                // ...  & the branches
+                propertyService.editProperty(
+                        branch1,
+                        SVNBranchConfigurationPropertyType,
+                        new SVNBranchConfigurationProperty(
+                                '/SVNDownload/branches/v1',
+                                TagNameSvnRevisionLink.DEFAULT
+                        )
+                )
+                propertyService.editProperty(
+                        trunk,
+                        SVNBranchConfigurationPropertyType,
+                        new SVNBranchConfigurationProperty(
+                                '/SVNDownload/trunk',
+                                TagNameSvnRevisionLink.DEFAULT
+                        )
+                )
+            }
 
-        asUser().with(project, ProjectConfig).call {
-            assert svnService.download(branch1, 'folder/file1').get() == 'Content 1'
-            assert svnService.download(trunk, 'folder/file1').get() == 'Content 2'
+            /**
+             * Downloads the files for two different branches
+             */
+
+            asUser().with(project, ProjectConfig).call {
+                assert svnService.download(branch1, 'folder/file1').get() == 'Content 1'
+                assert svnService.download(trunk, 'folder/file1').get() == 'Content 2'
+            }
         }
 
     }

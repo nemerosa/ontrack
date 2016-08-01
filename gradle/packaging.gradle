@@ -13,6 +13,23 @@
 
 apply plugin: 'base'
 
+// Global Javadoc
+
+apply plugin: 'nebula-aggregate-javadocs'
+
+gradle.projectsEvaluated {
+    aggregateJavadocs {
+        includes = ['net/nemerosa/**']
+    }
+
+    rootProject.tasks.create('javadocPackage', Zip) {
+        classifier = 'javadoc'
+        archiveName = 'ontrack-javadoc.zip'
+        dependsOn aggregateJavadocs
+        from rootProject.file("$rootProject.buildDir/docs/javadoc")
+    }
+}
+
 // ZIP package which contains all artifacts to be published
 
 task publicationPackage(type: Zip) {
@@ -28,6 +45,12 @@ task publicationPackage(type: Zip) {
                 if (tasks.findByName('pomFile')) from pomFile.output
             }
         }
+    }
+}
+
+gradle.projectsEvaluated {
+    publicationPackage {
+        from javadocPackage
     }
 }
 

@@ -37,7 +37,7 @@ class SVNBranchesTemplateSynchronisationSourceTest {
 
     @Test
     void 'Applicable if branch configured for Git'() {
-        when(svnService.getSVNRepository(branch)).thenReturn(Optional.of(SVNTestUtils.repository()))
+        when(svnService.getSVNRepository(branch)).thenReturn(Optional.of(SVNTestUtils.repository('svn://localhost')))
         assert source.isApplicable(branch)
     }
 

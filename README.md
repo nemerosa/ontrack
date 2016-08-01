@@ -3,27 +3,41 @@ ontrack
 
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/nemerosa/ontrack.svg)](http://isitmaintained.com/project/nemerosa/ontrack "Average time to resolve an issue")
 
-Continuous delivery monitoring.
+[Continuous delivery monitoring](https://nemerosa.github.io).
 
-![Ontrack builds](http://nemerosa.github.io/ontrack/images/ontrack-builds.png)
+Store all events which happen in your CI/CD environment: branches, builds,
+validations, promotions, labels, commits. Display this information in
+dashboards. Search for builds based on statuses, issues, commits, etc. Use
+this information as a powerful tool to drive your pipelines into new
+directions!
 
-Track your changes using logs between builds/releases:
+![Ontrack builds](doc/readme/ontrack-builds.png)
 
-![Ontrack Git Commits](http://nemerosa.github.io/ontrack/images/ontrack-git-commits.png)
+Track your changes using
+[logs](https://nemerosa.github.io/ontrack/release/latest/doc/index.html#changelogs)
+between builds/releases:
 
-(Git and Subversion are supported)
+![Ontrack Git Commits](doc/readme/ontrack-git-commits.png)
+
+([Git](https://nemerosa.github.io/ontrack/release/latest/doc/index.html#usage-git)
+and
+[Subversion](https://nemerosa.github.io/ontrack/release/latest/doc/index.html#usage-subversion)
+are supported)
 
 Issue change logs are of course available:
 
-![Ontrack GitHub Changelog](http://nemerosa.github.io/ontrack/images/ontrack-github-changelog.png)
+![Ontrack GitHub Changelog](doc/readme/ontrack-github-changelog.png)
 
-GitHub and JIRA are supported as ticketing systems.
+Ontrack can communicate with many tools:
+[GitHub](https://nemerosa.github.io/ontrack/release/latest/doc/index.html#usage-github),
+[BitBucket](https://nemerosa.github.io/ontrack/release/latest/doc/index.html#usage-bitbucket),
+JIRA, Jenkins, Artifactory.
 
-ontrack can integrate with Jenkins and Artifactory.
+And if this is not enough, you can add your own
+[extensions](https://nemerosa.github.io/ontrack/release/latest/doc/index.html#extending).
 
-Full documentation available in the [Wiki](https://github.com/nemerosa/ontrack/wiki).
+Full documentation available in the
+[Ontrack web site](https://nemerosa.github.io/ontrack/release/latest/doc/index.html) or as
+[PDF](https://nemerosa.github.io/ontrack/release/latest/index.pdf).
 
-Contributions are welcome:
-
-* Using [Git Flow](http://nvie.com/posts/a-successful-git-branching-model/) - fork from the `develop` branch
-* Contribution guidelines available in the [Wiki](https://github.com/nemerosa/ontrack/wiki/Contribute).
+[Contributions](https://nemerosa.github.io/ontrack/release/latest/doc/index.html#contributing) are welcome!

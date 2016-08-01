@@ -62,7 +62,7 @@ class SvnSCMServiceDetectorIT extends AbstractServiceTestSupport {
          * Definition of the repository
          */
 
-        def configuration = SVNTestUtils.repository().configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
 
         /**
          * Saves the configuration
@@ -104,7 +104,7 @@ class SvnSCMServiceDetectorIT extends AbstractServiceTestSupport {
         // Path to the branch
         def path = scmService.get().getSCMPathInfo(branch)
         assert path.present: "The branch has a SCM path info"
-        assert path.get().url == 'svn://localhost/SVNAsSCM/trunk'
+        assert path.get().url == "${repo.url}/SVNAsSCM/trunk" as String
 
     }
 

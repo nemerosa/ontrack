@@ -38,6 +38,10 @@ EXT_DIR="$DATA_DIR/extensions"
 # java options
 SPRINGBOOTAPP_JAVA_OPTIONS="-Dloader.path=$EXT_DIR"
 
+# Additional options
+JAVA_OPTIONS=""
+[ -r /etc/default/ontrack ] && . /etc/default/ontrack
+
 # spring boot options
 SPRINGBOOTAPP_OPTIONS="--logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files"
 
@@ -51,7 +55,7 @@ start() {
     echo -n $"Starting $PROJECT_NAME: "
 
     cd "$DATA_DIR"
-    su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA $SPRINGBOOTAPP_JAVA_OPTIONS -jar \"$SPRINGBOOTAPP_JAR\" $SPRINGBOOTAPP_OPTIONS  >> /dev/null 2>&1 &"
+    su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA $SPRINGBOOTAPP_JAVA_OPTIONS $JAVA_OPTIONS -jar \"$SPRINGBOOTAPP_JAR\" $SPRINGBOOTAPP_OPTIONS  >> /dev/null 2>&1 &"
 
     cnt=10
     while ! { pid_of_spring_boot > /dev/null ; } && [ $cnt -gt 0 ] ; do

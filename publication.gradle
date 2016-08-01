@@ -1,6 +1,6 @@
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
-import net.nemerosa.ontrack.dsl.*
+import net.nemerosa.ontrack.gradle.OntrackChangeLog
 
 /**
  * Release and publication tasks.
@@ -32,8 +32,13 @@ apply plugin: 'io.codearte.nexus-staging'
 
 // Gets the list of modules
 Properties ontrackProperties = new Properties()
-project.file('ontrack.properties').withInputStream { ontrackProperties.load(it) }
-ext.modules = ontrackProperties.getProperty('MODULES').split(',').collect { it.trim() }
+def ontrackPropertyFile = project.file('ontrack.properties')
+if (ontrackPropertyFile.exists()) {
+    ontrackPropertyFile.withInputStream { ontrackProperties.load(it) }
+    ext.modules = ontrackProperties.getProperty('MODULES').split(',').collect { it.trim() }
+} else {
+    ext.modules = []
+}
 println "Modules = ${modules}"
 
 artifacts {
@@ -43,6 +48,8 @@ artifacts {
         archives file: file("publication/${module}-${ontrackVersion}-sources.jar"), name: module, classifier: 'sources'
         archives file: file("publication/${module}-${ontrackVersion}-javadoc.jar"), name: module, classifier: 'javadoc'
     }
+    // Ontrack DSL
+    archives file: file("publication/ontrack-dsl-${ontrackVersion}-shell.jar"), name: 'ontrack-dsl', classifier: 'shell'
 }
 
 signing {
@@ -71,63 +78,6 @@ nexusStaging {
     password = ossrhPassword
     numberOfRetries = 60
     delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
-}
-
-/**
- * Ontrack task definitions
- */
-
-class OntrackChangeLog extends DefaultTask {
-
-    String ontrackProject = 'ontrack'
-    String ontrackUrl = project.properties.ontrackUrl
-    String ontrackUser = project.properties.ontrackUser
-    String ontrackPassword = project.properties.ontrackPassword
-
-    String ontrackReleasePromotionLevel = 'RELEASE'
-    String ontrackReleaseBranch = project.properties.ontrackReleaseBranch
-
-    private String changeLog
-
-    protected Ontrack getOntrackClient() {
-        return OntrackConnection.create(ontrackUrl)
-                .logger({ println "[${name}][Ontrack] ${it}" })
-                .authenticate(ontrackUser, ontrackPassword)
-                .build()
-    }
-
-    @TaskAction
-    void run() {
-        if (!ontrackReleaseBranch) throw new GradleException("Missing ontrackReleaseBranch property")
-        println "[${name}] Getting the Ontrack log for ${ontrackProject} since " +
-                "last ${ontrackReleasePromotionLevel} on branch ${ontrackReleaseBranch}"
-        // Gets the Ontrack client
-        def ontrack = ontrackClient
-        // Gest the Ontrack project
-        def project = ontrack.project(ontrackProject)
-        // Gets the last build on the branch to release
-        println "ontrackReleaseBranch = ${ontrackReleaseBranch}"
-        def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
-        // Gets the last release
-        def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
-        // Gets the change log
-        def changeLog = lastBuild.getChangeLog(lastRelease)
-        // Exports the issues
-        this.changeLog = changeLog.exportIssues(
-                format: 'text',
-                groups: [
-                        'Features'    : ['feature'],
-                        'Enhancements': ['enhancement'],
-                        'Bugs'        : ['bug'],
-                ],
-                exclude: ['design', 'delivery']
-
-        )
-    }
-
-    String getChangeLog() {
-        return changeLog
-    }
 }
 
 /**
@@ -254,6 +204,13 @@ task publicationGitHubReleaseJarUpload(type: GitHubReleaseUpload) {
     file = project.file("publication/ontrack-ui-${ontrackVersion}.jar")
 }
 
+task publicationGitHubReleaseJarShellUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack-dsl-shell.jar'
+    fileType = 'application/zip'
+    file = project.file("publication/ontrack-dsl-${ontrackVersion}-shell.jar")
+}
+
 task publicationGitHubReleasePostgresqlMigrationUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack-postgresql-migration.jar'
@@ -275,11 +232,20 @@ task publicationGitHubReleaseRpmUpload(type: GitHubReleaseUpload) {
     file = project.file("ontrack-${ontrackVersion.replaceAll(/[^0-9\.-_]/, '')}-1.noarch.rpm")
 }
 
+task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack.pdf'
+    fileType = 'application/pdf'
+    file = project.file('publication/pdf/index.pdf')
+}
+
 task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleaseJarUpload
     dependsOn publicationGitHubReleasePostgresqlMigrationUpload
+    dependsOn publicationGitHubReleaseJarShellUpload
     dependsOn publicationGitHubReleaseDebianUpload
     dependsOn publicationGitHubReleaseRpmUpload
+    dependsOn publicationGitHubReleasePdfUpload
 }
 
 task publicationOntrackChangeLog(type: OntrackChangeLog) {

@@ -1,0 +1,17 @@
+Access to <<usage-artifactory,Artifactory>> is done through the configurations:
+
+`def artifactory(String name, String url, String user = '', String password = '')`
+
+The list of Artifactory configurations is accessible:
+
+`List<String> getArtifactory()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   artifactory 'Artifactory', 'http://artifactory'
+}
+assert ontrack.config.artifactory.find { it == 'Artifactory' } != null
+----

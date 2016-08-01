@@ -1,0 +1,12 @@
+Returns an object describing the associated Jenkins build or `null` if none.
+
+The returned object contains the following attributes:
+
+* a `configuration` object, having itself a `name` and a `url` attribute
+* a `name` - path to the job in Jenkins
+* a `url` - absolute URL to the build page
+* a `pathComponents` list of string - same than `path` but as list of separate components
+* a `build` number
+
+IMPORTANT: Even if a link to a Jenkins build is registered, this does not mean that the actual Jenkins build
+           still actually exists.

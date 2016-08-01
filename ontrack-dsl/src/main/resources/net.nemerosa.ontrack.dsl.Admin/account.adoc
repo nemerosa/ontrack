@@ -1,0 +1,13 @@
+This method is used only to create _built-in_ accounts. There is no need to create <<ldap,LDAP-based>> accounts.
+
+The `name`, `fullName` and `email` parameters are required and unique. The password is required only when
+creating a new account, not when updating it.
+
+The list of groups the account must belong to is provided using the names of the groups.
+
+[source,groovy]
+----
+ontrack.admin {
+    account 'test', 'Test user', 'xxx'
+}
+----

@@ -94,9 +94,6 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
     void 'SVN: Search issue on several branches, with anonymous merge'() {
         def testName = 'SVNSearchIssueAnonymousMerge'
 
-        File wd = new File('build/work/SVNSearchMultiBranchIT/SVNSearchIssueAnonymousMerge')
-        FileUtils.forceMkdir(wd)
-
         /**
          * Initialisation
          */
@@ -108,13 +105,13 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
         repo.copy "${testName}/trunk", "${testName}/tags/v1.2.0", 'v1.2.0' // 4
 
         // Feature branch
-        repo.copy "${testName}/trunk", "${testName}/branches/1.2", 'Feature 1' // 5
+        int revision = repo.copy "${testName}/trunk", "${testName}/branches/1.2", 'Feature 1' // 5
         repo.mkdir "${testName}/branches/1.2/3", 'Commit 3 for #1' // 6
         repo.mkdir "${testName}/branches/1.2/4", 'Commit 4 for #1' // 7
         repo.copy "${testName}/branches/1.2", "${testName}/tags/v1.2.1", 'v1.2.1' // 8
 
         // Merge
-        repo.merge wd, "${testName}/branches/1.2", "${testName}/trunk", 'Merge' // 9
+        repo.merge "${testName}/branches/1.2@${revision}", "${testName}/trunk", 'Merge' // 9
 
         // Last commit on trunk
         repo.mkdir "${testName}/trunk/5", 'Commit 5' // 10
@@ -213,7 +210,7 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
          */
 
         def issueServiceIdentifier = MockIssueServiceConfiguration.INSTANCE.toIdentifier().format()
-        def configuration = SVNTestUtils.repository().configuration.withIssueServiceConfigurationIdentifier(issueServiceIdentifier)
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration.withIssueServiceConfigurationIdentifier(issueServiceIdentifier)
         def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
         def repository = SVNRepository.of(
                 repositoryId,

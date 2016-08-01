@@ -1,0 +1,1 @@
+This is the same than the <<dsl-abstractresource-link,`link`>> method, but returns `null` is the link does not exist instead of failing.

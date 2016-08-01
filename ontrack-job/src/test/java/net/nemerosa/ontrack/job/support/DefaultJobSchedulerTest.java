@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job.support;
 
 import com.google.common.collect.ImmutableSet;
+import net.nemerosa.ontrack.common.FutureUtils;
 import net.nemerosa.ontrack.job.*;
 import org.junit.After;
 import org.junit.Before;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -384,6 +386,97 @@ public class DefaultJobSchedulerTest {
         assertEquals(0, job.getCount());
         // ... and it's now gone
         assertFalse(jobScheduler.getJobStatus(job.getKey()).isPresent());
+    }
+
+    @Test
+    public void run_once_job() {
+        // Job to fire once
+        JobKey key = JobCategory.of("once").getType("short").getKey("1");
+        AtomicInteger count = new AtomicInteger();
+        Job job = new Job() {
+            @Override
+            public JobKey getKey() {
+                return key;
+            }
+
+            @Override
+            public JobRun getTask() {
+                return listener -> {
+                    listener.message("Very fast...");
+                    count.incrementAndGet();
+                };
+            }
+
+            @Override
+            public String getDescription() {
+                return "Short";
+            }
+
+            @Override
+            public boolean isDisabled() {
+                return false;
+            }
+        };
+        // Scheduler
+        JobScheduler jobScheduler = createJobScheduler();
+        // Fires once
+        Future<?> future = jobScheduler.runOnce(job);
+        // Waits for its result
+        FutureUtils.wait("Short job", future, 2);
+        // Checks the job is unregistered
+        assertFalse("Job is unregistered", jobScheduler.getJobStatus(key).isPresent());
+        // Checks it has run
+        assertEquals("Job has run", 1, count.get());
+    }
+
+    @Test
+    public void run_once_long_job() {
+        // Job to fire once
+        JobKey key = JobCategory.of("once").getType("long").getKey("1");
+        AtomicInteger count = new AtomicInteger();
+        Job job = new Job() {
+            @Override
+            public JobKey getKey() {
+                return key;
+            }
+
+            @Override
+            public JobRun getTask() {
+                return listener -> {
+                    listener.message("Very long...");
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    count.incrementAndGet();
+                };
+            }
+
+            @Override
+            public String getDescription() {
+                return "Long";
+            }
+
+            @Override
+            public boolean isDisabled() {
+                return false;
+            }
+        };
+        // Scheduler
+        JobScheduler jobScheduler = createJobScheduler();
+        // Fires once
+        Future<?> future = jobScheduler.runOnce(job);
+        // Checks it IS registered
+        Optional<JobStatus> status = jobScheduler.getJobStatus(key);
+        assertTrue("Job is registered", status.isPresent());
+        assertTrue("Job is running", status.get().isRunning());
+        // Waits for its result
+        FutureUtils.wait("Long job", future, 4);
+        // Checks the job is unregistered
+        assertFalse("Job is unregistered", jobScheduler.getJobStatus(key).isPresent());
+        // Checks it has run
+        assertEquals("Job has run", 1, count.get());
     }
 
 }

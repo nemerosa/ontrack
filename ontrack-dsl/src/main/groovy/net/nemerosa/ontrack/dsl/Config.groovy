@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
+
+@DSL(value = "General configuration of Ontrack.")
 class Config {
 
     private final Ontrack ontrack
@@ -8,9 +12,7 @@ class Config {
         this.ontrack = ontrack
     }
 
-    /**
-     * Gets the security settings
-     */
+    @DSLMethod("Checks if the projects are accessible in anonymous mode.")
     boolean getGrantProjectViewToAll() {
         def settings = ontrack.get('settings/general-security')
         return settings.grantProjectViewToAll
@@ -19,6 +21,7 @@ class Config {
     /**
      * Updates security settings
      */
+    @DSLMethod("Sets if the projects are accessible in anonymous mode.")
     def setGrantProjectViewToAll(boolean grantProjectViewToAll) {
         ontrack.put(
                 'settings/general-security',
@@ -32,10 +35,12 @@ class Config {
      * Creates or update a GitHub configuration.
      */
 
+    @DSLMethod(id = "github")
     def gitHub(String name) {
         gitHub([:], name)
     }
 
+    @DSLMethod(see = "github", id = "github-name")
     def gitHub(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -47,6 +52,7 @@ class Config {
     /**
      * Gets the list of all GitHub configuration names
      */
+    @DSLMethod(see = "github")
     List<String> getGitHub() {
         ontrack.get('extension/github/configurations/descriptors').resources.collect { it.id }
     }
@@ -55,6 +61,7 @@ class Config {
      * Stash configurations.
      */
 
+    @DSLMethod("Creates or updates a BitBucket configuration.")
     def stash(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -63,6 +70,7 @@ class Config {
         )
     }
 
+    @DSLMethod(see = "stash")
     List<String> getStash() {
         ontrack.get('extension/stash/configurations/descriptors').resources.collect { it.id }
     }
@@ -70,6 +78,7 @@ class Config {
     /**
      * Creates or update a Git configuration
      */
+    @DSLMethod("Creates or update a Git configuration")
     def git(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -81,10 +90,12 @@ class Config {
     /**
      * Gets the list of all Git configuration names
      */
+    @DSLMethod(see = "git")
     List<String> getGit() {
         ontrack.get('extension/git/configurations/descriptors').resources.collect { it.id }
     }
 
+    @DSLMethod("Creates a or updates a Subversion configuration.")
     def svn(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -93,14 +104,16 @@ class Config {
         )
     }
 
+    @DSLMethod(see = "svn")
     def getSvn() {
-        ontrack.get('extension/svn/configurations/descriptors').resources.collect { it.id }
+        ontrack.get('extension/svn/configurations').resources
     }
 
     /**
      * Jenkins configuration
      */
 
+    @DSLMethod(value = "Creates or updates a Jenkins configuration.", count = 4)
     def jenkins(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/jenkins/configurations/create', [
@@ -111,6 +124,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "jenkins")
     List<String> getJenkins() {
         ontrack.get('extension/jenkins/configurations/descriptors').resources.collect { it.id }
     }
@@ -119,6 +133,7 @@ class Config {
      * JIRA configuration
      */
 
+    @DSLMethod(value = "Creates or updates a JIRA configuration.", count = 4)
     def jira(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/jira/configurations/create', [
@@ -129,6 +144,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "jira")
     List<String> getJira() {
         ontrack.get('extension/jira/configurations/descriptors').resources.collect { it.id }
     }
@@ -137,6 +153,7 @@ class Config {
      * Artifactory configuration
      */
 
+    @DSLMethod(value = "Creates or updates a Artifactory configuration.", count = 4)
     def artifactory(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/artifactory/configurations/create', [
@@ -147,6 +164,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "artifactory")
     List<String> getArtifactory() {
         ontrack.get('extension/artifactory/configurations/descriptors').resources.collect { it.id }
     }
@@ -155,6 +173,7 @@ class Config {
      * Predefined validation stamps
      */
 
+    @DSLMethod("Gets the list of validation stamps. See <<dsl-projectproperties-autoValidationStamp>>.")
     List<PredefinedValidationStamp> getPredefinedValidationStamps() {
         ontrack.get('admin/predefinedValidationStamps').resources.collect {
             new PredefinedValidationStamp(
@@ -164,13 +183,14 @@ class Config {
         }
     }
 
+    @DSLMethod(value = "See <<dsl-projectproperties-autoValidationStamp>>.", count = 3)
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false) {
-        def node = predefinedValidationStamps.find { it.name == name }
-        if (node) {
+        def vs = predefinedValidationStamps.find { it.name == name }
+        if (vs) {
             if (getIfExists) {
                 new PredefinedValidationStamp(
                         ontrack,
-                        ontrack.get(node._self)
+                        ontrack.get(vs.link('self'))
                 )
             } else {
                 throw new ObjectAlreadyExistsException("Predefined validation stamp ${name} already exists.")
@@ -186,6 +206,7 @@ class Config {
         }
     }
 
+    @DSLMethod(value = "See <<dsl-projectproperties-autoValidationStamp>>.", count = 4, id = "predefinedValidationStamp-config")
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def vs = predefinedValidationStamp(name, description, getIfExists)
         vs(closure)
@@ -196,6 +217,7 @@ class Config {
      * Predefined promotion levels
      */
 
+    @DSLMethod("Gets the list of promotion levels. See <<dsl-projectproperties-autoPromotionLevel>>.")
     List<PredefinedPromotionLevel> getPredefinedPromotionLevels() {
         ontrack.get('admin/predefinedPromotionLevels').resources.collect {
             new PredefinedPromotionLevel(
@@ -205,13 +227,14 @@ class Config {
         }
     }
 
+    @DSLMethod(value = "See <<dsl-projectproperties-autoPromotionLevel>>.", count = 3)
     PredefinedPromotionLevel predefinedPromotionLevel(String name, String description = '', boolean getIfExists = false) {
-        def node = predefinedPromotionLevels.find { it.name == name }
-        if (node) {
+        def pl = predefinedPromotionLevels.find { it.name == name }
+        if (pl) {
             if (getIfExists) {
                 new PredefinedPromotionLevel(
                         ontrack,
-                        ontrack.get(node._self)
+                        ontrack.get(pl.link('self'))
                 )
             } else {
                 throw new ObjectAlreadyExistsException("Predefined promotion level ${name} already exists.")
@@ -227,9 +250,25 @@ class Config {
         }
     }
 
+    @DSLMethod(value = "See <<dsl-projectproperties-autoPromotionLevel>>.", count = 4, id = "predefinedPromotionLevel-config")
     PredefinedPromotionLevel predefinedPromotionLevel(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def vs = predefinedPromotionLevel(name, description, getIfExists)
         vs(closure)
         vs
+    }
+
+    /**
+     * LDAP settings
+     */
+
+    @DSLMethod("Gets the global LDAP settings")
+    LDAPSettings getLdapSettings() {
+        def json = ontrack.get('settings/ldap').data
+        return new LDAPSettings(json as Map)
+    }
+
+    @DSLMethod("Sets the global LDAP settings")
+    def setLdapSettings(LDAPSettings settings) {
+        ontrack.put('settings/ldap', settings)
     }
 }

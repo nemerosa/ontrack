@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
+
+@DSL
 class PredefinedPromotionLevel extends AbstractResource {
 
     PredefinedPromotionLevel(Ontrack ontrack, Object node) {
@@ -24,6 +28,7 @@ class PredefinedPromotionLevel extends AbstractResource {
         closure()
     }
 
+    @DSLMethod("Sets the image for this validation stamp (must be a PNG file). See <<dsl-usecases-images>>.")
     def image(Object o) {
         image(o, 'image/png')
     }
@@ -32,6 +37,7 @@ class PredefinedPromotionLevel extends AbstractResource {
         ontrack.upload(link('image'), 'file', o, contentType)
     }
 
+    @DSLMethod("Downloads the image for the promotion level. See <<dsl-usecases-images>>.")
     Document getImage() {
         ontrack.download(link('image'))
     }

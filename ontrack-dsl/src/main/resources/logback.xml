@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Defaults from Spring -->
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+    <!-- Console logging: default -->
+
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <!-- Root level -->
+
+    <root level="WARN">
+        <appender-ref ref="CONSOLE" />
+        <!--<appender-ref ref="FILE" />-->
+    </root>
+
+    <!-- Custom loggers -->
+
+    <!--<logger name="org.springframework" level="WARN"/>-->
+    <!--<logger name="net.nemerosa.ontrack" level="DEBUG"/>-->
+
+</configuration>

@@ -1,21 +1,30 @@
 package net.nemerosa.ontrack.dsl
 
+import groovy.json.JsonOutput
 import org.kohsuke.args4j.CmdLineException
 import org.kohsuke.args4j.CmdLineParser
 
 class Shell {
 
     private final PrintWriter output
+    private final OntrackLogger logger
+    private final boolean cmdLine
 
-    Shell(PrintWriter output) {
+    Shell(PrintWriter output, boolean cmdLine = false, OntrackLogger logger = null) {
         this.output = output
+        this.cmdLine = cmdLine
+        this.logger = logger
     }
 
-    Shell() {
-        this(new PrintWriter(System.out))
+    Shell(boolean cmdLine = false, OntrackLogger logger = null) {
+        this(new PrintWriter(System.out), cmdLine, logger)
     }
 
-    Shell withOutput(Writer writer) {
+    static Shell forCmdLine(OntrackLogger logger = null) {
+        new Shell(true, logger)
+    }
+
+    static Shell withOutput(Writer writer) {
         new Shell(new PrintWriter(writer))
     }
 
@@ -26,9 +35,35 @@ class Shell {
     def call(List<String> args) {
         // Parsing of options
         def options = new ShellOptions()
-        new CmdLineParser(options).parseArgument(args)
-        // Call
-        call options
+        def parser = new CmdLineParser(options)
+        // Help?
+        if (cmdLine && (args.contains("--help") || args.contains("-h"))) {
+            parser.printUsage(System.out)
+        } else {
+            // Parsing
+            try {
+                parser.parseArgument(args)
+            } catch (CmdLineException ex) {
+                if (cmdLine) {
+                    System.err.println ex.message
+                    parser.printUsage(System.out)
+                    System.exit(-1)
+                } else {
+                    throw ex
+                }
+            }
+            // Call
+            try {
+                call options
+            } catch (DSLException ex) {
+                if (cmdLine) {
+                    System.err.println ex.message
+                    System.exit(1)
+                } else {
+                    throw ex
+                }
+            }
+        }
     }
 
     def call(ShellOptions options) {
@@ -38,32 +73,52 @@ class Shell {
         if (options.user) {
             connection = connection.authenticate(options.user, options.password)
         }
+        if (logger) {
+            connection = connection.logger(logger)
+        }
         def ontrack = connection.build()
 
         // Creates the local shell connector
         def local = new ShellConnector()
 
         // Reads the script
-        def script = new File(options.path).text
+        def script = readScript(options)
 
         // Parsing of values
-        def params = options.values.collectEntries { token ->
-            List<String> tokens = token.split(/=/).collect { it.trim() }
-            if (tokens.size() != 2) {
-                throw new CmdLineException("Wrong value: ${token}")
-            } else {
-                return [tokens[0], tokens[1]]
+        def params = options.values
+
+        // Values in file
+        if (options.valueFile) {
+            Properties properties = new Properties()
+            options.valueFile.withInputStream {
+                properties.load(it)
             }
+            params.putAll(properties as Map)
         }
 
         // Runs the shell
-        run ontrack, local, script, params
+        def result = run(ontrack, local, script, params)
 
         // Output values
-        local.values.each { k, v ->
-            output.format('%s=%s%n', k, v)
+        if (options.discardResult) {
+            local.values.each { k, v ->
+                output.format('%s=%s%n', k, v)
+            }
+            output.flush()
+        } else {
+            // Output of result
+            def json = JsonOutput.prettyPrint(JsonOutput.toJson(result))
+            output.println(json)
+            output.flush()
         }
+    }
 
+    public static String readScript(ShellOptions options) {
+        if (options.path == '-') {
+            return System.in.text
+        } else {
+            return new File(options.path).text
+        }
     }
 
     static def run(Ontrack ontrack, ShellConnector connector, String script, Map<String, String> params) {
@@ -81,12 +136,8 @@ class Shell {
         gshell.evaluate(script)
     }
 
-    static Shell create() {
-        new Shell()
-    }
-
     static void main(String... args) {
-        create()(args)
+        forCmdLine()(args)
     }
 
 }

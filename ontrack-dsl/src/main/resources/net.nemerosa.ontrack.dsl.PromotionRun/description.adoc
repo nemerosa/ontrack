@@ -1,0 +1,16 @@
+You can get a promotion run by promoting a build:
+
+[source,groovy]
+----
+def run = ontrack.build('project', 'branch', '1').promote('BRONZE')
+assert run.promotionLevel.name == 'BRONZE'
+----
+
+or by getting the list of promotion runs for a build:
+
+[source,groovy]
+----
+def runs = ontrack.build('project', 'branch', '1').promotionRuns
+assert runs.size() == 1
+assert runs[0].promotionLevel.name == 'BRONZE'
+----

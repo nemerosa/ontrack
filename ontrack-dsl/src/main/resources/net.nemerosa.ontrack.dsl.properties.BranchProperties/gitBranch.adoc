@@ -1,0 +1,84 @@
+Defines the <<usage-git,Git properties>> for an Ontrack branch. `branch` is the name of the Git branch. Possible
+parameters are:
+
+* `buildCommitLink.id` & `buildCommitLink.data` are the definition of the link between the Ontrack builds and the Git
+  commits. See the samples below.
+* `override` - `true` or `false` - defines if the synchronisation overrides or not the existing builds (defaults
+  to `false`)
+* `buildTagInterval` - interval in minutes between each synchronisation between the builds and Git branch. `0` (default)
+  to disable. Note that not all build commit links allow for synchronisation
+
+Examples:
+
+* for a branch whose build names are long commits (the default):
+
+[source,groovy]
+----
+ontrack.branch('project') {
+   branch('1.0') {
+      config {
+         gitBranch 'release/1.0'
+      }
+   }
+}
+----
+
+* for a branch whose build names are short commits:
+
+[source,groovy]
+----
+ontrack.branch('project') {
+   branch('1.0') {
+      config {
+         gitBranch 'release/1.0', [
+            buildCommitLink: [
+               id: 'commit',
+               data: [
+                  abbreviated: true
+               ]
+            ]
+         ]
+      }
+   }
+}
+----
+
+* for a branch whose build names are associated to Git tags following a given pattern
+
+[source,groovy]
+----
+ontrack.branch('project') {
+   branch('1.0') {
+      config {
+         gitBranch 'release/1.0', [
+            buildCommitLink: [
+               id: 'tagPattern',
+               data: [
+                  pattern: '1.0.*'
+               ]
+            ]
+         ]
+      }
+   }
+}
+----
+
+* for a branch whose build are associated to Git commits using a Git property:
+
+[source,groovy]
+----
+ontrack.branch('project') {
+   branch('1.0') {
+      config {
+         gitBranch 'release/1.0', [
+            buildCommitLink: [
+               id: 'git-commit-property'
+            ]
+         ]
+      }
+   }
+}
+----
+
+TIP: The builds of this branch can be associated with a Git commit using the
+<<dsl-buildProperties-gitCommit,`build.config.gitCommit`>> method.

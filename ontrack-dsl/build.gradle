@@ -1,5 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE")
+    }
+}
+
 description = "DSL for Ontrack."
 
+apply plugin: 'spring-boot'
 apply plugin: 'groovy'
 
 tasks.withType(AbstractCompile) {
@@ -10,12 +20,28 @@ tasks.withType(AbstractCompile) {
 dependencies {
     compile libraries.groovy
     compile libraries.args4j
-    compile libraries.slf4j_api
-    compile libraries.http_client
-    compile libraries.http_mime
+    compile 'org.slf4j:slf4j-api'
+    compile 'org.apache.httpcomponents:httpclient'
+    compile 'org.apache.httpcomponents:httpmime'
+    compile 'org.springframework.boot:spring-boot-starter'
 }
 
 javadocJar {
     from javadoc
     from groovydoc
+}
+
+bootRepackage {
+    classifier = 'shell'
+    executable = true
+}
+
+springBoot {
+    mainClass = 'net.nemerosa.ontrack.dsl.ShellApplication'
+}
+
+afterEvaluate { prj ->
+    rootProject.tasks.publicationPackage {
+        from prj.bootRepackage
+    }
 }

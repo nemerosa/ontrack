@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.it;
 import net.nemerosa.ontrack.common.RunProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.autoconfigure.HealthIndicatorAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.MetricsDropwizardAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,8 @@ import java.io.IOException;
 @EnableTransactionManagement
 @Import({
         MetricRepositoryAutoConfiguration.class,
-        MetricsDropwizardAutoConfiguration.class
+        MetricsDropwizardAutoConfiguration.class,
+        HealthIndicatorAutoConfiguration.class
 })
 public class ITConfig {
 

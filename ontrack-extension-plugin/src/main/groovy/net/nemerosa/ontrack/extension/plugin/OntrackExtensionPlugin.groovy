@@ -44,6 +44,10 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         project.dependencies {
             compile "net.nemerosa.ontrack:ontrack-extension-support:${ontrackVersion}"
 
+            testCompile "net.nemerosa.ontrack:ontrack-it-utils:${ontrackVersion}"
+            testRuntime "net.nemerosa.ontrack:ontrack-service:${ontrackVersion}"
+            testRuntime "net.nemerosa.ontrack:ontrack-repository-impl:${ontrackVersion}"
+
             ontrack "net.nemerosa.ontrack:ontrack-ui:${ontrackVersion}"
         }
 

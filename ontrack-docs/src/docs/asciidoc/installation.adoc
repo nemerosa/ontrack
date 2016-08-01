@@ -1,0 +1,457 @@
+[[installation]]
+== Installation
+
+There are several ways to install Ontrack.
+
+[[installation-prerequisites]]
+=== Prerequisites
+
+Ontrack has been tested on different Linux variants (Ubuntu, Debian, CentOS)
+and should also work on Windows.
+
+Ontrack relies on at least a JDK 8 build 25. More recent versions of the JDK8
+are OK. However, no test has been done yet using early JDK 9 versions.
+
+Ontrack runs fine with 512 Mb of memory. However, think of upgrading to 2 Gb of
+memory if you intend to host a lot of projects. See the different installation
+modes (Docker, RPM, etc.) to know how to setup the memory settings.
+
+Ontrack stores its data in a local H2 database. This one can grow up to 500 Mb
+for big volumes (hundreds of projects).
+
+[[installation-docker]]
+=== Installing using Docker
+
+Ontrack is distributed as a Docker image on the https://hub.docker.com[Docker Hub], as `nemerosa/ontrack:{ontrack-version}`.
+
+[[installation-docker-overview]]
+==== Overview
+
+The Ontrack image exposes the ports `443` and `8080`.
+
+Two volumes are defined:
+
+* `/var/ontrack/data` - contains the data for Ontrack (files & database) but also the log files. This is typically provided through a data volume container.
+* `/var/ontrack/conf` - contains the configuration files for Ontrack (see later).
+
+[[installation-docker-basic]]
+==== Basic deployment
+
+You can start Ontrack as a container and a shared database and configuration on the host using:
+
+[source,bash]
+----
+docker run --detach \
+   --publish=8080:8080 \
+   --volume=/var/ontrack/data:/var/ontrack/data \
+   --volume=/var/ontrack/conf:/var/ontrack/conf \
+   nemerosa/ontrack
+----
+
+The <<configuration,configuration files>> for Ontrack can be put on the host in
+`/var/ontrack/conf` and the database and working files will be available
+in `/var/ontrack/data`. The application will be available on port `8080` of
+the host.
+
+Java options, like memory settings, can be passed to the Docker container using
+the `JAVA_OPTIONS` environment variable:
+
+[source,bash]
+----
+docker run \
+   ...
+   --env "JAVA_OPTIONS=-Xmx2048m" \
+   ...
+----
+
+[[installation-docker-compose]]
+==== Using compose to deploy Ontrack using HTTPS and Grafana/InfluxDB for metrics
+
+You can use http://docs.docker.com/compose[Docker Compose] to deploy Ontrack
+running on HTTPS and having its metrics exported to
+<<monitoring, InfluxDB>>, and exposed through a Grafana dashboard.
+
+Gets the source code from https://github.com/nemerosa/ontrack/tree/master/gradle/compose[GitHub].
+
+[[installation-docker-compose-preparation]]
+===== Preparation
+
+In the `prod/ontrack` folder, put two files:
+
+* an `application-prod.yml` file:
+
+[source,yaml]
+----
+# Production environment
+server:
+  ssl:
+     key-alias: server
+     key-store: "config/ontrack_your_domain.jks"
+     key-store-password: "your store password"
+----
+
+* a `ontrack_your_domain.jks` file which contains the SSL certificate for your
+web site serving Ontrack. See this
+https://nemerosa.ghost.io/2015/07/25/enabling-ssl-with-spring-boot-going-real[blog entry]
+to know how to create it.
+
+WARNING: Never store those two files in a SCM
+
+[[installation-docker-compose-host]]
+===== Docker host configuration
+
+Prepare the Docker host to have its Ontrack configuration. If you are using the
+http://docs.docker.com/machine[Docker Machine] `ontrack-production`:
+
+[source,bash]
+----
+docker-machine ssh ontrack-production rm -rf /var/ontrack/conf
+docker-machine scp -r \
+   prod/ontrack \
+   ontrack-production:/var/ontrack/conf
+----
+
+This copies the content of the `prod/ontrack` folder (three files:
+`application.yml`, `application-prod.yml` and the `.jks` file) into the
+`/var/ontrack/conf` directory of the Docker host.
+
+[[installation-docker-compose-launching]]
+===== Launching the composition
+
+When done, you just have to run Docker Compose:
+
+[source,bash]
+----
+ONTRACK_VERSION=2.16.7 docker-compose \
+    -f docker-compose.yml -f docker-compose-prod.yml \
+    --project-name prod \
+    --forceRecreate
+----
+
+This will install:
+
+* the versison `2.16.7` of Ontrack in a container
+* a Grafana container
+* an InfluxDB container
+
+The Ontrack container is configured to send its metrics to the InfluxDB
+container, and the Grafana application is configured to access
+the same InfluxDB database.
+
+Ontrack is accessible using `https`, using the default `443` port.
+
+Grafana is accessible on port `3000` and the default `admin` password
+is `admin` and should be changed immediately.
+
+[[installation-rpm]]
+=== RPM installation
+
+You can install Ontrack using a RPM file you can download from the
+https://github.com/nemerosa/ontrack/releases[releases] page.
+
+The RPM is continuously tested on CentOS 6.7 and CentOS 7.1.
+
+To install Ontrack:
+
+[source,bash]
+----
+rpm -i ontrack.rpm
+----
+
+The following directories are created:
+
+|===
+| Directory | Description
+
+| `/opt/ontrack` | Binaries and scripts
+| `/usr/lib/ontrack` | Working and <<configuration,configuration>> directory
+| `/var/log/ontrack` | Logging directory
+|===
+
+You can optionally create an `application.yml` configuration file in
+`/usr/lib/ontrack`. For example, to customise the port Ontrack is running on:
+
+[source,yaml]
+----
+server:
+  port: 9080
+----
+
+Ontrack is installed as a service using `/etc/init.d/ontrack`.
+
+[source,bash]
+----
+# Starting Ontrack
+service ontrack start
+# Status of Ontrack
+service ontrack status
+# Stopping Ontrack
+service ontrack stop
+----
+
+To upgrade Ontrack:
+
+[source,bash]
+----
+# Stopping Ontrack
+sudo service ontrack stop
+# Updating
+sudo rpm --upgrade ontrack.rpm
+# Starting Ontrack
+sudo service ontrack start
+----
+
+The optional `/etc/default/ontrack` file can be used to define the
+`JAVA_OPTIONS`, for example:
+
+[source]
+./etc/default/ontrack
+----
+JAVA_OPTIONS=-Xmx2048m
+----
+
+[[installation-debian]]
+=== Debian installation
+
+You can install Ontrack using a Debian file (`.deb`) you can download from the
+https://github.com/nemerosa/ontrack/releases[releases] page.
+
+To install Ontrack:
+
+[source,bash]
+----
+dpkg -i ontrack.deb
+----
+
+The following directories are created:
+
+|===
+| Directory | Description
+
+| `/opt/ontrack` | Binaries and scripts
+| `/usr/lib/ontrack` | Working and <<configuration,configuration>> directory
+| `/var/log/ontrack` | Logging directory
+|===
+
+Ontrack is installed as a service using `/etc/init.d/ontrack`.
+
+[source,bash]
+----
+# Starting Ontrack
+service ontrack start
+# Status of Ontrack
+service ontrack status
+# Stopping Ontrack
+service ontrack stop
+----
+
+The optional `/etc/default/ontrack` file can be used to define the
+`JAVA_OPTIONS`, for example:
+
+[source]
+./etc/default/ontrack
+----
+JAVA_OPTIONS=-Xmx2048m
+----
+
+[[installation-digitalocean]]
+=== Installing at DigitalOcean
+
+Ontrack has scripts which allow an easy installation on
+https://www.digitalocean.com[DigitalOcean].
+
+Ontrack itself is deployed there, as a
+https://ontrack.nemerosa.net[demonstration installation]. Its deployment is
+part of the the continuous delivery pipeline of Ontrack itself.
+
+NOTE: All the examples below are applicable for
+      https://ontrack.nemerosa.net[Ontrack @ Ontrack] and must be adapted for
+      your own situation.
+
+[[installation-digitalocean-preparation]]
+==== Preparation (only once)
+
+Clone the latest version of Ontrack and switch to the version you want to
+install:
+
+   git checkout {ontrack-version}
+
+The https://docs.docker.com/machine/[Docker Machine] must be installed.
+
+Edit the `~/.gradle/gradle.properties` file and add the following information:
+
+[source,bash]
+----
+# Your DigitalOcean token
+digitalOceanAccessToken = xxx
+# Name of the Docker Machine to create locally
+# It will also be used as the droplet name
+productionMachine = ontrack
+# Digital Ocean region where to create the droplet
+productionRegion = fra1
+# Relative location (can be absolute) of the production
+# configuration files
+productionConf = gradle/env/prod
+# Final URL of the production server
+# Used for acceptance testing only
+productionUrl = https://ontrack.nemerosa.net
+----
+
+Create the DigitalOcean droplet:
+
+[source,bash]
+----
+./gradlew -b production.gradle productionSetup
+----
+
+This creates an `ontrack` Docker Machine. An IP will be assigned to it, and
+this is the moment to configure your DNS and/or floating IP if you have a
+domain to assign to it.
+
+HINT: You can copy the `~/.docker/machine/machines/ontrack` Docker Machine
+      configuration to another host.
+
+Make sure the local `gradle/env/prod` directory (configured as `productionConf`)
+contains the following files:
+
+* `ontrack_nemerosa_net.jks` - the Java keystore containing the certificate for the `ontrack.nemerosa.net` name
+* `application-prod.yml` with SSH configuration:
+
+[source,yaml]
+----
+server:
+  ssl:
+    key-alias: server
+    key-store: "config/ontrack_nemerosa_net.jks"
+    key-store-password: "xxx"
+----
+
+NOTE: This must of course be adapted to your own environment!
+
+Configure the environment of the production server:
+
+[source,bash]
+----
+./gradlew -b production.gradle  productionEnv
+----
+
+This will upload the production configuration files onto the droplet.
+
+[[installation-digitalocean-backup]]
+==== Backing up the data (if applicable)
+
+[source,bash]
+----
+./gradlew -b production.gradle productionBackup
+----
+
+This will create a `backup-<version>.tgz` file in the `build` directory.
+
+[[installation-digitalocean-restoring]]
+==== Restoring data (if needed)
+
+Restore the data using an existing `backup.tgz` file:
+
+[source,bash]
+----
+./gradlew -b production.gradle productionRestore -Pbackup=<path/to/backup.tgz>
+----
+
+[[installation-digitalocean-installing]]
+==== Installing Ontrack
+
+Starts a new version of Ontrack:
+
+[source,bash]
+----
+./gradlew -b production.gradle productionUpgrade -PontrackVersion=2.13.7
+----
+
+[[installation-digitalocean-tests]]
+==== Running tests
+
+In order to validate the installation, you should run:
+
+[source,bash]
+----
+./gradlew -b production.gradle productionTest
+----
+
+This command relies on the `productionUrl` parameter being correctly configured.
+
+[[installation-digitalocean-logs]]
+==== Accessing the logs
+
+Logs can be accessed using Docker commands. If `ontrack` is the name of the
+Docker Machine, then:
+
+[source,bash]
+----
+# Displays the log in real time
+docker logs -f `docker-machine config ontrack` ontrack
+# Downloads the log in a ontrack.log file
+docker logs `docker-machine config ontrack` ontrack > ontrack.log
+----
+
+[[installation-dockercloud]]
+=== Installing on Docker Cloud
+
+[[installation-sa]]
+=== Standalone installation
+
+Ontrack can be downloaded as a JAR and started as a Spring Boot application.
+
+Download the JAR from the
+https://github.com/nemerosa/ontrack/releases[Ontrack release page]
+
+Start it using `java -jar ontrack.jar` with the following options:
+
+* `--spring.datasource.url=jdbc:h2:/var/ontrack/data/database/data`
+* or `--spring.datasource.url=jdbc:h2:./database/data`
+* and any other Java option, like memory settings: `-Xmx2048m`
+* or <<configuration,configuration parameter>> like `--server.port=9999`
+
+to specify the location of the H2 database files.
+
+<<configuration,Options>> can also be specified in an `application.yml` file in
+the working directory.
+
+For example:
+
+[source,yaml]
+.application.yml
+----
+spring:
+   datasource:
+      url: "jdbc:h2:/var/ontrack/data/database/data"
+----
+
+[[configuration]]
+=== Configuration
+
+As a regular http://projects.spring.io/spring-boot/[Spring Boot application],
+Ontrack can be configured using system properties and/or property files and/or
+YAML files. See the
+http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-properties-and-configuration[Spring Boot documentation]
+for more details.
+
+NOTE: The way to provide a YAML `application.yml` configuration file or
+command line arguments will vary
+according to the installation (Docker, RPM, etc.). See the corresponding
+section above for more details.
+
+For example, to setup the port Ontrack is running on, you can use the
+`server.port` property. Using a YAML file:
+
+[source,yaml]
+.application.yml
+----
+server.port=9999
+----
+
+or the command line option:
+
+[source,bash]
+----
+--server.port=9999
+----

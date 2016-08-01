@@ -1,0 +1,6 @@
+If the branch already exists, the `getIfExists` parameter is used:
+
+* if `false` (default), an error is thrown
+* if `true`, the existing branch is returned
+
+If the branch does not exist, it is created.

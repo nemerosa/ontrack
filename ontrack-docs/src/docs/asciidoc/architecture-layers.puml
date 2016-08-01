@@ -1,0 +1,14 @@
+@startuml
+participant Client
+participant UI
+participant Service
+participant Repository
+database Database
+boundary Resources
+
+Client -> UI: REST
+UI -> Service
+Service -> Repository
+Repository -> Database
+Service -> Resources
+@enduml

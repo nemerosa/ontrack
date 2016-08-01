@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
@@ -12,6 +14,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import net.nemerosa.ontrack.tx.Transaction;
@@ -33,13 +36,15 @@ public class SVNConfigurationServiceImpl extends AbstractConfigurationService<SV
     private final SVNRepositoryDao repositoryDao;
     private final TransactionService transactionService;
     private final SVNClient svnClient;
+    private final IssueServiceRegistry issueServiceRegistry;
 
     @Autowired
-    public SVNConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, SVNRepositoryDao repositoryDao, EventPostService eventPostService, EventFactory eventFactory, OntrackConfigProperties ontrackConfigProperties, TransactionService transactionService, SVNClient svnClient) {
+    public SVNConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, SVNRepositoryDao repositoryDao, EventPostService eventPostService, EventFactory eventFactory, OntrackConfigProperties ontrackConfigProperties, TransactionService transactionService, SVNClient svnClient, IssueServiceRegistry issueServiceRegistry) {
         super(SVNConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory, ontrackConfigProperties);
         this.repositoryDao = repositoryDao;
         this.transactionService = transactionService;
         this.svnClient = svnClient;
+        this.issueServiceRegistry = issueServiceRegistry;
     }
 
     @Override
@@ -48,6 +53,25 @@ public class SVNConfigurationServiceImpl extends AbstractConfigurationService<SV
         Integer id = repositoryDao.findByName(name);
         if (id != null) {
             repositoryDao.delete(id);
+        }
+    }
+
+    @Override
+    protected void validateAndCheck(SVNConfiguration configuration) {
+        super.validateAndCheck(configuration);
+        // Checks the issue service identifier
+        String issueServiceConfigurationIdentifier = configuration.getIssueServiceConfigurationIdentifier();
+        if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
+            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
+            if (configuredIssueService == null || configuredIssueService.getIssueServiceConfiguration() == null) {
+                throw new ConfigurationValidationException(
+                        configuration,
+                        String.format(
+                                "Issue service configuration cannot be validated: %s",
+                                issueServiceConfigurationIdentifier
+                        )
+                );
+            }
         }
     }
 
@@ -61,7 +85,7 @@ public class SVNConfigurationServiceImpl extends AbstractConfigurationService<SV
                     url
             );
         }
-        try (Transaction tx = transactionService.start()) {
+        try (Transaction ignored = transactionService.start()) {
             // Creates a repository
             SVNRepository repository = SVNRepository.of(
                     0,

@@ -1,0 +1,14 @@
+<<branches-stale,Stale branches>> can be automatically disabled or even deleted.
+
+To enable this property on a project:
+
+[source,groovy]
+----
+ontrack.project('project').config {
+   stale 15, 30
+}
+
+property = ontrack.project('project').config.stale
+assert property.disablingDuration == 15
+assert property.deletingDuration == 30
+----

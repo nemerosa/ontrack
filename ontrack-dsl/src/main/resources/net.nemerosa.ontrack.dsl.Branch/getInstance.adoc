@@ -1,0 +1,18 @@
+If the branch is a <<templates,template instance>>, returns a `TemplateInstance` object which contains the list of
+this instance parameters as a `Map` in the `parameters` property. Otherwise returns `null`.
+
+[source,groovy
+----
+ontrack.project('project') {
+   branch('template') {
+       template {
+           parameter 'paramName', 'A parameter'
+       }
+   }
+}
+ontrack.branch(project, 'template').instance 'TEST', [
+       paramName: 'paramValue'
+]
+def instance = ontrack.branch(project, 'TEST').instance
+assert instance.parameters == [paramName: 'paramValue']
+----
