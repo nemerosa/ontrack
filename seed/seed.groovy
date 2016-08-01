@@ -422,6 +422,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
 ./gradlew \\
     doAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PontrackVersion=${VERSION} \\
     -PdigitalOceanAccessToken=${DO_TOKEN} \\
     --info \\
     --profile \\
