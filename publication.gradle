@@ -229,7 +229,7 @@ task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.pdf'
     fileType = 'application/pdf'
-    file = project.file('pdf/index.pdf')
+    file = project.file('publication/pdf/index.pdf')
 }
 
 task publicationGitHubReleaseUpload {

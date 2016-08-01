@@ -44,10 +44,6 @@ task publicationPackage(type: Zip) {
                 if (tasks.findByName('sourceJar')) from sourceJar
                 if (tasks.findByName('pomFile')) from pomFile.output
             }
-            if (tasks.findByName('asciidoctor')) {
-                dependsOn asciidoctor
-                from asciidoctor.outputDir
-            }
         }
     }
 }
