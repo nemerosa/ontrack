@@ -318,6 +318,18 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             // Link based on full version
             stringParam('VERSION', '', '')
         }
+        scm {
+            git {
+                remote {
+                    url PROJECT_SCM_URL
+                    branch '${COMMIT}'
+                }
+                extensions {
+                    wipeOutWorkspace()
+                    localBranch "${BRANCH}"
+                }
+            }
+        }
         inDocker delegate
         extractDeliveryArtifacts delegate, 'ontrack-acceptance'
         steps {
@@ -353,6 +365,18 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             parameters {
                 // Link based on full version
                 stringParam('VERSION', '', '')
+            }
+            scm {
+                git {
+                    remote {
+                        url PROJECT_SCM_URL
+                        branch '${COMMIT}'
+                    }
+                    extensions {
+                        wipeOutWorkspace()
+                        localBranch "${BRANCH}"
+                    }
+                }
             }
             inDocker delegate
             extractDeliveryArtifacts delegate, 'ontrack-acceptance'
@@ -428,6 +452,18 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         // Link based on full version
         stringParam('VERSION', '', '')
     }
+    scm {
+        git {
+            remote {
+                url PROJECT_SCM_URL
+                branch '${COMMIT}'
+            }
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
+        }
+    }
     inDocker delegate
     wrappers {
         injectPasswords()
@@ -468,8 +504,20 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Publish')
-    jdk 'JDK8u25'
-    label 'master'
+    label 'docker'
+    scm {
+        git {
+            remote {
+                url PROJECT_SCM_URL
+                branch '${COMMIT}'
+            }
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
+        }
+    }
+    inDocker delegate
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -560,8 +608,20 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Site')
-    jdk 'JDK8u25'
-    label 'master'
+    label 'docker'
+    scm {
+        git {
+            remote {
+                url PROJECT_SCM_URL
+                branch '${COMMIT}'
+            }
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
+        }
+    }
+    inDocker delegate
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -603,8 +663,20 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        jdk 'JDK8u25'
-        label 'master'
+        label 'docker'
+        scm {
+            git {
+                remote {
+                    url PROJECT_SCM_URL
+                    branch '${COMMIT}'
+                }
+                extensions {
+                    wipeOutWorkspace()
+                    localBranch "${BRANCH}"
+                }
+            }
+        }
+        inDocker delegate
         parameters {
             // Link on version
             stringParam('VERSION', '', '')
@@ -648,8 +720,20 @@ productionUpgrade
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production acceptance')
-        jdk 'JDK8u25'
-        label 'master'
+        label 'docker'
+        scm {
+            git {
+                remote {
+                    url PROJECT_SCM_URL
+                    branch '${COMMIT}'
+                }
+                extensions {
+                    wipeOutWorkspace()
+                    localBranch "${BRANCH}"
+                }
+            }
+        }
+        inDocker delegate
         parameters {
             // Link on version
             stringParam('VERSION', '', '')
@@ -699,7 +783,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         numToKeep(40)
         artifactNumToKeep(1)
     }
-    jdk 'JDK8u25'
     label 'master'
     wrappers {
         injectPasswords()
