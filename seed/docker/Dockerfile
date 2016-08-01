@@ -20,6 +20,10 @@ RUN chmod +x /usr/bin/docker
 RUN curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
 RUN chmod +x /usr/bin/docker-compose
 
+# Installs Docker Machine
+RUN curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` > /usr/local/bin/docker-machine
+RUN chmod +x /usr/bin/docker-machine
+
 # Git configuration
 RUN git config --global user.email "jenkins@nemerosa.net" \
     && git config --global user.name "Jenkins"
