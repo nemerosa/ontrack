@@ -124,6 +124,30 @@ def inDocker (def job) {
     }
 }
 
+def preparePipelineJob(def job) {
+    job.parameters {
+        // Link based on full version
+        stringParam('VERSION', '', '')
+        // ... and Git commit
+        stringParam('COMMIT', '', '')
+    }
+    job.label 'docker'
+    job.scm {
+        git {
+            remote {
+                url PROJECT_SCM_URL
+                branch '${COMMIT}'
+            }
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
+        }
+    }
+    inDocker job
+    extractDeliveryArtifacts job, 'ontrack-acceptance'
+}
+
 // CentOS versions to tests
 List<String> centOsVersions = [
         '7',
@@ -219,27 +243,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Commit', 'Local acceptance')
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-        // ... and Git commit
-        stringParam('COMMIT', '', '')
-    }
-    label 'docker'
-    scm {
-        git {
-            remote {
-                url PROJECT_SCM_URL
-                branch '${COMMIT}'
-            }
-            extensions {
-                wipeOutWorkspace()
-                localBranch "${BRANCH}"
-            }
-        }
-    }
-    inDocker delegate
-    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
+    preparePipelineJob delegate
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         // Runs the CI acceptance tests
@@ -313,25 +317,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
-        label 'docker'
-        parameters {
-            // Link based on full version
-            stringParam('VERSION', '', '')
-        }
-        scm {
-            git {
-                remote {
-                    url PROJECT_SCM_URL
-                    branch '${COMMIT}'
-                }
-                extensions {
-                    wipeOutWorkspace()
-                    localBranch "${BRANCH}"
-                }
-            }
-        }
-        inDocker delegate
-        extractDeliveryArtifacts delegate, 'ontrack-acceptance'
+        preparePipelineJob delegate
         steps {
             // Runs the CI acceptance tests
             withXvfb delegate, """\
@@ -361,25 +347,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
                 artifactNumToKeep(5)
             }
             deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
-            label 'docker'
-            parameters {
-                // Link based on full version
-                stringParam('VERSION', '', '')
-            }
-            scm {
-                git {
-                    remote {
-                        url PROJECT_SCM_URL
-                        branch '${COMMIT}'
-                    }
-                    extensions {
-                        wipeOutWorkspace()
-                        localBranch "${BRANCH}"
-                    }
-                }
-            }
-            inDocker delegate
-            extractDeliveryArtifacts delegate, 'ontrack-acceptance'
+            preparePipelineJob delegate
             steps {
                 // Runs the CI acceptance tests
                 withXvfb delegate, """\
@@ -410,11 +378,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
-    label 'docker'
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
+    preparePipelineJob delegate
     wrappers {
         injectPasswords()
     }
@@ -447,28 +411,10 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
-    label 'docker'
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
-    scm {
-        git {
-            remote {
-                url PROJECT_SCM_URL
-                branch '${COMMIT}'
-            }
-            extensions {
-                wipeOutWorkspace()
-                localBranch "${BRANCH}"
-            }
-        }
-    }
-    inDocker delegate
+    preparePipelineJob delegate
     wrappers {
         injectPasswords()
     }
-    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         // Runs the CI acceptance tests
@@ -504,28 +450,10 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Publish')
-    label 'docker'
-    scm {
-        git {
-            remote {
-                url PROJECT_SCM_URL
-                branch '${COMMIT}'
-            }
-            extensions {
-                wipeOutWorkspace()
-                localBranch "${BRANCH}"
-            }
-        }
-    }
-    inDocker delegate
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
+    preparePipelineJob delegate
     wrappers {
         injectPasswords()
     }
-    extractDeliveryArtifacts delegate
     steps {
         // Publication
         if (release) {
@@ -608,31 +536,13 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Site')
-    label 'docker'
-    scm {
-        git {
-            remote {
-                url PROJECT_SCM_URL
-                branch '${COMMIT}'
-            }
-            extensions {
-                wipeOutWorkspace()
-                localBranch "${BRANCH}"
-            }
-        }
-    }
-    inDocker delegate
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
+    preparePipelineJob delegate
     wrappers {
         injectPasswords()
         credentialsBinding {
             usernamePassword 'GITHUB_USER', 'GITHUB_PASSWORD', PROJECT_SCM_CREDENTIALS
         }
     }
-    extractDeliveryArtifacts delegate
     steps {
             gradle """\
 --build-file site.gradle
@@ -663,29 +573,10 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        label 'docker'
-        scm {
-            git {
-                remote {
-                    url PROJECT_SCM_URL
-                    branch '${COMMIT}'
-                }
-                extensions {
-                    wipeOutWorkspace()
-                    localBranch "${BRANCH}"
-                }
-            }
-        }
-        inDocker delegate
-        parameters {
-            // Link on version
-            stringParam('VERSION', '', '')
-        }
+        preparePipelineJob delegate
         wrappers {
             injectPasswords()
-            xvfb('default')
         }
-        extractDeliveryArtifacts delegate
         steps {
             gradle '''\
 --build-file production.gradle
@@ -720,29 +611,10 @@ productionUpgrade
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production acceptance')
-        label 'docker'
-        scm {
-            git {
-                remote {
-                    url PROJECT_SCM_URL
-                    branch '${COMMIT}'
-                }
-                extensions {
-                    wipeOutWorkspace()
-                    localBranch "${BRANCH}"
-                }
-            }
-        }
-        inDocker delegate
-        parameters {
-            // Link on version
-            stringParam('VERSION', '', '')
-        }
+        preparePipelineJob delegate
         wrappers {
             injectPasswords()
-            xvfb('default')
         }
-        extractDeliveryArtifacts delegate, 'ontrack-acceptance'
         steps {
             gradle '''\
 --build-file production.gradle
