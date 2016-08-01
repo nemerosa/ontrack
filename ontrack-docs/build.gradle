@@ -85,3 +85,15 @@ tasks.withType(AsciidoctorTask) { docTask ->
 
 build.dependsOn 'generateHtml'
 build.dependsOn 'generatePdf'
+
+rootProject.tasks.publicationPackage {
+    dependsOn generateHtml
+    dependsOn generatePdf
+    from("${generateHtml.outputDir}/html5") {
+        into 'html5'
+    }
+    from ("${generatePdf.outputDir}/pdf") {
+        include '*.pdf'
+        into 'pdf'
+    }
+}
