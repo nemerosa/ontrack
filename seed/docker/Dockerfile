@@ -21,7 +21,7 @@ RUN curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-com
 RUN chmod +x /usr/bin/docker-compose
 
 # Installs Docker Machine
-RUN curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` > /usr/local/bin/docker-machine
+RUN curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` > /usr/bin/docker-machine
 RUN chmod +x /usr/bin/docker-machine
 
 # Git configuration
