@@ -114,7 +114,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     scm {
         git {
             remote {
-                url "git@github.com:nemerosa/ontrack.git"
+                url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
             }
             extensions {
@@ -123,11 +123,18 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             }
         }
     }
+    wrappers {
+        injectPasswords {
+            // Needs the VERSIONEYE_API_KEY
+            injectGlobalPasswords()
+        }
+    }
     steps {
         gradle '''\
 clean
 versionDisplay
 versionFile
+versionEyeUpdate
 test
 integrationTest
 dockerLatest
