@@ -120,17 +120,14 @@ This copies the content of the `prod/ontrack` folder (three files:
 
 When done, you just have to run Docker Compose:
 
-[source,bash]
-----
-ONTRACK_VERSION=2.16.7 docker-compose \
-    -f docker-compose.yml -f docker-compose-prod.yml \
-    --project-name prod \
-    --forceRecreate
-----
+    ONTRACK_VERSION={ontrack-version} docker-compose \
+        -f docker-compose.yml -f docker-compose-prod.yml \
+        --project-name prod \
+        --forceRecreate
 
 This will install:
 
-* the versison `2.16.7` of Ontrack in a container
+* the version `{ontrack-version}` of Ontrack in a container
 * a Grafana container
 * an InfluxDB container
 

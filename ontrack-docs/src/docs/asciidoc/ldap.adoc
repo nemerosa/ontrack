@@ -28,6 +28,13 @@ IMPORTANT: As of version 2.14, the list of groups (indicated by the `memberOf`
       property) is not searched recursively and that only the direct groups
       are taken into account.
 
+For example:
+
+image::images/security.ldap.png[LDAP settings,400]
+
+TIP: The settings shown above are suitable to use with an Activate Directory
+LDAP instance.
+
 [[ldap-mapping]]
 ==== LDAP group mapping
 
