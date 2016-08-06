@@ -485,9 +485,9 @@ publicationRelease
 -PontrackVersion=\${VERSION}
 -PontrackVersionCommit=\${VERSION}
 -PontrackReleaseBranch=${SEED_BRANCH}
--Psigning.keyId=\\${GPG_KEY_ID}
--Psigning.password=\\${GPG_KEY_PASSWORD}
--Psigning.secretKeyRingFile=\\${GPG_KEY_FILE}
+-Psigning.keyId=\${GPG_KEY_ID}
+-Psigning.password=\${GPG_KEY_PASSWORD}
+-Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
 publicationMaven
 """
         }
