@@ -124,7 +124,7 @@ def inDocker (def job) {
     }
 }
 
-def preparePipelineJob(def job) {
+def preparePipelineJob(def job, boolean acceptance = true) {
     job.parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -145,7 +145,7 @@ def preparePipelineJob(def job) {
         }
     }
     inDocker job
-    extractDeliveryArtifacts job, 'ontrack-acceptance'
+    extractDeliveryArtifacts job, acceptance ? ['ontrack-acceptance'] as String[] : [] as String[]
 }
 
 // CentOS versions to tests
@@ -451,7 +451,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Publish')
-    preparePipelineJob delegate
+    preparePipelineJob delegate, false
     wrappers {
         credentialsBinding {
             file 'GPG_KEY_FILE', 'GPGKeyRing'
@@ -545,7 +545,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Site')
-    preparePipelineJob delegate
+    preparePipelineJob delegate, false
     wrappers {
         injectPasswords()
         credentialsBinding {
@@ -582,7 +582,7 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        preparePipelineJob delegate
+        preparePipelineJob delegate, false
         wrappers {
             injectPasswords()
         }
