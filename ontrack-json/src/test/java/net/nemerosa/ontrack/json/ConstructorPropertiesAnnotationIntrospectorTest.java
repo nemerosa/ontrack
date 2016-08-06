@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.json;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.junit.Test;
@@ -19,13 +18,6 @@ public class ConstructorPropertiesAnnotationIntrospectorTest {
     }
 
     private final ImmutablePojo instance = new ImmutablePojo("foobar", 42);
-
-    @Test(expected = JsonMappingException.class)
-    public void testJacksonUnableToDeserialize() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(instance);
-        mapper.readValue(json, ImmutablePojo.class);
-    }
 
     @Test
     public void testJacksonAbleToDeserialize() throws IOException {

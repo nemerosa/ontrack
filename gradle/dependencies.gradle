@@ -30,7 +30,7 @@ ext {
             // Misc
             commons_lang3               : 'org.apache.commons:commons-lang3:3.4',
             commons_io                  : 'commons-io:commons-io:2.5',
-            jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.6.3',
+            jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.8.1',
             guava                       : 'com.google.guava:guava:19.0',
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             h2                          : 'com.h2database:h2:1.4.192',
