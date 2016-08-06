@@ -464,8 +464,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 --profile
 --console plain
 --stacktrace
--PontrackVersion=\${VERSION_DISPLAY}
--PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersion=\${VERSION}
+-PontrackVersionCommit=\${COMMIT}
 -PontrackReleaseBranch=${SEED_BRANCH}
 publicationRelease
 """
@@ -476,18 +476,18 @@ publicationRelease
 --profile
 --console plain
 --stacktrace
--PontrackVersion=\${VERSION_DISPLAY}
--PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersion=\${VERSION}
+-PontrackVersionCommit=\${VERSION}
 -PontrackReleaseBranch=${SEED_BRANCH}
 publicationMaven
 """
         }
         if (release) {
             shell """\
-docker tag --force nemerosa/ontrack:\${VERSION_DISPLAY} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION_DISPLAY} nemerosa/ontrack:\${VERSION_DISPLAY}
+docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
+docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:\${VERSION}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:\${VERSION_DISPLAY}
+docker push nemerosa/ontrack:\${VERSION}
 docker push nemerosa/ontrack:latest
 docker logout
 """
@@ -514,15 +514,14 @@ docker logout
     }
     publishers {
         // Use display version
-        ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'RELEASE'
+        ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'RELEASE'
         // Use display version
         ontrackDsl {
-            environment 'VERSION_BUILD'
-            environment 'VERSION_DISPLAY'
+            environment 'VERSION'
             log()
             script """\
-ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_DISPLAY).config {
-    label VERSION_DISPLAY
+ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION).config {
+    label VERSION
 }
 """
         }
@@ -550,7 +549,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
 --info
 --profile
 --stacktrace
--PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersion=\${VERSION}
 -PontrackGitHubUri=${PROJECT_SCM_URL}
 -PontrackGitHubPages=gh-pages
 -PontrackGitHubUser=\${GITHUB_USER}
@@ -560,7 +559,7 @@ site
     }
     publishers {
         // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'SITE'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'SITE'
     }
 }
 
