@@ -453,6 +453,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
     deliveryPipelineConfiguration('Release', 'Publish')
     preparePipelineJob delegate
     wrappers {
+        credentialsBinding {
+            file 'GPG_KEY_FILE', 'GPGKeyRing'
+        }
         injectPasswords()
     }
     steps {
@@ -467,6 +470,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 -PontrackVersion=\${VERSION}
 -PontrackVersionCommit=\${COMMIT}
 -PontrackReleaseBranch=${SEED_BRANCH}
+-Psigning.keyId=\${GPG_KEY_ID}
+-Psigning.password=\${GPG_KEY_PASSWORD}
+-Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
 publicationRelease
 """
         } else {
@@ -479,6 +485,9 @@ publicationRelease
 -PontrackVersion=\${VERSION}
 -PontrackVersionCommit=\${VERSION}
 -PontrackReleaseBranch=${SEED_BRANCH}
+-Psigning.keyId=\\${GPG_KEY_ID}
+-Psigning.password=\\${GPG_KEY_PASSWORD}
+-Psigning.secretKeyRingFile=\\${GPG_KEY_FILE}
 publicationMaven
 """
         }
