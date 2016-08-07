@@ -563,7 +563,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
 -PontrackGitHubUri=${PROJECT_SCM_URL}
 -PontrackGitHubPages=gh-pages
 -PontrackGitHubUser=\${GITHUB_USER}
--PontrackGitHubPassword=\${GITHUB_PASSWORD}
+-PontrackGitHubPassword=\${GITHUB_TOKEN}
 site
 """
     }
