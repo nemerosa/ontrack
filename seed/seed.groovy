@@ -552,9 +552,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
     preparePipelineJob delegate, false
     wrappers {
         injectPasswords()
-        credentialsBinding {
-            usernamePassword 'GITHUB_USER', 'GITHUB_PASSWORD', PROJECT_SCM_CREDENTIALS
-        }
     }
     steps {
             gradle """\
