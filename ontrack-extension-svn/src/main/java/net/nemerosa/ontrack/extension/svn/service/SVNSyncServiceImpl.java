@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.extension.svn.SubversionConfProperties;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
@@ -7,12 +8,11 @@ import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.ConfiguredBuildSvnRevisionLink;
 import net.nemerosa.ontrack.job.*;
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.AbstractBranchJob;
-import net.nemerosa.ontrack.model.support.JobProvider;
-import net.nemerosa.ontrack.job.JobRegistration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,15 +22,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
+public class SVNSyncServiceImpl implements SVNSyncService, JobOrchestratorSupplier {
 
     private static final JobType SVN_BUILD_SYNC_JOB =
             SVNService.SVN_JOB_CATEGORY.getType("svn-build-sync");
@@ -45,6 +43,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
     private final TransactionTemplate transactionTemplate;
     private final JobScheduler jobScheduler;
     private final BuildSvnRevisionLinkService buildSvnRevisionLinkService;
+    private final SubversionConfProperties subversionConfProperties;
 
     @Autowired
     public SVNSyncServiceImpl(
@@ -55,7 +54,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
             SVNEventDao eventDao,
             PlatformTransactionManager transactionManager,
             JobScheduler jobScheduler,
-            BuildSvnRevisionLinkService buildSvnRevisionLinkService) {
+            BuildSvnRevisionLinkService buildSvnRevisionLinkService, SubversionConfProperties subversionConfProperties) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
@@ -63,6 +62,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
         this.eventDao = eventDao;
         this.jobScheduler = jobScheduler;
         this.buildSvnRevisionLinkService = buildSvnRevisionLinkService;
+        this.subversionConfProperties = subversionConfProperties;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -203,13 +203,16 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
     }
 
     @Override
-    public Collection<JobRegistration> getStartingJobs() {
-        return securityService.asAdmin(() ->
-                getSVNConfiguredBranches()
-                        .filter(branch -> propertyService.getProperty(branch, SVNSyncPropertyType.class).option().isPresent())
-                        .map(this::getSVNBuildSyncJobRegistration)
-                        .collect(Collectors.toList())
-        );
+    public Stream<JobRegistration> collectJobRegistrations() {
+        if (subversionConfProperties.isBuildSyncDisabled()) {
+            return Stream.empty();
+        } else {
+            return securityService.asAdmin(() ->
+                    getSVNConfiguredBranches()
+                            .filter(branch -> propertyService.getProperty(branch, SVNSyncPropertyType.class).option().isPresent())
+                            .map(this::getSVNBuildSyncJobRegistration)
+            );
+        }
     }
 
     private JobRegistration getSVNBuildSyncJobRegistration(Branch branch) {
@@ -220,20 +223,6 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
             return JobRegistration.of(createJob(branch))
                     .everyMinutes(svnSync.getValue().getInterval());
         }
-    }
-
-    @Override
-    public void scheduleSVNBuildSync(Branch branch) {
-        JobRegistration r = getSVNBuildSyncJobRegistration(branch);
-        jobScheduler.schedule(
-                r.getJob(),
-                r.getSchedule()
-        );
-    }
-
-    @Override
-    public void unscheduleSVNBuildSync(Branch branch) {
-        jobScheduler.unschedule(getSvnBuildSyncJobKey(branch));
     }
 
     protected Job createJob(Branch branch) {

@@ -124,3 +124,42 @@ The build name has the branch revision in its name, using the `{revision}`
 token, following a given pattern. For example, if the pattern is
 `2.0.*-{revision}`, then all build names must start with `2.0.`, following
 by anything and suffixed by a revision number.
+
+[[usage-subversion-build-sync]]
+===== Build / tag synchronization
+
+For branches whose builds are associated with tags, you have the option to
+enable a synchronization between the builds in Ontrack and the tags in the
+Subversion branch.
+
+In the branch page, add the _SVN synchronisation_ property and configure it:
+
+|===
+| Parameter | Description
+
+| `override`
+| If set to `Yes`, the existing builds in Ontrack will be overridden by
+  the tags in Subversion. If set to `No` (the default), the existing builds in
+  Ontrack are never overridden and only new tags are taken into account.
+
+| `interval`
+| The frequency, in minutes, of the synchronization. If set to `0`,
+  the synchronization is not automated and must be triggered manually.
+|===
+
+[TIP]
+====
+In order to disable globally the tag/build synchronization, without
+having to change manually all the configured branches, add the following
+entry in the <<configuration,Ontrack configuration file>> and restart
+Ontrack:
+
+[source,yaml]
+.application.yml
+----
+ontrack:
+   extension:
+      svn:
+         build-sync-disabled: true
+----
+====

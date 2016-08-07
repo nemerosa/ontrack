@@ -40,8 +40,7 @@ Using Gradle:
 [[dsl-usage-shell]]
 ==== Standalone shell
 
-Future versions of https://github.com/nemerosa/ontrack/issues/198[Ontrack] will
-have a standalone executable JAR that you can call from the shell.
+See <<dsl-tool>>.
 
 [[dsl-usage-connection]]
 ==== Connection

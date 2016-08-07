@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
-import net.nemerosa.ontrack.extension.svn.service.SVNSyncService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertyService;
@@ -25,13 +23,11 @@ import java.util.function.Function;
 public class SVNSyncPropertyType extends AbstractPropertyType<SVNSyncProperty> {
 
     private final PropertyService propertyService;
-    private final SVNSyncService svnSyncService;
 
     @Autowired
-    public SVNSyncPropertyType(SVNExtensionFeature extensionFeature, PropertyService propertyService, SVNSyncService svnSyncService) {
+    public SVNSyncPropertyType(SVNExtensionFeature extensionFeature, PropertyService propertyService) {
         super(extensionFeature);
         this.propertyService = propertyService;
-        this.svnSyncService = svnSyncService;
     }
 
     @Override
@@ -131,13 +127,4 @@ public class SVNSyncPropertyType extends AbstractPropertyType<SVNSyncProperty> {
         return value;
     }
 
-    @Override
-    public void onPropertyChanged(ProjectEntity entity, SVNSyncProperty value) {
-        svnSyncService.scheduleSVNBuildSync((Branch) entity);
-    }
-
-    @Override
-    public void onPropertyDeleted(ProjectEntity entity, SVNSyncProperty oldValue) {
-        svnSyncService.unscheduleSVNBuildSync((Branch) entity);
-    }
 }
