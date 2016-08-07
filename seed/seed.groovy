@@ -473,6 +473,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 -Psigning.keyId=\${GPG_KEY_ID}
 -Psigning.password=\${GPG_KEY_PASSWORD}
 -Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
+-PossrhUser=\\${OSSRH_USER}
+-PossrhPassword=\\${OSSRH_PASSWORD}
 publicationRelease
 """
         } else {
@@ -488,6 +490,8 @@ publicationRelease
 -Psigning.keyId=\${GPG_KEY_ID}
 -Psigning.password=\${GPG_KEY_PASSWORD}
 -Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
+-PossrhUser=\${OSSRH_USER}
+-PossrhPassword=\${OSSRH_PASSWORD}
 publicationMaven
 """
         }
