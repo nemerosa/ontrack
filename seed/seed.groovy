@@ -96,6 +96,58 @@ fi
     }
 }
 
+/**
+ * Running a shell in a Xvfb session
+ */
+
+def withXvfb(def steps, String script) {
+    steps.shell """\
+#!/bin/bash
+
+mkdir -p xvfb-\${EXECUTOR_NUMBER}-\${BUILD_NUMBER}
+let 'NUM = EXECUTOR_NUMBER + 1'
+echo "Display number: \${NUM}"
+nohup /usr/bin/Xvfb :\${NUM} -screen 0 1024x768x24 -fbdir xvfb-\${EXECUTOR_NUMBER}-\${BUILD_NUMBER} &
+
+export DISPLAY=":\${NUM}"
+
+${script}
+"""
+}
+
+def inDocker (def job) {
+    job.wrappers {
+        buildInDocker {
+            dockerfile('seed/docker')
+            volume '/var/run/docker.sock', '/var/run/docker.sock'
+        }
+    }
+}
+
+def preparePipelineJob(def job, boolean acceptance = true) {
+    job.parameters {
+        // Link based on full version
+        stringParam('VERSION', '', '')
+        // ... and Git commit
+        stringParam('COMMIT', '', '')
+    }
+    job.label 'docker'
+    job.scm {
+        git {
+            remote {
+                url PROJECT_SCM_URL
+                branch '${COMMIT}'
+            }
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
+        }
+    }
+    inDocker job
+    extractDeliveryArtifacts job, acceptance ? ['ontrack-acceptance'] as String[] : [] as String[]
+}
+
 // CentOS versions to tests
 List<String> centOsVersions = [
         '7',
@@ -108,13 +160,13 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         numToKeep(40)
         artifactNumToKeep(5)
     }
+    label 'docker'
+    inDocker delegate
     deliveryPipelineConfiguration('Commit', 'Build')
-    jdk 'JDK8u25'
-    label 'master'
     scm {
         git {
             remote {
-                url "git@github.com:nemerosa/ontrack.git"
+                url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
             }
             extensions {
@@ -133,9 +185,11 @@ integrationTest
 dockerLatest
 osPackages
 build
+-PbowerOptions='--allow-root'
 --info
 --stacktrace
 --profile
+--console plain
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
@@ -160,6 +214,10 @@ build
                 parameters {
                     // Link based on full version
                     predefinedProp 'VERSION', '${VERSION_DISPLAY}'
+                    // Git
+                    predefinedProp 'COMMIT', '${VERSION_COMMIT}'
+                    // Uses the same node in order to have local Docker image available
+                    sameNode()
                 }
             }
         }
@@ -185,24 +243,19 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Commit', 'Local acceptance')
-    jdk 'JDK8u25'
-    label 'master'
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
-    wrappers {
-        xvfb('default')
-    }
-    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
+    preparePipelineJob delegate
     steps {
+        // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         // Runs the CI acceptance tests
-        gradle '''\
-ciAcceptanceTest
--PacceptanceJar=ontrack-acceptance-${VERSION}.jar
---info
---profile
---stacktrace
+        withXvfb delegate, '''\
+./gradlew \\
+    ciAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PciHost=dockerhost \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
 '''
     }
     publishers {
@@ -232,13 +285,17 @@ ciAcceptanceTest
                     condition 'SUCCESS'
                     parameters {
                         currentBuild()
+                        // Uses the same node in order to have local Docker image available
+                        sameNode()
                     }
                 }
             }
         } else {
             buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
                 parameters {
-                    currentBuild() // VERSION
+                    currentBuild()
+                    // Uses the same node in order to have local Docker image available
+                    sameNode()
                 }
             }
         }
@@ -250,7 +307,7 @@ ciAcceptanceTest
 // OS packages jobs
 // Only for releases
 
-if (release) {
+// TODO if (release) {
 
     // Debian package acceptance job
 
@@ -260,22 +317,18 @@ if (release) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
-        jdk 'JDK8u25'
-        label 'master'
-        parameters {
-            // Link based on full version
-            stringParam('VERSION', '', '')
-        }
-        wrappers {
-            xvfb('default')
-        }
-        extractDeliveryArtifacts delegate, 'ontrack-acceptance'
+        preparePipelineJob delegate
         steps {
             // Runs the CI acceptance tests
-            gradle """\
-debAcceptanceTest
--PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
--PacceptanceDebianDistributionDir=.
+            withXvfb delegate, """\
+./gradlew \\
+    debAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceDebianDistributionDir=. \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
 """
         }
         publishers {
@@ -294,22 +347,18 @@ debAcceptanceTest
                 artifactNumToKeep(5)
             }
             deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
-            jdk 'JDK8u25'
-            label 'master'
-            parameters {
-                // Link based on full version
-                stringParam('VERSION', '', '')
-            }
-            wrappers {
-                xvfb('default')
-            }
-            extractDeliveryArtifacts delegate, 'ontrack-acceptance'
+            preparePipelineJob delegate
             steps {
                 // Runs the CI acceptance tests
-                gradle """\
-rpmAcceptanceTest${centOsVersion}
--PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
--PacceptanceRpmDistributionDir=.
+                withXvfb delegate, """\
+./gradlew \\
+    rpmAcceptanceTest${centOsVersion} \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceRpmDistributionDir=. \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace \\
 """
             }
             publishers {
@@ -319,7 +368,7 @@ rpmAcceptanceTest${centOsVersion}
         }
     }
 
-}
+// TODO }
 
 // Docker push
 
@@ -329,17 +378,10 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
-    jdk 'JDK8u25'
-    label 'master'
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
+    preparePipelineJob delegate
     wrappers {
         injectPasswords()
     }
-    // Extracts the version information
-    extractDeliveryArtifacts delegate
     steps {
         shell """\
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
@@ -357,7 +399,7 @@ docker logout
             }
         }
         // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'DOCKER'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'DOCKER'
     }
 }
 
@@ -369,25 +411,25 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
-    jdk 'JDK8u25'
-    label 'master'
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
+    preparePipelineJob delegate
     wrappers {
         injectPasswords()
-        xvfb('default')
     }
-    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
+        // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         // Runs the CI acceptance tests
-        gradle '''\
-doAcceptanceTest
--PacceptanceJar=ontrack-acceptance-${VERSION}.jar
--PdigitalOceanAccessToken=${DO_TOKEN}
--PontrackVersion=${VERSION}
+        withXvfb delegate, '''\
+./gradlew \\
+    doAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PontrackVersion=${VERSION} \\
+    -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
 '''
+
     }
     publishers {
         archiveJunit('*-tests.xml')
@@ -396,7 +438,7 @@ doAcceptanceTest
                 currentBuild()
             }
         }
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE.DO'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ACCEPTANCE.DO'
     }
 }
 
@@ -409,16 +451,13 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Publish')
-    jdk 'JDK8u25'
-    label 'master'
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
+    preparePipelineJob delegate, false
     wrappers {
+        credentialsBinding {
+            file 'GPG_KEY_FILE', 'GPGKeyRing'
+        }
         injectPasswords()
     }
-    extractDeliveryArtifacts delegate
     steps {
         // Publication
         if (release) {
@@ -426,10 +465,16 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 --build-file publication.gradle
 --info
 --profile
+--console plain
 --stacktrace
--PontrackVersion=\${VERSION_DISPLAY}
--PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersion=\${VERSION}
+-PontrackVersionCommit=\${COMMIT}
 -PontrackReleaseBranch=${SEED_BRANCH}
+-Psigning.keyId=\${GPG_KEY_ID}
+-Psigning.password=\${GPG_KEY_PASSWORD}
+-Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
+-PossrhUser=\\${OSSRH_USER}
+-PossrhPassword=\\${OSSRH_PASSWORD}
 publicationRelease
 """
         } else {
@@ -437,19 +482,25 @@ publicationRelease
 --build-file publication.gradle
 --info
 --profile
+--console plain
 --stacktrace
--PontrackVersion=\${VERSION_DISPLAY}
--PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersion=\${VERSION}
+-PontrackVersionCommit=\${VERSION}
 -PontrackReleaseBranch=${SEED_BRANCH}
+-Psigning.keyId=\${GPG_KEY_ID}
+-Psigning.password=\${GPG_KEY_PASSWORD}
+-Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
+-PossrhUser=\${OSSRH_USER}
+-PossrhPassword=\${OSSRH_PASSWORD}
 publicationMaven
 """
         }
         if (release) {
             shell """\
-docker tag --force nemerosa/ontrack:\${VERSION_DISPLAY} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION_DISPLAY} nemerosa/ontrack:\${VERSION_DISPLAY}
+docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
+docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:\${VERSION}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:\${VERSION_DISPLAY}
+docker push nemerosa/ontrack:\${VERSION}
 docker push nemerosa/ontrack:latest
 docker logout
 """
@@ -476,15 +527,14 @@ docker logout
     }
     publishers {
         // Use display version
-        ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'RELEASE'
+        ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'RELEASE'
         // Use display version
         ontrackDsl {
-            environment 'VERSION_BUILD'
-            environment 'VERSION_DISPLAY'
+            environment 'VERSION'
             log()
             script """\
-ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_DISPLAY).config {
-    label VERSION_DISPLAY
+ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION).config {
+    label VERSION
 }
 """
         }
@@ -499,36 +549,27 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Release', 'Site')
-    jdk 'JDK8u25'
-    label 'master'
-    parameters {
-        // Link based on full version
-        stringParam('VERSION', '', '')
-    }
+    preparePipelineJob delegate, false
     wrappers {
         injectPasswords()
-        credentialsBinding {
-            usernamePassword 'GITHUB_USER', 'GITHUB_PASSWORD', PROJECT_SCM_CREDENTIALS
-        }
     }
-    extractDeliveryArtifacts delegate
     steps {
             gradle """\
 --build-file site.gradle
 --info
 --profile
 --stacktrace
--PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersion=\${VERSION}
 -PontrackGitHubUri=${PROJECT_SCM_URL}
 -PontrackGitHubPages=gh-pages
 -PontrackGitHubUser=\${GITHUB_USER}
--PontrackGitHubPassword=\${GITHUB_PASSWORD}
+-PontrackGitHubPassword=\${GITHUB_TOKEN}
 site
 """
     }
     publishers {
         // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'SITE'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'SITE'
     }
 }
 
@@ -542,22 +583,17 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        jdk 'JDK8u25'
-        label 'master'
-        parameters {
-            // Link on version
-            stringParam('VERSION', '', '')
-        }
+        preparePipelineJob delegate, false
         wrappers {
             injectPasswords()
-            xvfb('default')
         }
-        extractDeliveryArtifacts delegate
         steps {
             gradle '''\
 --build-file production.gradle
 --info
 --profile
+--console plain
+--stacktrace
 productionUpgrade
 -PontrackVersion=${VERSION_DISPLAY}
 -PproductionPostgresPassword=${ONTRACK_POSTGRESQL_PASSWORD}
@@ -583,22 +619,17 @@ productionUpgrade
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production acceptance')
-        jdk 'JDK8u25'
-        label 'master'
-        parameters {
-            // Link on version
-            stringParam('VERSION', '', '')
-        }
+        preparePipelineJob delegate
         wrappers {
             injectPasswords()
-            xvfb('default')
         }
-        extractDeliveryArtifacts delegate, 'ontrack-acceptance'
         steps {
             gradle '''\
 --build-file production.gradle
 --info
 --profile
+--console plain
+--stacktrace
 productionTest
 -PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 '''
@@ -632,7 +663,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         numToKeep(40)
         artifactNumToKeep(1)
     }
-    jdk 'JDK8u25'
     label 'master'
     wrappers {
         injectPasswords()
