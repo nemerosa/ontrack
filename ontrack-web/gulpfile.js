@@ -92,6 +92,7 @@ gulp.task('lint', function () {
         .pipe(debug({title: 'lint:'}))
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
+        .pipe(jshint.reporter('fail'))
         .pipe(liveReload());
 });
 
