@@ -29,6 +29,17 @@ allprojects {
 apply from: "$rootDir/gradle/dependencies.gradle"
 
 /**
+ * Version Eye integration
+ */
+
+versioneye {
+    includeSubProjects = true
+    includePlugins = false
+    dependencies = transitive
+    exclude 'testCompile', 'testRuntime'
+}
+
+/**
  * Build task (used only as an anchor point at the root level)
  */
 
