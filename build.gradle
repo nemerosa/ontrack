@@ -35,7 +35,6 @@ apply from: "$rootDir/gradle/dependencies.gradle"
 versioneye {
     includeSubProjects = true
     includePlugins = false
-    dependencies = transitive
     exclude 'testCompile', 'testRuntime'
 }
 
