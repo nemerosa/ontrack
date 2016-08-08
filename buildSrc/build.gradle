@@ -6,7 +6,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'com.moowork.gradle:gradle-node-plugin:0.11'
+    compile 'com.moowork.gradle:gradle-node-plugin:0.13'
     compile('net.nemerosa.ontrack:ontrack-dsl:2.23.2') {
         exclude module: 'groovy-all'
     }
