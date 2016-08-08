@@ -18,7 +18,7 @@ class ACCDSLDecorations extends AbstractACCDSL {
         def document = jsonClient.download(path)
         // Checks the document
         assert document != null
-        assert document.type == 'image/png;charset=UTF-8'
+        assert document.type == 'application/octet-stream'
         assert document.content.length == 853
     }
 
