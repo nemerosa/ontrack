@@ -225,6 +225,7 @@ Ontrack provides the following extension points:
 * <<extending-usermenu, User menu action>> - allows to add an entry in the connected user menu
 * <<extending-metrics, Metrics>> - allows to contribute to the
   <<monitoring,metrics>> exported by Ontrack
+* <<extending-event-types, Event types>> - allows to define additional event types.
 *  **TODO** Entity action - allows to add an action for the page of an entity
 *  **TODO** Entity information - allows to add some information into the page of an entity
 *  **TODO** Search extension - provides a search end point for global text based searches
