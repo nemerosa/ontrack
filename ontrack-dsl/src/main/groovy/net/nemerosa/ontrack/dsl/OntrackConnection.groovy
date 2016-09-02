@@ -9,6 +9,8 @@ class OntrackConnection {
     private String user
     private String password
     private OntrackLogger logger
+    private int maxTries = 1
+    private int retryDelaySeconds = 10
 
     private OntrackConnection(String url) {
         this.url = url
@@ -43,6 +45,10 @@ class OntrackConnection {
         // Logger
         if (logger) {
             builder = builder.withLogger({ String it -> logger.trace(it) })
+        }
+        // Retries
+        if (maxTries > 1) {
+            builder = builder.withMaxTries(maxTries).withRetryDelaySeconds(retryDelaySeconds)
         }
         // Ontrack client
         new Ontrack(builder.build())

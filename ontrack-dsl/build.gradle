@@ -24,6 +24,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient'
     compile 'org.apache.httpcomponents:httpmime'
     compile 'org.springframework.boot:spring-boot-starter'
+    compile libraries.failsafe
 }
 
 javadocJar {

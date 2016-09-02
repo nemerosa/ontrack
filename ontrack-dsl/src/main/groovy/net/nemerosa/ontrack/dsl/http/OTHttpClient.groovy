@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.dsl.http
 
 import groovy.json.JsonSlurper
+import net.jodah.failsafe.Failsafe
+import net.jodah.failsafe.RetryPolicy
 import net.nemerosa.ontrack.dsl.Document
 import org.apache.http.HttpEntity
 import org.apache.http.HttpHost
@@ -13,6 +15,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.util.EntityUtils
 
+import java.util.concurrent.TimeUnit
+
 class OTHttpClient {
 
     private final URL url
@@ -20,13 +24,29 @@ class OTHttpClient {
     private final Closure<CloseableHttpClient> httpClientSupplier
     private final HttpClientContext httpContext
     private final Closure clientLogger
+    private final RetryPolicy retryPolicy
 
-    OTHttpClient(URL url, HttpHost host, Closure<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, Closure clientLogger) {
+    OTHttpClient(URL url, HttpHost host, Closure<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, Closure clientLogger, int maxTries, int retryDelaySeconds) {
+        this(
+                url,
+                host,
+                httpClientSupplier,
+                httpContext,
+                clientLogger,
+                new RetryPolicy()
+                    .retryOn(ConnectException.class)
+                    .withDelay(retryDelaySeconds, TimeUnit.SECONDS)
+                    .withMaxRetries(maxTries)
+        )
+    }
+
+    OTHttpClient(URL url, HttpHost host, Closure<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, Closure clientLogger, RetryPolicy retryPolicy) {
         this.url = url
         this.host = host
         this.httpClientSupplier = httpClientSupplier
         this.httpContext = httpContext
         this.clientLogger = clientLogger
+        this.retryPolicy = retryPolicy
     }
 
     URL getUrl() {
@@ -95,7 +115,7 @@ class OTHttpClient {
                     entity.contentType.value,
                     bytes
             )
-        })
+        }) as Document
     }
 
     Object request(HttpRequestBase request, Closure responseParser) {
@@ -164,7 +184,9 @@ class OTHttpClient {
         try {
             CloseableHttpClient http = httpClientSupplier()
             try {
-                HttpResponse response = http.execute(host, request, httpContext)
+                HttpResponse response = Failsafe.with(retryPolicy).get {
+                    http.execute(host, request, httpContext)
+                }
                 // Entity response
                 HttpEntity entity = response.entity
                 try {
