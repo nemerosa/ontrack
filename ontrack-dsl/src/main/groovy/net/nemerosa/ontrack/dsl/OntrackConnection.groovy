@@ -25,6 +25,16 @@ class OntrackConnection {
         this
     }
 
+    OntrackConnection maxTries(int value) {
+        this.maxTries = value
+        this
+    }
+
+    OntrackConnection retryDelaySeconds(int value) {
+        this.retryDelaySeconds = value
+        this
+    }
+
     OntrackConnection logger(OntrackLogger logger) {
         this.logger = logger
         this
