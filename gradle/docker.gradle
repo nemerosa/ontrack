@@ -25,7 +25,6 @@ task dockerLatest(type: Exec, dependsOn: dockerBuild) {
     executable 'docker'
     args = [
             'tag',
-            '--force',
             "nemerosa/ontrack:${versioning.info.display}",
             "nemerosa/ontrack:latest",
     ]
