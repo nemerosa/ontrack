@@ -7,7 +7,7 @@
     "bootstrap": "3.2.0",
     "angular-bootstrap": "0.10.0",
     "jquery-ui": "1.11.1",
-    "angular-ui-sortable": "0.12.10",
+    "angular-ui-sortable": "0.14.3",
     "angular-multi-select": "2.0.1",
     "angular-taglist": "0.1.5",
     "oclazyload": "~1.0.9",
