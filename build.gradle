@@ -46,6 +46,7 @@ ext {
     itJdbcUrl = project.properties.itJdbcUrl
     itJdbcUsername = project.properties.itJdbcUsername
     itJdbcPassword = project.properties.itJdbcPassword
+    itJdbcWait = project.properties.itJdbcWait
 }
 
 // Pre-integration tests: starting Postgresql
@@ -61,6 +62,8 @@ task preIntegrationTest(type: ComposeUp) {
         def jdbcUrl = "jdbc:postgresql://${host}:${getPublishedPort('db', 5432)}/ontrack"
         project.ext.itJdbcUrl = jdbcUrl
         logger.info("JDBC URL = ${project.ext.itJdbcUrl}")
+        logger.info("JDBC. Wait ${itJdbcWait} seconds for DB container to be ready...")
+        sleep ((itJdbcWait as int) * 1000)
     }
 }
 
