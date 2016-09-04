@@ -197,7 +197,7 @@ angular.module('ot.view.admin.console', [
         };
 
         function jobStatusFilter(job) {
-            return $scope.selectedJobStatus.id == '' || $scope.selectedJobStatus.id == job.state;
+            return $scope.selectedJobStatus.id === '' || $scope.selectedJobStatus.id === job.state;
         }
 
         // Job error filter
@@ -221,7 +221,7 @@ angular.module('ot.view.admin.console', [
         };
 
         function jobCategoryFilter(job) {
-            return $scope.selectedJobCategory.id == '' || $scope.selectedJobCategory.id == job.key.type.category.key;
+            return $scope.selectedJobCategory.id === '' || $scope.selectedJobCategory.id === job.key.type.category.key;
         }
 
         // Job type filter
@@ -230,14 +230,14 @@ angular.module('ot.view.admin.console', [
         };
 
         function jobTypeFilter(job) {
-            return $scope.selectedJobType.id == '' || $scope.selectedJobType.id == job.key.type.key;
+            return $scope.selectedJobType.id === '' || $scope.selectedJobType.id === job.key.type.key;
         }
 
         // Job description filter
         $scope.jobDescription = {value: ''};
 
         function jobDescriptionFilter(job) {
-            return $scope.jobDescription.value == '' || job.description.toLowerCase().indexOf($scope.jobDescription.value.toLowerCase()) >= 0;
+            return $scope.jobDescription.value === '' || job.description.toLowerCase().indexOf($scope.jobDescription.value.toLowerCase()) >= 0;
         }
 
         // Job filter
@@ -251,11 +251,11 @@ angular.module('ot.view.admin.console', [
         };
 
         $scope.jobFilter = function (job) {
-            return jobStatusFilter(job)
-                && jobCategoryFilter(job)
-                && jobTypeFilter(job)
-                && jobErrorFilter(job)
-                && jobDescriptionFilter(job);
+            return jobStatusFilter(job) &&
+                jobCategoryFilter(job) &&
+                jobTypeFilter(job) &&
+                jobErrorFilter(job) &&
+                jobDescriptionFilter(job);
         };
 
         // Pause & resume all jobs

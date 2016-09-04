@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.gradle.*
 
 task ciStart(type: ComposeUp) {
     machine = project.properties.ciMachine
+    host = project.properties.ciHost
     dir = file("${rootDir}/gradle/compose")
     projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
     projectName = 'ci'
