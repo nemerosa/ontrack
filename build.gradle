@@ -57,6 +57,7 @@ task preIntegrationTest(type: ComposeUp) {
     projectFiles = ['docker-compose.yml']
     projectName = project.properties.itProject
     forceRecreate = false
+    host = project.properties.itJdbcHost
     // When done
     doLast {
         def jdbcUrl = "jdbc:postgresql://${host}:${getPublishedPort('db', 5432)}/ontrack"
