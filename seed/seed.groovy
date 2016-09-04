@@ -186,7 +186,7 @@ dockerLatest
 osPackages
 build
 -PitJdbcWait=20
--itJdbcHost=dockerhost
+-PitJdbcHost=dockerhost
 -PbowerOptions='--allow-root'
 --info
 --stacktrace
