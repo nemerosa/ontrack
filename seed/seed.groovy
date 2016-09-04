@@ -185,6 +185,7 @@ integrationTest
 dockerLatest
 osPackages
 build
+-PitJdbcWait=20
 -PbowerOptions='--allow-root'
 --info
 --stacktrace
