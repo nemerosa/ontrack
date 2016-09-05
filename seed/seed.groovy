@@ -325,7 +325,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     debAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceDebianDistributionDir=. \\
-    -PciHost=dockerhost \\
+    -PacceptanceHost=dockerhost \\
     --info \\
     --profile \\
     --console plain \\
@@ -356,7 +356,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     rpmAcceptanceTest${centOsVersion} \\
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceRpmDistributionDir=. \\
-    -PciHost=dockerhost \\
+    -PacceptanceHost=dockerhost \\
     --info \\
     --profile \\
     --console plain \\
