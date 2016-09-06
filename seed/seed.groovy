@@ -479,6 +479,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 -Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
 -PossrhUser=\${OSSRH_USER}
 -PossrhPassword=\${OSSRH_PASSWORD}
+-PgitHubUser=dcoraboeuf
+-PgitHubPassword=\${GITHUB_TOKEN}
 publicationRelease
 """
         } else {
