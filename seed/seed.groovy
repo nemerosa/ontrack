@@ -503,8 +503,7 @@ publicationMaven
         }
         if (release) {
             shell """\
-docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:\${VERSION}
+docker tag nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION}
 docker push nemerosa/ontrack:latest
