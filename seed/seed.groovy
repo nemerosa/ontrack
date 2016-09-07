@@ -589,7 +589,9 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        preparePipelineJob delegate, false
+        label 'master'
+        // TODO preparePipelineJob delegate, false
+        // TODO connection on the production Docker machine to setup (using the master in the meantime)
         wrappers {
             injectPasswords()
         }
@@ -601,7 +603,7 @@ if (production) {
 --console plain
 --stacktrace
 productionUpgrade
--PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersion=${VERSION}
 -PproductionPostgresPassword=${ONTRACK_POSTGRESQL_PASSWORD}
 '''
         }
@@ -642,8 +644,8 @@ productionTest
         }
         publishers {
             archiveJunit('*-tests.xml')
-            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK.SMOKE'
-            ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK'
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ONTRACK.SMOKE'
+            ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ONTRACK'
         }
     }
 
