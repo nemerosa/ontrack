@@ -599,7 +599,7 @@ if (production) {
             stringParam('COMMIT', '', '')
         }
         label 'master'
-        extractDeliveryArtifacts job, [] as String[]
+        extractDeliveryArtifacts delegate, [] as String[]
 
         wrappers {
             injectPasswords()
