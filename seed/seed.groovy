@@ -589,9 +589,18 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        label 'master'
+
         // TODO preparePipelineJob delegate, false
         // TODO connection on the production Docker machine to setup (using the master in the meantime)
+        parameters {
+            // Link based on full version
+            stringParam('VERSION', '', '')
+            // ... and Git commit
+            stringParam('COMMIT', '', '')
+        }
+        label 'master'
+        extractDeliveryArtifacts job, [] as String[]
+
         wrappers {
             injectPasswords()
         }
