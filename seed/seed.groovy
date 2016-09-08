@@ -651,7 +651,7 @@ productionUpgrade
 ./gradlew \\
     --build-file production.gradle
     productionTest \\
-    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
