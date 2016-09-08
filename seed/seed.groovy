@@ -188,6 +188,7 @@ build
 -PitJdbcWait=20
 -PitJdbcHost=dockerhost
 -PbowerOptions='--allow-root'
+-Dorg.gradle.jvmargs=-Xmx1536m
 --info
 --stacktrace
 --profile
@@ -254,6 +255,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     ciAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
     -PciHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -328,6 +330,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceDebianDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -359,6 +362,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceRpmDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -428,6 +432,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
     -PontrackVersion=${VERSION} \\
     -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -641,15 +646,18 @@ productionUpgrade
             injectPasswords()
         }
         steps {
-            gradle '''\
---build-file production.gradle
---info
---profile
---console plain
---stacktrace
-productionTest
--PacceptanceJar=ontrack-acceptance-${VERSION}.jar
-'''
+            // Runs the acceptance tests
+            withXvfb delegate, """\
+./gradlew \\
+    --build-file production.gradle
+    productionTest \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
+"""
         }
         publishers {
             archiveJunit('*-tests.xml')
