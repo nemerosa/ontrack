@@ -332,6 +332,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     debAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceDebianDistributionDir=. \\
+    -PacceptanceHost=dockerhost \\
     --info \\
     --profile \\
     --console plain \\
@@ -362,6 +363,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     rpmAcceptanceTest${centOsVersion} \\
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceRpmDistributionDir=. \\
+    -PacceptanceHost=dockerhost \\
     --info \\
     --profile \\
     --console plain \\
@@ -480,8 +482,10 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 -Psigning.keyId=\${GPG_KEY_ID}
 -Psigning.password=\${GPG_KEY_PASSWORD}
 -Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
--PossrhUser=\\${OSSRH_USER}
--PossrhPassword=\\${OSSRH_PASSWORD}
+-PossrhUser=\${OSSRH_USER}
+-PossrhPassword=\${OSSRH_PASSWORD}
+-PgitHubUser=dcoraboeuf
+-PgitHubPassword=\${GITHUB_TOKEN}
 publicationRelease
 """
         } else {
@@ -504,8 +508,8 @@ publicationMaven
         }
         if (release) {
             shell """\
-docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:\${VERSION}
+docker pull nemerosa/ontrack:\${VERSION}
+docker tag nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION}
 docker push nemerosa/ontrack:latest
