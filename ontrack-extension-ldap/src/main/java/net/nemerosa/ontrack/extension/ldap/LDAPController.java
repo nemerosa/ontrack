@@ -68,7 +68,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
                 .with(
                         Link.CREATE,
                         uri(on(getClass()).getMappingCreationForm()),
-                        securityService.isGlobalFunctionGranted(AccountManagement.class)
+                        securityService.isGlobalFunctionGranted(AccountGroupManagement.class)
                 )
                 ;
     }

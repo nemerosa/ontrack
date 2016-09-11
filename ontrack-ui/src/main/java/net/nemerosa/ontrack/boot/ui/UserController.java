@@ -129,7 +129,7 @@ public class UserController extends AbstractResourceController {
             );
         }
         // Account management
-        if (securityService.isGlobalFunctionGranted(AccountManagement.class)) {
+        if (securityService.isGlobalFunctionGranted(AccountManagement.class) || securityService.isGlobalFunctionGranted(AccountGroupManagement.class)) {
             user.add(Action.of("admin-accounts", "Account management", "admin-accounts"));
         }
         // Management of predefined validation stamps and promotion levels
