@@ -49,7 +49,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
                 .with(
                         "_mappings",
                         uri(on(getClass()).getMappings()),
-                        securityService.isGlobalFunctionGranted(AccountManagement.class)
+                        securityService.isGlobalFunctionGranted(AccountGroupManagement.class)
                 )
                 ;
     }
@@ -59,7 +59,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping", method = RequestMethod.GET)
     public Resources<LDAPMapping> getMappings() {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return Resources.of(
                 accountGroupMappingService.getMappings(LDAPExtensionFeature.LDAP_GROUP_MAPPING)
                         .stream().map(LDAPMapping::of),
@@ -78,7 +78,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping/create", method = RequestMethod.GET)
     public Form getMappingCreationForm() {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return AccountGroupMapping.form(
                 accountService.getAccountGroups()
         );
@@ -89,7 +89,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping/create", method = RequestMethod.POST)
     public LDAPMapping newMapping(@RequestBody AccountGroupMappingInput input) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return LDAPMapping.of(accountGroupMappingService.newMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, input));
     }
 
@@ -98,7 +98,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping/{id}", method = RequestMethod.GET)
     public LDAPMapping getMapping(@PathVariable ID id) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return LDAPMapping.of(accountGroupMappingService.getMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, id));
     }
 
@@ -107,7 +107,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping/{id}/update", method = RequestMethod.GET)
     public Form getMappingUpdateForm(@PathVariable ID id) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return accountGroupMappingService.getMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, id).asForm(
                 accountService.getAccountGroups()
         );
@@ -118,7 +118,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping/{id}/update", method = RequestMethod.PUT)
     public LDAPMapping updateMapping(@PathVariable ID id, @RequestBody AccountGroupMappingInput input) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return LDAPMapping.of(accountGroupMappingService.updateMapping(
                 LDAPExtensionFeature.LDAP_GROUP_MAPPING,
                 id,
@@ -131,7 +131,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping/{id}/delete", method = RequestMethod.DELETE)
     public Ack deleteMapping(@PathVariable ID id) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return accountGroupMappingService.deleteMapping(
                 LDAPExtensionFeature.LDAP_GROUP_MAPPING,
                 id
