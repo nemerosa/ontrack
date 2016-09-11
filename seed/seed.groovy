@@ -193,6 +193,7 @@ dockerLatest
 osPackages
 build
 -PbowerOptions='--allow-root'
+-Dorg.gradle.jvmargs=-Xmx1536m
 --info
 --stacktrace
 --profile
@@ -259,6 +260,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     ciAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
     -PciHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -333,6 +335,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceDebianDistributionDir=. \\
     -PciHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -364,6 +367,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceRpmDistributionDir=. \\
     -PciHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -433,6 +437,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
     -PontrackVersion=${VERSION} \\
     -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -644,6 +649,7 @@ productionUpgrade
 --console plain
 --stacktrace
 productionTest
+-Dorg.gradle.jvmargs=-Xmx1536m \\
 -PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 '''
         }
