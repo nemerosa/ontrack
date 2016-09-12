@@ -151,7 +151,6 @@ class ACCDSLPredefinedValidationStamps extends AbstractACCDSL {
         assert vs.id > 0
         assert vs.name == vsName
         assert vs.description == "Validation automatically created on demand."
-        assert vs.image.empty
     }
 
 }
