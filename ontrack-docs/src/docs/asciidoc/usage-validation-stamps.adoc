@@ -57,3 +57,18 @@ name will follow this procedure:
 IMPORTANT: The auto creation of validation stamps is available only through the
 <<dsl,DSL>> or through the API. It is not accessible through the GUI, where
 only the validation stamps of the branch can be selected for a build validation.
+
+[[validation-stamps-auto-creation-if-not-predefined]]
+===== Auto creation of validation stamps when not predefined
+
+You can also configure the project so that validation stamps are created on demand, _even when
+no predefined validation stamp is created_.
+
+In this case:
+
+* if the validation stamp is already defined in the branch, it is of
+  course used
+* if the validation stamp is predefined, it is used to create a new one on
+  the branch and is then used
+* in any other case, a new validation stamp is created in the branch, with the requested name (and with
+  an empty image and a default description)

@@ -41,10 +41,22 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
                 // Creates the validation stamp
                 return Optional.of(
                         securityService.asAdmin(() ->
-                                        structureService.newValidationStampFromPredefined(
+                                structureService.newValidationStampFromPredefined(
+                                        branch,
+                                        oPredefinedValidationStamp.get()
+                                )
+                        )
+                );
+            } else if (value.isAutoCreateIfNotPredefined()) {
+                // Creates a validation stamp even without a predefined one
+                return Optional.of(
+                        securityService.asAdmin(() ->
+                                structureService.newValidationStamp(
+                                        ValidationStamp.of(
                                                 branch,
-                                                oPredefinedValidationStamp.get()
+                                                NameDescription.nd(validationStampName, "Validation automatically created on demand.")
                                         )
+                                )
                         )
                 );
             }
@@ -85,6 +97,12 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
                                 .label("Auto creation")
                                 .help("If set, allows validation stamps to be created automatically")
                                 .value(value != null && value.isAutoCreate())
+                )
+                .with(
+                        YesNo.of("autoCreateIfNotPredefined")
+                                .label("Auto creation if not predefined")
+                                .help("If set, allows validation stamps to be created automatically, even if not predefined version is present.")
+                                .value(value != null && value.isAutoCreateIfNotPredefined())
                 )
                 ;
     }
