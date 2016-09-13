@@ -1,15 +1,14 @@
 package net.nemerosa.ontrack.gradle
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
-import net.nemerosa.ontrack.dsl.Ontrack
 
 class OntrackChangeLog extends AbstractOntrackTask {
 
     String ontrackProject = 'ontrack'
     String ontrackReleasePromotionLevel = 'RELEASE'
     String ontrackReleaseBranch = project.properties.ontrackReleaseBranch
+    String ontrackReleaseFilter = project.properties.ontrackReleaseFilter
 
     private String changeLog
 
@@ -26,7 +25,9 @@ class OntrackChangeLog extends AbstractOntrackTask {
         println "ontrackReleaseBranch = ${ontrackReleaseBranch}"
         def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
         // Gets the last release
-        def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
+        def lastRelease = project.search(
+                branchName: ontrackReleaseFilter,
+                promotionName: ontrackReleasePromotionLevel)[0]
         // Gets the change log
         def changeLog = lastBuild.getChangeLog(lastRelease)
         // Exports the issues
