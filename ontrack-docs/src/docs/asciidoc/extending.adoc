@@ -223,6 +223,7 @@ Ontrack provides the following extension points:
 * <<extending-properties, Properties>> - allows to attach a property to an [entity](Model)
 * <<extending-decorators, Decorators>> - allows to display a decoration for an [entity](Model)
 * <<extending-usermenu, User menu action>> - allows to add an entry in the connected user menu
+* <<extending-settings, Settings>> - allows to add an entry in the global settings
 * <<extending-metrics, Metrics>> - allows to contribute to the
   <<monitoring,metrics>> exported by Ontrack
 * <<extending-event-types, Event types>> - allows to define additional event types.

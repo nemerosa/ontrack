@@ -40,7 +40,7 @@ private final PropertyService propertyService;
 @Autowired
 public MyDecorator(MyExtensionFeature extensionFeature, PropertyService propertyService) {
    super(extensionFeature);
-   this.propertyService ==== propertyService;
+   this.propertyService = propertyService;
 }
 ----
 
