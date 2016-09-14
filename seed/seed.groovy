@@ -334,7 +334,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     debAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceDebianDistributionDir=. \\
-    -PciHost=dockerhost \\
+    -PacceptanceHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
@@ -366,7 +366,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     rpmAcceptanceTest${centOsVersion} \\
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceRpmDistributionDir=. \\
-    -PciHost=dockerhost \\
+    -PacceptanceHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
