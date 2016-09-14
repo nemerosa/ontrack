@@ -144,6 +144,17 @@ configure(javaProjects) {
                             email 'damien.coraboeuf@gmail.com'
                         }
                     }
+                    dependencyManagement {
+                        dependencies {
+                            dependency {
+                                groupId "org.springframework.boot"
+                                artifactId "spring-boot-dependencies"
+                                version springBootVersion
+                                type "pom"
+                                scope "import"
+                            }
+                        }
+                    }
                 }
             }.writeTo(output)
         }
