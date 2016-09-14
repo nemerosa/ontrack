@@ -26,7 +26,7 @@ bootRepackage {
 }
 
 springBoot {
-    mainClass = 'net.nemerosa.ontrack.dsl.ShellApplication'
+    mainClass = 'net.nemerosa.ontrack.shell.ShellApplication'
 }
 
 // TODO See if needed for the shell JAR
