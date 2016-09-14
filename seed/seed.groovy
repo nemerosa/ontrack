@@ -175,11 +175,18 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             }
         }
     }
+    wrappers {
+        injectPasswords {
+            // Needs the VERSIONEYE_API_KEY
+            injectGlobalPasswords()
+        }
+    }
     steps {
         gradle '''\
 clean
 versionDisplay
 versionFile
+versionEyeUpdate
 test
 integrationTest
 dockerLatest
@@ -188,6 +195,7 @@ build
 -PitJdbcWait=20
 -PitJdbcHost=dockerhost
 -PbowerOptions='--allow-root'
+-Dorg.gradle.jvmargs=-Xmx1536m
 --info
 --stacktrace
 --profile
@@ -254,6 +262,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     ciAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
     -PciHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -328,6 +337,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceDebianDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -359,6 +369,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -PacceptanceRpmDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -428,6 +439,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
     -PontrackVersion=${VERSION} \\
     -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\
     --console plain \\
@@ -503,8 +515,8 @@ publicationMaven
         }
         if (release) {
             shell """\
-docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION} nemerosa/ontrack:\${VERSION}
+docker pull nemerosa/ontrack:\${VERSION}
+docker tag nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION}
 docker push nemerosa/ontrack:latest
@@ -637,6 +649,7 @@ productionUpgrade
 --console plain
 --stacktrace
 productionTest
+-Dorg.gradle.jvmargs=-Xmx1536m \\
 -PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 '''
         }

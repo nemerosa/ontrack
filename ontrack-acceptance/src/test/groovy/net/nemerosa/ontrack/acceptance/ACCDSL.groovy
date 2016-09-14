@@ -278,6 +278,18 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Branch validation stamps with complex names'() {
+        def name = uid('P')
+        ontrack.project(name) {
+            branch('1.0') {
+                validationStamp 'CI.J2EE.JBOSS'
+                validationStamp 'GEN.CSS'
+            }
+        }
+        assert ontrack.branch(name, '1.0').validationStamps*.name == ['CI.J2EE.JBOSS', 'GEN.CSS']
+    }
+
+    @Test
     void 'Validation runs'() {
         def branch = createBuildsAndPromotions()
         // Creates one run
@@ -612,7 +624,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -628,7 +640,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -644,7 +656,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -660,7 +672,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -676,7 +688,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -692,7 +704,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -708,7 +720,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -724,7 +736,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 

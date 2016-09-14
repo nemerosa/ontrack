@@ -34,6 +34,8 @@ class OTHttpClientBuilder {
     private final HttpHost host
     private String username
     private String password
+    private int maxTries = 1
+    private int retryDelaySeconds = 10
     private Closure clientLogger = { message -> println message }
 
     OTHttpClientBuilder(String url, boolean disableSsl) {
@@ -48,6 +50,16 @@ class OTHttpClientBuilder {
 
     OTHttpClientBuilder withLogger(Closure httpClientLogger) {
         this.clientLogger = httpClientLogger
+        return this
+    }
+
+    OTHttpClientBuilder withMaxTries(int value) {
+        this.maxTries = value
+        return this
+    }
+
+    OTHttpClientBuilder withRetryDelaySeconds(int value) {
+        this.retryDelaySeconds = value
         return this
     }
 
@@ -120,6 +132,6 @@ class OTHttpClientBuilder {
                     .setConnectionManager(new PoolingHttpClientConnectionManager(registry)).build()
         }
 
-        new OTHttpClient(url, host, httpClientSupplier, httpContext, clientLogger);
+        new OTHttpClient(url, host, httpClientSupplier, httpContext, clientLogger, maxTries, retryDelaySeconds)
     }
 }

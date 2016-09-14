@@ -123,4 +123,25 @@ class AutoValidationStampPropertyIT extends AbstractServiceTestSupport {
             structureService.getOrCreateValidationStamp(branch, null, name)
         }
     }
+
+    @Test
+    void 'Get validation stamp by name - not found - not predefined - allowing creation'() {
+        def name = uid('PVS')
+        def branch = doCreateBranch()
+        asUser().with(branch, ProjectEdit).call {
+            propertyService.editProperty(
+                    branch.project,
+                    AutoValidationStampPropertyType,
+                    new AutoValidationStampProperty(true, true)
+            )
+        }
+
+        def vs = asUser().with(branch, ProjectEdit).call {
+            structureService.getOrCreateValidationStamp(branch, null, name)
+        }
+
+        assert vs != null
+        assert vs.name == name
+        assert vs.description == "Validation automatically created on demand."
+    }
 }

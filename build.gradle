@@ -15,6 +15,7 @@ buildscript {
 plugins {
     id 'net.nemerosa.versioning' version '1.7.1'
     id 'nebula.os-package' version '2.2.6'
+    id 'org.standardout.versioneye' version '1.4.0'
 }
 
 /**
@@ -31,6 +32,16 @@ allprojects {
  */
 
 apply from: "$rootDir/gradle/dependencies.gradle"
+
+/**
+ * Version Eye integration
+ */
+
+versioneye {
+    includeSubProjects = true
+    includePlugins = false
+    exclude 'testCompile', 'testRuntime'
+}
 
 /**
  * Build task (used only as an anchor point at the root level)

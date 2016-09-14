@@ -22,6 +22,7 @@ public interface RolesService {
             ApplicationManagement.class,
             GlobalSettings.class,
             AccountManagement.class,
+            AccountGroupManagement.class,
             ProjectList.class
     );
 

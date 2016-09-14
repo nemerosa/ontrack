@@ -164,13 +164,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<AccountGroup> getAccountGroups() {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return accountGroupRepository.findAll();
     }
 
     @Override
     public AccountGroup createGroup(NameDescription nameDescription) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         // Creates the account group
         AccountGroup group = AccountGroup.of(nameDescription.getName(), nameDescription.getDescription());
         // Saves it
@@ -179,13 +179,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountGroup getAccountGroup(ID groupId) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return accountGroupRepository.getById(groupId);
     }
 
     @Override
     public AccountGroup updateGroup(ID groupId, NameDescription input) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         AccountGroup group = getAccountGroup(groupId).update(input);
         accountGroupRepository.update(group);
         return group;
@@ -193,7 +193,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Ack deleteGroup(ID groupId) {
-        securityService.checkGlobalFunction(AccountManagement.class);
+        securityService.checkGlobalFunction(AccountGroupManagement.class);
         return accountGroupRepository.delete(groupId);
     }
 
@@ -235,11 +235,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Ack saveGlobalPermission(PermissionTargetType type, int id, PermissionInput input) {
-        securityService.checkGlobalFunction(AccountManagement.class);
         switch (type) {
             case ACCOUNT:
+                securityService.checkGlobalFunction(AccountManagement.class);
                 return roleRepository.saveGlobalRoleForAccount(id, input.getRole());
             case GROUP:
+                securityService.checkGlobalFunction(AccountGroupManagement.class);
                 return roleRepository.saveGlobalRoleForGroup(id, input.getRole());
             default:
                 return Ack.NOK;
@@ -273,11 +274,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Ack deleteGlobalPermission(PermissionTargetType type, int id) {
-        securityService.checkGlobalFunction(AccountManagement.class);
         switch (type) {
             case ACCOUNT:
+                securityService.checkGlobalFunction(AccountManagement.class);
                 return roleRepository.deleteGlobalRoleForAccount(id);
             case GROUP:
+                securityService.checkGlobalFunction(AccountGroupManagement.class);
                 return roleRepository.deleteGlobalRoleForGroup(id);
             default:
                 return Ack.NOK;

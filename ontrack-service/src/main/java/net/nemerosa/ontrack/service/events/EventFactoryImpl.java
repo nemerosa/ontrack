@@ -56,7 +56,8 @@ public class EventFactoryImpl implements EventFactory {
 
     }
 
-    private void register(EventType eventType) {
+    @Override
+    public void register(EventType eventType) {
         if (types.containsKey(eventType.getId())) {
             throw new IllegalStateException(format("Event with ID = %s is already registered.", eventType.getId()));
         } else {

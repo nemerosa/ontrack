@@ -67,7 +67,7 @@ public class AccountServiceIT extends AbstractServiceTestSupport {
         Account origAccount = account();
 
         // Group
-        AccountGroup group = asUser().with(AccountManagement.class).call(() -> accountService.createGroup(nameDescription()));
+        AccountGroup group = asUser().with(AccountGroupManagement.class).call(() -> accountService.createGroup(nameDescription()));
 
         // Updates the account with the group
         Account accountWithGroup = asUser().with(AccountManagement.class).call(() -> accountService.updateAccount(
@@ -87,7 +87,7 @@ public class AccountServiceIT extends AbstractServiceTestSupport {
         assertEquals(group, accountWithGroup.getAccountGroups().get(0));
 
         // Changes the group global role
-        asUser().with(AccountManagement.class).call(() -> accountService.saveGlobalPermission(
+        asUser().with(AccountGroupManagement.class).call(() -> accountService.saveGlobalPermission(
                 PermissionTargetType.GROUP,
                 group.id(),
                 new PermissionInput("CONTROLLER")

@@ -523,12 +523,9 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             throws IOException {
         final CanonicalTreeParser p = new CanonicalTreeParser();
         Repository db = git.getRepository();
-        final ObjectReader or = db.newObjectReader();
-        try {
+        try (ObjectReader or = db.newObjectReader()) {
             p.reset(or, new RevWalk(db).parseTree(id));
             return p;
-        } finally {
-            or.release();
         }
     }
 

@@ -67,7 +67,7 @@ class ACCDSLPredefinedPromotionLevels extends AbstractACCDSL {
         assert pvs != null
         // Downloading the image
         def image = pvs.image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
 
         // Creating a branch
@@ -91,7 +91,7 @@ class ACCDSLPredefinedPromotionLevels extends AbstractACCDSL {
         def vs = ontrack.promotionLevel(projectName, 'B', plName)
         assert vs.id > 0
         image = pvs.image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 

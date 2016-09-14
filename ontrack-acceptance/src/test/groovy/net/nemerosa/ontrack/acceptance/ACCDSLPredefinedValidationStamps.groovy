@@ -26,7 +26,7 @@ class ACCDSLPredefinedValidationStamps extends AbstractACCDSL {
         assert pvs != null
         // Downloading the image
         def image = pvs.image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
 
         // Creating a branch
@@ -50,7 +50,7 @@ class ACCDSLPredefinedValidationStamps extends AbstractACCDSL {
         def vs = ontrack.validationStamp(projectName, 'B', vsName)
         assert vs.id > 0
         image = pvs.image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -122,6 +122,35 @@ class ACCDSLPredefinedValidationStamps extends AbstractACCDSL {
         validationError("Validation stamp not found: ${projectName}/B/${vsName}") {
             build.validate(vsName)
         }
+    }
+
+    @Test
+    void 'Creation of validation stamps authorised for some projects'() {
+        // Name of the validation stamp
+        def vsName = uid('VS')
+
+        // Creating a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B')
+        }
+
+        // Enabling the auto validation stamps on the project, even when not predefiend
+        ontrack.project(projectName).config {
+            autoValidationStamp(true, true)
+        }
+
+        // Creates a build
+        def build = ontrack.branch(projectName, 'B').build('1')
+
+        // Validates a build using a non existing validation stamp on the branch
+        build.validate(vsName)
+
+        // Checks the validation stamp has been created
+        def vs = ontrack.validationStamp(projectName, 'B', vsName)
+        assert vs.id > 0
+        assert vs.name == vsName
+        assert vs.description == "Validation automatically created on demand."
     }
 
 }

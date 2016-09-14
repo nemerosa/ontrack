@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -27,7 +28,7 @@ public class ResourceDecoratorSerializer<T> extends BeanSerializerBase {
         this.resourceDecorator = resourceDecorator;
     }
 
-    protected ResourceDecoratorSerializer(BeanSerializerBase src, String[] toIgnore, ResourceContext resourceContext, ResourceDecorator<T> resourceDecorator) {
+    public ResourceDecoratorSerializer(BeanSerializerBase src, Set<String> toIgnore, ResourceContext resourceContext, ResourceDecorator<T> resourceDecorator) {
         super(src, toIgnore);
         this.resourceContext = resourceContext;
         this.resourceDecorator = resourceDecorator;
@@ -35,7 +36,7 @@ public class ResourceDecoratorSerializer<T> extends BeanSerializerBase {
 
     @Override
     public BeanSerializerBase withObjectIdWriter(ObjectIdWriter objectIdWriter) {
-        return new ResourceDecoratorSerializer<T>(
+        return new ResourceDecoratorSerializer<>(
                 this,
                 objectIdWriter,
                 resourceContext,
@@ -44,8 +45,8 @@ public class ResourceDecoratorSerializer<T> extends BeanSerializerBase {
     }
 
     @Override
-    protected BeanSerializerBase withIgnorals(String[] toIgnore) {
-        return new ResourceDecoratorSerializer<T>(
+    protected BeanSerializerBase withIgnorals(Set<String> toIgnore) {
+        return new ResourceDecoratorSerializer<>(
                 this,
                 toIgnore,
                 resourceContext,

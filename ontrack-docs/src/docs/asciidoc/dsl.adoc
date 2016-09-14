@@ -69,6 +69,24 @@ Ontrack ontrack = OntrackConnection.create(url)
    .build();
 ----
 
+[[dsl-usage-retry]]
+==== Retry mechanism
+
+By default, if the remote Ontrack API cannot be reached, the calls will fail. You can enable a retry mechanism
+by defining a maximum number of retries and a delay between the retries (defaults to 10 seconds):
+
+[source,java]
+----
+Ontrack ontrack = OntrackConnection.create(url)
+    // ...
+    // Max retries
+    .maxTries(10)
+    // Delay between retries (1 minute here)
+    .retryDelaySeconds(60)
+    // OK
+    .build();
+----
+
 [[dsl-usage-calling]]
 ==== Calling the DSL
 
