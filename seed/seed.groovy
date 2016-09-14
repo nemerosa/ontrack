@@ -601,7 +601,18 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        preparePipelineJob delegate, false
+
+        // TODO preparePipelineJob delegate, false
+        // TODO connection on the production Docker machine to setup (using the master in the meantime)
+        parameters {
+            // Link based on full version
+            stringParam('VERSION', '', '')
+            // ... and Git commit
+            stringParam('COMMIT', '', '')
+        }
+        label 'master'
+        extractDeliveryArtifacts delegate, [] as String[]
+
         wrappers {
             injectPasswords()
         }
@@ -613,7 +624,7 @@ if (production) {
 --console plain
 --stacktrace
 productionUpgrade
--PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersion=${VERSION}
 -PproductionPostgresPassword=${ONTRACK_POSTGRESQL_PASSWORD}
 '''
         }
@@ -642,21 +653,23 @@ productionUpgrade
             injectPasswords()
         }
         steps {
-            gradle '''\
---build-file production.gradle
---info
---profile
---console plain
---stacktrace
-productionTest
--Dorg.gradle.jvmargs=-Xmx1536m \\
--PacceptanceJar=ontrack-acceptance-${VERSION}.jar
-'''
+            // Runs the acceptance tests
+            withXvfb delegate, """\
+./gradlew \\
+    --build-file production.gradle
+    productionTest \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
+"""
         }
         publishers {
             archiveJunit('*-tests.xml')
-            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK.SMOKE'
-            ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK'
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ONTRACK.SMOKE'
+            ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ONTRACK'
         }
     }
 
