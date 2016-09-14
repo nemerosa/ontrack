@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.acceptance
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.*
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTNotFoundException
+import net.nemerosa.ontrack.shell.Shell
 import org.junit.Assert
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.dsl
+package net.nemerosa.ontrack.shell
 
 import org.kohsuke.args4j.Option
 import org.kohsuke.args4j.spi.MapOptionHandler

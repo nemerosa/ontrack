@@ -13,6 +13,7 @@ apply plugin: 'spring-boot'
 dependencies {
     testCompile project(':ontrack-client')
     testCompile project(':ontrack-dsl')
+    testCompile project(':ontrack-dsl-shell')
     testCompile project(':ontrack-test-utils')
     testCompile libraries.groovy
     testCompile libraries.spring_boot_starter
