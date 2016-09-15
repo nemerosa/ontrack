@@ -272,24 +272,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         archiveJunit('*-tests.xml')
         if (release) {
             downstreamParameterized {
-                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
-                    condition 'SUCCESS'
-                    parameters {
-                        currentBuild()
-                    }
-                }
-                centOsVersions.each { centOsVersion ->
-                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
-                        condition 'SUCCESS'
-                        parameters {
-                            currentBuild()
-                        }
-                    }
-                }
-            }
-        }
-        if (release) {
-            downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
                     condition 'SUCCESS'
                     parameters {
@@ -316,7 +298,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 // OS packages jobs
 // Only for releases
 
-// TODO if (release) {
+ if (release) {
 
     // Debian package acceptance job
 
@@ -325,7 +307,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             numToKeep(40)
             artifactNumToKeep(5)
         }
-        deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
+        deliveryPipelineConfiguration('Acceptance', 'Debian package acceptance')
         preparePipelineJob delegate
         steps {
             // Runs the CI acceptance tests
@@ -357,7 +339,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
                 numToKeep(40)
                 artifactNumToKeep(5)
             }
-            deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
+            deliveryPipelineConfiguration('Acceptance', "CentOS ${centOsVersion} package acceptance")
             preparePipelineJob delegate
             steps {
                 // Runs the CI acceptance tests
@@ -381,7 +363,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         }
     }
 
-// TODO }
+}
 
 // Docker push
 
@@ -408,6 +390,24 @@ docker logout
                 condition('SUCCESS')
                 parameters {
                     currentBuild() // VERSION
+                }
+            }
+        }
+        if (release) {
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
+                    condition 'SUCCESS'
+                    parameters {
+                        currentBuild()
+                    }
+                }
+                centOsVersions.each { centOsVersion ->
+                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
+                        condition 'SUCCESS'
+                        parameters {
+                            currentBuild()
+                        }
+                    }
                 }
             }
         }
