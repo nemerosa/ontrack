@@ -175,12 +175,14 @@ public class RolesServiceImpl implements RolesService, StartupService {
         register("AUTOMATION", "Automation",
                 "This role can be assigned to users or groups which must automate Ontrack. It aggregates both the " +
                         "Creator and the Controller roles into one.",
-                Collections.singletonList(
-                        ProjectCreation.class
+                Arrays.asList(
+                        ProjectCreation.class,
+                        AccountGroupManagement.class
                 ),
                 Arrays.asList(
                         // Structure creation functions only
                         ProjectConfig.class,
+                        ProjectAuthorisationMgt.class,
                         BranchCreate.class,
                         BranchTemplateMgt.class,
                         PromotionLevelCreate.class,

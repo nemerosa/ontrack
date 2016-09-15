@@ -1,6 +1,10 @@
-package net.nemerosa.ontrack.dsl
+package net.nemerosa.ontrack.shell
 
 import groovy.json.JsonOutput
+import net.nemerosa.ontrack.dsl.DSLException
+import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.OntrackConnection
+import net.nemerosa.ontrack.dsl.OntrackLogger
 import org.kohsuke.args4j.CmdLineException
 import org.kohsuke.args4j.CmdLineParser
 
@@ -123,6 +127,7 @@ class Shell {
 
     static def run(Ontrack ontrack, ShellConnector connector, String script, Map<String, String> params) {
         // Binding
+        //noinspection GroovyAssignabilityCheck
         Map<String, ?> bindingMap = [
                 ontrack: ontrack,
                 shell  : connector

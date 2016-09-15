@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+    }
+}
+
+description = "DSL Shell for Ontrack."
+
+apply plugin: 'spring-boot'
+apply plugin: 'groovy'
+
+dependencies {
+    compile libraries.args4j
+    compile 'org.slf4j:slf4j-api'
+    compile 'org.apache.httpcomponents:httpclient'
+    compile 'org.apache.httpcomponents:httpmime'
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile project(':ontrack-dsl')
+}
+
+bootRepackage {
+    executable = true
+}
+
+springBoot {
+    mainClass = 'net.nemerosa.ontrack.shell.ShellApplication'
+}

@@ -175,11 +175,18 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             }
         }
     }
+    wrappers {
+        injectPasswords {
+            // Needs the VERSIONEYE_API_KEY
+            injectGlobalPasswords()
+        }
+    }
     steps {
         gradle '''\
 clean
 versionDisplay
 versionFile
+versionEyeUpdate
 test
 integrationTest
 dockerLatest

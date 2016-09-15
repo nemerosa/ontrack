@@ -50,6 +50,13 @@ public interface EventFactory {
      */
     EventType toEventType(String id);
 
+    /**
+     * Allows a third-party extension to register an additional event type.
+     *
+     * @param eventType Event type to register.
+     */
+    void register(EventType eventType);
+
     // List of known events
 
     Event newProject(Project project);

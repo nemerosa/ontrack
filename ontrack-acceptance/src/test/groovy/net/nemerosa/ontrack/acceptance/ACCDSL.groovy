@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.acceptance
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.*
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTNotFoundException
+import net.nemerosa.ontrack.shell.Shell
 import org.junit.Assert
 import org.junit.Test
 
@@ -275,6 +275,18 @@ class ACCDSL extends AbstractACCDSL {
             }
         }
         assert ontrack.branch(name, '1.0').validationStamps*.name == ['CI', 'QA']
+    }
+
+    @Test
+    void 'Branch validation stamps with complex names'() {
+        def name = uid('P')
+        ontrack.project(name) {
+            branch('1.0') {
+                validationStamp 'CI.J2EE.JBOSS'
+                validationStamp 'GEN.CSS'
+            }
+        }
+        assert ontrack.branch(name, '1.0').validationStamps*.name == ['CI.J2EE.JBOSS', 'GEN.CSS']
     }
 
     @Test
@@ -612,7 +624,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -628,7 +640,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -644,7 +656,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -660,7 +672,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -676,7 +688,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -692,7 +704,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -708,7 +720,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 
@@ -724,7 +736,7 @@ class ACCDSL extends AbstractACCDSL {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png;charset=UTF-8'
+        assert image.type == 'image/png'
         assert image.content == imageFile.bytes
     }
 

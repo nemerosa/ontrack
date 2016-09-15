@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.3.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
     }
 }
 
@@ -29,6 +29,7 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output
     testCompile libraries.groovy
+    testCompile libraries.spring_boot_starter_test
 
     // List of extensions to include in core
     runtime project(':ontrack-extension-general')

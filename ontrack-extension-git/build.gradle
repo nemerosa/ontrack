@@ -7,7 +7,6 @@ dependencies {
     compile project(':ontrack-extension-scm')
     compile project(':ontrack-git')
     compile project(':ontrack-tx')
-    compile 'org.eclipse.jgit:org.eclipse.jgit:3.5.1.201410131835-r'
     compile libraries.spring_tx
     compile libraries.commons_io
 

@@ -23,6 +23,20 @@ ontrack.project('project') {
 }
 ----
 
+You can also edit the property so that a validation stamp is created even when
+<<validation-stamps-auto-creation-if-not-predefined,no predefined validation stamp>>
+does exit. In this case, the validation stamp will be created with the required name and without any image. To
+enable this feature:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   config {
+      autoValidationStamp(true, true)
+   }
+}
+----
+
 To get the value of this property:
 
 [source,groovy]

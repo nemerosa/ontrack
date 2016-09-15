@@ -40,7 +40,8 @@ of automating the definition of projects and branches.
 
 An **AUTOMATION** user can do the same things than a _CREATOR_ but can, on all
 projects, additionally edit promotion levels and validation stamps, create
-builds, promote and validate them, synchronize branches with their template.
+builds, promote and validate them, synchronize branches with their template,
+manage account groups and project permissions.
 This role is suited for build and integration automation (CI).
 
 A **CONTROLLER** can, on all projects, create builds, promote and validate

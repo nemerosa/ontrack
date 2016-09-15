@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.dsl;
+package net.nemerosa.ontrack.shell;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +15,7 @@ public class ShellApplication {
 
     @Bean
     public Shell shell() {
-        return Shell.forCmdLine(new OntrackLogger() {
-            @Override
-            public void trace(String message) {
-                logger.debug(message);
-            }
-        });
+        return Shell.forCmdLine(logger::debug);
     }
 
     public static void main(String[] args) {

@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.3.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
     }
 }
 
@@ -13,6 +13,7 @@ apply plugin: 'spring-boot'
 dependencies {
     testCompile project(':ontrack-client')
     testCompile project(':ontrack-dsl')
+    testCompile project(':ontrack-dsl-shell')
     testCompile project(':ontrack-test-utils')
     testCompile libraries.groovy
     testCompile libraries.spring_boot_starter

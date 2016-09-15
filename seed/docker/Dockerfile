@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     xvfb \
     iceweasel \
+    graphviz \
     && rm -rf /var/lib/apt/lists/*
 
 # Installing Docker

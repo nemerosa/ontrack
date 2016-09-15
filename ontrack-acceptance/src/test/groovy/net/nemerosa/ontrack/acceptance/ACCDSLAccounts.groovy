@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -118,6 +119,42 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert permissions[0].id == 'PARTICIPANT'
         assert permissions[0].name == 'Participant'
         assert permissions[0].description == "A participant in a project is allowed to change statuses in validation runs."
+    }
+
+    @Test
+    void 'Automation role can create groups'() {
+        // Automation account
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creating a group
+        def group = ontrack.admin.accountGroup(uid('G'), "Test group")
+        assert group != null
+    }
+
+    @Test(expected = OTForbiddenClientException)
+    void 'Automation role cannot create accounts'() {
+        // Automation account
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creating an account
+        ontrack.admin.account(uid('A'), uid('N'), "test@test.com", "pwd")
+    }
+
+    @Test
+    void 'Automation role can set project permissions'() {
+        // Creating a project
+        def projectName = doCreateProject().name.asText() as String
+        // Creating a group
+        String groupName = uid('G')
+        ontrack.admin.accountGroup(groupName, "Test group")
+        // Automation account
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Project permission for this group
+        ontrack.admin.setAccountGroupProjectPermission(projectName, groupName, 'PARTICIPANT')
     }
 
 }
