@@ -107,11 +107,18 @@ def withXvfb(def steps, String script) {
 mkdir -p xvfb-\${EXECUTOR_NUMBER}-\${BUILD_NUMBER}
 let 'NUM = EXECUTOR_NUMBER + 1'
 echo "Display number: \${NUM}"
-nohup /usr/bin/Xvfb :\${NUM} -screen 0 1024x768x24 -fbdir xvfb-\${EXECUTOR_NUMBER}-\${BUILD_NUMBER} &
+nohup /usr/bin/Xvfb :\${NUM} -screen 0 1024x768x24 -fbdir xvfb-\${EXECUTOR_NUMBER}-\${BUILD_NUMBER} & > xvfb.pid
+
+# Make sure to stop Xvfb at the end
+trap "kill -KILL `cat xvfb.pid`" EXIT
 
 export DISPLAY=":\${NUM}"
 
 ${script}
+
+# Exit normally in all cases
+# Evaluation is done by test reporting
+exit 0
 """
 }
 
