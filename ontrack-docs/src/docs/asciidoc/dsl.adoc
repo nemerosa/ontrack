@@ -109,13 +109,16 @@ GroovyShell shell = new GroovyShell(binding);
 Object shellResult = shell.evaluate(script);
 ----
 
+[[dsl-usecases]]
+=== DSL Samples
+
 [[dsl-usecases-security]]
-=== DSL Security
+==== DSL Security
 
 The DSL allows to manage the <<security,accounts>> and the <<security,account groups>>.
 
 [[dsl-usecases-security-accounts]]
-==== Management of accounts
+===== Management of accounts
 
 To add or update a _built-in_ account:
 
@@ -152,7 +155,7 @@ assert account.accountGroups.length == 2
 IMPORTANT: LDAP accounts cannot be created directly. See the <<security,documentation>> for more details.
 
 [[dsl-usecases-security-account-permissions]]
-==== Account permissions
+===== Account permissions
 
 To give a role to an account:
 
@@ -179,7 +182,7 @@ assert permissions[0].name == 'Project owner'
 ----
 
 [[dsl-usecases-security-account-groups]]
-==== Management of account groups
+===== Management of account groups
 
 To add or update an account group:
 
@@ -199,7 +202,7 @@ assert group.description == "Group of administrators"
 ----
 
 [[dsl-usecases-security-account-group-permissions]]
-==== Account group permissions
+===== Account group permissions
 
 To give a role to an account group:
 
@@ -226,7 +229,7 @@ assert permissions[0].name == 'Project owner'
 ----
 
 [[dsl-usecases-ldap-mapping]]
-=== DSL LDAP mapping
+===== DSL LDAP mapping
 
 The <<ldap,LDAP mappings>> can be generated using the DSL.
 
@@ -247,7 +250,7 @@ assert mapping.groupName == 'groupName'
 ----
 
 [[dsl-usecases-images]]
-=== DSL Images and documents
+==== DSL Images and documents
 
 Some resources can be associated with images (like promotion levels and validation stamps) and some documents can be
 downloaded.
@@ -291,7 +294,7 @@ file.bytes = promotionLevel.image.content
 ----
 
 [[dsl-usecases-changelogs]]
-=== DSL Change logs
+==== DSL Change logs
 
 When a branch is configured for a SCM (Git, Subversion), a
 <<changelogs,change log>> can be computed between two builds and following
@@ -306,7 +309,7 @@ TIP: Change logs can also be computed between builds which belong to different
      supported for Git, not for Subversion._
 
 [[dsl-usecases-changelogs-get]]
-==== Getting the change log
+===== Getting the change log
 
 Given two builds, one gets access to the change log using:
 
@@ -325,7 +328,7 @@ On the returned `ChangeLog` object, one can access commits, issues and file
 changes.
 
 [[dsl-usecases-changelogs-commits]]
-==== Commits
+===== Commits
 
 The list of commits can be accessed using the `commits` property:
 
@@ -350,7 +353,7 @@ NOTE: This covers only the common attributes provided by Ontrack - additional
       properties are also available for a specific SCM.
 
 [[dsl-usecases-changelogs-issues]]
-==== Issues
+===== Issues
 
 The list of issues can be accessed using the `issues` property:
 
@@ -373,7 +376,7 @@ NOTE: This covers only the common attributes provided by Ontrack - additional
       properties are also available for a specific issue service.
 
 [[dsl-usecases-changelogs-export]]
-==== Exporting the change log
+===== Exporting the change log
 
 The change log can also be exported as text (HTML and Markdown are also
 available):
@@ -398,7 +401,7 @@ String text = changeLog.exportIssues(
    issues do not fit.
 
 [[dsl-usecases-changelogs-files]]
-==== File changes
+===== File changes
 
 The list of file changes can be accessed using the `files` property:
 
@@ -419,7 +422,7 @@ NOTE: This covers only the common attributes provided by Ontrack - additional
       properties are also available for a specific SCM.
 
 [[dsl-templates]]
-=== DSL Branch template definitions
+==== DSL Branch template definitions
 
 Using the `template(Closure)` method on a branch, one can define the template
 definition for a branch.
@@ -459,7 +462,7 @@ ontrack.branch('project', 'template').instance 'TEST', [
 ----
 
 [[dsl-scm]]
-=== DSL SCM extensions
+==== DSL SCM extensions
 
 If a SCM (<<usage-subversion,Subversion>> or <<usage-git,Git>>) is correctly configured on a branch, it is possible
 to download some files.
