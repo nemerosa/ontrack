@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.graphql;
 
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLSchema;
+import graphql.schema.*;
+import net.nemerosa.ontrack.model.structure.StructureService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +16,9 @@ public class GraphqlConfig {
 
     public static final String QUERY = "Query";
     public static final String PROJECT = "Project";
+
+    @Autowired
+    private StructureService structureService;
 
     /**
      * GraphQL schema definition
@@ -50,12 +53,18 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("project")
-                                .type(projectType())
+                                .type(new GraphQLList(projectType()))
+                                .dataFetcher(projectFetcher())
                                 .build()
                 )
                 // TODO Extension contributions
                 // OK
                 .build();
+    }
+
+    private DataFetcher projectFetcher() {
+        // TODO Search criterias
+        return environment -> structureService.getProjectList();
     }
 
 }
