@@ -1,15 +1,18 @@
 package net.nemerosa.ontrack.graphql;
 
-import graphql.schema.*;
+import graphql.schema.DataFetcher;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLSchema;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
+import static net.nemerosa.ontrack.graphql.GraphqlUtils.*;
 
 @Configuration
 public class GraphqlConfig {
@@ -34,12 +37,10 @@ public class GraphqlConfig {
     private GraphQLObjectType projectType() {
         return newObject()
                 .name(PROJECT)
-                .field(
-                        newFieldDefinition()
-                                .name("name")
-                                .type(new GraphQLNonNull(GraphQLString))
-                                .build()
-                )
+                .field(idField())
+                .field(nameField())
+                .field(descriptionField())
+                .field(disabledField())
                 // TODO Branches
                 // TODO Project properties
                 // OK
