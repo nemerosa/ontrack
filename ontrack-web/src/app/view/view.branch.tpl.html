@@ -38,10 +38,12 @@
         </div>
     </div>
 
-    <div class="row" ng-show="branch.type != 'TEMPLATE_DEFINITION' && !branchBuildView && loadingBuildView">
-        <div class="col-md-12 alert alert-warning">
-            <span class="fa fa-spinner fa-spin"></span>
-            Loading the builds...
+    <div class="row" ng-show="(!branch || branch.type != 'TEMPLATE_DEFINITION') && !branchBuildView && loadingBuildView">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <span class="fa fa-spinner fa-spin"></span>
+                Loading the branch view...
+            </div>
         </div>
     </div>
 
