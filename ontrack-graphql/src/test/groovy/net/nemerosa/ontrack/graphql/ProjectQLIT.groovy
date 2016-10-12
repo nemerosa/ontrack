@@ -21,4 +21,11 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         assert data.project*.id.contains(p.id())
     }
 
+    @Test
+    void 'Project by ID'() {
+        def p = doCreateProject()
+        def data = new GraphQL(ontrackSchema).execute("{project(id: ${p.id}) { name }}").data
+        assert data.project[0].name == p.name
+    }
+
 }

@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.graphql;
 
 import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import net.nemerosa.ontrack.model.structure.BranchType;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
 
+import static graphql.Scalars.GraphQLInt;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.graphql.GraphqlUtils.*;
@@ -85,10 +87,17 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("project")
-                                .type(new GraphQLList(projectType()))
+                                .type(stdList(projectType()))
+                                .argument(
+                                        GraphQLArgument.newArgument()
+                                                .name("id")
+                                                .type(GraphQLInt)
+                                                .build()
+                                )
                                 .dataFetcher(projectFetcher())
                                 .build()
                 )
+                // TODO Branch search
                 // TODO Extension contributions
                 // OK
                 .build();
@@ -108,8 +117,22 @@ public class GraphqlConfig {
     }
 
     private DataFetcher projectFetcher() {
-        // TODO Search criterias
-        return environment -> structureService.getProjectList();
+        return environment -> {
+            Integer id = environment.getArgument("id");
+            if (id != null) {
+                // TODO No other argument is expected
+                // Fetch by ID
+                Project project = structureService.getProject(ID.of(id));
+                // TODO Do we catch a project not found? See GraphQL doc for recommendation
+                // As list
+                return Collections.singletonList(project);
+            }
+            // TODO Other criterias
+            // Whole list
+            else {
+                return structureService.getProjectList();
+            }
+        };
     }
 
 }
