@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.graphql;
 
-import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLSchema;
+import graphql.schema.*;
+import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +17,7 @@ public class GraphqlConfig {
 
     public static final String QUERY = "Query";
     public static final String PROJECT = "Project";
+    public static final String BRANCH = "Branch";
 
     @Autowired
     private StructureService structureService;
@@ -33,6 +32,26 @@ public class GraphqlConfig {
                 .query(queryType())
                 .build();
     }
+
+    private GraphQLObjectType branchType() {
+        return newObject()
+                .name(BRANCH)
+                .field(idField())
+                .field(nameField())
+                .field(descriptionField())
+                .field(disabledField())
+                .field(
+                        newFieldDefinition()
+                                .name("type")
+                                .type(newEnumType(BranchType.class))
+                        .build()
+                )
+                // TODO Branch properties
+                // OK
+                .build();
+    }
+
+
 
     private GraphQLObjectType projectType() {
         return newObject()

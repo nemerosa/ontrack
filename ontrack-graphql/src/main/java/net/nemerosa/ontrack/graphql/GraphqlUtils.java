@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.graphql;
 
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
+import graphql.schema.GraphQLOutputType;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import org.apache.commons.lang3.EnumUtils;
 
 import static graphql.Scalars.*;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -45,6 +48,15 @@ public final class GraphqlUtils {
                 .name("description")
                 .type(GraphQLString)
                 .build();
+    }
+
+    public static <E extends Enum<E>> GraphQLOutputType newEnumType(Class<E> enumClass) {
+        GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
+                .name(enumClass.getSimpleName());
+        for (E e : EnumUtils.getEnumList(enumClass)) {
+            builder = builder.value(e.name(), e);
+        }
+        return builder.build();
     }
 
 }
