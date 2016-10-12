@@ -70,7 +70,7 @@ public class GraphqlConfig {
                 // Branches
                 .field(
                         newFieldDefinition()
-                                .name("branch")
+                                .name("branches")
                                 .type(stdList(branchType()))
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
@@ -86,7 +86,7 @@ public class GraphqlConfig {
                 // Project
                 .field(
                         newFieldDefinition()
-                                .name("project")
+                                .name("projects")
                                 .type(stdList(projectType()))
                                 .argument(
                                         GraphQLArgument.newArgument()
@@ -97,7 +97,14 @@ public class GraphqlConfig {
                                 .dataFetcher(projectFetcher())
                                 .build()
                 )
-                // TODO Branch search
+                // Branches
+                .field(
+                        newFieldDefinition()
+                                .name("branches")
+                                .type(stdList(branchType()))
+                                // TODO Branch search
+                                .build()
+                )
                 // TODO Extension contributions
                 // OK
                 .build();
