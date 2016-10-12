@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.graphql;
 
-import graphql.schema.GraphQLEnumType;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLOutputType;
+import graphql.schema.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.apache.commons.lang3.EnumUtils;
@@ -57,6 +54,19 @@ public final class GraphqlUtils {
             builder = builder.value(e.name(), e);
         }
         return builder.build();
+    }
+
+    /**
+     * Returns a non-null list of non-null types
+     */
+    public static GraphQLOutputType stdList(GraphQLObjectType type) {
+        return new GraphQLNonNull(
+                new GraphQLList(
+                        new GraphQLNonNull(
+                                type
+                        )
+                )
+        );
     }
 
 }

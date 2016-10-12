@@ -1,12 +1,18 @@
 package net.nemerosa.ontrack.graphql;
 
-import graphql.schema.*;
+import graphql.schema.DataFetcher;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLSchema;
 import net.nemerosa.ontrack.model.structure.BranchType;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Collections;
 
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -44,13 +50,12 @@ public class GraphqlConfig {
                         newFieldDefinition()
                                 .name("type")
                                 .type(newEnumType(BranchType.class))
-                        .build()
+                                .build()
                 )
                 // TODO Branch properties
                 // OK
                 .build();
     }
-
 
 
     private GraphQLObjectType projectType() {
@@ -60,7 +65,14 @@ public class GraphqlConfig {
                 .field(nameField())
                 .field(descriptionField())
                 .field(disabledField())
-                // TODO Branches
+                // Branches
+                .field(
+                        newFieldDefinition()
+                                .name("branch")
+                                .type(stdList(branchType()))
+                                .dataFetcher(projectBranchesFetcher())
+                                .build()
+                )
                 // TODO Project properties
                 // OK
                 .build();
@@ -80,6 +92,19 @@ public class GraphqlConfig {
                 // TODO Extension contributions
                 // OK
                 .build();
+    }
+
+    private DataFetcher projectBranchesFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (source instanceof Project) {
+                return structureService.getBranchesForProject(
+                        ((Project) source).getId()
+                );
+            } else {
+                return Collections.emptyList();
+            }
+        };
     }
 
     private DataFetcher projectFetcher() {
