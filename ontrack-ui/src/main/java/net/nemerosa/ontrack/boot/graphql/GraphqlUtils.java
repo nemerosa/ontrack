@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql;
+package net.nemerosa.ontrack.boot.graphql;
 
 import graphql.schema.*;
 import net.nemerosa.ontrack.model.structure.ID;

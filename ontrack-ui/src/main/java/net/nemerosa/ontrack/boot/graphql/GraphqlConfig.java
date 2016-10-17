@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql;
+package net.nemerosa.ontrack.boot.graphql;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLArgument;
@@ -18,7 +18,6 @@ import java.util.Collections;
 import static graphql.Scalars.GraphQLInt;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
-import static net.nemerosa.ontrack.graphql.GraphqlUtils.*;
 
 @Configuration
 public class GraphqlConfig {
@@ -44,14 +43,14 @@ public class GraphqlConfig {
     private GraphQLObjectType branchType() {
         return newObject()
                 .name(BRANCH)
-                .field(idField())
-                .field(nameField())
-                .field(descriptionField())
-                .field(disabledField())
+                .field(GraphqlUtils.idField())
+                .field(GraphqlUtils.nameField())
+                .field(GraphqlUtils.descriptionField())
+                .field(GraphqlUtils.disabledField())
                 .field(
                         newFieldDefinition()
                                 .name("type")
-                                .type(newEnumType(BranchType.class))
+                                .type(GraphqlUtils.newEnumType(BranchType.class))
                                 .build()
                 )
                 // TODO Branch properties
@@ -63,15 +62,15 @@ public class GraphqlConfig {
     private GraphQLObjectType projectType() {
         return newObject()
                 .name(PROJECT)
-                .field(idField())
-                .field(nameField())
-                .field(descriptionField())
-                .field(disabledField())
+                .field(GraphqlUtils.idField())
+                .field(GraphqlUtils.nameField())
+                .field(GraphqlUtils.descriptionField())
+                .field(GraphqlUtils.disabledField())
                 // Branches
                 .field(
                         newFieldDefinition()
                                 .name("branches")
-                                .type(stdList(branchType()))
+                                .type(GraphqlUtils.stdList(branchType()))
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
@@ -87,7 +86,7 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("projects")
-                                .type(stdList(projectType()))
+                                .type(GraphqlUtils.stdList(projectType()))
                                 .argument(
                                         GraphQLArgument.newArgument()
                                                 .name("id")
@@ -101,7 +100,7 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("branches")
-                                .type(stdList(branchType()))
+                                .type(GraphqlUtils.stdList(branchType()))
                                 // TODO Branch search
                                 .build()
                 )
