@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class GraphqlController {
      * GET end point
      */
     @RequestMapping(method = RequestMethod.GET)
+    @Transactional
     public ResponseEntity<JsonNode> get(
             @RequestParam String query,
             @RequestParam(required = false) String variables,
@@ -76,6 +78,7 @@ public class GraphqlController {
      * POST end point
      */
     @RequestMapping(method = RequestMethod.POST)
+    @Transactional
     public ResponseEntity<JsonNode> post(@RequestBody String input) throws IOException {
         // Gets the components
         Request request = objectMapper.readValue(input, Request.class);
