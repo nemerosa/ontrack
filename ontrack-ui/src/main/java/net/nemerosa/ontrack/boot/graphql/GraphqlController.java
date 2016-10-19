@@ -5,14 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
+import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -32,6 +31,25 @@ public class GraphqlController {
     }
 
     /**
+     * Request model
+     */
+    @Data
+    public static class Request {
+        private final String query;
+        @Wither
+        private final Map<String, Object> variables;
+        private final String operationName;
+
+        public Request withVariables() {
+            if (variables == null) {
+                return withVariables(Collections.emptyMap());
+            } else {
+                return this;
+            }
+        }
+    }
+
+    /**
      * GET end point
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -43,12 +61,53 @@ public class GraphqlController {
         // Parses the arguments
         Map<String, Object> arguments = decodeIntoMap(variables);
         // Runs the query
-        // TODO Execution strategy
-        ExecutionResult executionResult = new GraphQL(schema).execute(query, operationName, null, arguments);
-        // As JSON
         return ResponseEntity.ok(
-                objectMapper.valueToTree(executionResult)
+                requestAsJson(
+                        new Request(
+                                query,
+                                arguments,
+                                operationName
+                        )
+                )
         );
+    }
+
+    /**
+     * POST end point
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<JsonNode> post(@RequestBody String input) throws IOException {
+        // Gets the components
+        Request request = objectMapper.readValue(input, Request.class);
+        // Variables must not be null
+        request = request.withVariables();
+        // Runs the query
+        return ResponseEntity.ok(
+                requestAsJson(request)
+        );
+    }
+
+    /**
+     * Request execution (JSON)
+     */
+    public JsonNode requestAsJson(Request request) {
+        return objectMapper.valueToTree(
+                request(request)
+        );
+
+    }
+
+    /**
+     * Request execution
+     */
+    public ExecutionResult request(Request request) {
+        // TODO Execution strategy
+        return new GraphQL(schema).execute(
+                request.getQuery(),
+                request.getOperationName(),
+                null, // No context
+                request.getVariables());
+
     }
 
     @SuppressWarnings("unchecked")
