@@ -62,9 +62,13 @@ deleted.
 
 If the _deleting_ days are set to 0, no branch will ever be deleted.
 
+You can also set a list of <<model,promotion levels>> - a branch which is or has been promoted to such
+a promotion level will not be eligible for being disabled or deleted.
+
 In the sample above, the stale branches will be disabled after 60 days (not
 shown any longer by default), and after again 300 days, they will be deleted
-(so after 360 days in total).
+(so after 360 days in total). Branches which have at least one build being promoted to `PRODUCTION` will not
+be deleted or disabled.s
 
 Note that the _Stale branches_ property can also be set programmatically using
 the [DSL](DSL Property Stale Branches).
