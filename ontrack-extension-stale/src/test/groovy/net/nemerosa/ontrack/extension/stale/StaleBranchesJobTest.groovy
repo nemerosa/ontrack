@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.stale
 
-import net.nemerosa.ontrack.job.Job
 import net.nemerosa.ontrack.job.JobRegistration
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.JobScheduler
-import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventQueryService
@@ -17,7 +15,6 @@ import java.util.stream.Collectors
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static org.mockito.Matchers.any
-import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.*
 
 class StaleBranchesJobTest {
@@ -59,6 +56,16 @@ class StaleBranchesJobTest {
         // By default, no build
         when(structureService.getLastBuild(any(ID))).thenReturn(Optional.empty())
 
+        // Last promotions
+        when(structureService.getBranchStatusView(branch)).thenReturn(
+                new BranchStatusView(
+                        branch,
+                        [],
+                        null,
+                        []
+                )
+        )
+
         // Times
         now = LocalDateTime.now()
         disablingTime = now.minusDays(5)
@@ -72,7 +79,7 @@ class StaleBranchesJobTest {
         // Branch creation for deletion (normally)
         configureBranchCreationEvent(11)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -83,7 +90,7 @@ class StaleBranchesJobTest {
         // Last build for deletion
         configureBuild(11)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService).deleteBranch(branch.id)
         verify(structureService, never()).saveBranch(any(Branch))
@@ -96,7 +103,7 @@ class StaleBranchesJobTest {
         // Last build for deletion
         configureBuild(11)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -107,7 +114,7 @@ class StaleBranchesJobTest {
         // Last build for disabling
         configureBuild(6)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -118,7 +125,7 @@ class StaleBranchesJobTest {
         // Last build still OK
         configureBuild(4)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -129,7 +136,7 @@ class StaleBranchesJobTest {
         // Configure branch for deletion
         configureBranchCreationEvent(11)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService).deleteBranch(branch.id)
         verify(structureService, never()).saveBranch(any(Branch))
@@ -140,10 +147,84 @@ class StaleBranchesJobTest {
         // Configure branch for disabling
         configureBranchCreationEvent(6)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
+    }
+
+    @Test
+    void 'Not disabling a branch because of promotions'() {
+        // Configure branch for disabling
+        configureBranchCreationEvent(6)
+        // Promotion
+        configureBranchForPromotion()
+
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, ['PRODUCTION'])
+
+        verify(structureService, never()).deleteBranch(any(ID))
+        verify(structureService, never()).saveBranch(any(Branch))
+    }
+
+    @Test
+    void 'Disabling a branch even if promoted when not configured'() {
+        // Configure branch for disabling
+        configureBranchCreationEvent(6)
+        // Promotion
+        configureBranchForPromotion()
+
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
+
+        verify(structureService, never()).deleteBranch(any(ID))
+        verify(structureService).saveBranch(branch.withDisabled(true))
+    }
+
+    public void configureBranchForPromotion() {
+        def production = PromotionLevel.of(branch, nd('PRODUCTION', ''))
+        when(structureService.getBranchStatusView(branch)).thenReturn(
+                new BranchStatusView(
+                        branch,
+                        [],
+                        null,
+                        [
+                                new PromotionView(
+                                        production,
+                                        PromotionRun.of(
+                                                Build.of(branch, nd('1', ''), Signature.of('test')),
+                                                production,
+                                                Signature.of('test'),
+                                                ''
+                                        )
+                                )
+                        ]
+                )
+        )
+    }
+
+    @Test
+    void 'Not deleting a branch because of promotions'() {
+        // Configure branch for deletion
+        configureBranchCreationEvent(11)
+        // Promotion
+        configureBranchForPromotion()
+
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, ['PRODUCTION'])
+
+        verify(structureService, never()).deleteBranch(any(ID))
+        verify(structureService, never()).saveBranch(any(Branch))
+    }
+
+    @Test
+    void 'Deleting a branch even if promoted when not configured'() {
+        // Configure branch for deletion
+        configureBranchCreationEvent(11)
+        // Promotion
+        configureBranchForPromotion()
+
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
+
+        verify(structureService).deleteBranch(branch.id)
+        verify(structureService, never()).saveBranch(any(Branch))
     }
 
     @Test
@@ -151,7 +232,7 @@ class StaleBranchesJobTest {
         // Configure branch for OK
         configureBranchCreationEvent(4)
 
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -159,7 +240,7 @@ class StaleBranchesJobTest {
 
     @Test
     void 'Not touching a branch when no branch creation time'() {
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, [])
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -202,7 +283,9 @@ class StaleBranchesJobTest {
         // Gets the list of jobs
         List<JobRegistration> jobs = staleJobService.collectJobRegistrations().collect(Collectors.toList())
         // Verifies the job has not been scheduled
-        assert jobs.find { it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))} != null
+        assert jobs.find {
+            it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))
+        } != null
     }
 
     @Test
@@ -212,7 +295,9 @@ class StaleBranchesJobTest {
         // Gets the list of jobs
         List<JobRegistration> jobs = staleJobService.collectJobRegistrations().collect(Collectors.toList())
         // Verifies the job has not been scheduled
-        assert jobs.find { it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))} == null
+        assert jobs.find {
+            it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))
+        } == null
     }
 
     @Test
@@ -223,7 +308,9 @@ class StaleBranchesJobTest {
         // Gets the list of jobs
         List<JobRegistration> jobs = staleJobService.collectJobRegistrations().collect(Collectors.toList())
         // Verifies the job has been scheduled
-        assert jobs.find { it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))} != null
+        assert jobs.find {
+            it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))
+        } != null
     }
 
     @Test
@@ -234,12 +321,16 @@ class StaleBranchesJobTest {
         // Gets the list of jobs
         List<JobRegistration> jobs = staleJobService.collectJobRegistrations().collect(Collectors.toList())
         // Verifies the job has been scheduled
-        assert jobs.find { it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))} != null
+        assert jobs.find {
+            it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))
+        } != null
         // Unconfigures the project
         configureProject(null)
         // Verifies the job has been unscheduled
         jobs = staleJobService.collectJobRegistrations().collect(Collectors.toList())
-        assert jobs.find { it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))} == null
+        assert jobs.find {
+            it.job.key == StaleJobServiceImpl.STALE_BRANCH_JOB.getKey(String.valueOf(project.id))
+        } == null
     }
 
     protected def configureProject(StaleProperty property) {

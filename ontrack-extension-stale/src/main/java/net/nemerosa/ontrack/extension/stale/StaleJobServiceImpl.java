@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.stale;
 
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.job.*;
-import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier;
 import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
@@ -13,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Component
@@ -100,6 +98,7 @@ public class StaleJobServiceImpl implements StaleJobService {
             // Disabling and deletion times
             int disablingDuration = property.getDisablingDuration();
             int deletionDuration = property.getDeletingDuration();
+            List<String> promotionsToKeep = property.getPromotionsToKeep();
             if (disablingDuration <= 0) {
                 trace(project, "No disabling time being set - exiting.");
             } else {
@@ -121,18 +120,34 @@ public class StaleJobServiceImpl implements StaleJobService {
                 runListener.message("Scanning %s project for stale branches", project.getName());
                 trace(project, "Scanning project for stale branches");
                 structureService.getBranchesForProject(project.getId()).forEach(
-                        branch -> detectAndManageStaleBranch(branch, disablingTime, deletionTime.orElse(null))
+                        branch -> detectAndManageStaleBranch(branch, disablingTime, deletionTime.orElse(null), promotionsToKeep)
                 );
             }
         });
     }
 
     @Override
-    public void detectAndManageStaleBranch(Branch branch, LocalDateTime disablingTime, LocalDateTime deletionTime) {
+    public void detectAndManageStaleBranch(Branch branch, LocalDateTime disablingTime, LocalDateTime deletionTime, List<String> promotionsToKeep) {
         trace(branch.getProject(), "[%s] Scanning branch for staleness", branch.getName());
         // Templates are excluded
         if (branch.getType() == BranchType.TEMPLATE_DEFINITION) {
             trace(branch.getProject(), "[%s] Branch templates are not eligible for staleness", branch.getName());
+            return;
+        }
+        // Indexation of promotion levels to protect
+        Set<String> promotionsToProtect;
+        if (promotionsToKeep != null) {
+            promotionsToProtect = new HashSet<>(promotionsToKeep);
+        } else {
+            promotionsToProtect = Collections.emptySet();
+        }
+        // Gets the last promotions for this branch
+        List<PromotionView> lastPromotions = structureService.getBranchStatusView(branch).getPromotions();
+        boolean isProtected = lastPromotions.stream()
+                .anyMatch(promotionView -> promotionView.getPromotionRun() != null
+                        && promotionsToProtect.contains(promotionView.getPromotionLevel().getName()));
+        if (isProtected) {
+            trace(branch.getProject(), "[%s] Branch is promoted and is not eligible for staleness", branch.getName());
             return;
         }
         // Last date
