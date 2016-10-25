@@ -9,11 +9,11 @@ import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
+import net.nemerosa.ontrack.model.form.MultiStrings;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.JobProvider;
-import net.nemerosa.ontrack.job.JobRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +91,12 @@ public class StalePropertyType extends AbstractPropertyType<StaleProperty> imple
                                         "disabled automatically. 0 means that " +
                                         "the branch won't ever be deleted automatically.")
                                 .value(value != null ? value.getDeletingDuration() : 0)
+                )
+                .with(
+                        MultiStrings.of("promotionsToKeep")
+                                .label("Promotions to keep")
+                                .help("List of promotion levels which prevent a branch to be disabled or deleted")
+                                .value(value != null ? value.getPromotionsToKeep() : Collections.emptyList())
                 )
                 ;
     }
