@@ -21,6 +21,7 @@ class ACCDSLStaleProperty extends AbstractACCDSL {
         def property = project.config.stale
         assert property.disablingDuration == 0
         assert property.deletingDuration == 0
+        assert property.promotionsToKeep == []
 
         // Sets the stale property
         project.config {
@@ -31,6 +32,26 @@ class ACCDSLStaleProperty extends AbstractACCDSL {
         property = project.config.stale
         assert property.disablingDuration == 15
         assert property.deletingDuration == 30
+        assert property.promotionsToKeep == []
+
+    }
+
+    @Test
+    void 'Stale property with promotions to keep'() {
+
+        // Creating a project and a branch
+        def project = ontrack.project(uid('P'))
+
+        // Sets the stale property
+        project.config {
+            stale 15, 30, [ 'DELIVERY', 'PRODUCTION']
+        }
+
+        // Gets the stale property
+        def property = project.config.stale
+        assert property.disablingDuration == 15
+        assert property.deletingDuration == 30
+        assert property.promotionsToKeep == [ 'DELIVERY', 'PRODUCTION']
 
     }
 

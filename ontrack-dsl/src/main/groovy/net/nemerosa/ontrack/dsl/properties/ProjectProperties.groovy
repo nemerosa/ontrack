@@ -20,13 +20,14 @@ class ProjectProperties extends ProjectEntityProperties {
      *
      * Sets the disabling and deleting durations (in days) on the project.
      */
-    @DSLMethod(value = "Setup of stale branches management.", count = 2)
-    def stale(int disablingDuration = 0, int deletingDuration = 0) {
+    @DSLMethod(value = "Setup of stale branches management.", count = 3)
+    def stale(int disablingDuration = 0, int deletingDuration = 0, List<String> promotionsToKeep = []) {
         assert disablingDuration >= 0: "The disabling duration must be >= 0"
         assert deletingDuration >= 0: "The deleting duration must be >= 0"
         property('net.nemerosa.ontrack.extension.stale.StalePropertyType', [
                 disablingDuration: disablingDuration,
                 deletingDuration : deletingDuration,
+                promotionsToKeep : promotionsToKeep,
         ])
     }
 
@@ -41,6 +42,7 @@ class ProjectProperties extends ProjectEntityProperties {
             return [
                     disablingDuration: 0,
                     deletingDuration : 0,
+                    promotionsToKeep: [],
             ]
         }
     }
