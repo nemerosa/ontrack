@@ -98,6 +98,7 @@ public class GraphqlConfig {
                                 .argument(
                                         GraphQLArgument.newArgument()
                                                 .name("name")
+                                                .description("Exact name of the branch to look for.")
                                                 .type(GraphQLString)
                                                 .build()
                                 )
