@@ -38,4 +38,23 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         assert data.projects[0].branches*.name == ["B1", "B2"]
     }
 
+    @Test
+    void 'Branch by name'() {
+        def p = doCreateProject()
+        doCreateBranch(p, NameDescription.nd("B1", ""))
+        doCreateBranch(p, NameDescription.nd("B2", ""))
+        def data = new GraphQL(ontrackSchema).execute("{projects(id: ${p.id}) { name branches(name: 'B2') { name } } }").data
+        assert data.projects[0].branches*.name == ["B2"]
+    }
+
+    @Test
+    void 'Builds for a branch'() {
+        def b = doCreateBuild()
+        def p = b.project
+        def branchName = b.branch.name
+        def data = new GraphQL(ontrackSchema).execute("{projects(id: ${p.id}) { name branches(name: '${branchName}') { name builds { name } } } }").data
+        def rBranch = data.projects[0].branches[0]
+        assert rBranch.builds*.name == [b.name]
+    }
+
 }
