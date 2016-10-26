@@ -8,6 +8,8 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+import static org.junit.Assert.fail
+
 class ProjectQLIT extends AbstractServiceTestSupport {
 
     @Autowired
@@ -17,7 +19,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     @Test
     void 'All projects'() {
         def p = doCreateProject()
-        def data = new GraphQL(ontrackSchema).execute('{projects { id name }}').data
+        def data = run('{projects { id name }}')
         assert data.projects*.name.contains(p.name)
         assert data.projects*.id.contains(p.id())
     }
@@ -25,7 +27,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     @Test
     void 'Project by ID'() {
         def p = doCreateProject()
-        def data = new GraphQL(ontrackSchema).execute("{projects(id: ${p.id}) { name }}").data
+        def data = run("{projects(id: ${p.id}) { name }}")
         assert data.projects[0].name == p.name
     }
 
@@ -34,7 +36,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         def p = doCreateProject()
         doCreateBranch(p, NameDescription.nd("B1", ""))
         doCreateBranch(p, NameDescription.nd("B2", ""))
-        def data = new GraphQL(ontrackSchema).execute("{projects(id: ${p.id}) { name branches { name } }}").data
+        def data = run("{projects(id: ${p.id}) { name branches { name } }}")
         assert data.projects[0].branches*.name == ["B1", "B2"]
     }
 
@@ -43,7 +45,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         def p = doCreateProject()
         doCreateBranch(p, NameDescription.nd("B1", ""))
         doCreateBranch(p, NameDescription.nd("B2", ""))
-        def data = new GraphQL(ontrackSchema).execute("{projects(id: ${p.id}) { name branches(name: 'B2') { name } } }").data
+        def data = run("{projects(id: ${p.id}) { name branches(name: 'B2') { name } } }")
         assert data.projects[0].branches*.name == ["B2"]
     }
 
@@ -52,9 +54,20 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         def b = doCreateBuild()
         def p = b.project
         def branchName = b.branch.name
-        def data = new GraphQL(ontrackSchema).execute("{projects(id: ${p.id}) { name branches(name: '${branchName}') { name builds { name } } } }").data
+        def data = run("{projects(id: ${p.id}) { name branches(name: '${branchName}') { name builds { name } } } }")
         def rBranch = data.projects[0].branches[0]
         assert rBranch.builds*.name == [b.name]
+    }
+
+    def run(String query) {
+        def result = new GraphQL(ontrackSchema).execute(query)
+        if (result.errors && !result.errors.empty) {
+            fail result.errors*.message.join('\n')
+        } else if (result.data) {
+            return result.data
+        } else {
+            fail "No data was returned and no error was thrown."
+        }
     }
 
 }
