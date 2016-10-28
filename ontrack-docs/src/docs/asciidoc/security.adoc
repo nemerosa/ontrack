@@ -48,6 +48,8 @@ A **CONTROLLER** can, on all projects, create builds, promote and validate
 them, synchronize branches with their template. It is suited for a basic CI
 need when the Ontrack structure already exists and does not need to be created.
 
+A **READ_ONLY** can view all projects, but cannot perform any action on them.
+
 The global roles can only be assigned by an _administrator_, in the _Account
 management_ page, by going to the _Global permissions_ command.
 
@@ -82,6 +84,8 @@ validation runs statuses.
 A project **PROJECT_MANAGER** cumulates the functions of a PROMOTER and of a
 VALIDATION\_MANAGER. He can additional manage the common
 build filters.
+
+A project **READ_ONLY** user can view this project, but cannot perform any action on it.
 
 Only project owners, automation users and administrators can grant rights
 in a project.
