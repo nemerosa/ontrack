@@ -130,6 +130,12 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 projectManagerFunctions
         );
 
+        // Read only on a project
+        register("READ_ONLY", "Read Only",
+                "This role grants a read-only access to all components of the projects",
+                readOnlyProjectFunctions
+        );
+
     }
 
     private void register(String id, String name, String description, List<Class<? extends ProjectFunction>> projectFunctions) {
@@ -211,6 +217,13 @@ public class RolesServiceImpl implements RolesService, StartupService {
                         ValidationRunCreate.class,
                         BranchTemplateSync.class
                 )
+        );
+
+        // Read only on all projects
+        register("READ_ONLY", "Read Only",
+                "This role grants a read-only access to all projects",
+                readOnlyGlobalFunctions,
+                readOnlyProjectFunctions
         );
 
     }
