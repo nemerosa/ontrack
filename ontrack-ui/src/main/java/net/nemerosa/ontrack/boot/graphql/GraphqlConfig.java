@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.graphql;
 
+import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLObjectType;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static graphql.Scalars.GraphQLInt;
@@ -81,8 +83,7 @@ public class GraphqlConfig {
                         newFieldDefinition()
                                 .name("builds")
                                 // TODO Build filtering
-                                // TODO Use connectionList
-                                .type(GraphqlUtils.stdList(buildType()))
+                                .type(GraphqlUtils.connectionList(buildType()))
                                 .dataFetcher(branchBuildsFetcher())
                                 .build()
                 )
@@ -202,11 +203,12 @@ public class GraphqlConfig {
                 // TODO Build filtering
                 BuildFilter buildFilter = buildFilterService.standardFilter(10).build();
                 // Result
-                return structureService.getFilteredBuilds(
+                List<Build> builds = structureService.getFilteredBuilds(
                         branch.getId(),
                         buildFilter
                 );
-                // TODO Connection list
+                // As a connection list
+                return new SimpleListConnection(builds).get(environment);
             } else {
                 return Collections.emptyList();
             }

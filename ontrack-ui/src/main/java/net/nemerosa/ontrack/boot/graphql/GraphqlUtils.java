@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.boot.graphql;
 
 import graphql.schema.*;
+import net.nemerosa.ontrack.boot.graphql.relay.Relay;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.apache.commons.lang3.EnumUtils;
+
+import java.util.Collections;
 
 import static graphql.Scalars.*;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -69,4 +72,18 @@ public final class GraphqlUtils {
         );
     }
 
+    public static GraphQLOutputType connectionList(GraphQLObjectType type) {
+        return new GraphQLNonNull(
+                Relay.connectionType(
+                        type.getName() + "Connection",
+                        Relay.edgeType(
+                                type.getName() + "Edge",
+                                type,
+                                null,
+                                Collections.emptyList()
+                        ),
+                        Collections.emptyList()
+                )
+        );
+    }
 }
