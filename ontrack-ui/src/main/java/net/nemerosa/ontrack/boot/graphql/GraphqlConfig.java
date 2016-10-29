@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.boot.graphql;
 
 import graphql.relay.SimpleListConnection;
-import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLSchema;
+import graphql.schema.*;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -13,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +24,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 public class GraphqlConfig {
 
     public static final String QUERY = "Query";
+    public static final String PROJECT_ENTITY = "ProjectEntity";
     public static final String PROJECT = "Project";
     public static final String BRANCH = "Branch";
     public static final String BUILD = "Build";
@@ -47,14 +46,32 @@ public class GraphqlConfig {
                 .build();
     }
 
+    private List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
+        return Arrays.asList(
+                GraphqlUtils.idField(),
+                GraphqlUtils.nameField(),
+                GraphqlUtils.descriptionField()
+        );
+    }
+
+    private GraphQLInterfaceType projectEntityInterface() {
+        return GraphQLInterfaceType.newInterface()
+                .name(PROJECT_ENTITY)
+                .fields(projectEntityInterfaceFields())
+                // TODO Properties
+                // TODO Type resolver not set, but it should
+                .typeResolver(new TypeResolverProxy())
+                // OK
+                .build();
+    }
+
     // TODO Define a ProjectEntity interface
 
     private GraphQLObjectType buildType() {
         return newObject()
                 .name(BUILD)
-                .field(GraphqlUtils.idField())
-                .field(GraphqlUtils.nameField())
-                .field(GraphqlUtils.descriptionField())
+                .withInterface(projectEntityInterface())
+                .fields(projectEntityInterfaceFields())
                 // TODO Signature
                 // TODO Promotion runs
                 // TODO Validation runs
@@ -66,9 +83,8 @@ public class GraphqlConfig {
     private GraphQLObjectType branchType() {
         return newObject()
                 .name(BRANCH)
-                .field(GraphqlUtils.idField())
-                .field(GraphqlUtils.nameField())
-                .field(GraphqlUtils.descriptionField())
+                .withInterface(projectEntityInterface())
+                .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
                 .field(
                         newFieldDefinition()
@@ -95,9 +111,8 @@ public class GraphqlConfig {
     private GraphQLObjectType projectType() {
         return newObject()
                 .name(PROJECT)
-                .field(GraphqlUtils.idField())
-                .field(GraphqlUtils.nameField())
-                .field(GraphqlUtils.descriptionField())
+                .withInterface(projectEntityInterface())
+                .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
                 // Branches
                 .field(
