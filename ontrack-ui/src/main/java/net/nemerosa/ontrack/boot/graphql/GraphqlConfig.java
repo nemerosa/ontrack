@@ -4,6 +4,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,6 +30,9 @@ public class GraphqlConfig {
 
     @Autowired
     private StructureService structureService;
+
+    @Autowired
+    private BuildFilterService buildFilterService;
 
     /**
      * GraphQL schema definition
@@ -75,9 +80,10 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("builds")
+                                // TODO Build filtering
                                 // TODO Use connectionList
                                 .type(GraphqlUtils.stdList(buildType()))
-                                // TODO Build fetcher
+                                .dataFetcher(branchBuildsFetcher())
                                 .build()
                 )
                 // OK
@@ -159,8 +165,7 @@ public class GraphqlConfig {
                     } else {
                         return Collections.emptyList();
                     }
-                }
-                else {
+                } else {
                     return structureService.getBranchesForProject(
                             project.getId()
                     );
@@ -185,6 +190,25 @@ public class GraphqlConfig {
             // Whole list
             else {
                 return structureService.getProjectList();
+            }
+        };
+    }
+
+    private DataFetcher branchBuildsFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (source instanceof Branch) {
+                Branch branch = (Branch) source;
+                // TODO Build filtering
+                BuildFilter buildFilter = buildFilterService.standardFilter(10).build();
+                // Result
+                return structureService.getFilteredBuilds(
+                        branch.getId(),
+                        buildFilter
+                );
+                // TODO Connection list
+            } else {
+                return Collections.emptyList();
             }
         };
     }
