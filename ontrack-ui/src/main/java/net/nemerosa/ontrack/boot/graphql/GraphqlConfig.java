@@ -40,6 +40,8 @@ public class GraphqlConfig {
                 .build();
     }
 
+    // TODO Define a ProjectEntity interface
+
     private GraphQLObjectType buildType() {
         return newObject()
                 .name(BUILD)
@@ -122,6 +124,7 @@ public class GraphqlConfig {
                                 .argument(
                                         GraphQLArgument.newArgument()
                                                 .name("id")
+                                                .description("ID of the project to look for")
                                                 .type(GraphQLInt)
                                                 .build()
                                 )

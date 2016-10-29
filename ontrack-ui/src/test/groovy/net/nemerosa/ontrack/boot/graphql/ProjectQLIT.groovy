@@ -45,7 +45,10 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         def p = doCreateProject()
         doCreateBranch(p, NameDescription.nd("B1", ""))
         doCreateBranch(p, NameDescription.nd("B2", ""))
-        def data = run("{projects(id: ${p.id}) { name branches(name: 'B2') { name } } }")
+
+        def query = "{projects(id: ${p.id}) { name branches(name: 'B2') { id } } }"
+        println query
+        def data = run(query)
         assert data.projects[0].branches*.name == ["B2"]
     }
 
