@@ -28,6 +28,7 @@ public class GraphqlConfig {
     public static final String PROJECT = "Project";
     public static final String BRANCH = "Branch";
     public static final String BUILD = "Build";
+    public static final String PROMOTION_LEVEL = "PromotionLevel";
 
     @Autowired
     private StructureService structureService;
@@ -93,7 +94,15 @@ public class GraphqlConfig {
                                 .build()
                 )
                 // TODO Events: branch creation
-                // TODO Branch properties
+                // Promotion levels
+                .field(
+                        newFieldDefinition()
+                                .name("promotionLevels")
+                                .type(GraphqlUtils.stdList(promotionLevelType()))
+                                .dataFetcher(branchPromotionLevelsFetcher())
+                                .build()
+                )
+                // TODO Validation stamps
                 // Builds for the branch
                 .field(
                         newFieldDefinition()
@@ -110,6 +119,16 @@ public class GraphqlConfig {
                                 .dataFetcher(branchBuildsFetcher())
                                 .build()
                 )
+                // OK
+                .build();
+    }
+
+    private GraphQLObjectType promotionLevelType() {
+        return newObject()
+                .name(PROMOTION_LEVEL)
+                .withInterface(projectEntityInterface())
+                .fields(projectEntityInterfaceFields())
+                // TODO Image
                 // OK
                 .build();
     }
@@ -233,6 +252,18 @@ public class GraphqlConfig {
                 );
                 // As a connection list
                 return new SimpleListConnection(builds).get(environment);
+            } else {
+                return Collections.emptyList();
+            }
+        };
+    }
+
+    private DataFetcher branchPromotionLevelsFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (source instanceof Branch) {
+                Branch branch = (Branch) source;
+                return structureService.getPromotionLevelListForBranch(branch.getId());
             } else {
                 return Collections.emptyList();
             }

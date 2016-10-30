@@ -53,6 +53,25 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    void 'Promotion levels for a branch'() {
+        def branch = doCreateBranch()
+        def project = branch.project
+        (1..5).each {
+            doCreatePromotionLevel(branch, NameDescription.nd("PL${it}", "Promotion level ${it}"))
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    promotionLevels {
+                        name
+                    }
+                }
+            }
+        }""")
+        assert data.projects[0].branches.promotionLevels.name.flatten() == (1..5).collect { "PL${it}" }
+    }
+
+    @Test
     void 'Builds for a branch'() {
         def b = doCreateBuild()
         def p = b.project
