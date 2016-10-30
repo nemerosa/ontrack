@@ -5,6 +5,7 @@ import graphql.schema.*;
 import net.nemerosa.ontrack.boot.graphql.relay.Relay;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
+import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -81,7 +82,13 @@ public class GraphqlConfig {
                         newFieldDefinition()
                                 .name("promotionRuns")
                                 .description("Promotions for this build")
-                                // TODO Filter on promotion
+                                .argument(
+                                        GraphQLArgument.newArgument()
+                                                .name("promotion")
+                                                .description("Name of the promotion level")
+                                                .type(GraphQLString)
+                                                .build()
+                                )
                                 .type(GraphqlUtils.stdList(new GraphQLTypeReference(PROMOTION_RUN)))
                                 .dataFetcher(buildPromotionRunsFetcher())
                                 .build()
@@ -325,9 +332,25 @@ public class GraphqlConfig {
             Object source = environment.getSource();
             if (source instanceof Build) {
                 Build build = (Build) source;
-                // TODO Promotion filter
-                // Gets all the promotion runs
-                return structureService.getPromotionRunsForBuild(build.getId());
+                // Promotion filter
+                String promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null);
+                if (promotion != null) {
+                    // Gets the promotion level
+                    PromotionLevel promotionLevel = structureService.findPromotionLevelByName(
+                            build.getProject().getName(),
+                            build.getBranch().getName(),
+                            promotion
+                    ).orElseThrow(() -> new PromotionLevelNotFoundException(
+                            build.getProject().getName(),
+                            build.getBranch().getName(),
+                            promotion
+                    ));
+                    // Gets promotion runs for this promotion level
+                    return structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel);
+                } else {
+                    // Gets all the promotion runs
+                    return structureService.getPromotionRunsForBuild(build.getId());
+                }
             } else {
                 return Collections.emptyList();
             }

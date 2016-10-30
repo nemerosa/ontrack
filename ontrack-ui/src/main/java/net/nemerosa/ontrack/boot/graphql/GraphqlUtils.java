@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.apache.commons.lang3.EnumUtils;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import static graphql.Scalars.*;
@@ -94,6 +95,15 @@ public final class GraphqlUtils {
             return OptionalInt.of((Integer) value);
         } else {
             return OptionalInt.empty();
+        }
+    }
+
+    public static Optional<String> getStringArgument(DataFetchingEnvironment environment, String name) {
+        Object value = environment.getArgument(name);
+        if (value instanceof String) {
+            return Optional.of((String) value);
+        } else {
+            return Optional.empty();
         }
     }
 }

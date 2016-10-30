@@ -259,7 +259,7 @@ public class StructureServiceImpl implements StructureService {
     @Override
     public List<PromotionRun> getPromotionRunsForPromotionLevel(ID promotionLevelId) {
         PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
-        return structureRepository.getPromotionRunsForPromotionLevel(promotionLevel);
+        return  structureRepository.getPromotionRunsForPromotionLevel(promotionLevel);
     }
 
     @Override

@@ -669,7 +669,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<PromotionRun> getPromotionRunsForPromotionLevel(PromotionLevel promotionLevel) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC",
+                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC, ID DESC",
                 params("promotionLevelId", promotionLevel.id()),
                 (rs, rowNum) -> toPromotionRun(rs,
                         this::getBuild,
