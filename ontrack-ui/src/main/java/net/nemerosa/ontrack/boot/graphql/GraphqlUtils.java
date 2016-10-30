@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.apache.commons.lang3.EnumUtils;
 
 import java.util.Collections;
+import java.util.OptionalInt;
 
 import static graphql.Scalars.*;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -85,5 +86,14 @@ public final class GraphqlUtils {
                         Collections.emptyList()
                 )
         );
+    }
+
+    public static OptionalInt getIntArgument(DataFetchingEnvironment environment, String name) {
+        Object value = environment.getArgument(name);
+        if (value instanceof Integer) {
+            return OptionalInt.of((Integer) value);
+        } else {
+            return OptionalInt.empty();
+        }
     }
 }

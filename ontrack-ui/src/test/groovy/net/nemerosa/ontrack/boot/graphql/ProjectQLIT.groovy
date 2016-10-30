@@ -76,6 +76,32 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         assert rBranch.builds.edges*.node.name == [b.name]
     }
 
+    @Test
+    void 'Build edge query for a branch'() {
+        def branch = doCreateBranch()
+        def project = branch.project
+        (1..20).each {
+            doCreateBuild(branch, NameDescription.nd("${it}", "Build ${it}"))
+        }
+        def data = run("""{
+            projects(id: ${project.id}) {
+                name
+                branches(name: "${branch.name}") {
+                    name
+                    builds(count: 5) {
+                        edges {
+                            node {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        def builds = data.projects[0].branches[0].builds
+        assert builds != null
+    }
+
     def run(String query) {
         def result = new GraphQL(ontrackSchema).execute(query)
         if (result.errors && !result.errors.empty) {

@@ -98,8 +98,15 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("builds")
-                                // TODO Build filtering
                                 .type(GraphqlUtils.connectionList(buildType()))
+                                // TODO Build filtering
+                                .argument(
+                                        GraphQLArgument.newArgument()
+                                                .name("count")
+                                                .description("Maximum number of builds to return")
+                                                .type(GraphQLInt)
+                                                .build()
+                                )
                                 .dataFetcher(branchBuildsFetcher())
                                 .build()
                 )
@@ -215,8 +222,10 @@ public class GraphqlConfig {
             Object source = environment.getSource();
             if (source instanceof Branch) {
                 Branch branch = (Branch) source;
+                // Count
+                int count = GraphqlUtils.getIntArgument(environment, "count").orElse(10);
                 // TODO Build filtering
-                BuildFilter buildFilter = buildFilterService.standardFilter(10).build();
+                BuildFilter buildFilter = buildFilterService.standardFilter(count).build();
                 // Result
                 List<Build> builds = structureService.getFilteredBuilds(
                         branch.getId(),
