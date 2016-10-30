@@ -257,6 +257,12 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<PromotionRun> getPromotionRunsForPromotionLevel(ID promotionLevelId) {
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        return structureRepository.getPromotionRunsForPromotionLevel(promotionLevel);
+    }
+
+    @Override
     public Build getLastBuildForBranch(Branch branch) {
         // Checks the accesses
         securityService.checkProjectFunction(branch.projectId(), ProjectView.class);

@@ -3,7 +3,10 @@ package net.nemerosa.ontrack.boot.graphql
 import graphql.GraphQL
 import graphql.schema.GraphQLSchema
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.PromotionRun
+import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -69,6 +72,88 @@ class ProjectQLIT extends AbstractServiceTestSupport {
             }
         }""")
         assert data.projects[0].branches.promotionLevels.name.flatten() == (1..5).collect { "PL${it}" }
+    }
+
+    @Test
+    void 'Promotion runs for a promotion level'() {
+        def pl = doCreatePromotionLevel()
+        def branch = pl.branch
+        def project = branch.project
+        (1..5).each {
+            def build = doCreateBuild(branch, NameDescription.nd("${it}", "Build ${it}"))
+            if (it % 2 == 0) {
+                asUser().with(project, PromotionRunCreate).call {
+                    structureService.newPromotionRun(
+                            PromotionRun.of(
+                                    build,
+                                    pl,
+                                    Signature.of('test'),
+                                    "Promotion"
+                            )
+                    )
+                }
+            }
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    promotionLevels {
+                        name
+                        promotionRuns {
+                            edges {
+                                node {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.projects.branches.promotionLevels.promotionRuns.edges.node.build.name.flatten() == ['4', '2']
+    }
+
+    @Test
+    void 'Filtered list of promotion runs for a promotion level'() {
+        def pl = doCreatePromotionLevel()
+        def branch = pl.branch
+        def project = branch.project
+        (1..20).each {
+            def build = doCreateBuild(branch, NameDescription.nd("${it}", "Build ${it}"))
+            if (it % 2 == 0) {
+                asUser().with(project, PromotionRunCreate).call {
+                    structureService.newPromotionRun(
+                            PromotionRun.of(
+                                    build,
+                                    pl,
+                                    Signature.of('test'),
+                                    "Promotion"
+                            )
+                    )
+                }
+            }
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    promotionLevels {
+                        name
+                        promotionRuns(first: 5) {
+                            edges {
+                                node {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.projects.branches.promotionLevels.promotionRuns.edges.node.build.name.flatten() == ['20', '18', '16', '14', '12']
     }
 
     @Test

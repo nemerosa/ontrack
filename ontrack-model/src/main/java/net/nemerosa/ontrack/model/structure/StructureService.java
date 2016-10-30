@@ -164,6 +164,8 @@ public interface StructureService {
 
     Optional<PromotionRun> getEarliestPromotionRunAfterBuild(PromotionLevel promotionLevel, Build build);
 
+    List<PromotionRun> getPromotionRunsForPromotionLevel(ID promotionLevelId);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);
