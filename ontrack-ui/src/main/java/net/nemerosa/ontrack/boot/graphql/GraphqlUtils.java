@@ -63,7 +63,7 @@ public final class GraphqlUtils {
     /**
      * Returns a non-null list of non-null types
      */
-    public static GraphQLOutputType stdList(GraphQLObjectType type) {
+    public static GraphQLOutputType stdList(GraphQLType type) {
         return new GraphQLNonNull(
                 new GraphQLList(
                         new GraphQLNonNull(

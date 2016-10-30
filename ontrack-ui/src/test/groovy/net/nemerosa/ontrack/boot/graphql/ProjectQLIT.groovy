@@ -116,6 +116,51 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    void 'Promotion runs for a build'() {
+        def branch = doCreateBranch()
+        def pl1 = doCreatePromotionLevel(branch, NameDescription.nd("PL1", ""))
+        def pl2 = doCreatePromotionLevel(branch, NameDescription.nd("PL2", ""))
+        def project = branch.project
+        def build = doCreateBuild(branch, NameDescription.nd("1", ""))
+        asUser().with(project, PromotionRunCreate).call {
+            structureService.newPromotionRun(
+                    PromotionRun.of(
+                            build,
+                            pl1,
+                            Signature.of('test'),
+                            "Promotion 1"
+                    )
+            )
+            structureService.newPromotionRun(
+                    PromotionRun.of(
+                            build,
+                            pl2,
+                            Signature.of('test'),
+                            "Promotion 2"
+                    )
+            )
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    builds(count: 1) {
+                        edges {
+                            node {
+                                promotionRuns {
+                                    promotionLevel {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.projects.branches.builds.edges.node.promotionRuns.promotionLevel.name.flatten() == ['PL2', 'PL1']
+    }
+
+    @Test
     void 'Filtered list of promotion runs for a promotion level'() {
         def pl = doCreatePromotionLevel()
         def branch = pl.branch

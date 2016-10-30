@@ -76,7 +76,16 @@ public class GraphqlConfig {
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
                 // TODO Signature
-                // TODO Promotion runs
+                // Promotion runs
+                .field(
+                        newFieldDefinition()
+                                .name("promotionRuns")
+                                .description("Promotions for this build")
+                                // TODO Filter on promotion
+                                .type(GraphqlUtils.stdList(new GraphQLTypeReference(PROMOTION_RUN)))
+                                .dataFetcher(buildPromotionRunsFetcher())
+                                .build()
+                )
                 // TODO Validation runs
                 // TODO Build properties
                 // OK
@@ -305,6 +314,20 @@ public class GraphqlConfig {
                 List<PromotionRun> promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.getId());
                 // As a connection list
                 return new SimpleListConnection(promotionRuns).get(environment);
+            } else {
+                return Collections.emptyList();
+            }
+        };
+    }
+
+    private DataFetcher buildPromotionRunsFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (source instanceof Build) {
+                Build build = (Build) source;
+                // TODO Promotion filter
+                // Gets all the promotion runs
+                return structureService.getPromotionRunsForBuild(build.getId());
             } else {
                 return Collections.emptyList();
             }
