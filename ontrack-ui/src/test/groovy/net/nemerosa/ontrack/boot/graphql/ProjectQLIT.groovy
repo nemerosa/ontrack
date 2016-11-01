@@ -31,7 +31,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     void 'Project by ID'() {
         def p = doCreateProject()
         def data = run("{projects(id: ${p.id}) { name }}")
-        assert data.projects[0].name == p.name
+        assert data.projects.first().name == p.name
     }
 
     @Test
@@ -40,7 +40,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         doCreateBranch(p, NameDescription.nd("B1", ""))
         doCreateBranch(p, NameDescription.nd("B2", ""))
         def data = run("{projects(id: ${p.id}) { name branches { name } }}")
-        assert data.projects[0].branches*.name == ["B1", "B2"]
+        assert data.projects.branches.name.flatten() == ["B1", "B2"]
     }
 
     @Test
@@ -52,7 +52,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         def query = """{projects(id: ${p.id}) { name branches(name: "B2") { name } } }"""
         println query
         def data = run(query)
-        assert data.projects[0].branches*.name == ["B2"]
+        assert data.projects.branches.name.flatten() == ["B2"]
     }
 
     @Test
@@ -71,7 +71,26 @@ class ProjectQLIT extends AbstractServiceTestSupport {
                 }
             }
         }""")
-        assert data.projects[0].branches.promotionLevels.name.flatten() == (1..5).collect { "PL${it}" }
+        assert data.projects.branches.promotionLevels.name.flatten() == (1..5).collect { "PL${it}" }
+    }
+
+    @Test
+    void 'Validation stamps for a branch'() {
+        def branch = doCreateBranch()
+        def project = branch.project
+        (1..5).each {
+            doCreateValidationStamp(branch, NameDescription.nd("VS${it}", "Validation stamp ${it}"))
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    validationStamps {
+                        name
+                    }
+                }
+            }
+        }""")
+        assert data.projects.branches.validationStamps.name.flatten() == (1..5).collect { "VS${it}" }
     }
 
     @Test
@@ -266,8 +285,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
                 }
             }
         }""")
-        def rBranch = data.projects[0].branches[0]
-        assert rBranch.builds.edges*.node.name == [b.name]
+        assert data.projects.branches.builds.edges.node.name.flatten() == [b.name]
     }
 
     @Test
@@ -292,8 +310,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
                 }
             }
         }""")
-        def builds = data.projects[0].branches[0].builds
-        assert builds != null
+        assert data.projects.branches.builds.edges.node.name.flatten() == ['20', '19', '18', '17', '16']
     }
 
     def run(String query) {

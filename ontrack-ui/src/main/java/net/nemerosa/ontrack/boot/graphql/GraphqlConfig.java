@@ -32,6 +32,7 @@ public class GraphqlConfig {
     public static final String BUILD = "Build";
     public static final String PROMOTION_LEVEL = "PromotionLevel";
     public static final String PROMOTION_RUN = "PromotionRun";
+    public static final String VALIDATION_STAMP = "ValidationStamp";
 
     @Autowired
     private StructureService structureService;
@@ -120,7 +121,14 @@ public class GraphqlConfig {
                                 .dataFetcher(branchPromotionLevelsFetcher())
                                 .build()
                 )
-                // TODO Validation stamps
+                // Validation stamps
+                .field(
+                        newFieldDefinition()
+                                .name("validationStamps")
+                                .type(GraphqlUtils.stdList(validationStampType()))
+                                .dataFetcher(branchValidationStampsFetcher())
+                                .build()
+                )
                 // Builds for the branch
                 .field(
                         newFieldDefinition()
@@ -157,6 +165,26 @@ public class GraphqlConfig {
                                 .dataFetcher(promotionLevelPromotionRunsFetcher())
                                 .build()
                 )
+                // OK
+                .build();
+    }
+
+    private GraphQLObjectType validationStampType() {
+        return newObject()
+                .name(VALIDATION_STAMP)
+                .withInterface(projectEntityInterface())
+                .fields(projectEntityInterfaceFields())
+                // TODO Image
+                // TODO Validation runs
+//                .field(
+//                        newFieldDefinition()
+//                                .name("promotionRuns")
+//                                .description("List of runs for this promotion")
+//                                .type(GraphqlUtils.connectionList(promotionRunType()))
+//                                .argument(Relay.getConnectionFieldArguments())
+//                                .dataFetcher(promotionLevelPromotionRunsFetcher())
+//                                .build()
+//                )
                 // OK
                 .build();
     }
@@ -363,6 +391,18 @@ public class GraphqlConfig {
             if (source instanceof Branch) {
                 Branch branch = (Branch) source;
                 return structureService.getPromotionLevelListForBranch(branch.getId());
+            } else {
+                return Collections.emptyList();
+            }
+        };
+    }
+
+    private DataFetcher branchValidationStampsFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (source instanceof Branch) {
+                Branch branch = (Branch) source;
+                return structureService.getValidationStampListForBranch(branch.getId());
             } else {
                 return Collections.emptyList();
             }
