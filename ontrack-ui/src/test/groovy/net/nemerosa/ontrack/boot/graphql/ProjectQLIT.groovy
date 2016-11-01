@@ -35,6 +35,13 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    void 'Project by name'() {
+        def p = doCreateProject()
+        def data = run("""{projects(name: "${p.name}") { id }}""")
+        assert data.projects.first().id == p.id()
+    }
+
+    @Test
     void 'Project branches'() {
         def p = doCreateProject()
         doCreateBranch(p, NameDescription.nd("B1", ""))

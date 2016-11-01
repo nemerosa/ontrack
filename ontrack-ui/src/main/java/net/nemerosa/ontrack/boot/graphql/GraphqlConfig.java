@@ -366,6 +366,13 @@ public class GraphqlConfig {
                                                 .type(GraphQLInt)
                                                 .build()
                                 )
+                                .argument(
+                                        GraphQLArgument.newArgument()
+                                                .name("name")
+                                                .description("Name of the project to look for")
+                                                .type(GraphQLString)
+                                                .build()
+                                )
                                 .dataFetcher(projectFetcher())
                                 .build()
                 )
@@ -430,12 +437,21 @@ public class GraphqlConfig {
     private DataFetcher projectFetcher() {
         return environment -> {
             Integer id = environment.getArgument("id");
+            String name = environment.getArgument("name");
+            // Per ID
             if (id != null) {
                 // TODO No other argument is expected
                 // Fetch by ID
                 Project project = structureService.getProject(ID.of(id));
                 // As list
                 return Collections.singletonList(project);
+            }
+            // Name
+            else if (name != null) {
+                // TODO No other argument is expected
+                return structureService.findProjectByName(name)
+                        .map(Collections::singletonList)
+                        .orElse(Collections.emptyList());
             }
             // TODO Other criterias
             // Whole list
