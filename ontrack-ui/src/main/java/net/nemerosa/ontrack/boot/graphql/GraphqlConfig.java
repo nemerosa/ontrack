@@ -17,10 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static graphql.Scalars.GraphQLInt;
-import static graphql.Scalars.GraphQLString;
+import static graphql.Scalars.*;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
+import static net.nemerosa.ontrack.boot.graphql.GraphqlUtils.stdList;
 
 @Configuration
 public class GraphqlConfig {
@@ -34,6 +34,8 @@ public class GraphqlConfig {
     public static final String PROMOTION_RUN = "PromotionRun";
     public static final String VALIDATION_STAMP = "ValidationStamp";
     public static final String VALIDATION_RUN = "ValidationRun";
+    public static final String VALIDATION_RUN_STATUS = "ValidationRunStatus";
+    public static final String VALIDATION_RUN_STATUS_ID = "ValidationRunStatusID";
 
     @Autowired
     private StructureService structureService;
@@ -91,7 +93,7 @@ public class GraphqlConfig {
                                                 .type(GraphQLString)
                                                 .build()
                                 )
-                                .type(GraphqlUtils.stdList(new GraphQLTypeReference(PROMOTION_RUN)))
+                                .type(stdList(new GraphQLTypeReference(PROMOTION_RUN)))
                                 .dataFetcher(buildPromotionRunsFetcher())
                                 .build()
                 )
@@ -118,7 +120,7 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("promotionLevels")
-                                .type(GraphqlUtils.stdList(promotionLevelType()))
+                                .type(stdList(promotionLevelType()))
                                 .dataFetcher(branchPromotionLevelsFetcher())
                                 .build()
                 )
@@ -126,7 +128,7 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("validationStamps")
-                                .type(GraphqlUtils.stdList(validationStampType()))
+                                .type(stdList(validationStampType()))
                                 .dataFetcher(branchValidationStampsFetcher())
                                 .build()
                 )
@@ -245,11 +247,82 @@ public class GraphqlConfig {
                                 .type(GraphQLInt)
                                 .build()
                 )
-                // TODO Validation statuses
+                // Validation statuses
+                .field(
+                        newFieldDefinition()
+                                .name("validationRunStatuses")
+                                .description("List of validation statuses")
+                                .type(stdList(validationRunStatusType()))
+                                .build()
+                )
                 // OK
                 .build();
     }
 
+    private GraphQLObjectType validationRunStatusType() {
+        return newObject()
+                .name(VALIDATION_RUN_STATUS)
+                // TODO Signature
+                // Status ID
+                .field(
+                        newFieldDefinition()
+                                .name("statusID")
+                                .description("Status ID")
+                                .type(validationRunStatusIDType())
+                                .build()
+                )
+                // Description
+                .field(GraphqlUtils.descriptionField())
+                // OK
+                .build();
+    }
+
+    private GraphQLObjectType validationRunStatusIDType() {
+        return newObject()
+                .name(VALIDATION_RUN_STATUS_ID)
+                // ID
+                .field(
+                        newFieldDefinition()
+                                .name("id")
+                                .description("Status ID")
+                                .type(GraphQLString)
+                                .build()
+                )
+                // Name
+                .field(
+                        newFieldDefinition()
+                                .name("name")
+                                .description("Status display name")
+                                .type(GraphQLString)
+                                .build()
+                )
+                // Root
+                .field(
+                        newFieldDefinition()
+                                .name("root")
+                                .description("Root status?")
+                                .type(GraphQLBoolean)
+                                .build()
+                )
+                // Passed
+                .field(
+                        newFieldDefinition()
+                                .name("passed")
+                                .description("Passing status?")
+                                .type(GraphQLBoolean)
+                                .build()
+                )
+                // Following statuses
+                .field(
+                        newFieldDefinition()
+                                .name("followingStatuses")
+                                .description("List of following statuses")
+                                .type(stdList(GraphQLString))
+                                .build()
+                )
+                // OK
+                .build();
+    }
 
     private GraphQLObjectType projectType() {
         return newObject()
@@ -261,7 +334,7 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("branches")
-                                .type(GraphqlUtils.stdList(branchType()))
+                                .type(stdList(branchType()))
                                 .argument(
                                         GraphQLArgument.newArgument()
                                                 .name("name")
@@ -285,7 +358,7 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("projects")
-                                .type(GraphqlUtils.stdList(projectType()))
+                                .type(stdList(projectType()))
                                 .argument(
                                         GraphQLArgument.newArgument()
                                                 .name("id")
@@ -300,8 +373,27 @@ public class GraphqlConfig {
                 .field(
                         newFieldDefinition()
                                 .name("branches")
-                                .type(GraphqlUtils.stdList(branchType()))
+                                .type(stdList(branchType()))
                                 // TODO Branch search
+                                .build()
+                )
+                // TODO Builds
+                // TODO Promotion levels
+                // TODO Promotion runs
+                // TODO Validation stamps
+                // Validation runs
+                .field(
+                        newFieldDefinition()
+                                .name("validationRuns")
+                                .type(stdList(validationRunType()))
+                                .argument(
+                                        GraphQLArgument.newArgument()
+                                                .name("id")
+                                                .description("ID of the validation run to look for")
+                                                .type(new GraphQLNonNull(GraphQLInt))
+                                                .build()
+                                )
+                                .dataFetcher(validationRunFetcher())
                                 .build()
                 )
                 // TODO Extension contributions
@@ -349,6 +441,23 @@ public class GraphqlConfig {
             // Whole list
             else {
                 return structureService.getProjectList();
+            }
+        };
+    }
+
+    private DataFetcher validationRunFetcher() {
+        return environment -> {
+            Integer id = environment.getArgument("id");
+            if (id != null) {
+                // Fetch by ID
+                return Collections.singletonList(
+                        structureService.getValidationRun(ID.of(id))
+                );
+            }
+            // TODO Other criterias
+            // Empty list
+            else {
+                return Collections.emptyList();
             }
         };
     }
