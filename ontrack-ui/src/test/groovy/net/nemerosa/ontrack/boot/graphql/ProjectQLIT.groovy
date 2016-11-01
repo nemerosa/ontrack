@@ -4,9 +4,8 @@ import graphql.GraphQL
 import graphql.schema.GraphQLSchema
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.PromotionRun
-import net.nemerosa.ontrack.model.structure.Signature
+import net.nemerosa.ontrack.model.security.ValidationRunCreate
+import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -132,6 +131,49 @@ class ProjectQLIT extends AbstractServiceTestSupport {
             }
         }""")
         assert data.projects.branches.promotionLevels.promotionRuns.edges.node.build.name.flatten() == ['4', '2']
+    }
+
+    @Test
+    void 'Validation runs for a validation stamp'() {
+        def vs = doCreateValidationStamp()
+        def branch = vs.branch
+        def project = branch.project
+        (1..5).each {
+            def build = doCreateBuild(branch, NameDescription.nd("${it}", "Build ${it}"))
+            if (it % 2 == 0) {
+                asUser().with(project, ValidationRunCreate).call {
+                    structureService.newValidationRun(
+                            ValidationRun.of(
+                                    build,
+                                    vs,
+                                    0,
+                                    Signature.of('test'),
+                                    ValidationRunStatusID.STATUS_PASSED,
+                                    "Validation"
+                            )
+                    )
+                }
+            }
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    validationStamps {
+                        name
+                        validationRuns {
+                            edges {
+                                node {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.projects.branches.validationStamps.validationRuns.edges.node.build.name.flatten() == ['4', '2']
     }
 
     @Test

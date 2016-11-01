@@ -33,6 +33,7 @@ public class GraphqlConfig {
     public static final String PROMOTION_LEVEL = "PromotionLevel";
     public static final String PROMOTION_RUN = "PromotionRun";
     public static final String VALIDATION_STAMP = "ValidationStamp";
+    public static final String VALIDATION_RUN = "ValidationRun";
 
     @Autowired
     private StructureService structureService;
@@ -175,16 +176,16 @@ public class GraphqlConfig {
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
                 // TODO Image
-                // TODO Validation runs
-//                .field(
-//                        newFieldDefinition()
-//                                .name("promotionRuns")
-//                                .description("List of runs for this promotion")
-//                                .type(GraphqlUtils.connectionList(promotionRunType()))
-//                                .argument(Relay.getConnectionFieldArguments())
-//                                .dataFetcher(promotionLevelPromotionRunsFetcher())
-//                                .build()
-//                )
+                // Validation runs
+                .field(
+                        newFieldDefinition()
+                                .name("validationRuns")
+                                .description("List of runs for this validation stamp")
+                                .type(GraphqlUtils.connectionList(validationRunType()))
+                                .argument(Relay.getConnectionFieldArguments())
+                                .dataFetcher(validationStampValidationRunsFetcher())
+                                .build()
+                )
                 // OK
                 .build();
     }
@@ -211,6 +212,40 @@ public class GraphqlConfig {
                                 .build()
                 )
                 // TODO Signature
+                // OK
+                .build();
+    }
+
+    private GraphQLObjectType validationRunType() {
+        return newObject()
+                .name(VALIDATION_RUN)
+                .withInterface(projectEntityInterface())
+                .fields(projectEntityInterfaceFields())
+                // Build
+                .field(
+                        newFieldDefinition()
+                                .name("build")
+                                .description("Associated build")
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(BUILD)))
+                                .build()
+                )
+                // Promotion level
+                .field(
+                        newFieldDefinition()
+                                .name("validationStamp")
+                                .description("Associated validation stamp")
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(VALIDATION_STAMP)))
+                                .build()
+                )
+                // Run order
+                .field(
+                        newFieldDefinition()
+                                .name("runOrder")
+                                .description("Run order")
+                                .type(GraphQLInt)
+                                .build()
+                )
+                // TODO Validation statuses
                 // OK
                 .build();
     }
@@ -349,6 +384,26 @@ public class GraphqlConfig {
                 List<PromotionRun> promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.getId());
                 // As a connection list
                 return new SimpleListConnection(promotionRuns).get(environment);
+            } else {
+                return Collections.emptyList();
+            }
+        };
+    }
+
+    private DataFetcher validationStampValidationRunsFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (source instanceof ValidationStamp) {
+                ValidationStamp validationStamp = (ValidationStamp) source;
+                // Gets all the validation runs
+                // TODO Use environment for limits?
+                List<ValidationRun> validationRuns = structureService.getValidationRunsForValidationStamp(
+                        validationStamp.getId(),
+                        0,
+                        Integer.MAX_VALUE
+                );
+                // As a connection list
+                return new SimpleListConnection(validationRuns).get(environment);
             } else {
                 return Collections.emptyList();
             }
