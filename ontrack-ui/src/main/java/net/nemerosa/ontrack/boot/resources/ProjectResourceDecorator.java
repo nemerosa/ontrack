@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.ui.resource.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -97,5 +98,32 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
         resourceDecorationContributorService.contribute(linksBuilder, project);
         // OK
         return linksBuilder.build();
+    }
+
+    @Override
+    public List<String> getLinkNames() {
+        return Arrays.asList(
+                // FIXME Use constants
+                "_self",
+                "_branches",
+                "_createBranch",
+                "_branchStatusViews",
+                "_buildSearch",
+                "_buildDiffActions",
+                "_properties",
+                "_actions",
+                "_update",
+                "_delete",
+                "_decorations",
+                "_permissions",
+                "_events",
+                "_clone",
+                "_enable",
+                "_disable",
+                "_unfavourite",
+                "_favourite",
+                "_page"
+        );
+        // FIXME Link contributors
     }
 }

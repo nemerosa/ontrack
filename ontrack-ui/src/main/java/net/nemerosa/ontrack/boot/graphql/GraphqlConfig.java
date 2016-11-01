@@ -6,16 +6,20 @@ import net.nemerosa.ontrack.boot.graphql.relay.Relay;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.ui.controller.URIBuilder;
+import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
+import net.nemerosa.ontrack.ui.resource.Link;
+import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static graphql.Scalars.*;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -43,6 +47,16 @@ public class GraphqlConfig {
     @Autowired
     private BuildFilterService buildFilterService;
 
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    @Autowired
+    private List<ResourceDecorator<?>> decorators;
+
+    @Autowired
+    private URIBuilder uriBuilder;
+
+    @Autowired
+    private SecurityService securityService;
+
     /**
      * GraphQL schema definition
      */
@@ -54,18 +68,91 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
-        return Arrays.asList(
-                GraphqlUtils.idField(),
-                GraphqlUtils.nameField(),
-                GraphqlUtils.descriptionField()
+    @Bean
+    public ResourceContext graphqlResourceContext() {
+        return new DefaultResourceContext(
+                uriBuilder,
+                securityService
         );
+    }
+
+    private <T extends ProjectEntity> List<GraphQLFieldDefinition> projectEntityInterfaceFields(Class<T> projectEntityClass) {
+        List<GraphQLFieldDefinition> definitions = new ArrayList<>(
+                Arrays.asList(
+                        GraphqlUtils.idField(),
+                        GraphqlUtils.nameField(),
+                        GraphqlUtils.descriptionField()
+                )
+        );
+        // Links
+        decorators.stream()
+                .filter(decorator -> decorator.appliesFor(projectEntityClass))
+                .forEach(decorator -> {
+                    List<String> linkNames = decorator.getLinkNames();
+                    if (linkNames != null && !linkNames.isEmpty()) {
+                        definitions.add(
+                                newFieldDefinition()
+                                        .name("links")
+                                        .description("Links")
+                                        .type(
+                                                newObject()
+                                                        .name(projectEntityClass.getSimpleName() + "Links")
+                                                        .description(projectEntityClass.getSimpleName() + " links")
+                                                        .fields(
+                                                                linkNames.stream()
+                                                                        .map(linkName -> newFieldDefinition()
+                                                                                .name(linkName)
+                                                                                .type(GraphQLString)
+                                                                                .build()
+                                                                        )
+                                                                        .collect(Collectors.toList())
+                                                        )
+                                                        .build()
+                                        )
+                                        .dataFetcher(projectEntityLinksFetcher(projectEntityClass))
+                                        .build()
+                        );
+                    }
+                });
+        // OK
+        return definitions;
+    }
+
+    private <T extends ProjectEntity> DataFetcher projectEntityLinksFetcher(Class<T> projectEntityClass) {
+        return environment -> {
+            Object source = environment.getSource();
+            if (projectEntityClass.isInstance(source)) {
+                for (ResourceDecorator<?> decorator : decorators) {
+                    if (decorator.appliesFor(projectEntityClass)) {
+                        return getLinks(decorator, source);
+                    }
+                }
+                return Collections.emptyMap();
+            } else {
+                return Collections.emptyMap();
+            }
+        };
+    }
+
+    private <T extends ProjectEntity> Map<String, String> getLinks(ResourceDecorator<?> decorator, Object source) {
+        @SuppressWarnings("unchecked")
+        ResourceDecorator<T> resourceDecorator = (ResourceDecorator<T>) decorator;
+        @SuppressWarnings("unchecked")
+        T t = (T) source;
+
+        return resourceDecorator.links(
+                t,
+                graphqlResourceContext()
+        ).stream().collect(Collectors.toMap(
+                Link::getName,
+                link -> link.getHref().toString()
+        ));
     }
 
     private GraphQLInterfaceType projectEntityInterface() {
         return GraphQLInterfaceType.newInterface()
                 .name(PROJECT_ENTITY)
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(Project.class))
                 // TODO Properties
                 // TODO Type resolver not set, but it should
                 .typeResolver(new TypeResolverProxy())
@@ -79,7 +166,7 @@ public class GraphqlConfig {
         return newObject()
                 .name(BUILD)
                 .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(Build.class))
                 // TODO Signature
                 // Promotion runs
                 .field(
@@ -107,7 +194,7 @@ public class GraphqlConfig {
         return newObject()
                 .name(BRANCH)
                 .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(Branch.class))
                 .field(GraphqlUtils.disabledField())
                 .field(
                         newFieldDefinition()
@@ -156,7 +243,7 @@ public class GraphqlConfig {
         return newObject()
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(PromotionLevel.class))
                 // TODO Image
                 // Promotion runs
                 .field(
@@ -176,7 +263,7 @@ public class GraphqlConfig {
         return newObject()
                 .name(VALIDATION_STAMP)
                 .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(ValidationStamp.class))
                 // TODO Image
                 // Validation runs
                 .field(
@@ -196,7 +283,7 @@ public class GraphqlConfig {
         return newObject()
                 .name(PROMOTION_RUN)
                 .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(PromotionRun.class))
                 // Build
                 .field(
                         newFieldDefinition()
@@ -222,7 +309,7 @@ public class GraphqlConfig {
         return newObject()
                 .name(VALIDATION_RUN)
                 .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(ValidationRun.class))
                 // Build
                 .field(
                         newFieldDefinition()
@@ -328,7 +415,7 @@ public class GraphqlConfig {
         return newObject()
                 .name(PROJECT)
                 .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields())
+                .fields(projectEntityInterfaceFields(Project.class))
                 .field(GraphqlUtils.disabledField())
                 // Branches
                 .field(

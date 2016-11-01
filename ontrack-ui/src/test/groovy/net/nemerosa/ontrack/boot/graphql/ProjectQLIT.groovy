@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.graphql
 import graphql.GraphQL
 import graphql.schema.GraphQLSchema
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -32,6 +33,14 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         def p = doCreateProject()
         def data = run("{projects(id: ${p.id}) { name }}")
         assert data.projects.first().name == p.name
+    }
+
+    @Test
+    void 'Project links'() {
+        def p = doCreateProject()
+        def data = asUser().with(p, ProjectEdit).call { run("{projects(id: ${p.id}) { name links { _update } }}") }
+        assert data.projects.first().name == p.name
+        assert data.projects.first().links._update == "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:${p.id},"
     }
 
     @Test
