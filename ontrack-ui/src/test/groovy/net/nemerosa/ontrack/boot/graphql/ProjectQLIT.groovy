@@ -65,10 +65,17 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         doCreateBranch(p, NameDescription.nd("B1", ""))
         doCreateBranch(p, NameDescription.nd("B2", ""))
 
-        def query = """{projects(id: ${p.id}) { name branches(name: "B2") { name } } }"""
-        println query
-        def data = run(query)
+        def data = run("""{projects(id: ${p.id}) { name branches(name: "B2") { name } } }""")
         assert data.projects.branches.name.flatten() == ["B2"]
+    }
+
+    @Test
+    void 'Branch links'() {
+        def branch = doCreateBranch()
+
+        def data = run("""{branches (id: ${branch.id}) { name links { _page } } }""")
+        assert data.branches.first().name == branch.name
+        assert data.branches.first().links._page == "urn:test:#:entity:BRANCH:${branch.id}"
     }
 
     @Test

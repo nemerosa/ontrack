@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static graphql.Scalars.*;
+import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.GraphqlUtils.stdList;
@@ -174,7 +175,7 @@ public class GraphqlConfig {
                                 .name("promotionRuns")
                                 .description("Promotions for this build")
                                 .argument(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("promotion")
                                                 .description("Name of the promotion level")
                                                 .type(GraphQLString)
@@ -226,7 +227,7 @@ public class GraphqlConfig {
                                 .type(GraphqlUtils.connectionList(buildType()))
                                 // TODO Build filtering
                                 .argument(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("count")
                                                 .description("Maximum number of builds to return")
                                                 .type(GraphQLInt)
@@ -423,7 +424,7 @@ public class GraphqlConfig {
                                 .name("branches")
                                 .type(stdList(branchType()))
                                 .argument(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("name")
                                                 .description("Exact name of the branch to look for.")
                                                 .type(GraphQLString)
@@ -447,14 +448,14 @@ public class GraphqlConfig {
                                 .name("projects")
                                 .type(stdList(projectType()))
                                 .argument(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("id")
                                                 .description("ID of the project to look for")
                                                 .type(GraphQLInt)
                                                 .build()
                                 )
                                 .argument(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("name")
                                                 .description("Name of the project to look for")
                                                 .type(GraphQLString)
@@ -468,7 +469,14 @@ public class GraphqlConfig {
                         newFieldDefinition()
                                 .name("branches")
                                 .type(stdList(branchType()))
-                                // TODO Branch search
+                                .argument(
+                                        newArgument()
+                                                .name("id")
+                                                .description("ID of the branch to look for")
+                                                .type(new GraphQLNonNull(GraphQLInt))
+                                                .build()
+                                )
+                                .dataFetcher(branchFetcher())
                                 .build()
                 )
                 // TODO Builds
@@ -481,7 +489,7 @@ public class GraphqlConfig {
                                 .name("validationRuns")
                                 .type(stdList(validationRunType()))
                                 .argument(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("id")
                                                 .description("ID of the validation run to look for")
                                                 .type(new GraphQLNonNull(GraphQLInt))
@@ -544,6 +552,21 @@ public class GraphqlConfig {
             // Whole list
             else {
                 return structureService.getProjectList();
+            }
+        };
+    }
+
+    private DataFetcher branchFetcher() {
+        return environment -> {
+            Integer id = environment.getArgument("id");
+            if (id != null) {
+                return Collections.singletonList(
+                        structureService.getBranch(ID.of(id))
+                );
+            }
+            // Whole list
+            else {
+                return Collections.emptyList();
             }
         };
     }
