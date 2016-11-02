@@ -91,9 +91,9 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
                         "_favourite",
                         project -> on(ProjectController.class).favouriteProject(project.getId()),
                         (project, resourceContext) -> resourceContext.isLogged() && !projectFavouriteService.isProjectFavourite(project)
-                )
-                // FIXME Page
-                // .page(project);
+                ),
+                // Page
+                page()
         );
         // FIXME Contributions
         // resourceDecorationContributorService.contribute(linksBuilder, project);

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.ui.resource;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -24,10 +25,7 @@ public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> ext
         LinksBuilder linksBuilder = resourceContext.links();
         for (LinkDefinition linkDefinition : linkDefinitions) {
             if (linkDefinition.getCheckFn().apply(resource, resourceContext)) {
-                linksBuilder = linksBuilder.link(
-                        linkDefinition.getName(),
-                        linkDefinition.getLinkFn().apply(resource, resourceContext)
-                );
+                linksBuilder = linkDefinition.addLink(linksBuilder, resource, resourceContext);
             }
         }
         return linksBuilder.build();
@@ -52,7 +50,7 @@ public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> ext
 
     protected LinkDefinition link(String name, BiFunction<T, ResourceContext, Object> linkFn,
                                   BiFunction<T, ResourceContext, Boolean> checkFn) {
-        return new LinkDefinition(
+        return new LinkDefinitionLink(
                 name,
                 linkFn,
                 checkFn
@@ -82,10 +80,54 @@ public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> ext
         );
     }
 
+    /**
+     * Creation of a link to the entity's page
+     */
+    protected LinkDefinition page() {
+        return new LinkDefinitionPage(
+                (e, rc) -> true
+        );
+    }
+
+    protected abstract class LinkDefinition {
+
+        abstract public String getName();
+
+        abstract public BiFunction<T, ResourceContext, Boolean> getCheckFn();
+
+        public abstract LinksBuilder addLink(LinksBuilder linksBuilder, T resource, ResourceContext resourceContext);
+
+    }
+
+    @EqualsAndHashCode(callSuper = true)
     @Data
-    protected class LinkDefinition {
+    protected class LinkDefinitionLink extends LinkDefinition {
         private final String name;
         private final BiFunction<T, ResourceContext, Object> linkFn;
         private final BiFunction<T, ResourceContext, Boolean> checkFn;
+
+        @Override
+        public LinksBuilder addLink(LinksBuilder linksBuilder, T resource, ResourceContext resourceContext) {
+            return linksBuilder.link(
+                    name,
+                    linkFn.apply(resource, resourceContext)
+            );
+        }
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    protected class LinkDefinitionPage extends LinkDefinition {
+        private final BiFunction<T, ResourceContext, Boolean> checkFn;
+
+        @Override
+        public String getName() {
+            return Link.PAGE;
+        }
+
+        @Override
+        public LinksBuilder addLink(LinksBuilder linksBuilder, T resource, ResourceContext resourceContext) {
+            return linksBuilder.page(resource);
+        }
     }
 }
