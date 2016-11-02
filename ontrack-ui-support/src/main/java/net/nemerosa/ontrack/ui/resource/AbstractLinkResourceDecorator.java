@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.ui.resource;
 
+import com.google.common.collect.ImmutableList;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -15,7 +16,7 @@ public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> ext
 
     protected AbstractLinkResourceDecorator(Class<T> resourceClass) {
         super(resourceClass);
-        this.linkDefinitions = getLinkDefinitions();
+        this.linkDefinitions = ImmutableList.copyOf(getLinkDefinitions());
     }
 
     @Override
@@ -29,7 +30,7 @@ public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> ext
         return linksBuilder.build();
     }
 
-    protected abstract List<LinkDefinition<T>> getLinkDefinitions();
+    protected abstract Iterable<LinkDefinition<T>> getLinkDefinitions();
 
     @Override
     public List<String> getLinkNames() {
@@ -47,7 +48,7 @@ public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> ext
     }
 
     protected LinkDefinition<T> link(String name, BiFunction<T, ResourceContext, Object> linkFn,
-                                  BiFunction<T, ResourceContext, Boolean> checkFn) {
+                                     BiFunction<T, ResourceContext, Boolean> checkFn) {
         return new SimpleLinkDefinition<>(
                 name,
                 linkFn,
