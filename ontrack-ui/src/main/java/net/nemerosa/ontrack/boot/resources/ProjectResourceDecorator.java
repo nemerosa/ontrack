@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.ProjectFavouriteService;
 import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
+import net.nemerosa.ontrack.ui.resource.LinkDefinition;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,7 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
         this.projectFavouriteService = projectFavouriteService;
     }
 
-    protected List<LinkDefinition> getLinkDefinitions() {
+    protected List<LinkDefinition<Project>> getLinkDefinitions() {
         return Arrays.asList(
                 link(Link.SELF, project -> on(ProjectController.class).getProject(project.getId())),
                 // List of branches for this project

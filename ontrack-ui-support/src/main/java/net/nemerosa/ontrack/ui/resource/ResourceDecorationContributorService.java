@@ -13,6 +13,7 @@ public interface ResourceDecorationContributorService {
      * @param linksBuilder  Link decorator
      * @param projectEntity Entity to decorate
      */
+    @Deprecated
     void contribute(LinksBuilder linksBuilder, ProjectEntity projectEntity);
 
 }
