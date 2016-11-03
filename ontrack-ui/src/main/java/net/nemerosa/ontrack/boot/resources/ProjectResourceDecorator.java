@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static net.nemerosa.ontrack.ui.resource.LinkDefinitions.*;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @Component
@@ -32,7 +33,7 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
 
     protected Iterable<LinkDefinition<Project>> getLinkDefinitions() {
         return Iterables.concat(
-                Arrays.<LinkDefinition<Project>>asList(
+                Arrays.asList(
                         link(Link.SELF, project -> on(ProjectController.class).getProject(project.getId())),
                         // List of branches for this project
                         link("_branches", project -> on(BranchController.class).getBranchListForProject(project.getId())),
