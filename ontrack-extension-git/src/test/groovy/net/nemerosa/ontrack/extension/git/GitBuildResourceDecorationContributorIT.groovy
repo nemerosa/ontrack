@@ -15,19 +15,15 @@ import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
-import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
-import net.nemerosa.ontrack.ui.resource.ResourceModule
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory
+import net.nemerosa.ontrack.ui.resource.*
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static net.nemerosa.ontrack.test.TestUtils.uid
-import static org.mockito.Mockito.when
 
 class GitBuildResourceDecorationContributorIT extends AbstractServiceTestSupport {
 
@@ -43,48 +39,36 @@ class GitBuildResourceDecorationContributorIT extends AbstractServiceTestSupport
     @Autowired
     private ResourceModule resourceModule
 
+    @Autowired
+    private GitBuildResourceDecorationContributor contributor
+
     private ResourceObjectMapper resourceObjectMapper
 
     /**
-     * FIXME Scope issue
-     *
      * The BuildResourceDecorator is NOT loaded since it belongs to the "ui" module.
      *
-     * See if core resource decorators could be put in a separate module.
+     * See if core resource decorators could be put in a separate module. They cannot because
+     * they themselves rely on the UI controllers.
+     *
+     * So, in order to test a resource decoration contributor in an extension, we'd have to load
+     * the complete UI module, which is not very practical.
+     *
+     * We can, on the other hand, create a fake resource decorator to wrap the resource decoration contributor
+     * to test.
      */
 
     @Before
     void 'Setup'() {
         resourceObjectMapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                [resourceModule],
-                new DefaultResourceContext(new MockURIBuilder(), securityService)
+                new DefaultResourceContext(new MockURIBuilder(), securityService),
+                ResourceDecorators.decoratorWithExtension(Build, contributor)
         )
     }
 
     @Test
     void 'No change log link on a build not configured'() {
-        Branch branch = Branch.of(
-                Project.of(nd('P', '')),
-                nd('B', '')
-        )
-        Build build = Build.of(branch, nd('1', ''), Signature.of('test'))
-
-        when(gitService.isBranchConfiguredForGit(branch)).thenReturn(false)
-
-        JsonNode node = resourceObjectMapper.objectMapper.valueToTree(build)
-        assert node.get("_changeLog") == null
-        assert node.get("_changeLogPage") == null
-    }
-
-    @Test
-    void 'No change log link on a build not authorized'() {
-        Branch branch = Branch.of(
-                Project.of(nd('P', '')),
-                nd('B', '')
-        )
-        Build build = Build.of(branch, nd('1', ''), Signature.of('test'))
-
-        when(gitService.isBranchConfiguredForGit(branch)).thenReturn(true)
+        // Creates a build
+        def build = doCreateBuild()
 
         JsonNode node = resourceObjectMapper.objectMapper.valueToTree(build)
         assert node.get("_changeLog") == null
@@ -139,9 +123,8 @@ class GitBuildResourceDecorationContributorIT extends AbstractServiceTestSupport
             JsonNode node = resourceObjectMapper.objectMapper.valueToTree(build)
 
             println resourceObjectMapper.objectMapper.writeValueAsString(build)
-            assert node.get("_self").asText() == ""
-            assert node.get("_changeLog").asText() == ""
-            assert node.get("_changeLogPage").asText() == ""
+            assert node.get("_changeLog").asText() == "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:BuildDiffRequest%28from%3D${build.id}%2C+to%3Dnull%29" as String
+            assert node.get("_changeLogPage").asText() == "urn:test:#:extension/git/changelog"
         } finally {
             repo.close()
         }

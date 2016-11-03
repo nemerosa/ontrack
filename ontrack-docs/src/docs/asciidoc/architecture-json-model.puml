@@ -15,6 +15,9 @@ package "ui-support" {
 
 package "ui" {
     class BuildResourceDecorator
+    class BuildController <<controller>>
+
+    BuildResourceDecorator --> BuildController
 }
 
 package "extension-git" {

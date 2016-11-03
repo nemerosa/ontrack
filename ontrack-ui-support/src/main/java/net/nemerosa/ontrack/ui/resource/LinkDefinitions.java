@@ -59,10 +59,18 @@ public class LinkDefinitions {
     }
 
     public static <T extends ProjectEntity, P extends ProjectFunction> LinkDefinition<T> page(String name, Class<P> projectFn, String path, Object... arguments) {
+        return page(
+                name,
+                withProjectFn(projectFn),
+                path, arguments
+        );
+    }
+
+    public static <T extends ProjectEntity, P extends ProjectFunction> LinkDefinition<T> page(String name, BiFunction<T, ResourceContext, Boolean> checkFn, String path, Object... arguments) {
         return new PagePathLinkDefinition<>(
                 name,
                 String.format(path, arguments),
-                withProjectFn(projectFn)
+                checkFn
         );
     }
 }

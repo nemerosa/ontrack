@@ -36,7 +36,9 @@ public class GitBuildResourceDecorationContributor implements ResourceDecoration
                 ),
                 LinkDefinitions.page(
                         "_changeLogPage",
-                        ProjectView.class,
+                        (build, resourceContext) -> resourceContext.isProjectFunctionGranted(build, ProjectView.class) &&
+                                gitService.isBranchConfiguredForGit(build.getBranch())
+                        ,
                         "extension/git/changelog"
                 )
         );
