@@ -1,0 +1,37 @@
+@startuml
+package "ui-support" {
+    interface ResourceModule
+    class DefaultResourceModule <<component>>
+
+    interface ResourceDecorator
+    abstract class AbstractResourceDecorator
+    abstract class AbstractLinkResourceDecorator
+
+    interface ResourceDecorationContributorService
+    class ResourceDecorationContributorServiceImpl <<service>>
+
+    interface ResourceDecorationContributor
+}
+
+package "ui" {
+    class BuildResourceDecorator
+}
+
+package "extension-git" {
+    class GitBuildResourceDecorationContributor
+
+    GitBuildResourceDecorationContributor ..|> ResourceDecorationContributor
+}
+
+DefaultResourceModule ..|> ResourceModule
+DefaultResourceModule o--> "*" ResourceDecorator : decorators
+
+AbstractResourceDecorator ..|> ResourceDecorator
+AbstractLinkResourceDecorator --|> AbstractResourceDecorator
+
+BuildResourceDecorator --|> AbstractLinkResourceDecorator
+BuildResourceDecorator o--> "1" ResourceDecorationContributorService
+
+ResourceDecorationContributorServiceImpl ..|> ResourceDecorationContributorService
+ResourceDecorationContributorServiceImpl o--> "*" ResourceDecorationContributor: contributors
+@enduml
