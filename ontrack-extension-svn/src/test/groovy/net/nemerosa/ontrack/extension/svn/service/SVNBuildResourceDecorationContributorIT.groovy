@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.extension.svn.support.TagNameSvnRevisionLink
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.ResourceDecorationContributorTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -18,11 +19,7 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder
-import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
-import net.nemerosa.ontrack.ui.resource.ResourceDecorators
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -55,10 +52,10 @@ class SVNBuildResourceDecorationContributorIT extends AbstractServiceTestSupport
     @Before
     void 'SVN repository: start'() {
         repo = SVNTestRepo.get('SVNChangeLogIT')
-        // FIXME Code duplicated with GitBuildResourceDecorationContributorIT
-        resourceObjectMapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                new DefaultResourceContext(new MockURIBuilder(), securityService),
-                ResourceDecorators.decoratorWithExtension(Build, contributor)
+        resourceObjectMapper = ResourceDecorationContributorTestSupport.createResourceObjectMapper(
+                Build,
+                contributor,
+                securityService
         )
     }
 

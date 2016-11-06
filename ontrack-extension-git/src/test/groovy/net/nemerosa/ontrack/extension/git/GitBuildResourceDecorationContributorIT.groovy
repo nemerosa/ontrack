@@ -12,13 +12,14 @@ import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.ResourceDecorationContributorTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder
-import net.nemerosa.ontrack.ui.resource.*
+import net.nemerosa.ontrack.ui.resource.ResourceModule
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,24 +45,12 @@ class GitBuildResourceDecorationContributorIT extends AbstractServiceTestSupport
 
     private ResourceObjectMapper resourceObjectMapper
 
-    /**
-     * The BuildResourceDecorator is NOT loaded since it belongs to the "ui" module.
-     *
-     * See if core resource decorators could be put in a separate module. They cannot because
-     * they themselves rely on the UI controllers.
-     *
-     * So, in order to test a resource decoration contributor in an extension, we'd have to load
-     * the complete UI module, which is not very practical.
-     *
-     * We can, on the other hand, create a fake resource decorator to wrap the resource decoration contributor
-     * to test.
-     */
-
     @Before
     void 'Setup'() {
-        resourceObjectMapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                new DefaultResourceContext(new MockURIBuilder(), securityService),
-                ResourceDecorators.decoratorWithExtension(Build, contributor)
+        resourceObjectMapper = ResourceDecorationContributorTestSupport.createResourceObjectMapper(
+                Build,
+                contributor,
+                securityService
         )
     }
 
