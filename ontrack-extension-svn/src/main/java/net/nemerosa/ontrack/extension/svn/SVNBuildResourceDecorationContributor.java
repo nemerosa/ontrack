@@ -39,7 +39,8 @@ public class SVNBuildResourceDecorationContributor implements ResourceDecoration
                 ),
                 LinkDefinitions.page(
                         "_changeLogPage",
-                        ProjectView.class,
+                        (build, resourceContext) -> resourceContext.isProjectFunctionGranted(build, ProjectView.class) &&
+                                svnService.getSVNRepository(build.getBranch()).isPresent(),
                         "extension/svn/changelog"
                 )
         );
