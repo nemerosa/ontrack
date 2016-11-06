@@ -86,35 +86,35 @@ public class GraphqlConfig {
                 )
         );
         // Links
-        decorators.stream()
+        List<String> linkNames = decorators.stream()
                 .filter(decorator -> decorator.appliesFor(projectEntityClass))
-                .forEach(decorator -> {
-                    List<String> linkNames = decorator.getLinkNames();
-                    if (linkNames != null && !linkNames.isEmpty()) {
-                        definitions.add(
-                                newFieldDefinition()
-                                        .name("links")
-                                        .description("Links")
-                                        .type(
-                                                newObject()
-                                                        .name(projectEntityClass.getSimpleName() + "Links")
-                                                        .description(projectEntityClass.getSimpleName() + " links")
-                                                        .fields(
-                                                                linkNames.stream()
-                                                                        .map(linkName -> newFieldDefinition()
-                                                                                .name(linkName)
-                                                                                .type(GraphQLString)
-                                                                                .build()
-                                                                        )
-                                                                        .collect(Collectors.toList())
-                                                        )
-                                                        .build()
-                                        )
-                                        .dataFetcher(projectEntityLinksFetcher(projectEntityClass))
-                                        .build()
-                        );
-                    }
-                });
+                .flatMap(decorator -> decorator.getLinkNames().stream())
+                .distinct()
+                .collect(Collectors.toList());
+        if (linkNames != null && !linkNames.isEmpty()) {
+            definitions.add(
+                    newFieldDefinition()
+                            .name("links")
+                            .description("Links")
+                            .type(
+                                    newObject()
+                                            .name(projectEntityClass.getSimpleName() + "Links")
+                                            .description(projectEntityClass.getSimpleName() + " links")
+                                            .fields(
+                                                    linkNames.stream()
+                                                            .map(linkName -> newFieldDefinition()
+                                                                    .name(linkName)
+                                                                    .type(GraphQLString)
+                                                                    .build()
+                                                            )
+                                                            .collect(Collectors.toList())
+                                            )
+                                            .build()
+                            )
+                            .dataFetcher(projectEntityLinksFetcher(projectEntityClass))
+                            .build()
+            );
+        }
         // OK
         return definitions;
     }
