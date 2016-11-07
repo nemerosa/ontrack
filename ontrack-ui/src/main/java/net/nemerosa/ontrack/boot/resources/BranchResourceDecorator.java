@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static net.nemerosa.ontrack.ui.resource.LinkDefinitions.*;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -247,47 +246,4 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
         );
     }
 
-    @Override
-    public List<String> getLinkNames() {
-        return Arrays.asList(
-                // FIXME Use constants
-                "_self",
-                "_project",
-                "_createBuild",
-                "_createPromotionLevel",
-                "_promotionLevels",
-                "_createValidationStamp",
-                "_validationStamps",
-                "_validationStampViews",
-                "_branches",
-                "_properties",
-                "_actions",
-                "_update",
-                "_bulkUpdate",
-                "_delete",
-                "_status",
-                "_view",
-                "_decorations",
-                "_buildFilterResources",
-                "_buildFilterForms",
-                "_buildFilterSave",
-                "_buildFilterShare",
-                "_reorderPromotionLevels",
-                "_reorderValidationStamps",
-                "_copy",
-                "_clone",
-                "_events",
-                "_enable",
-                "_disable",
-                "_templateDefinition",
-                "_templateSync",
-                "_templateInstanceCreate",
-                "_templateInstance",
-                "_templateInstanceDisconnect",
-                "_templateInstanceConnect",
-                "_templateInstanceSync",
-                "_page"
-        );
-        // FIXME Link contributors
-    }
 }
