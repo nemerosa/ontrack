@@ -41,11 +41,26 @@ public class LinkDefinitions {
         );
     }
 
+    public static <T extends ProjectEntity> LinkDefinition<T> self(Function<T, Object> linkFn) {
+        return link(
+                Link.SELF,
+                linkFn
+        );
+    }
+
     public static <T extends ProjectEntity> LinkDefinition<T> link(String name, Function<T, Object> linkFn, BiFunction<T, ResourceContext, Boolean> checkFn) {
         return link(
                 name,
                 (t, resourceContext) -> linkFn.apply(t),
                 checkFn
+        );
+    }
+
+    public static <T extends ProjectEntity, P extends ProjectFunction> LinkDefinition<T> delete(Function<T, Object> linkFn, Class<P> fn) {
+        return link(
+                Link.DELETE,
+                linkFn,
+                withProjectFn(fn)
         );
     }
 
@@ -66,7 +81,7 @@ public class LinkDefinitions {
         );
     }
 
-    public static <T extends ProjectEntity, P extends ProjectFunction> LinkDefinition<T> page(String name, BiFunction<T, ResourceContext, Boolean> checkFn, String path, Object... arguments) {
+    public static <T extends ProjectEntity> LinkDefinition<T> page(String name, BiFunction<T, ResourceContext, Boolean> checkFn, String path, Object... arguments) {
         return new PagePathLinkDefinition<>(
                 name,
                 String.format(path, arguments),
