@@ -1,7 +1,6 @@
-package net.nemerosa.ontrack.boot.graphql;
+package net.nemerosa.ontrack.boot.graphql.support;
 
 import graphql.schema.*;
-import net.nemerosa.ontrack.boot.graphql.relay.Relay;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.apache.commons.lang3.EnumUtils;

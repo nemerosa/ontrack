@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.graphql.relay;
+package net.nemerosa.ontrack.boot.graphql.support;
 
 
 import graphql.relay.Base64;

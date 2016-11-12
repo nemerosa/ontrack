@@ -2,7 +2,8 @@ package net.nemerosa.ontrack.boot.graphql;
 
 import graphql.relay.SimpleListConnection;
 import graphql.schema.*;
-import net.nemerosa.ontrack.boot.graphql.relay.Relay;
+import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
+import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
@@ -25,7 +26,7 @@ import static graphql.Scalars.*;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
-import static net.nemerosa.ontrack.boot.graphql.GraphqlUtils.stdList;
+import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Configuration
 public class GraphqlConfig {
@@ -442,28 +443,6 @@ public class GraphqlConfig {
     private GraphQLObjectType queryType() {
         return newObject()
                 .name(QUERY)
-                // Project
-                .field(
-                        newFieldDefinition()
-                                .name("projects")
-                                .type(stdList(projectType()))
-                                .argument(
-                                        newArgument()
-                                                .name("id")
-                                                .description("ID of the project to look for")
-                                                .type(GraphQLInt)
-                                                .build()
-                                )
-                                .argument(
-                                        newArgument()
-                                                .name("name")
-                                                .description("Name of the project to look for")
-                                                .type(GraphQLString)
-                                                .build()
-                                )
-                                .dataFetcher(projectFetcher())
-                                .build()
-                )
                 // Branches
                 .field(
                         newFieldDefinition()
@@ -525,33 +504,6 @@ public class GraphqlConfig {
                 }
             } else {
                 return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher projectFetcher() {
-        return environment -> {
-            Integer id = environment.getArgument("id");
-            String name = environment.getArgument("name");
-            // Per ID
-            if (id != null) {
-                // TODO No other argument is expected
-                // Fetch by ID
-                Project project = structureService.getProject(ID.of(id));
-                // As list
-                return Collections.singletonList(project);
-            }
-            // Name
-            else if (name != null) {
-                // TODO No other argument is expected
-                return structureService.findProjectByName(name)
-                        .map(Collections::singletonList)
-                        .orElse(Collections.emptyList());
-            }
-            // TODO Other criterias
-            // Whole list
-            else {
-                return structureService.getProjectList();
             }
         };
     }

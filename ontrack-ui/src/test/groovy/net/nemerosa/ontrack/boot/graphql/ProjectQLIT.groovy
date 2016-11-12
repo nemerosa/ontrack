@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.graphql
 
 import graphql.GraphQL
 import graphql.schema.GraphQLSchema
+import net.nemerosa.ontrack.boot.graphql.schema.GraphqlSchemaService
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
@@ -17,8 +18,7 @@ import static org.junit.Assert.fail
 class ProjectQLIT extends AbstractServiceTestSupport {
 
     @Autowired
-    @Qualifier("ontrack")
-    private GraphQLSchema ontrackSchema
+    private GraphqlSchemaService schemaService
 
     @Test
     void 'All projects'() {
@@ -493,7 +493,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     }
 
     def run(String query) {
-        def result = new GraphQL(ontrackSchema).execute(query)
+        def result = new GraphQL(schemaService.schema).execute(query)
         if (result.errors && !result.errors.empty) {
             fail result.errors*.message.join('\n')
         } else if (result.data) {
