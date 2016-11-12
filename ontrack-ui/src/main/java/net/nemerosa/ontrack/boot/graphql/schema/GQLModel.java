@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -29,6 +28,7 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 // TODO Type providers?
 
 @Component
+@Deprecated
 public class GQLModel {
 
     public static final String PROJECT_ENTITY = "ProjectEntity";
@@ -57,6 +57,9 @@ public class GQLModel {
 
     @Autowired
     private SecurityService securityService;
+
+    @Autowired
+    private GQLBuild build;
 
     /**
      * Creates a context for the evaluation of links
@@ -154,34 +157,6 @@ public class GQLModel {
 
     // TODO Define a ProjectEntity interface
 
-    public GraphQLObjectType buildType() {
-        return newObject()
-                .name(BUILD)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(Build.class))
-                // TODO Signature
-                // Promotion runs
-                .field(
-                        newFieldDefinition()
-                                .name("promotionRuns")
-                                .description("Promotions for this build")
-                                .argument(
-                                        newArgument()
-                                                .name("promotion")
-                                                .description("Name of the promotion level")
-                                                .type(GraphQLString)
-                                                .build()
-                                )
-                                .type(stdList(new GraphQLTypeReference(PROMOTION_RUN)))
-                                .dataFetcher(buildPromotionRunsFetcher())
-                                .build()
-                )
-                // TODO Validation runs
-                // TODO Build properties
-                // OK
-                .build();
-    }
-
     public GraphQLObjectType projectType() {
         return newObject()
                 .name(PROJECT)
@@ -204,7 +179,6 @@ public class GQLModel {
                                 .build()
                 )
                 // TODO Events: project creation
-                // TODO Project properties
                 // OK
                 .build();
     }
@@ -242,7 +216,7 @@ public class GQLModel {
                 .field(
                         newFieldDefinition()
                                 .name("builds")
-                                .type(GraphqlUtils.connectionList(buildType()))
+                                .type(GraphqlUtils.connectionList(build.getType()))
                                 // TODO Build filtering
                                 .argument(
                                         newArgument()
@@ -507,36 +481,6 @@ public class GQLModel {
                 );
                 // As a connection list
                 return new SimpleListConnection(validationRuns).get(environment);
-            } else {
-                return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher buildPromotionRunsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof Build) {
-                Build build = (Build) source;
-                // Promotion filter
-                String promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null);
-                if (promotion != null) {
-                    // Gets the promotion level
-                    PromotionLevel promotionLevel = structureService.findPromotionLevelByName(
-                            build.getProject().getName(),
-                            build.getBranch().getName(),
-                            promotion
-                    ).orElseThrow(() -> new PromotionLevelNotFoundException(
-                            build.getProject().getName(),
-                            build.getBranch().getName(),
-                            promotion
-                    ));
-                    // Gets promotion runs for this promotion level
-                    return structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel);
-                } else {
-                    // Gets all the promotion runs
-                    return structureService.getPromotionRunsForBuild(build.getId());
-                }
             } else {
                 return Collections.emptyList();
             }

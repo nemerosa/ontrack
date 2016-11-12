@@ -17,13 +17,13 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLProjectsRootQuery implements GQLRootQuery {
+public class GQLRootQueryProjects implements GQLRootQuery {
 
     private final StructureService structureService;
     private final GQLModel model;
 
     @Autowired
-    public GQLProjectsRootQuery(StructureService structureService, GQLModel model) {
+    public GQLRootQueryProjects(StructureService structureService, GQLModel model) {
         this.structureService = structureService;
         this.model = model;
     }

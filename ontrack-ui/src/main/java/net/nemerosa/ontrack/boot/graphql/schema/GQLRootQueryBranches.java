@@ -16,13 +16,13 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLBranchesRootQuery implements GQLRootQuery {
+public class GQLRootQueryBranches implements GQLRootQuery {
 
     private final StructureService structureService;
     private final GQLModel model;
 
     @Autowired
-    public GQLBranchesRootQuery(StructureService structureService, GQLModel model) {
+    public GQLRootQueryBranches(StructureService structureService, GQLModel model) {
         this.structureService = structureService;
         this.model = model;
     }
