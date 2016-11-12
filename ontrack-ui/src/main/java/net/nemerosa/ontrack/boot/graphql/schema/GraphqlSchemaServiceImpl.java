@@ -45,41 +45,6 @@ public class GraphqlSchemaServiceImpl implements GraphqlSchemaService {
                                 .map(GQLRootQuery::getFieldDefinition)
                                 .collect(Collectors.toList())
                 )
-                // FIXME Branches
-//                .field(
-//                        newFieldDefinition()
-//                                .name("branches")
-//                                .type(stdList(branchType()))
-//                                .argument(
-//                                        newArgument()
-//                                                .name("id")
-//                                                .description("ID of the branch to look for")
-//                                                .type(new GraphQLNonNull(GraphQLInt))
-//                                                .build()
-//                                )
-//                                .dataFetcher(branchFetcher())
-//                                .build()
-//                )
-                // TODO Builds
-                // TODO Promotion levels
-                // TODO Promotion runs
-                // TODO Validation stamps
-                // FIXME Validation runs
-//                .field(
-//                        newFieldDefinition()
-//                                .name("validationRuns")
-//                                .type(stdList(validationRunType()))
-//                                .argument(
-//                                        newArgument()
-//                                                .name("id")
-//                                                .description("ID of the validation run to look for")
-//                                                .type(new GraphQLNonNull(GraphQLInt))
-//                                                .build()
-//                                )
-//                                .dataFetcher(validationRunFetcher())
-//                                .build()
-//                )
-                // TODO Extension contributions
                 // OK
                 .build();
     }

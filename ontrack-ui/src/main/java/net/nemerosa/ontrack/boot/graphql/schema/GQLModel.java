@@ -26,10 +26,11 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
+// TODO Type providers?
+
 @Component
 public class GQLModel {
 
-    public static final String QUERY = "Query";
     public static final String PROJECT_ENTITY = "ProjectEntity";
     public static final String PROJECT = "Project";
     public static final String BRANCH = "Branch";
@@ -429,48 +430,6 @@ public class GQLModel {
                 .build();
     }
 
-    private GraphQLObjectType queryType() {
-        return newObject()
-                .name(QUERY)
-                // Branches
-                .field(
-                        newFieldDefinition()
-                                .name("branches")
-                                .type(stdList(branchType()))
-                                .argument(
-                                        newArgument()
-                                                .name("id")
-                                                .description("ID of the branch to look for")
-                                                .type(new GraphQLNonNull(GraphQLInt))
-                                                .build()
-                                )
-                                .dataFetcher(branchFetcher())
-                                .build()
-                )
-                // TODO Builds
-                // TODO Promotion levels
-                // TODO Promotion runs
-                // TODO Validation stamps
-                // Validation runs
-                .field(
-                        newFieldDefinition()
-                                .name("validationRuns")
-                                .type(stdList(validationRunType()))
-                                .argument(
-                                        newArgument()
-                                                .name("id")
-                                                .description("ID of the validation run to look for")
-                                                .type(new GraphQLNonNull(GraphQLInt))
-                                                .build()
-                                )
-                                .dataFetcher(validationRunFetcher())
-                                .build()
-                )
-                // TODO Extension contributions
-                // OK
-                .build();
-    }
-
     private DataFetcher projectBranchesFetcher() {
         return environment -> {
             Object source = environment.getSource();
@@ -492,38 +451,6 @@ public class GQLModel {
                     );
                 }
             } else {
-                return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher branchFetcher() {
-        return environment -> {
-            Integer id = environment.getArgument("id");
-            if (id != null) {
-                return Collections.singletonList(
-                        structureService.getBranch(ID.of(id))
-                );
-            }
-            // Whole list
-            else {
-                return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher validationRunFetcher() {
-        return environment -> {
-            Integer id = environment.getArgument("id");
-            if (id != null) {
-                // Fetch by ID
-                return Collections.singletonList(
-                        structureService.getValidationRun(ID.of(id))
-                );
-            }
-            // TODO Other criterias
-            // Empty list
-            else {
                 return Collections.emptyList();
             }
         };
