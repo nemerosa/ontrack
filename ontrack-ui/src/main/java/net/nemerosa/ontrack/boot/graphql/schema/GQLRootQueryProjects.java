@@ -20,19 +20,19 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 public class GQLRootQueryProjects implements GQLRootQuery {
 
     private final StructureService structureService;
-    private final GQLModel model;
+    private final GQLProject project;
 
     @Autowired
-    public GQLRootQueryProjects(StructureService structureService, GQLModel model) {
+    public GQLRootQueryProjects(StructureService structureService, GQLProject project) {
         this.structureService = structureService;
-        this.model = model;
+        this.project = project;
     }
 
     @Override
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("projects")
-                .type(stdList(model.projectType()))
+                .type(stdList(project.getType()))
                 .argument(
                         newArgument()
                                 .name("id")

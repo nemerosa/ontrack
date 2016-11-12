@@ -32,7 +32,6 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 public class GQLModel {
 
     public static final String PROJECT_ENTITY = "ProjectEntity";
-    public static final String PROJECT = "Project";
     public static final String BRANCH = "Branch";
     public static final String BUILD = "Build";
     public static final String PROMOTION_LEVEL = "PromotionLevel";
@@ -156,32 +155,6 @@ public class GQLModel {
     }
 
     // TODO Define a ProjectEntity interface
-
-    public GraphQLObjectType projectType() {
-        return newObject()
-                .name(PROJECT)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(Project.class))
-                .field(GraphqlUtils.disabledField())
-                // Branches
-                .field(
-                        newFieldDefinition()
-                                .name("branches")
-                                .type(stdList(branchType()))
-                                .argument(
-                                        newArgument()
-                                                .name("name")
-                                                .description("Exact name of the branch to look for.")
-                                                .type(GraphQLString)
-                                                .build()
-                                )
-                                .dataFetcher(projectBranchesFetcher())
-                                .build()
-                )
-                // TODO Events: project creation
-                // OK
-                .build();
-    }
 
     public GraphQLObjectType branchType() {
         return newObject()
@@ -402,32 +375,6 @@ public class GQLModel {
                 )
                 // OK
                 .build();
-    }
-
-    private DataFetcher projectBranchesFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof Project) {
-                Project project = (Project) source;
-                String name = environment.getArgument("name");
-                // TODO Combined filter
-                // TODO Other criterias
-                if (name != null) {
-                    Optional<Branch> oBranch = structureService.findBranchByName(project.getName(), name);
-                    if (oBranch.isPresent()) {
-                        return Collections.singletonList(oBranch.get());
-                    } else {
-                        return Collections.emptyList();
-                    }
-                } else {
-                    return structureService.getBranchesForProject(
-                            project.getId()
-                    );
-                }
-            } else {
-                return Collections.emptyList();
-            }
-        };
     }
 
     private DataFetcher branchBuildsFetcher() {

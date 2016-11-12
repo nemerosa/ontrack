@@ -27,7 +27,7 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 @Component
 public class GQLBuild extends AbstractGQLProjectEntity<Build> {
 
-    private static final String BUILD = "Build";
+    public static final String BUILD = "Build";
 
     private final StructureService structureService;
 
