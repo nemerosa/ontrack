@@ -14,22 +14,25 @@ import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
+import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
 public class GQLProjectsRootQuery implements GQLRootQuery {
 
     private final StructureService structureService;
+    private final GQLModel model;
 
     @Autowired
-    public GQLProjectsRootQuery(StructureService structureService) {
+    public GQLProjectsRootQuery(StructureService structureService, GQLModel model) {
         this.structureService = structureService;
+        this.model = model;
     }
 
     @Override
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("projects")
-                // FIXME .type(stdList(projectType()))
+                .type(stdList(model.projectType()))
                 .argument(
                         newArgument()
                                 .name("id")

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.graphql;
+package net.nemerosa.ontrack.boot.graphql.schema;
 
 import graphql.relay.SimpleListConnection;
 import graphql.schema.*;
@@ -15,9 +15,7 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,8 +26,8 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
-@Configuration
-public class GraphqlConfig {
+@Component
+public class GQLModel {
 
     public static final String QUERY = "Query";
     public static final String PROJECT_ENTITY = "ProjectEntity";
@@ -60,18 +58,9 @@ public class GraphqlConfig {
     private SecurityService securityService;
 
     /**
-     * GraphQL schema definition
+     * Creates a context for the evaluation of links
      */
-    @Bean
-    @Qualifier("ontrack")
-    public GraphQLSchema grapqlSchema() {
-        return GraphQLSchema.newSchema()
-                .query(queryType())
-                .build();
-    }
-
-    @Bean
-    public ResourceContext graphqlResourceContext() {
+    private ResourceContext graphqlResourceContext() {
         return new DefaultResourceContext(
                 uriBuilder,
                 securityService
@@ -164,7 +153,7 @@ public class GraphqlConfig {
 
     // TODO Define a ProjectEntity interface
 
-    private GraphQLObjectType buildType() {
+    public GraphQLObjectType buildType() {
         return newObject()
                 .name(BUILD)
                 .withInterface(projectEntityInterface())
@@ -192,7 +181,34 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private GraphQLObjectType branchType() {
+    public GraphQLObjectType projectType() {
+        return newObject()
+                .name(PROJECT)
+                .withInterface(projectEntityInterface())
+                .fields(projectEntityInterfaceFields(Project.class))
+                .field(GraphqlUtils.disabledField())
+                // Branches
+                .field(
+                        newFieldDefinition()
+                                .name("branches")
+                                .type(stdList(branchType()))
+                                .argument(
+                                        newArgument()
+                                                .name("name")
+                                                .description("Exact name of the branch to look for.")
+                                                .type(GraphQLString)
+                                                .build()
+                                )
+                                .dataFetcher(projectBranchesFetcher())
+                                .build()
+                )
+                // TODO Events: project creation
+                // TODO Project properties
+                // OK
+                .build();
+    }
+
+    public GraphQLObjectType branchType() {
         return newObject()
                 .name(BRANCH)
                 .withInterface(projectEntityInterface())
@@ -241,7 +257,7 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private GraphQLObjectType promotionLevelType() {
+    public GraphQLObjectType promotionLevelType() {
         return newObject()
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface())
@@ -261,7 +277,7 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private GraphQLObjectType validationStampType() {
+    public GraphQLObjectType validationStampType() {
         return newObject()
                 .name(VALIDATION_STAMP)
                 .withInterface(projectEntityInterface())
@@ -281,7 +297,7 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private GraphQLObjectType promotionRunType() {
+    public GraphQLObjectType promotionRunType() {
         return newObject()
                 .name(PROMOTION_RUN)
                 .withInterface(projectEntityInterface())
@@ -307,7 +323,7 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private GraphQLObjectType validationRunType() {
+    public GraphQLObjectType validationRunType() {
         return newObject()
                 .name(VALIDATION_RUN)
                 .withInterface(projectEntityInterface())
@@ -348,7 +364,7 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private GraphQLObjectType validationRunStatusType() {
+    public GraphQLObjectType validationRunStatusType() {
         return newObject()
                 .name(VALIDATION_RUN_STATUS)
                 // TODO Signature
@@ -366,7 +382,7 @@ public class GraphqlConfig {
                 .build();
     }
 
-    private GraphQLObjectType validationRunStatusIDType() {
+    public GraphQLObjectType validationRunStatusIDType() {
         return newObject()
                 .name(VALIDATION_RUN_STATUS_ID)
                 // ID
@@ -409,33 +425,6 @@ public class GraphqlConfig {
                                 .type(stdList(GraphQLString))
                                 .build()
                 )
-                // OK
-                .build();
-    }
-
-    private GraphQLObjectType projectType() {
-        return newObject()
-                .name(PROJECT)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(Project.class))
-                .field(GraphqlUtils.disabledField())
-                // Branches
-                .field(
-                        newFieldDefinition()
-                                .name("branches")
-                                .type(stdList(branchType()))
-                                .argument(
-                                        newArgument()
-                                                .name("name")
-                                                .description("Exact name of the branch to look for.")
-                                                .type(GraphQLString)
-                                                .build()
-                                )
-                                .dataFetcher(projectBranchesFetcher())
-                                .build()
-                )
-                // TODO Events: project creation
-                // TODO Project properties
                 // OK
                 .build();
     }
