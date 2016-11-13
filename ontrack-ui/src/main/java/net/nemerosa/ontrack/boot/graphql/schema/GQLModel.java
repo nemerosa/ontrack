@@ -38,7 +38,6 @@ public class GQLModel {
     public static final String PROMOTION_RUN = "PromotionRun";
     public static final String VALIDATION_STAMP = "ValidationStamp";
     public static final String VALIDATION_RUN = "ValidationRun";
-    public static final String VALIDATION_RUN_STATUS = "ValidationRunStatus";
 
     @Autowired
     private StructureService structureService;
@@ -60,7 +59,7 @@ public class GQLModel {
     private GQLTypeBuild build;
 
     @Autowired
-    private GQLTypeValidationRunStatusID validationRunStatusID;
+    private GQLTypeValidationRunStatus validationRunStatus;
 
     /**
      * Creates a context for the evaluation of links
@@ -287,27 +286,9 @@ public class GQLModel {
                         newFieldDefinition()
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
-                                .type(stdList(validationRunStatusType()))
+                                .type(stdList(validationRunStatus.getType()))
                                 .build()
                 )
-                // OK
-                .build();
-    }
-
-    public GraphQLObjectType validationRunStatusType() {
-        return newObject()
-                .name(VALIDATION_RUN_STATUS)
-                // TODO Signature
-                // Status ID
-                .field(
-                        newFieldDefinition()
-                                .name("statusID")
-                                .description("Status ID")
-                                .type(validationRunStatusID.getType())
-                                .build()
-                )
-                // Description
-                .field(GraphqlUtils.descriptionField())
                 // OK
                 .build();
     }

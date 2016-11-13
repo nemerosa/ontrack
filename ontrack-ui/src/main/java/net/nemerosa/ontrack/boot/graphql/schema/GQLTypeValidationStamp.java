@@ -45,6 +45,7 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
                         newFieldDefinition()
                                 .name("validationRuns")
                                 .description("List of runs for this validation stamp")
+                                // FIXME Validation run, not validation ID
                                 .type(GraphqlUtils.connectionList(validationRunStatusID.getType()))
                                 .argument(Relay.getConnectionFieldArguments())
                                 .dataFetcher(validationStampValidationRunsFetcher())
