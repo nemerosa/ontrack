@@ -57,7 +57,7 @@ public class GQLModel {
     private SecurityService securityService;
 
     @Autowired
-    private GQLBuild build;
+    private GQLTypeBuild build;
 
     @Autowired
     private GQLTypeValidationRunStatusID validationRunStatusID;
@@ -257,7 +257,7 @@ public class GQLModel {
                         newFieldDefinition()
                                 .name("build")
                                 .description("Associated build")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLBuild.BUILD)))
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeBuild.BUILD)))
                                 .build()
                 )
                 // Promotion level
@@ -283,7 +283,7 @@ public class GQLModel {
                         newFieldDefinition()
                                 .name("build")
                                 .description("Associated build")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLBuild.BUILD)))
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeBuild.BUILD)))
                                 .build()
                 )
                 // Promotion level

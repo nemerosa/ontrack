@@ -22,17 +22,17 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 @Component
-public class GQLProject extends AbstractGQLProjectEntity<Project> {
+public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
 
     public static final String PROJECT = "Project";
 
     private final StructureService structureService;
 
     @Autowired
-    public GQLProject(URIBuilder uriBuilder,
-                      SecurityService securityService,
-                      List<ResourceDecorator<?>> decorators,
-                      StructureService structureService) {
+    public GQLTypeProject(URIBuilder uriBuilder,
+                          SecurityService securityService,
+                          List<ResourceDecorator<?>> decorators,
+                          StructureService structureService) {
         super(uriBuilder, securityService, Project.class, decorators);
         this.structureService = structureService;
     }

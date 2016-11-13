@@ -20,10 +20,10 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 public class GQLRootQueryProjects implements GQLRootQuery {
 
     private final StructureService structureService;
-    private final GQLProject project;
+    private final GQLTypeProject project;
 
     @Autowired
-    public GQLRootQueryProjects(StructureService structureService, GQLProject project) {
+    public GQLRootQueryProjects(StructureService structureService, GQLTypeProject project) {
         this.structureService = structureService;
         this.project = project;
     }

@@ -25,17 +25,17 @@ import static net.nemerosa.ontrack.boot.graphql.schema.GQLModel.PROMOTION_RUN;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLBuild extends AbstractGQLProjectEntity<Build> {
+public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
 
     public static final String BUILD = "Build";
 
     private final StructureService structureService;
 
     @Autowired
-    public GQLBuild(URIBuilder uriBuilder,
-                    SecurityService securityService,
-                    List<ResourceDecorator<?>> decorators,
-                    StructureService structureService) {
+    public GQLTypeBuild(URIBuilder uriBuilder,
+                        SecurityService securityService,
+                        List<ResourceDecorator<?>> decorators,
+                        StructureService structureService) {
         super(uriBuilder, securityService, Build.class, decorators);
         this.structureService = structureService;
     }
