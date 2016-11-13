@@ -183,7 +183,7 @@ public class GQLModel {
                 .field(
                         newFieldDefinition()
                                 .name("validationStamps")
-                                .type(stdList(validationStampType()))
+                                .type(stdList(new GraphQLTypeReference(GQLTypeValidationStamp.VALIDATION_STAMP)))
                                 .dataFetcher(branchValidationStampsFetcher())
                                 .build()
                 )
@@ -221,26 +221,6 @@ public class GQLModel {
                                 .type(GraphqlUtils.connectionList(promotionRunType()))
                                 .argument(Relay.getConnectionFieldArguments())
                                 .dataFetcher(promotionLevelPromotionRunsFetcher())
-                                .build()
-                )
-                // OK
-                .build();
-    }
-
-    public GraphQLObjectType validationStampType() {
-        return newObject()
-                .name(VALIDATION_STAMP)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(ValidationStamp.class))
-                // TODO Image
-                // Validation runs
-                .field(
-                        newFieldDefinition()
-                                .name("validationRuns")
-                                .description("List of runs for this validation stamp")
-                                .type(GraphqlUtils.connectionList(validationRunType()))
-                                .argument(Relay.getConnectionFieldArguments())
-                                .dataFetcher(validationStampValidationRunsFetcher())
                                 .build()
                 )
                 // OK
@@ -363,26 +343,6 @@ public class GQLModel {
                 List<PromotionRun> promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.getId());
                 // As a connection list
                 return new SimpleListConnection(promotionRuns).get(environment);
-            } else {
-                return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher validationStampValidationRunsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof ValidationStamp) {
-                ValidationStamp validationStamp = (ValidationStamp) source;
-                // Gets all the validation runs
-                // TODO Use environment for limits?
-                List<ValidationRun> validationRuns = structureService.getValidationRunsForValidationStamp(
-                        validationStamp.getId(),
-                        0,
-                        Integer.MAX_VALUE
-                );
-                // As a connection list
-                return new SimpleListConnection(validationRuns).get(environment);
             } else {
                 return Collections.emptyList();
             }

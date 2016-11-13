@@ -15,7 +15,7 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 @Component
 public class GQLTypeValidationRunStatusID extends AbstractGQLType {
 
-    private static final String VALIDATION_RUN_STATUS_ID = "ValidationRunStatusID";
+    public static final String VALIDATION_RUN_STATUS_ID = "ValidationRunStatusID";
 
     @Autowired
     public GQLTypeValidationRunStatusID(URIBuilder uriBuilder, SecurityService securityService) {
