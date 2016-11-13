@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static graphql.Scalars.*;
+import static graphql.Scalars.GraphQLInt;
+import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -33,13 +34,11 @@ public class GQLModel {
 
     public static final String PROJECT_ENTITY = "ProjectEntity";
     public static final String BRANCH = "Branch";
-    public static final String BUILD = "Build";
     public static final String PROMOTION_LEVEL = "PromotionLevel";
     public static final String PROMOTION_RUN = "PromotionRun";
     public static final String VALIDATION_STAMP = "ValidationStamp";
     public static final String VALIDATION_RUN = "ValidationRun";
     public static final String VALIDATION_RUN_STATUS = "ValidationRunStatus";
-    public static final String VALIDATION_RUN_STATUS_ID = "ValidationRunStatusID";
 
     @Autowired
     private StructureService structureService;
@@ -59,6 +58,9 @@ public class GQLModel {
 
     @Autowired
     private GQLBuild build;
+
+    @Autowired
+    private GQLTypeValidationRunStatusID validationRunStatusID;
 
     /**
      * Creates a context for the evaluation of links
@@ -255,7 +257,7 @@ public class GQLModel {
                         newFieldDefinition()
                                 .name("build")
                                 .description("Associated build")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(BUILD)))
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLBuild.BUILD)))
                                 .build()
                 )
                 // Promotion level
@@ -281,7 +283,7 @@ public class GQLModel {
                         newFieldDefinition()
                                 .name("build")
                                 .description("Associated build")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(BUILD)))
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLBuild.BUILD)))
                                 .build()
                 )
                 // Promotion level
@@ -321,58 +323,11 @@ public class GQLModel {
                         newFieldDefinition()
                                 .name("statusID")
                                 .description("Status ID")
-                                .type(validationRunStatusIDType())
+                                .type(validationRunStatusID.getType())
                                 .build()
                 )
                 // Description
                 .field(GraphqlUtils.descriptionField())
-                // OK
-                .build();
-    }
-
-    public GraphQLObjectType validationRunStatusIDType() {
-        return newObject()
-                .name(VALIDATION_RUN_STATUS_ID)
-                // ID
-                .field(
-                        newFieldDefinition()
-                                .name("id")
-                                .description("Status ID")
-                                .type(GraphQLString)
-                                .build()
-                )
-                // Name
-                .field(
-                        newFieldDefinition()
-                                .name("name")
-                                .description("Status display name")
-                                .type(GraphQLString)
-                                .build()
-                )
-                // Root
-                .field(
-                        newFieldDefinition()
-                                .name("root")
-                                .description("Root status?")
-                                .type(GraphQLBoolean)
-                                .build()
-                )
-                // Passed
-                .field(
-                        newFieldDefinition()
-                                .name("passed")
-                                .description("Passing status?")
-                                .type(GraphQLBoolean)
-                                .build()
-                )
-                // Following statuses
-                .field(
-                        newFieldDefinition()
-                                .name("followingStatuses")
-                                .description("List of following statuses")
-                                .type(stdList(GraphQLString))
-                                .build()
-                )
                 // OK
                 .build();
     }
