@@ -11,3 +11,9 @@
     <b>{{property.value.disablingDuration + property.value.deletingDuration}}</b>
     day(s).
 </p>
+<p ng-if="property.value.promotionsToKeep" class="ot-label-suite">
+    Keeping branches promoted to:
+    <span class="label label-info" ng-repeat="promotion in property.value.promotionsToKeep">
+        {{promotion}}
+    </span>
+</p>

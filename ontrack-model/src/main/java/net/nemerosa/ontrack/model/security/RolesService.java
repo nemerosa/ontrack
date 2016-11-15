@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.security;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
 public interface RolesService {
 
     /**
-     * List of core global functions.
+     * List of all global functions.
      */
     List<Class<? extends GlobalFunction>> defaultGlobalFunctions = Arrays.asList(
             ProjectCreation.class,
@@ -27,7 +28,14 @@ public interface RolesService {
     );
 
     /**
-     * List of core project functions.
+     * List of read-only global functions.
+     */
+    List<Class<? extends GlobalFunction>> readOnlyGlobalFunctions = Collections.singletonList(
+            ProjectList.class
+    );
+
+    /**
+     * List of all project functions.
      */
     List<Class<? extends ProjectFunction>> defaultProjectFunctions = Arrays.asList(
             ProjectView.class,
@@ -55,6 +63,13 @@ public interface RolesService {
             ValidationRunStatusChange.class,
             PromotionRunCreate.class,
             PromotionRunDelete.class
+    );
+
+    /**
+     * List of read-only project functions.
+     */
+    List<Class<? extends ProjectFunction>> readOnlyProjectFunctions = Collections.singletonList(
+            ProjectView.class
     );
 
     /**

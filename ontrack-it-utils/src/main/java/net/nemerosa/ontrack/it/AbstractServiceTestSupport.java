@@ -56,6 +56,21 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         });
     }
 
+    protected Account doCreateAccountWithProjectRole(Project project, String role) throws Exception {
+        Account account = doCreateAccount();
+        return asUser().with(project, ProjectAuthorisationMgt.class).call(() -> {
+            accountService.saveProjectPermission(
+                    project.getId(),
+                    PermissionTargetType.ACCOUNT,
+                    account.id(),
+                    new PermissionInput(role)
+            );
+            return accountService.withACL(
+                    AuthenticatedAccount.of(account)
+            );
+        });
+    }
+
     protected Project doCreateProject() throws Exception {
         return doCreateProject(nameDescription());
     }
@@ -155,12 +170,25 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return asUser().with(projectEntity.projectId(), ProjectView.class).call(callable);
     }
 
-    public void grantViewToAll(boolean grantViewToAll) throws Exception {
-        asUser().with(GlobalSettings.class).execute(() ->
-                settingsManagerService.saveSettings(
-                        SecuritySettings.of().withGrantProjectViewToAll(grantViewToAll)
-                )
-        );
+    public void grantViewToAll(boolean grantViewToAll) {
+        try {
+            asUser().with(GlobalSettings.class).execute(() ->
+                    settingsManagerService.saveSettings(
+                            SecuritySettings.of().withGrantProjectViewToAll(grantViewToAll)
+                    )
+            );
+        } catch (Exception ex) {
+            throw new IllegalStateException("Cannot set GrantViewToAll settings", ex);
+        }
+    }
+
+    protected <T> T withNoGrantViewToAll(Callable<T> task) throws Exception {
+        grantViewToAll(false);
+        try {
+            return task.call();
+        } finally {
+            grantViewToAll(false);
+        }
     }
 
     protected interface ContextCall {

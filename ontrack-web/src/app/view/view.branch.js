@@ -25,6 +25,9 @@ angular.module('ot.view.branch', [
         // Branch's id
         var branchId = $stateParams.branchId;
 
+        // Initial loading taking place... now
+        $scope.loadingBuildView = true;
+
         // Auto refresh status
         function refreshBuildView() {
             loadBuildView();

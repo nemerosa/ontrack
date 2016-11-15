@@ -18,6 +18,8 @@ include::usage.adoc[]
 
 include::administration.adoc[]
 
+include::integration.adoc[]
+
 include::dsl.adoc[]
 
 include::contributing.adoc[]

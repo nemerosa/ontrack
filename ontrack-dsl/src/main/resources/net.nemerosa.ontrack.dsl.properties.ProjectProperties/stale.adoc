@@ -8,7 +8,24 @@ ontrack.project('project').config {
    stale 15, 30
 }
 
-property = ontrack.project('project').config.stale
+def property = ontrack.project('project').config.stale
 assert property.disablingDuration == 15
 assert property.deletingDuration == 30
+assert property.promotionsToKeep == []
 ----
+
+It is possible to make sure to keep branches which have been promoted to some levels. For example, if you want
+to keep branches which have been promoted to `PRODUCTION`:
+
+[source,groovy]
+----
+ontrack.project('project').config {
+   stale 15, 30, ['PRODUCTION']
+}
+
+def property = ontrack.project('project').config.stale
+assert property.disablingDuration == 15
+assert property.deletingDuration == 30
+assert property.promotionsToKeep == ['PRODUCTION']
+----
+
