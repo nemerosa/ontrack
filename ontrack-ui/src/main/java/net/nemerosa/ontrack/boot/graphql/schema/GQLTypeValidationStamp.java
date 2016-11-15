@@ -25,12 +25,12 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
     public static final String VALIDATION_STAMP = "ValidationStamp";
 
     private final StructureService structureService;
-    private final GQLTypeValidationRunStatusID validationRunStatusID;
+    private final GQLTypeValidationRun validationRun;
 
-    public GQLTypeValidationStamp(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypeValidationRunStatusID validationRunStatusID) {
+    public GQLTypeValidationStamp(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypeValidationRun validationRun) {
         super(uriBuilder, securityService, ValidationStamp.class, decorators);
         this.structureService = structureService;
-        this.validationRunStatusID = validationRunStatusID;
+        this.validationRun = validationRun;
     }
 
     @Override
@@ -45,8 +45,7 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
                         newFieldDefinition()
                                 .name("validationRuns")
                                 .description("List of runs for this validation stamp")
-                                // FIXME Validation run, not validation ID
-                                .type(GraphqlUtils.connectionList(validationRunStatusID.getType()))
+                                .type(GraphqlUtils.connectionList(validationRun.getType()))
                                 .argument(Relay.getConnectionFieldArguments())
                                 .dataFetcher(validationStampValidationRunsFetcher())
                                 .build()

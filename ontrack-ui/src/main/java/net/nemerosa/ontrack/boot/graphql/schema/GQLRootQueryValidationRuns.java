@@ -19,19 +19,19 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 public class GQLRootQueryValidationRuns implements GQLRootQuery {
 
     private final StructureService structureService;
-    private final GQLModel model;
+    private final GQLTypeValidationRun validationRun;
 
     @Autowired
-    public GQLRootQueryValidationRuns(StructureService structureService, GQLModel model) {
+    public GQLRootQueryValidationRuns(StructureService structureService, GQLTypeValidationRun validationRun) {
         this.structureService = structureService;
-        this.model = model;
+        this.validationRun = validationRun;
     }
 
     @Override
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("validationRuns")
-                .type(stdList(model.validationRunType()))
+                .type(stdList(validationRun.getType()))
                 .argument(
                         newArgument()
                                 .name("id")

@@ -36,8 +36,6 @@ public class GQLModel {
     public static final String BRANCH = "Branch";
     public static final String PROMOTION_LEVEL = "PromotionLevel";
     public static final String PROMOTION_RUN = "PromotionRun";
-    public static final String VALIDATION_STAMP = "ValidationStamp";
-    public static final String VALIDATION_RUN = "ValidationRun";
 
     @Autowired
     private StructureService structureService;
@@ -57,9 +55,6 @@ public class GQLModel {
 
     @Autowired
     private GQLTypeBuild build;
-
-    @Autowired
-    private GQLTypeValidationRunStatus validationRunStatus;
 
     /**
      * Creates a context for the evaluation of links
@@ -248,47 +243,6 @@ public class GQLModel {
                                 .build()
                 )
                 // TODO Signature
-                // OK
-                .build();
-    }
-
-    public GraphQLObjectType validationRunType() {
-        return newObject()
-                .name(VALIDATION_RUN)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(ValidationRun.class))
-                // Build
-                .field(
-                        newFieldDefinition()
-                                .name("build")
-                                .description("Associated build")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeBuild.BUILD)))
-                                .build()
-                )
-                // Promotion level
-                .field(
-                        newFieldDefinition()
-                                .name("validationStamp")
-                                .description("Associated validation stamp")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(VALIDATION_STAMP)))
-                                .build()
-                )
-                // Run order
-                .field(
-                        newFieldDefinition()
-                                .name("runOrder")
-                                .description("Run order")
-                                .type(GraphQLInt)
-                                .build()
-                )
-                // Validation statuses
-                .field(
-                        newFieldDefinition()
-                                .name("validationRunStatuses")
-                                .description("List of validation statuses")
-                                .type(stdList(validationRunStatus.getType()))
-                                .build()
-                )
                 // OK
                 .build();
     }
