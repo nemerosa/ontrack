@@ -184,7 +184,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     }
     wrappers {
         injectPasswords {
-            // Needs the VERSIONEYE_API_KEY
             injectGlobalPasswords()
         }
     }
@@ -193,7 +192,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
 clean
 versionDisplay
 versionFile
-versionEyeUpdate
 test
 integrationTest
 dockerLatest
