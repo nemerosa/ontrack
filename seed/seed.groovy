@@ -385,11 +385,11 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
         injectPasswords()
     }
     steps {
-        shell """\
-docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:\${VERSION}
+        shell '''\
+docker login --username="nemerosa" --password="${DOCKER_PASSWORD}"
+docker push nemerosa/ontrack:${VERSION}
 docker logout
-"""
+'''
     }
     publishers {
         downstreamParameterized {
