@@ -13,7 +13,7 @@ plugins {
 }
 
 task siteOntrackLastReleases(type: OntrackLastReleases) {
-    releaseCount = 1
+    releaseCount = 3
     releasePattern = /2\..*/
 }
 

@@ -193,6 +193,7 @@ class Build extends AbstractProjectResource {
     /**
      * SVN revision decoration
      */
+    @DSLMethod
     Long getSvnRevisionDecoration() {
         getDecoration('net.nemerosa.ontrack.extension.svn.SVNRevisionDecorationExtension') as Long
     }
