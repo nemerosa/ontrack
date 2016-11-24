@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
-import graphql.relay.SimpleListConnection;
-import graphql.schema.*;
+import graphql.schema.DataFetcher;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.TypeResolverProxy;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -18,12 +21,9 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
-import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
-import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 // TODO Type providers?
 
@@ -148,100 +148,5 @@ public class GQLModel {
     }
 
     // TODO Define a ProjectEntity interface
-
-    public GraphQLObjectType branchType() {
-        return newObject()
-                .name(BRANCH)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(Branch.class))
-                .field(GraphqlUtils.disabledField())
-                .field(
-                        newFieldDefinition()
-                                .name("type")
-                                .type(GraphqlUtils.newEnumType(BranchType.class))
-                                .build()
-                )
-                // TODO Events: branch creation
-                // Promotion levels
-                .field(
-                        newFieldDefinition()
-                                .name("promotionLevels")
-                                .type(stdList(new GraphQLTypeReference(GQLTypePromotionLevel.PROMOTION_LEVEL)))
-                                .dataFetcher(branchPromotionLevelsFetcher())
-                                .build()
-                )
-                // Validation stamps
-                .field(
-                        newFieldDefinition()
-                                .name("validationStamps")
-                                .type(stdList(new GraphQLTypeReference(GQLTypeValidationStamp.VALIDATION_STAMP)))
-                                .dataFetcher(branchValidationStampsFetcher())
-                                .build()
-                )
-                // Builds for the branch
-                .field(
-                        newFieldDefinition()
-                                .name("builds")
-                                .type(GraphqlUtils.connectionList(build.getType()))
-                                // TODO Build filtering
-                                .argument(
-                                        newArgument()
-                                                .name("count")
-                                                .description("Maximum number of builds to return")
-                                                .type(GraphQLInt)
-                                                .build()
-                                )
-                                .dataFetcher(branchBuildsFetcher())
-                                .build()
-                )
-                // OK
-                .build();
-    }
-
-    private DataFetcher branchBuildsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof Branch) {
-                Branch branch = (Branch) source;
-                // Count
-                int count = GraphqlUtils.getIntArgument(environment, "count").orElse(10);
-                // TODO Build filtering
-                BuildFilter buildFilter = buildFilterService.standardFilter(count).build();
-                // Result
-                List<Build> builds = structureService.getFilteredBuilds(
-                        branch.getId(),
-                        buildFilter
-                );
-                // As a connection list
-                return new SimpleListConnection(builds).get(environment);
-            } else {
-                return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher branchPromotionLevelsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof Branch) {
-                Branch branch = (Branch) source;
-                return structureService.getPromotionLevelListForBranch(branch.getId());
-            } else {
-                return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher branchValidationStampsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof Branch) {
-                Branch branch = (Branch) source;
-                return structureService.getValidationStampListForBranch(branch.getId());
-            } else {
-                return Collections.emptyList();
-            }
-        };
-    }
 
 }
