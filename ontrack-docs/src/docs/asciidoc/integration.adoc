@@ -1,0 +1,4 @@
+[[integration]]
+== Integration
+
+include::integration-jenkins.adoc[]
