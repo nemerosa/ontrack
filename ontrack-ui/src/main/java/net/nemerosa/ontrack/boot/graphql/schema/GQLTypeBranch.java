@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
@@ -34,16 +33,20 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     private final StructureService structureService;
     private final BuildFilterService buildFilterService;
     private final GQLTypeBuild build;
+    private final GQLTypePromotionLevel promotionLevel;
+    private final GQLTypeValidationStamp validationStamp;
 
     @Autowired
     public GQLTypeBranch(URIBuilder uriBuilder,
                          SecurityService securityService,
                          List<ResourceDecorator<?>> decorators,
-                         StructureService structureService, BuildFilterService buildFilterService, GQLTypeBuild build) {
+                         StructureService structureService, BuildFilterService buildFilterService, GQLTypeBuild build, GQLTypePromotionLevel promotionLevel, GQLTypeValidationStamp validationStamp) {
         super(uriBuilder, securityService, Branch.class, decorators);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;
+        this.promotionLevel = promotionLevel;
+        this.validationStamp = validationStamp;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("promotionLevels")
-                                .type(stdList(new GraphQLTypeReference(GQLTypePromotionLevel.PROMOTION_LEVEL)))
+                                .type(stdList(promotionLevel.getType()))
                                 .dataFetcher(branchPromotionLevelsFetcher())
                                 .build()
                 )
@@ -72,7 +75,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("validationStamps")
-                                .type(stdList(new GraphQLTypeReference(GQLTypeValidationStamp.VALIDATION_STAMP)))
+                                .type(stdList(validationStamp.getType()))
                                 .dataFetcher(branchValidationStampsFetcher())
                                 .build()
                 )
