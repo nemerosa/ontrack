@@ -2,17 +2,21 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLNonNull;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static graphql.Scalars.GraphQLInt;
+import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
+import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.checkArgList;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
@@ -36,7 +40,14 @@ public class GQLRootQueryBranches implements GQLRootQuery {
                         newArgument()
                                 .name("id")
                                 .description("ID of the branch to look for")
-                                .type(new GraphQLNonNull(GraphQLInt))
+                                .type(GraphQLInt)
+                                .build()
+                )
+                .argument(
+                        newArgument()
+                                .name("project")
+                                .description("Name of the project the branch belongs to")
+                                .type(GraphQLString)
                                 .build()
                 )
                 .dataFetcher(branchFetcher())
@@ -46,10 +57,26 @@ public class GQLRootQueryBranches implements GQLRootQuery {
     private DataFetcher branchFetcher() {
         return environment -> {
             Integer id = environment.getArgument("id");
+            String projectName = environment.getArgument("project");
+            // Per ID
             if (id != null) {
+                checkArgList(environment, "id");
                 return Collections.singletonList(
                         structureService.getBranch(ID.of(id))
                 );
+            }
+            // Per project name
+            else if (StringUtils.isNotBlank(projectName)) {
+                // Gets the project
+                Optional<Project> oProject = structureService.findProjectByName(projectName);
+                if (oProject.isPresent()) {
+                    // TODO Might be a search by name as well, or by property
+                    return structureService.getBranchesForProject(
+                            oProject.get().getId()
+                    );
+                } else {
+                    return Collections.emptyList();
+                }
             }
             // Whole list
             else {
