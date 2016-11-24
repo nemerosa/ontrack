@@ -21,7 +21,6 @@ import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
-import static net.nemerosa.ontrack.boot.graphql.schema.GQLModel.PROMOTION_RUN;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
@@ -59,7 +58,7 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
                                                 .type(GraphQLString)
                                                 .build()
                                 )
-                                .type(stdList(new GraphQLTypeReference(PROMOTION_RUN)))
+                                .type(stdList(new GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
                                 .dataFetcher(buildPromotionRunsFetcher())
                                 .build()
                 )

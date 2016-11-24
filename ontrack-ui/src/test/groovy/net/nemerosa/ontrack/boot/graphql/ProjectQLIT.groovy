@@ -1,24 +1,13 @@
 package net.nemerosa.ontrack.boot.graphql
 
-import graphql.GraphQL
-import graphql.schema.GraphQLSchema
-import net.nemerosa.ontrack.boot.graphql.schema.GraphqlSchemaService
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 
-import static org.junit.Assert.fail
-
-class ProjectQLIT extends AbstractServiceTestSupport {
-
-    @Autowired
-    private GraphqlSchemaService schemaService
+class ProjectQLIT extends AbstractQLITSupport {
 
     @Test
     void 'All projects'() {
@@ -67,15 +56,6 @@ class ProjectQLIT extends AbstractServiceTestSupport {
 
         def data = run("""{projects(id: ${p.id}) { name branches(name: "B2") { name } } }""")
         assert data.projects.branches.name.flatten() == ["B2"]
-    }
-
-    @Test
-    void 'Branch links'() {
-        def branch = doCreateBranch()
-
-        def data = run("""{branches (id: ${branch.id}) { name links { _page } } }""")
-        assert data.branches.first().name == branch.name
-        assert data.branches.first().links._page == "urn:test:#:entity:BRANCH:${branch.id}"
     }
 
     @Test
@@ -263,57 +243,6 @@ class ProjectQLIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    void 'Validation run statuses for a validation run'() {
-        def vs = doCreateValidationStamp()
-        def branch = vs.branch
-        def project = branch.project
-        def build = doCreateBuild(branch, NameDescription.nd("1", "Build 1"))
-        def validationRun = asUser().with(project, ValidationRunCreate).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            0,
-                            Signature.of('test'),
-                            ValidationRunStatusID.STATUS_FAILED,
-                            "Validation failed"
-                    )
-            )
-        }
-        asUser().with(project, ValidationRunStatusChange).call {
-            structureService.newValidationRunStatus(
-                    validationRun,
-                    ValidationRunStatus.of(
-                            Signature.of('test'),
-                            ValidationRunStatusID.STATUS_INVESTIGATING,
-                            "Investigating"
-                    )
-            )
-            structureService.newValidationRunStatus(
-                    validationRun,
-                    ValidationRunStatus.of(
-                            Signature.of('test'),
-                            ValidationRunStatusID.STATUS_EXPLAINED,
-                            "Explained"
-                    )
-            )
-        }
-        def data = run("""{
-            validationRuns(id: ${validationRun.id}) {
-                validationRunStatuses {
-                    statusID {
-                        id
-                    }
-                    description
-                }
-            }
-        }""")
-        def validationRunStatuses = data.validationRuns.validationRunStatuses.flatten()
-        assert validationRunStatuses.statusID.id == ['EXPLAINED', 'INVESTIGATING', 'FAILED']
-        assert validationRunStatuses.description == ['Explained', 'Investigating', 'Validation failed']
-    }
-
-    @Test
     void 'Promotion runs for a build'() {
         def branch = doCreateBranch()
         def pl1 = doCreatePromotionLevel(branch, NameDescription.nd("PL1", ""))
@@ -490,17 +419,6 @@ class ProjectQLIT extends AbstractServiceTestSupport {
             }
         }""")
         assert data.projects.branches.builds.edges.node.name.flatten() == ['20', '19', '18', '17', '16']
-    }
-
-    def run(String query) {
-        def result = new GraphQL(schemaService.schema).execute(query)
-        if (result.errors && !result.errors.empty) {
-            fail result.errors*.message.join('\n')
-        } else if (result.data) {
-            return result.data
-        } else {
-            fail "No data was returned and no error was thrown."
-        }
     }
 
 }
