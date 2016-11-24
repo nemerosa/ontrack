@@ -5,9 +5,8 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.apache.commons.lang3.EnumUtils;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static graphql.Scalars.*;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -104,5 +103,31 @@ public final class GraphqlUtils {
         } else {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Checks list of arguments
+     */
+    public static void checkArgList(DataFetchingEnvironment environment, String... args) {
+        Set<String> actualArgs = getActualArguments(environment).keySet();
+        Set<String> expectedArgs = new HashSet<>(Arrays.asList(args));
+        if (!Objects.equals(actualArgs, expectedArgs)) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Expected this list of arguments: %s, but was: %s",
+                            expectedArgs,
+                            actualArgs
+                    )
+            );
+        }
+    }
+
+    private static Map<String, Object> getActualArguments(DataFetchingEnvironment environment) {
+        return environment.getArguments().entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
     }
 }

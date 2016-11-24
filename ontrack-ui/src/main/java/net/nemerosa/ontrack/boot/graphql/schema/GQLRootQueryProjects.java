@@ -14,6 +14,7 @@ import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
+import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.checkArgList;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
@@ -57,7 +58,8 @@ public class GQLRootQueryProjects implements GQLRootQuery {
             String name = environment.getArgument("name");
             // Per ID
             if (id != null) {
-                // TODO No other argument is expected
+                // No other argument is expected
+                checkArgList(environment, "id");
                 // Fetch by ID
                 Project project = structureService.getProject(ID.of(id));
                 // As list
@@ -65,7 +67,8 @@ public class GQLRootQueryProjects implements GQLRootQuery {
             }
             // Name
             else if (name != null) {
-                // TODO No other argument is expected
+                // No other argument is expected
+                checkArgList(environment, "name");
                 return structureService.findProjectByName(name)
                         .map(Collections::singletonList)
                         .orElse(Collections.emptyList());
