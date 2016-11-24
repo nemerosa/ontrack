@@ -20,6 +20,7 @@ import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
+import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
 public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
@@ -27,14 +28,16 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
     public static final String PROJECT = "Project";
 
     private final StructureService structureService;
+    private final GQLTypeBranch branch;
 
     @Autowired
     public GQLTypeProject(URIBuilder uriBuilder,
                           SecurityService securityService,
                           List<ResourceDecorator<?>> decorators,
-                          StructureService structureService) {
+                          StructureService structureService, GQLTypeBranch branch) {
         super(uriBuilder, securityService, Project.class, decorators);
         this.structureService = structureService;
+        this.branch = branch;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
                 .field(
                         newFieldDefinition()
                                 .name("branches")
-                                // FIXME .type(stdList(branchType()))
+                                .type(stdList(branch.getType()))
                                 .argument(
                                         newArgument()
                                                 .name("name")

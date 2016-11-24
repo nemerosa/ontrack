@@ -19,19 +19,19 @@ import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 public class GQLRootQueryBranches implements GQLRootQuery {
 
     private final StructureService structureService;
-    private final GQLModel model;
+    private final GQLTypeBranch branch;
 
     @Autowired
-    public GQLRootQueryBranches(StructureService structureService, GQLModel model) {
+    public GQLRootQueryBranches(StructureService structureService, GQLTypeBranch branch) {
         this.structureService = structureService;
-        this.model = model;
+        this.branch = branch;
     }
 
     @Override
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("branches")
-                .type(stdList(model.branchType()))
+                .type(stdList(branch.getType()))
                 .argument(
                         newArgument()
                                 .name("id")
