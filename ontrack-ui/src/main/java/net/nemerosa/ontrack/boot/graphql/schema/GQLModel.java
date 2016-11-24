@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.*;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -34,8 +33,6 @@ public class GQLModel {
 
     public static final String PROJECT_ENTITY = "ProjectEntity";
     public static final String BRANCH = "Branch";
-    public static final String PROMOTION_LEVEL = "PromotionLevel";
-    public static final String PROMOTION_RUN = "PromotionRun";
 
     @Autowired
     private StructureService structureService;
@@ -169,7 +166,7 @@ public class GQLModel {
                 .field(
                         newFieldDefinition()
                                 .name("promotionLevels")
-                                .type(stdList(promotionLevelType()))
+                                .type(stdList(new GraphQLTypeReference(GQLTypePromotionLevel.PROMOTION_LEVEL)))
                                 .dataFetcher(branchPromotionLevelsFetcher())
                                 .build()
                 )
@@ -201,52 +198,6 @@ public class GQLModel {
                 .build();
     }
 
-    public GraphQLObjectType promotionLevelType() {
-        return newObject()
-                .name(PROMOTION_LEVEL)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(PromotionLevel.class))
-                // TODO Image
-                // Promotion runs
-                .field(
-                        newFieldDefinition()
-                                .name("promotionRuns")
-                                .description("List of runs for this promotion")
-                                .type(GraphqlUtils.connectionList(promotionRunType()))
-                                .argument(Relay.getConnectionFieldArguments())
-                                .dataFetcher(promotionLevelPromotionRunsFetcher())
-                                .build()
-                )
-                // OK
-                .build();
-    }
-
-    public GraphQLObjectType promotionRunType() {
-        return newObject()
-                .name(PROMOTION_RUN)
-                .withInterface(projectEntityInterface())
-                .fields(projectEntityInterfaceFields(PromotionRun.class))
-                // Build
-                .field(
-                        newFieldDefinition()
-                                .name("build")
-                                .description("Associated build")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeBuild.BUILD)))
-                                .build()
-                )
-                // Promotion level
-                .field(
-                        newFieldDefinition()
-                                .name("promotionLevel")
-                                .description("Associated promotion level")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(PROMOTION_LEVEL)))
-                                .build()
-                )
-                // TODO Signature
-                // OK
-                .build();
-    }
-
     private DataFetcher branchBuildsFetcher() {
         return environment -> {
             Object source = environment.getSource();
@@ -263,21 +214,6 @@ public class GQLModel {
                 );
                 // As a connection list
                 return new SimpleListConnection(builds).get(environment);
-            } else {
-                return Collections.emptyList();
-            }
-        };
-    }
-
-    private DataFetcher promotionLevelPromotionRunsFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (source instanceof PromotionLevel) {
-                PromotionLevel promotionLevel = (PromotionLevel) source;
-                // Gets all the promotion runs
-                List<PromotionRun> promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.getId());
-                // As a connection list
-                return new SimpleListConnection(promotionRuns).get(environment);
             } else {
                 return Collections.emptyList();
             }
