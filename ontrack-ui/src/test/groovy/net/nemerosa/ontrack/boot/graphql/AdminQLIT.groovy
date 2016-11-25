@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.graphql
 
 import graphql.GraphQLException
 import net.nemerosa.ontrack.model.security.AccountGroupManagement
+import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.model.security.AccountManagement
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -48,6 +49,24 @@ class AdminQLIT extends AbstractQLITSupport {
         asUser().with(AccountManagement).call {
             def data = run("""{ accounts(id: ${a.id}) { name } }""")
             assert data.accounts.first().name == a.name
+        }
+    }
+
+    @Test
+    void 'Account groups'() {
+        def g1 = doCreateAccountGroup()
+        def g2 = doCreateAccountGroup()
+        def a = doCreateAccount()
+        asUser().with(AccountManagement).call {
+            a = accountService.updateAccount(a.id, new AccountInput(
+                    a.name,
+                    a.fullName,
+                    a.email,
+                    '',
+                    [g1.id(), g2.id()]
+            ))
+            def data = run("""{ accounts(id: ${a.id}) { groups { name } } }""")
+            assert data.accounts.first().groups.name == [g1.name, g2.name]
         }
     }
 

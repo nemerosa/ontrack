@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
+import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -30,15 +32,36 @@ public class GQLTypeAccount extends AbstractGQLType {
                 .field(GraphqlUtils.nameField("Unique name for the account"))
                 .field(GraphqlUtils.stringField("fullName", "Full name of the account"))
                 .field(GraphqlUtils.stringField("email", "Email of the account"))
-                .field(newFieldDefinition()
-                        .name("authenticationSource")
-                        .description("Source of authentication (builtin, ldap, etc.)")
-                        .type(GraphQLString)
-                        .dataFetcher(environment -> ((Account) environment.getSource()).getAuthenticationSource().getId())
-                        .build()
+                .field(
+                        newFieldDefinition()
+                                .name("authenticationSource")
+                                .description("Source of authentication (builtin, ldap, etc.)")
+                                .type(GraphQLString)
+                                .dataFetcher(environment -> ((Account) environment.getSource()).getAuthenticationSource().getId())
+                                .build()
                 )
                 .field(GraphqlUtils.stringField("role", "Security role (admin or none)"))
-                // TODO Groups
+                .field(
+                        newFieldDefinition()
+                                .name("groups")
+                                .description("List of groups the account belongs to")
+                                .type(GraphqlUtils.stdList(new GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
+                                .dataFetcher(accountAccountGroupsFetcher())
+                                .build()
+                )
                 .build();
     }
+
+    private DataFetcher accountAccountGroupsFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (source instanceof Account) {
+                Account account = (Account) source;
+                return account.getAccountGroups();
+            } else {
+                return null;
+            }
+        };
+    }
+    
 }

@@ -27,6 +27,15 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     @Autowired
     private SettingsManagerService settingsManagerService;
 
+    protected AccountGroup doCreateAccountGroup() throws Exception {
+        return asUser().with(AccountGroupManagement.class).call(() -> {
+            String name = uid("G");
+            return accountService.createGroup(
+                    NameDescription.nd(name, "")
+            );
+        });
+    }
+
     protected Account doCreateAccount() throws Exception {
         return asUser().with(AccountManagement.class).call(() -> {
             String name = uid("A");
