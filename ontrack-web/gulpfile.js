@@ -30,6 +30,9 @@ var webPath = './' + web;
 var assetResources = webPath + '/assets/**';
 var extensionAssetResources = [webPath + '/extension/**/*.png'];
 
+var contribJsResources = webPath + '/contrib/*.js';
+var contribCssResources = webPath + '/contrib/*.css';
+
 var lessResources = webPath + '/less/*.less';
 
 var jsResources = webPath + '/app/**/*.js';
@@ -122,6 +125,7 @@ gulp.task('js:angular', ['lint', 'templates'], function () {
 gulp.task('js:concat', ['js:angular'], function () {
     var jsSource = vendorJsResources;
     jsSource.push(buildAngular + '/*.js');
+    jsSource.push(contribJsResources);
     return gulp.src(jsSource)
         .pipe(debug({title: 'js:concat:input'}))
         .pipe(concat('ci-' + options.version + '.js'))
@@ -151,7 +155,8 @@ gulp.task('css:concat', function () {
             .pipe(debug({title: 'less:input:'}))
             .pipe(less())
             .pipe(debug({title: 'less:output:'})),
-        gulp.src(vendorCssResources)
+        gulp.src(vendorCssResources),
+        gulp.src(contribCssResources)
     )
         .pipe(debug({title: 'css:concat:input'}))
         .pipe(minifyCss())
