@@ -38,4 +38,27 @@ class BranchQLIT extends AbstractQLITSupport {
         assert data.branches.name == ['B1', 'B2']
     }
 
+    @Test
+    void 'Branch by project and name'() {
+        def project = doCreateProject()
+        doCreateBranch(project, NameDescription.nd("B1", ""))
+        doCreateBranch(project, NameDescription.nd("B2", ""))
+        doCreateBranch(project, NameDescription.nd("C1", ""))
+
+        def data = run("""{branches (project: "${project.name}", name: "C.*") { name } }""")
+        assert data.branches.name == ['C1']
+    }
+
+    @Test
+    void 'Branch by name'() {
+        def p1 = doCreateProject()
+        def b1 = doCreateBranch(p1, NameDescription.nd("B1", ""))
+        doCreateBranch(p1, NameDescription.nd("B2", ""))
+        def p2 = doCreateProject()
+        def b2 = doCreateBranch(p2, NameDescription.nd("B1", ""))
+
+        def data = run("""{branches (name: "B1") { id } }""")
+        assert data.branches.id == [b1.id(), b2.id()]
+    }
+
 }
