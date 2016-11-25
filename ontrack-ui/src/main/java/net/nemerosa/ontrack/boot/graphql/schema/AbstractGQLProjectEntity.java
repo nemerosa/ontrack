@@ -1,19 +1,19 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
+import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.TypeResolverProxy;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLString;
@@ -90,10 +90,55 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                 Arrays.asList(
                         GraphqlUtils.idField(),
                         GraphqlUtils.nameField(),
-                        GraphqlUtils.descriptionField()
+                        GraphqlUtils.descriptionField(),
+                        newFieldDefinition()
+                                .name("creation")
+                                .type(
+                                        newObject()
+                                                .name("Signature")
+                                                .field(
+                                                        newFieldDefinition()
+                                                                .name("user")
+                                                                .description("User name")
+                                                                .type(GraphQLString)
+                                                                .build()
+                                                )
+                                                .field(
+                                                        newFieldDefinition()
+                                                                .name("time")
+                                                                .description("ISO timestamp")
+                                                                .type(GraphQLString)
+                                                                .build()
+                                                )
+                                                .build()
+                                )
+                                .dataFetcher(creationFetcher())
+                                .build()
                 )
         );
     }
+
+    protected DataFetcher creationFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (projectEntityClass.isInstance(source)) {
+                @SuppressWarnings("unchecked")
+                T entity = (T) source;
+                return getSignature(entity)
+                        .map(signature ->
+                                ImmutableMap.of(
+                                        "user", signature.getUser().getName(),
+                                        "time", Time.forStorage(signature.getTime())
+                                )
+                        ).orElse(null);
+            } else {
+                return null;
+            }
+        };
+    }
+
+    protected abstract Optional<Signature> getSignature(T entity);
+
 
     private DataFetcher projectEntityLinksFetcher() {
         return environment -> {

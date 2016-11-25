@@ -6,6 +6,9 @@ import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventQueryService;
+import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.BranchType;
@@ -26,7 +29,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
+public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Branch> {
 
     public static final String BRANCH = "Branch";
 
@@ -40,8 +43,8 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     public GQLTypeBranch(URIBuilder uriBuilder,
                          SecurityService securityService,
                          List<ResourceDecorator<?>> decorators,
-                         StructureService structureService, BuildFilterService buildFilterService, GQLTypeBuild build, GQLTypePromotionLevel promotionLevel, GQLTypeValidationStamp validationStamp) {
-        super(uriBuilder, securityService, Branch.class, decorators);
+                         StructureService structureService, BuildFilterService buildFilterService, GQLTypeBuild build, GQLTypePromotionLevel promotionLevel, GQLTypeValidationStamp validationStamp, EventQueryService eventQueryService) {
+        super(uriBuilder, securityService, Branch.class, decorators, eventQueryService);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;
@@ -62,7 +65,6 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                 .type(GraphqlUtils.newEnumType(BranchType.class))
                                 .build()
                 )
-                // TODO Events: branch creation
                 // Promotion levels
                 .field(
                         newFieldDefinition()
@@ -146,4 +148,8 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
         };
     }
 
+    @Override
+    protected EventType getEventCreationType() {
+        return EventFactory.NEW_BRANCH;
+    }
 }

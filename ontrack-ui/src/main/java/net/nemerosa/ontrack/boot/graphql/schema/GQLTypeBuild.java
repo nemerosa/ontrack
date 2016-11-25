@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
+import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
@@ -24,7 +26,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
+public class GQLTypeBuild extends AbstractGQLProjectEntityWithSignature<Build> {
 
     public static final String BUILD = "Build";
 
@@ -45,7 +47,6 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
                 .name(BUILD)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
-                // TODO Signature
                 // Promotion runs
                 .field(
                         newFieldDefinition()
@@ -98,4 +99,8 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
         };
     }
 
+    @Override
+    protected Optional<Signature> getSignature(Build entity) {
+        return Optional.ofNullable(entity.getSignature());
+    }
 }

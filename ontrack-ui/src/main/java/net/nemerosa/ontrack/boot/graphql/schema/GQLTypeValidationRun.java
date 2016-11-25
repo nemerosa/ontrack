@@ -4,12 +4,14 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.model.structure.ValidationRun;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 import static graphql.Scalars.GraphQLInt;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -17,7 +19,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun> {
+public class GQLTypeValidationRun extends AbstractGQLProjectEntityWithSignature<ValidationRun> {
 
     public static final String VALIDATION_RUN = "ValidationRun";
 
@@ -71,4 +73,8 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
 
     }
 
+    @Override
+    protected Optional<Signature> getSignature(ValidationRun entity) {
+        return Optional.ofNullable(entity.getLastStatus().getSignature());
+    }
 }

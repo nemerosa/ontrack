@@ -5,6 +5,9 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventQueryService;
+import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.model.structure.ValidationRun;
@@ -20,15 +23,15 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 @Component
-public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationStamp> {
+public class GQLTypeValidationStamp extends AbstractGQLProjectEntityWithoutSignature<ValidationStamp> {
 
     public static final String VALIDATION_STAMP = "ValidationStamp";
 
     private final StructureService structureService;
     private final GQLTypeValidationRun validationRun;
 
-    public GQLTypeValidationStamp(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypeValidationRun validationRun) {
-        super(uriBuilder, securityService, ValidationStamp.class, decorators);
+    public GQLTypeValidationStamp(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypeValidationRun validationRun, EventQueryService eventQueryService) {
+        super(uriBuilder, securityService, ValidationStamp.class, decorators, eventQueryService);
         this.structureService = structureService;
         this.validationRun = validationRun;
     }
@@ -75,4 +78,8 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
         };
     }
 
+    @Override
+    protected EventType getEventCreationType() {
+        return EventFactory.NEW_VALIDATION_STAMP;
+    }
 }

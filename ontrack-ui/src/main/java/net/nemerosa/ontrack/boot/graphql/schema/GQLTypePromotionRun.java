@@ -5,17 +5,19 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
+import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 @Component
-public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> {
+public class GQLTypePromotionRun extends AbstractGQLProjectEntityWithSignature<PromotionRun> {
 
     public static final String PROMOTION_RUN = "PromotionRun";
 
@@ -44,9 +46,12 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
                                 .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypePromotionLevel.PROMOTION_LEVEL)))
                                 .build()
                 )
-                // TODO Signature
                 // OK
                 .build();
     }
 
+    @Override
+    protected Optional<Signature> getSignature(PromotionRun entity) {
+        return Optional.ofNullable(entity.getSignature());
+    }
 }

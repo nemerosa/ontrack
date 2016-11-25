@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventQueryService;
+import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -23,7 +26,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
+public class GQLTypeProject extends AbstractGQLProjectEntityWithoutSignature<Project> {
 
     public static final String PROJECT = "Project";
 
@@ -34,8 +37,8 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
     public GQLTypeProject(URIBuilder uriBuilder,
                           SecurityService securityService,
                           List<ResourceDecorator<?>> decorators,
-                          StructureService structureService, GQLTypeBranch branch) {
-        super(uriBuilder, securityService, Project.class, decorators);
+                          StructureService structureService, GQLTypeBranch branch, EventQueryService eventQueryService) {
+        super(uriBuilder, securityService, Project.class, decorators, eventQueryService);
         this.structureService = structureService;
         this.branch = branch;
     }
@@ -62,7 +65,6 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
-                // TODO Events: project creation
                 // OK
                 .build();
 
@@ -94,4 +96,8 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
         };
     }
 
+    @Override
+    protected EventType getEventCreationType() {
+        return EventFactory.NEW_PROJECT;
+    }
 }
