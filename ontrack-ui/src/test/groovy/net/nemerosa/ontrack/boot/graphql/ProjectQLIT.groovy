@@ -1,22 +1,14 @@
 package net.nemerosa.ontrack.boot.graphql
 
-import graphql.GraphQL
-import graphql.schema.GraphQLSchema
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import graphql.GraphQLException
+import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
+import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 
-import static org.junit.Assert.fail
-
-class ProjectQLIT extends AbstractServiceTestSupport {
-
-    @Autowired
-    @Qualifier("ontrack")
-    private GraphQLSchema ontrackSchema
+class ProjectQLIT extends AbstractQLITSupport {
 
     @Test
     void 'All projects'() {
@@ -31,6 +23,26 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         def p = doCreateProject()
         def data = run("{projects(id: ${p.id}) { name }}")
         assert data.projects.first().name == p.name
+    }
+
+    @Test(expected = GraphQLException)
+    void 'Project by ID and name is not authorised'() {
+        run("""{projects(id: 1, name: "test") { name }}""")
+    }
+
+    @Test
+    void 'Project links'() {
+        def p = doCreateProject()
+        def data = asUser().with(p, ProjectEdit).call { run("{projects(id: ${p.id}) { name links { _update } }}") }
+        assert data.projects.first().name == p.name
+        assert data.projects.first().links._update == "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:${p.id},"
+    }
+
+    @Test
+    void 'Project by name'() {
+        def p = doCreateProject()
+        def data = run("""{projects(name: "${p.name}") { id }}""")
+        assert data.projects.first().id == p.id()
     }
 
     @Test
@@ -48,9 +60,7 @@ class ProjectQLIT extends AbstractServiceTestSupport {
         doCreateBranch(p, NameDescription.nd("B1", ""))
         doCreateBranch(p, NameDescription.nd("B2", ""))
 
-        def query = """{projects(id: ${p.id}) { name branches(name: "B2") { name } } }"""
-        println query
-        def data = run(query)
+        def data = run("""{projects(id: ${p.id}) { name branches(name: "B2") { name } } }""")
         assert data.projects.branches.name.flatten() == ["B2"]
     }
 
@@ -174,6 +184,68 @@ class ProjectQLIT extends AbstractServiceTestSupport {
             }
         }""")
         assert data.projects.branches.validationStamps.validationRuns.edges.node.build.name.flatten() == ['4', '2']
+    }
+
+    @Test
+    void 'Validation run statuses for a run for a validation stamp'() {
+        def vs = doCreateValidationStamp()
+        def branch = vs.branch
+        def project = branch.project
+        def build = doCreateBuild(branch, NameDescription.nd("1", "Build 1"))
+        def validationRun = asUser().with(project, ValidationRunCreate).call {
+            structureService.newValidationRun(
+                    ValidationRun.of(
+                            build,
+                            vs,
+                            0,
+                            Signature.of('test'),
+                            ValidationRunStatusID.STATUS_FAILED,
+                            "Validation failed"
+                    )
+            )
+        }
+        asUser().with(project, ValidationRunStatusChange).call {
+            structureService.newValidationRunStatus(
+                    validationRun,
+                    ValidationRunStatus.of(
+                            Signature.of('test'),
+                            ValidationRunStatusID.STATUS_INVESTIGATING,
+                            "Investigating"
+                    )
+            )
+            structureService.newValidationRunStatus(
+                    validationRun,
+                    ValidationRunStatus.of(
+                            Signature.of('test'),
+                            ValidationRunStatusID.STATUS_EXPLAINED,
+                            "Explained"
+                    )
+            )
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    validationStamps {
+                        name
+                        validationRuns {
+                            edges {
+                                node {
+                                    validationRunStatuses {
+                                        statusID {
+                                            id
+                                        }
+                                        description
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        def validationRunStatuses = data.projects.branches.validationStamps.validationRuns.edges.node.validationRunStatuses.flatten()
+        assert validationRunStatuses.statusID.id == ['EXPLAINED', 'INVESTIGATING', 'FAILED']
+        assert validationRunStatuses.description == ['Explained', 'Investigating', 'Validation failed']
     }
 
     @Test
@@ -353,17 +425,6 @@ class ProjectQLIT extends AbstractServiceTestSupport {
             }
         }""")
         assert data.projects.branches.builds.edges.node.name.flatten() == ['20', '19', '18', '17', '16']
-    }
-
-    def run(String query) {
-        def result = new GraphQL(ontrackSchema).execute(query)
-        if (result.errors && !result.errors.empty) {
-            fail result.errors*.message.join('\n')
-        } else if (result.data) {
-            return result.data
-        } else {
-            fail "No data was returned and no error was thrown."
-        }
     }
 
 }

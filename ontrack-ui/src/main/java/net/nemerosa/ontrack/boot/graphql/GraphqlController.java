@@ -7,6 +7,7 @@ import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import lombok.Data;
 import lombok.experimental.Wither;
+import net.nemerosa.ontrack.boot.graphql.schema.GraphqlSchemaService;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,13 @@ import java.util.Map;
 @RequestMapping("/graphql")
 public class GraphqlController {
 
-    private final GraphQLSchema schema;
+    private final GraphqlSchemaService schemaService;
 
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     @Autowired
-    public GraphqlController(GraphQLSchema schema) {
-        this.schema = schema;
+    public GraphqlController(GraphqlSchemaService schemaService) {
+        this.schemaService = schemaService;
     }
 
     /**
@@ -104,6 +105,8 @@ public class GraphqlController {
      * Request execution
      */
     public ExecutionResult request(Request request) {
+        // Schema
+        GraphQLSchema schema = schemaService.getSchema();
         // TODO Execution strategy
         return new GraphQL(schema).execute(
                 request.getQuery(),
