@@ -30,8 +30,9 @@ var webPath = './' + web;
 var assetResources = webPath + '/assets/**';
 var extensionAssetResources = [webPath + '/extension/**/*.png'];
 
-var contribJsResources = webPath + '/contrib/*.js';
-var contribCssResources = webPath + '/contrib/*.css';
+var graphiqlJsResources = webPath + '/graphiql/*.js';
+var graphiqlCssResources = webPath + '/graphiql/*.css';
+var graphiqlIndexResource = webPath + '/graphiql.html';
 
 var lessResources = webPath + '/less/*.less';
 
@@ -74,15 +75,15 @@ var vendorJsResources = [
     'react/react-dom.min.js',
     'fetch/fetch.js'
 ].map(function (rel) {
-        return vendor + '/' + rel;
-    });
+    return vendor + '/' + rel;
+});
 
 var vendorCssResources = [
     'angular-multi-select/angular-multi-select.css',
     'angular-taglist/css/angular-taglist-directive.css'
 ].map(function (rel) {
-        return vendor + '/' + rel;
-    });
+    return vendor + '/' + rel;
+});
 
 // Cleaning
 
@@ -125,7 +126,6 @@ gulp.task('js:angular', ['lint', 'templates'], function () {
 gulp.task('js:concat', ['js:angular'], function () {
     var jsSource = vendorJsResources;
     jsSource.push(buildAngular + '/*.js');
-    jsSource.push(contribJsResources);
     return gulp.src(jsSource)
         .pipe(debug({title: 'js:concat:input'}))
         .pipe(concat('ci-' + options.version + '.js'))
@@ -155,8 +155,7 @@ gulp.task('css:concat', function () {
             .pipe(debug({title: 'less:input:'}))
             .pipe(less())
             .pipe(debug({title: 'less:output:'})),
-        gulp.src(vendorCssResources),
-        gulp.src(contribCssResources)
+        gulp.src(vendorCssResources)
     )
         .pipe(debug({title: 'css:concat:input'}))
         .pipe(minifyCss())
@@ -205,8 +204,6 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
                 cssSources,
                 vendorJsSources,
                 vendorCssSources,
-                gulp.src(contribJsResources, {read: false}),
-                gulp.src(contribCssResources, {read: false}),
                 appSources
             ),
             {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
@@ -231,11 +228,30 @@ gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:conca
         .pipe(debug({title: 'index:prod:output'}));
 });
 
+// Injection in graphiql.html
+
+gulp.task('graphiql:dev', [], function () {
+    var cssSources = gulp.src([graphiqlCssResources], {read: false});
+    var jsSources = gulp.src([graphiqlJsResources], {read: false});
+
+    return gulp.src(graphiqlIndexResource)
+        .pipe(debug({title: 'graphiql:dev:input'}))
+        .pipe(inject(
+            series(
+                cssSources,
+                jsSources
+            ),
+            {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
+        .pipe(gulp.dest(buildPath))
+        .pipe(debug({title: 'graphiql:dev:output'}))
+        .pipe(liveReload());
+});
+
 // Default build
 
-gulp.task('dev', ['index:dev', 'fonts']);
+gulp.task('dev', ['index:dev', 'graphiql:dev', 'fonts']);
 
-gulp.task('default', ['index:prod', 'assets', 'extensionAssets', 'fonts']);
+gulp.task('default', ['index:prod', 'graphiql:prod', 'assets', 'extensionAssets', 'fonts']);
 
 // Watch setup
 

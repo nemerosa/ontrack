@@ -45,13 +45,14 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/css/**").addResourceLocations(dev + "/css/");
         registry.addResourceHandler("/templates/**").addResourceLocations(dev + "/templates/");
         registry.addResourceHandler("index.html").addResourceLocations(dev + "/");
+        registry.addResourceHandler("graphiql.html").addResourceLocations(dev + "/");
 
         // Direct access to the sources
 
         String source = getPath(devSettings.getSrc());
         log.info("[dev] Web sources from: " + source);
         registry.addResourceHandler("/app/**").addResourceLocations(source + "/app/");
-        registry.addResourceHandler("/contrib/**").addResourceLocations(source + "/contrib/");
+        registry.addResourceHandler("/graphiql/**").addResourceLocations(source + "/graphiql/");
         registry.addResourceHandler("/assets/**").addResourceLocations(source + "/assets/");
 
         // Vendor resources
