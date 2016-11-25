@@ -69,7 +69,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                             .description("Links")
                             .type(
                                     newObject()
-                                            .name(projectEntityClass.getSimpleName() + "Links")
+                                            .name("ProjectEntityLinks")
                                             .description(projectEntityClass.getSimpleName() + " links")
                                             .fields(
                                                     linkNames.stream()
