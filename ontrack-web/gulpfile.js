@@ -205,6 +205,8 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
                 cssSources,
                 vendorJsSources,
                 vendorCssSources,
+                gulp.src(contribJsResources, {read: false}),
+                gulp.src(contribCssResources, {read: false}),
                 appSources
             ),
             {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))

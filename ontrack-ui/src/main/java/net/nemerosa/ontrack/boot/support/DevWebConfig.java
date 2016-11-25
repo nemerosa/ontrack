@@ -51,6 +51,7 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
         String source = getPath(devSettings.getSrc());
         log.info("[dev] Web sources from: " + source);
         registry.addResourceHandler("/app/**").addResourceLocations(source + "/app/");
+        registry.addResourceHandler("/contrib/**").addResourceLocations(source + "/contrib/");
         registry.addResourceHandler("/assets/**").addResourceLocations(source + "/assets/");
 
         // Vendor resources
