@@ -40,7 +40,8 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     protected GraphQLInterfaceType projectEntityInterface() {
         return GraphQLInterfaceType.newInterface()
                 .name(PROJECT_ENTITY)
-                .fields(projectEntityInterfaceFields())
+                // Common fields
+                .fields(baseProjectEntityInterfaceFields())
                 // TODO Properties
                 // TODO Type resolver not set, but it should
                 .typeResolver(new TypeResolverProxy())
@@ -49,13 +50,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     }
 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
-        List<GraphQLFieldDefinition> definitions = new ArrayList<>(
-                Arrays.asList(
-                        GraphqlUtils.idField(),
-                        GraphqlUtils.nameField(),
-                        GraphqlUtils.descriptionField()
-                )
-        );
+        List<GraphQLFieldDefinition> definitions = baseProjectEntityInterfaceFields();
         // Links
         List<String> linkNames = decorators.stream()
                 .filter(decorator -> decorator.appliesFor(projectEntityClass))
@@ -69,7 +64,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                             .description("Links")
                             .type(
                                     newObject()
-                                            .name("ProjectEntityLinks")
+                                            .name(projectEntityClass.getSimpleName() + "Links")
                                             .description(projectEntityClass.getSimpleName() + " links")
                                             .fields(
                                                     linkNames.stream()
@@ -88,6 +83,16 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
         }
         // OK
         return definitions;
+    }
+
+    private List<GraphQLFieldDefinition> baseProjectEntityInterfaceFields() {
+        return new ArrayList<>(
+                Arrays.asList(
+                        GraphqlUtils.idField(),
+                        GraphqlUtils.nameField(),
+                        GraphqlUtils.descriptionField()
+                )
+        );
     }
 
     private DataFetcher projectEntityLinksFetcher() {
