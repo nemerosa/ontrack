@@ -85,6 +85,14 @@ var vendorCssResources = [
     return vendor + '/' + rel;
 });
 
+var graphiqlVendorJsResources = [
+    'fetch/fetch.js',
+    'react/react.min.js',
+    'react/react-dom.min.js'
+].map(function (rel) {
+    return vendor + '/' + rel;
+});
+
 // Cleaning
 
 gulp.task('clean', function () {
@@ -232,14 +240,16 @@ gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:conca
 
 gulp.task('graphiql:dev', [], function () {
     var cssSources = gulp.src([graphiqlCssResources], {read: false});
-    var jsSources = gulp.src([graphiqlJsResources], {read: false});
+
+    var jsSources = graphiqlVendorJsResources;
+    jsSources.push(graphiqlJsResources);
 
     return gulp.src(graphiqlIndexResource)
         .pipe(debug({title: 'graphiql:dev:input'}))
         .pipe(inject(
             series(
                 cssSources,
-                jsSources
+                gulp.src(jsSources, {read: false})
             ),
             {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
         .pipe(gulp.dest(buildPath))
