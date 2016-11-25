@@ -35,9 +35,22 @@ public final class GraphqlUtils {
     }
 
     public static GraphQLFieldDefinition nameField() {
+        return nameField("");
+    }
+
+    public static GraphQLFieldDefinition nameField(String description) {
         return newFieldDefinition()
                 .name(NAME)
+                .description(description)
                 .type(new GraphQLNonNull(GraphQLString))
+                .build();
+    }
+
+    public static GraphQLFieldDefinition stringField(String name, String description) {
+        return newFieldDefinition()
+                .name(name)
+                .description(description)
+                .type(GraphQLString)
                 .build();
     }
 
