@@ -57,6 +57,7 @@ var outputJs = './' + outputPath + '/js';
 var outputFonts = './' + outputPath + '/fonts';
 var outputAssets = './' + outputPath + '/assets';
 var outputExtensionAssets = './' + outputPath + '/extension/';
+var outputGraphiql = './' + outputPath + '/graphiql/';
 
 // Vendor resources
 
@@ -71,9 +72,7 @@ var vendorJsResources = [
     'angular-sanitize/angular-sanitize.js',
     'angular-bootstrap/ui-bootstrap-tpls.js',
     'moment/min/moment.min.js',
-    'oclazyload/dist/ocLazyLoad.min.js',
-    'react/react-dom.min.js',
-    'fetch/fetch.js'
+    'oclazyload/dist/ocLazyLoad.min.js'
 ].map(function (rel) {
     return vendor + '/' + rel;
 });
@@ -257,11 +256,45 @@ gulp.task('graphiql:dev', [], function () {
         .pipe(liveReload());
 });
 
+gulp.task('graphiql:prod:css', [], function () {
+    return gulp
+        .src(graphiqlCssResources)
+        .pipe(debug({title: 'graphiql:prod:css:input'}))
+        .pipe(concat('ci-graphiql-' + options.version + '.css'))
+        .pipe(gulp.dest(outputGraphiql));
+});
+
+gulp.task('graphiql:prod:js', [], function () {
+    var jsSources = graphiqlVendorJsResources;
+    jsSources.push(graphiqlJsResources);
+    return gulp.src(jsSources)
+        .pipe(debug({title: 'graphiql:prod:js:input'}))
+        .pipe(concat('ci-graphiql-' + options.version + '.js'))
+        .pipe(gulp.dest(outputGraphiql))
+        .pipe(debug({title: 'graphiql:prod:js:output'}))
+        ;
+});
+
+gulp.task('graphiql:prod:index', ['graphiql:prod:css', 'graphiql:prod:js'], function () {
+    var cssSources = gulp.src([outputGraphiql + '/*.css'], {read: false});
+    var jsSources = gulp.src([outputGraphiql + '/*.js'], {read: false});
+    return gulp.src(graphiqlIndexResource)
+        .pipe(debug({title: 'graphiql:prod:input'}))
+        .pipe(inject(
+            series(
+                cssSources,
+                jsSources
+            ),
+            {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
+        .pipe(gulp.dest(output))
+        .pipe(debug({title: 'graphiql:prod:output'}));
+});
+
 // Default build
 
 gulp.task('dev', ['index:dev', 'graphiql:dev', 'fonts']);
 
-gulp.task('default', ['index:prod', 'graphiql:prod', 'assets', 'extensionAssets', 'fonts']);
+gulp.task('default', ['index:prod', 'graphiql:prod:index', 'assets', 'extensionAssets', 'fonts']);
 
 // Watch setup
 
