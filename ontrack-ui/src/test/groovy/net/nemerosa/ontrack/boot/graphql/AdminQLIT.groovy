@@ -62,6 +62,23 @@ class AdminQLIT extends AbstractQLITSupport {
     }
 
     @Test
+    void 'Account by group'() {
+        def g = doCreateAccountGroup()
+        def a = doCreateAccount()
+        asUser().with(AccountManagement).call {
+            a = accountService.updateAccount(a.id, new AccountInput(
+                    a.name,
+                    a.fullName,
+                    a.email,
+                    '',
+                    [g.id()]
+            ))
+            def data = run("""{ accounts(group: "${g.name}") { id }}""")
+            assert data.accounts.first().id == a.id()
+        }
+    }
+
+    @Test
     void 'Account groups'() {
         def g1 = doCreateAccountGroup()
         def g2 = doCreateAccountGroup()

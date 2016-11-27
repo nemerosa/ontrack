@@ -24,6 +24,9 @@ import static org.apache.commons.lang3.StringUtils.contains;
 @Component
 public class GQLRootQueryAdminAccounts implements GQLRootQuery {
 
+    public static final String ID_ARGUMENT = "id";
+    public static final String NAME_ARGUMENT = "name";
+    public static final String GROUP_ARGUMENT = "group";
     private final AccountService accountService;
     private final GQLTypeAccount account;
 
@@ -40,15 +43,22 @@ public class GQLRootQueryAdminAccounts implements GQLRootQuery {
                 .type(stdList(account.getType()))
                 .argument(
                         newArgument()
-                                .name("id")
+                                .name(ID_ARGUMENT)
                                 .description("Searching by ID")
                                 .type(GraphQLInt)
                                 .build()
                 )
                 .argument(
                         newArgument()
-                                .name("name")
+                                .name(NAME_ARGUMENT)
                                 .description("Searching by looking for a string in the name or the full name")
+                                .type(GraphQLString)
+                                .build()
+                )
+                .argument(
+                        newArgument()
+                                .name(GROUP_ARGUMENT)
+                                .description("Searching by looking for a string in one of the groups the account belongs to")
                                 .type(GraphQLString)
                                 .build()
                 )
@@ -58,10 +68,11 @@ public class GQLRootQueryAdminAccounts implements GQLRootQuery {
 
     private DataFetcher adminAccountsFetcher() {
         return environment -> {
-            Integer id = environment.getArgument("id");
-            String name = environment.getArgument("name");
+            Integer id = environment.getArgument(ID_ARGUMENT);
+            String name = environment.getArgument(NAME_ARGUMENT);
+            String group = environment.getArgument(GROUP_ARGUMENT);
             if (id != null) {
-                checkArgList(environment, "id");
+                checkArgList(environment, ID_ARGUMENT);
                 return Collections.singletonList(
                         accountService.getAccount(ID.of(id))
                 );
@@ -71,6 +82,14 @@ public class GQLRootQueryAdminAccounts implements GQLRootQuery {
                 if (StringUtils.isNotBlank(name)) {
                     filter = filter.and(
                             account -> contains(account.getName(), name) || contains(account.getFullName(), name)
+                    );
+                }
+                // Filter by group
+                if (StringUtils.isNotBlank(group)) {
+                    filter = filter.and(
+                            account -> account.getAccountGroups().stream().anyMatch(
+                                    grp -> contains(grp.getName(), group)
+                            )
                     );
                 }
                 // Getting the list
