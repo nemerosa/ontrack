@@ -96,4 +96,14 @@ class AdminQLIT extends AbstractQLITSupport {
         }
     }
 
+    @Test
+    void 'Account global roles'() {
+        def a = doCreateAccountWithGlobalRole('CONTROLLER')
+        def data = asUser().with(AccountManagement).call {
+            run("""{ accounts(id:${a.id}) { globalRoles { id name } }}""")
+        }
+        assert data.accounts.first().globalRoles.first().id == 'CONTROLLER'
+        assert data.accounts.first().globalRoles.first().name == 'Controller'
+    }
+
 }
