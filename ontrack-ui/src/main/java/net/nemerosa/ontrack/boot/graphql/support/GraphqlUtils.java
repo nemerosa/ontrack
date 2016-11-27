@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.ID;
 import org.apache.commons.lang3.EnumUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static graphql.Scalars.*;
@@ -147,5 +148,17 @@ public final class GraphqlUtils {
                         Map.Entry::getKey,
                         Map.Entry::getValue
                 ));
+    }
+
+    public static <T, R> DataFetcher fetcher(Class<T> sourceType, Function<T, R> fn) {
+        return environment -> {
+            Object o = environment.getSource();
+            if (sourceType.isInstance(o)) {
+                @SuppressWarnings("unchecked") T t = (T) o;
+                return fn.apply(t);
+            } else {
+                return null;
+            }
+        };
     }
 }
