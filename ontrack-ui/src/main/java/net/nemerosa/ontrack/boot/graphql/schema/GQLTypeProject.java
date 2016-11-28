@@ -18,6 +18,9 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
@@ -58,7 +61,7 @@ public class GQLTypeProject extends AbstractGQLProjectEntityWithoutSignature<Pro
                                 .argument(
                                         newArgument()
                                                 .name("name")
-                                                .description("Exact name of the branch to look for.")
+                                                .description("Regular expression to match against the branch name")
                                                 .type(GraphQLString)
                                                 .build()
                                 )
@@ -76,20 +79,16 @@ public class GQLTypeProject extends AbstractGQLProjectEntityWithoutSignature<Pro
             if (source instanceof Project) {
                 Project project = (Project) source;
                 String name = environment.getArgument("name");
-                // TODO Combined filter
-                // TODO Other criterias
+                // Combined filter
+                Predicate<Branch> filter = b -> true;
+                // Name criteria
                 if (name != null) {
-                    Optional<Branch> oBranch = structureService.findBranchByName(project.getName(), name);
-                    if (oBranch.isPresent()) {
-                        return Collections.singletonList(oBranch.get());
-                    } else {
-                        return Collections.emptyList();
-                    }
-                } else {
-                    return structureService.getBranchesForProject(
-                            project.getId()
-                    );
+                    Pattern nameFilter = Pattern.compile(name);
+                    filter = filter.and(branch -> nameFilter.matcher(branch.getName()).matches());
                 }
+                return structureService.getBranchesForProject(project.getId()).stream()
+                        .filter(filter)
+                        .collect(Collectors.toList());
             } else {
                 return Collections.emptyList();
             }

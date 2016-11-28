@@ -4,7 +4,10 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountService;
+import net.nemerosa.ontrack.model.security.AuthenticatedAccount;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,17 +24,11 @@ public class GQLTypeAccount extends AbstractGQLType {
 
     public static final String ACCOUNT = "Account";
 
-    private final AccountService accountService;
     private final GQLTypeGlobalRole globalRole;
 
     @Autowired
-    public GQLTypeAccount(URIBuilder uriBuilder,
-                          SecurityService securityService,
-                          AccountService accountService,
-                          GQLTypeGlobalRole globalRole) {
+    public GQLTypeAccount(URIBuilder uriBuilder, SecurityService securityService) {
         super(uriBuilder, securityService);
-        this.accountService = accountService;
-        this.globalRole = globalRole;
     }
 
     @Override
@@ -61,14 +58,6 @@ public class GQLTypeAccount extends AbstractGQLType {
                 )
                 .field(
                         newFieldDefinition()
-                                .name("actualGroups")
-                                .description("List of groups gotten at runtime")
-                                .type(GraphqlUtils.stdList(new GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
-                                .dataFetcher(accountActualGroupsFetcher())
-                                .build()
-                )
-                .field(
-                        newFieldDefinition()
                                 .name("globalRoles")
                                 .description("List of global permissions")
                                 .type(GraphqlUtils.stdList(globalRole.getType()))
@@ -84,10 +73,6 @@ public class GQLTypeAccount extends AbstractGQLType {
                         (gp.getTarget().getId() == account.id()))
                 .map(GlobalPermission::getRole)
                 .collect(Collectors.toList()));
-    }
-
-    private DataFetcher accountActualGroupsFetcher() {
-        return fetcher(Account.class, account -> accountService.withACL(AuthenticatedAccount.of(account)));
     }
 
     private DataFetcher accountAccountGroupsFetcher() {

@@ -65,6 +65,16 @@ class ProjectQLIT extends AbstractQLITSupport {
     }
 
     @Test
+    void 'Branch by regular expression'() {
+        def p = doCreateProject()
+        doCreateBranch(p, NameDescription.nd("11.8.3", ""))
+        doCreateBranch(p, NameDescription.nd("11.9.0", ""))
+
+        def data = run("""{projects(id: ${p.id}) { name branches(name: "11\\\\.9.*") { name } } }""")
+        assert data.projects.branches.name.flatten() == ["11.9.0"]
+    }
+
+    @Test
     void 'Promotion levels for a branch'() {
         def branch = doCreateBranch()
         def project = branch.project
