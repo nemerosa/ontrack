@@ -5,8 +5,6 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountService;
-import net.nemerosa.ontrack.model.security.AuthenticatedAccount;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +20,9 @@ public class GQLTypeAccount extends AbstractGQLType {
 
     public static final String ACCOUNT = "Account";
 
-    private final AccountService accountService;
-
     @Autowired
-    public GQLTypeAccount(URIBuilder uriBuilder, SecurityService securityService, AccountService accountService) {
+    public GQLTypeAccount(URIBuilder uriBuilder, SecurityService securityService) {
         super(uriBuilder, securityService);
-        this.accountService = accountService;
     }
 
     @Override
@@ -55,19 +50,7 @@ public class GQLTypeAccount extends AbstractGQLType {
                                 .dataFetcher(accountAccountGroupsFetcher())
                                 .build()
                 )
-                .field(
-                        newFieldDefinition()
-                                .name("actualGroups")
-                                .description("List of groups gotten at runtime")
-                                .type(GraphqlUtils.stdList(new GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
-                                .dataFetcher(accountActualGroupsFetcher())
-                                .build()
-                )
                 .build();
-    }
-
-    private DataFetcher accountActualGroupsFetcher() {
-        return fetcher(Account.class, account -> accountService.withACL(AuthenticatedAccount.of(account)));
     }
 
     private DataFetcher accountAccountGroupsFetcher() {
