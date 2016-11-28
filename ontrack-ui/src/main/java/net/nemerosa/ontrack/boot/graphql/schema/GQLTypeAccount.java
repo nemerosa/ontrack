@@ -4,10 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountService;
-import net.nemerosa.ontrack.model.security.AuthenticatedAccount;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,11 +21,14 @@ public class GQLTypeAccount extends AbstractGQLType {
 
     public static final String ACCOUNT = "Account";
 
+    private final AccountService accountService;
     private final GQLTypeGlobalRole globalRole;
 
     @Autowired
-    public GQLTypeAccount(URIBuilder uriBuilder, SecurityService securityService) {
+    public GQLTypeAccount(URIBuilder uriBuilder, SecurityService securityService, AccountService accountService, GQLTypeGlobalRole globalRole) {
         super(uriBuilder, securityService);
+        this.accountService = accountService;
+        this.globalRole = globalRole;
     }
 
     @Override
@@ -62,6 +62,14 @@ public class GQLTypeAccount extends AbstractGQLType {
                                 .description("List of global permissions")
                                 .type(GraphqlUtils.stdList(globalRole.getType()))
                                 .dataFetcher(accountGlobalRolesFetchers())
+                                .build()
+                )
+                .field(
+                        newFieldDefinition()
+                                .name("authorizedProjects")
+                                .description("List of authorized projects")
+                                .type(GraphqlUtils.stdList(new GraphQLTypeReference(GQLTypeProject.PROJECT)))
+                                // FIXME .dataFetcher(accountGlobalRolesFetchers())
                                 .build()
                 )
                 .build();
