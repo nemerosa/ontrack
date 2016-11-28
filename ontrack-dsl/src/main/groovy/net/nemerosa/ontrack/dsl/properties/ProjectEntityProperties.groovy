@@ -22,7 +22,7 @@ class ProjectEntityProperties {
         entity.property(type, data)
     }
 
-    @DSLMethod(id = "property-get")
+    @DSLMethod(id = "property-get", count = 2)
     def property(String type, boolean required = true) {
         entity.getProperty(type, required)
     }
