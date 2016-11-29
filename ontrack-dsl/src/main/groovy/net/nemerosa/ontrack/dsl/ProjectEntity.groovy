@@ -28,6 +28,11 @@ interface ProjectEntity {
     /**
      * Gets a property
      */
+    def getProperty(String type, boolean required)
+
+    /**
+     * Gets a required property
+     */
     def property(String type)
 
 }

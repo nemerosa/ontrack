@@ -105,6 +105,8 @@ jar.dependsOn generateVersionInfo
 processResources.mustRunAfter copyWebResources
 processResources.mustRunAfter generateVersionInfo
 
+bootRun.dependsOn jar
+
 /**
  * Spring boot packaging
  */

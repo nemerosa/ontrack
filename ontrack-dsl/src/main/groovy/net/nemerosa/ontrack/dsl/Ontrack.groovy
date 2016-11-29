@@ -33,7 +33,7 @@ class Ontrack {
     @DSLMethod("Gets the list of projects")
     List<Project> getProjects() {
         return get('structure/projects').resources.collect {
-            new Project(this, get(it._self))
+            new Project(this, it)
         }
     }
 
