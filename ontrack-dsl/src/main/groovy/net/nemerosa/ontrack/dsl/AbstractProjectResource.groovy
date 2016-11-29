@@ -50,9 +50,9 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         }
     }
 
-    @DSLMethod("Gets the value for a property of this entity. Prefer using dedicated DSL methods.")
+    @DSLMethod(id = "property-get")
     @Override
-    def property(String type) {
+    def getProperty(String type, boolean required) {
         // Gets the list of properties
         def properties = ontrack.get(link('properties'))
         // Looks for the property
@@ -62,14 +62,24 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
             def valueNode = propertyNode['value']
             if (valueNode) {
                 valueNode
-            } else {
+            } else if (required) {
                 throw new PropertyNotFoundException(type)
+            } else {
+                return null
             }
         }
         // Not found
-        else {
+        else if (required) {
             throw new PropertyNotFoundException(type)
+        } else {
+            return null
         }
+    }
+
+    @DSLMethod(id = "property-get-required")
+    @Override
+    def property(String type) {
+        return getProperty(type, true)
     }
 
     /**

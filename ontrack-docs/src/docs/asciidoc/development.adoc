@@ -20,8 +20,20 @@ Following tools must be installed before you can start coding with Ontrack:
 
 To launch the integration tests or acceptance tests, see <<testing>>.
 
+[[development-launch-gradle]]
+==== Launching the application from the command line
+
+Just run:
+
+[source,bash]
+----
+./gradlew :ontrack-ui:bootRun
+----
+
+The application is then available at http://localhost:8080
+
 [[development-launch]]
-==== Launching the application
+==== Launching the application in the IDE
 
 Prepare the Web resources by launching:
 
