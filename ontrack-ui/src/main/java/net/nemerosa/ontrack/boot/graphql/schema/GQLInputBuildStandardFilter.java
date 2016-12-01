@@ -38,8 +38,8 @@ public class GQLInputBuildStandardFilter {
                                 .defaultValue(10)
                                 .build()
                 )
-                // FIXME String sincePromotionLevel;
-                // FIXME String withPromotionLevel;
+                .field(formField("sincePromotionLevel", "Builds since the last one which was promoted to this level"))
+                .field(formField("withPromotionLevel", "Builds with this promotion level"))
                 // FIXME LocalDate afterDate;
                 // FIXME LocalDate beforeDate;
                 .field(formField("sinceValidationStamp", "Builds since the last one which had this validation stamp"))
