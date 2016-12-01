@@ -88,4 +88,49 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         assert data.branches.first().builds.edges.node.name.flatten() == ['2']
     }
 
+    @Test
+    void 'Default filter since validation stamp'() {
+        def branch = doCreateBranch()
+        def vs = doCreateValidationStamp(branch, NameDescription.nd('VS', ''))
+        doValidateBuild(doCreateBuild(branch, NameDescription.nd('1', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doValidateBuild(doCreateBuild(branch, NameDescription.nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doCreateBuild(branch, NameDescription.nd('3', ''))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {sinceValidationStamp: "VS"}) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['3', '2']
+    }
+
+    @Test
+    void 'Default filter since validation stamp status'() {
+        def branch = doCreateBranch()
+        def vs = doCreateValidationStamp(branch, NameDescription.nd('VS', ''))
+        doValidateBuild(doCreateBuild(branch, NameDescription.nd('1', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doValidateBuild(doCreateBuild(branch, NameDescription.nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doValidateBuild(doCreateBuild(branch, NameDescription.nd('3', '')), vs, ValidationRunStatusID.STATUS_FAILED)
+        doCreateBuild(branch, NameDescription.nd('4', ''))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {sinceValidationStamp: "VS", sinceValidationStampStatus: "PASSED"}) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3', '2']
+    }
+
 }
