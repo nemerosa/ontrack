@@ -114,6 +114,26 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         ));
     }
 
+    public ValidationRun doValidateBuild(Build build, ValidationStamp vs, ValidationRunStatusID statusId) throws Exception {
+        return asUser().with(build, ValidationRunCreate.class).call(() ->
+                structureService.newValidationRun(
+                        ValidationRun.of(
+                                build,
+                                vs,
+                                1,
+                                Signature.of("test"),
+                                statusId,
+                                ""
+                        )
+                )
+        );
+    }
+
+    public ValidationRun doValidateBuild(Build build, String vsName, ValidationRunStatusID statusId) throws Exception {
+        ValidationStamp vs = doCreateValidationStamp(build.getBranch(), NameDescription.nd(vsName, ""));
+        return doValidateBuild(build, vs, statusId);
+    }
+
     protected PromotionLevel doCreatePromotionLevel() throws Exception {
         return doCreatePromotionLevel(doCreateBranch(), nameDescription());
     }

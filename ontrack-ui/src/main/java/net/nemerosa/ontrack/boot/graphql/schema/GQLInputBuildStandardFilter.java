@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
 import net.nemerosa.ontrack.json.JsonUtils;
@@ -27,7 +28,6 @@ public class GQLInputBuildStandardFilter {
     }
 
     public GraphQLInputType getInputType() {
-        // TODO See how to reuse the Form object
         return GraphQLInputObjectType.newInputObject()
                 .name("StandardBuildFilter")
                 .field(
@@ -42,23 +42,24 @@ public class GQLInputBuildStandardFilter {
                 // FIXME String withPromotionLevel;
                 // FIXME LocalDate afterDate;
                 // FIXME LocalDate beforeDate;
-                // FIXME String sinceValidationStamp;
-                // FIXME String sinceValidationStampStatus;
-                .field(
-                        newInputObjectField()
-                                .name("withValidationStamp")
-                                .description("Builds with this validation stamp")
-                                .type(GraphQLString)
-                                .defaultValue(null)
-                                .build()
-                )
-                // FIXME String withValidationStampStatus;
+                .field(formField("sinceValidationStamp", "Builds since the last one which had this validation stamp"))
+                .field(formField("sinceValidationStampStatus", "... with status"))
+                .field(formField("withValidationStamp", "Builds with this validation stamp"))
+                .field(formField("withValidationStampStatus", "... with status"))
                 // FIXME String withProperty;
                 // FIXME String withPropertyValue;
                 // FIXME String sinceProperty;
                 // FIXME String sincePropertyValue;
                 // FIXME String linkedFrom;
                 // FIXME String linkedTo;
+                .build();
+    }
+
+    private GraphQLInputObjectField formField(String fieldName, String description) {
+        return newInputObjectField()
+                .name(fieldName)
+                .description(description)
+                .type(GraphQLString)
                 .build();
     }
 
