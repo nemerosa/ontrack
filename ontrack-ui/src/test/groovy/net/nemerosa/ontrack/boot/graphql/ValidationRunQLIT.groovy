@@ -54,8 +54,8 @@ class ValidationRunQLIT extends AbstractQLITSupport {
             }
         }""")
         def validationRunStatuses = data.validationRuns.validationRunStatuses.flatten()
-        assert validationRunStatuses.statusID.id == ['EXPLAINED', 'INVESTIGATING', 'FAILED']
-        assert validationRunStatuses.description == ['Explained', 'Investigating', 'Validation failed']
+        assert validationRunStatuses.statusID.id as Set == ['EXPLAINED', 'INVESTIGATING', 'FAILED'] as Set
+        assert validationRunStatuses.description as Set == ['Explained', 'Investigating', 'Validation failed'] as Set
     }
 
 }
