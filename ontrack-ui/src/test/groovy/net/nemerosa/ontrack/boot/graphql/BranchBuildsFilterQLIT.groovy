@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.boot.graphql
 
 import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.Test
+
+import java.time.LocalDateTime
 
 class BranchBuildsFilterQLIT extends AbstractQLITSupport {
 
@@ -204,6 +207,27 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
             }
         }""")
         assert data.branches.first().builds.edges.node.name.flatten() == ['4', '2']
+    }
+
+    @Test
+    void 'Default filter dates'() {
+        def branch = doCreateBranch()
+        doCreateBuild(branch, NameDescription.nd('1', ''), Signature.of(LocalDateTime.of(2016, 11, 30, 17, 00), 'test'))
+        doCreateBuild(branch, NameDescription.nd('2', ''), Signature.of(LocalDateTime.of(2016, 12, 02, 17, 10), 'test'))
+        doCreateBuild(branch, NameDescription.nd('3', ''), Signature.of(LocalDateTime.of(2016, 12, 04, 17, 20), 'test'))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {afterDate: "2016-12-01", beforeDate: "2016-12-03"}) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['2']
     }
 
 }

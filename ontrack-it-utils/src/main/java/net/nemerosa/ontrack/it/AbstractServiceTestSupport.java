@@ -105,11 +105,15 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     }
 
     protected Build doCreateBuild(Branch branch, NameDescription nameDescription) throws Exception {
+        return doCreateBuild(branch, nameDescription, Signature.of("test"));
+    }
+
+    protected Build doCreateBuild(Branch branch, NameDescription nameDescription, Signature signature) throws Exception {
         return asUser().with(branch.projectId(), BuildCreate.class).call(() -> structureService.newBuild(
                 Build.of(
                         branch,
                         nameDescription,
-                        Signature.of("test")
+                        signature
                 )
         ));
     }

@@ -40,8 +40,8 @@ public class GQLInputBuildStandardFilter {
                 )
                 .field(formField("sincePromotionLevel", "Builds since the last one which was promoted to this level"))
                 .field(formField("withPromotionLevel", "Builds with this promotion level"))
-                // FIXME LocalDate afterDate;
-                // FIXME LocalDate beforeDate;
+                .field(formField("afterDate", "Build created after or on this date"))
+                .field(formField("beforeDate", "Build created before or on this date"))
                 .field(formField("sinceValidationStamp", "Builds since the last one which had this validation stamp"))
                 .field(formField("sinceValidationStampStatus", "... with status"))
                 .field(formField("withValidationStamp", "Builds with this validation stamp"))
