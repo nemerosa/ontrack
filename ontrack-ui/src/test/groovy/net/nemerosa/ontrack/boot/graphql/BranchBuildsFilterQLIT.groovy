@@ -67,4 +67,25 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         assert data.branches.first().builds.edges.node.validationRuns.validationRunStatuses.statusID.id.flatten() == ['PASSED']
     }
 
+    @Test
+    void 'Default filter with validation stamp status'() {
+        def branch = doCreateBranch()
+        def vs = doCreateValidationStamp(branch, NameDescription.nd('VS', ''))
+        doValidateBuild(doCreateBuild(branch, NameDescription.nd('1', '')), vs, ValidationRunStatusID.STATUS_FAILED)
+        doValidateBuild(doCreateBuild(branch, NameDescription.nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {withValidationStamp: "VS", withValidationStampStatus: "PASSED"}) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['2']
+    }
+
 }
