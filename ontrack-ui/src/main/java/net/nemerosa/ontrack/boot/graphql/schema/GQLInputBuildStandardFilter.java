@@ -48,8 +48,8 @@ public class GQLInputBuildStandardFilter {
                 .field(formField("withValidationStampStatus", "... with status"))
                 .field(formField("withProperty", "With property"))
                 .field(formField("withPropertyValue", "...with value"))
-                // FIXME String sinceProperty;
-                // FIXME String sincePropertyValue;
+                .field(formField("sinceProperty", "Since property"))
+                .field(formField("sincePropertyValue", "...with value"))
                 // FIXME String linkedFrom;
                 // FIXME String linkedTo;
                 .build();

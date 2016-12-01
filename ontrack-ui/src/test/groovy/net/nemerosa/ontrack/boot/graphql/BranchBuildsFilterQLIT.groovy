@@ -274,4 +274,51 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         assert data.branches.first().builds.edges.node.name.flatten() == ['1']
     }
 
+    @Test
+    void 'Default filter since property'() {
+        def branch = doCreateBranch()
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, NameDescription.nd('2', ''))
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+        doCreateBuild(branch, NameDescription.nd('4', ''))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {sinceProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType"}) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3']
+    }
+
+    @Test
+    void 'Default filter since property value'() {
+        def branch = doCreateBranch()
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, NameDescription.nd('2', ''))
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+        doCreateBuild(branch, NameDescription.nd('4', ''))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {
+                    sinceProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType",
+                    sincePropertyValue: "1"
+                 }) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3', '2', '1']
+    }
+
 }
