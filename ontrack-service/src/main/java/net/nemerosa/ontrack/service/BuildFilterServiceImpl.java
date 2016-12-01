@@ -155,6 +155,15 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @Override
+    public BuildFilter standardFilter(ID branchId, JsonNode parameters) {
+        return computeFilter(
+                branchId,
+                StandardBuildFilterProvider.class.getName(),
+                parameters
+        );
+    }
+
+    @Override
     public Collection<BuildFilterResource<?>> getBuildFilters(ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         // Are we logged?
@@ -188,7 +197,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     @Override
     public BuildFilter computeFilter(ID branchId, String type, JsonNode jsonData) {
         Optional<BuildFilter> optFilter = getBuildFilterProviderByType(type).map(provider -> getBuildFilter(branchId, provider, jsonData));
-        return optFilter.get();
+        return optFilter.orElseThrow(() -> new IllegalStateException("Could not map filter " + type));
     }
 
     @Override

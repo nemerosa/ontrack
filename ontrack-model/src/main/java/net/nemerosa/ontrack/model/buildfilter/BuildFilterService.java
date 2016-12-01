@@ -24,6 +24,11 @@ public interface BuildFilterService {
     StandardFilterBuilder standardFilter(int count);
 
     /**
+     * Builds a standard build filter
+     */
+    BuildFilter standardFilter(ID branchId, JsonNode parameters);
+
+    /**
      * Gets the list of all existing filters.
      *
      * @param branchId Branch to get the filters for

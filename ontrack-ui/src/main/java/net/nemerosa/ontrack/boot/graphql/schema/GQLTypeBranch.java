@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static graphql.Scalars.GraphQLInt;
 import static graphql.schema.GraphQLArgument.newArgument;
@@ -38,18 +39,26 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
     private final GQLTypeBuild build;
     private final GQLTypePromotionLevel promotionLevel;
     private final GQLTypeValidationStamp validationStamp;
+    private final GQLInputBuildStandardFilter inputBuildStandardFilter;
 
     @Autowired
     public GQLTypeBranch(URIBuilder uriBuilder,
                          SecurityService securityService,
                          List<ResourceDecorator<?>> decorators,
-                         StructureService structureService, BuildFilterService buildFilterService, GQLTypeBuild build, GQLTypePromotionLevel promotionLevel, GQLTypeValidationStamp validationStamp, EventQueryService eventQueryService) {
+                         StructureService structureService,
+                         BuildFilterService buildFilterService,
+                         GQLTypeBuild build,
+                         GQLTypePromotionLevel promotionLevel,
+                         GQLTypeValidationStamp validationStamp,
+                         EventQueryService eventQueryService,
+                         GQLInputBuildStandardFilter inputBuildStandardFilter) {
         super(uriBuilder, securityService, Branch.class, decorators, eventQueryService);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;
         this.promotionLevel = promotionLevel;
         this.validationStamp = validationStamp;
+        this.inputBuildStandardFilter = inputBuildStandardFilter;
     }
 
     @Override
@@ -86,7 +95,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
                         newFieldDefinition()
                                 .name("builds")
                                 .type(GraphqlUtils.connectionList(build.getType()))
-                                // TODO Build filtering
+                                // Last builds
                                 .argument(
                                         newArgument()
                                                 .name("count")
@@ -94,6 +103,15 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
                                                 .type(GraphQLInt)
                                                 .build()
                                 )
+                                // Standard filter
+                                .argument(
+                                        newArgument()
+                                                .name("filter")
+                                                .description("Filter based on build promotions, validations, properties, ...")
+                                                .type(inputBuildStandardFilter.getInputType())
+                                                .build()
+                                )
+                                // Query
                                 .dataFetcher(branchBuildsFetcher())
                                 .build()
                 )
@@ -109,8 +127,21 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
                 Branch branch = (Branch) source;
                 // Count
                 int count = GraphqlUtils.getIntArgument(environment, "count").orElse(10);
-                // TODO Build filtering
-                BuildFilter buildFilter = buildFilterService.standardFilter(count).build();
+                Object filter = environment.getArgument("filter");
+                // TODO Last promotion filter
+                // Standard filter
+                BuildFilter buildFilter;
+                if (filter == null) {
+                    buildFilter = buildFilterService.standardFilter(count).build();
+                } else {
+                    if (!(filter instanceof Map)) {
+                        throw new IllegalStateException("Filter is expected to be a map");
+                    } else {
+                        @SuppressWarnings("unchecked")
+                        Map<String, ?> map = (Map<String, ?>) filter;
+                        buildFilter = inputBuildStandardFilter.parseMap(branch, map);
+                    }
+                }
                 // Result
                 List<Build> builds = structureService.getFilteredBuilds(
                         branch.getId(),
