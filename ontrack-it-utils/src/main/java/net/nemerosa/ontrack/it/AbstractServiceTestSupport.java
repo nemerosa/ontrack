@@ -25,6 +25,9 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     protected StructureService structureService;
 
     @Autowired
+    protected PropertyService propertyService;
+
+    @Autowired
     private SettingsManagerService settingsManagerService;
 
     protected AccountGroup doCreateAccountGroup() throws Exception {
@@ -175,6 +178,16 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                                 Signature.of("test"),
                                 description
                         )
+                )
+        );
+    }
+
+    protected <T> void doSetProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyType, T data) throws Exception {
+        asUser().with(entity, ProjectEdit.class).call(() ->
+                propertyService.editProperty(
+                        entity,
+                        propertyType,
+                        data
                 )
         );
     }

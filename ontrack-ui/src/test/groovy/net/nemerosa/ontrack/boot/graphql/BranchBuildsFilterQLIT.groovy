@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.graphql
 
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -228,6 +230,48 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
             }
         }""")
         assert data.branches.first().builds.edges.node.name.flatten() == ['2']
+    }
+
+    @Test
+    void 'Default filter with property'() {
+        def branch = doCreateBranch()
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, NameDescription.nd('2', ''))
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {withProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType"}) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['3', '1']
+    }
+
+    @Test
+    void 'Default filter with property value'() {
+        def branch = doCreateBranch()
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, NameDescription.nd('2', ''))
+        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(filter: {withProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", withPropertyValue: "1"}) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['1']
     }
 
 }
