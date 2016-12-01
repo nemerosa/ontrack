@@ -340,3 +340,5 @@ include::extending-decorators.adoc[]
 include::extending-user-menu.adoc[]
 
 include::extending-pages.adoc[]
+
+include::extending-event-types.adoc[]
