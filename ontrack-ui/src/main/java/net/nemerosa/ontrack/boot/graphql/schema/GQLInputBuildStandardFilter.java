@@ -50,8 +50,18 @@ public class GQLInputBuildStandardFilter {
                 .field(formField("withPropertyValue", "...with value"))
                 .field(formField("sinceProperty", "Since property"))
                 .field(formField("sincePropertyValue", "...with value"))
-                // FIXME String linkedFrom;
-                // FIXME String linkedTo;
+                .field(formField(
+                        "linkedFrom",
+                        "The build must be linked FROM the builds selected by the pattern.\n" +
+                                "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - " +
+                                "with * as placeholder"
+                ))
+                .field(formField(
+                        "linkedTo",
+                        "The build must be linked TO the builds selected by the pattern.\n" +
+                                "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - " +
+                                "with * as placeholder"
+                ))
                 .build();
     }
 

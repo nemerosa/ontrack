@@ -2,19 +2,22 @@ package net.nemerosa.ontrack.boot.graphql
 
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
-import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.security.BuildConfig
+import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.Test
 
 import java.time.LocalDateTime
 
+import static net.nemerosa.ontrack.model.structure.NameDescription.nd
+
 class BranchBuildsFilterQLIT extends AbstractQLITSupport {
 
     @Test
     void 'Default filter with validation stamp'() {
         def branch = doCreateBranch()
-        def build = doCreateBuild(branch, NameDescription.nd('1', ''))
+        def build = doCreateBuild(branch, nd('1', ''))
         doValidateBuild(build, 'VS', ValidationRunStatusID.STATUS_PASSED)
 
         def data = run("""{
@@ -47,7 +50,7 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter with validation stamp and returning validation runs'() {
         def branch = doCreateBranch()
-        def build = doCreateBuild(branch, NameDescription.nd('1', ''))
+        def build = doCreateBuild(branch, nd('1', ''))
         doValidateBuild(build, 'VS', ValidationRunStatusID.STATUS_PASSED)
 
         def data = run("""{
@@ -75,9 +78,9 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter with validation stamp status'() {
         def branch = doCreateBranch()
-        def vs = doCreateValidationStamp(branch, NameDescription.nd('VS', ''))
-        doValidateBuild(doCreateBuild(branch, NameDescription.nd('1', '')), vs, ValidationRunStatusID.STATUS_FAILED)
-        doValidateBuild(doCreateBuild(branch, NameDescription.nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        def vs = doCreateValidationStamp(branch, nd('VS', ''))
+        doValidateBuild(doCreateBuild(branch, nd('1', '')), vs, ValidationRunStatusID.STATUS_FAILED)
+        doValidateBuild(doCreateBuild(branch, nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -96,10 +99,10 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter since validation stamp'() {
         def branch = doCreateBranch()
-        def vs = doCreateValidationStamp(branch, NameDescription.nd('VS', ''))
-        doValidateBuild(doCreateBuild(branch, NameDescription.nd('1', '')), vs, ValidationRunStatusID.STATUS_PASSED)
-        doValidateBuild(doCreateBuild(branch, NameDescription.nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
-        doCreateBuild(branch, NameDescription.nd('3', ''))
+        def vs = doCreateValidationStamp(branch, nd('VS', ''))
+        doValidateBuild(doCreateBuild(branch, nd('1', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doValidateBuild(doCreateBuild(branch, nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doCreateBuild(branch, nd('3', ''))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -118,11 +121,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter since validation stamp status'() {
         def branch = doCreateBranch()
-        def vs = doCreateValidationStamp(branch, NameDescription.nd('VS', ''))
-        doValidateBuild(doCreateBuild(branch, NameDescription.nd('1', '')), vs, ValidationRunStatusID.STATUS_PASSED)
-        doValidateBuild(doCreateBuild(branch, NameDescription.nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
-        doValidateBuild(doCreateBuild(branch, NameDescription.nd('3', '')), vs, ValidationRunStatusID.STATUS_FAILED)
-        doCreateBuild(branch, NameDescription.nd('4', ''))
+        def vs = doCreateValidationStamp(branch, nd('VS', ''))
+        doValidateBuild(doCreateBuild(branch, nd('1', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doValidateBuild(doCreateBuild(branch, nd('2', '')), vs, ValidationRunStatusID.STATUS_PASSED)
+        doValidateBuild(doCreateBuild(branch, nd('3', '')), vs, ValidationRunStatusID.STATUS_FAILED)
+        doCreateBuild(branch, nd('4', ''))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -141,10 +144,10 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter with promotion level'() {
         def branch = doCreateBranch()
-        def copper = doCreatePromotionLevel(branch, NameDescription.nd('COPPER', ''))
-        doPromote(doCreateBuild(branch, NameDescription.nd('1', '')), copper, '')
-        doCreateBuild(branch, NameDescription.nd('2', ''))
-        doPromote(doCreateBuild(branch, NameDescription.nd('3', '')), copper, '')
+        def copper = doCreatePromotionLevel(branch, nd('COPPER', ''))
+        doPromote(doCreateBuild(branch, nd('1', '')), copper, '')
+        doCreateBuild(branch, nd('2', ''))
+        doPromote(doCreateBuild(branch, nd('3', '')), copper, '')
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -163,11 +166,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter since promotion level'() {
         def branch = doCreateBranch()
-        def copper = doCreatePromotionLevel(branch, NameDescription.nd('COPPER', ''))
-        doPromote(doCreateBuild(branch, NameDescription.nd('1', '')), copper, '')
-        doCreateBuild(branch, NameDescription.nd('2', ''))
-        doPromote(doCreateBuild(branch, NameDescription.nd('3', '')), copper, '')
-        doCreateBuild(branch, NameDescription.nd('4', ''))
+        def copper = doCreatePromotionLevel(branch, nd('COPPER', ''))
+        doPromote(doCreateBuild(branch, nd('1', '')), copper, '')
+        doCreateBuild(branch, nd('2', ''))
+        doPromote(doCreateBuild(branch, nd('3', '')), copper, '')
+        doCreateBuild(branch, nd('4', ''))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -186,16 +189,16 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter since and with promotion level'() {
         def branch = doCreateBranch()
-        def copper = doCreatePromotionLevel(branch, NameDescription.nd('COPPER', ''))
-        def bronze = doCreatePromotionLevel(branch, NameDescription.nd('BRONZE', ''))
+        def copper = doCreatePromotionLevel(branch, nd('COPPER', ''))
+        def bronze = doCreatePromotionLevel(branch, nd('BRONZE', ''))
 
-        doCreateBuild(branch, NameDescription.nd('1', ''))
-        def build2 = doCreateBuild(branch, NameDescription.nd('2', ''))
+        doCreateBuild(branch, nd('1', ''))
+        def build2 = doCreateBuild(branch, nd('2', ''))
         doPromote(build2, copper, '')
         doPromote(build2, bronze, '')
-        doCreateBuild(branch, NameDescription.nd('3', ''))
-        doPromote(doCreateBuild(branch, NameDescription.nd('4', '')), copper, '')
-        doCreateBuild(branch, NameDescription.nd('5', ''))
+        doCreateBuild(branch, nd('3', ''))
+        doPromote(doCreateBuild(branch, nd('4', '')), copper, '')
+        doCreateBuild(branch, nd('5', ''))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -214,9 +217,9 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter dates'() {
         def branch = doCreateBranch()
-        doCreateBuild(branch, NameDescription.nd('1', ''), Signature.of(LocalDateTime.of(2016, 11, 30, 17, 00), 'test'))
-        doCreateBuild(branch, NameDescription.nd('2', ''), Signature.of(LocalDateTime.of(2016, 12, 02, 17, 10), 'test'))
-        doCreateBuild(branch, NameDescription.nd('3', ''), Signature.of(LocalDateTime.of(2016, 12, 04, 17, 20), 'test'))
+        doCreateBuild(branch, nd('1', ''), Signature.of(LocalDateTime.of(2016, 11, 30, 17, 00), 'test'))
+        doCreateBuild(branch, nd('2', ''), Signature.of(LocalDateTime.of(2016, 12, 02, 17, 10), 'test'))
+        doCreateBuild(branch, nd('3', ''), Signature.of(LocalDateTime.of(2016, 12, 04, 17, 20), 'test'))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -235,9 +238,9 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter with property'() {
         def branch = doCreateBranch()
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
-        doCreateBuild(branch, NameDescription.nd('2', ''))
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+        doSetProperty(doCreateBuild(branch, nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, nd('2', ''))
+        doSetProperty(doCreateBuild(branch, nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -256,9 +259,9 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter with property value'() {
         def branch = doCreateBranch()
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
-        doCreateBuild(branch, NameDescription.nd('2', ''))
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+        doSetProperty(doCreateBuild(branch, nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, nd('2', ''))
+        doSetProperty(doCreateBuild(branch, nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -277,10 +280,10 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter since property'() {
         def branch = doCreateBranch()
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
-        doCreateBuild(branch, NameDescription.nd('2', ''))
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
-        doCreateBuild(branch, NameDescription.nd('4', ''))
+        doSetProperty(doCreateBuild(branch, nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, nd('2', ''))
+        doSetProperty(doCreateBuild(branch, nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+        doCreateBuild(branch, nd('4', ''))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -299,10 +302,10 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     @Test
     void 'Default filter since property value'() {
         def branch = doCreateBranch()
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
-        doCreateBuild(branch, NameDescription.nd('2', ''))
-        doSetProperty(doCreateBuild(branch, NameDescription.nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
-        doCreateBuild(branch, NameDescription.nd('4', ''))
+        doSetProperty(doCreateBuild(branch, nd('1', '')), TestSimplePropertyType, new TestSimpleProperty("1"))
+        doCreateBuild(branch, nd('2', ''))
+        doSetProperty(doCreateBuild(branch, nd('3', '')), TestSimplePropertyType, new TestSimpleProperty("3"))
+        doCreateBuild(branch, nd('4', ''))
 
         def data = run("""{
             branches (id: ${branch.id}) {
@@ -319,6 +322,40 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
             }
         }""")
         assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3', '2', '1']
+    }
+
+    @Test
+    void 'Default filter with linked FROM criteria'() {
+        // Project 1
+        def branch1 = doCreateBranch()
+        def build1 = doCreateBuild(branch1, nd('1.0', ''))
+        // Project 2
+        def branch2 = doCreateBranch()
+        def build2 = doCreateBuild(branch1, nd('2.0', ''))
+        // Link build 2 --> build 1
+        asUser().with(build2, BuildConfig).with(build1, ProjectView).call {
+            structureService.addBuildLink(
+                    build2,
+                    build1
+            )
+        }
+
+        def data = asUser().withView(branch1).withView(branch2).call {
+            run("""{
+                branches (id: ${branch1.id}) {
+                    builds(filter: {
+                        linkedFrom: "${branch2.project.name}:"
+                     }) {
+                        edges {
+                            node {
+                                name
+                            }
+                        }
+                    }
+                }
+            }""")
+        }
+        assert data.branches.first().builds.edges.node.name.flatten() == ['1.0']
     }
 
 }
