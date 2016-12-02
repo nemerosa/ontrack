@@ -11,6 +11,16 @@ package "ui-support" {
     class ResourceDecorationContributorServiceImpl <<service>>
 
     interface ResourceDecorationContributor
+
+    DefaultResourceModule ..|> ResourceModule
+    DefaultResourceModule o--> "*" ResourceDecorator : decorators
+
+    AbstractResourceDecorator ..|> ResourceDecorator
+    AbstractLinkResourceDecorator --|> AbstractResourceDecorator
+
+    ResourceDecorationContributorServiceImpl ..|> ResourceDecorationContributorService
+    ResourceDecorationContributorServiceImpl o--> "*" ResourceDecorationContributor: contributors
+
 }
 
 package "ui" {
@@ -18,6 +28,16 @@ package "ui" {
     class BuildController <<controller>>
 
     BuildResourceDecorator --> BuildController
+
+    BuildResourceDecorator --|> AbstractLinkResourceDecorator
+    BuildResourceDecorator o--> "1" ResourceDecorationContributorService
+
+    package "graphql" {
+        class AbstractGQLProjectEntity
+
+        AbstractGQLProjectEntity --> "*" ResourceDecorator: decorators
+    }
+
 }
 
 package "extension-git" {
@@ -26,15 +46,4 @@ package "extension-git" {
     GitBuildResourceDecorationContributor ..|> ResourceDecorationContributor
 }
 
-DefaultResourceModule ..|> ResourceModule
-DefaultResourceModule o--> "*" ResourceDecorator : decorators
-
-AbstractResourceDecorator ..|> ResourceDecorator
-AbstractLinkResourceDecorator --|> AbstractResourceDecorator
-
-BuildResourceDecorator --|> AbstractLinkResourceDecorator
-BuildResourceDecorator o--> "1" ResourceDecorationContributorService
-
-ResourceDecorationContributorServiceImpl ..|> ResourceDecorationContributorService
-ResourceDecorationContributorServiceImpl o--> "*" ResourceDecorationContributor: contributors
 @enduml
