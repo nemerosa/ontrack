@@ -19,6 +19,11 @@ public interface BuildFilterService {
     BuildFilter defaultFilter();
 
     /**
+     * Returns a filter which returns the last promoted builds
+     */
+    BuildFilter lastPromotionsFilter(ID branchId);
+
+    /**
      * Builds a standard build filter
      */
     StandardFilterBuilder standardFilter(int count);

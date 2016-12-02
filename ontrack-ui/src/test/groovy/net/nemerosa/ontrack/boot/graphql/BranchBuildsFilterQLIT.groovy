@@ -392,4 +392,32 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         assert data.branches.first().builds.edges.node.name.flatten() == ['2.0']
     }
 
+    @Test
+    void 'Last promotion filter'() {
+        def branch = doCreateBranch()
+        def copper = doCreatePromotionLevel(branch, nd('COPPER', ''))
+        def bronze = doCreatePromotionLevel(branch, nd('BRONZE', ''))
+        def silver = doCreatePromotionLevel(branch, nd('SILVER', ''))
+
+        doCreateBuild(branch, nd('1', ''))
+        doPromote(doCreateBuild(branch, nd('2', '')), silver, '')
+        doPromote(doCreateBuild(branch, nd('3', '')), bronze, '')
+        doCreateBuild(branch, nd('4', ''))
+        doPromote(doCreateBuild(branch, nd('5', '')), copper, '')
+        doCreateBuild(branch, nd('6', ''))
+
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                builds(lastPromotions: true) {
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().builds.edges.node.name.flatten() == ['5', '3', '2']
+    }
+
 }

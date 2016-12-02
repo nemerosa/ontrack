@@ -51,6 +51,13 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         return DefaultBuildFilter.INSTANCE;
     }
 
+    @Override
+    public BuildFilter lastPromotionsFilter(ID branchId) {
+        return getBuildFilterProviderByType(PromotionLevelBuildFilterProvider.class.getName())
+                .map(provider -> provider.filter(branchId, null))
+                .orElseThrow(() -> new IllegalStateException("Could not find filter " + PromotionLevelBuildFilterProvider.class.getName()));
+    }
+
     public class DefaultStandardFilterBuilder implements StandardFilterBuilder {
 
         private StandardBuildFilterData data;

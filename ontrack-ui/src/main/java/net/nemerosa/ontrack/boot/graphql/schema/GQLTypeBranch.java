@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLInt;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -103,6 +104,14 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
                                                 .type(GraphQLInt)
                                                 .build()
                                 )
+                                // Last promotion filter
+                                .argument(
+                                        newArgument()
+                                                .name("lastPromotions")
+                                                .description("Filter which returns the last promoted builds")
+                                                .type(GraphQLBoolean)
+                                                .build()
+                                )
                                 // Standard filter
                                 .argument(
                                         newArgument()
@@ -128,10 +137,15 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
                 // Count
                 int count = GraphqlUtils.getIntArgument(environment, "count").orElse(10);
                 Object filter = environment.getArgument("filter");
-                // TODO Last promotion filter
-                // Standard filter
+                boolean lastPromotions = GraphqlUtils.getBooleanArgument(environment, "lastPromotions", false);
+                // Filter to use
                 BuildFilter buildFilter;
-                if (filter == null) {
+                // Last promotion filter
+                if (lastPromotions) {
+                    buildFilter = buildFilterService.lastPromotionsFilter(branch.getId());
+                }
+                // Standard filter
+                else if (filter == null) {
                     buildFilter = buildFilterService.standardFilter(count).build();
                 } else {
                     if (!(filter instanceof Map)) {

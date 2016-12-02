@@ -115,6 +115,15 @@ public final class GraphqlUtils {
         }
     }
 
+    public static boolean getBooleanArgument(DataFetchingEnvironment environment, String name, boolean defaultValue) {
+        Object value = environment.getArgument(name);
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        } else {
+            return defaultValue;
+        }
+    }
+
     public static Optional<String> getStringArgument(DataFetchingEnvironment environment, String name) {
         Object value = environment.getArgument(name);
         if (value instanceof String) {
@@ -161,4 +170,5 @@ public final class GraphqlUtils {
             }
         };
     }
+
 }
