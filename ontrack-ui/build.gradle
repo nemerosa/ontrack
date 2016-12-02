@@ -59,9 +59,9 @@ clean << {
  * Copy of Web resources before packaging
  */
 
-task copyWebResources(dependsOn: ':ontrack-web:build') << {
+task copyWebResources(dependsOn: ':ontrack-web:prod') << {
     project.copy {
-        from project(':ontrack-web').tasks.build.outputDir
+        from project(':ontrack-web').tasks.prod.outputDir
         into project.file('src/main/resources/static')
     }
 }

@@ -36,12 +36,6 @@ allprojects {
 apply from: "$rootDir/gradle/dependencies.gradle"
 
 /**
- * Build task (used only as an anchor point at the root level)
- */
-
-task build
-
-/**
  * Java projects
  */
 
@@ -225,5 +219,5 @@ task testReport(type: TestReport) {
  */
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
+    gradleVersion = '3.2.1'
 }
