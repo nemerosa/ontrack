@@ -1,5 +1,5 @@
 # Grafana base image
-FROM grafana/grafana:latest
+FROM grafana/grafana:4.0.0
 
 # Dashboards
 VOLUME /usr/lib/grafana/dashboards
