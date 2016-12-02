@@ -331,7 +331,7 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def build1 = doCreateBuild(branch1, nd('1.0', ''))
         // Project 2
         def branch2 = doCreateBranch()
-        def build2 = doCreateBuild(branch1, nd('2.0', ''))
+        def build2 = doCreateBuild(branch2, nd('2.0', ''))
         // Link build 2 --> build 1
         asUser().with(build2, BuildConfig).with(build1, ProjectView).call {
             structureService.addBuildLink(
@@ -344,7 +344,7 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
             run("""{
                 branches (id: ${branch1.id}) {
                     builds(filter: {
-                        linkedFrom: "${branch2.project.name}:"
+                        linkedFrom: "${branch2.project.name}:*"
                      }) {
                         edges {
                             node {
@@ -356,6 +356,40 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
             }""")
         }
         assert data.branches.first().builds.edges.node.name.flatten() == ['1.0']
+    }
+
+    @Test
+    void 'Default filter with linked TO criteria'() {
+        // Project 1
+        def branch1 = doCreateBranch()
+        def build1 = doCreateBuild(branch1, nd('1.0', ''))
+        // Project 2
+        def branch2 = doCreateBranch()
+        def build2 = doCreateBuild(branch2, nd('2.0', ''))
+        // Link build 2 --> build 1
+        asUser().with(build2, BuildConfig).with(build1, ProjectView).call {
+            structureService.addBuildLink(
+                    build2,
+                    build1
+            )
+        }
+
+        def data = asUser().withView(branch1).withView(branch2).call {
+            run("""{
+                branches (id: ${branch2.id}) {
+                    builds(filter: {
+                        linkedTo: "${branch1.project.name}:*"
+                     }) {
+                        edges {
+                            node {
+                                name
+                            }
+                        }
+                    }
+                }
+            }""")
+        }
+        assert data.branches.first().builds.edges.node.name.flatten() == ['2.0']
     }
 
 }
