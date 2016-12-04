@@ -1,0 +1,9 @@
+Gets a required property on the project entity.
+
+If the property does not exist or is not set, a `net.nemerosa.ontrack.dsl.PropertyNotFoundException` is thrown.
+
+[source,groovy]
+----
+def project = ontrack.project('PRJ')
+def value = project.property('com.my.PropertyType')
+----
