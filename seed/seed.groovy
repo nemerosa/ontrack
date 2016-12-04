@@ -435,7 +435,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
