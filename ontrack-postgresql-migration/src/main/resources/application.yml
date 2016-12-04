@@ -6,6 +6,6 @@ ontrack:
       username: ontrack
       password: ontrack
     postgresql:
-      url: "jdbc:postgresql://postgresql/ontrack"
+      url: "jdbc:postgresql://localhost:5432/ontrack"
       username: ontrack
       password: ontrack

@@ -7,6 +7,8 @@ include::appendix-roadmap.adoc[]
 
 include::appendix-certificates.adoc[]
 
+include::appendix-migration-postgres.adoc[]
+
 [[dsl-doc]]
 === DSL Reference
 
