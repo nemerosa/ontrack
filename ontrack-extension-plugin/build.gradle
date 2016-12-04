@@ -14,9 +14,11 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
 }
 
-javadocJar {
-    from javadoc
-    from groovydoc
+if (documentationProfile) {
+    javadocJar {
+        from javadoc
+        from groovydoc
+    }
 }
 
 processResources {

@@ -15,18 +15,20 @@ apply plugin: 'base'
 
 // Global Javadoc
 
-apply plugin: 'nebula-aggregate-javadocs'
+if (documentationProfile) {
+    apply plugin: 'nebula-aggregate-javadocs'
 
-gradle.projectsEvaluated {
-    aggregateJavadocs {
-        includes = ['net/nemerosa/**']
-    }
+    gradle.projectsEvaluated {
+        aggregateJavadocs {
+            includes = ['net/nemerosa/**']
+        }
 
-    rootProject.tasks.create('javadocPackage', Zip) {
-        classifier = 'javadoc'
-        archiveName = 'ontrack-javadoc.zip'
-        dependsOn aggregateJavadocs
-        from rootProject.file("$rootProject.buildDir/docs/javadoc")
+        rootProject.tasks.create('javadocPackage', Zip) {
+            classifier = 'javadoc'
+            archiveName = 'ontrack-javadoc.zip'
+            dependsOn aggregateJavadocs
+            from rootProject.file("$rootProject.buildDir/docs/javadoc")
+        }
     }
 }
 
@@ -40,17 +42,21 @@ task publicationPackage(type: Zip) {
             if (tasks.findByName('jar')) {
                 dependsOn assemble
                 from jar
-                if (tasks.findByName('javadocJar')) from javadocJar
-                if (tasks.findByName('sourceJar')) from sourceJar
+                if (documentationProfile) {
+                    if (tasks.findByName('javadocJar')) from javadocJar
+                    if (tasks.findByName('sourceJar')) from sourceJar
+                }
                 if (tasks.findByName('pomFile')) from pomFile.output
             }
         }
     }
 }
 
-gradle.projectsEvaluated {
-    publicationPackage {
-        from javadocPackage
+if (documentationProfile) {
+    gradle.projectsEvaluated {
+        publicationPackage {
+            from javadocPackage
+        }
     }
 }
 
