@@ -104,3 +104,13 @@ creating a local `application.properties` file.
 | Password used to connect to the Postgres database
 
 |===
+
+[[migration-postgres-options]]
+==== Secret files
+
+The `master.key` and
+`net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption` files
+must be copied and put in the <<installation,correct place>>.
+
+TIP: For a development environment, put those files in
+`work/files/security/secrets`, relatively to the workspace root.
