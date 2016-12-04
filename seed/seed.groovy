@@ -375,7 +375,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         shell """\
