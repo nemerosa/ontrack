@@ -9,6 +9,8 @@ include::appendix-certificates.adoc[]
 
 include::appendix-migration-postgres.adoc[]
 
+include::appendix-postgres-production-data.adoc[]
+
 [[dsl-doc]]
 === DSL Reference
 
