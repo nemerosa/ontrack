@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.gradle.DockerStart
 
 task devPostgresql(type: DockerStart) {
     machine = project.properties.devMachine
-    image = 'postgres:9.5.3'
+    image = 'postgres:9.5.5'
     environment = [
             POSTGRES_USER    : 'ontrack',
             POSTGRES_PASSWORD: 'ontrack',

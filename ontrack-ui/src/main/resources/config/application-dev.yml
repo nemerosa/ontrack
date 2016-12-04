@@ -2,3 +2,9 @@
 
 # Static resources
 # See DevSettings
+
+# Spring configuration
+spring:
+  # Default database connection
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/ontrack"

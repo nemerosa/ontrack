@@ -10,6 +10,47 @@ Following tools must be installed before you can start coding with Ontrack:
 * https://www.docker.com/[Docker 1.11] or more recent
 * https://docs.docker.com/compose/[Docker Compose 1.6.2] or more recent
 
+[[development-postgres]]
+===== Postgres set-up
+
+Starting from release 3, Ontrack uses a Postgresql database for its backend.
+
+By default, the application will try to access it at
+`jdbc:postgresql://localhost:5432/ontrack` using `ontrack` / `ontrack` as
+credentials.
+
+You can of course set the database yourself, but the best way is to run the
+following Gradle command:
+
+[source,bash]
+----
+./gradlew devInit
+----
+
+This will use Docker in order to set up a Postgres database container, exposing
+the port `5432` on the host and named `postgresql`.
+
+Following properties are available to personalize this setup:
+
+|===
+| Property | Default | Description
+
+| `devPostgresPort` | `5432` | Port the container must expose on the host
+| `devPostgresName` | `postgresql` | Name of the container to create
+
+|===
+
+For example, to use the `5555` port:
+
+[source,bash]
+----
+./gradlew devInit -PdevPostgresPort=5555
+----
+
+NOTE: This container is used only for your local development, and is not used
+for running the <<testing,integration tests>>, where another container is
+automatically created and destroyed.
+
 [[development-build]]
 ==== Building locally
 
