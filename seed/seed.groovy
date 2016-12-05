@@ -615,9 +615,6 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-
-        // TODO preparePipelineJob delegate, false
-        // TODO connection on the production Docker machine to setup (using the master in the meantime)
         parameters {
             // Link based on full version
             stringParam('VERSION', '', '')
@@ -664,7 +661,7 @@ productionUpgrade
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production acceptance')
-        preparePipelineJob delegate
+        preparePipelineJob delegate, true
         wrappers {
             injectPasswords {
                 injectGlobalPasswords()
