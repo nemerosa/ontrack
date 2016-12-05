@@ -16,23 +16,23 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Enabling the metrics in Graphite.
- * <p>
- * The InfluxdbReporter from net.alchim31 is not compatible with InfluxDB 0.9, the official InfluxDBReporter
- * from DropWizards is not released yet
- * TODO Use DroWizard InfluxDB 4.x as soon as out
+ * Enabling the metrics in InfluxDB.
  */
 @Configuration
-@ConditionalOnProperty(name = InfluxdbMetricsConfigProperties.HOST_PROPERTY, havingValue = "")
+@ConditionalOnProperty(name = InfluxdbMetricsConfigProperties.HOST_PROPERTY)
 public class InfluxdbMetricsConfig {
 
     private final Logger logger = LoggerFactory.getLogger(InfluxdbMetricsConfig.class);
 
-    @Autowired
-    private InfluxdbMetricsConfigProperties config;
+    private final InfluxdbMetricsConfigProperties config;
+
+    private final MetricRegistry registry;
 
     @Autowired
-    private MetricRegistry registry;
+    public InfluxdbMetricsConfig(InfluxdbMetricsConfigProperties config, MetricRegistry registry) {
+        this.config = config;
+        this.registry = registry;
+    }
 
     @Bean
     public InfluxDbSender influxdb() throws Exception {
