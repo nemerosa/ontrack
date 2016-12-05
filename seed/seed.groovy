@@ -588,6 +588,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
 --info
 --profile
 --stacktrace
+--console plain
 -PontrackVersion=\${VERSION}
 -PontrackGitHubUri=${PROJECT_SCM_URL}
 -PontrackGitHubPages=gh-pages
