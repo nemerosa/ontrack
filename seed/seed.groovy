@@ -580,7 +580,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
     deliveryPipelineConfiguration('Release', 'Site')
     preparePipelineJob delegate, false
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
             gradle """\
