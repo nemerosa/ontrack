@@ -1,8 +1,7 @@
-package io.dropwizard.metrics.influxdb;
+package net.nemerosa.ontrack.extension.metrics.influxdb.client;
 
 import com.codahale.metrics.*;
 import com.codahale.metrics.Timer;
-import io.dropwizard.metrics.influxdb.data.InfluxDbPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +165,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -192,7 +191,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -202,7 +201,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -212,7 +211,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -229,7 +228,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 

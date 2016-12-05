@@ -1,4 +1,4 @@
-package io.dropwizard.metrics.influxdb.data;
+package net.nemerosa.ontrack.extension.metrics.influxdb.client;
 
 import java.util.Collections;
 import java.util.Map;
@@ -9,10 +9,10 @@ import java.util.Map;
 public class InfluxDbPoint {
     private String measurement;
     private Map<String, String> tags = Collections.emptyMap();
-    private String timestamp;
+    private long timestamp;
     private Map<String, Object> fields = Collections.emptyMap();
 
-    public InfluxDbPoint(final String measurement, final String timestamp, final Map<String, Object> fields) {
+    public InfluxDbPoint(final String measurement, final long timestamp, final Map<String, Object> fields) {
         this.measurement = measurement;
         this.timestamp = timestamp;
         if (fields != null) {
@@ -21,7 +21,7 @@ public class InfluxDbPoint {
 
     }
 
-    public InfluxDbPoint(String measurement, Map<String, String> tags, String timestamp, Map<String, Object> fields) {
+    public InfluxDbPoint(String measurement, Map<String, String> tags, long timestamp, Map<String, Object> fields) {
         this.measurement = measurement;
         if (tags != null) {
             this.tags = Collections.unmodifiableMap(tags);
@@ -50,11 +50,11 @@ public class InfluxDbPoint {
         }
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

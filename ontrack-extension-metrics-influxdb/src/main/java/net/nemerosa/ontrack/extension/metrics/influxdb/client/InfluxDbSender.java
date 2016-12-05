@@ -1,8 +1,6 @@
-package io.dropwizard.metrics.influxdb;
+package net.nemerosa.ontrack.extension.metrics.influxdb.client;
 
 import java.util.Map;
-
-import io.dropwizard.metrics.influxdb.data.InfluxDbPoint;
 
 public interface InfluxDbSender {
     /**
@@ -25,11 +23,9 @@ public interface InfluxDbSender {
     /**
      * Writes buffer data to InfluxDb.
      *
-     * @return the response code for the request sent to InfluxDb.
-     *
      * @throws Exception exception while writing to InfluxDb api
      */
-    int writeData() throws Exception;
+    void writeData() throws Exception;
 
     /**
      * Set tags applicable for all the points.

@@ -2,9 +2,9 @@ package net.nemerosa.ontrack.extension.metrics.influxdb;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
-import io.dropwizard.metrics.influxdb.InfluxDbHttpSender;
-import io.dropwizard.metrics.influxdb.InfluxDbReporter;
-import io.dropwizard.metrics.influxdb.InfluxDbSender;
+import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbHttpSender;
+import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbReporter;
+import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,9 @@ public class InfluxdbMetricsConfig {
                 config.getPort(),
                 config.getDatabase(),
                 config.getUser(),
-                config.getPassword()
+                config.getPassword(),
+                config.getRetentionPolicy(),
+                TimeUnit.MILLISECONDS
         );
     }
 

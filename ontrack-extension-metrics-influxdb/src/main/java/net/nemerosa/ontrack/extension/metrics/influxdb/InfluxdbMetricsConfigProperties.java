@@ -52,4 +52,9 @@ public class InfluxdbMetricsConfigProperties {
      */
     private int period = 60;
 
+    /**
+     * Retention policy. Use "default" for InfluxDB version < 1.0.0
+     */
+    private String retentionPolicy = "autogen";
+
 }
