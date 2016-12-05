@@ -481,7 +481,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
         credentialsBinding {
             file 'GPG_KEY_FILE', 'GPGKeyRing'
         }
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         // Publication
