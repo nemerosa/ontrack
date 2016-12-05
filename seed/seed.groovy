@@ -628,7 +628,9 @@ if (production) {
         extractDeliveryArtifacts delegate, [] as String[]
 
         wrappers {
-            injectPasswords()
+            injectPasswords {
+                injectGlobalPasswords()
+            }
         }
         steps {
             gradle '''\
@@ -664,7 +666,9 @@ productionUpgrade
         deliveryPipelineConfiguration('Release', 'Production acceptance')
         preparePipelineJob delegate
         wrappers {
-            injectPasswords()
+            injectPasswords {
+                injectGlobalPasswords()
+            }
         }
         steps {
             // Runs the acceptance tests
