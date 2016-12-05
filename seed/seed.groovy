@@ -671,7 +671,7 @@ productionUpgrade
             // Runs the acceptance tests
             withXvfb delegate, """\
 ./gradlew \\
-    --build-file production.gradle
+    --build-file production.gradle \\
     productionTest \\
     -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
