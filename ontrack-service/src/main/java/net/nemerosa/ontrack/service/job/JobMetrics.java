@@ -4,6 +4,8 @@ import lombok.Data;
 import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.job.JobStatus;
 import net.nemerosa.ontrack.model.metrics.OntrackMetrics;
+import net.nemerosa.ontrack.model.metrics.OntrackTaggedMetrics;
+import net.nemerosa.ontrack.model.metrics.TaggedMetric;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class JobMetrics implements OntrackMetrics {
+public class JobMetrics implements OntrackMetrics, OntrackTaggedMetrics {
 
     private final JobScheduler scheduler;
 
@@ -80,6 +82,57 @@ public class JobMetrics implements OntrackMetrics {
         return metrics;
     }
 
+    @Override
+    public Collection<TaggedMetric<?>> getTaggedMetrics() {
+        // Gets the statuses
+        Collection<JobStatus> statuses = scheduler.getJobStatuses();
+
+        // Collects all metrics
+        List<TaggedMetric<?>> metrics = new ArrayList<>();
+
+        // Statuses
+        Map<String, JobMetric> categories = new HashMap<>();
+        for (JobStatus status : statuses) {
+            JobMetric.getCategory(categories, status).count++;
+            if (status.isRunning()) {
+                JobMetric.getCategory(categories, status).running++;
+            }
+            if (status.isDisabled()) {
+                JobMetric.getCategory(categories, status).disabled++;
+            }
+            if (!status.isValid()) {
+                JobMetric.getCategory(categories, status).invalid++;
+            }
+            if (status.isPaused()) {
+                JobMetric.getCategory(categories, status).paused++;
+            }
+            if (status.isError()) {
+                JobMetric.getCategory(categories, status).error++;
+            }
+        }
+
+        // Per categories
+        for (Map.Entry<String, JobMetric> entry : categories.entrySet()) {
+            String category = entry.getKey();
+            JobMetric metric = entry.getValue();
+            metrics.add(categoryMetric("ontrack.job.count", category, metric.count));
+            metrics.add(categoryMetric("ontrack.job.running", category, metric.running));
+            metrics.add(categoryMetric("ontrack.job.disabled", category, metric.disabled));
+            metrics.add(categoryMetric("ontrack.job.error", category, metric.error));
+            metrics.add(categoryMetric("ontrack.job.invalid", category, metric.invalid));
+            metrics.add(categoryMetric("ontrack.job.paused", category, metric.paused));
+        }
+
+        // OK
+        return metrics;
+    }
+
+    private TaggedMetric<?> categoryMetric(String name, String category, int value) {
+        return TaggedMetric.of(name, value)
+                .tag("category", category)
+                .build();
+    }
+
     @Data
     private static class JobMetric {
         int count = 0;
@@ -91,12 +144,7 @@ public class JobMetrics implements OntrackMetrics {
 
         public static JobMetric getCategory(Map<String, JobMetric> categories, JobStatus status) {
             String category = status.getKey().getType().getCategory().getKey();
-            JobMetric metric = categories.get(category);
-            if (metric == null) {
-                metric = new JobMetric();
-                categories.put(category, metric);
-            }
-            return metric;
+            return categories.computeIfAbsent(category, k -> new JobMetric());
         }
     }
 
