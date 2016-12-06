@@ -315,6 +315,28 @@ For example:
 docker run --volume /extension/on/host:/var/ontrack/extensions ...
 ----
 
+You can also create your own image. Create the following `Dockerfile`:
+
+[source]
+.Dockerfile
+----
+# Base Ontrack image
+FROM nemerosa/ontrack:<yourversion>
+# Copies the extensions in the target volume
+COPY extensions/*.jar /var/ontrack/extensions/
+----
+
+We assume here that your extensions are packaged in an `extensions` folder
+at the same level than your `Dockerfile`:
+
+[source]
+----
+/-- Dockerfile
+|-- extensions/
+     |-- extension1.jar
+     |-- extension2.jar
+----
+
 [[extending-deploying-os]]
 ===== Using the CentOS or Debian/Ubuntu package
 
