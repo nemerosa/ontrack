@@ -5,6 +5,7 @@ import com.codahale.metrics.MetricRegistry;
 import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbHttpSender;
 import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbReporter;
 import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbSender;
+import net.nemerosa.ontrack.model.metrics.OntrackTaggedMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -28,10 +30,13 @@ public class InfluxdbMetricsConfig {
 
     private final MetricRegistry registry;
 
+    private final Collection<OntrackTaggedMetrics> taggedMetrics;
+
     @Autowired
-    public InfluxdbMetricsConfig(InfluxdbMetricsConfigProperties config, MetricRegistry registry) {
+    public InfluxdbMetricsConfig(InfluxdbMetricsConfigProperties config, MetricRegistry registry, Collection<OntrackTaggedMetrics> taggedMetrics) {
         this.config = config;
         this.registry = registry;
+        this.taggedMetrics = taggedMetrics;
     }
 
     @Bean
@@ -52,6 +57,7 @@ public class InfluxdbMetricsConfig {
         InfluxDbReporter reporter = InfluxDbReporter
                 .forRegistry(registry)
                 .withTags(Collections.singletonMap("src", "ontrack"))
+                .withTaggedMetrics(taggedMetrics)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)
