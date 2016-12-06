@@ -121,12 +121,18 @@ Tagged job metrics:
 IMPORTANT: Only since Ontrack 2.27 and only in InfluxDB. Those metrics are
 associated with tags.
 
-* `ontrack.job.count` (tag: `category`) - total number of jobs for a given category
-* `ontrack.job.running` (tag: `category`) - number of running jobs for a given category
-* `ontrack.job.disabled` (tag: `category`) - number of disabled jobs for a given category
-* `ontrack.job.error` (tag: `category`) - number of jobs in error for a given category
-* `ontrack.job.invalid` (tag: `category`) - number of invalid jobs for a given category
-* `ontrack.job.paused` (tag: `category`) - number of paused jobs for a given category
+* `ontrack.job.count` - total number of jobs for a given job
+* `ontrack.job.running` - number of running jobs for a given job
+* `ontrack.job.disabled` - number of disabled jobs for a given job
+* `ontrack.job.error` - number of jobs in error for a given job
+* `ontrack.job.invalid` - number of invalid jobs for a given job
+* `ontrack.job.paused` - number of paused jobs for a given job
+
+Following tags are associated with each of those measurements:
+
+* `category` of the job
+* `type` of the job
+* `jobId` of the job
 
 Entity metrics:
 
