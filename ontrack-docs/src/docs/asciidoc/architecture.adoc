@@ -199,6 +199,8 @@ injected `BuildFilterProvider`s to get an actual instance.
 
 include::reference-services.adoc[]
 
+include::architecture-metrics.adoc[]
+
 [[artifacture-technology]]
 ==== Technology
 
