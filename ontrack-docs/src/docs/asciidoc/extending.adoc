@@ -344,6 +344,17 @@ The <<installation-rpm, RPM>> and <<installation-debian, Debian>> packages both
 use the `/usr/lib/ontrack/extensions` directory for the location of the
 extensions JAR files.
 
+You can also create a RPM or Debian package which embeds both Ontrack and your
+extensions.
+
+The means to achieve this depend on your build technology but the idea is the
+same in all cases:
+
+Your package must:
+
+* put the extension JAR files in `/usr/lib/ontrack/extensions`
+* have a dependency on the `ontrack` package
+
 [[extending-deploying-sa]]
 ===== In standalone mode
 
