@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.metrics;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.boot.actuate.metrics.Metric;
 
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@ToString(callSuper = true)
 public final class TaggedMetric<T extends Number> extends Metric<T> {
 
     private final Map<String, String> tags;
