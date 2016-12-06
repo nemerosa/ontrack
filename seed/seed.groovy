@@ -206,7 +206,7 @@ build
     }
     publishers {
         buildDescription '', '${VERSION_DISPLAY}', '', ''
-        archiveJunit("**/build/test-results/*.xml")
+        archiveJunit("**/build/test-results/**/*.xml")
         archiveArtifacts {
             pattern 'build/distributions/ontrack-*-delivery.zip'
             pattern 'build/distributions/ontrack*.deb'
