@@ -11,6 +11,9 @@ import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Component
 public class JobMetrics implements OntrackMetrics, OntrackTaggedMetrics {
@@ -82,55 +85,48 @@ public class JobMetrics implements OntrackMetrics, OntrackTaggedMetrics {
         return metrics;
     }
 
-    @Override
-    public Collection<TaggedMetric<?>> getTaggedMetrics() {
-        // Gets the statuses
-        Collection<JobStatus> statuses = scheduler.getJobStatuses();
-
-        // Collects all metrics
-        List<TaggedMetric<?>> metrics = new ArrayList<>();
-
-        // Statuses
-        Map<String, JobMetric> categories = new HashMap<>();
-        for (JobStatus status : statuses) {
-            JobMetric.getCategory(categories, status).count++;
-            if (status.isRunning()) {
-                JobMetric.getCategory(categories, status).running++;
-            }
-            if (status.isDisabled()) {
-                JobMetric.getCategory(categories, status).disabled++;
-            }
-            if (!status.isValid()) {
-                JobMetric.getCategory(categories, status).invalid++;
-            }
-            if (status.isPaused()) {
-                JobMetric.getCategory(categories, status).paused++;
-            }
-            if (status.isError()) {
-                JobMetric.getCategory(categories, status).error++;
-            }
-        }
-
-        // Per categories
-        for (Map.Entry<String, JobMetric> entry : categories.entrySet()) {
-            String category = entry.getKey();
-            JobMetric metric = entry.getValue();
-            metrics.add(categoryMetric("ontrack.job.count", category, metric.count));
-            metrics.add(categoryMetric("ontrack.job.running", category, metric.running));
-            metrics.add(categoryMetric("ontrack.job.disabled", category, metric.disabled));
-            metrics.add(categoryMetric("ontrack.job.error", category, metric.error));
-            metrics.add(categoryMetric("ontrack.job.invalid", category, metric.invalid));
-            metrics.add(categoryMetric("ontrack.job.paused", category, metric.paused));
-        }
-
-        // OK
-        return metrics;
+    /**
+     * Metrics for ONE job.
+     */
+    protected Stream<TaggedMetric<?>> getJobMetrics(JobStatus job) {
+        return StreamSupport.stream(
+                Arrays.<TaggedMetric<?>>asList(
+                        count(job, "count", 1),
+                        count(job, "running", job.isRunning()),
+                        count(job, "disabled", job.isDisabled()),
+                        count(job, "paused", job.isPaused()),
+                        count(job, "error", job.isError()),
+                        count(job, "invalid", !job.isValid()),
+                        count(job, "runCount", job.getRunCount()),
+                        count(job, "lastRunDurationMs", job.getLastRunDurationMs()),
+                        count(job, "lastErrorCount", job.getLastErrorCount())
+                ).spliterator(),
+                true // Can be processed in parallel
+        );
     }
 
-    private TaggedMetric<?> categoryMetric(String name, String category, int value) {
-        return TaggedMetric.of(name, value)
-                .tag("category", category)
+    protected TaggedMetric<Long> count(JobStatus job, String measure, boolean flag) {
+        return count(job, measure, flag ? 1 : 0);
+    }
+
+    protected TaggedMetric<Long> count(JobStatus job, String measure, long count) {
+        return TaggedMetric.of(name(measure), count)
+                .tag("category", job.getKey().getType().getCategory().getKey())
+                .tag("type", job.getKey().getType().getKey())
+                .tag("jobId", job.getKey().getId())
                 .build();
+    }
+
+    private String name(String measure) {
+        return String.format("ontrack.job.%s", measure);
+    }
+
+    @Override
+    public Collection<TaggedMetric<?>> getTaggedMetrics() {
+        return scheduler.getJobStatuses()
+                .stream()
+                .flatMap(this::getJobMetrics)
+                .collect(Collectors.toList());
     }
 
     @Data
