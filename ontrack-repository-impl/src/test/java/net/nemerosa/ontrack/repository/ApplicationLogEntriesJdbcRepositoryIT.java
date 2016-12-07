@@ -19,7 +19,6 @@ public class ApplicationLogEntriesJdbcRepositoryIT extends AbstractRepositoryTes
                         "Some information"
                 )
         );
-        // TODO Reads the record
     }
 
     @Test
@@ -33,7 +32,6 @@ public class ApplicationLogEntriesJdbcRepositoryIT extends AbstractRepositoryTes
                         .withDetail("detail1", "value1")
                         .withDetail("detail2", "value2")
         );
-        // TODO Reads the record
     }
 
     @Test
@@ -46,7 +44,6 @@ public class ApplicationLogEntriesJdbcRepositoryIT extends AbstractRepositoryTes
                 )
                         .withAuthentication("user")
         );
-        // TODO Reads the record
     }
 
 }

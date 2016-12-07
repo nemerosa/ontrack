@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntryLevel;
 import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -75,10 +76,26 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
                 query.append(" AND LEVEL = :level");
                 params = params.addValue("level", filter.getLevel().name());
             }
-            // TODO Criteria: LocalDateTime before;
-            // TODO Criteria: LocalDateTime after;
-            // TODO Criteria: String authentication;
-            // TODO Criteria: NameDescription text;
+            // Criteria: before
+            if (filter.getBefore() != null) {
+                query.append(" AND TIMESTAMP <= :before");
+                params = params.addValue("before", dateTimeForDB(filter.getBefore()));
+            }
+            // Criteria: after
+            if (filter.getAfter() != null) {
+                query.append(" AND TIMESTAMP >= :after");
+                params = params.addValue("after", dateTimeForDB(filter.getAfter()));
+            }
+            // Criteria: authentication
+            if (filter.getAuthentication() != null) {
+                query.append(" AND AUTHENTICATION = :authentication");
+                params = params.addValue("authentication", filter.getAuthentication());
+            }
+            // Criteria: text
+            if (StringUtils.isNotBlank(filter.getText())) {
+                query.append(" AND (NAME LIKE :text OR DESCRIPTION LIKE :text OR INFORMATION LIKE :text OR DETAILS LIKE :text)");
+                params = params.addValue("text", "%" + filter.getText() + "%");
+            }
             // Ordering
             query.append(" ORDER BY ID DESC");
             // Performing the query

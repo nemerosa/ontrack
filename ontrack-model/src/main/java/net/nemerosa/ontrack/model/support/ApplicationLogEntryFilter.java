@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.support;
 
 import lombok.Builder;
 import lombok.Data;
-import net.nemerosa.ontrack.model.structure.NameDescription;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +16,7 @@ public class ApplicationLogEntryFilter {
     private final LocalDateTime before;
     private final LocalDateTime after;
     private final String authentication;
-    private final NameDescription text;
+    private final String text;
 
     public static ApplicationLogEntryFilter none() {
         return ApplicationLogEntryFilter.builder().build();
