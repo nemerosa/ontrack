@@ -55,16 +55,16 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
         // Logging
         logger.error(
                 String.format(
-                        "[%s] name=%s,authentication=%s,timestamp=%s,%s",
+                        "[%s] name=%s,authentication=%s,timestamp=%s,%s%nStacktrace: %s",
                         entry.getLevel(),
                         entry.getType().getName(),
                         entry.getAuthentication(),
                         Time.forStorage(entry.getTimestamp()),
                         entry.getDetailList().stream()
                                 .map(nd -> String.format("%s=%s", nd.getName(), nd.getDescription()))
-                                .collect(Collectors.joining(","))
-                ),
-                entry.getException()
+                                .collect(Collectors.joining(",")),
+                        entry.getStacktrace()
+                )
         );
         // Storage
         entries.addFirst(entry);

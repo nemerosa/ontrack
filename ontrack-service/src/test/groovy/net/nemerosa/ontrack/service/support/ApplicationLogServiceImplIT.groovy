@@ -7,8 +7,7 @@ import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.Page
 import net.nemerosa.ontrack.test.TestUtils
-import org.apache.commons.lang.exception.ExceptionUtils
-import org.junit.Ignore
+import org.apache.commons.lang3.exception.ExceptionUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -68,13 +67,12 @@ class ApplicationLogServiceImplIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    @Ignore
     void 'Retrieving log entry with stack trace'() {
         // UUID
         String e = TestUtils.uid("T")
         // Exception
         def exception = new RuntimeException("Test 1")
-        def stack = ExceptionUtils.getFullStackTrace(exception)
+        def stack = ExceptionUtils.getStackTrace(exception)
         // Creates one entry
         logService.log(ApplicationLogEntry.error(
                 exception,
@@ -87,7 +85,7 @@ class ApplicationLogServiceImplIT extends AbstractServiceTestSupport {
         def filteredEntries = entries.findAll { it.information == e }
         // Gets the details back
         assert filteredEntries.size() == 1
-        assert filteredEntries[0].exception == stack
+        assert filteredEntries[0].stacktrace == stack
     }
 
 }

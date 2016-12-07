@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -32,7 +31,7 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
                         .addValue("name", entry.getType().getName())
                         .addValue("description", entry.getType().getDescription())
                         .addValue("information", entry.getInformation())
-                        .addValue("exception", getStacktraceAsString(entry.getException()))
+                        .addValue("exception", entry.getStacktrace())
                         .addValue("details", getDetailsAsJson(entry.getDetails()))
         );
     }
@@ -41,7 +40,4 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
         return details != null ? writeJson(details) : "{}";
     }
 
-    private String getStacktraceAsString(Throwable exception) {
-        return exception != null ? ExceptionUtils.getStackTrace(exception) : null;
-    }
 }
