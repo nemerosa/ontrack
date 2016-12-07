@@ -62,7 +62,6 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
     public List<ApplicationLogEntry> getLogEntries(ApplicationLogEntryFilter filter, Page page) {
         int total = getTotalCount();
         int offset = page.getOffset();
-        int count = page.getCount();
         if (offset >= total) {
             return Collections.emptyList();
         } else {
@@ -99,8 +98,7 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
             // Ordering
             query.append(" ORDER BY ID DESC");
             // Performing the query
-            // FIXME Pagination
-            return getNamedParameterJdbcTemplate().query(
+            List<ApplicationLogEntry> entries = getNamedParameterJdbcTemplate().query(
                     query.toString(),
                     params,
                     (rs, rowNum) -> new ApplicationLogEntry(
@@ -113,17 +111,19 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
                             ),
                             rs.getString("INFORMATION"),
                             rs.getString("EXCEPTION"),
-                            getDetailsFromJson(rs, "DETAILS")
+                            getDetailsFromJson(rs)
                     )
             );
+            // Pagination
+            return page.extract(entries);
         }
     }
 
-    private Map<String, String> getDetailsFromJson(ResultSet rs, String column) throws SQLException {
+    private Map<String, String> getDetailsFromJson(ResultSet rs) throws SQLException {
         try {
             //noinspection unchecked
             return (Map<String, String>) JsonUtils.toMap(
-                    readJson(rs, column)
+                    readJson(rs, "DETAILS")
             );
         } catch (IOException e) {
             throw new JsonParsingException(e);

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -58,7 +59,11 @@ public class AdminController extends AbstractResourceController {
     @RequestMapping(value = "logs", method = RequestMethod.GET)
     public Resources<ApplicationLogEntry> getLogEntries(Page page) {
         // Gets the entries
-        List<ApplicationLogEntry> entries = applicationLogService.getLogEntries(page);
+        List<ApplicationLogEntry> entries = applicationLogService.getLogEntries(
+                // FIXME #467 Filter
+                ApplicationLogEntryFilter.none(),
+                page
+        );
         // Builds the resources
         Resources<ApplicationLogEntry> resources = Resources.of(
                 entries,
