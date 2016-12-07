@@ -35,7 +35,6 @@ public class ApplicationLogEntry {
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @JsonIgnore
     @Wither(AccessLevel.PRIVATE)
-    @Getter(AccessLevel.PRIVATE)
     private final Map<String, String> details;
 
     public static ApplicationLogEntry error(Throwable exception, NameDescription type, String information) {
