@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Application log entry.
  */
 @Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class ApplicationLogEntry {
 
     private final ApplicationLogEntryLevel level;

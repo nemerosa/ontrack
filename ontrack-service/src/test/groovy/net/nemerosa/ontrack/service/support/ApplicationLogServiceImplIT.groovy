@@ -11,6 +11,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
+import static net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter.none
+
 class ApplicationLogServiceImplIT extends AbstractServiceTestSupport {
 
     @Autowired
@@ -33,7 +35,7 @@ class ApplicationLogServiceImplIT extends AbstractServiceTestSupport {
                 e2
         ))
         // Gets the entries
-        def entries = asUser().with(ApplicationManagement).call { logService.getLogEntries(new Page()) }
+        def entries = asUser().with(ApplicationManagement).call { logService.getLogEntries(none(), new Page()) }
         // Filter the entries
         def filteredEntries = entries.findAll { it.information == e1 || it.information == e2 }
         // Checks the order
@@ -55,7 +57,7 @@ class ApplicationLogServiceImplIT extends AbstractServiceTestSupport {
                 e
         ).withDetail("detail1", "value1").withDetail("detail2", "value2"))
         // Gets the entries
-        def entries = asUser().with(ApplicationManagement).call { logService.getLogEntries(new Page()) }
+        def entries = asUser().with(ApplicationManagement).call { logService.getLogEntries(none(), new Page()) }
         // Filter the entries
         def filteredEntries = entries.findAll { it.information == e }
         // Gets the details back
@@ -80,7 +82,7 @@ class ApplicationLogServiceImplIT extends AbstractServiceTestSupport {
                 e
         ))
         // Gets the entries
-        def entries = asUser().with(ApplicationManagement).call { logService.getLogEntries(new Page()) }
+        def entries = asUser().with(ApplicationManagement).call { logService.getLogEntries(none(), new Page()) }
         // Filter the entries
         def filteredEntries = entries.findAll { it.information == e }
         // Gets the details back

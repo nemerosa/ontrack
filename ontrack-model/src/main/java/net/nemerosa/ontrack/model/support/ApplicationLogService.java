@@ -11,16 +11,24 @@ public interface ApplicationLogService {
 
     /**
      * Total list of messages
+     *
+     * @return Count of entries
      */
     int getLogEntriesTotal();
 
     /**
      * List of messages
+     *
+     * @param filter Filter to use
+     * @param page   Pagination instructions
+     * @return List of entries for the filter and the page
      */
-    List<ApplicationLogEntry> getLogEntries(Page page);
+    List<ApplicationLogEntry> getLogEntries(ApplicationLogEntryFilter filter, Page page);
 
     /**
      * Logs an entry
+     *
+     * @param entry Entry to log
      */
     void log(ApplicationLogEntry entry);
 }
