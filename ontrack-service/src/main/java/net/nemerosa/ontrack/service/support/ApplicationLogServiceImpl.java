@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import net.nemerosa.ontrack.model.support.Page;
+import net.nemerosa.ontrack.repository.ApplicationLogEntriesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,17 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     private final Logger logger = LoggerFactory.getLogger(ApplicationLogService.class);
 
     private final SecurityService securityService;
+    @Deprecated
     private final int maxEntries;
+    @Deprecated
     private final LinkedList<ApplicationLogEntry> entries;
+    private final ApplicationLogEntriesRepository entriesRepository;
     private final CounterService counterService;
 
     @Autowired
-    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties, SecurityService securityService, CounterService counterService) {
+    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties, SecurityService securityService, ApplicationLogEntriesRepository entriesRepository, CounterService counterService) {
         this.securityService = securityService;
+        this.entriesRepository = entriesRepository;
         this.counterService = counterService;
         this.maxEntries = ontrackConfigProperties.getApplicationLogMaxEntries();
         this.entries = new LinkedList<>();
@@ -67,6 +72,8 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
         while (entries.size() > maxEntries) {
             entries.removeLast();
         }
+        // Storing in database
+        entriesRepository.log(entry);
         // Metrics
         counterService.increment("error");
         counterService.increment(String.format("error.%s", entry.getType().getName()));

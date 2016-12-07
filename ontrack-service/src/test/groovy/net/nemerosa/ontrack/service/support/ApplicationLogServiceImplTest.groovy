@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.Page
+import net.nemerosa.ontrack.repository.ApplicationLogEntriesRepository
 import org.junit.Test
 import org.springframework.boot.actuate.metrics.CounterService
 
@@ -21,10 +22,13 @@ class ApplicationLogServiceImplTest {
         SecurityService securityService = mock(SecurityService)
         when(securityService.getAccount()).thenReturn(Optional.empty())
 
+        ApplicationLogEntriesRepository entriesRepository = mock(ApplicationLogEntriesRepository)
+
         CounterService counterService = mock(CounterService)
         ApplicationLogServiceImpl service = new ApplicationLogServiceImpl(
                 ontrackConfigProperties,
                 securityService,
+                entriesRepository,
                 counterService
         )
         // Creates two entries
