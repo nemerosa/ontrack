@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ApplicationLogServiceImpl implements ApplicationLogService {
 
     private final Logger logger = LoggerFactory.getLogger(ApplicationLogService.class);
@@ -81,7 +83,7 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
 
     @Override
     public synchronized int getLogEntriesTotal() {
-        return entries.size();
+        return entriesRepository.getTotalCount();
     }
 
     @Override

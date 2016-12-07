@@ -36,6 +36,15 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
         );
     }
 
+    @Override
+    public int getTotalCount() {
+        return getFirstItem(
+                "SELECT COUNT(*) FROM APPLICATION_LOG_ENTRIES",
+                noParams(),
+                Integer.class
+        );
+    }
+
     private String getDetailsAsJson(Map<String, String> details) {
         return details != null ? writeJson(details) : "{}";
     }
