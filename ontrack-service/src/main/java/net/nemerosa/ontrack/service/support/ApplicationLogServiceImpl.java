@@ -4,7 +4,10 @@ import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.support.*;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter;
+import net.nemerosa.ontrack.model.support.ApplicationLogService;
+import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.repository.ApplicationLogEntriesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +16,6 @@ import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,20 +26,14 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     private final Logger logger = LoggerFactory.getLogger(ApplicationLogService.class);
 
     private final SecurityService securityService;
-    @Deprecated
-    private final int maxEntries;
-    @Deprecated
-    private final LinkedList<ApplicationLogEntry> entries;
     private final ApplicationLogEntriesRepository entriesRepository;
     private final CounterService counterService;
 
     @Autowired
-    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties, SecurityService securityService, ApplicationLogEntriesRepository entriesRepository, CounterService counterService) {
+    public ApplicationLogServiceImpl(SecurityService securityService, ApplicationLogEntriesRepository entriesRepository, CounterService counterService) {
         this.securityService = securityService;
         this.entriesRepository = entriesRepository;
         this.counterService = counterService;
-        this.maxEntries = ontrackConfigProperties.getApplicationLogMaxEntries();
-        this.entries = new LinkedList<>();
     }
 
     @Override
@@ -65,12 +59,6 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
                         entry.getStacktrace()
                 )
         );
-        // Storage
-        entries.addFirst(entry);
-        // Pruning
-        while (entries.size() > maxEntries) {
-            entries.removeLast();
-        }
         // Storing in database
         entriesRepository.log(entry);
         // Metrics
