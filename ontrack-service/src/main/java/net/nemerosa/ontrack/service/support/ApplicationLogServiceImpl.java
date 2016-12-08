@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     }
 
     @Override
-    // FIXME #467 @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.NESTED)
     public void log(ApplicationLogEntry entry) {
         ApplicationLogEntry signedEntry = entry.withAuthentication(
                 securityService.getAccount().map(Account::getName).orElse("anonymous")
