@@ -12,20 +12,14 @@
                 <div class="well">
                     <div class="row">
                         <div class="col-md-12">
-                            Total:
-                            <b>{{logs.pagination.total}}</b>
-                            &nbsp;
-                            <span ng-click="toggleFilter()" class="ot-action"><i class="fa fa-filter"></i>&nbsp;Filter</span>
-                            &nbsp;
-                            <span ng-click="previousPage()" class="ot-action" ng-show="logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</span>
-                            <span class="text-muted" ng-hide="logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</span>
-                            <span ng-click="nextPage()" class="ot-action" ng-show="logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</span>
-                            <span class="text-muted" ng-hide="logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form ng-show="logFilterEnabled" class="form-inline">
+                            <form class="form-inline">
+                                <!-- Navigation -->
+                                <div class="form-group">
+                                    <button ng-click="previousPage()" class="btn btn-default" ng-disabled="!logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</button>
+                                </div>
+                                <div class="form-group">
+                                    <button ng-click="nextPage()" class="btn btn-default" ng-disabled="!logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</button>
+                                </div>
                                 <!-- TODO Before -->
                                 <!-- TODO After -->
                                 <!-- Authentication -->

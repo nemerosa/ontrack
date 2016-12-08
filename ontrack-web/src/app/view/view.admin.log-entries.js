@@ -19,7 +19,6 @@ angular.module('ot.view.admin.log-entries', [
         ];
 
         // Filtering
-        $scope.logFilterEnabled = false;
         $scope.defaultLogFilter = {
             text: ""
         };
@@ -51,15 +50,6 @@ angular.module('ot.view.admin.log-entries', [
                 data: log,
                 template: 'app/dialog/dialog.applicationLogEntry.tpl.html'
             });
-        };
-
-        // Toggling filtering
-        $scope.toggleFilter = function () {
-            $scope.logFilterEnabled = !$scope.logFilterEnabled;
-            if (!$scope.logFilterEnabled) {
-                $scope.logFilter = $scope.defaultLogFilter;
-                loadLogs();
-            }
         };
 
         // Previous page
