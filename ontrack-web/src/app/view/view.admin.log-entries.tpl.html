@@ -1,0 +1,48 @@
+<ot-view>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <br/>
+
+            <p ng-if="logs.resources.length == 0" class="ot-admin-console-log-ok">
+                No log entry - everything is OK!
+            </p>
+            <table class="ot-admin-console-log" ng-if="logs.resources">
+                <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Timestamp</th>
+                    <th>Type</th>
+                    <th>Information</th>
+                    <th>Details</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="log in logs.resources" class="ot-application-log-{{log.level | lowercase}}">
+                    <td>
+                        {{log.level}}
+                    </td>
+                    <td>
+                        {{log.timestamp | date:'fullDate'}}
+                        {{log.timestamp | date:'mediumTime'}}
+                    </td>
+                    <td>
+                        <code>{{log.type.name}}</code>
+                        {{log.type.description}}
+                    </td>
+                    <td>
+                        {{log.information}}
+                    </td>
+                    <td>
+                        <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
+                            Details...
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</ot-view>

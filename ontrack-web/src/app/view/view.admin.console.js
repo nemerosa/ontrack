@@ -79,35 +79,13 @@ angular.module('ot.view.admin.console', [
             });
         }
 
-        // Loads the logs
-        function loadLogs() {
-            ot.call($http.get('admin/logs', {
-                params: {
-                    offset: 0,
-                    count: 20
-                }
-            })).then(function (logs) {
-                $scope.logs = logs;
-            });
-        }
-
         // Initialisation
         loadJobs();
-        loadLogs();
         loadHealth();
         loadExtensions();
 
         var interval = 10 * 1000; // 10 seconds
         otTaskService.register('Admin Console Load Jobs', loadJobs, interval);
-        otTaskService.register('Admin Console Load Logs', loadLogs, interval);
-
-        // Showing the details of a log entry
-        $scope.showLogDetails = function (log) {
-            otAlertService.popup({
-                data: log,
-                template: 'app/dialog/dialog.applicationLogEntry.tpl.html'
-            });
-        };
 
         // Duration formatting
         $scope.jobDuration = function (ms) {
