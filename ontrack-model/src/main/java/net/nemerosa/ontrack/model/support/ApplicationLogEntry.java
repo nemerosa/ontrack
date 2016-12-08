@@ -32,7 +32,6 @@ public class ApplicationLogEntry {
     @Wither(AccessLevel.PRIVATE)
     private final String stacktrace;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    @JsonIgnore
     @Wither(AccessLevel.PRIVATE)
     private final Map<String, String> details;
 
@@ -52,6 +51,11 @@ public class ApplicationLogEntry {
         Map<String, String> map = new HashMap<>(details);
         map.put(name, value);
         return withDetails(map);
+    }
+
+    @JsonIgnore
+    public Map<String, String> getDetails() {
+        return details;
     }
 
     public List<NameDescription> getDetailList() {
