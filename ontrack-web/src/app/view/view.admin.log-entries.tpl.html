@@ -2,13 +2,7 @@
 
     <div class="row">
         <div class="col-md-12">
-
-            <br/>
-
-            <p ng-if="logs.resources.length == 0" class="ot-admin-console-log-ok">
-                No log entry - everything is OK!
-            </p>
-            <div ng-if="logs.resources">
+            <div>
                 <div class="well">
                     <div class="row">
                         <div class="col-md-12">
@@ -44,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <table class="ot-admin-console-log" ng-if="logs.resources">
+                <table class="table table-condensed table-hover">
                     <thead>
                     <tr>
                         <th>Level</th>
@@ -55,6 +49,11 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <tr ng-show="logs.resources.length == 0">
+                        <td class="success" colspan="5">
+                            No log entry - everything is OK!
+                        </td>
+                    </tr>
                     <tr ng-repeat="log in logs.resources" class="ot-application-log-{{log.level | lowercase}}">
                         <td>
                             {{log.level}}
