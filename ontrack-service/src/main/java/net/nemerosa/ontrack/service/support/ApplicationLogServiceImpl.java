@@ -50,6 +50,11 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
         entriesRepository.cleanup(retentionDays);
     }
 
+    @Override
+    public void deleteLogEntries() {
+        entriesRepository.deleteLogEntries();
+    }
+
     private synchronized void doLog(ApplicationLogEntry entry) {
         // Logging
         logger.error(

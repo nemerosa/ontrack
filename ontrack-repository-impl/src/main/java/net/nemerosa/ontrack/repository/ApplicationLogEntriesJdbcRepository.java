@@ -131,6 +131,12 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
         );
     }
 
+    @Override
+    public void deleteLogEntries() {
+        getJdbcTemplate().update("DELETE FROM APPLICATION_LOG_ENTRIES");
+
+    }
+
     private Map<String, String> getDetailsFromJson(ResultSet rs) throws SQLException {
         try {
             //noinspection unchecked

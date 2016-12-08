@@ -38,4 +38,9 @@ public interface ApplicationLogService {
      * @param retentionDays Number of days to retain log entries
      */
     void cleanup(int retentionDays);
+
+    /**
+     * Deletes all log entries
+     */
+    void deleteLogEntries();
 }
