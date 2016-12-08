@@ -28,7 +28,10 @@
                             <form ng-show="logFilterEnabled" class="form-inline">
                                 <!-- TODO Before -->
                                 <!-- TODO After -->
-                                <!-- TODO Authentication -->
+                                <!-- Authentication -->
+                                <div class="form-group">
+                                    <input type="text" class="form-control" ng-model="logFilter.authentication" placeholder="Authentication" />
+                                </div>
                                 <!-- Text -->
                                 <div class="form-group">
                                     <input type="text" class="form-control" ng-model="logFilter.text" placeholder="Looking for any text" />
