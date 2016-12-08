@@ -19,11 +19,19 @@ angular.module('ot.view.admin.log-entries', [
         ];
 
         // Filtering
-        $scope.defaultLogFilter = {
-            text: ""
-        };
-        $scope.logFilter = $scope.defaultLogFilter;
+        $scope.logFilter = {};
+
         $scope.filterLogs = function () {
+            $scope.offset = 0;
+            $scope.pageSize = 20;
+            loadLogs();
+        };
+
+        $scope.resetFilter = function () {
+            $scope.offset = 0;
+            $scope.pageSize = 20;
+            delete $scope.logFilter.text;
+            delete $scope.logFilter.authentication;
             loadLogs();
         };
 
