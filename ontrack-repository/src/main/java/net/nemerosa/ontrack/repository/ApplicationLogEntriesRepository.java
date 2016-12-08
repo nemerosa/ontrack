@@ -30,4 +30,11 @@ public interface ApplicationLogEntriesRepository {
      * @return List of entries for the filter and the page
      */
     List<ApplicationLogEntry> getLogEntries(ApplicationLogEntryFilter filter, Page page);
+
+    /**
+     * Removes all entries which are older than x days
+     *
+     * @param retentionDays Number of days to retain log entries
+     */
+    void cleanup(int retentionDays);
 }

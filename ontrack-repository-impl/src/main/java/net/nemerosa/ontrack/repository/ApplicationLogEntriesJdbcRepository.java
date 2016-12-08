@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.structure.NameDescription;
@@ -17,6 +18,8 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +120,15 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
             // Pagination
             return page.extract(entries);
         }
+    }
+
+    @Override
+    public void cleanup(int retentionDays) {
+        LocalDateTime pivotDate = Time.now().minus(retentionDays, ChronoUnit.DAYS);
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM APPLICATION_LOG_ENTRIES WHERE TIMESTAMP < :date",
+                params("date", dateTimeForDB(pivotDate))
+        );
     }
 
     private Map<String, String> getDetailsFromJson(ResultSet rs) throws SQLException {

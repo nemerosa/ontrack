@@ -31,4 +31,11 @@ public interface ApplicationLogService {
      * @param entry Entry to log
      */
     void log(ApplicationLogEntry entry);
+
+    /**
+     * Removes all entries which are older than x days
+     *
+     * @param retentionDays Number of days to retain log entries
+     */
+    void cleanup(int retentionDays);
 }

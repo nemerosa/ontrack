@@ -37,11 +37,17 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     }
 
     @Override
+    // FIXME #467 @Transactional(propagation = Propagation.NESTED)
     public void log(ApplicationLogEntry entry) {
         ApplicationLogEntry signedEntry = entry.withAuthentication(
                 securityService.getAccount().map(Account::getName).orElse("anonymous")
         );
         doLog(signedEntry);
+    }
+
+    @Override
+    public void cleanup(int retentionDays) {
+        entriesRepository.cleanup(retentionDays);
     }
 
     private synchronized void doLog(ApplicationLogEntry entry) {
