@@ -20,11 +20,12 @@ angular.module('ot.view.admin.log-entries', [
 
         // Loads the logs
         $scope.offset = 0;
+        $scope.pageSize = 20;
         function loadLogs() {
             ot.call($http.get('admin/logs', {
                 params: {
                     offset: $scope.offset,
-                    count: 10
+                    count: $scope.pageSize
                 }
             })).then(function (logs) {
                 $scope.logs = logs;
@@ -48,7 +49,7 @@ angular.module('ot.view.admin.log-entries', [
         // Previous page
         $scope.previousPage = function () {
             if ($scope.logs.pagination.prev) {
-                $scope.offset -= 10;
+                $scope.offset -= $scope.pageSize;
                 loadLogs();
             }
         };
@@ -56,7 +57,7 @@ angular.module('ot.view.admin.log-entries', [
         // Next page
         $scope.nextPage = function () {
             if ($scope.logs.pagination.next) {
-                $scope.offset += 10;
+                $scope.offset += $scope.pageSize;
                 loadLogs();
             }
         };
