@@ -142,6 +142,7 @@ public class UserController extends AbstractResourceController {
         // Admin tools
         if (securityService.isGlobalFunctionGranted(ApplicationManagement.class)) {
             user.add(Action.of("admin-console", "Admin console", "admin-console"));
+            user.add(Action.of("admin-log-entries", "Log entries", "admin-log-entries"));
         }
         // OK
         return user;
