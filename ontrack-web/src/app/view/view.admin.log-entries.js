@@ -19,11 +19,12 @@ angular.module('ot.view.admin.log-entries', [
         ];
 
         // Loads the logs
+        $scope.offset = 0;
         function loadLogs() {
             ot.call($http.get('admin/logs', {
                 params: {
-                    offset: 0,
-                    count: 20
+                    offset: $scope.offset,
+                    count: 10
                 }
             })).then(function (logs) {
                 $scope.logs = logs;
@@ -42,6 +43,22 @@ angular.module('ot.view.admin.log-entries', [
                 data: log,
                 template: 'app/dialog/dialog.applicationLogEntry.tpl.html'
             });
+        };
+
+        // Previous page
+        $scope.previousPage = function () {
+            if ($scope.logs.pagination.prev) {
+                $scope.offset -= 10;
+                loadLogs();
+            }
+        };
+
+        // Next page
+        $scope.nextPage = function () {
+            if ($scope.logs.pagination.next) {
+                $scope.offset += 10;
+                loadLogs();
+            }
         };
 
     })

@@ -8,40 +8,52 @@
             <p ng-if="logs.resources.length == 0" class="ot-admin-console-log-ok">
                 No log entry - everything is OK!
             </p>
-            <table class="ot-admin-console-log" ng-if="logs.resources">
-                <thead>
-                <tr>
-                    <th>Level</th>
-                    <th>Timestamp</th>
-                    <th>Type</th>
-                    <th>Information</th>
-                    <th>Details</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="log in logs.resources" class="ot-application-log-{{log.level | lowercase}}">
-                    <td>
-                        {{log.level}}
-                    </td>
-                    <td>
-                        {{log.timestamp | date:'fullDate'}}
-                        {{log.timestamp | date:'mediumTime'}}
-                    </td>
-                    <td>
-                        <code>{{log.type.name}}</code>
-                        {{log.type.description}}
-                    </td>
-                    <td>
-                        {{log.information}}
-                    </td>
-                    <td>
-                        <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
-                            Details...
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <div ng-if="logs.resources">
+                <table class="ot-admin-console-log" ng-if="logs.resources">
+                    <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Timestamp</th>
+                        <th>Type</th>
+                        <th>Information</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            Total:
+                            <b>{{logs.pagination.total}}</b>
+                        </td>
+                        <td colspan="4">
+                            <span ng-click="previousPage()" class="ot-action" ng-show="logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</span>
+                            <span ng-click="nextPage()" class="ot-action" ng-show="logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</span>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="log in logs.resources" class="ot-application-log-{{log.level | lowercase}}">
+                        <td>
+                            {{log.level}}
+                        </td>
+                        <td>
+                            {{log.timestamp | date:'fullDate'}}
+                            {{log.timestamp | date:'mediumTime'}}
+                        </td>
+                        <td>
+                            <code>{{log.type.name}}</code>
+                            {{log.type.description}}
+                        </td>
+                        <td>
+                            {{log.information}}
+                        </td>
+                        <td>
+                            <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
+                                Details...
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
