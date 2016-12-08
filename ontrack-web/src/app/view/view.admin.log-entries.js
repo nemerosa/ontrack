@@ -18,15 +18,25 @@ angular.module('ot.view.admin.log-entries', [
             ot.viewCloseCommand('/home')
         ];
 
+        // Filtering
+        $scope.logFilterEnabled = false;
+        $scope.defaultLogFilter = {
+            text: ""
+        };
+        $scope.logFilter = $scope.defaultLogFilter;
+        $scope.filterLogs = function () {
+            loadLogs();
+        };
+
         // Loads the logs
         $scope.offset = 0;
         $scope.pageSize = 20;
         function loadLogs() {
+            var params = angular.copy($scope.logFilter);
+            params.offset = $scope.offset;
+            params.count = $scope.pageSize;
             ot.call($http.get('admin/logs', {
-                params: {
-                    offset: $scope.offset,
-                    count: $scope.pageSize
-                }
+                params: params
             })).then(function (logs) {
                 $scope.logs = logs;
             });
@@ -35,15 +45,20 @@ angular.module('ot.view.admin.log-entries', [
         // Initialisation
         loadLogs();
 
-        var interval = 10 * 1000; // 10 seconds
-        otTaskService.register('Admin Console Load Logs', loadLogs, interval);
-
         // Showing the details of a log entry
         $scope.showLogDetails = function (log) {
             otAlertService.popup({
                 data: log,
                 template: 'app/dialog/dialog.applicationLogEntry.tpl.html'
             });
+        };
+
+        // Toggling filtering
+        $scope.toggleFilter = function () {
+            $scope.logFilterEnabled = !$scope.logFilterEnabled;
+            if (!$scope.logFilterEnabled) {
+                $scope.logFilter = $scope.defaultLogFilter;
+            }
         };
 
         // Previous page
