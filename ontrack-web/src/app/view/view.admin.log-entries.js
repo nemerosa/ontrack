@@ -1,7 +1,6 @@
 angular.module('ot.view.admin.log-entries', [
     'ui.router',
-    'ot.service.core',
-    'ot.service.task'
+    'ot.service.core'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-log-entries', {
@@ -10,7 +9,7 @@ angular.module('ot.view.admin.log-entries', [
             controller: 'AdminLogEntriesCtrl'
         });
     })
-    .controller('AdminLogEntriesCtrl', function ($scope, $http, ot, otAlertService, otTaskService) {
+    .controller('AdminLogEntriesCtrl', function ($scope, $http, ot, otAlertService) {
         var view = ot.view();
         view.title = "Log entries";
         view.description = "List of application log messages.";
@@ -74,6 +73,16 @@ angular.module('ot.view.admin.log-entries', [
                 $scope.offset += $scope.pageSize;
                 loadLogs();
             }
+        };
+
+        // Deletes all log entries
+        $scope.deleteAll = function () {
+            otAlertService.confirm({
+                title: "Delete log entries",
+                message: "Do you really want to delete all log entries?"
+            }).then(function () {
+                ot.pageCall($http.delete('admin/logs')).then(loadLogs);
+            });
         };
 
     })
