@@ -85,5 +85,8 @@ angular.module('ot.view.admin.log-entries', [
             });
         };
 
+        // Reloads the log
+        $scope.refreshList = loadLogs;
+
     })
 ;
