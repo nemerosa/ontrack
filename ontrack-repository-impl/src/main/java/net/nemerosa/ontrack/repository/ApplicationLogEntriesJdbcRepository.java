@@ -89,7 +89,7 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
                 params = params.addValue("after", dateTimeForDB(filter.getAfter()));
             }
             // Criteria: authentication
-            if (filter.getAuthentication() != null) {
+            if (StringUtils.isNotBlank(filter.getAuthentication())) {
                 query.append(" AND AUTHENTICATION = :authentication");
                 params = params.addValue("authentication", filter.getAuthentication());
             }
