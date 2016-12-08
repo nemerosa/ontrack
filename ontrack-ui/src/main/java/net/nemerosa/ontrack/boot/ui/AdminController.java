@@ -57,17 +57,16 @@ public class AdminController extends AbstractResourceController {
      * Gets the list of application log entries
      */
     @RequestMapping(value = "logs", method = RequestMethod.GET)
-    public Resources<ApplicationLogEntry> getLogEntries(Page page) {
+    public Resources<ApplicationLogEntry> getLogEntries(ApplicationLogEntryFilter filter, Page page) {
         // Gets the entries
         List<ApplicationLogEntry> entries = applicationLogService.getLogEntries(
-                // FIXME #467 Filter
-                ApplicationLogEntryFilter.none(),
+                filter,
                 page
         );
         // Builds the resources
         Resources<ApplicationLogEntry> resources = Resources.of(
                 entries,
-                uri(on(getClass()).getLogEntries(page))
+                uri(on(getClass()).getLogEntries(filter, page))
         );
         // Pagination information
         int offset = page.getOffset();
@@ -79,6 +78,7 @@ public class AdminController extends AbstractResourceController {
         if (offset > 0) {
             pagination = pagination.withPrev(
                     uri(on(AdminController.class).getLogEntries(
+                            filter,
                             new Page(
                                     Math.max(0, offset - count),
                                     count
@@ -90,6 +90,7 @@ public class AdminController extends AbstractResourceController {
         if (offset + count < total) {
             pagination = pagination.withNext(
                     uri(on(AdminController.class).getLogEntries(
+                            filter,
                             new Page(
                                     offset + count,
                                     count
