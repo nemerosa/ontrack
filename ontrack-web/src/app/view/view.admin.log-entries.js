@@ -58,6 +58,7 @@ angular.module('ot.view.admin.log-entries', [
             $scope.logFilterEnabled = !$scope.logFilterEnabled;
             if (!$scope.logFilterEnabled) {
                 $scope.logFilter = $scope.defaultLogFilter;
+                loadLogs();
             }
         };
 

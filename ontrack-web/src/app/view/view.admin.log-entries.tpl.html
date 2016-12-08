@@ -10,26 +10,36 @@
             </p>
             <div ng-if="logs.resources">
                 <div class="well">
-                    Total:
-                    <b>{{logs.pagination.total}}</b>
-                    &nbsp;
-                    <span ng-click="toggleFilter()" class="ot-action"><i class="fa fa-filter"></i>&nbsp;Filter</span>
-                    &nbsp;
-                    <span ng-click="previousPage()" class="ot-action" ng-show="logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</span>
-                    <span class="text-muted" ng-hide="logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</span>
-                    <span ng-click="nextPage()" class="ot-action" ng-show="logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</span>
-                    <span class="text-muted" ng-hide="logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</span>
-                    <div ng-show="logFilterEnabled">
-                        <!-- TODO Before -->
-                        <!-- TODO After -->
-                        <!-- TODO Authentication -->
-                        <!-- Text -->
-                        <input type="text" ng-model="logFilter.text" placeholder="Looking for any text" />
-                        &nbsp;
-                        <button ng-click="filterLogs()">
-                            <i class="fa fa-filter"></i>&nbsp;Filter
-                        </button>
-                        {{logFilter}}
+                    <div class="row">
+                        <div class="col-md-12">
+                            Total:
+                            <b>{{logs.pagination.total}}</b>
+                            &nbsp;
+                            <span ng-click="toggleFilter()" class="ot-action"><i class="fa fa-filter"></i>&nbsp;Filter</span>
+                            &nbsp;
+                            <span ng-click="previousPage()" class="ot-action" ng-show="logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</span>
+                            <span class="text-muted" ng-hide="logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</span>
+                            <span ng-click="nextPage()" class="ot-action" ng-show="logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</span>
+                            <span class="text-muted" ng-hide="logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form ng-show="logFilterEnabled" class="form-inline">
+                                <!-- TODO Before -->
+                                <!-- TODO After -->
+                                <!-- TODO Authentication -->
+                                <!-- Text -->
+                                <div class="form-group">
+                                    <input type="text" class="form-control" ng-model="logFilter.text" placeholder="Looking for any text" />
+                                </div>
+                                <div class="form-group">
+                                    <button ng-click="filterLogs()" class="btn btn-default">
+                                        <i class="fa fa-filter"></i>&nbsp;Filter
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <table class="ot-admin-console-log" ng-if="logs.resources">
