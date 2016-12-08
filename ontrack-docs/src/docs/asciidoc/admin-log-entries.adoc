@@ -1,0 +1,7 @@
+[[admin-log-entries]]
+=== Application log messages
+
+The list of application log messages is available to the _Administrators_ only
+and is accessed through the user menu.
+
+It allows an administrator to manage the error messages.
