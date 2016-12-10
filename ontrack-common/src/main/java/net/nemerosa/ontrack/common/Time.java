@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -17,6 +18,10 @@ public final class Time {
 
     public static LocalDateTime now() {
         return LocalDateTime.now(ZoneOffset.UTC);
+    }
+
+    public static LocalDateTime toLocalDateTime(ZonedDateTime zonedDateTime) {
+        return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }
 
     public static String forStorage(LocalDateTime time) {
