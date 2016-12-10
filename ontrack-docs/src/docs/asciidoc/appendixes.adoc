@@ -1,6 +1,8 @@
 [[appendixes]]
 == Appendixes
 
+include::configuration-properties.adoc[]
+
 include::appendix-deprecations.adoc[]
 
 include::appendix-roadmap.adoc[]
