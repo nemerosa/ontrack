@@ -30,7 +30,11 @@
                                 <!-- After -->
                                 <div class="form-group">
                                     <label for="filter-after">After</label>
-                                    <input id="filter-after" type="datetime-local" class="form-control" ng-model="logFilter.after" placeholder="After" />
+                                    <input id="filter-after" ng-model="logFilter.afterDate" name="logFilterAfterDate"
+                                           type="text" class="form-control"
+                                           datepicker-popup="EEE dd MMM yyyy"
+                                           is-open="opened"
+                                    />
                                 </div>
                                 <!-- Before -->
                                 <div class="form-group">
