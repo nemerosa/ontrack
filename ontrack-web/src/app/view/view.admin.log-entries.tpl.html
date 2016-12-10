@@ -33,13 +33,29 @@
                                     <input id="filter-after" ng-model="logFilter.afterDate" name="logFilterAfterDate"
                                            type="text" class="form-control"
                                            datepicker-popup="EEE dd MMM yyyy"
-                                           is-open="opened"
+                                           is-open="openedAfter"
                                     />
+                                    <input id="filter-after-time" ng-model="logFilter.afterTime" name="logFilterAfterTime"
+                                           type="text" class="form-control"
+                                           size="6"
+                                           placeholder="HH:mm"
+                                           pattern="[0-9]{2}:[0-9]{2}"
+                                           />
                                 </div>
                                 <!-- Before -->
                                 <div class="form-group">
                                     <label for="filter-before">Before</label>
-                                    <input id="filter-before" type="datetime-local" class="form-control" ng-model="logFilter.before" placeholder="Before" />
+                                    <input id="filter-before" ng-model="logFilter.beforeDate" name="logFilterBeforeDate"
+                                           type="text" class="form-control"
+                                           datepicker-popup="EEE dd MMM yyyy"
+                                           is-open="openedBefore"
+                                    />
+                                    <input id="filter-before-time" ng-model="logFilter.beforeTime" name="logFilterBeforeTime"
+                                           type="text" class="form-control"
+                                           size="6"
+                                           placeholder="HH:mm"
+                                           pattern="[0-9]{2}:[0-9]{2}"
+                                    />
                                 </div>
                                 <!-- Authentication -->
                                 <div class="form-group">
