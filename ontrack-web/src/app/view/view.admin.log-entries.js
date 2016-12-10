@@ -37,8 +37,45 @@ angular.module('ot.view.admin.log-entries', [
         // Loads the logs
         $scope.offset = 0;
         $scope.pageSize = 20;
+
+        function getDateTime(dateField, timeField) {
+            var date = $scope.logFilter[dateField];
+            var time = $scope.logFilter[timeField];
+            console.log("date = ", date);
+            console.log("time = ", time);
+            if (date) {
+                var dateTime = date;
+                if (time) {
+                    var hours = Number(time.substring(0, 2));
+                    var minutes = Number(time.substring(3, 5));
+                    dateTime.setHours(hours);
+                    dateTime.setMinutes(minutes);
+                    dateTime.setSeconds(0);
+                    dateTime.setMilliseconds(0);
+                }
+                console.log("datetime = ", dateTime);
+                return dateTime;
+            }
+            return undefined;
+        }
+
+        function getBeforeDateTime() {
+            return getDateTime('beforeDate', 'beforeTime');
+        }
+
+        function getAfterDateTime() {
+            return getDateTime('afterDate', 'afterTime');
+        }
+
         function loadLogs() {
-            var params = angular.copy($scope.logFilter);
+            var filter = {
+                before: getBeforeDateTime(),
+                after: getAfterDateTime(),
+                authentication: $scope.logFilter.authentication,
+                text: $scope.logFilter.text
+            };
+            console.log("filter = ", filter);
+            var params = angular.copy(filter);
             params.offset = $scope.offset;
             params.count = $scope.pageSize;
             ot.call($http.get('admin/logs', {
