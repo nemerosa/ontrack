@@ -14,8 +14,29 @@
                                 <div class="form-group">
                                     <button ng-click="nextPage()" class="btn btn-default" ng-disabled="!logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</button>
                                 </div>
-                                <!-- TODO Before -->
-                                <!-- TODO After -->
+                                <!-- Actions -->
+                                <div class="form-group">
+                                    <button ng-click="refreshList()" class="btn btn-info">
+                                        <i class="fa fa-refresh"></i>&nbsp;Refresh log
+                                    </button>
+                                    <button ng-click="deleteAll()" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i>&nbsp;Delete all entries
+                                    </button>
+                                </div>
+                            </form>
+                            <br/>
+                            <form class="form-inline">
+                                {{logFilter}}
+                                <!-- After -->
+                                <div class="form-group">
+                                    <label for="filter-after">After</label>
+                                    <input id="filter-after" type="datetime-local" class="form-control" ng-model="logFilter.after" placeholder="After" />
+                                </div>
+                                <!-- Before -->
+                                <div class="form-group">
+                                    <label for="filter-before">Before</label>
+                                    <input id="filter-before" type="datetime-local" class="form-control" ng-model="logFilter.before" placeholder="Before" />
+                                </div>
                                 <!-- Authentication -->
                                 <div class="form-group">
                                     <input type="text" class="form-control" ng-model="logFilter.authentication" placeholder="Authentication" />
@@ -32,14 +53,6 @@
                                 <div class="form-group">
                                     <button ng-click="resetFilter()" class="btn btn-default">
                                         <i class="fa fa-ban"></i>&nbsp;Reset filter
-                                    </button>
-                                </div>
-                                <div class="form-group pull-right">
-                                    <button ng-click="refreshList()" class="btn btn-info">
-                                        <i class="fa fa-refresh"></i>&nbsp;Refresh log
-                                    </button>
-                                    <button ng-click="deleteAll()" class="btn btn-danger">
-                                        <i class="fa fa-trash"></i>&nbsp;Delete all entries
                                     </button>
                                 </div>
                             </form>
