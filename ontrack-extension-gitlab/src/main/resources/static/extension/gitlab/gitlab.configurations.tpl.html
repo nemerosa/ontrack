@@ -10,7 +10,6 @@
                 <tr>
                     <th>Name</th>
                     <th>URL</th>
-                    <th>User</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
@@ -21,14 +20,6 @@
                     </td>
                     <td>
                         <a href="{{configuration.url}}">{{configuration.url}}</a>
-                    </td>
-                    <td>
-                        <span ng-if="configuration.user">
-                            {{configuration.user}}
-                        </span>
-                        <span ng-if="!configuration.user" class="ot-description">
-                            No user
-                        </span>
                     </td>
                     <td>
                         <span class="ot-command" ng-click="updateConfiguration(configuration)">

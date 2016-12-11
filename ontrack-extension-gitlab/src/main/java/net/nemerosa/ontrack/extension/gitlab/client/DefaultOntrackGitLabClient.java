@@ -1,11 +1,9 @@
 package net.nemerosa.ontrack.extension.gitlab.client;
 
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
-import org.apache.commons.lang3.StringUtils;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.TokenType;
 import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,20 +19,11 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
 
     public DefaultOntrackGitLabClient(GitLabConfiguration configuration) throws IOException {
         String personalAccessToken = configuration.getPersonalAccessToken();
-        GitlabAPI api;
-        if (StringUtils.isNotBlank(personalAccessToken)) {
-            api = GitlabAPI.connect(
-                    configuration.getUrl(),
-                    personalAccessToken,
-                    TokenType.PRIVATE_TOKEN
-            );
-        } else {
-            api = GitlabAPI.connect(configuration.getUrl(), null, null, null);
-            api.dispatch()
-                    .with("login", configuration.getUser())
-                    .with("password", configuration.getPassword())
-                    .to(GitlabSession.URL, GitlabSession.class);
-        }
+        GitlabAPI api = GitlabAPI.connect(
+                configuration.getUrl(),
+                personalAccessToken,
+                TokenType.PRIVATE_TOKEN
+        );
         if (configuration.isIgnoreSslCertificate()) {
             this.api = api.ignoreCertificateErrors(true);
         } else {

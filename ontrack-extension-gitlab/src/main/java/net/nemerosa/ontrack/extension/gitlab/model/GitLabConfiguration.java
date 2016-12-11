@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.gitlab.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
@@ -96,18 +95,19 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                                 .length(250)
                                 .help("URL of the GitLab engine.")
                 )
-                .with(
-                        Text.of("user")
-                                .label("User")
-                                .length(16)
-                                .optional()
-                )
-                .with(
-                        Password.of("password")
-                                .label("Password")
-                                .length(40)
-                                .optional()
-                )
+                // GitLab user/password authentication is not supported
+//                .with(
+//                        Text.of("user")
+//                                .label("User")
+//                                .length(16)
+//                                .optional()
+//                )
+//                .with(
+//                        Password.of("password")
+//                                .label("Password")
+//                                .length(40)
+//                                .optional()
+//                )
                 .with(
                         Text.of("personalAccessToken")
                                 .label("Personal Access Token")
@@ -125,8 +125,8 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
         return form()
                 .with(defaultNameField().readOnly().value(name))
                 .fill("url", url)
-                .fill("user", user)
-                .fill("password", "")
+//                .fill("user", user)
+//                .fill("password", "")
                 .fill("personalAccessToken", personalAccessToken)
                 .fill("ignoreSslCertificate", ignoreSslCertificate)
                 ;
