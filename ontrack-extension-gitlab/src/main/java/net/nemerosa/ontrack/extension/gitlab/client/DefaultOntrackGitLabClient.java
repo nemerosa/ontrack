@@ -17,13 +17,11 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
 
     private final Logger logger = LoggerFactory.getLogger(OntrackGitLabClient.class);
 
-    private final GitLabConfiguration configuration;
     private final GitlabAPI api;
 
     public DefaultOntrackGitLabClient(GitLabConfiguration configuration) throws IOException {
-        this.configuration = configuration;
         String personalAccessToken = configuration.getPersonalAccessToken();
-        GitlabSession session;
+        GitlabAPI api;
         if (StringUtils.isNotBlank(personalAccessToken)) {
             api = GitlabAPI.connect(
                     configuration.getUrl(),
@@ -36,6 +34,11 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
                     .with("login", configuration.getUser())
                     .with("password", configuration.getPassword())
                     .to(GitlabSession.URL, GitlabSession.class);
+        }
+        if (configuration.isIgnoreSslCertificate()) {
+            this.api = api.ignoreCertificateErrors(true);
+        } else {
+            this.api = api;
         }
     }
 
