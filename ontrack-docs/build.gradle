@@ -57,7 +57,6 @@ if (documentationProfile) {
         attributes = [
                 'ontrack-version'    : project.versioning.info.display,
                 'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
-                'toc'                : 'left',
                 'icons'              : 'font',
         ]
     }
@@ -69,7 +68,6 @@ if (documentationProfile) {
         attributes = [
                 'ontrack-version'    : project.versioning.info.display,
                 'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
-                'toc'                : 'left',
                 'icons'              : 'font',
                 'imagesdir'          : file('build/asciidoc/html5'),
         ]
