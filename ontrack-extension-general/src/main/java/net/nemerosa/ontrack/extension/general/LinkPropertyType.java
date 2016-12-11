@@ -59,9 +59,10 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
                         NamedEntries.of("links")
                                 .label("List of links")
                                 .nameLabel("Name")
+                                .valueLabel("Link")
                                 .nameOptional()
                                 .addText("Add a link")
-                                .help("List of links")
+                                .help("List of links associated with a name.")
                                 .value(value != null ? value.getLinks() : Collections.emptyList())
                 )
                 ;
