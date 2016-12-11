@@ -44,6 +44,14 @@ public class GitLabConfigurationServiceImpl extends AbstractConfigurationService
         this.applicationLogService = applicationLogService;
     }
 
+    /**
+     * No need to inject a password since this is not supported.
+     */
+    @Override
+    protected GitLabConfiguration injectCredentials(GitLabConfiguration configuration) {
+        return configuration;
+    }
+
     @Override
     protected ConnectionResult validate(GitLabConfiguration configuration) {
         try {
