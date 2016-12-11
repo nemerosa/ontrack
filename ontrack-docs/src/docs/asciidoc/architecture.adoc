@@ -35,6 +35,8 @@ Ontrack services and the domain model.
 [[architecture-ui]]
 ==== UI
 
+include::architecture-ui-forms.adoc[]
+
 [[architecture-ui-resources]]
 ===== Resources
 
