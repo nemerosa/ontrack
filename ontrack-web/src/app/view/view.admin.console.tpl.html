@@ -10,8 +10,6 @@
                                                                                 ng-click="tab = 'extensions'">Extensions</a></li>
                 <li role="presentation" ng-class="{'active': tab == 'jobs'}"><a role="tab"
                                                                                 ng-click="tab = 'jobs'">Jobs</a></li>
-                <li role="presentation" ng-class="{'active': tab == 'log'}"><a role="tab" ng-click="tab = 'log'">Log</a>
-                </li>
             </ul>
         </div>
     </div>
@@ -316,55 +314,6 @@
                     <td>
                         {{job.nextRunDate | date:'shortDate'}}
                         {{job.nextRunDate | date:'shortTime'}}
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="row" ng-show="tab == 'log'">
-        <div class="col-md-12">
-
-            <br/>
-
-            <p class="ot-description">
-                List of application log messages.
-            </p>
-
-            <p ng-if="logs.resources.length == 0" class="ot-admin-console-log-ok">
-                No log entry - everything is OK!
-            </p>
-            <table class="ot-admin-console-log" ng-if="logs.resources">
-                <thead>
-                <tr>
-                    <th>Level</th>
-                    <th>Timestamp</th>
-                    <th>Type</th>
-                    <th>Information</th>
-                    <th>Details</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="log in logs.resources" class="ot-application-log-{{log.level | lowercase}}">
-                    <td>
-                        {{log.level}}
-                    </td>
-                    <td>
-                        {{log.timestamp | date:'fullDate'}}
-                        {{log.timestamp | date:'mediumTime'}}
-                    </td>
-                    <td>
-                        <code>{{log.type.name}}</code>
-                        {{log.type.description}}
-                    </td>
-                    <td>
-                        {{log.information}}
-                    </td>
-                    <td>
-                        <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
-                            Details...
-                        </button>
                     </td>
                 </tr>
                 </tbody>

@@ -1,0 +1,52 @@
+[[configuration-properties]]
+=== Configuration properties
+
+Ontrack uses the Spring Boot mechanism for its configuration. See
+the <<configuration,documentation>> on how to set those properties
+in your Ontrack installation.
+
+All http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties[Spring Boot properties]
+are available for configuration.
+
+Additionally, Ontrack defines the following ones.
+
+TIP: The names of the configuration properties are given for a `.properties`
+     file format but you can configure them in YAML of course. They can also
+     be provided as system properties or environment variables. See the
+     http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-properties-and-configuration[Spring Boot documentation]
+     for more details.
+
+
+WARNING: This sample file is meant as a guide only. Do *not* copy/paste the
+         entire content into your application; rather pick only the properties
+         that you need.
+
+TIP: When applicable, the default value is mentioned.
+
+[source,properties]
+----
+# ======================================================
+# Ontrack properties
+# ======================================================
+
+# Maximum number of days to keep the log entries
+ontrack.config.application-log-retention-days = 7
+
+# Directory which contains all the working files of Ontrack
+# It is usually set by the installation
+ontrack.config.application-working-dir = work/files
+
+# Metrics export period (in seconds)
+ontrack.config.metrics-period
+
+# Testing the configurations of external configurations
+# Used only for internal testing, to disable the checks
+# when creating external configurations
+ontrack.config.configuration-test = true
+
+# Number of threads to use to run the background jobs
+ontrack.config.jobs.pool-size = 10
+
+# Interval (in minutes) between each refresh of the job list
+ontrack.config.jobs.orchestration = 2
+----

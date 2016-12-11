@@ -1,20 +1,26 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.repository;
+
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter;
+import net.nemerosa.ontrack.model.support.Page;
 
 import java.util.List;
 
-/**
- * This service is used to log messages at application level, to be seen by operation and administration people.
- * <p>
- * Having a message here would mean that something is defective in the application or in its configuration.
- */
-public interface ApplicationLogService {
+public interface ApplicationLogEntriesRepository {
 
     /**
-     * Total list of messages
+     * Saves a log entry
      *
-     * @return Count of entries
+     * @param entry Entry to log
      */
-    int getLogEntriesTotal();
+    void log(ApplicationLogEntry entry);
+
+    /**
+     * Gets the total number of entries
+     *
+     * @return Number of entries
+     */
+    int getTotalCount();
 
     /**
      * List of messages
@@ -24,13 +30,6 @@ public interface ApplicationLogService {
      * @return List of entries for the filter and the page
      */
     List<ApplicationLogEntry> getLogEntries(ApplicationLogEntryFilter filter, Page page);
-
-    /**
-     * Logs an entry
-     *
-     * @param entry Entry to log
-     */
-    void log(ApplicationLogEntry entry);
 
     /**
      * Removes all entries which are older than x days
