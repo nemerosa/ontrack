@@ -6,12 +6,9 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import net.nemerosa.ontrack.model.support.UserPassword;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
-import org.apache.commons.lang3.StringUtils;
 
 import java.beans.ConstructorProperties;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -132,28 +129,6 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                 password,
                 personalAccessToken
         );
-    }
-
-    @Override
-    @JsonIgnore
-    public Optional<UserPassword> getCredentials() {
-        if (StringUtils.isNotBlank(personalAccessToken)) {
-            return Optional.of(
-                    new UserPassword(
-                            personalAccessToken,
-                            "PRIVATE-TOKEN"
-                    )
-            );
-        } else if (StringUtils.isNotBlank(user)) {
-            return Optional.of(
-                    new UserPassword(
-                            user,
-                            password
-                    )
-            );
-        } else {
-            return Optional.empty();
-        }
     }
 
 }

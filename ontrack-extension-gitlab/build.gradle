@@ -4,6 +4,7 @@ apply plugin: OntrackExtensionPlugin
 
 dependencies {
     compile project(':ontrack-extension-git')
+    compile 'org.gitlab:java-gitlab-api:1.2.7'
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
