@@ -187,6 +187,13 @@ angular.module('ot.service.core', [
         var self = {};
         /**
          * Displays a confirmation box.
+         *
+         * For example:
+         *
+         * otAlertService.confirm({title: "My title", message: "My message"}).then(function () {
+         *     // Does something on success
+         * });
+         *
          * @param config.title Title for the alert
          * @param config.message Message content for the alert
          * @returns Promise on the confirmation result.

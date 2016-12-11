@@ -15,7 +15,9 @@ dependencies {
     compile libraries.failsafe
 }
 
-javadocJar {
-    from javadoc
-    from groovydoc
+if (documentationProfile) {
+    javadocJar {
+        from javadoc
+        from groovydoc
+    }
 }

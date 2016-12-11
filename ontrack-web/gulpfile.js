@@ -175,7 +175,10 @@ gulp.task('css:concat', function () {
 
 gulp.task('fonts', function () {
     return gulp
-        .src(vendor + '/font-awesome/fonts/*.*')
+        .src([
+            vendor + '/font-awesome/fonts/*.*',
+            vendor + '/bootstrap/fonts/*.*'
+        ])
         .pipe(debug({title: 'fonts:input'}))
         .pipe(gulp.dest(outputFonts));
 });

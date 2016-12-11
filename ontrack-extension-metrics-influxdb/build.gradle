@@ -1,4 +1,5 @@
 dependencies {
     compile libraries.metrics_core
+    compile 'org.influxdb:influxdb-java:2.4'
     compile project(':ontrack-extension-support')
 }

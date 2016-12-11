@@ -65,7 +65,7 @@ task dev(type: NodeTask, dependsOn: bowerInstall) {
     args = ['dev']
 }
 
-task build(type: NodeTask, dependsOn: bowerInstall) {
+task prod(type: NodeTask, dependsOn: bowerInstall) {
     script = file('node_modules/gulp/bin/gulp')
     args = ['default', '--version', versioning.info.display]
     inputs.dir file('src')
@@ -75,6 +75,8 @@ task build(type: NodeTask, dependsOn: bowerInstall) {
     ext.outputDir = file('build/web/prod')
     outputs.dir outputDir
 }
+
+build.dependsOn prod
 
 task watch(type: NodeTask, dependsOn: dev) {
     script = file('node_modules/gulp/bin/gulp')

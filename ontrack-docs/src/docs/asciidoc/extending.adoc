@@ -315,12 +315,45 @@ For example:
 docker run --volume /extension/on/host:/var/ontrack/extensions ...
 ----
 
+You can also create your own image. Create the following `Dockerfile`:
+
+[source]
+.Dockerfile
+----
+# Base Ontrack image
+FROM nemerosa/ontrack:<yourversion>
+# Copies the extensions in the target volume
+COPY extensions/*.jar /var/ontrack/extensions/
+----
+
+We assume here that your extensions are packaged in an `extensions` folder
+at the same level than your `Dockerfile`:
+
+[source]
+----
+/-- Dockerfile
+|-- extensions/
+     |-- extension1.jar
+     |-- extension2.jar
+----
+
 [[extending-deploying-os]]
 ===== Using the CentOS or Debian/Ubuntu package
 
 The <<installation-rpm, RPM>> and <<installation-debian, Debian>> packages both
 use the `/usr/lib/ontrack/extensions` directory for the location of the
 extensions JAR files.
+
+You can also create a RPM or Debian package which embeds both Ontrack and your
+extensions.
+
+The means to achieve this depend on your build technology but the idea is the
+same in all cases:
+
+Your package must:
+
+* put the extension JAR files in `/usr/lib/ontrack/extensions`
+* have a dependency on the `ontrack` package
 
 [[extending-deploying-sa]]
 ===== In standalone mode
@@ -340,3 +373,5 @@ include::extending-decorators.adoc[]
 include::extending-user-menu.adoc[]
 
 include::extending-pages.adoc[]
+
+include::extending-event-types.adoc[]

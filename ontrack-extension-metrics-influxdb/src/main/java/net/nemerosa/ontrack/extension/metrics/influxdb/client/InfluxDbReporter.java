@@ -1,8 +1,9 @@
-package io.dropwizard.metrics.influxdb;
+package net.nemerosa.ontrack.extension.metrics.influxdb.client;
 
 import com.codahale.metrics.*;
 import com.codahale.metrics.Timer;
-import io.dropwizard.metrics.influxdb.data.InfluxDbPoint;
+import net.nemerosa.ontrack.model.metrics.OntrackTaggedMetrics;
+import net.nemerosa.ontrack.model.metrics.TaggedMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +11,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public final class InfluxDbReporter extends ScheduledReporter {
+
     public static final class Builder {
         private final MetricRegistry registry;
         private Map<String, String> tags;
@@ -17,6 +19,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         private TimeUnit durationUnit;
         private MetricFilter filter;
         private boolean skipIdleMetrics;
+        private Collection<OntrackTaggedMetrics> taggedMetrics = Collections.emptyList();
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -24,6 +27,14 @@ public final class InfluxDbReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+        }
+
+        /**
+         * Use the list of tagged metrics sources
+         */
+        public Builder withTaggedMetrics(Collection<OntrackTaggedMetrics> taggedMetrics) {
+            this.taggedMetrics = Collections.unmodifiableCollection(taggedMetrics);
+            return this;
         }
 
         /**
@@ -76,13 +87,13 @@ public final class InfluxDbReporter extends ScheduledReporter {
          * @param skipIdleMetrics true/false for skipping metrics not reported
          * @return {@code this}
          */
-        public Builder skipIdleMetrics(boolean skipIdleMetrics) {
+        public Builder skipIdleMetrics(@SuppressWarnings("SameParameterValue") boolean skipIdleMetrics) {
             this.skipIdleMetrics = skipIdleMetrics;
             return this;
         }
 
         public InfluxDbReporter build(final InfluxDbSender influxDb) {
-            return new InfluxDbReporter(registry, influxDb, tags, rateUnit, durationUnit, filter, skipIdleMetrics);
+            return new InfluxDbReporter(registry, influxDb, tags, rateUnit, durationUnit, filter, skipIdleMetrics, taggedMetrics);
         }
     }
 
@@ -90,11 +101,13 @@ public final class InfluxDbReporter extends ScheduledReporter {
     private final InfluxDbSender influxDb;
     private final boolean skipIdleMetrics;
     private final Map<String, Long> previousValues;
+    private final Collection<OntrackTaggedMetrics> taggedMetrics;
 
     private InfluxDbReporter(final MetricRegistry registry, final InfluxDbSender influxDb, final Map<String, String> tags,
-                             final TimeUnit rateUnit, final TimeUnit durationUnit, final MetricFilter filter, final boolean skipIdleMetrics) {
+                             final TimeUnit rateUnit, final TimeUnit durationUnit, final MetricFilter filter, final boolean skipIdleMetrics, Collection<OntrackTaggedMetrics> taggedMetrics) {
         super(registry, "influxDb-reporter", filter, rateUnit, durationUnit);
         this.influxDb = influxDb;
+        this.taggedMetrics = taggedMetrics;
         influxDb.setTags(tags);
         this.skipIdleMetrics = skipIdleMetrics;
         this.previousValues = new TreeMap<>();
@@ -132,12 +145,28 @@ public final class InfluxDbReporter extends ScheduledReporter {
                 reportTimer(entry.getKey(), entry.getValue(), now);
             }
 
+            // Tagged metrics
+            taggedMetrics.stream()
+                    .flatMap(source -> source.getTaggedMetrics().stream())
+                    .forEach(this::reportTaggedMetric);
+
             if (influxDb.hasSeriesData()) {
                 influxDb.writeData();
             }
         } catch (Exception e) {
             LOGGER.warn("Unable to report to InfluxDB. Discarding data.", e);
         }
+    }
+
+    private <T extends Number> void reportTaggedMetric(TaggedMetric<T> metric) {
+        influxDb.appendPoints(
+                new InfluxDbPoint(
+                        metric.getName(),
+                        metric.getTags(),
+                        metric.getTimestamp().getTime(),
+                        Collections.singletonMap("value", metric.getValue())
+                )
+        );
     }
 
     private void reportTimer(String name, Timer timer, long now) {
@@ -166,7 +195,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -192,7 +221,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -202,7 +231,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -212,7 +241,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 
@@ -229,7 +258,7 @@ public final class InfluxDbReporter extends ScheduledReporter {
         influxDb.appendPoints(new InfluxDbPoint(
                 name,
                 Collections.emptyMap(),
-                String.valueOf(now),
+                now,
                 fields));
     }
 

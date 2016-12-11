@@ -4,14 +4,19 @@ import lombok.Data;
 import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.job.JobStatus;
 import net.nemerosa.ontrack.model.metrics.OntrackMetrics;
+import net.nemerosa.ontrack.model.metrics.OntrackTaggedMetrics;
+import net.nemerosa.ontrack.model.metrics.TaggedMetric;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Component
-public class JobMetrics implements OntrackMetrics {
+public class JobMetrics implements OntrackMetrics, OntrackTaggedMetrics {
 
     private final JobScheduler scheduler;
 
@@ -80,6 +85,50 @@ public class JobMetrics implements OntrackMetrics {
         return metrics;
     }
 
+    /**
+     * Metrics for ONE job.
+     */
+    protected Stream<TaggedMetric<?>> getJobMetrics(JobStatus job) {
+        return StreamSupport.stream(
+                Arrays.<TaggedMetric<?>>asList(
+                        count(job, "count", 1),
+                        count(job, "running", job.isRunning()),
+                        count(job, "disabled", job.isDisabled()),
+                        count(job, "paused", job.isPaused()),
+                        count(job, "error", job.isError()),
+                        count(job, "invalid", !job.isValid()),
+                        count(job, "runCount", job.getRunCount()),
+                        count(job, "lastRunDurationMs", job.getLastRunDurationMs()),
+                        count(job, "lastErrorCount", job.getLastErrorCount())
+                ).spliterator(),
+                true // Can be processed in parallel
+        );
+    }
+
+    protected TaggedMetric<Long> count(JobStatus job, String measure, boolean flag) {
+        return count(job, measure, flag ? 1 : 0);
+    }
+
+    protected TaggedMetric<Long> count(JobStatus job, String measure, long count) {
+        return TaggedMetric.of(name(measure), count)
+                .tag("category", job.getKey().getType().getCategory().getKey())
+                .tag("type", job.getKey().getType().getKey())
+                .tag("jobId", job.getKey().getId())
+                .build();
+    }
+
+    private String name(String measure) {
+        return String.format("ontrack.job.%s", measure);
+    }
+
+    @Override
+    public Collection<TaggedMetric<?>> getTaggedMetrics() {
+        return scheduler.getJobStatuses()
+                .stream()
+                .flatMap(this::getJobMetrics)
+                .collect(Collectors.toList());
+    }
+
     @Data
     private static class JobMetric {
         int count = 0;
@@ -91,12 +140,7 @@ public class JobMetrics implements OntrackMetrics {
 
         public static JobMetric getCategory(Map<String, JobMetric> categories, JobStatus status) {
             String category = status.getKey().getType().getCategory().getKey();
-            JobMetric metric = categories.get(category);
-            if (metric == null) {
-                metric = new JobMetric();
-                categories.put(category, metric);
-            }
-            return metric;
+            return categories.computeIfAbsent(category, k -> new JobMetric());
         }
     }
 

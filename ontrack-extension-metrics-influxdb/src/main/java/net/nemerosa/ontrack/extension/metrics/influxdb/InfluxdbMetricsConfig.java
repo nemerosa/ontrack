@@ -2,9 +2,10 @@ package net.nemerosa.ontrack.extension.metrics.influxdb;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
-import io.dropwizard.metrics.influxdb.InfluxDbHttpSender;
-import io.dropwizard.metrics.influxdb.InfluxDbReporter;
-import io.dropwizard.metrics.influxdb.InfluxDbSender;
+import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbHttpSender;
+import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbReporter;
+import net.nemerosa.ontrack.extension.metrics.influxdb.client.InfluxDbSender;
+import net.nemerosa.ontrack.model.metrics.OntrackTaggedMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,27 +13,31 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Enabling the metrics in Graphite.
- * <p>
- * The InfluxdbReporter from net.alchim31 is not compatible with InfluxDB 0.9, the official InfluxDBReporter
- * from DropWizards is not released yet
- * TODO Use DroWizard InfluxDB 4.x as soon as out
+ * Enabling the metrics in InfluxDB.
  */
 @Configuration
-@ConditionalOnProperty(name = InfluxdbMetricsConfigProperties.HOST_PROPERTY, havingValue = "")
+@ConditionalOnProperty(name = InfluxdbMetricsConfigProperties.HOST_PROPERTY)
 public class InfluxdbMetricsConfig {
 
     private final Logger logger = LoggerFactory.getLogger(InfluxdbMetricsConfig.class);
 
-    @Autowired
-    private InfluxdbMetricsConfigProperties config;
+    private final InfluxdbMetricsConfigProperties config;
+
+    private final MetricRegistry registry;
+
+    private final Collection<OntrackTaggedMetrics> taggedMetrics;
 
     @Autowired
-    private MetricRegistry registry;
+    public InfluxdbMetricsConfig(InfluxdbMetricsConfigProperties config, MetricRegistry registry, Collection<OntrackTaggedMetrics> taggedMetrics) {
+        this.config = config;
+        this.registry = registry;
+        this.taggedMetrics = taggedMetrics;
+    }
 
     @Bean
     public InfluxDbSender influxdb() throws Exception {
@@ -41,7 +46,9 @@ public class InfluxdbMetricsConfig {
                 config.getPort(),
                 config.getDatabase(),
                 config.getUser(),
-                config.getPassword()
+                config.getPassword(),
+                config.getRetentionPolicy(),
+                TimeUnit.MILLISECONDS
         );
     }
 
@@ -50,6 +57,7 @@ public class InfluxdbMetricsConfig {
         InfluxDbReporter reporter = InfluxDbReporter
                 .forRegistry(registry)
                 .withTags(Collections.singletonMap("src", "ontrack"))
+                .withTaggedMetrics(taggedMetrics)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)

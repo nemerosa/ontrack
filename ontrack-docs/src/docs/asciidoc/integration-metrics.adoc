@@ -1,12 +1,12 @@
 [[monitoring]]
-==== Monitoring
+=== Monitoring
 
 Ontrack is based on http://projects.spring.io/spring-boot[Spring Boot] and
 exports metrics and health indicators that can be used to monitor the status
 of the applications.
 
 [[monitoring-health]]
-===== Health
+==== Health
 
 The `/manage/health` end point provides a JSON tree which indicates the status
 of all connected systems: JIRA, Jenkins, Subversion repositories, Git
@@ -16,7 +16,7 @@ Note than an administrator can have access to this information as a dashboard
 in the _Admin console_ (accessible through the user menu).
 
 [[monitoring-metrics]]
-===== Metrics
+==== Metrics
 
 The default Spring Boot metrics, plus specific ones for Ontrack, are accessible
 at the `/manage/metrics` end point.
@@ -26,7 +26,7 @@ http://graphite.wikidot.com[Graphite] or https://influxdb.com[InfluxDB]
 back-end, to be displayed, for example, by http://grafana.org[Grafana].
 
 [[monitoring-metrics-graphite]]
-====== Export to Graphite
+===== Export to Graphite
 
 The following options must be passed to Ontrack, either on the command line or
 in a local `application.yml` file:
@@ -50,7 +50,7 @@ ontrack:
 ----
 
 [[monitoring-metrics-influxdb]]
-====== Export to InfluxDB
+===== Export to InfluxDB
 
 The following options must be passed to Ontrack, either on the command line or
 in a local `application.yml` file:
@@ -80,7 +80,7 @@ ontrack:
 ----
 
 [[monitoring-metrics-grafana]]
-====== Grafana dashboard
+===== Grafana dashboard
 
 You can
 https://raw.githubusercontent.com/nemerosa/ontrack/master/doc/grafana.json[download this sample dashboard]
@@ -90,7 +90,7 @@ as a starting point for defining an Ontrack monitoring system in Grafana:
 2. import it in Grafana
 
 [[monitoring-metrics-list]]
-====== List of metrics
+===== List of metrics
 
 Provided by Spring Boot:
 
@@ -107,10 +107,32 @@ Job metrics:
 * `gauge.jobs.running` - number of running jobs
 * `gauge.jobs.disabled` - number of disabled jobs
 * `gauge.jobs.error` - number of jobs in error
+* `gauge.jobs.invalid` - number of invalid
+* `gauge.jobs.paused` - number of invalid
 * `gauge.jobs.<category>` - total number of jobs for a given category
 * `gauge.jobs.<category>.running` - number of running jobs for a given category
 * `gauge.jobs.<category>.disabled` - number of disabled jobs for a given category
 * `gauge.jobs.<category>.error` - number of jobs in error for a given category
+* `gauge.jobs.<category>.invalid` - number of invalid jobs for a given category
+* `gauge.jobs.<category>.paused` - number of paused jobs for a given category
+
+Tagged job metrics:
+
+IMPORTANT: Only since Ontrack 2.27 and only in InfluxDB. Those metrics are
+associated with tags.
+
+* `ontrack.job.count` - total number of jobs for a given job
+* `ontrack.job.running` - number of running jobs for a given job
+* `ontrack.job.disabled` - number of disabled jobs for a given job
+* `ontrack.job.error` - number of jobs in error for a given job
+* `ontrack.job.invalid` - number of invalid jobs for a given job
+* `ontrack.job.paused` - number of paused jobs for a given job
+
+Following tags are associated with each of those measurements:
+
+* `category` of the job
+* `type` of the job
+* `jobId` of the job
 
 Entity metrics:
 

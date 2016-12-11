@@ -182,23 +182,17 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             }
         }
     }
-    wrappers {
-        injectPasswords {
-            // Needs the VERSIONEYE_API_KEY
-            injectGlobalPasswords()
-        }
-    }
     steps {
         gradle '''\
 clean
 versionDisplay
 versionFile
-versionEyeUpdate
 test
 integrationTest
 dockerLatest
 osPackages
 build
+-Pdocumentation
 -PbowerOptions='--allow-root'
 -Dorg.gradle.jvmargs=-Xmx1536m
 --info
@@ -212,7 +206,7 @@ build
     }
     publishers {
         buildDescription '', '${VERSION_DISPLAY}', '', ''
-        archiveJunit("**/build/test-results/*.xml")
+        archiveJunit("**/build/test-results/**/*.xml")
         archiveArtifacts {
             pattern 'build/distributions/ontrack-*-delivery.zip'
             pattern 'build/distributions/ontrack*.deb'
@@ -382,7 +376,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         shell """\

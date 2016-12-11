@@ -10,7 +10,14 @@ buildscript {
 plugins {
     id 'net.nemerosa.versioning' version '1.7.1'
     id 'nebula.os-package' version '2.2.6'
-    id 'org.standardout.versioneye' version '1.4.0'
+}
+
+/**
+ * Profiles
+ */
+
+ext {
+    documentationProfile = project.hasProperty('documentation')
 }
 
 /**
@@ -27,22 +34,6 @@ allprojects {
  */
 
 apply from: "$rootDir/gradle/dependencies.gradle"
-
-/**
- * Version Eye integration
- */
-
-versioneye {
-    includeSubProjects = true
-    includePlugins = false
-    exclude 'testCompile', 'testRuntime'
-}
-
-/**
- * Build task (used only as an anchor point at the root level)
- */
-
-task build
 
 /**
  * Java projects
@@ -102,16 +93,18 @@ configure(javaProjects) {
 
     // Javadoc
 
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
+    if (documentationProfile) {
+        task javadocJar(type: Jar) {
+            classifier = 'javadoc'
+            from javadoc
+        }
 
-    // Sources
+        // Sources
 
-    task sourceJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
+        task sourceJar(type: Jar) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
     }
 
     // POM file
@@ -163,8 +156,10 @@ configure(javaProjects) {
     // Archives for Javadoc and Sources
 
     artifacts {
-        archives javadocJar
-        archives sourceJar
+        if (documentationProfile) {
+            archives javadocJar
+            archives sourceJar
+        }
         archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: pomFile
     }
 
@@ -224,5 +219,5 @@ task testReport(type: TestReport) {
  */
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
+    gradleVersion = '3.2.1'
 }
