@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.gitlab.resource;
 
+import net.nemerosa.ontrack.extension.gitlab.GitLabController;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @Component
 public class GitLabConfigurationResourceDecorator extends AbstractResourceDecorator<GitLabConfiguration> {
@@ -34,9 +37,9 @@ public class GitLabConfigurationResourceDecorator extends AbstractResourceDecora
     public List<Link> links(GitLabConfiguration configuration, ResourceContext resourceContext) {
         boolean globalSettingsGranted = securityService.isGlobalFunctionGranted(GlobalSettings.class);
         return resourceContext.links()
-                // FIXME .self(on(GitHubController.class).getConfiguration(configuration.getName()))
-                // FIXME .link(Link.UPDATE, on(GitHubController.class).updateConfigurationForm(configuration.getName()), globalSettingsGranted)
-                // FIXME .link(Link.DELETE, on(GitHubController.class).deleteConfiguration(configuration.getName()), globalSettingsGranted)
+                .self(on(GitLabController.class).getConfiguration(configuration.getName()))
+                .link(Link.UPDATE, on(GitLabController.class).updateConfigurationForm(configuration.getName()), globalSettingsGranted)
+                .link(Link.DELETE, on(GitLabController.class).deleteConfiguration(configuration.getName()), globalSettingsGranted)
                 // OK
                 .build();
     }
