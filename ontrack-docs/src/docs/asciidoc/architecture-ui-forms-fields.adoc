@@ -2,17 +2,17 @@
 ====== Common field properties
 
 |===
-| Property | Default value | Description
-| `name` | _required_ | Mapping
-| `label` | _none_ | Display name
-| `required` | `true` | Is the input required?
-| `readOnly` | `false` | Is the input read-only?
-| `validation` | _none_ | Message to display is the field content is deemed invalid
-| `help` | _none_ | Help message to display for the field (see below for
+| Property | Method | Default value | Description
+| `name` | `of(...)` | _required_ | Mapping
+| `label` | `label(...)` |  _none_ | Display name
+| `required` | `optional()` | `true` | Is the input required?
+| `readOnly` | `readOnly()` | `false` | Is the input read-only?
+| `validation` | `validation(...)`| _none_ | Message to display is the field content is deemed invalid
+| `help` | `help(...)` | _none_ | Help message to display for the field (see below for
   special syntax)
-| `visibleIf` | _none_ | Expression which defines if the field is displayed or
+| `visibleIf` | `visibleIf(...)` |  _none_ | Expression which defines if the field is displayed or
   not - see below for a detailed explanation
-| `value` | _none_ | Value to associated with the field
+| `value` | `value(...)` | _none_ | Value to associated with the field
 |===
 
 [[architecture-ui-forms-fields-help]]
@@ -31,11 +31,13 @@ TODO
 The `text` field is a single line text entry field, mapped to the HTML
 `<input type="test"/>` form field.
 
-|===
-| Property | Default value | Description
+image::images/architecture-ui-forms-fields-text.png[Text,400]
 
-| `length` | `300` | Maximum length for the text
-| `regex` | `.*` | The text must comply with this regex in order to be valid
+|===
+| Property | Method | Default value | Description
+
+| `length` | `length(...)` | `300` | Maximum length for the text
+| `regex` | `regex(...)` | `.*` | The text must comply with this regex in order to be valid
 |===
 
 Example:
@@ -75,7 +77,41 @@ TODO
 [[architecture-ui-forms-fields-named-entries]]
 ====== `namedEntries` field
 
-TODO
+Multiple list of name/value fields:
+
+image::images/architecture-ui-forms-fields-named-entries.png[Named entries,500]
+
+The user can:
+
+* add / remove entries in the list
+* set a name and a value for each item
+* the name might be optional - the value is not
+
+|===
+| Property | Method | Default value | Description
+
+| `nameLabel` | `nameLabel(...)` | "Name" | Label for the "name" input part of an entry.
+| `valueLabel` | `valueLabel(...)` | "Value" | Label for the "value" input part of an entry.
+| `nameRequired` | `nameOptional()` | `true` | If the name part is required.
+| `addText` | `addText(...)` | "Add an entry" | Label for the "add" button.
+|===
+
+Example:
+
+[source,java]
+----
+Form.create()
+   .with(
+      NamedEntries.of("links")
+         .label("List of links")
+         .nameLabel("Name")
+         .valueLabel("Link")
+         .nameOptional()
+         .addText("Add a link")
+         .help("List of links associated with a name.")
+         .value(value != null ? value.getLinks() : Collections.emptyList())
+   )
+----
 
 [[architecture-ui-forms-fields-date]]
 ====== `date` field
