@@ -1,6 +1,3 @@
-[[architecture-ui-forms]]
-===== Forms
-
 Simple input forms do not need a lot of effort to design in Ontrack. They
 can be used directly in pages or in modal dialogs.
 
@@ -14,7 +11,7 @@ include::architecture-ui-forms.puml[]
 ----
 
 [[architecture-ui-forms-object]]
-====== Form object
+===== Form object
 
 The `Form` object is created by adding `Field`s into it using its `with` method:
 
@@ -67,16 +64,16 @@ Form.create()
 ----
 
 [[architecture-ui-forms-fields]]
-====== Fields
+===== Fields
 
-TODO
+include::architecture-ui-forms-fields.adoc[]
 
 [[architecture-ui-forms-client]]
-====== Form usage on the client
+===== Form usage on the client
 
 TODO
 
 [[architecture-ui-forms-fields-rendering]]
-====== Fields rendering
+===== Fields rendering
 
 TODO
