@@ -26,7 +26,7 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
             api = GitlabAPI.connect(
                     configuration.getUrl(),
                     personalAccessToken,
-                    TokenType.ACCESS_TOKEN
+                    TokenType.PRIVATE_TOKEN
             );
         } else {
             api = GitlabAPI.connect(configuration.getUrl(), null, null, null);
