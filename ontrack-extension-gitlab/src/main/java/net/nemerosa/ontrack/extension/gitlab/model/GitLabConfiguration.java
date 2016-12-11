@@ -67,7 +67,7 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
 
     @Override
     public GitLabConfiguration obfuscate() {
-        return this;
+        return this.withPassword("");
     }
 
     @Override
