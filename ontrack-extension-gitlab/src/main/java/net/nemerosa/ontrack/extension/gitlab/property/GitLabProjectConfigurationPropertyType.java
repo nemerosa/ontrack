@@ -66,7 +66,7 @@ public class GitLabProjectConfigurationPropertyType
                 .with(
                         Selection.of("configuration")
                                 .label("Configuration")
-                                .help("GitHub configuration to use to access the repository")
+                                .help("GitLab configuration to use to access the repository")
                                 .items(configurationService.getConfigurationDescriptors())
                                 .value(value != null ? value.getConfiguration().getName() : null)
                 )
@@ -75,7 +75,7 @@ public class GitLabProjectConfigurationPropertyType
                                 .label("Repository")
                                 .length(100)
                                 .regex("[A-Za-z0-9_\\.\\-]+")
-                                .validation("Repository is required and must be a GitHub repository (account/repository).")
+                                .validation("Repository is required and must be a GitLab repository (account/repository).")
                                 .value(value != null ? value.getRepository() : null)
                 )
                 .with(

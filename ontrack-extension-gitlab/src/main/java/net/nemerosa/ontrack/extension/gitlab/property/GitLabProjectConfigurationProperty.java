@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty;
 public class GitLabProjectConfigurationProperty implements ConfigurationProperty<GitLabConfiguration> {
 
     /**
-     * Link to the GitHub configuration
+     * Link to the GitLab configuration
      */
     private final GitLabConfiguration configuration;
 
