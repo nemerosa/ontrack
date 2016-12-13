@@ -79,7 +79,7 @@ public class GitLabProjectConfigurationPropertyType
         // Adds the configuration for THIS project
         availableIssueServiceConfigurations.add(
                 0,
-                IssueServiceConfigurationRepresentation.self()
+                IssueServiceConfigurationRepresentation.self("GitLab issues")
         );
         // Edition form
         return Form.create()
@@ -96,7 +96,7 @@ public class GitLabProjectConfigurationPropertyType
                                 .help("Select an issue service that is used to associate tickets and issues to the source.")
                                 .optional()
                                 .items(availableIssueServiceConfigurations)
-                                .validation(value != null ? value.getIssueServiceConfigurationIdentifier() : null)
+                                .value(value != null ? value.getIssueServiceConfigurationIdentifier() : null)
                 )
                 .with(
                         Text.of("repository")

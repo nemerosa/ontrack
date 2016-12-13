@@ -42,10 +42,10 @@ public class IssueServiceConfigurationRepresentation {
      * Special representation used to designate an issue service which is linked to another configuration.
      * For example, the GitLab issue service linked to the GitLab Git configuration.
      */
-    public static IssueServiceConfigurationRepresentation self() {
+    public static IssueServiceConfigurationRepresentation self(String name) {
         return new IssueServiceConfigurationRepresentation(
                 SELF_ID,
-                "Self",
+                name,
                 ""
         );
     }
