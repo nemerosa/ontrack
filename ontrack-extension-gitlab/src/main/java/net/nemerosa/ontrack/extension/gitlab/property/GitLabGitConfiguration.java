@@ -9,6 +9,8 @@ import static java.lang.String.format;
 
 public class GitLabGitConfiguration implements GitConfiguration {
 
+    public static final String CONFIGURATION_REPOSITORY_SEPARATOR = ":";
+
     private final GitLabProjectConfigurationProperty property;
 
     public GitLabGitConfiguration(GitLabProjectConfigurationProperty property) {

@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.gitlab.client;
 
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
+import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.TokenType;
+import org.gitlab.api.models.GitlabIssue;
 import org.gitlab.api.models.GitlabProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,15 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
             return api.getProjects().stream()
                     .map(GitlabProject::getNameWithNamespace)
                     .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new OntrackGitLabClientException(e);
+        }
+    }
+
+    @Override
+    public GitLabIssueWrapper getIssue(String repository, int id) {
+        try {
+            return GitLabIssueWrapper.of(api.getIssue(repository, id));
         } catch (IOException e) {
             throw new OntrackGitLabClientException(e);
         }
