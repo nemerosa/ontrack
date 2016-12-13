@@ -3,12 +3,15 @@ package net.nemerosa.ontrack.extension.gitlab.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.UserPassword;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 
 import java.beans.ConstructorProperties;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -95,21 +98,13 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                                 .length(250)
                                 .help("URL of the GitLab engine.")
                 )
-                // GitLab user/password authentication is not supported
-//                .with(
-//                        Text.of("user")
-//                                .label("User")
-//                                .length(16)
-//                                .optional()
-//                )
-//                .with(
-//                        Password.of("password")
-//                                .label("Password")
-//                                .length(40)
-//                                .optional()
-//                )
                 .with(
-                        Text.of("personalAccessToken")
+                        Text.of("user")
+                                .label("User")
+                                .length(16)
+                )
+                .with(
+                        Password.of("personalAccessToken")
                                 .label("Personal Access Token")
                                 .length(50)
                                 .optional()
@@ -125,7 +120,7 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
         return form()
                 .with(defaultNameField().readOnly().value(name))
                 .fill("url", url)
-//                .fill("user", user)
+                .fill("user", user)
 //                .fill("password", "")
                 .fill("personalAccessToken", personalAccessToken)
                 .fill("ignoreSslCertificate", ignoreSslCertificate)
@@ -144,4 +139,13 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
         );
     }
 
+    @Override
+    public Optional<UserPassword> getCredentials() {
+        return Optional.of(
+                new UserPassword(
+                        user,
+                        personalAccessToken
+                )
+        );
+    }
 }
