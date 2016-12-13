@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.support.UserPassword;
 
@@ -49,8 +50,24 @@ public interface GitConfiguration {
     /**
      * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
      * with this repository.
+     * <p>
+     * FIXME #352 Remove this method
      */
-    String getIssueServiceConfigurationIdentifier();
+    @Deprecated
+    default String getIssueServiceConfigurationIdentifier() {
+        return getConfiguredIssueService()
+                .map(configuredIssueService -> configuredIssueService.getIssueServiceConfigurationRepresentation().getId())
+                .orElse(null);
+    }
+
+    /**
+     * Gets the associated issue service configuration (if any)
+     * <p>
+     * FIXME #352 #473 Implements this method in all providers
+     */
+    default Optional<ConfiguredIssueService> getConfiguredIssueService() {
+        return Optional.empty();
+    }
 
     /**
      * Gets the Git repository for this configuration

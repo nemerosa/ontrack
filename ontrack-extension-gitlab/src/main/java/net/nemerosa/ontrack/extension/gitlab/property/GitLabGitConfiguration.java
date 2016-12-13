@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.gitlab.property;
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.support.UserPassword;
 
 import java.util.Optional;
@@ -12,9 +13,11 @@ public class GitLabGitConfiguration implements GitConfiguration {
     public static final String CONFIGURATION_REPOSITORY_SEPARATOR = ":";
 
     private final GitLabProjectConfigurationProperty property;
+    private final ConfiguredIssueService configuredIssueService;
 
-    public GitLabGitConfiguration(GitLabProjectConfigurationProperty property) {
+    public GitLabGitConfiguration(GitLabProjectConfigurationProperty property, ConfiguredIssueService configuredIssueService) {
         this.property = property;
+        this.configuredIssueService = configuredIssueService;
     }
 
     @Override
@@ -65,8 +68,7 @@ public class GitLabGitConfiguration implements GitConfiguration {
     }
 
     @Override
-    public String getIssueServiceConfigurationIdentifier() {
-        return property.getIssueServiceConfigurationIdentifier();
+    public Optional<ConfiguredIssueService> getConfiguredIssueService() {
+        return Optional.ofNullable(configuredIssueService);
     }
-
 }

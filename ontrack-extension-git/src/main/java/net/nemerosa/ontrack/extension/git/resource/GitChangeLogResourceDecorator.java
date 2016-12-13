@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.scm.SCMController;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +34,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
         boolean issues = false;
         Optional<GitConfiguration> configuration = gitService.getProjectConfiguration(changeLog.getProject());
         if (configuration.isPresent()) {
-            issues = StringUtils.isNotBlank(configuration.get().getIssueServiceConfigurationIdentifier());
+            issues = configuration.get().getConfiguredIssueService().isPresent();
         }
         // Links
         return resourceContext.links()

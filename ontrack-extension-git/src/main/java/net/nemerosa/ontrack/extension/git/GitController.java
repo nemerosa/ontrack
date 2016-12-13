@@ -32,7 +32,6 @@ import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,7 +39,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -204,23 +202,20 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Gets the configuration for the project
-        Optional<GitConfiguration> configuration = gitService.getProjectConfiguration(project);
-        if (configuration.isPresent()) {
-            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.get().getIssueServiceConfigurationIdentifier());
-            if (configuredIssueService != null) {
-                return Resources.of(
+        return gitService.getProjectConfiguration(project)
+                .flatMap(GitConfiguration::getConfiguredIssueService)
+                .map(configuredIssueService -> Resources.of(
                         configuredIssueService.getIssueServiceExtension().exportFormats(
                                 configuredIssueService.getIssueServiceConfiguration()
                         ),
                         uri(on(GitController.class).changeLogExportFormats(projectId))
+                ))
+                .orElse(
+                        Resources.of(
+                                Collections.emptyList(),
+                                uri(on(GitController.class).changeLogExportFormats(projectId))
+                        )
                 );
-            }
-        }
-        // No configured issues
-        return Resources.of(
-                Collections.<ExportFormat>emptyList(),
-                uri(on(GitController.class).changeLogExportFormats(projectId))
-        );
     }
 
     /**
@@ -236,14 +231,14 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project)
                 .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
         // Gets the issue service
-        String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
-        if (StringUtils.isBlank(issueServiceConfigurationIdentifier)) {
+        Optional<ConfiguredIssueService> optConfiguredIssueService = gitConfiguration.getConfiguredIssueService();
+        if (!optConfiguredIssueService.isPresent()) {
             return new ResponseEntity<>(
                     "The branch is not configured for issues",
                     HttpStatus.NO_CONTENT
             );
         }
-        ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
+        ConfiguredIssueService configuredIssueService = optConfiguredIssueService.get();
         // Gets the issue change log
         GitChangeLogIssues changeLogIssues = gitService.getChangeLogIssues(changeLog);
         // List of issues
@@ -278,12 +273,14 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "changelog/diff", method = RequestMethod.GET)
     public ResponseEntity<String> diff(FileDiffChangeLogRequest request) {
+        // Null proof
+        FileDiffChangeLogRequest nonNullRequest = request != null ? request : new FileDiffChangeLogRequest();
         // Gets the change log
-        GitChangeLog changeLog = gitService.changeLog(request);
+        GitChangeLog changeLog = gitService.changeLog(nonNullRequest);
         // Diff export
         String diff = gitService.diff(
                 changeLog,
-                request.getPatterns()
+                nonNullRequest.getPatterns()
         );
         // Content type
         HttpHeaders responseHeaders = new HttpHeaders();
