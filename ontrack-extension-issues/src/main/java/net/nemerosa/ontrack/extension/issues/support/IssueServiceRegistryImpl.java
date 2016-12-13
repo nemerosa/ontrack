@@ -81,14 +81,10 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
         IssueServiceConfigurationIdentifier identifier = IssueServiceConfigurationIdentifier.parse(issueServiceConfigurationIdentifier);
         if (identifier != null) {
             Optional<IssueServiceExtension> issueService = getOptionalIssueService(identifier.getServiceId());
-            if (issueService.isPresent()) {
-                return new ConfiguredIssueService(
-                        issueService.get(),
-                        issueService.get().getConfigurationByName(identifier.getName())
-                );
-            } else {
-                return null;
-            }
+            return issueService.map(issueServiceExtension -> new ConfiguredIssueService(
+                    issueServiceExtension,
+                    issueServiceExtension.getConfigurationByName(identifier.getName())
+            )).orElse(null);
         } else {
             return null;
         }
@@ -96,10 +92,6 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
 
     private IssueServiceConfiguration getIssueServiceConfigurationById(IssueServiceConfigurationIdentifier identifier) {
         Optional<IssueServiceExtension> issueService = getOptionalIssueService(identifier.getServiceId());
-        if (issueService.isPresent()) {
-            return issueService.get().getConfigurationByName(identifier.getName());
-        } else {
-            return null;
-        }
+        return issueService.map(issueServiceExtension -> issueServiceExtension.getConfigurationByName(identifier.getName())).orElse(null);
     }
 }

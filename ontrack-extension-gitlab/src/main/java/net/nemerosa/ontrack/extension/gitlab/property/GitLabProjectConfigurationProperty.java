@@ -15,6 +15,12 @@ public class GitLabProjectConfigurationProperty implements ConfigurationProperty
     private final GitLabConfiguration configuration;
 
     /**
+     * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
+     * with this repository.
+     */
+    private final String issueServiceConfigurationIdentifier;
+
+    /**
      * Repository name
      */
     private final String repository;
