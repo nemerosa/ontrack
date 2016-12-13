@@ -66,8 +66,7 @@ public class GitLabGitConfiguration implements GitConfiguration {
 
     @Override
     public String getIssueServiceConfigurationIdentifier() {
-        // FIXME return property.getConfiguration().getIssueServiceConfigurationIdentifier();
-        return null;
+        return property.getIssueServiceConfigurationIdentifier();
     }
 
 }

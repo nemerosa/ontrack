@@ -17,6 +17,8 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class IssueServiceConfigurationRepresentation {
 
+    private static final String SELF_ID = "self";
+
     private final String id;
     private final String name;
     private final String serviceId;
@@ -29,4 +31,22 @@ public class IssueServiceConfigurationRepresentation {
         );
     }
 
+    /**
+     * Checks if this representation designates the special `self` issue service.
+     */
+    public boolean isSelf() {
+        return SELF_ID.equals(id);
+    }
+
+    /**
+     * Special representation used to designate an issue service which is linked to another configuration.
+     * For example, the GitLab issue service linked to the GitLab Git configuration.
+     */
+    public static IssueServiceConfigurationRepresentation self() {
+        return new IssueServiceConfigurationRepresentation(
+                SELF_ID,
+                "Self",
+                ""
+        );
+    }
 }

@@ -20,6 +20,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -72,7 +73,14 @@ public class GitLabProjectConfigurationPropertyType
     public Form getEditionForm(ProjectEntity entity, GitLabProjectConfigurationProperty value) {
         // Gets the list of issue configurations
         List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations =
-                issueServiceRegistry.getAvailableIssueServiceConfigurations();
+                new ArrayList<>(
+                        issueServiceRegistry.getAvailableIssueServiceConfigurations()
+                );
+        // Adds the configuration for THIS project
+        availableIssueServiceConfigurations.add(
+                0,
+                IssueServiceConfigurationRepresentation.self()
+        );
         // Edition form
         return Form.create()
                 .with(
@@ -85,7 +93,7 @@ public class GitLabProjectConfigurationPropertyType
                 .with(
                         Selection.of("issueServiceConfigurationIdentifier")
                                 .label("Issue configuration")
-                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
+                                .help("Select an issue service that is used to associate tickets and issues to the source.")
                                 .optional()
                                 .items(availableIssueServiceConfigurations)
                                 .validation(value != null ? value.getIssueServiceConfigurationIdentifier() : null)

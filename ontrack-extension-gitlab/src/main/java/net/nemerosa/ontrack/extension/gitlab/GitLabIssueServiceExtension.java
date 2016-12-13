@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
-import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.model.support.MessageAnnotation;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import net.nemerosa.ontrack.model.support.RegexMessageAnnotator;
@@ -34,7 +33,7 @@ public class GitLabIssueServiceExtension extends AbstractIssueServiceExtension {
     /**
      * Constructor.
      */
-    protected GitLabIssueServiceExtension(ExtensionFeature extensionFeature, IssueExportServiceFactory issueExportServiceFactory, GitLabConfigurationService configurationService, OntrackGitLabClientFactory gitLabClientFactory) {
+    protected GitLabIssueServiceExtension(GitLabExtensionFeature extensionFeature, IssueExportServiceFactory issueExportServiceFactory, GitLabConfigurationService configurationService, OntrackGitLabClientFactory gitLabClientFactory) {
         super(extensionFeature, GITLAB_SERVICE_ID, "GitLab", issueExportServiceFactory);
         this.configurationService = configurationService;
         this.gitLabClientFactory = gitLabClientFactory;
