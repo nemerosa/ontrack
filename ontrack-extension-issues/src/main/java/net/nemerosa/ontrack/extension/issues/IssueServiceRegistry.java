@@ -16,11 +16,6 @@ public interface IssueServiceRegistry {
     Collection<IssueServiceExtension> getIssueServices();
 
     /**
-     * Gets an issue service by its ID
-     */
-    IssueServiceExtension getIssueService(String id);
-
-    /**
      * Gets an issue service by its ID. It may be present or not.
      */
     Optional<IssueServiceExtension> getOptionalIssueService(String id);

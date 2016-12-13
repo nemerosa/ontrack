@@ -39,12 +39,6 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
     }
 
     @Override
-    public IssueServiceExtension getIssueService(String id) {
-        return getOptionalIssueService(id)
-                .orElseThrow(() -> new IssueServiceNotAvailableException(id));
-    }
-
-    @Override
     public Optional<IssueServiceExtension> getOptionalIssueService(String id) {
         return Optional.ofNullable(getIssueServiceExtensionMap().get(id));
     }
