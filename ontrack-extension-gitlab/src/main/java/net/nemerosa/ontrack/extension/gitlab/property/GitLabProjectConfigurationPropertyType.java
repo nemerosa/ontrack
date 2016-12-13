@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.gitlab.GitLabExtensionFeature;
+import net.nemerosa.ontrack.extension.gitlab.GitLabIssueServiceExtension;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
@@ -79,7 +80,7 @@ public class GitLabProjectConfigurationPropertyType
         // Adds the configuration for THIS project
         availableIssueServiceConfigurations.add(
                 0,
-                IssueServiceConfigurationRepresentation.self("GitLab issues")
+                IssueServiceConfigurationRepresentation.self("GitLab issues", GitLabIssueServiceExtension.GITLAB_SERVICE_ID)
         );
         // Edition form
         return Form.create()
