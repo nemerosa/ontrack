@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationIdentifier;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +26,8 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
     protected Map<String, IssueServiceExtension> getIssueServiceExtensionMap() {
         return extensionManager.getExtensions(IssueServiceExtension.class).stream()
                 .collect(Collectors.toMap(
-                                IssueServiceExtension::getId,
-                                x -> x
+                        IssueServiceExtension::getId,
+                        x -> x
                         )
                 );
     }
@@ -61,15 +60,6 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
     }
 
     @Override
-    public IssueServiceConfiguration getIssueServiceConfigurationById(String id) {
-        if (StringUtils.isBlank(id)) {
-            return null;
-        } else {
-            return getIssueServiceConfigurationById(IssueServiceConfigurationIdentifier.parse(id));
-        }
-    }
-
-    @Override
     public ConfiguredIssueService getConfiguredIssueService(String issueServiceConfigurationIdentifier) {
         // Parsing
         IssueServiceConfigurationIdentifier identifier = IssueServiceConfigurationIdentifier.parse(issueServiceConfigurationIdentifier);
@@ -84,8 +74,4 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
         }
     }
 
-    private IssueServiceConfiguration getIssueServiceConfigurationById(IssueServiceConfigurationIdentifier identifier) {
-        Optional<IssueServiceExtension> issueService = getOptionalIssueService(identifier.getServiceId());
-        return issueService.map(issueServiceExtension -> issueServiceExtension.getConfigurationByName(identifier.getName())).orElse(null);
-    }
 }
