@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPassword;
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
  */
 @Data
 @AllArgsConstructor
-public class BasicGitConfiguration implements GitConfiguration, UserPasswordConfiguration<BasicGitConfiguration> {
+public class BasicGitConfiguration implements UserPasswordConfiguration<BasicGitConfiguration> {
 
     /**
      * Name of this configuration
@@ -84,12 +84,6 @@ public class BasicGitConfiguration implements GitConfiguration, UserPasswordConf
                 0,
                 ""
         );
-    }
-
-    @Override
-    @JsonIgnore
-    public String getType() {
-        return "basic";
     }
 
     @Override
