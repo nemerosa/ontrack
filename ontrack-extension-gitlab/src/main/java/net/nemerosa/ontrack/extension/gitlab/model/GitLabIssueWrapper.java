@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.gitlab.model;
 
 import lombok.Data;
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueStatus;
 import org.gitlab.api.models.GitlabIssue;
@@ -13,6 +14,8 @@ import java.util.List;
 public class GitLabIssueWrapper implements Issue {
 
     private final GitlabIssue gitlabIssue;
+    private final String milestoneUrl;
+    private final String issueUrl;
 
     @Override
     public String getKey() {
@@ -26,24 +29,21 @@ public class GitLabIssueWrapper implements Issue {
 
     @Override
     public String getUrl() {
-        // FIXME Method net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper.getUrl
-        return null;
+        return issueUrl;
     }
 
     @Override
     public IssueStatus getStatus() {
-        // FIXME Method net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper.getStatus
-        return null;
+        return new GitLabIssueStatusWrapper(gitlabIssue.getState());
     }
 
     @Override
     public LocalDateTime getUpdateTime() {
-        // FIXME Method net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper.getUpdateTime
-        return null;
+        return Time.from(gitlabIssue.getUpdatedAt(), null);
     }
 
-    public static GitLabIssueWrapper of(GitlabIssue issue) {
-        return new GitLabIssueWrapper(issue);
+    public static GitLabIssueWrapper of(GitlabIssue issue, String milestoneUrl, String issueUrl) {
+        return new GitLabIssueWrapper(issue, milestoneUrl, issueUrl);
     }
 
     public List<String> getLabels() {
