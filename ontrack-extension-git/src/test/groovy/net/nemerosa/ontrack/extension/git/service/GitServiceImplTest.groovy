@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
+import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
@@ -38,9 +39,11 @@ class GitServiceImplTest {
         def gitConfigurator = mock(GitConfigurator)
         when(gitConfigurator.getConfiguration(Mockito.any(Project.class))).thenReturn(
                 Optional.of(
-                        BasicGitConfiguration.empty()
-                                .withRemote("remote")
-                                .withName("MyGitConfig")
+                        BasicGitActualConfiguration.of(
+                                BasicGitConfiguration.empty()
+                                        .withRemote("remote")
+                                        .withName("MyGitConfig")
+                        )
                 )
         )
 
@@ -119,7 +122,7 @@ class GitServiceImplTest {
         // Git configuration
         BasicGitConfiguration gitConfiguration = BasicGitConfiguration.empty()
         GitBranchConfiguration branchConfiguration = GitBranchConfiguration.of(
-                gitConfiguration,
+                BasicGitActualConfiguration.of(gitConfiguration),
                 branch.name
         )
 

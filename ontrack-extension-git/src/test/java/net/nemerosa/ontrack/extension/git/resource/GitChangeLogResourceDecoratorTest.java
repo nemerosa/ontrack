@@ -201,7 +201,7 @@ public class GitChangeLogResourceDecoratorTest {
                 Optional.of(
                         new BasicGitActualConfiguration(
                                 BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
-                                MockIssueServiceConfiguration.configuredIssueService("MyTest")
+                                null
                         )
                 )
         );

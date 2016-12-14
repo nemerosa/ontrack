@@ -189,7 +189,8 @@ public class BasicGitConfiguration implements UserPasswordConfiguration<BasicGit
                 ;
     }
 
-    public GitRepository asGitRepository() {
+    @JsonIgnore
+    public GitRepository getGitRepository() {
         Optional<UserPassword> credentials = getCredentials();
         return new GitRepository(
                 TYPE,

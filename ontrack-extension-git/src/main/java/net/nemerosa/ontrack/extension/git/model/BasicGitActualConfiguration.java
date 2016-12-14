@@ -26,6 +26,13 @@ public class BasicGitActualConfiguration implements GitConfiguration {
         this.configuredIssueService = configuredIssueService;
     }
 
+    public static GitConfiguration of(BasicGitConfiguration basicGitConfiguration) {
+        return new BasicGitActualConfiguration(
+                basicGitConfiguration,
+                null
+        );
+    }
+
     @Override
     public String getType() {
         return BasicGitConfiguration.TYPE;
