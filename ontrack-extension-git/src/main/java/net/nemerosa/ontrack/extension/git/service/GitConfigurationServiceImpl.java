@@ -29,7 +29,7 @@ public class GitConfigurationServiceImpl extends AbstractConfigurationService<Ba
     @Override
     protected ConnectionResult validate(BasicGitConfiguration configuration) {
         try {
-            repositoryClientFactory.getClient(configuration.getGitRepository()).test();
+            repositoryClientFactory.getClient(configuration.asGitRepository()).test();
             return ConnectionResult.ok();
         } catch (Exception ex) {
             return ConnectionResult.error(ex.getMessage());

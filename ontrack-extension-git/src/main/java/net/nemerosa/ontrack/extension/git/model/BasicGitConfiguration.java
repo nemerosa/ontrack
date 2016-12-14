@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
+import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPassword;
@@ -23,6 +24,8 @@ import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 @Data
 @AllArgsConstructor
 public class BasicGitConfiguration implements UserPasswordConfiguration<BasicGitConfiguration> {
+
+    public static final String TYPE = "basic";
 
     /**
      * Name of this configuration
@@ -184,5 +187,16 @@ public class BasicGitConfiguration implements UserPasswordConfiguration<BasicGit
                 .fill("indexationInterval", indexationInterval)
                 .fill("issueServiceConfigurationIdentifier", issueServiceConfigurationIdentifier)
                 ;
+    }
+
+    public GitRepository asGitRepository() {
+        Optional<UserPassword> credentials = getCredentials();
+        return new GitRepository(
+                TYPE,
+                getName(),
+                getRemote(),
+                credentials.map(UserPassword::getUser).orElse(""),
+                credentials.map(UserPassword::getPassword).orElse("")
+        );
     }
 }

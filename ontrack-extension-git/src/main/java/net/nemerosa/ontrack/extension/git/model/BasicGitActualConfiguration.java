@@ -29,7 +29,7 @@ public class BasicGitActualConfiguration implements GitConfiguration {
 
     @Override
     public String getType() {
-        return "basic";
+        return BasicGitConfiguration.TYPE;
     }
 
     @Override

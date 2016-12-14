@@ -25,7 +25,7 @@ public class GitHealthIndicator extends ConfigurationHealthIndicator<BasicGitCon
     @Override
     protected Health getHealth(BasicGitConfiguration config) {
         try {
-            GitRepositoryClient client = repositoryClientFactory.getClient(config.getGitRepository());
+            GitRepositoryClient client = repositoryClientFactory.getClient(config.asGitRepository());
             client.getRemoteBranches();
             return Health.up().build();
         } catch (Exception ex) {
