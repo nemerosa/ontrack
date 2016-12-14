@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration;
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitBuildInfo;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
-import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
@@ -82,9 +81,7 @@ public class GitChangeLogResourceDecoratorTest {
         when(gitService.getProjectConfiguration(project)).thenReturn(
                 Optional.of(
                         new BasicGitActualConfiguration(
-                                new GitProjectConfigurationProperty(
-                                        BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest")
-                                ),
+                                BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
                                 MockIssueServiceConfiguration.configuredIssueService("MyTest")
                         )
                 )
@@ -203,9 +200,7 @@ public class GitChangeLogResourceDecoratorTest {
         when(gitService.getProjectConfiguration(project)).thenReturn(
                 Optional.of(
                         new BasicGitActualConfiguration(
-                                new GitProjectConfigurationProperty(
-                                        BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest")
-                                ),
+                                BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
                                 MockIssueServiceConfiguration.configuredIssueService("MyTest")
                         )
                 )

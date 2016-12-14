@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.model;
 
-import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
@@ -15,15 +14,15 @@ public class BasicGitActualConfiguration implements GitConfiguration {
     /**
      * Configuration property
      */
-    private final GitProjectConfigurationProperty property;
+    private final BasicGitConfiguration configuration;
 
     /**
      * Issue service
      */
     private final ConfiguredIssueService configuredIssueService;
 
-    public BasicGitActualConfiguration(GitProjectConfigurationProperty property, ConfiguredIssueService configuredIssueService) {
-        this.property = property;
+    public BasicGitActualConfiguration(BasicGitConfiguration configuration, ConfiguredIssueService configuredIssueService) {
+        this.configuration = configuration;
         this.configuredIssueService = configuredIssueService;
     }
 
@@ -34,18 +33,18 @@ public class BasicGitActualConfiguration implements GitConfiguration {
 
     @Override
     public String getName() {
-        return property.getConfiguration().getName();
+        return configuration.getName();
     }
 
     @Override
     public String getRemote() {
-        return property.getConfiguration().getRemote();
+        return configuration.getRemote();
     }
 
     @Override
     public Optional<UserPassword> getCredentials() {
-        String user = property.getConfiguration().getUser();
-        String password = property.getConfiguration().getPassword();
+        String user = configuration.getUser();
+        String password = configuration.getPassword();
         return StringUtils.isNotBlank(user) ?
                 Optional.of(new UserPassword(user, password)) :
                 Optional.empty();
@@ -53,17 +52,17 @@ public class BasicGitActualConfiguration implements GitConfiguration {
 
     @Override
     public String getCommitLink() {
-        return property.getConfiguration().getCommitLink();
+        return configuration.getCommitLink();
     }
 
     @Override
     public String getFileAtCommitLink() {
-        return property.getConfiguration().getFileAtCommitLink();
+        return configuration.getFileAtCommitLink();
     }
 
     @Override
     public int getIndexationInterval() {
-        return property.getConfiguration().getIndexationInterval();
+        return configuration.getIndexationInterval();
     }
 
     @Override

@@ -35,7 +35,7 @@ public class BasicGitConfigurator implements GitConfigurator {
 
     private GitConfiguration getGitConfiguration(GitProjectConfigurationProperty property) {
         return new BasicGitActualConfiguration(
-                property,
+                property.getConfiguration(),
                 getConfiguredIssueService(property)
         );
     }
