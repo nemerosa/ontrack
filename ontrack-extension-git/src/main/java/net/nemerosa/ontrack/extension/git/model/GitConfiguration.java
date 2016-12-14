@@ -63,6 +63,7 @@ public interface GitConfiguration {
      * <p>
      * FIXME #352 #473 Implements this method in all providers
      */
+    @JsonIgnore
     default Optional<ConfiguredIssueService> getConfiguredIssueService() {
         return Optional.empty();
     }
