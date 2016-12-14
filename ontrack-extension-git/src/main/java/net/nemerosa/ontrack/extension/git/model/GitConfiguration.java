@@ -48,17 +48,6 @@ public interface GitConfiguration {
     int getIndexationInterval();
 
     /**
-     * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
-     * with this repository.
-     * <p>
-     * FIXME #352 Remove this method
-     */
-    @Deprecated
-    default String getIssueServiceConfigurationIdentifier() {
-        return null;
-    }
-
-    /**
      * Gets the associated issue service configuration (if any)
      * <p>
      * FIXME #352 #473 Implements this method in all providers
