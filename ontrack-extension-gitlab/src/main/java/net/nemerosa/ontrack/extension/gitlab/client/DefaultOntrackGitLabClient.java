@@ -49,6 +49,7 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
     @Override
     public GitLabIssueWrapper getIssue(String repository, int id) {
         try {
+            // FIXME URL base...
             // Issue
             String issueUrl = GitlabProject.URL + "/" + repository + GitlabIssue.URL + "/" + id;
             GitlabIssue issue = api.getIssue(repository, id);
