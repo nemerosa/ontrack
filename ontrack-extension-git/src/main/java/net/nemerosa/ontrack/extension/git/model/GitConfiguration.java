@@ -55,9 +55,7 @@ public interface GitConfiguration {
      */
     @Deprecated
     default String getIssueServiceConfigurationIdentifier() {
-        return getConfiguredIssueService()
-                .map(configuredIssueService -> configuredIssueService.getIssueServiceConfigurationRepresentation().getId())
-                .orElse(null);
+        return null;
     }
 
     /**
