@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.gitlab.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
@@ -46,6 +47,7 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
     /**
      * Personal Access Token
      */
+    @Wither
     private final String personalAccessToken;
 
     /**
@@ -74,7 +76,7 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
 
     @Override
     public GitLabConfiguration obfuscate() {
-        return this.withPassword("");
+        return this.withPersonalAccessToken("");
     }
 
     @Override
@@ -121,8 +123,7 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                 .with(defaultNameField().readOnly().value(name))
                 .fill("url", url)
                 .fill("user", user)
-//                .fill("password", "")
-                .fill("personalAccessToken", personalAccessToken)
+                // .fill("personalAccessToken", personalAccessToken)
                 .fill("ignoreSslCertificate", ignoreSslCertificate)
                 ;
     }
