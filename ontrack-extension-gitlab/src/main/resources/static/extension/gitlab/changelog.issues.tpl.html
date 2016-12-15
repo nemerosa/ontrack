@@ -44,10 +44,8 @@
             <span>{{changeLogIssue.issue.updateTime | date:'mediumDate'}}</span>
         </td>
         <td class="ot-label-suite">
-            <span ng-repeat="label in changeLogIssue.issue.labels"
-                  class="label label-info"
-                  ng-style="{'background-color': '#' + label.color + ' !important'}"
-                    >{{label.name}}</span>
+            <span ng-repeat="label in changeLogIssue.issue.gitlabIssue.labels"
+                  class="label label-info">{{label}}</span>
         </td>
     </tr>
     </tbody>
