@@ -1,0 +1,31 @@
+<div ng-if="value.bodyHtml" ng-bind-html="value.bodyHtml" class="well"></div>
+<div>
+    State:
+    <span class="label"
+          ng-class="{
+                    'label-success': (value.status.name == 'opened'),
+                    'label-danger': (value.status.name != 'opened')
+                    }">
+                {{value.status.name}}
+            </span>
+    <span ng-if="value.gitlabIssue.milestone">
+        Milestone:
+        <a class="label"
+           ng-class="{
+                    'label-success': (value.gitlabIssue.milestone.state == 'active'),
+                    'label-danger': (value.gitlabIssue.milestone.state != 'active')
+                    }"
+           ng-if="value.milestoneUrl"
+           href="{{value.milestoneUrl}}">
+                {{value.gitlabIssue.milestone.title}}
+            </a>
+    </span>
+    <span ng-if="value.labels" class="ot-label-suite">
+        Labels:
+        <span ng-repeat="label in value.labels" class="label label-info">{{label}}</span>
+    </span>
+    <span ng-if="value.gitlabIssue.assignee">
+        Assignee:
+        {{value.gitlabIssue.assignee.name}}
+    </span>
+</div>
