@@ -23,6 +23,11 @@ public class GitLabIssueWrapper implements Issue {
     }
 
     @Override
+    public String getDisplayKey() {
+        return "#" + gitlabIssue.getId();
+    }
+
+    @Override
     public String getSummary() {
         return gitlabIssue.getTitle();
     }
