@@ -38,10 +38,10 @@
             </a>
         </td>
         <td>
-            <a ng-if="changeLogIssue.issue.assignee" href="{{changeLogIssue.issue.assignee.url}}">{{changeLogIssue.issue.assignee.login}}</a>
+            {{changeLogIssue.issue.gitlabIssue.assignee.name}}
         </td>
         <td>
-            <span>{{changeLogIssue.issue.updatedAt | date:'mediumDate'}}</span>
+            <span>{{changeLogIssue.issue.updateTime | date:'mediumDate'}}</span>
         </td>
         <td class="ot-label-suite">
             <span ng-repeat="label in changeLogIssue.issue.labels"
