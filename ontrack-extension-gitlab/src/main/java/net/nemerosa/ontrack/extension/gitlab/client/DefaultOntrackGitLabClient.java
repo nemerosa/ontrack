@@ -19,8 +19,10 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
     private final Logger logger = LoggerFactory.getLogger(OntrackGitLabClient.class);
 
     private final GitlabAPI api;
+    private final GitLabConfiguration configuration;
 
     public DefaultOntrackGitLabClient(GitLabConfiguration configuration) throws IOException {
+        this.configuration = configuration;
         String personalAccessToken = configuration.getPersonalAccessToken();
         GitlabAPI api = GitlabAPI.connect(
                 configuration.getUrl(),
@@ -49,14 +51,13 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
     @Override
     public GitLabIssueWrapper getIssue(String repository, int id) {
         try {
-            // FIXME URL base...
             // Issue
-            String issueUrl = GitlabProject.URL + "/" + repository + GitlabIssue.URL + "/" + id;
+            String issueUrl = configuration.getUrl() + "/" + repository + GitlabIssue.URL + "/" + id;
             GitlabIssue issue = api.getIssue(repository, id);
             // Milestone URL
             String milestoneUrl = null;
             if (issue.getMilestone() != null) {
-                milestoneUrl = GitlabProject.URL + "/" + repository + GitlabMilestone.URL + "/" + issue.getMilestone().getId();
+                milestoneUrl = configuration.getUrl() + "/" + repository + GitlabMilestone.URL + "/" + issue.getMilestone().getId();
             }
             // OK
             return GitLabIssueWrapper.of(issue, milestoneUrl, issueUrl);
