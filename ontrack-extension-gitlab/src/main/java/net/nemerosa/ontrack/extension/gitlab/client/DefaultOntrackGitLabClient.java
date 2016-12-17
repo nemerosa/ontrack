@@ -23,7 +23,7 @@ public class DefaultOntrackGitLabClient implements OntrackGitLabClient {
 
     public DefaultOntrackGitLabClient(GitLabConfiguration configuration) throws IOException {
         this.configuration = configuration;
-        String personalAccessToken = configuration.getPersonalAccessToken();
+        String personalAccessToken = configuration.getPassword();
         GitlabAPI api = GitlabAPI.connect(
                 configuration.getUrl(),
                 personalAccessToken,

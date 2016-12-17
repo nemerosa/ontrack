@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.gitlab.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
@@ -40,28 +39,21 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
     private final String user;
 
     /**
-     * User password
+     * User password (used as Personal Access Token)
      */
     private final String password;
-
-    /**
-     * Personal Access Token
-     */
-    @Wither
-    private final String personalAccessToken;
 
     /**
      * Ignoring SSL issues?
      */
     private final boolean ignoreSslCertificate;
 
-    @ConstructorProperties({"name", "url", "user", "password", "personalAccessToken", "ignoreSslCertificate"})
-    public GitLabConfiguration(String name, String url, String user, String password, String personalAccessToken, boolean ignoreSslCertificate) {
+    @ConstructorProperties({"name", "url", "user", "password", "ignoreSslCertificate"})
+    public GitLabConfiguration(String name, String url, String user, String password, boolean ignoreSslCertificate) {
         this.name = name;
         this.url = url;
         this.user = user;
         this.password = password;
-        this.personalAccessToken = personalAccessToken;
         this.ignoreSslCertificate = ignoreSslCertificate;
     }
 
@@ -76,7 +68,7 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
 
     @Override
     public GitLabConfiguration obfuscate() {
-        return this.withPersonalAccessToken("");
+        return this.withPassword("");
     }
 
     @Override
@@ -86,7 +78,6 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                 url,
                 user,
                 password,
-                personalAccessToken,
                 ignoreSslCertificate
         );
     }
@@ -106,10 +97,9 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                                 .length(16)
                 )
                 .with(
-                        Password.of("personalAccessToken")
+                        Password.of("password")
                                 .label("Personal Access Token")
                                 .length(50)
-                                .optional()
                 )
                 .with(
                         YesNo.of("ignoreSslCertificate")
@@ -123,7 +113,6 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                 .with(defaultNameField().readOnly().value(name))
                 .fill("url", url)
                 .fill("user", user)
-                // .fill("personalAccessToken", personalAccessToken)
                 .fill("ignoreSslCertificate", ignoreSslCertificate)
                 ;
     }
@@ -135,7 +124,6 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
                 replacementFunction.apply(url),
                 replacementFunction.apply(user),
                 password,
-                personalAccessToken,
                 ignoreSslCertificate
         );
     }
@@ -145,7 +133,7 @@ public class GitLabConfiguration implements UserPasswordConfiguration<GitLabConf
         return Optional.of(
                 new UserPassword(
                         user,
-                        personalAccessToken
+                        password
                 )
         );
     }

@@ -24,8 +24,7 @@ public class GitLabConfigurationTest {
                         .with("name", "ontrack")
                         .with("url", "https://gitlab.nemerosa.net")
                         .with("user", "test")
-                        .withNull("password")
-                        .with("personalAccessToken", "1234567890abcdef")
+                        .with("password", "1234567890abcdef")
                         .with("ignoreSslCertificate", false)
                         .end(),
                 configurationFixture()
@@ -40,8 +39,7 @@ public class GitLabConfigurationTest {
                         .with("name", "ontrack")
                         .with("url", "https://gitlab.nemerosa.net")
                         .with("user", "test")
-                        .withNull("password")
-                        .with("personalAccessToken", "1234567890abcdef")
+                        .with("password", "1234567890abcdef")
                         .with("ignoreSslCertificate", false)
                         .end(),
                 GitLabConfiguration.class
@@ -58,7 +56,7 @@ public class GitLabConfigurationTest {
     @Test
     public void obfuscate() {
         GitLabConfiguration obfuscate = configurationFixture().obfuscate();
-        assertEquals("", obfuscate.getPersonalAccessToken());
+        assertEquals("", obfuscate.getPassword());
     }
 
     @Test
@@ -70,9 +68,7 @@ public class GitLabConfigurationTest {
         assertEquals("test", form.getField("user").getValue());
         assertEquals(Boolean.FALSE, form.getField("ignoreSslCertificate").getValue());
         // Obfuscated token
-        assertNull(form.getField("personalAccessToken").getValue());
-        // No password
-        assertNull(form.getField("password"));
+        assertNull(form.getField("password").getValue());
     }
 
     @Test
@@ -81,8 +77,7 @@ public class GitLabConfigurationTest {
         assertEquals("newConfig", cloned.getName());
         assertEquals("https://gitlab.other.net", cloned.getUrl());
         assertEquals("test", cloned.getUser());
-        assertNull(cloned.getPassword());
-        assertEquals("1234567890abcdef", cloned.getPersonalAccessToken());
+        assertEquals("1234567890abcdef", cloned.getPassword());
         assertFalse(cloned.isIgnoreSslCertificate());
     }
 
@@ -107,7 +102,6 @@ public class GitLabConfigurationTest {
                 "ontrack",
                 "https://gitlab.nemerosa.net",
                 "test",
-                null,
                 "1234567890abcdef",
                 false
         );
