@@ -1522,6 +1522,27 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Project configuration - GitLab'() {
+        def name = uid('GL')
+        ontrack.configure {
+            gitLab name, url: 'https://gitlab.acme.com', user: 'user', password: 'abcdef'
+        }
+        def projectName = uid('P')
+        // Sets the configuration
+        ontrack.project(projectName) {
+            config {
+                gitLab name, repository: "nemerosa/ontrack", indexationInterval: 10, issueServiceConfigurationIdentifier: 'self'
+            }
+        }
+        // Gets the configuration
+        def gitLab = ontrack.project(projectName).config.gitLab
+        assert gitLab != null
+        assert gitLab.configuration.name == name
+        assert gitLab.repository == 'nemerosa/ontrack'
+        assert gitLab.issueServiceConfigurationIdentifier == 'self'
+    }
+
+    @Test
     void 'Configuration - Git'() {
         def name = uid('G')
         ontrack.configure {

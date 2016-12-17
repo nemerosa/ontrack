@@ -62,6 +62,24 @@ class ProjectProperties extends ProjectEntityProperties {
     }
 
     /**
+     * GitLab configuration
+     */
+
+    @DSLMethod
+    def gitLab(Map<String, ?> parameters, String name) {
+        assert parameters.containsKey('repository'): "The 'repository' parameter is required"
+        property('net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType',
+                parameters + [
+                        configuration: name
+                ])
+    }
+
+    @DSLMethod(see = "gitLab")
+    def getGitLab() {
+        property('net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType', false)
+    }
+
+    /**
      * SVN configuration
      */
 
