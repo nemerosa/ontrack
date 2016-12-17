@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.*
+import net.nemerosa.ontrack.dsl.Branch
+import net.nemerosa.ontrack.dsl.MetaInfo
+import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
+import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import net.nemerosa.ontrack.shell.Shell
@@ -1507,6 +1510,15 @@ class ACCDSL extends AbstractACCDSL {
             gitHub name, oauth2Token: 'ABCDEF'
         }
         assert ontrack.config.gitHub.find { it == name } != null
+    }
+
+    @Test
+    void 'Configuration - GitLab'() {
+        def name = uid('GL')
+        ontrack.configure {
+            gitLab name, url: 'https://gitlab.acme.com', user: 'user', password: 'abcdef'
+        }
+        assert ontrack.config.gitLab.find { it == name } != null
     }
 
     @Test
