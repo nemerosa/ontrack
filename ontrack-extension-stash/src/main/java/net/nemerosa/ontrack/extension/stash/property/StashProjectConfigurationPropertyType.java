@@ -3,10 +3,13 @@ package net.nemerosa.ontrack.extension.stash.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.stash.StashExtensionFeature;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
@@ -18,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -26,11 +30,13 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
         implements ConfigurationPropertyType<StashConfiguration, StashProjectConfigurationProperty> {
 
     private final StashConfigurationService configurationService;
+    private final IssueServiceRegistry issueServiceRegistry;
 
     @Autowired
-    public StashProjectConfigurationPropertyType(StashExtensionFeature extensionFeature, StashConfigurationService configurationService) {
+    public StashProjectConfigurationPropertyType(StashExtensionFeature extensionFeature, StashConfigurationService configurationService, IssueServiceRegistry issueServiceRegistry) {
         super(extensionFeature);
         this.configurationService = configurationService;
+        this.issueServiceRegistry = issueServiceRegistry;
     }
 
     @Override
@@ -60,6 +66,7 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
 
     @Override
     public Form getEditionForm(ProjectEntity entity, StashProjectConfigurationProperty value) {
+        List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations = issueServiceRegistry.getAvailableIssueServiceConfigurations();
         return Form.create()
                 .with(
                         Selection.of("configuration")
@@ -80,6 +87,21 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
                                 .help("Repository in the BitBucket project")
                                 .value(value != null ? value.getRepository() : null)
                 )
+                .with(
+                        Int.of("indexationInterval")
+                                .label("Indexation interval")
+                                .min(0)
+                                .max(60 * 24)
+                                .value(0)
+                                .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.model.GitConfiguration.indexationInterval.tpl.html")
+                )
+                .with(
+                        Selection.of("issueServiceConfigurationIdentifier")
+                                .label("Issue configuration")
+                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
+                                .optional()
+                                .items(availableIssueServiceConfigurations)
+                )
                 ;
     }
 
@@ -97,7 +119,9 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
         return new StashProjectConfigurationProperty(
                 configuration,
                 node.path("project").asText(),
-                node.path("repository").asText()
+                node.path("repository").asText(),
+                node.path("indexationInterval").asInt(),
+                node.path("issueServiceConfigurationIdentifier").asText()
         );
     }
 
@@ -108,6 +132,8 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
                         .with("configuration", value.getConfiguration().getName())
                         .with("project", value.getProject())
                         .with("repository", value.getRepository())
+                        .with("indexationInterval", value.getIndexationInterval())
+                        .with("issueServiceConfigurationIdentifier", value.getIssueServiceConfigurationIdentifier())
                         .get()
         );
     }
@@ -122,7 +148,9 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
         return new StashProjectConfigurationProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
                 replacementFunction.apply(value.getProject()),
-                replacementFunction.apply(value.getRepository())
+                replacementFunction.apply(value.getRepository()),
+                value.getIndexationInterval(),
+                value.getIssueServiceConfigurationIdentifier()
         );
     }
 

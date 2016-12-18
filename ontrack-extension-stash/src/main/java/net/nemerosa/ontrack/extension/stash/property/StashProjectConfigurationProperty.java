@@ -23,6 +23,17 @@ public class StashProjectConfigurationProperty implements ConfigurationProperty<
     private final String repository;
 
     /**
+     * Indexation interval
+     */
+    private final int indexationInterval;
+
+    /**
+     * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
+     * with this repository.
+     */
+    private final String issueServiceConfigurationIdentifier;
+
+    /**
      * Link to the repository
      */
     @SuppressWarnings("unused")

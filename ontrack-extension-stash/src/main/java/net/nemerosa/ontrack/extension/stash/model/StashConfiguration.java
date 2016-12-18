@@ -42,12 +42,14 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
     /**
      * Indexation interval
      */
+    @Deprecated
     private final int indexationInterval;
 
     /**
      * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
      * with this repository.
      */
+    @Deprecated
     private final String issueServiceConfigurationIdentifier;
 
     @Override

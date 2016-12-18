@@ -15,7 +15,8 @@ public class StashGitConfigurationTest {
                                 "server",
                                 "http://stash.mycompany.com",
                                 "", "", 0, ""
-                        ), "nemerosa", "ontrack"
+                        ), "nemerosa", "ontrack",
+                        0, ""
                 ),
                 null);
         assertFalse(gitConfiguration.isCloud());
@@ -32,7 +33,8 @@ public class StashGitConfigurationTest {
                                 "cloud",
                                 "https://bitbucket.org",
                                 "", "", 0, ""
-                        ), "nemerosa", "ontrack"
+                        ), "nemerosa", "ontrack",
+                        0, ""
                 ),
                 null);
         assertTrue(gitConfiguration.isCloud());
