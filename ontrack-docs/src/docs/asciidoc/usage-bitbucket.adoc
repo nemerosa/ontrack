@@ -5,7 +5,7 @@ https://www.atlassian.com/software/bitbucket[BitBucket] is an enterprise Git
 repository manager by Atlassian.
 
 When <<usage-git,working with Git>> in Ontrack, one can configure a project
-to connect to a Git repository defined in Stash in order to access to the
+to connect to a Git repository defined in BitBucket in order to access to the
 change logs.
 
 [[usage-bitbucket-config]]
