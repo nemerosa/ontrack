@@ -3,11 +3,14 @@ package net.nemerosa.ontrack.extension.github.property;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationIdentifier;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,14 +23,16 @@ public class GitHubConfigurator implements GitConfigurator {
 
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
+    private final GitHubIssueServiceExtension issueServiceExtension;
 
     @Autowired
     public GitHubConfigurator(
             PropertyService propertyService,
-            IssueServiceRegistry issueServiceRegistry
-    ) {
+            IssueServiceRegistry issueServiceRegistry,
+            GitHubIssueServiceExtension issueServiceExtension) {
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
+        this.issueServiceExtension = issueServiceExtension;
     }
 
     @Override
@@ -45,24 +50,24 @@ public class GitHubConfigurator implements GitConfigurator {
     }
 
     private ConfiguredIssueService getConfiguredIssueService(GitHubProjectConfigurationProperty property) {
-        // TODO #473 String identifier = property.getIssueServiceConfigurationIdentifier();
-        // TODO #473 if (IssueServiceConfigurationRepresentation.isSelf(identifier)) {
-//            return new ConfiguredIssueService(
-//                    issueServiceExtension,
-//                    new GitLabIssueServiceConfiguration(
-//                            property.getConfiguration(),
-//                            property.getRepository()
-//                    )
-//            );
-//        } else {
-        return issueServiceRegistry.getConfiguredIssueService(
-                new IssueServiceConfigurationIdentifier(
-                        GitHubIssueServiceExtension.GITHUB_SERVICE_ID,
-                        property.getConfiguration().getName()
-                                + CONFIGURATION_REPOSITORY_SEPARATOR
-                                + property.getRepository()
-                ).format()
-        );
-//        }
+        String identifier = property.getIssueServiceConfigurationIdentifier();
+        if (StringUtils.isBlank(identifier) || IssueServiceConfigurationRepresentation.isSelf(identifier)) {
+            return new ConfiguredIssueService(
+                    issueServiceExtension,
+                    new GitHubIssueServiceConfiguration(
+                            property.getConfiguration(),
+                            property.getRepository()
+                    )
+            );
+        } else {
+            return issueServiceRegistry.getConfiguredIssueService(
+                    new IssueServiceConfigurationIdentifier(
+                            GitHubIssueServiceExtension.GITHUB_SERVICE_ID,
+                            property.getConfiguration().getName()
+                                    + CONFIGURATION_REPOSITORY_SEPARATOR
+                                    + property.getRepository()
+                    ).format()
+            );
+        }
     }
 }

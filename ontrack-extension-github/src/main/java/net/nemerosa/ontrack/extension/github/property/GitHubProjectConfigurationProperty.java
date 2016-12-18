@@ -22,4 +22,10 @@ public class GitHubProjectConfigurationProperty implements ConfigurationProperty
      */
     private final int indexationInterval;
 
+    /**
+     * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
+     * with this repository.
+     */
+    private final String issueServiceConfigurationIdentifier;
+
 }
