@@ -49,13 +49,8 @@ public interface GitConfiguration {
 
     /**
      * Gets the associated issue service configuration (if any)
-     * <p>
-     * FIXME #352 #473 Implements this method in all providers
      */
-    @JsonIgnore
-    default Optional<ConfiguredIssueService> getConfiguredIssueService() {
-        return Optional.empty();
-    }
+    Optional<ConfiguredIssueService> getConfiguredIssueService();
 
     /**
      * Gets the Git repository for this configuration
