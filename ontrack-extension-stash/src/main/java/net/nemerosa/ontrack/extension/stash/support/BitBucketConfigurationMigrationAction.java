@@ -43,7 +43,11 @@ public class BitBucketConfigurationMigrationAction implements DBMigrationAction 
                     // Gets the fields to migrate
                     int indexationInterval = JsonUtils.getInt(node, "indexationInterval", 0);
                     String issueServiceIdentifier = JsonUtils.get(node, "issueServiceConfigurationIdentifier", false, "");
-                    // FIXME Removes interval & issue identifier
+                    // Removes interval & issue identifier
+                    node.remove("indexationInterval");
+                    node.remove("issueServiceConfigurationIdentifier");
+                    rs.updateString("CONTENT", objectMapper.writeValueAsString(node));
+                    rs.updateRow();
                     // Migration of project configurations if needed
                     String sqlP = "SELECT * FROM PROPERTIES WHERE TYPE = ? AND PROJECT IS NOT NULL";
                     try (PreparedStatement psp = connection.prepareStatement(sqlP, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
