@@ -20,14 +20,8 @@ The access to a BitBucket instance must be configured.
 ** **URL** - URL to the Stash instance
 ** User & Password - credentials used to access Stash - Ontrack only needs a
    read access to the repositories
-** Indexation interval - interval (in minutes) between each synchronization
-   (Ontrack maintains internally a clone of the Stash repositories)
-** Issue configuration - <<usage-issues,configured issue service>> to use
-   when looking for issues in commits (_as of now, this is defined globally
-   for all the repositories in Stash. This might change in the future_)
 
 The existing configurations can be updated and deleted.
-
 
 [[usage-bitbucket-config]]
 ===== Project configuration
@@ -39,5 +33,9 @@ configuration_ property:
   this is used for the access and the issues management
 * **Project** - name of the _Stash project_
 * **Repository** - name of the _Stash repository_
+** Indexation interval - interval (in minutes) between each synchronization
+(Ontrack maintains internally a clone of the BitBucket repositories)
+** Issue configuration - <<usage-issues,configured issue service>> to use
+when looking for issues in commits.
 
 Branches can be <<usage-git,configured for Git>> independently.
