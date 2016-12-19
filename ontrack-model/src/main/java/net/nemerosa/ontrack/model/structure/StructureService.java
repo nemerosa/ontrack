@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public interface StructureService {
@@ -207,4 +208,8 @@ public interface StructureService {
     Optional<Project> findProjectByName(String project);
 
     Optional<Branch> findBranchByName(String project, String branch);
+
+    default BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader() {
+        return (entityType, id) -> entityType.getEntityFn(this).apply(id);
+    }
 }
