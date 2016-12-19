@@ -2,14 +2,14 @@ package net.nemerosa.ontrack.extension.stash.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.model.form.*;
+import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Password;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPassword;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -39,19 +39,6 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
      */
     private final String password;
 
-    /**
-     * Indexation interval
-     */
-    @Deprecated
-    private final int indexationInterval;
-
-    /**
-     * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
-     * with this repository.
-     */
-    @Deprecated
-    private final String issueServiceConfigurationIdentifier;
-
     @Override
     @JsonIgnore
     public ConfigurationDescriptor getDescriptor() {
@@ -72,13 +59,11 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                 name,
                 url,
                 user,
-                password,
-                indexationInterval,
-                issueServiceConfigurationIdentifier
+                password
         );
     }
 
-    public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
+    public static Form form() {
         return Form.create()
                 .with(defaultNameField())
                 .with(
@@ -96,32 +81,15 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                                 .label("Password")
                                 .length(40)
                                 .optional()
-                )
-                .with(
-                        Int.of("indexationInterval")
-                                .label("Indexation interval")
-                                .min(0)
-                                .max(60 * 24)
-                                .value(0)
-                                .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.model.GitConfiguration.indexationInterval.tpl.html")
-                )
-                .with(
-                        Selection.of("issueServiceConfigurationIdentifier")
-                                .label("Issue configuration")
-                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
-                                .optional()
-                                .items(availableIssueServiceConfigurations)
                 );
     }
 
-    public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
-        return form(availableIssueServiceConfigurations)
+    public Form asForm() {
+        return form()
                 .with(defaultNameField().readOnly().value(name))
                 .fill("url", url)
                 .fill("user", user)
                 .fill("password", "")
-                .fill("indexationInterval", indexationInterval)
-                .fill("issueServiceConfigurationIdentifier", issueServiceConfigurationIdentifier)
                 ;
     }
 
@@ -131,9 +99,7 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                 targetConfigurationName,
                 replacementFunction.apply(url),
                 replacementFunction.apply(user),
-                password,
-                indexationInterval,
-                issueServiceConfigurationIdentifier
+                password
         );
     }
 

@@ -39,7 +39,7 @@ public class StashConfigurator implements GitConfigurator {
 
     private ConfiguredIssueService getConfiguredIssueService(StashProjectConfigurationProperty property) {
         return issueServiceRegistry.getConfiguredIssueService(
-                property.getConfiguration().getIssueServiceConfigurationIdentifier()
+                property.getIssueServiceConfigurationIdentifier()
         );
     }
 }

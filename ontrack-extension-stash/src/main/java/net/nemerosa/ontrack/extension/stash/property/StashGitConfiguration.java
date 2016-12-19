@@ -72,7 +72,7 @@ public class StashGitConfiguration implements GitConfiguration {
 
     @Override
     public int getIndexationInterval() {
-        return property.getConfiguration().getIndexationInterval();
+        return property.getIndexationInterval();
     }
 
     @Override
