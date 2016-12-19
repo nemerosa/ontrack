@@ -92,7 +92,7 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
                                 .label("Indexation interval")
                                 .min(0)
                                 .max(60 * 24)
-                                .value(0)
+                                .value(value != null ? value.getIndexationInterval() : 0)
                                 .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.model.GitConfiguration.indexationInterval.tpl.html")
                 )
                 .with(
@@ -101,6 +101,7 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
                                 .help("Select an issue service that is sued to associate tickets and issues to the source.")
                                 .optional()
                                 .items(availableIssueServiceConfigurations)
+                                .value(value != null ? value.getIssueServiceConfigurationIdentifier() : "")
                 )
                 ;
     }
