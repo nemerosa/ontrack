@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
@@ -25,7 +24,7 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
     }
 
     @Override
-    public List<Build> getBuilds(Branch branch, StandardBuildFilterData data) {
+    public List<Build> getBuilds(ID branchId, StandardBuildFilterData data) {
         // Query root
         // TODO Builds linked from
         // TODO Builds linked to
@@ -41,7 +40,7 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 "                LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID" +
                 "                WHERE B.BRANCHID = :branch");
         // Parameters
-        MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
+        MapSqlParameterSource params = new MapSqlParameterSource("branch", branchId);
 
         // FIXME sincePromotionLevel
         // FIXME withPromotionLevel

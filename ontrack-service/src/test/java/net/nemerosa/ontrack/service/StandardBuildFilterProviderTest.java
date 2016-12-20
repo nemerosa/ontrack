@@ -25,7 +25,7 @@ public class StandardBuildFilterProviderTest {
         provider = new StandardBuildFilterProvider(
                 structureService,
                 validationRunStatusService,
-                propertyService);
+                propertyService, standardBuildFilterRepository);
     }
 
     @Test

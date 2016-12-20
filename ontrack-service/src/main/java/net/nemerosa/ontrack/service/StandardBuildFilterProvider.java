@@ -5,8 +5,10 @@ import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.repository.StandardBuildFilterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,22 +16,38 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@Transactional
 public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<StandardBuildFilterData> {
 
     private final StructureService structureService;
     private final ValidationRunStatusService validationRunStatusService;
     private final PropertyService propertyService;
+    private final StandardBuildFilterRepository standardBuildFilterRepository;
 
     @Autowired
-    public StandardBuildFilterProvider(StructureService structureService, ValidationRunStatusService validationRunStatusService, PropertyService propertyService) {
+    public StandardBuildFilterProvider(
+            StructureService structureService,
+            ValidationRunStatusService validationRunStatusService,
+            PropertyService propertyService,
+            StandardBuildFilterRepository standardBuildFilterRepository
+    ) {
         this.structureService = structureService;
         this.validationRunStatusService = validationRunStatusService;
         this.propertyService = propertyService;
+        this.standardBuildFilterRepository = standardBuildFilterRepository;
     }
 
     @Override
     public String getName() {
         return "Standard filter";
+    }
+
+    @Override
+    public List<Build> filterBranchBuilds(ID branchId, StandardBuildFilterData data) {
+        return standardBuildFilterRepository.getBuilds(
+                branchId,
+                data
+        );
     }
 
     @Override
@@ -205,8 +223,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withWithProperty(JsonUtils.get(data, "withProperty", null))
                 .withWithPropertyValue(JsonUtils.get(data, "withPropertyValue", null))
                 .withLinkedFrom(JsonUtils.get(data, "linkedFrom", null))
-                .withLinkedTo(JsonUtils.get(data, "linkedTo", null))
-                ;
+                .withLinkedTo(JsonUtils.get(data, "linkedTo", null));
         return Optional.of(filter);
     }
 
