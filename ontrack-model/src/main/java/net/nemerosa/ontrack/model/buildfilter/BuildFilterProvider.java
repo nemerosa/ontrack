@@ -10,6 +10,11 @@ import java.util.Optional;
 public interface BuildFilterProvider<T> {
 
     /**
+     * Type
+     */
+    String getType();
+
+    /**
      * Display name
      */
     String getName();

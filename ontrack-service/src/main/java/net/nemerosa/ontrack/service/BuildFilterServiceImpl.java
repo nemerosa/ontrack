@@ -17,15 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class BuildFilterServiceImpl implements BuildFilterService {
 
-    private final Collection<BuildFilterProvider<?>> buildFilterProviders;
+    private final Map<String, BuildFilterProvider<?>> buildFilterProviders;
     private final BuildFilterRepository buildFilterRepository;
     private final StructureService structureService;
     private final SecurityService securityService;
@@ -38,7 +40,11 @@ public class BuildFilterServiceImpl implements BuildFilterService {
             StructureService structureService,
             SecurityService securityService,
             PropertyService propertyService) {
-        this.buildFilterProviders = buildFilterProviders;
+        this.buildFilterProviders = buildFilterProviders.stream()
+                .collect(Collectors.toMap(
+                        BuildFilterProvider::getType,
+                        Function.identity()
+                ));
         this.buildFilterRepository = buildFilterRepository;
         this.structureService = structureService;
         this.securityService = securityService;
@@ -169,7 +175,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                                     StandardBuildFilterProvider.class.getName())
                             );
             //noinspection unchecked
-            return ((BuildFilterProvider<StandardBuildFilterData>)provider).withData(data);
+            return ((BuildFilterProvider<StandardBuildFilterData>) provider).withData(data);
         }
 
         @Override
@@ -293,7 +299,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public Collection<BuildFilterForm> getBuildFilterForms(ID branchId) {
-        return buildFilterProviders.stream()
+        return buildFilterProviders.values().stream()
                 .map(provider -> provider.newFilterForm(branchId))
                 .collect(Collectors.toList());
     }
@@ -421,12 +427,9 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                 .orElse(defaultFilter());
     }
 
+    @SuppressWarnings("unchecked")
     private <T> Optional<? extends BuildFilterProvider<T>> getBuildFilterProviderByType(String type) {
-        Optional<? extends BuildFilterProvider<?>> first = buildFilterProviders.stream()
-                .filter(provider -> type.equals(provider.getClass().getName()))
-                .findFirst();
-        //noinspection unchecked
-        return (Optional<? extends BuildFilterProvider<T>>) first;
+        return Optional.ofNullable((BuildFilterProvider<T>) buildFilterProviders.get(type));
     }
 
     @SuppressWarnings("unchecked")

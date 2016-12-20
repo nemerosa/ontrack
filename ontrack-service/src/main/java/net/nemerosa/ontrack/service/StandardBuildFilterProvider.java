@@ -38,6 +38,11 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
     }
 
     @Override
+    public String getType() {
+        return StandardBuildFilterProvider.class.getName();
+    }
+
+    @Override
     public String getName() {
         return "Standard filter";
     }
