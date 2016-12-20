@@ -13,6 +13,7 @@ import java.util.function.Supplier;
  * Implementation note: a <code>BuildFilter</code> instance is created for each query, and can therefore
  * hold instance variables.
  */
+@Deprecated
 public interface BuildFilter {
 
     /**
