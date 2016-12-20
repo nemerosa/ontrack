@@ -43,17 +43,13 @@ public class StandardBuildFilter implements BuildFilter {
         if (isNotBlank(data.getWithPromotionLevel())) {
             result = result.acceptIf(
                     buildViewSupplier.get().getPromotionRuns().stream()
-                            .filter(run -> data.getWithPromotionLevel().equals(run.getPromotionLevel().getName()))
-                            .findAny()
-                            .isPresent()
+                            .anyMatch(run -> data.getWithPromotionLevel().equals(run.getPromotionLevel().getName()))
             );
         }
         // Since promotion level
         if (isNotBlank(data.getSincePromotionLevel())) {
             boolean promoted = buildViewSupplier.get().getPromotionRuns().stream()
-                    .filter(run -> data.getSincePromotionLevel().equals(run.getPromotionLevel().getName()))
-                    .findAny()
-                    .isPresent();
+                    .anyMatch(run -> data.getSincePromotionLevel().equals(run.getPromotionLevel().getName()));
             // The last build is accepted
             if (promoted) {
                 result = result.doAccept();
@@ -65,17 +61,13 @@ public class StandardBuildFilter implements BuildFilter {
         if (isNotBlank(data.getWithValidationStamp())) {
             result = result.acceptIf(
                     buildViewSupplier.get().getValidationStampRunViews().stream()
-                            .filter(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getWithValidationStamp(), data.getWithValidationStampStatus()))
-                            .findAny()
-                            .isPresent()
+                            .anyMatch(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getWithValidationStamp(), data.getWithValidationStampStatus()))
             );
         }
         // Since validation stamp
         if (isNotBlank(data.getSinceValidationStamp())) {
             boolean validated = buildViewSupplier.get().getValidationStampRunViews().stream()
-                    .filter(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getSinceValidationStamp(), data.getSinceValidationStampStatus()))
-                    .findAny()
-                    .isPresent();
+                    .anyMatch(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getSinceValidationStamp(), data.getSinceValidationStampStatus()));
             // The last build is accepted
             if (validated) {
                 result = result.doAccept();
