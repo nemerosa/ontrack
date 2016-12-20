@@ -826,7 +826,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
 
         // Statuses
-        validationRun.getValidationRunStatuses().stream()
+        validationRun.getValidationRunStatuses()
                 .forEach(validationRunStatus -> newValidationRunStatus(id, validationRunStatus));
 
         // Reloads the run
