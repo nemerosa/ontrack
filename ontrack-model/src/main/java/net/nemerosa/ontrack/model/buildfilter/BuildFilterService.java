@@ -16,12 +16,23 @@ public interface BuildFilterService {
     /**
      * Gets the default filter to use when none is defined.
      */
+    @Deprecated
     BuildFilter defaultFilter();
+
+    /**
+     * Gets the default filter to use when none is defined.
+     */
+    BuildFilterProviderData<?> defaultFilterProviderData();
 
     /**
      * Builds a standard build filter
      */
     StandardFilterBuilder standardFilter(int count);
+
+    /**
+     * Builds a standard build filter
+     */
+    StandardFilterProviderDataBuilder standardFilterProviderData(int count);
 
     /**
      * Gets the list of all existing filters.
@@ -38,6 +49,17 @@ public interface BuildFilterService {
      * @return List of forms
      */
     Collection<BuildFilterForm> getBuildFilterForms(ID branchId);
+
+    /**
+     * Gets a build filter provider for the given type.
+     *
+     * @param filterType Qualified type for the filter
+     * @param parameters Parameters for the filter
+     * @return Actual filter to use
+     * @throws BuildFilterProviderNotFoundException    If the type cannot be resolved
+     * @throws BuildFilterProviderDataParsingException If the parameters cannot be parsed
+     */
+    <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, JsonNode parameters);
 
     /**
      * Basic method to compute an actual filter from a type and a list of parameters.

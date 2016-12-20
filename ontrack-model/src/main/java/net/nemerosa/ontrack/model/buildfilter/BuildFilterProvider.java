@@ -54,4 +54,7 @@ public interface BuildFilterProvider<T> {
      */
     Optional<T> parse(JsonNode data);
 
+    default BuildFilterProviderData<T> withData(T data) {
+        return BuildFilterProviderData.of(this, data);
+    }
 }

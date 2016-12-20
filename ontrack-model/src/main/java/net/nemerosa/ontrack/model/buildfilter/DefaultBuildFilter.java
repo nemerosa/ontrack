@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.BuildView;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Deprecated
 public final class DefaultBuildFilter implements BuildFilter {
 
     public static final int MAX_COUNT = 10;

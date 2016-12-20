@@ -30,8 +30,7 @@ public class BuildFilterServiceImplTest {
                 buildFilterRepository,
                 structureService,
                 securityService,
-                propertyService
-        );
+                propertyService);
     }
 
     @Test
