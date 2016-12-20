@@ -20,6 +20,8 @@ angular.module('ontrack.extension.svn', [
         view.title = 'SVN configurations';
         view.description = 'Management of the SVN configurations.';
 
+        $scope.configurationFilter = "";
+
         // Loading the SVN configurations
         function loadSVNConfigurations() {
             ot.call($http.get('extension/svn/configurations')).then(function (configurations) {
