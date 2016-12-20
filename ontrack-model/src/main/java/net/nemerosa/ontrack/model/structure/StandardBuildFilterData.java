@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.model.structure;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

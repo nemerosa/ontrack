@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService;
 import org.junit.Before;
