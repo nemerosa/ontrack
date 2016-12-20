@@ -35,12 +35,12 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 "                    SELECT R.BUILDID,  R.VALIDATIONSTAMPID, VRS.VALIDATIONRUNSTATUSID " +
                 "                    FROM VALIDATION_RUNS R" +
                 "                    INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = R.ID ORDER BY ID DESC LIMIT 1)" +
-                "                    AND R.ID = (SELECT MAX(ID) FROM VALIDATION_RUNS WHERE BUILDID = R.BUILDID AND VALIDATIONSTAMPID = R.VALIDATION_STAMPID)" +
+                "                    AND R.ID = (SELECT MAX(ID) FROM VALIDATION_RUNS WHERE BUILDID = R.BUILDID AND VALIDATIONSTAMPID = R.VALIDATIONSTAMPID)" +
                 "                    ) S ON S.BUILDID = B.ID" +
                 "                LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID" +
                 "                WHERE B.BRANCHID = :branch");
         // Parameters
-        MapSqlParameterSource params = new MapSqlParameterSource("branch", branchId);
+        MapSqlParameterSource params = new MapSqlParameterSource("branch", branchId.getValue());
 
         // FIXME sincePromotionLevel
         // FIXME withPromotionLevel
