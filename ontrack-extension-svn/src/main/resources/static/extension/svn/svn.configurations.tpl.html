@@ -1,5 +1,13 @@
 <ot-view>
-    <div class="row">
+    <div class="row" ng-show="loadingConfigurations">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the configurations...
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-hide="loadingConfigurations">
         <div class="col-md-12">
             <ot-section-title>List of configurations</ot-section-title>
             <div class="row" ng-show="configurations.resources.length > 5">

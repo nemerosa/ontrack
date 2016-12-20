@@ -21,9 +21,11 @@ angular.module('ontrack.extension.svn', [
         view.description = 'Management of the SVN configurations.';
 
         $scope.configurationFilter = "";
+        $scope.loadingConfigurations = true;
 
         // Loading the SVN configurations
         function loadSVNConfigurations() {
+            $scope.loadingConfigurations = true;
             ot.call($http.get('extension/svn/configurations')).then(function (configurations) {
                 $scope.configurations = configurations;
                 view.commands = [
@@ -36,6 +38,8 @@ angular.module('ontrack.extension.svn', [
                     ot.viewApiCommand(configurations._self),
                     ot.viewCloseCommand('/home')
                 ];
+            }).finally(function () {
+                $scope.loadingConfigurations = false;
             });
         }
 
@@ -60,6 +64,7 @@ angular.module('ontrack.extension.svn', [
                 message: "Do you really want to delete this SVN configuration? Some projects may still refer to it."
             }).then(
                 function success() {
+                    $scope.loadingConfigurations = true;
                     ot.call($http.delete(configuration._delete)).then(loadSVNConfigurations);
                 }
             );
