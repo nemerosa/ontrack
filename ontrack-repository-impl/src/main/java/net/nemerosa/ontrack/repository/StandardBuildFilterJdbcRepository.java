@@ -171,7 +171,7 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         MapSqlParameterSource params = params("validationStampId", validationStampId);
         // Status criteria
         if (StringUtils.isNotBlank(status)) {
-            sql.append("AND VRS.STATUS = :status\n");
+            sql.append("AND VRS.VALIDATIONRUNSTATUSID = :status\n");
             params.addValue("status", status);
         }
         // Order & limit
