@@ -26,7 +26,7 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
 
     /**
      * The fat join query (dreaming of Neo4J) defines the following columns:
-     *
+     * <p>
      * <pre>
      *     B (BUILDS)
      *     PR (PROMOTION_RUNS)
@@ -86,21 +86,28 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
 
         // FIXME afterDate
         // FIXME beforeDate
-        // FIXME sinceValidationStamp
-        // FIXME sinceValidationStampStatus
+
+        // sinceValidationStamp
+        String sinceValidationStamp = data.getSinceValidationStamp();
+        if (StringUtils.isNotBlank(sinceValidationStamp)) {
+            // Gets the validation stamp ID
+            int validationStampId = getValidationStampId(branch, sinceValidationStamp);
+            // Gets the last build having this validation stamp and the validation status
+            Integer id = findLastBuildWithValidationStamp(validationStampId, data.getSinceValidationStampStatus());
+            if (id != null) {
+                if (sinceBuildId == null) {
+                    sinceBuildId = id;
+                } else {
+                    sinceBuildId = Math.min(sinceBuildId, id);
+                }
+            }
+        }
 
         // withValidationStamp
         String withValidationStamp = data.getWithValidationStamp();
         if (StringUtils.isNotBlank(withValidationStamp)) {
             // Gets the validation stamp ID
-            int validationStampId = structureRepository
-                    .getValidationStampByName(branch, withValidationStamp)
-                    .map(Entity::id)
-                    .orElseThrow(() -> new ValidationStampNotFoundException(
-                            branch.getProject().getName(),
-                            branch.getName(),
-                            withValidationStamp
-                    ));
+            int validationStampId = getValidationStampId(branch, withValidationStamp);
             sql.append(" AND (S.VALIDATIONSTAMPID = :validationStampId");
             params.addValue("validationStampId", validationStampId);
             // withValidationStampStatus
@@ -141,6 +148,40 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 .stream()
                 .map(id -> structureRepository.getBuild(ID.of(id)))
                 .collect(Collectors.toList());
+    }
+
+    private Integer getValidationStampId(Branch branch, String validationStampName) {
+        return structureRepository
+                .getValidationStampByName(branch, validationStampName)
+                .map(Entity::id)
+                .orElseThrow(() -> new ValidationStampNotFoundException(
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        validationStampName
+                ));
+    }
+
+    private Integer findLastBuildWithValidationStamp(int validationStampId, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT VR.BUILDID FROM VALIDATION_RUN_STATUSES VRS\n" +
+                        "INNER JOIN VALIDATION_RUNS VR ON VR.ID = VRS.VALIDATIONRUNID\n" +
+                        "WHERE VR.VALIDATIONSTAMPID = :validationStampId\n"
+        );
+        // Parameters
+        MapSqlParameterSource params = params("validationStampId", validationStampId);
+        // Status criteria
+        if (StringUtils.isNotBlank(status)) {
+            sql.append("AND VRS.STATUS = :status\n");
+            params.addValue("status", status);
+        }
+        // Order & limit
+        sql.append("ORDER BY VR.BUILDID DESC LIMIT 1\n");
+        // Build ID
+        return getFirstItem(
+                sql.toString(),
+                params,
+                Integer.class
+        );
     }
 
     private Integer findLastBuildWithPromotionLevel(int promotionLevelId) {
