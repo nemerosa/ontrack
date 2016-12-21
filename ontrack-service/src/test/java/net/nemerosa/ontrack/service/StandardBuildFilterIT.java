@@ -106,6 +106,40 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         checkList(builds, 5);
     }
 
+    /**
+     * Tests the following sequence:
+     * <p>
+     * <pre>
+     *     1
+     *     2 --> COPPER
+     *     3
+     *     4 --> COPPER
+     *     5 --> COPPER, BRONZE
+     * </pre>
+     * <ul>
+     * <li>With promotion level: COPPER</li>
+     * </ul>
+     * <p>
+     * Build 5, 4, 2 should be accepted
+     */
+    @Test
+    public void with_promotion_level() throws Exception {
+        // Builds
+        build(1);
+        build(2).withPromotion(copper);
+        build(3);
+        build(4).withPromotion(copper);
+        build(5).withPromotion(copper).withPromotion(bronze);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withWithPromotionLevel("COPPER")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch.getId());
+        // Checks the list
+        checkList(builds, 5, 4, 2);
+    }
+
     protected BuildCreator build(int name) throws Exception {
         return build(String.valueOf(name));
     }

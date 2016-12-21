@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -43,7 +44,14 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         MapSqlParameterSource params = new MapSqlParameterSource("branch", branchId.getValue());
 
         // FIXME sincePromotionLevel
-        // FIXME withPromotionLevel
+
+        // withPromotionLevel
+        String withPromotionLevel = data.getWithPromotionLevel();
+        if (StringUtils.isNotBlank(withPromotionLevel)) {
+            sql.append(" AND PL.NAME = :withPromotionLevel");
+            params.addValue("withPromotionLevel", withPromotionLevel);
+        }
+
         // FIXME afterDate
         // FIXME beforeDate
         // FIXME sinceValidationStamp
