@@ -4,6 +4,7 @@ import lombok.Data;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
+import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
@@ -68,6 +69,25 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         List<Build> builds = filter.filterBranchBuilds(branch);
         // Checks the list
         checkList(builds, 5, 4);
+    }
+
+    /**
+     * Since a not found promotion level
+     */
+    @Test(expected = PromotionLevelNotFoundException.class)
+    public void since_promotion_level_not_found() throws Exception {
+        // Builds
+        build(1);
+        build(2);
+        build(3);
+        build(4).withPromotion(copper);
+        build(5).withPromotion(bronze);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withSincePromotionLevel("NOT_FOUND")
+                .build();
+        // Filtering
+        filter.filterBranchBuilds(branch);
     }
 
     /**
