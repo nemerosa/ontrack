@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
+import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 @Repository
@@ -41,10 +40,29 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 "                    ) S ON S.BUILDID = B.ID" +
                 "                LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID" +
                 "                WHERE B.BRANCHID = :branch");
+
         // Parameters
         MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
+        Integer sinceBuildId = null;
 
-        // FIXME sincePromotionLevel
+        // sincePromotionLevel
+        String sincePromotionLevel = data.getSincePromotionLevel();
+        if (StringUtils.isNotBlank(sincePromotionLevel)) {
+            // Gets the promotion level ID
+            int promotionLevelId = structureRepository
+                    .getPromotionLevelByName(branch, sincePromotionLevel)
+                    .map(Entity::id)
+                    .orElseThrow(() -> new PromotionLevelNotFoundException(
+                            branch.getProject().getName(),
+                            branch.getName(),
+                            sincePromotionLevel
+                    ));
+            // Gets the last build having this promotion level
+            Integer id = findLastBuildWithPromotionLevel(promotionLevelId);
+            if (id != null) {
+                sinceBuildId = id;
+            }
+        }
 
         // withPromotionLevel
         String withPromotionLevel = data.getWithPromotionLevel();
@@ -66,6 +84,12 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         // FIXME linkedFrom
         // FIXME linkedTo
 
+        // Since build?
+        if (sinceBuildId != null) {
+            sql.append(" AND B.ID >= :sinceBuildId");
+            params.addValue("sinceBuildId", sinceBuildId);
+        }
+
         // Ordering
         sql.append(" ORDER BY B.ID DESC");
         // Limit
@@ -82,5 +106,13 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 .stream()
                 .map(id -> structureRepository.getBuild(ID.of(id)))
                 .collect(Collectors.toList());
+    }
+
+    private Integer findLastBuildWithPromotionLevel(int promotionLevelId) {
+        return getFirstItem(
+                "SELECT BUILDID FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY BUILDID DESC LIMIT 1",
+                params("promotionLevelId", promotionLevelId),
+                Integer.class
+        );
     }
 }

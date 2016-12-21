@@ -498,11 +498,17 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Optional<PromotionLevel> getPromotionLevelByName(String project, String branch, String promotionLevel) {
-        return getBranchByName(project, branch).map(b -> getFirstItem(
+        return getBranchByName(project, branch)
+                .flatMap(b -> getPromotionLevelByName(b, promotionLevel));
+    }
+
+    @Override
+    public Optional<PromotionLevel> getPromotionLevelByName(Branch branch, String promotionLevel) {
+        return getOptional(
                 "SELECT * FROM PROMOTION_LEVELS WHERE BRANCHID = :branch AND NAME = :name",
-                params("name", promotionLevel).addValue("branch", b.id()),
-                (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
-        ));
+                params("name", promotionLevel).addValue("branch", branch.id()),
+                (rs, rowNum) -> toPromotionLevel(rs, id -> branch)
+        );
     }
 
     @Override

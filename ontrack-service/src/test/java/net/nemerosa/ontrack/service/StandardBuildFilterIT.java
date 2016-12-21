@@ -177,12 +177,14 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         }
     }
 
-    protected void checkList(List<Build> builds, Integer... ids) {
-        List<Integer> expectedIds = Arrays.asList(ids);
-        List<Integer> actualIds = builds.stream()
-                .map(Entity::id)
+    protected void checkList(List<Build> builds, Integer... names) {
+        List<String> expectedNames = Arrays.stream(names)
+                .map(String::valueOf)
                 .collect(Collectors.toList());
-        assertEquals(expectedIds, actualIds);
+        List<String> actualNames = builds.stream()
+                .map(Build::getName)
+                .collect(Collectors.toList());
+        assertEquals(expectedNames, actualNames);
     }
 
 }

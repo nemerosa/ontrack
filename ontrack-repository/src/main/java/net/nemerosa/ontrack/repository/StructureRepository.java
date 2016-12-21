@@ -111,6 +111,8 @@ public interface StructureRepository {
 
     Optional<PromotionLevel> getPromotionLevelByName(String project, String branch, String promotionLevel);
 
+    Optional<PromotionLevel> getPromotionLevelByName(Branch branch, String promotionLevel);
+
     Document getPromotionLevelImage(ID promotionLevelId);
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);
