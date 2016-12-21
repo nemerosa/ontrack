@@ -469,7 +469,7 @@ public class BranchController extends AbstractResourceController {
         // Gets the branch
         Branch branch = getBranch(branchId);
         // Gets the list of builds
-        List<Build> builds = buildFilterProviderData.filterBranchBuilds(branchId);
+        List<Build> builds = buildFilterProviderData.filterBranchBuilds(branch);
         // Gets the list of build diff actions
         List<Action> buildDiffActions = extensionManager.getExtensions(BuildDiffExtension.class)
                 .stream()

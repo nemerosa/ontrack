@@ -65,7 +65,7 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
                 .withSincePromotionLevel("COPPER")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch.getId());
+        List<Build> builds = filter.filterBranchBuilds(branch);
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -101,7 +101,7 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
                 .withWithPromotionLevel("COPPER")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch.getId());
+        List<Build> builds = filter.filterBranchBuilds(branch);
         // Checks the list
         checkList(builds, 5);
     }
@@ -135,7 +135,7 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
                 .withWithPromotionLevel("COPPER")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch.getId());
+        List<Build> builds = filter.filterBranchBuilds(branch);
         // Checks the list
         checkList(builds, 5, 4, 2);
     }

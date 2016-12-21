@@ -48,9 +48,9 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
     }
 
     @Override
-    public List<Build> filterBranchBuilds(ID branchId, StandardBuildFilterData data) {
+    public List<Build> filterBranchBuilds(Branch branch, StandardBuildFilterData data) {
         return standardBuildFilterRepository.getBuilds(
-                branchId,
+                branch,
                 data
         );
     }

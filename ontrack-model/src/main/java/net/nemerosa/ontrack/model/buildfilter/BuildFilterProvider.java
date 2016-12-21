@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 
@@ -41,7 +42,7 @@ public interface BuildFilterProvider<T> {
     /**
      * Performs the filtering
      */
-    default List<Build> filterBranchBuilds(ID branchId, T data) {
+    default List<Build> filterBranchBuilds(Branch branch, T data) {
         throw new UnsupportedOperationException("Filter branch builds must be implemented for " + this.getClass());
     }
 

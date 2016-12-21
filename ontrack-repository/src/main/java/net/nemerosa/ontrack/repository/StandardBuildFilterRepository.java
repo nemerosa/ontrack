@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
 
 import java.util.List;
@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface StandardBuildFilterRepository {
 
-    List<Build> getBuilds(ID branchId, StandardBuildFilterData data);
+    List<Build> getBuilds(Branch branch, StandardBuildFilterData data);
 
 }

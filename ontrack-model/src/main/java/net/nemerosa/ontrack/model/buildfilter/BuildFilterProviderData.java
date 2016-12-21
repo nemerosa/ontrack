@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
 import lombok.Data;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class BuildFilterProviderData<T> {
     /**
      * Launches the filter
      */
-    public List<Build> filterBranchBuilds(ID branchId) {
-        return provider.filterBranchBuilds(branchId, data);
+    public List<Build> filterBranchBuilds(Branch branch) {
+        return provider.filterBranchBuilds(branch, data);
     }
 }
