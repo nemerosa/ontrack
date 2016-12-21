@@ -301,6 +301,46 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         checkList(builds, 5);
     }
 
+    /**
+     * Tests the following sequence:
+     * <p>
+     * <pre>
+     *     1
+     *     2 --> PUBLICATION (success) + COPPER + BRONZE
+     *     3
+     *     4 --> PUBLICATION, PRODUCTION + COPPER
+     *     5 --> PUBLICATION (failed)
+     * </pre>
+     * <ul>
+     * <li>Since validation stamp: PRODUCTION</li>
+     * <li>Since production level: BRONZE</li>
+     * </ul>
+     * <p>
+     * Build 5 and 4 should be accepted
+     */
+    @Test
+    public void since_validation_stamp_and_since_promotion_level() throws Exception {
+        // Builds
+        build(1);
+        build(2).withValidation(publication, ValidationRunStatusID.STATUS_PASSED)
+                .withPromotion(copper)
+                .withPromotion(bronze);
+        build(3);
+        build(4).withValidation(publication, ValidationRunStatusID.STATUS_PASSED)
+                .withValidation(production, ValidationRunStatusID.STATUS_PASSED)
+                .withPromotion(copper);
+        build(5).withValidation(publication, ValidationRunStatusID.STATUS_FAILED);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withSinceValidationStamp("PRODUCTION")
+                .withSincePromotionLevel("BRONZE")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4);
+    }
+
     @Test(expected = ValidationStampNotFoundException.class)
     public void with_validation_stamp_not_found() throws Exception {
         // Filter

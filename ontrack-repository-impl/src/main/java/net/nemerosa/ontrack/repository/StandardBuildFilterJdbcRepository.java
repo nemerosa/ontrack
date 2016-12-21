@@ -98,7 +98,7 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 if (sinceBuildId == null) {
                     sinceBuildId = id;
                 } else {
-                    sinceBuildId = Math.min(sinceBuildId, id);
+                    sinceBuildId = Math.max(sinceBuildId, id);
                 }
             }
         }
