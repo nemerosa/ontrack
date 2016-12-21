@@ -444,7 +444,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                         branch,
                         shared,
                         name,
-                        provider.getClass().getName(),
+                        provider.getType(),
                         parsedData
                 )
         );
