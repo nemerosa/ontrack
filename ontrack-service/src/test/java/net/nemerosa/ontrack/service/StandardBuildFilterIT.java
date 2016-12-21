@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
+import net.nemerosa.ontrack.model.security.ValidationRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.assertEquals;
 
 public class StandardBuildFilterIT extends AbstractServiceTestSupport {
@@ -29,12 +31,16 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
     private Branch branch;
     private PromotionLevel copper;
     private PromotionLevel bronze;
+    private ValidationStamp publication;
+    private ValidationStamp production;
 
     @Before
     public void prepare() throws Exception {
         branch = doCreateBranch();
-        copper = doCreatePromotionLevel(branch, NameDescription.nd("COPPER", ""));
-        bronze = doCreatePromotionLevel(branch, NameDescription.nd("BRONZE", ""));
+        copper = doCreatePromotionLevel(branch, nd("COPPER", ""));
+        bronze = doCreatePromotionLevel(branch, nd("BRONZE", ""));
+        publication = doCreateValidationStamp(branch, nd("PUBLICATION", ""));
+        production = doCreateValidationStamp(branch, nd("PRODUCTION", ""));
     }
 
     /**
@@ -160,6 +166,40 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         checkList(builds, 5, 4, 2);
     }
 
+    /**
+     * Tests the following sequence:
+     * <p>
+     * <pre>
+     *     1
+     *     2 --> PUBLICATION (success)
+     *     3
+     *     4 --> PUBLICATION, PRODUCTION
+     *     5 --> PUBLICATION (failed)
+     * </pre>
+     * <ul>
+     * <li>With validation stamp: PUBLICATION</li>
+     * </ul>
+     * <p>
+     * Build 5, 4, 2 should be accepted
+     */
+    @Test
+    public void with_validation_stamp() throws Exception {
+        // Builds
+        build(1);
+        build(2).withValidation(publication, ValidationRunStatusID.STATUS_PASSED);
+        build(3);
+        build(4).withValidation(publication, ValidationRunStatusID.STATUS_PASSED).withValidation(production, ValidationRunStatusID.STATUS_PASSED);
+        build(5).withValidation(publication, ValidationRunStatusID.STATUS_FAILED);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withWithValidationStamp("PUBLICATION")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4, 2);
+    }
+
     protected BuildCreator build(int name) throws Exception {
         return build(String.valueOf(name));
     }
@@ -189,6 +229,22 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
                                     build,
                                     promotionLevel,
                                     Signature.of("user"),
+                                    ""
+                            )
+                    )
+            );
+            return this;
+        }
+
+        public BuildCreator withValidation(ValidationStamp stamp, ValidationRunStatusID status) throws Exception {
+            asUser().with(branch, ValidationRunCreate.class).call(() ->
+                    structureService.newValidationRun(
+                            ValidationRun.of(
+                                    build,
+                                    stamp,
+                                    1,
+                                    Signature.of("user"),
+                                    status,
                                     ""
                             )
                     )

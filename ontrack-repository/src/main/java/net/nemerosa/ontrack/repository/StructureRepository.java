@@ -155,6 +155,8 @@ public interface StructureRepository {
 
     Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp);
 
+    Optional<ValidationStamp> getValidationStampByName(Branch branch, String validationStamp);
+
     Document getValidationStampImage(ID validationStampId);
 
     void setValidationStampImage(ID validationStampId, Document document);

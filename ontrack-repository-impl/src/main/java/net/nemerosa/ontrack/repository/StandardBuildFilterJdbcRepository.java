@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
+import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 @Repository
@@ -75,8 +75,24 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         // FIXME beforeDate
         // FIXME sinceValidationStamp
         // FIXME sinceValidationStampStatus
-        // FIXME withValidationStamp
-        // FIXME withValidationStampStatus
+
+        // withValidationStamp
+        String withValidationStamp = data.getWithValidationStamp();
+        if (StringUtils.isNotBlank(withValidationStamp)) {
+            // Gets the validation stamp ID
+            int vaidationStampId = structureRepository
+                    .getValidationStampByName(branch, withValidationStamp)
+                    .map(Entity::id)
+                    .orElseThrow(() -> new ValidationStampNotFoundException(
+                            branch.getProject().getName(),
+                            branch.getName(),
+                            withValidationStamp
+                    ));
+            sql.append(" AND (S.VALIDATIONSTAMPID = :validationStampId)");
+            params.addValue("validationStampId", vaidationStampId);
+            // FIXME withValidationStampStatus
+        }
+
         // FIXME withProperty
         // FIXME withPropertyValue
         // FIXME sinceProperty

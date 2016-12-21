@@ -759,11 +759,17 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp) {
-        return getBranchByName(project, branch).map(b -> getFirstItem(
+        return getBranchByName(project, branch)
+                .flatMap(b -> getValidationStampByName(b, validationStamp));
+    }
+
+    @Override
+    public Optional<ValidationStamp> getValidationStampByName(Branch branch, String validationStamp) {
+        return getOptional(
                 "SELECT * FROM VALIDATION_STAMPS WHERE NAME = :name AND BRANCHID = :branch",
-                params("name", validationStamp).addValue("branch", b.id()),
-                (rs, rowNum) -> toValidationStamp(rs, id -> b)
-        ));
+                params("name", validationStamp).addValue("branch", branch.id()),
+                (rs, rowNum) -> toValidationStamp(rs, id -> branch)
+        );
     }
 
     @Override
