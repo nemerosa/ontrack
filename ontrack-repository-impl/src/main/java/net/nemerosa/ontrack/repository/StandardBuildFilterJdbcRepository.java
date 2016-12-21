@@ -24,6 +24,19 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         this.structureRepository = structureRepository;
     }
 
+    /**
+     * The fat join query (dreaming of Neo4J) defines the following columns:
+     *
+     * <pre>
+     *     B (BUILDS)
+     *     PR (PROMOTION_RUNS)
+     *     PL (PROMOTION_LEVELS)
+     *     S (last validation run status)
+     *          VALIDATIONSTAMPID
+     *          VALIDATIONRUNSTATUSID
+     *     PP (PROPERTIES)
+     * </pre>
+     */
     @Override
     public List<Build> getBuilds(Branch branch, StandardBuildFilterData data) {
         // Query root
@@ -80,7 +93,7 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         String withValidationStamp = data.getWithValidationStamp();
         if (StringUtils.isNotBlank(withValidationStamp)) {
             // Gets the validation stamp ID
-            int vaidationStampId = structureRepository
+            int validationStampId = structureRepository
                     .getValidationStampByName(branch, withValidationStamp)
                     .map(Entity::id)
                     .orElseThrow(() -> new ValidationStampNotFoundException(
@@ -88,9 +101,15 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                             branch.getName(),
                             withValidationStamp
                     ));
-            sql.append(" AND (S.VALIDATIONSTAMPID = :validationStampId)");
-            params.addValue("validationStampId", vaidationStampId);
-            // FIXME withValidationStampStatus
+            sql.append(" AND (S.VALIDATIONSTAMPID = :validationStampId");
+            params.addValue("validationStampId", validationStampId);
+            // withValidationStampStatus
+            String withValidationStampStatus = data.getWithValidationStampStatus();
+            if (StringUtils.isNotBlank(withValidationStampStatus)) {
+                sql.append(" AND S.VALIDATIONRUNSTATUSID = :withValidationStampStatus");
+                params.addValue("withValidationStampStatus", withValidationStampStatus);
+            }
+            sql.append(")");
         }
 
         // FIXME withProperty
