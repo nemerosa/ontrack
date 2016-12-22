@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StandardBuildFilterRepository;
@@ -53,11 +52,6 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 branch,
                 data
         );
-    }
-
-    @Override
-    public BuildFilter filter(ID branchId, StandardBuildFilterData data) {
-        return new StandardBuildFilter(data, propertyService, structureService);
     }
 
     @Override
