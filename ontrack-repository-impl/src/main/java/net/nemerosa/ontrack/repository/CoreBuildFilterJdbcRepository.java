@@ -262,7 +262,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
 
         // From build
-        Optional<Integer> fromBuildId = lastBuild(branch, fromBuild, withPromotionLevel)
+        Optional<Integer> fromBuildId = lastBuild(branch, fromBuild, null)
                 .map(Entity::id);
         if (!fromBuildId.isPresent()) {
             return Collections.emptyList();
@@ -272,7 +272,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
 
         // To build
         if (StringUtils.isNotBlank(toBuild)) {
-            Optional<Integer> toBuildId = lastBuild(branch, toBuild, withPromotionLevel).map(Entity::id);
+            Optional<Integer> toBuildId = lastBuild(branch, toBuild, null).map(Entity::id);
             if (toBuildId.isPresent()) {
                 sql.append(" AND B.ID <= :toBuildId");
                 params.addValue("toBuildId", toBuildId.get());
@@ -281,7 +281,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
 
         // With promotion
         if (StringUtils.isNotBlank(withPromotionLevel)) {
-            sql.append(" AND PL.NAME : withPromotionLevel");
+            sql.append(" AND PL.NAME = :withPromotionLevel");
             params.addValue("withPromotionLevel", withPromotionLevel);
         }
 
@@ -318,7 +318,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
 
         // With promotion
         if (StringUtils.isNotBlank(withPromotionLevel)) {
-            sql.append(" AND PL.NAME : withPromotionLevel");
+            sql.append(" AND PL.NAME = :withPromotionLevel");
             params.addValue("withPromotionLevel", withPromotionLevel);
         }
 
