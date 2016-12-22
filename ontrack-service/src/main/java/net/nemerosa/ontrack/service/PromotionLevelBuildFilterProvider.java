@@ -32,6 +32,12 @@ public class PromotionLevelBuildFilterProvider extends AbstractPredefinedBuildFi
     }
 
     @Override
+    public List<Build> filterBranchBuilds(Branch branch, Object data) {
+        // FIXME Method net.nemerosa.ontrack.service.PromotionLevelBuildFilterProvider.filterBranchBuilds
+        return null;
+    }
+
+    @Override
     public BuildFilter filter(ID branchId, Object parameters) {
         return new PromotionLevelBuildFilter(
                 structureService.getPromotionLevelListForBranch(branchId)
