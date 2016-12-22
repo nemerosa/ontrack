@@ -72,8 +72,14 @@ The `standardFilter` method accepts the following parameters:
 | Selects builds which are _linked from_ the build selected by the criteria.
   See <<builds-links>> for the exact syntax.
 
+| `linkedFromPromotion`
+| The build must be linked FROM a build having this promotion (requires "Linked from")
+
 | `linkedTo`
 | Selects builds which are _linked to_ the build selected by the criteria.
   See <<builds-links>> for the exact syntax.
+
+| `linkedToPromotion`
+| The build must be linked TO a build having this promotion (requires "Linked to")
 
 |===
