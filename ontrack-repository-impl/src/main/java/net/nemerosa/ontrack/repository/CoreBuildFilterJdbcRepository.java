@@ -358,6 +358,9 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
             params.addValue("toId", toId);
         }
 
+        // Ordering
+        sql.append(" ORDER BY ID DESC");
+
         // Query
         return loadBuilds(sql.toString(), params);
     }
