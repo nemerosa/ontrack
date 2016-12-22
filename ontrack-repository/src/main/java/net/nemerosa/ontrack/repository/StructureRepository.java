@@ -61,7 +61,6 @@ public interface StructureRepository {
      * Iterates over the builds of the branch, from the newest to the oldest, until
      * the <code>buildPredicate</code> returns <code>false</code>.
      */
-    @Deprecated
     default void builds(Branch branch, Predicate<Build> buildPredicate) {
         builds(branch, buildPredicate, BuildSortDirection.FROM_NEWEST);
     }
@@ -69,14 +68,12 @@ public interface StructureRepository {
     /**
      * Iterates over the builds of the branch.
      */
-    @Deprecated
     void builds(Branch branch, Predicate<Build> buildPredicate, BuildSortDirection sortDirection);
 
     /**
      * Iterates over the builds of the project, from the newest to the oldest, until
      * the <code>buildPredicate</code> returns <code>false</code>.
      */
-    @Deprecated
     void builds(Project project, Predicate<Build> buildPredicate);
 
     Build getLastBuildForBranch(Branch branch);
