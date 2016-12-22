@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -28,13 +28,10 @@ public class DBStartup {
     public DBStartup(List<DBInitConfig> dbInitConfigs, List<StartupService> startupServices) {
         // Sorts the DB configurations
         this.dbInitConfigs = new ArrayList<>(dbInitConfigs);
-        Collections.sort(
-                this.dbInitConfigs,
-                (o1, o2) -> o2.getOrder() - o1.getOrder()
-        );
+        this.dbInitConfigs.sort((o1, o2) -> o2.getOrder() - o1.getOrder());
         // Sorts the startup services
         List<StartupService> services = new ArrayList<>(startupServices);
-        Collections.sort(services, (o1, o2) -> o1.startupOrder() - o2.startupOrder());
+        services.sort(Comparator.comparingInt(StartupService::startupOrder));
         this.startupServices = services;
     }
 

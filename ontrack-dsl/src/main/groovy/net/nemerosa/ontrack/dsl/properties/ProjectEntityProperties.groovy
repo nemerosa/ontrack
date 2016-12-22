@@ -18,13 +18,14 @@ class ProjectEntityProperties {
         this.entity = entity
     }
 
-    def property(String type, data) {
-        entity.property(type, data)
-    }
-
     @DSLMethod(id = "property-get", count = 2)
     def property(String type, boolean required = true) {
         entity.getProperty(type, required)
+    }
+
+    @DSLMethod("Sets a property.")
+    def property(String type, Map<String, ?> data) {
+        entity.property(type, data)
     }
 
     /**

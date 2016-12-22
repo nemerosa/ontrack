@@ -6,15 +6,18 @@ Example:
 [source,groovy]
 ----
 ontrack.configure {
-   stash 'MyStash', repository: 'https://stash.example.com', indexationInterval: 30
+   jira 'MyJIRA', 'https://jira.example.com', 'user', 'password'
+   stash 'MyStash', repository: 'https://stash.example.com', 'user', 'password'
 }
 ontrack.project('project') {
    config {
-       stash 'MyStash', 'PROJECT', 'my-repo'
+       stash 'MyStash', 'PROJECT', 'my-repo', 30, "jira//MyJIRA"
    }
 }
 assert ontrack.project('project').config.stash.configuration.name == 'MyStash'
 assert ontrack.project('project').config.stash.project == 'PROJECT'
 assert ontrack.project('project').config.stash.repository == 'my-repo'
+assert ontrack.project('project').config.stash.indexationInterval == 30
+assert ontrack.project('project').config.stash.issueServiceConfigurationIdentifier == "jira//MyJIRA"
 assert ontrack.project('project').config.stash.repositoryUrl == 'https://stash.example.com/projects/PROJECT/repos/my-repo'
 ----

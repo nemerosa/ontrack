@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
+import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService
 import net.nemerosa.ontrack.git.GitRepositoryClient
@@ -39,16 +39,18 @@ class GitServiceImplTest {
         def gitConfigurator = mock(GitConfigurator)
         when(gitConfigurator.getConfiguration(Mockito.any(Project.class))).thenReturn(
                 Optional.of(
-                        BasicGitConfiguration.empty()
-                                .withRemote("remote")
-                                .withName("MyGitConfig")
+                        BasicGitActualConfiguration.of(
+                                BasicGitConfiguration.empty()
+                                        .withRemote("remote")
+                                        .withName("MyGitConfig")
+                        )
                 )
         )
 
         gitService = new GitServiceImpl(
                 structureService,
-                propertyService,
-                mock(IssueServiceRegistry),
+                propertyService
+                ,
                 mock(JobScheduler),
                 mock(SecurityService),
                 mock(TransactionService),
@@ -120,7 +122,7 @@ class GitServiceImplTest {
         // Git configuration
         BasicGitConfiguration gitConfiguration = BasicGitConfiguration.empty()
         GitBranchConfiguration branchConfiguration = GitBranchConfiguration.of(
-                gitConfiguration,
+                BasicGitActualConfiguration.of(gitConfiguration),
                 branch.name
         )
 

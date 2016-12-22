@@ -12,7 +12,7 @@ public class StashConfigurationTest {
         StashConfiguration configuration = new StashConfiguration(
                 "server",
                 "http://stash.mycompany.com",
-                "", "", 0, ""
+                "", ""
         );
         assertFalse(configuration.isCloud());
     }
@@ -22,7 +22,7 @@ public class StashConfigurationTest {
         StashConfiguration configuration = new StashConfiguration(
                 "cloud",
                 "https://bitbucket.org",
-                "", "", 0, ""
+                "", ""
         );
         assertTrue(configuration.isCloud());
     }

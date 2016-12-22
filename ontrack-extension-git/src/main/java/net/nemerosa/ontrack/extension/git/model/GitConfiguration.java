@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.support.UserPassword;
 
@@ -47,10 +48,9 @@ public interface GitConfiguration {
     int getIndexationInterval();
 
     /**
-     * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
-     * with this repository.
+     * Gets the associated issue service configuration (if any)
      */
-    String getIssueServiceConfigurationIdentifier();
+    Optional<ConfiguredIssueService> getConfiguredIssueService();
 
     /**
      * Gets the Git repository for this configuration

@@ -2,10 +2,10 @@ package net.nemerosa.ontrack.model.structure;
 
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public interface StructureService {
@@ -110,8 +110,6 @@ public interface StructureService {
      */
     Optional<Build> findBuild(ID branchId, Predicate<Build> buildPredicate, BuildSortDirection sortDirection);
 
-    List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter);
-
     Optional<Build> getLastBuild(ID branchId);
 
     List<Build> buildSearch(ID projectId, BuildSearchForm form);
@@ -209,4 +207,8 @@ public interface StructureService {
     Optional<Project> findProjectByName(String project);
 
     Optional<Branch> findBranchByName(String project, String branch);
+
+    default BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader() {
+        return (entityType, id) -> entityType.getEntityFn(this).apply(id);
+    }
 }

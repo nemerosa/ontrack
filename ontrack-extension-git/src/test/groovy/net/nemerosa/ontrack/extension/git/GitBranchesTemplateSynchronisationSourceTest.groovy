@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
+import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
@@ -24,7 +25,7 @@ class GitBranchesTemplateSynchronisationSourceTest {
     void before() {
         project = Project.of(nd('P', "Project"))
         branch = Branch.of(project, nd('B', "Branch"))
-        gitConfiguration = BasicGitConfiguration.empty()
+        gitConfiguration = BasicGitActualConfiguration.of(BasicGitConfiguration.empty())
         gitService = mock(GitService)
         when(gitService.getProjectConfiguration(project)).thenReturn(Optional.of(gitConfiguration))
         when(gitService.getRemoteBranches(gitConfiguration)).thenReturn(

@@ -214,7 +214,7 @@ build
         }
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
-                '**/target/**,**/node_modules/**,**/vendor/**',
+                '**/build/**,**/node_modules/**,**/vendor/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
         downstreamParameterized {

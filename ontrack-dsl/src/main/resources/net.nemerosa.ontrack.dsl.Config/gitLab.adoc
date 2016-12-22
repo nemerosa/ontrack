@@ -1,0 +1,28 @@
+When working with <<usage-gitlab,GitLab>>, the access to the GitLab API must be configured.
+
+`def gitLab(Map<String, ?> parameters, String name)`
+
+The `name` is the identifier of the configuration - if it already exists, it will be updated.
+
+The parameters are the following:
+
+|===
+| Parameter | Description
+
+| *url* | the URL to the GitLab application, without any repository nor project reference
+| *user* | user used to connect to GitHub
+| *password* | *Personal Access Token* associated with the user
+| ignoreSslCertificate | Set to `true` if SSL checks must be disabled (optional, default to `false`)
+|===
+
+WARNING: The `password` field must be a *Personal Access Token* - using the actual password is *not* supported.
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   gitLab 'AcmeGitLab', url: 'https://gitlab.acme.com', user: 'user', password: 'abcdef'
+}
+assert ontrack.config.gitLab.find { it == 'AcmeGitLab' } != null
+----

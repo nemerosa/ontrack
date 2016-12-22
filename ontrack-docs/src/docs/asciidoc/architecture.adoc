@@ -58,6 +58,11 @@ This is achieved using the _model filtering_ technics.
 
 TODO
 
+[[architecture-ui-forms]]
+==== Forms
+
+include::architecture-ui-forms.adoc[]
+
 [[architecture-model]]
 ==== Model
 

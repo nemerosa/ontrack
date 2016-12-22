@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.issues.support
 
+import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
+import org.mockito.Mockito
 
 class MockIssueServiceConfiguration implements IssueServiceConfiguration {
 
@@ -20,5 +23,15 @@ class MockIssueServiceConfiguration implements IssueServiceConfiguration {
     @Override
     String getName() {
         name
+    }
+
+    static ConfiguredIssueService configuredIssueService(String name) {
+        return new ConfiguredIssueService(
+                new MockIssueServiceExtension(
+                        new MockIssueServiceFeature(),
+                        Mockito.mock(IssueExportServiceFactory)
+                ),
+                new MockIssueServiceConfiguration(name)
+        )
     }
 }

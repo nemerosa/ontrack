@@ -31,8 +31,7 @@ public class StashConfigurationServiceIT extends AbstractServiceTestSupport {
                         new StashConfiguration(
                                 confName,
                                 "https://bitbucket.org",
-                                "", "",
-                                0, ""
+                                "", ""
                         )
                 );
                 configurationService.deleteConfiguration(confName);

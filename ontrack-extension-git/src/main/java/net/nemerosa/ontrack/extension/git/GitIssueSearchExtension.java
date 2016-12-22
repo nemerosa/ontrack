@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.api.SearchExtension;
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
@@ -16,7 +15,6 @@ import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,18 +27,15 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class GitIssueSearchExtension extends AbstractExtension implements SearchExtension {
 
     private final GitService gitService;
-    private final IssueServiceRegistry issueServiceRegistry;
     private final URIBuilder uriBuilder;
 
     @Autowired
     public GitIssueSearchExtension(
             GitExtensionFeature extensionFeature,
             GitService gitService,
-            IssueServiceRegistry issueServiceRegistry,
             URIBuilder uriBuilder) {
         super(extensionFeature);
         this.gitService = gitService;
-        this.issueServiceRegistry = issueServiceRegistry;
         this.uriBuilder = uriBuilder;
     }
 
@@ -67,16 +62,13 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
             branchSearchConfigurations = new ArrayList<>();
             gitService.forEachConfiguredBranch((branch, branchConfiguration) -> {
                 GitConfiguration config = branchConfiguration.getConfiguration();
-                String issueServiceConfigurationIdentifier = config.getIssueServiceConfigurationIdentifier();
-                if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
-                    ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
-                    if (configuredIssueService != null) {
-                        branchSearchConfigurations.add(new BranchSearchConfiguration(
-                                branch,
-                                branchConfiguration,
-                                configuredIssueService
-                        ));
-                    }
+                ConfiguredIssueService configuredIssueService = config.getConfiguredIssueService().orElse(null);
+                if (configuredIssueService != null) {
+                    branchSearchConfigurations.add(new BranchSearchConfiguration(
+                            branch,
+                            branchConfiguration,
+                            configuredIssueService
+                    ));
                 }
             });
         }
@@ -84,9 +76,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
         @Override
         public boolean isTokenSearchable(String token) {
             return branchSearchConfigurations.stream()
-                    .filter(c -> c.getConfiguredIssueService().getIssueServiceExtension().validIssueToken(token))
-                    .findAny()
-                    .isPresent();
+                    .anyMatch(c -> c.getConfiguredIssueService().getIssueServiceExtension().validIssueToken(token));
         }
 
         @Override

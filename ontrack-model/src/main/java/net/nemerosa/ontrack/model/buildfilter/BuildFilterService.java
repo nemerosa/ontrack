@@ -16,7 +16,12 @@ public interface BuildFilterService {
     /**
      * Gets the default filter to use when none is defined.
      */
-    BuildFilter defaultFilter();
+    BuildFilterProviderData<?> defaultFilterProviderData();
+
+    /**
+     * Builds a last promotion filter
+     */
+    BuildFilterProviderData<?> lastPromotedBuildsFilterData();
 
     /**
      * Returns a filter which returns the last promoted builds
@@ -26,7 +31,7 @@ public interface BuildFilterService {
     /**
      * Builds a standard build filter
      */
-    StandardFilterBuilder standardFilter(int count);
+    StandardFilterProviderDataBuilder standardFilterProviderData(int count);
 
     /**
      * Builds a standard build filter
@@ -50,16 +55,26 @@ public interface BuildFilterService {
     Collection<BuildFilterForm> getBuildFilterForms(ID branchId);
 
     /**
-     * Basic method to compute an actual filter from a type and a list of parameters.
+     * Gets a build filter provider for the given type.
      *
-     * @param branchId   Branch to apply the filter on
-     * @param type       Qualified type for the filter
+     * @param filterType Qualified type for the filter
      * @param parameters Parameters for the filter
-     * @return Actual filter to use, or the {@linkplain #defaultFilter() default filter} if
-     * the <code>type</code> cannot be resolved or if the filter cannot be instantiated using
-     * the given parameters.
+     * @return Actual filter to use
+     * @throws BuildFilterProviderNotFoundException    If the type cannot be resolved
+     * @throws BuildFilterProviderDataParsingException If the parameters cannot be parsed
      */
-    BuildFilter computeFilter(ID branchId, String type, JsonNode parameters);
+    <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, JsonNode parameters);
+
+    /**
+     * Gets a build filter provider for the given type.
+     *
+     * @param filterType Qualified type for the filter
+     * @param parameters Parameters for the filter
+     * @return Actual filter to use
+     * @throws BuildFilterProviderNotFoundException    If the type cannot be resolved
+     * @throws BuildFilterProviderDataParsingException If the parameters cannot be parsed
+     */
+    <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, T parameters);
 
     /**
      * Gets the form to edit an existing filter.
