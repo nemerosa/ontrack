@@ -47,14 +47,6 @@ public interface BuildFilterProvider<T> {
     }
 
     /**
-     * Builds an actual filter using the given set of parameters
-     */
-    @Deprecated
-    default BuildFilter filter(ID branchId, T data) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * Parses the filter data, provided as JSON, into an actual filter data object, when possible.
      *
      * @param data Filter data, as JSON
