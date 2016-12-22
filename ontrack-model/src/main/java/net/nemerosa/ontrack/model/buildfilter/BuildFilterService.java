@@ -30,6 +30,11 @@ public interface BuildFilterService {
     StandardFilterBuilder standardFilter(int count);
 
     /**
+     * Builds a last promotion filter
+     */
+    BuildFilterProviderData<?> lastPromotedBuildsFilterData();
+
+    /**
      * Builds a standard build filter
      */
     StandardFilterProviderDataBuilder standardFilterProviderData(int count);

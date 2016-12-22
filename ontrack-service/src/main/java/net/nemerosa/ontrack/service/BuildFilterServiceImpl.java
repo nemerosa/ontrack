@@ -159,6 +159,16 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
     }
 
+    @Override
+    public BuildFilterProviderData<?> lastPromotedBuildsFilterData() {
+        BuildFilterProvider<?> provider =
+                getBuildFilterProviderByType(PromotionLevelBuildFilterProvider.class.getName())
+                        .orElseThrow(() -> new BuildFilterProviderNotFoundException(
+                                PromotionLevelBuildFilterProvider.class.getName())
+                        );
+        return provider.withData(null);
+    }
+
     public class DefaultStandardFilterProviderDataBuilder implements StandardFilterProviderDataBuilder {
 
         private StandardBuildFilterData data;
