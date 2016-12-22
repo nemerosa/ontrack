@@ -224,7 +224,12 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
                     params.addValue("buildTo", buildPattern);
                 }
             }
-            // FIXME linkedToPromotion
+            // linkedToPromotion
+            String linkedToPromotion = data.getLinkedToPromotion();
+            if (StringUtils.isNotBlank(linkedToPromotion)) {
+                sql.append(" AND PLTO.NAME = :linkedToPromotion");
+                params.addValue("linkedToPromotion", linkedToPromotion);
+            }
         }
 
         // Since build?

@@ -506,6 +506,37 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     }
 
     @Test
+    public void linked_to_project_and_promotion() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        PromotionLevel otherPL = doCreatePromotionLevel(otherBranch, nd("PRODUCTION", ""));
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        asUser().with(otherBranch, PromotionRunCreate.class).execute(() -> structureService.newPromotionRun(
+                PromotionRun.of(
+                        otherBuild2,
+                        otherPL,
+                        Signature.of("test"),
+                        ""
+                )
+        ));
+        // Builds
+        build(1);
+        build(2).linkedTo(otherBuild1);
+        build(3);
+        build(4).linkedTo(otherBuild2);
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedTo(otherBranch.getProject().getName())
+                .withLinkedToPromotion("PRODUCTION")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4);
+    }
+
+    @Test
     public void linked_to_project_and_build() throws Exception {
         Branch otherBranch = doCreateBranch();
         Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
