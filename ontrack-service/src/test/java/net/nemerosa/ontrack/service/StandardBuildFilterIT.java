@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -351,17 +352,84 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         filter.filterBranchBuilds(branch);
     }
 
+    @Test
+    public void after_date() throws Exception {
+        // Builds
+        build(1, LocalDateTime.of(2014, 7, 14, 13, 25, 0));
+        build(2, LocalDateTime.of(2014, 7, 15, 15, 0, 0));
+        build(3, LocalDateTime.of(2014, 7, 16, 9, 0, 0));
+        build(4, LocalDateTime.of(2014, 7, 17, 7, 0, 0));
+        build(5, LocalDateTime.of(2014, 7, 18, 17, 0, 0));
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withAfterDate(LocalDate.of(2014, 7, 16))
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4, 3);
+    }
+
+    @Test
+    public void before_date() throws Exception {
+        // Builds
+        build(1, LocalDateTime.of(2014, 7, 14, 13, 25, 0));
+        build(2, LocalDateTime.of(2014, 7, 15, 15, 0, 0));
+        build(3, LocalDateTime.of(2014, 7, 16, 9, 0, 0));
+        build(4, LocalDateTime.of(2014, 7, 17, 7, 0, 0));
+        build(5, LocalDateTime.of(2014, 7, 18, 17, 0, 0));
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withBeforeDate(LocalDate.of(2014, 7, 16))
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 3, 2, 1);
+    }
+
+    @Test
+    public void before_and_after_date() throws Exception {
+        // Builds
+        build(1, LocalDateTime.of(2014, 7, 14, 13, 25, 0));
+        build(2, LocalDateTime.of(2014, 7, 15, 15, 0, 0));
+        build(3, LocalDateTime.of(2014, 7, 16, 9, 0, 0));
+        build(4, LocalDateTime.of(2014, 7, 17, 7, 0, 0));
+        build(5, LocalDateTime.of(2014, 7, 18, 17, 0, 0));
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withBeforeDate(LocalDate.of(2014, 7, 17))
+                .withAfterDate(LocalDate.of(2014, 7, 15))
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4, 3, 2);
+    }
+
+    // =======================================
+    // Utility methods for tests
+    // =======================================
+
     protected BuildCreator build(int name) throws Exception {
         return build(String.valueOf(name));
     }
 
     protected BuildCreator build(String name) throws Exception {
+        return build(name, LocalDateTime.of(2014, 7, 14, 13, 25, 0));
+    }
+
+    protected BuildCreator build(int name, LocalDateTime dateTime) throws Exception {
+        return build(String.valueOf(name), dateTime);
+    }
+
+    protected BuildCreator build(String name, LocalDateTime dateTime) throws Exception {
         Build build = asUser().with(branch, BuildCreate.class).call(() ->
                 structureService.newBuild(
                         Build.of(
                                 branch,
                                 new NameDescription(name, "Build " + name),
-                                Signature.of("user").withTime(LocalDateTime.of(2014, 7, 14, 13, 25, 0))
+                                Signature.of("user").withTime(dateTime)
                         )
                 )
         );

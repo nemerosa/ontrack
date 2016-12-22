@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,8 +85,19 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
             params.addValue("withPromotionLevel", withPromotionLevel);
         }
 
-        // FIXME afterDate
-        // FIXME beforeDate
+        // afterDate
+        LocalDate afterDate = data.getAfterDate();
+        if (afterDate != null) {
+            sql.append(" AND B.CREATION >= :afterDate");
+            params.addValue("afterDate", dateTimeForDB(afterDate.atTime(0, 0)));
+        }
+
+        // beforeDate
+        LocalDate beforeDate = data.getBeforeDate();
+        if (beforeDate != null) {
+            sql.append(" AND B.CREATION <= :beforeDate");
+            params.addValue("beforeDate", dateTimeForDB(beforeDate.atTime(23, 59, 59)));
+        }
 
         // sinceValidationStamp
         String sinceValidationStamp = data.getSinceValidationStamp();
