@@ -25,11 +25,6 @@ public interface BuildFilterService {
     BuildFilterProviderData<?> defaultFilterProviderData();
 
     /**
-     * Builds a standard build filter
-     */
-    StandardFilterBuilder standardFilter(int count);
-
-    /**
      * Builds a last promotion filter
      */
     BuildFilterProviderData<?> lastPromotedBuildsFilterData();
@@ -76,18 +71,6 @@ public interface BuildFilterService {
      * @throws BuildFilterProviderDataParsingException If the parameters cannot be parsed
      */
     <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, T parameters);
-
-    /**
-     * Basic method to compute an actual filter from a type and a list of parameters.
-     *
-     * @param branchId   Branch to apply the filter on
-     * @param type       Qualified type for the filter
-     * @param parameters Parameters for the filter
-     * @return Actual filter to use, or the {@linkplain #defaultFilter() default filter} if
-     * the <code>type</code> cannot be resolved or if the filter cannot be instantiated using
-     * the given parameters.
-     */
-    BuildFilter computeFilter(ID branchId, String type, JsonNode parameters);
 
     /**
      * Gets the form to edit an existing filter.

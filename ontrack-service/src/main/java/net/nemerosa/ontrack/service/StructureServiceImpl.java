@@ -8,9 +8,6 @@ import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
-import net.nemerosa.ontrack.model.buildfilter.DefaultBuildFilter;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.*;
@@ -354,18 +351,6 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter) {
-        // Gets the branch
-        Branch branch = getBranch(branchId);
-        // Initialises the build filter with the branch
-        buildFilter.init(branch);
-        // Collects the builds associated with this predicate
-        List<Build> builds = new ArrayList<>();
-        structureRepository.builds(branch, build -> filterBuild(builds, branch, build, buildFilter));
-        return builds;
-    }
-
-    @Override
     public Optional<Build> findBuild(ID branchId, Predicate<Build> buildPredicate, BuildSortDirection sortDirection) {
         // Gets the branch
         Branch branch = getBranch(branchId);
@@ -389,14 +374,11 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public Optional<Build> getLastBuild(ID branchId) {
-        return getFilteredBuilds(
-                branchId,
-                new StandardBuildFilter(
-                        StandardBuildFilterData.of(1),
-                        propertyService,
-                        this
+        return Optional.ofNullable(
+                structureRepository.getLastBuildForBranch(
+                        getBranch(branchId)
                 )
-        ).stream().findFirst();
+        );
     }
 
     @Override
@@ -425,17 +407,13 @@ public class StructureServiceImpl implements StructureService {
             if (accept && StringUtils.isNotBlank(form.getPromotionName())) {
                 BuildView buildView = buildViewSupplier.get();
                 accept = buildView.getPromotionRuns().stream()
-                        .filter(run -> form.getPromotionName().equals(run.getPromotionLevel().getName()))
-                        .findAny()
-                        .isPresent();
+                        .anyMatch(run -> form.getPromotionName().equals(run.getPromotionLevel().getName()));
             }
             // Validation stamp name
             if (accept && StringUtils.isNotBlank(form.getValidationStampName())) {
                 BuildView buildView = buildViewSupplier.get();
                 accept = buildView.getValidationStampRunViews().stream()
-                        .filter(validationStampRunView -> validationStampRunView.hasValidationStamp(form.getValidationStampName(), ValidationRunStatusID.PASSED))
-                        .findAny()
-                        .isPresent();
+                        .anyMatch(validationStampRunView -> validationStampRunView.hasValidationStamp(form.getValidationStampName(), ValidationRunStatusID.PASSED));
             }
             // Property & property value
             if (accept && StringUtils.isNotBlank(form.getProperty())) {
@@ -470,29 +448,6 @@ public class StructureServiceImpl implements StructureService {
         structureRepository.builds(project, buildPredicate);
         // OK
         return builds;
-    }
-
-    /**
-     * @param builds      List of builds already added in the list
-     * @param branch      Branch
-     * @param build       Build to test
-     * @param buildFilter Filter definition
-     * @return True is OK to go on with other builds
-     */
-    private boolean filterBuild(List<Build> builds, Branch branch, Build build, BuildFilter buildFilter) {
-        // Calls the filter
-        BuildFilterResult result = buildFilter.filter(
-                builds,
-                branch,
-                build,
-                CachedSupplier.of(() -> getBuildView(build, false))
-        );
-        // Adding the build
-        if (result.isAccept()) {
-            builds.add(build);
-        }
-        // Going on?
-        return result.isGoingOn();
     }
 
     @Override
@@ -896,10 +851,7 @@ public class StructureServiceImpl implements StructureService {
         return new BranchStatusView(
                 build.getBranch(),
                 decorationService.getDecorations(build.getBranch()),
-                getFilteredBuilds(
-                        build.getBranch().getId(),
-                        new DefaultBuildFilter(1)
-                ).get(0),
+                getLastBuild(build.getBranch().getId()).orElse(null),
                 getPromotionLevelListForBranch(build.getBranch().getId()).stream()
                         .map(promotionLevel ->
                                 new PromotionView(

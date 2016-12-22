@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.structure;
 
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 
 import java.util.List;
 import java.util.Optional;
@@ -110,8 +109,6 @@ public interface StructureService {
      * @return Build if found, empty otherwise
      */
     Optional<Build> findBuild(ID branchId, Predicate<Build> buildPredicate, BuildSortDirection sortDirection);
-
-    List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter);
 
     Optional<Build> getLastBuild(ID branchId);
 

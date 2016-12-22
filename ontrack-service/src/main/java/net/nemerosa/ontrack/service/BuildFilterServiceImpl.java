@@ -8,7 +8,10 @@ import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.BranchFilterMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.repository.BuildFilterRepository;
 import net.nemerosa.ontrack.repository.TBuildFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +34,13 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     private final BuildFilterRepository buildFilterRepository;
     private final StructureService structureService;
     private final SecurityService securityService;
-    private final PropertyService propertyService;
 
     @Autowired
     public BuildFilterServiceImpl(
             Collection<BuildFilterProvider<?>> buildFilterProviders,
             BuildFilterRepository buildFilterRepository,
             StructureService structureService,
-            SecurityService securityService,
-            PropertyService propertyService) {
+            SecurityService securityService) {
         this.buildFilterProviders = buildFilterProviders.stream()
                 .collect(Collectors.toMap(
                         BuildFilterProvider::getType,
@@ -48,7 +49,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         this.buildFilterRepository = buildFilterRepository;
         this.structureService = structureService;
         this.securityService = securityService;
-        this.propertyService = propertyService;
     }
 
     @Override
@@ -59,104 +59,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     @Override
     public BuildFilterProviderData<?> defaultFilterProviderData() {
         return standardFilterProviderData(1).build();
-    }
-
-    public class DefaultStandardFilterBuilder implements StandardFilterBuilder {
-
-        private StandardBuildFilterData data;
-
-        public DefaultStandardFilterBuilder(int count) {
-            data = StandardBuildFilterData.of(count);
-        }
-
-        @Override
-        public BuildFilter build() {
-            return new StandardBuildFilter(data, propertyService, structureService);
-        }
-
-        @Override
-        public StandardFilterBuilder withSincePromotionLevel(String sincePromotionLevel) {
-            data = data.withSincePromotionLevel(sincePromotionLevel);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withWithPromotionLevel(String withPromotionLevel) {
-            data = data.withWithPromotionLevel(withPromotionLevel);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withAfterDate(LocalDate afterDate) {
-            data = data.withAfterDate(afterDate);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withBeforeDate(LocalDate beforeDate) {
-            data = data.withBeforeDate(beforeDate);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withSinceValidationStamp(String sinceValidationStamp) {
-            data = data.withSinceValidationStamp(sinceValidationStamp);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withSinceValidationStampStatus(String sinceValidationStampStatus) {
-            data = data.withSinceValidationStampStatus(sinceValidationStampStatus);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withWithValidationStamp(String withValidationStamp) {
-            data = data.withWithValidationStamp(withValidationStamp);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withWithValidationStampStatus(String withValidationStampStatus) {
-            data = data.withWithValidationStampStatus(withValidationStampStatus);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withWithProperty(String withProperty) {
-            data = data.withWithProperty(withProperty);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withWithPropertyValue(String withPropertyValue) {
-            data = data.withWithPropertyValue(withPropertyValue);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withSinceProperty(String sinceProperty) {
-            data = data.withSinceProperty(sinceProperty);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withSincePropertyValue(String sincePropertyValue) {
-            data = data.withSincePropertyValue(sincePropertyValue);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withLinkedFrom(String linkedFrom) {
-            data = data.withLinkedFrom(linkedFrom);
-            return this;
-        }
-
-        @Override
-        public StandardFilterBuilder withLinkedTo(String linkedTo) {
-            data = data.withLinkedTo(linkedTo);
-            return this;
-        }
     }
 
     @Override
@@ -274,11 +176,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @Override
-    public StandardFilterBuilder standardFilter(int count) {
-        return new DefaultStandardFilterBuilder(count);
-    }
-
-    @Override
     public StandardFilterProviderDataBuilder standardFilterProviderData(int count) {
         return new DefaultStandardFilterProviderDataBuilder(count);
     }
@@ -343,12 +240,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         } else {
             throw new BuildFilterProviderDataParsingException(provider.getClass().getName());
         }
-    }
-
-    @Override
-    public BuildFilter computeFilter(ID branchId, String type, JsonNode jsonData) {
-        Optional<BuildFilter> optFilter = getBuildFilterProviderByType(type).map(provider -> getBuildFilter(branchId, provider, jsonData));
-        return optFilter.get();
     }
 
     @Override
@@ -440,12 +331,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                         filter.getData()
                 )
         );
-    }
-
-    private <T> BuildFilter getBuildFilter(ID branchId, BuildFilterProvider<T> provider, JsonNode jsonData) {
-        return provider.parse(jsonData)
-                .map(data -> provider.filter(branchId, data))
-                .orElse(defaultFilter());
     }
 
     @SuppressWarnings("unchecked")

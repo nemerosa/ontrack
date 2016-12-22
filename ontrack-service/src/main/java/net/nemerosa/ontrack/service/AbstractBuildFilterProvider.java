@@ -10,12 +10,6 @@ import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 public abstract class AbstractBuildFilterProvider<T> implements BuildFilterProvider<T> {
 
     @Override
-    // FIXME All subclasses must implement this method
-    public String getType() {
-        return getClass().getName();
-    }
-
-    @Override
     public BuildFilterForm newFilterForm(ID branchId) {
         return new BuildFilterForm(
                 getClass(),

@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.repository.BuildFilterRepository;
 import org.junit.Before;
@@ -29,23 +30,24 @@ public class BuildFilterServiceImplTest {
                 Collections.emptyList(),
                 buildFilterRepository,
                 structureService,
-                securityService,
-                propertyService);
+                securityService
+        );
     }
 
     @Test
     public void standardFilter() {
-        BuildFilter filter = service.standardFilter(20)
+        BuildFilterProviderData<?> providerData = service.standardFilterProviderData(20)
                 .withWithPromotionLevel("BRONZE")
                 .withWithProperty("my.property.MyPropertyType")
                 .withWithPropertyValue("Value")
                 .build();
-        assertTrue(filter instanceof StandardBuildFilter);
-        StandardBuildFilter std = (StandardBuildFilter) filter;
-        assertEquals(20, std.getData().getCount());
-        assertEquals("BRONZE", std.getData().getWithPromotionLevel());
-        assertEquals("my.property.MyPropertyType", std.getData().getWithProperty());
-        assertEquals("Value", std.getData().getWithPropertyValue());
+        Object filter = providerData.getData();
+        assertTrue(filter instanceof StandardBuildFilterData);
+        StandardBuildFilterData std = (StandardBuildFilterData) filter;
+        assertEquals(20, std.getCount());
+        assertEquals("BRONZE", std.getWithPromotionLevel());
+        assertEquals("my.property.MyPropertyType", std.getWithProperty());
+        assertEquals("Value", std.getWithPropertyValue());
     }
 
 }
