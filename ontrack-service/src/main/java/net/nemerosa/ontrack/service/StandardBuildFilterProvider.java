@@ -174,11 +174,25 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                                 .optional()
                 )
                 .with(
+                        Text.of("linkedFromPromotion")
+                                .label("Linked from promotion level")
+                                .help("The build must be linked FROM a build having this promotion (requires \"Linked from\")")
+                                .length(40)
+                                .optional()
+                )
+                .with(
                         Text.of("linkedTo")
                                 .label("Linked to")
                                 .help("The build must be linked TO the builds selected by the pattern.\n" +
                                         "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
                                 )
+                                .length(40)
+                                .optional()
+                )
+                .with(
+                        Text.of("linkedToPromotion")
+                                .label("Linked to promotion level")
+                                .help("The build must be linked TO a build having this promotion (requires \"Linked to\")")
                                 .length(40)
                                 .optional()
                 )
@@ -202,7 +216,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .fill("withProperty", data.getWithProperty())
                 .fill("withPropertyValue", data.getWithPropertyValue())
                 .fill("linkedFrom", data.getLinkedFrom())
-                .fill("linkedTo", data.getLinkedTo())
+                .fill("linkedFromPromotion", data.getLinkedFromPromotion())
+                .fill("linkedToPromotion", data.getLinkedToPromotion())
                 ;
     }
 
@@ -222,7 +237,9 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withWithProperty(JsonUtils.get(data, "withProperty", null))
                 .withWithPropertyValue(JsonUtils.get(data, "withPropertyValue", null))
                 .withLinkedFrom(JsonUtils.get(data, "linkedFrom", null))
-                .withLinkedTo(JsonUtils.get(data, "linkedTo", null));
+                .withLinkedFromPromotion(JsonUtils.get(data, "linkedFromPromotion", null))
+                .withLinkedTo(JsonUtils.get(data, "linkedTo", null))
+                .withLinkedToPromotion(JsonUtils.get(data, "linkedToPromotion", null));
         return Optional.of(filter);
     }
 
