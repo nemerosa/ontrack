@@ -167,8 +167,19 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
             }
         }
 
-        // FIXME sinceProperty
-        // FIXME sincePropertyValue
+        // sinceProperty
+        String sinceProperty = data.getSinceProperty();
+        if (StringUtils.isNotBlank(sinceProperty)) {
+            String sincePropertyValue = data.getSincePropertyValue();
+            Integer id = findLastBuildWithPropertyValue(branch, sinceProperty, sincePropertyValue);
+            if (id != null) {
+                if (sinceBuildId == null) {
+                    sinceBuildId = id;
+                } else {
+                    sinceBuildId = Math.max(sinceBuildId, id);
+                }
+            }
+        }
 
         // linkedFrom
         String linkedFrom = data.getLinkedFrom();
@@ -230,6 +241,30 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 .stream()
                 .map(id -> structureRepository.getBuild(ID.of(id)))
                 .collect(Collectors.toList());
+    }
+
+    private Integer findLastBuildWithPropertyValue(Branch branch, String propertyType, String propertyValue) {
+        // SQL
+        StringBuilder sql = new StringBuilder("SELECT B.ID " +
+                "FROM BUILDS B " +
+                "LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID " +
+                "WHERE B.BRANCHID = :branchId " +
+                "AND PP.TYPE = :propertyType ");
+        MapSqlParameterSource params = params("branchId", branch.id())
+                .addValue("propertyType", propertyType);
+        // Property value
+        if (StringUtils.isNotBlank(propertyValue)) {
+            sql.append(" AND PP.SEARCHKEY REGEXP :propertyValue");
+            params.addValue("propertyValue", propertyValue);
+        }
+        // Ordering
+        sql.append(" ORDER BY B.ID DESC LIMIT 1");
+        // Build ID
+        return getFirstItem(
+                sql.toString(),
+                params,
+                Integer.class
+        );
     }
 
     private Integer getValidationStampId(Branch branch, String validationStampName) {

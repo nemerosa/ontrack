@@ -615,6 +615,62 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         checkList(builds, 2);
     }
 
+    @Test
+    public void since_property() throws Exception {
+        // Builds
+        build(1);
+        build(2).withProperty("ananas");
+        build(3);
+        build(4).withProperty("an apple");
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withSinceProperty(TestSimplePropertyType.class.getName())
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4);
+    }
+
+    @Test
+    public void since_property_value_pattern() throws Exception {
+        // Builds
+        build(1);
+        build(2).withProperty("ananas");
+        build(3).withProperty("coconut");
+        build(4).withProperty("an apple");
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withSinceProperty(TestSimplePropertyType.class.getName())
+                .withSincePropertyValue("an.*")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4);
+    }
+
+    @Test
+    public void since_property_value() throws Exception {
+        // Builds
+        build(1);
+        build(2).withProperty("ananas");
+        build(3).withProperty("coconut");
+        build(4).withProperty("an apple");
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withSinceProperty(TestSimplePropertyType.class.getName())
+                .withSincePropertyValue("ananas")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4, 3, 2);
+    }
+
     // =======================================
     // Utility methods for tests
     // =======================================
