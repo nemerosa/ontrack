@@ -6,9 +6,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
-import net.nemerosa.ontrack.model.security.BuildCreate;
-import net.nemerosa.ontrack.model.security.PromotionRunCreate;
-import net.nemerosa.ontrack.model.security.ValidationRunCreate;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -407,6 +405,81 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         checkList(builds, 4, 3, 2);
     }
 
+    @Test
+    public void linked_from_project() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        // Builds
+        build(1);
+        build(2).linkedFrom(otherBuild1);
+        build(3);
+        build(4).linkedFrom(otherBuild2);
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedFrom(otherBranch.getProject().getName())
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4, 2);
+    }
+
+    @Test
+    public void linked_from_project_and_build() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        Build otherBuild3 = doCreateBuild(otherBranch, nd("2.1", ""));
+        // Builds
+        build(1);
+        build(2).linkedFrom(otherBuild1);
+        build(3);
+        build(4).linkedFrom(otherBuild2);
+        build(5).linkedFrom(otherBuild3);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedFrom(
+                        String.format(
+                                "%s:2.0",
+                                otherBranch.getProject().getName()
+                        )
+                )
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4);
+    }
+
+    @Test
+    public void linked_from_project_and_build_pattern() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        Build otherBuild3 = doCreateBuild(otherBranch, nd("2.1", ""));
+        // Builds
+        build(1);
+        build(2).linkedFrom(otherBuild1);
+        build(3);
+        build(4).linkedFrom(otherBuild2);
+        build(5).linkedFrom(otherBuild3);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedFrom(
+                        String.format(
+                                "%s:2.*",
+                                otherBranch.getProject().getName()
+                        )
+                )
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4);
+    }
+
     // =======================================
     // Utility methods for tests
     // =======================================
@@ -468,6 +541,20 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
                             )
                     )
             );
+            return this;
+        }
+
+        public BuildCreator linkedFrom(Build otherBuild) throws Exception {
+            asUser()
+                    .with(branch, ProjectView.class)
+                    .with(otherBuild, BuildEdit.class)
+                    .call(() -> {
+                        structureService.addBuildLink(
+                                otherBuild,
+                                build
+                        );
+                        return null;
+                    });
             return this;
         }
     }
