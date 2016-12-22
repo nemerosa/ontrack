@@ -44,29 +44,33 @@ public abstract class AbstractBuildFilterIT extends AbstractServiceTestSupport {
         production = doCreateValidationStamp(branch, nd("PRODUCTION", ""));
     }
 
-    protected BuildCreator build(int name) throws Exception {
+    protected BuildCreator build(int name) {
         return build(String.valueOf(name));
     }
 
-    protected BuildCreator build(String name) throws Exception {
+    protected BuildCreator build(String name) {
         return build(name, LocalDateTime.of(2014, 7, 14, 13, 25, 0));
     }
 
-    protected BuildCreator build(int name, LocalDateTime dateTime) throws Exception {
+    protected BuildCreator build(int name, LocalDateTime dateTime) {
         return build(String.valueOf(name), dateTime);
     }
 
-    protected BuildCreator build(String name, LocalDateTime dateTime) throws Exception {
-        Build build = asUser().with(branch, BuildCreate.class).call(() ->
-                structureService.newBuild(
-                        Build.of(
-                                branch,
-                                new NameDescription(name, "Build " + name),
-                                Signature.of("user").withTime(dateTime)
-                        )
-                )
-        );
-        return new BuildCreator(build);
+    protected BuildCreator build(String name, LocalDateTime dateTime) {
+        try {
+            Build build = asUser().with(branch, BuildCreate.class).call(() ->
+                    structureService.newBuild(
+                            Build.of(
+                                    branch,
+                                    new NameDescription(name, "Build " + name),
+                                    Signature.of("user").withTime(dateTime)
+                            )
+                    )
+            );
+            return new BuildCreator(build);
+        } catch (Exception ex) {
+            throw new RuntimeException("Cannot create build " + name, ex);
+        }
     }
 
     @Data

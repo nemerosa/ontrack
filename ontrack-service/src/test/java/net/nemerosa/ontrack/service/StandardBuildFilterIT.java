@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -13,8 +14,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
+import static net.nemerosa.ontrack.test.TestUtils.range;
+import static org.junit.Assert.assertEquals;
 
 public class StandardBuildFilterIT extends AbstractBuildFilterIT {
+
+    /**
+     * Default filter
+     */
+    @Test
+    public void default_filter() {
+        range(1, 20).forEach(this::build);
+        List<Build> builds = buildFilterService.defaultFilterProviderData().filterBranchBuilds(branch);
+        assertEquals(10, builds.size());
+        assertEquals("20", builds.get(0).getName());
+        assertEquals("11", builds.get(9).getName());
+    }
 
     /**
      * Tests the following sequence:

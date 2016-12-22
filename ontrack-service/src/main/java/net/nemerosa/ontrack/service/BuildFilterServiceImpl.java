@@ -53,7 +53,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public BuildFilterProviderData<?> defaultFilterProviderData() {
-        return standardFilterProviderData(1).build();
+        return standardFilterProviderData(10).build();
     }
 
     @Override
