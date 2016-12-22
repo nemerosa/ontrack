@@ -480,6 +480,81 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         checkList(builds, 5, 4);
     }
 
+    @Test
+    public void linked_to_project() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        // Builds
+        build(1);
+        build(2).linkedTo(otherBuild1);
+        build(3);
+        build(4).linkedTo(otherBuild2);
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedTo(otherBranch.getProject().getName())
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4, 2);
+    }
+
+    @Test
+    public void linked_to_project_and_build() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        Build otherBuild3 = doCreateBuild(otherBranch, nd("2.1", ""));
+        // Builds
+        build(1);
+        build(2).linkedTo(otherBuild1);
+        build(3);
+        build(4).linkedTo(otherBuild2);
+        build(5).linkedTo(otherBuild3);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedTo(
+                        String.format(
+                                "%s:2.0",
+                                otherBranch.getProject().getName()
+                        )
+                )
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4);
+    }
+
+    @Test
+    public void linked_to_project_and_build_pattern() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        Build otherBuild3 = doCreateBuild(otherBranch, nd("2.1", ""));
+        // Builds
+        build(1);
+        build(2).linkedTo(otherBuild1);
+        build(3);
+        build(4).linkedTo(otherBuild2);
+        build(5).linkedTo(otherBuild3);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedTo(
+                        String.format(
+                                "%s:2.*",
+                                otherBranch.getProject().getName()
+                        )
+                )
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 5, 4);
+    }
+
     // =======================================
     // Utility methods for tests
     // =======================================
@@ -552,6 +627,20 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
                         structureService.addBuildLink(
                                 otherBuild,
                                 build
+                        );
+                        return null;
+                    });
+            return this;
+        }
+
+        public BuildCreator linkedTo(Build otherBuild) throws Exception {
+            asUser()
+                    .with(branch, BuildEdit.class)
+                    .with(otherBuild, ProjectView.class)
+                    .call(() -> {
+                        structureService.addBuildLink(
+                                build,
+                                otherBuild
                         );
                         return null;
                     });
