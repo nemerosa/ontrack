@@ -16,12 +16,6 @@ public interface BuildFilterService {
     /**
      * Gets the default filter to use when none is defined.
      */
-    @Deprecated
-    BuildFilter defaultFilter();
-
-    /**
-     * Gets the default filter to use when none is defined.
-     */
     BuildFilterProviderData<?> defaultFilterProviderData();
 
     /**

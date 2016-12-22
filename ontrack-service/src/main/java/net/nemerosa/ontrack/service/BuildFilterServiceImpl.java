@@ -52,11 +52,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @Override
-    public BuildFilter defaultFilter() {
-        return DefaultBuildFilter.INSTANCE;
-    }
-
-    @Override
     public BuildFilterProviderData<?> defaultFilterProviderData() {
         return standardFilterProviderData(1).build();
     }
