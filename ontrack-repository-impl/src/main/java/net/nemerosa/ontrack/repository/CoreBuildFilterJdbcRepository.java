@@ -11,18 +11,20 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Repository
-public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository implements StandardBuildFilterRepository {
+public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implements CoreBuildFilterRepository {
 
     private final StructureRepository structureRepository;
 
     @Autowired
-    public StandardBuildFilterJdbcRepository(DataSource dataSource, StructureRepository structureRepository) {
+    public CoreBuildFilterJdbcRepository(DataSource dataSource, StructureRepository structureRepository) {
         super(dataSource);
         this.structureRepository = structureRepository;
     }
@@ -49,7 +51,7 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
      * </pre>
      */
     @Override
-    public List<Build> getBuilds(Branch branch, StandardBuildFilterData data) {
+    public List<Build> standardFilter(Branch branch, StandardBuildFilterData data) {
         // Query root
         StringBuilder sql = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
                 "                LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
@@ -232,6 +234,10 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         params.addValue("count", data.getCount());
 
         // Running the query
+        return loadBuilds(sql, params);
+    }
+
+    private List<Build> loadBuilds(StringBuilder sql, MapSqlParameterSource params) {
         return getNamedParameterJdbcTemplate()
                 .queryForList(
                         sql.toString(),
@@ -241,6 +247,90 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 .stream()
                 .map(id -> structureRepository.getBuild(ID.of(id)))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Build> nameFilter(Branch branch, String fromBuild, String toBuild, String withPromotionLevel, int count) {
+        // Query root
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
+                "                LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
+                "                LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID" +
+                // Branch criteria
+                "                WHERE B.BRANCHID = :branch");
+
+        // Parameters
+        MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
+
+        // From build
+        Optional<Integer> fromBuildId = lastBuild(branch, fromBuild, withPromotionLevel)
+                .map(Entity::id);
+        if (!fromBuildId.isPresent()) {
+            return Collections.emptyList();
+        }
+        sql.append(" AND B.ID >= :fromBuildId");
+        params.addValue("fromBuildId", fromBuildId.get());
+
+        // To build
+        if (StringUtils.isNotBlank(toBuild)) {
+            Optional<Integer> toBuildId = lastBuild(branch, toBuild, withPromotionLevel).map(Entity::id);
+            if (toBuildId.isPresent()) {
+                sql.append(" AND B.ID <= :toBuildId");
+                params.addValue("toBuildId", toBuildId.get());
+            }
+        }
+
+        // With promotion
+        if (StringUtils.isNotBlank(withPromotionLevel)) {
+            sql.append(" AND PL.NAME : withPromotionLevel");
+            params.addValue("withPromotionLevel", withPromotionLevel);
+        }
+
+        // Ordering
+        sql.append(" ORDER BY B.ID DESC");
+        // Limit
+        sql.append(" LIMIT :count");
+        params.addValue("count", count);
+
+        // Running the query
+        return loadBuilds(sql, params);
+    }
+
+    @Override
+    public Optional<Build> lastBuild(Branch branch, String sinceBuild, String withPromotionLevel) {
+        // Query root
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
+                "                LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
+                "                LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID" +
+                // Branch criteria
+                "                WHERE B.BRANCHID = :branch");
+
+        // Parameters
+        MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
+
+        // Since build
+        if (StringUtils.contains(sinceBuild, "*")) {
+            sql.append(" AND B.NAME LIKE :buildName");
+            params.addValue("buildName", StringUtils.replace(sinceBuild, "*", "%"));
+        } else {
+            sql.append(" AND B.NAME = :buildName");
+            params.addValue("buildName", sinceBuild);
+        }
+
+        // With promotion
+        if (StringUtils.isNotBlank(withPromotionLevel)) {
+            sql.append(" AND PL.NAME : withPromotionLevel");
+            params.addValue("withPromotionLevel", withPromotionLevel);
+        }
+
+        // Ordering
+        sql.append(" ORDER BY B.ID DESC");
+        // Limit
+        sql.append(" LIMIT 1");
+
+        // Running the query
+        return loadBuilds(sql, params)
+                .stream()
+                .findFirst();
     }
 
     private Integer findLastBuildWithPropertyValue(Branch branch, String propertyType, String propertyValue) {

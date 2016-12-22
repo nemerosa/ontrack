@@ -3,9 +3,11 @@ package net.nemerosa.ontrack.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class NamedBuildFilterProvider extends AbstractBuildFilterProvider<NamedBuildFilterData> {
 
     private final StructureService structureService;
+    private final CoreBuildFilterRepository filterRepository;
 
     @Autowired
-    public NamedBuildFilterProvider(StructureService structureService) {
+    public NamedBuildFilterProvider(StructureService structureService, CoreBuildFilterRepository filterRepository) {
         this.structureService = structureService;
+        this.filterRepository = filterRepository;
     }
 
     @Override
@@ -43,6 +47,13 @@ public class NamedBuildFilterProvider extends AbstractBuildFilterProvider<NamedB
         List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branchId);
         // Form
         return Form.create()
+                .with(
+                        Int.of("count")
+                                .label("Maximum count")
+                                .help("Maximum number of builds to display")
+                                .min(1)
+                                .value(10)
+                )
                 .with(
                         Text.of("fromBuild")
                                 .label("From build")
@@ -71,6 +82,7 @@ public class NamedBuildFilterProvider extends AbstractBuildFilterProvider<NamedB
     @Override
     protected Form fill(Form form, NamedBuildFilterData data) {
         return form
+                .fill("count", data.getCount())
                 .fill("fromBuild", data.getFromBuild())
                 .fill("toBuild", data.getToBuild())
                 .fill("withPromotionLevel", data.getWithPromotionLevel())
@@ -80,6 +92,7 @@ public class NamedBuildFilterProvider extends AbstractBuildFilterProvider<NamedB
     @Override
     public Optional<NamedBuildFilterData> parse(JsonNode data) {
         NamedBuildFilterData filter = NamedBuildFilterData.of(JsonUtils.get(data, "fromBuild", ""))
+                .withCount(JsonUtils.getInt(data, "count", 10))
                 .withToBuild(JsonUtils.get(data, "toBuild", null))
                 .withWithPromotionLevel(JsonUtils.get(data, "withPromotionLevel", null));
         return Optional.of(filter);
@@ -87,7 +100,12 @@ public class NamedBuildFilterProvider extends AbstractBuildFilterProvider<NamedB
 
     @Override
     public List<Build> filterBranchBuilds(Branch branch, NamedBuildFilterData data) {
-        // FIXME Method net.nemerosa.ontrack.service.NamedBuildFilterProvider.filterBranchBuilds
-        return null;
+        return filterRepository.nameFilter(
+                branch,
+                data.getFromBuild(),
+                data.getToBuild(),
+                data.getWithPromotionLevel(),
+                data.getCount()
+        );
     }
 }

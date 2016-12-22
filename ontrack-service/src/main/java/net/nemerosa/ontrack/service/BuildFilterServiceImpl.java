@@ -316,10 +316,21 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, JsonNode parameters) {
-        Optional<? extends BuildFilterProvider<?>> o = getBuildFilterProviderByType(filterType);
+        Optional<? extends BuildFilterProvider<T>> o = getBuildFilterProviderByType(filterType);
         if (o.isPresent()) {
             //noinspection unchecked
-            return getBuildFilterProviderData((BuildFilterProvider<T>) o.get(), parameters);
+            return getBuildFilterProviderData(o.get(), parameters);
+        } else {
+            throw new BuildFilterProviderNotFoundException(filterType);
+        }
+    }
+
+    @Override
+    public <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, T parameters) {
+        Optional<? extends BuildFilterProvider<T>> o = getBuildFilterProviderByType(filterType);
+        if (o.isPresent()) {
+            //noinspection unchecked
+            return o.get().withData(parameters);
         } else {
             throw new BuildFilterProviderNotFoundException(filterType);
         }

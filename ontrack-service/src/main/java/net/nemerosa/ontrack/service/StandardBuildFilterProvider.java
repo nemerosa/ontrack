@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.repository.StandardBuildFilterRepository;
+import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +21,19 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
     private final StructureService structureService;
     private final ValidationRunStatusService validationRunStatusService;
     private final PropertyService propertyService;
-    private final StandardBuildFilterRepository standardBuildFilterRepository;
+    private final CoreBuildFilterRepository coreBuildFilterRepository;
 
     @Autowired
     public StandardBuildFilterProvider(
             StructureService structureService,
             ValidationRunStatusService validationRunStatusService,
             PropertyService propertyService,
-            StandardBuildFilterRepository standardBuildFilterRepository
+            CoreBuildFilterRepository coreBuildFilterRepository
     ) {
         this.structureService = structureService;
         this.validationRunStatusService = validationRunStatusService;
         this.propertyService = propertyService;
-        this.standardBuildFilterRepository = standardBuildFilterRepository;
+        this.coreBuildFilterRepository = coreBuildFilterRepository;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
 
     @Override
     public List<Build> filterBranchBuilds(Branch branch, StandardBuildFilterData data) {
-        return standardBuildFilterRepository.getBuilds(
+        return coreBuildFilterRepository.standardFilter(
                 branch,
                 data
         );

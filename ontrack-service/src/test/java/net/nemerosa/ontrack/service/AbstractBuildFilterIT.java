@@ -144,14 +144,21 @@ public abstract class AbstractBuildFilterIT extends AbstractServiceTestSupport {
         }
     }
 
-    protected void checkList(List<Build> builds, Integer... names) {
-        List<String> expectedNames = Arrays.stream(names)
+    protected void checkList(List<Build> builds, Integer... ids) {
+        List<String> expectedNames = Arrays.stream(ids)
                 .map(String::valueOf)
                 .collect(Collectors.toList());
         List<String> actualNames = builds.stream()
                 .map(Build::getName)
                 .collect(Collectors.toList());
         assertEquals(expectedNames, actualNames);
+    }
+
+    protected void checkList(List<Build> builds, String... expectedNames) {
+        List<String> actualNames = builds.stream()
+                .map(Build::getName)
+                .collect(Collectors.toList());
+        assertEquals(Arrays.asList(expectedNames), actualNames);
     }
 
 }

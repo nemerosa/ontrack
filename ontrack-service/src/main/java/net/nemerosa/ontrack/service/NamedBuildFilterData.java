@@ -9,6 +9,8 @@ import lombok.experimental.Wither;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class NamedBuildFilterData {
 
+    @Wither
+    private final int count;
     private final String fromBuild;
     @Wither
     private final String toBuild;
@@ -16,6 +18,6 @@ public class NamedBuildFilterData {
     private final String withPromotionLevel;
 
     public static NamedBuildFilterData of(String fromBuild) {
-        return new NamedBuildFilterData(fromBuild, null, null);
+        return new NamedBuildFilterData(10, fromBuild, null, null);
     }
 }

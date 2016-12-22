@@ -67,6 +67,17 @@ public interface BuildFilterService {
     <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, JsonNode parameters);
 
     /**
+     * Gets a build filter provider for the given type.
+     *
+     * @param filterType Qualified type for the filter
+     * @param parameters Parameters for the filter
+     * @return Actual filter to use
+     * @throws BuildFilterProviderNotFoundException    If the type cannot be resolved
+     * @throws BuildFilterProviderDataParsingException If the parameters cannot be parsed
+     */
+    <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, T parameters);
+
+    /**
      * Basic method to compute an actual filter from a type and a list of parameters.
      *
      * @param branchId   Branch to apply the filter on
