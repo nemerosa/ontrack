@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
@@ -234,13 +235,13 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         params.addValue("count", data.getCount());
 
         // Running the query
-        return loadBuilds(sql, params);
+        return loadBuilds(sql.toString(), params);
     }
 
-    private List<Build> loadBuilds(StringBuilder sql, MapSqlParameterSource params) {
+    private List<Build> loadBuilds(String sql, MapSqlParameterSource params) {
         return getNamedParameterJdbcTemplate()
                 .queryForList(
-                        sql.toString(),
+                        sql,
                         params,
                         Integer.class
                 )
@@ -292,7 +293,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         params.addValue("count", count);
 
         // Running the query
-        return loadBuilds(sql, params);
+        return loadBuilds(sql.toString(), params);
     }
 
     @Override
@@ -328,9 +329,37 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         sql.append(" LIMIT 1");
 
         // Running the query
-        return loadBuilds(sql, params)
+        return loadBuilds(sql.toString(), params)
                 .stream()
                 .findFirst();
+    }
+
+    @Override
+    public List<Build> between(Branch branch, String from, String to) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT ID FROM BUILDS WHERE " +
+                        "BRANCHID = :branchId "
+        );
+        MapSqlParameterSource params = params("branchId", branch.id());
+
+        // From build
+        int fromId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), from)
+                .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), from))
+                .id();
+        sql.append(" AND ID >= :fromId");
+        params.addValue("fromId", fromId);
+
+        // To build
+        if (StringUtils.isNotBlank(to)) {
+            int toId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), to)
+                    .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), to))
+                    .id();
+            sql.append(" AND ID <= :toId");
+            params.addValue("toId", toId);
+        }
+
+        // Query
+        return loadBuilds(sql.toString(), params);
     }
 
     private Integer findLastBuildWithPropertyValue(Branch branch, String propertyType, String propertyValue) {

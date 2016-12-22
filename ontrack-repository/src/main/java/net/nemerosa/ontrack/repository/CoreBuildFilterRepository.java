@@ -18,4 +18,5 @@ public interface CoreBuildFilterRepository {
 
     Optional<Build> lastBuild(Branch branch, String sinceBuild, String withPromotionLevel);
 
+    List<Build> between(Branch branch, String from, String to);
 }
