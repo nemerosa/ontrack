@@ -33,7 +33,7 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withPromotion(copper);
         build(5).withPromotion(bronze);
         // Filter
-        List<Build> builds = buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch);
+        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -58,7 +58,7 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(4);
         build(5).withPromotion(bronze);
         // Filter
-        List<Build> builds = buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch);
+        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
         // Checks the list
         checkList(builds, 5, 3);
     }
@@ -83,7 +83,7 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withPromotion(bronze);
         build(5).withPromotion(copper);
         // Filter
-        List<Build> builds = buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch);
+        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -108,7 +108,7 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withPromotion(bronze);
         build(5).withPromotion(copper).withPromotion(bronze);
         // Filter
-        List<Build> builds = buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch);
+        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
         // Checks the list
         checkList(builds, 5);
     }
@@ -133,7 +133,7 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withPromotion(copper).withPromotion(bronze);
         build(5).withPromotion(bronze);
         // Filter
-        List<Build> builds = buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch);
+        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -158,7 +158,7 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withPromotion(copper).withPromotion(bronze);
         build(5).withPromotion(gold);
         // Filter
-        List<Build> builds = buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch);
+        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
         // Checks the list
         checkList(builds, 5, 4);
     }
