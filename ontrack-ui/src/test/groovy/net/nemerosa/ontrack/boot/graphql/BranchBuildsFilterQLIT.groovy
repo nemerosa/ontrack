@@ -18,6 +18,7 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
     void 'Default filter with validation stamp'() {
         def branch = doCreateBranch()
         def build = doCreateBuild(branch, nd('1', ''))
+        doCreateValidationStamp(branch, nd('NONE', ''))
         doValidateBuild(build, 'VS', ValidationRunStatusID.STATUS_PASSED)
 
         def data = run("""{

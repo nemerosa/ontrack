@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.json.JsonUtils;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
@@ -139,28 +141,26 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
                 Object filter = environment.getArgument("filter");
                 boolean lastPromotions = GraphqlUtils.getBooleanArgument(environment, "lastPromotions", false);
                 // Filter to use
-                BuildFilter buildFilter;
+                BuildFilterProviderData<?> buildFilter;
                 // Last promotion filter
                 if (lastPromotions) {
-                    buildFilter = buildFilterService.lastPromotionsFilter(branch.getId());
+                    buildFilter = buildFilterService.lastPromotedBuildsFilterData();
                 }
-                // Standard filter
+                // Default filter
                 else if (filter == null) {
-                    buildFilter = buildFilterService.standardFilter(count).build();
+                    buildFilter = buildFilterService.standardFilterProviderData(count).build();
                 } else {
                     if (!(filter instanceof Map)) {
                         throw new IllegalStateException("Filter is expected to be a map");
                     } else {
                         @SuppressWarnings("unchecked")
                         Map<String, ?> map = (Map<String, ?>) filter;
-                        buildFilter = inputBuildStandardFilter.parseMap(branch, map);
+                        JsonNode node = JsonUtils.fromMap(map);
+                        buildFilter = buildFilterService.standardFilterProviderData(node);
                     }
                 }
                 // Result
-                List<Build> builds = structureService.getFilteredBuilds(
-                        branch.getId(),
-                        buildFilter
-                );
+                List<Build> builds = buildFilter.filterBranchBuilds(branch);
                 // As a connection list
                 return new SimpleListConnection(builds).get(environment);
             } else {

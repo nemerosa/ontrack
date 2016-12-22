@@ -24,19 +24,14 @@ public interface BuildFilterService {
     BuildFilterProviderData<?> lastPromotedBuildsFilterData();
 
     /**
-     * Returns a filter which returns the last promoted builds
-     */
-    BuildFilter lastPromotionsFilter(ID branchId);
-
-    /**
      * Builds a standard build filter
      */
     StandardFilterProviderDataBuilder standardFilterProviderData(int count);
 
     /**
-     * Builds a standard build filter
+     * Builds a standard build filter given its parameters as a JSON node
      */
-    BuildFilter standardFilter(ID branchId, JsonNode parameters);
+    BuildFilterProviderData<?> standardFilterProviderData(JsonNode node);
 
     /**
      * Gets the list of all existing filters.

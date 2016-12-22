@@ -1,17 +1,9 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
-import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.structure.Branch;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
@@ -19,13 +11,6 @@ import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
 
 @Component
 public class GQLInputBuildStandardFilter {
-
-    private final BuildFilterService buildFilterService;
-
-    @Autowired
-    public GQLInputBuildStandardFilter(BuildFilterService buildFilterService) {
-        this.buildFilterService = buildFilterService;
-    }
 
     public GraphQLInputType getInputType() {
         return GraphQLInputObjectType.newInputObject()
@@ -57,10 +42,18 @@ public class GQLInputBuildStandardFilter {
                                 "with * as placeholder"
                 ))
                 .field(formField(
+                        "linkedFromPromotion",
+                        "The build must be linked FROM a build having this promotion (requires \"linkedFrom\")"
+                ))
+                .field(formField(
                         "linkedTo",
                         "The build must be linked TO the builds selected by the pattern.\n" +
                                 "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - " +
                                 "with * as placeholder"
+                ))
+                .field(formField(
+                        "linkedToPromotion",
+                        "The build must be linked TO a build having this promotion (requires \"linkedTo\")"
                 ))
                 .build();
     }
@@ -73,11 +66,4 @@ public class GQLInputBuildStandardFilter {
                 .build();
     }
 
-    public BuildFilter parseMap(Branch branch, Map<String, ?> map) {
-        JsonNode node = JsonUtils.fromMap(map);
-        return buildFilterService.standardFilter(
-                branch.getId(),
-                node
-        );
-    }
 }
