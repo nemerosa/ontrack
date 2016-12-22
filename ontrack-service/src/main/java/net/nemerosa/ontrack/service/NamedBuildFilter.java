@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 @Data
+@Deprecated
 public class NamedBuildFilter implements BuildFilter {
 
     private final NamedBuildFilterData data;

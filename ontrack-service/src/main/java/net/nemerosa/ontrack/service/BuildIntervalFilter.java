@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Data
+@Deprecated
 public class BuildIntervalFilter implements BuildFilter {
 
     private final StructureService structureService;

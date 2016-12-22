@@ -38,6 +38,7 @@ public class PromotionLevelBuildFilterProvider extends AbstractPredefinedBuildFi
         );
     }
 
+    @Deprecated
     private static class PromotionLevelBuildFilter implements BuildFilter {
 
         private final Set<String> promotionLevelsToFill;

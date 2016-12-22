@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Data
+@Deprecated
 public class StandardBuildFilter implements BuildFilter {
 
     private final StandardBuildFilterData data;
