@@ -154,8 +154,19 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
             sql.append(")");
         }
 
-        // FIXME withProperty
-        // FIXME withPropertyValue
+        // withProperty
+        String withProperty = data.getWithProperty();
+        if (StringUtils.isNotBlank(withProperty)) {
+            sql.append(" AND PP.TYPE = :withProperty");
+            params.addValue("withProperty", withProperty);
+            // withPropertyValue
+            String withPropertyValue = data.getWithPropertyValue();
+            if (StringUtils.isNotBlank(withPropertyValue)) {
+                sql.append(" AND PP.SEARCHKEY REGEXP :withPropertyValue");
+                params.addValue("withPropertyValue", withPropertyValue);
+            }
+        }
+
         // FIXME sinceProperty
         // FIXME sincePropertyValue
 

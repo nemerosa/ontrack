@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty;
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
@@ -23,6 +25,8 @@ import static org.junit.Assert.assertEquals;
 
 public class StandardBuildFilterIT extends AbstractServiceTestSupport {
 
+    @Autowired
+    private PropertyService propertyService;
     @Autowired
     private StructureService structureService;
     @Autowired
@@ -555,6 +559,62 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
         checkList(builds, 5, 4);
     }
 
+    @Test
+    public void with_property() throws Exception {
+        // Builds
+        build(1);
+        build(2).withProperty("ananas");
+        build(3);
+        build(4).withProperty("an apple");
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withWithProperty(TestSimplePropertyType.class.getName())
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4, 2);
+    }
+
+    @Test
+    public void with_property_value_pattern() throws Exception {
+        // Builds
+        build(1);
+        build(2).withProperty("ananas");
+        build(3).withProperty("coconut");
+        build(4).withProperty("an apple");
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withWithProperty(TestSimplePropertyType.class.getName())
+                .withWithPropertyValue("an.*")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4, 2);
+    }
+
+    @Test
+    public void with_property_value() throws Exception {
+        // Builds
+        build(1);
+        build(2).withProperty("ananas");
+        build(3).withProperty("coconut");
+        build(4).withProperty("an apple");
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withWithProperty(TestSimplePropertyType.class.getName())
+                .withWithPropertyValue("ananas")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 2);
+    }
+
     // =======================================
     // Utility methods for tests
     // =======================================
@@ -644,6 +704,17 @@ public class StandardBuildFilterIT extends AbstractServiceTestSupport {
                         );
                         return null;
                     });
+            return this;
+        }
+
+        public BuildCreator withProperty(String value) throws Exception {
+            asUser().with(build, ProjectEdit.class).call(() ->
+                    propertyService.editProperty(
+                            build,
+                            TestSimplePropertyType.class,
+                            new TestSimpleProperty(value)
+                    )
+            );
             return this;
         }
     }
