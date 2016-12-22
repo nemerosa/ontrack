@@ -351,19 +351,32 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
                         "BRANCHID = :branchId "
         );
         MapSqlParameterSource params = params("branchId", branch.id());
+        Integer fromId;
+        Integer toId = null;
 
         // From build
-        int fromId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), from)
+        fromId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), from)
                 .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), from))
                 .id();
-        sql.append(" AND ID >= :fromId");
-        params.addValue("fromId", fromId);
 
         // To build
         if (StringUtils.isNotBlank(to)) {
-            int toId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), to)
+            toId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), to)
                     .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), to))
                     .id();
+        }
+
+        if (toId != null) {
+            if (toId < fromId) {
+                int i = toId;
+                toId = fromId;
+                fromId = i;
+            }
+        }
+
+        sql.append(" AND ID >= :fromId");
+        params.addValue("fromId", fromId);
+        if (toId != null) {
             sql.append(" AND ID <= :toId");
             params.addValue("toId", toId);
         }

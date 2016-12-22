@@ -42,12 +42,22 @@ public class IntervalBuildFilterIT extends AbstractBuildFilterIT {
     }
 
     @Test
-    public void from_and_to_only() throws Exception {
+    public void from_and_to() throws Exception {
         build("1.0.0");
         build("1.0.1");
         build("1.0.2");
         build("1.1.0");
         List<Build> builds = filter(BuildIntervalFilterData.of("1.0.0", "1.0.2")).filterBranchBuilds(branch);
+        checkList(builds, "1.0.2", "1.0.1", "1.0.0");
+    }
+
+    @Test
+    public void from_and_to_reverse() throws Exception {
+        build("1.0.0");
+        build("1.0.1");
+        build("1.0.2");
+        build("1.1.0");
+        List<Build> builds = filter(BuildIntervalFilterData.of("1.0.2", "1.0.0")).filterBranchBuilds(branch);
         checkList(builds, "1.0.2", "1.0.1", "1.0.0");
     }
 
