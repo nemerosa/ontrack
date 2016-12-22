@@ -30,6 +30,7 @@ public abstract class AbstractBuildFilterIT extends AbstractServiceTestSupport {
     protected Branch branch;
     protected PromotionLevel copper;
     protected PromotionLevel bronze;
+    protected PromotionLevel gold;
     protected ValidationStamp publication;
     protected ValidationStamp production;
 
@@ -38,6 +39,7 @@ public abstract class AbstractBuildFilterIT extends AbstractServiceTestSupport {
         branch = doCreateBranch();
         copper = doCreatePromotionLevel(branch, nd("COPPER", ""));
         bronze = doCreatePromotionLevel(branch, nd("BRONZE", ""));
+        gold = doCreatePromotionLevel(branch, nd("GOLD", ""));
         publication = doCreateValidationStamp(branch, nd("PUBLICATION", ""));
         production = doCreateValidationStamp(branch, nd("PRODUCTION", ""));
     }

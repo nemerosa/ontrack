@@ -49,6 +49,8 @@ public class PromotionLevelBuildFilterProvider extends AbstractPredefinedBuildFi
         );
         // List of results
         List<Build> builds = new ArrayList<>();
+        // Index of added builds
+        Set<Integer> addedBuilds = new HashSet<>();
         // Looping over the builds until all promotion levels are filled in
         Predicate<Build> loop = build -> {
             // Gets the promotions for this build
@@ -58,7 +60,10 @@ public class PromotionLevelBuildFilterProvider extends AbstractPredefinedBuildFi
                 int promotionLevelId = run.getPromotionLevel().id();
                 if (index.contains(promotionLevelId)) {
                     index.remove(promotionLevelId);
-                    builds.add(build);
+                    if (!addedBuilds.contains(build.id())) {
+                        builds.add(build);
+                        addedBuilds.add(build.id());
+                    }
                 }
             });
             // Going on if index is not empty
