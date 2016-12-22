@@ -4,9 +4,8 @@ import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ValidationRunStatusID;
+import net.nemerosa.ontrack.model.security.PromotionRunCreate;
+import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -398,6 +397,37 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         List<Build> builds = filter.filterBranchBuilds(branch);
         // Checks the list
         checkList(builds, 4, 2);
+    }
+
+    @Test
+    public void linked_from_project_and_promotion() throws Exception {
+        Branch otherBranch = doCreateBranch();
+        PromotionLevel otherPL = doCreatePromotionLevel(otherBranch, nd("PRODUCTION", ""));
+        Build otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""));
+        Build otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""));
+        asUser().with(otherBranch, PromotionRunCreate.class).execute(() -> structureService.newPromotionRun(
+                PromotionRun.of(
+                        otherBuild2,
+                        otherPL,
+                        Signature.of("test"),
+                        ""
+                )
+        ));
+        // Builds
+        build(1);
+        build(2).linkedFrom(otherBuild1);
+        build(3);
+        build(4).linkedFrom(otherBuild2);
+        build(5);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withLinkedFrom(otherBranch.getProject().getName())
+                .withLinkedFromPromotion("PRODUCTION")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 4);
     }
 
     @Test

@@ -40,9 +40,31 @@ public class StandardBuildFilterData implements StandardFilterDataBuilder<Standa
     @Wither
     private final String linkedFrom;
     @Wither
+    private final String linkedFromPromotion;
+    @Wither
     private final String linkedTo;
+    @Wither
+    private final String linkedToPromotion;
 
     public static StandardBuildFilterData of(int count) {
-        return new StandardBuildFilterData(count, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new StandardBuildFilterData(
+                count,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 }

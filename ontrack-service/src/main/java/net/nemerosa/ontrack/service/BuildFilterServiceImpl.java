@@ -164,8 +164,20 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
 
         @Override
+        public StandardFilterProviderDataBuilder withLinkedFromPromotion(String linkedFromPromotion) {
+            data = data.withLinkedFromPromotion(linkedFromPromotion);
+            return this;
+        }
+
+        @Override
         public StandardFilterProviderDataBuilder withLinkedTo(String linkedTo) {
             data = data.withLinkedTo(linkedTo);
+            return this;
+        }
+
+        @Override
+        public StandardFilterProviderDataBuilder withLinkedToPromotion(String linkedToPromotion) {
+            data = data.withLinkedToPromotion(linkedToPromotion);
             return this;
         }
     }
