@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 @Repository
 public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository implements StandardBuildFilterRepository {
 
@@ -36,13 +38,19 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
      *          VALIDATIONSTAMPID
      *          VALIDATIONRUNSTATUSID
      *     PP (PROPERTIES)
+     *     BDFROM (builds linked from)
+     *     BRFROM (branches linked from)
+     *     PJFROM (projects linked from)
+     *     PLFROM (promotions linked from)
+     *     BDTO (builds linked to)
+     *     BRTO (branches linked to)
+     *     PJTO (projects linked to)
+     *     PLTO (promotions linked to)
      * </pre>
      */
     @Override
     public List<Build> getBuilds(Branch branch, StandardBuildFilterData data) {
         // Query root
-        // TODO Builds linked from
-        // TODO Builds linked to
         StringBuilder sql = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
                 "                LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
                 "                LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID" +
@@ -53,6 +61,21 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
                 "                    AND R.ID = (SELECT MAX(ID) FROM VALIDATION_RUNS WHERE BUILDID = R.BUILDID AND VALIDATIONSTAMPID = R.VALIDATIONSTAMPID)" +
                 "                    ) S ON S.BUILDID = B.ID" +
                 "                LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID" +
+                // FROM BUILDS
+                "                LEFT JOIN BUILD_LINKS BLFROM ON BLFROM.TARGETBUILDID = B.ID" +
+                "                LEFT JOIN BUILDS BDFROM ON BDFROM.ID = BLFROM.BUILDID" +
+                "                LEFT JOIN BRANCHES BRFROM ON BRFROM.ID = BDFROM.BRANCHID" +
+                "                LEFT JOIN PROJECTS PJFROM ON PJFROM.ID = BRFROM.PROJECTID" +
+                "                LEFT JOIN PROMOTION_RUNS PRFROM ON PRFROM.BUILDID = BDFROM.ID" +
+                "                LEFT JOIN PROMOTION_LEVELS PLFROM ON PLFROM.ID = PRFROM.PROMOTIONLEVELID" +
+                // TO BUILDS
+                "                LEFT JOIN BUILD_LINKS BLTO ON BLTO.BUILDID = B.ID" +
+                "                LEFT JOIN BUILDS BDTO ON BDTO.ID = BLTO.TARGETBUILDID" +
+                "                LEFT JOIN BRANCHES BRTO ON BRTO.ID = BDTO.BRANCHID" +
+                "                LEFT JOIN PROJECTS PJTO ON PJTO.ID = BRTO.PROJECTID" +
+                "                LEFT JOIN PROMOTION_RUNS PRTO ON PRTO.BUILDID = BDTO.ID" +
+                "                LEFT JOIN PROMOTION_LEVELS PLTO ON PLTO.ID = PRTO.PROMOTIONLEVELID" +
+                // Branch criteria
                 "                WHERE B.BRANCHID = :branch");
 
         // Parameters
@@ -135,8 +158,44 @@ public class StandardBuildFilterJdbcRepository extends AbstractJdbcRepository im
         // FIXME withPropertyValue
         // FIXME sinceProperty
         // FIXME sincePropertyValue
-        // FIXME linkedFrom
-        // FIXME linkedTo
+
+        // linkedFrom
+        String linkedFrom = data.getLinkedFrom();
+        if (isNotBlank(linkedFrom)) {
+            String project = StringUtils.substringBefore(linkedFrom, ":");
+            sql.append(" AND PJFROM.NAME = :fromProject");
+            params.addValue("fromProject", project);
+            String buildPattern = StringUtils.substringAfter(linkedFrom, ":");
+            if (StringUtils.isNotBlank(buildPattern)) {
+                if (StringUtils.contains(buildPattern, "*")) {
+                    sql.append(" AND BDFROM.NAME LIKE :buildFrom");
+                    params.addValue("buildFrom", StringUtils.replace(buildPattern, "*", "%"));
+                } else {
+                    sql.append(" AND BDFROM.NAME = :buildFrom");
+                    params.addValue("buildFrom", buildPattern);
+                }
+            }
+            // FIXME linkedFromPromotion
+        }
+
+        // linkedTo
+        String linkedTo = data.getLinkedTo();
+        if (isNotBlank(linkedTo)) {
+            String project = StringUtils.substringBefore(linkedTo, ":");
+            sql.append(" AND PJTO.NAME = :toProject");
+            params.addValue("toProject", project);
+            String buildPattern = StringUtils.substringAfter(linkedTo, ":");
+            if (StringUtils.isNotBlank(buildPattern)) {
+                if (StringUtils.contains(buildPattern, "*")) {
+                    sql.append(" AND BDTO.NAME LIKE :buildTo");
+                    params.addValue("buildTo", StringUtils.replace(buildPattern, "*", "%"));
+                } else {
+                    sql.append(" AND BDTO.NAME = :buildTo");
+                    params.addValue("buildTo", buildPattern);
+                }
+            }
+            // FIXME linkedToPromotion
+        }
 
         // Since build?
         if (sinceBuildId != null) {
