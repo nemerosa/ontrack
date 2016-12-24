@@ -42,7 +42,7 @@ class ProjectProperties extends ProjectEntityProperties {
             return [
                     disablingDuration: 0,
                     deletingDuration : 0,
-                    promotionsToKeep: [],
+                    promotionsToKeep : [],
             ]
         }
     }
@@ -59,6 +59,24 @@ class ProjectProperties extends ProjectEntityProperties {
                 parameters + [
                         configuration: name
                 ])
+    }
+
+    /**
+     * GitLab configuration
+     */
+
+    @DSLMethod
+    def gitLab(Map<String, ?> parameters, String name) {
+        assert parameters.containsKey('repository'): "The 'repository' parameter is required"
+        property('net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType',
+                parameters + [
+                        configuration: name
+                ])
+    }
+
+    @DSLMethod(see = "gitLab")
+    def getGitLab() {
+        property('net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType', false)
     }
 
     /**
@@ -98,12 +116,14 @@ class ProjectProperties extends ProjectEntityProperties {
      * Stash configuration
      */
 
-    @DSLMethod
-    def stash(String name, String project, String repository) {
+    @DSLMethod(count = 5)
+    def stash(String name, String project, String repository, int indexationInterval = 0, String issueServiceConfigurationIdentifier = '') {
         property('net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType', [
-                configuration: name,
-                project      : project,
-                repository   : repository,
+                configuration                      : name,
+                project                            : project,
+                repository                         : repository,
+                indexationInterval                 : indexationInterval,
+                issueServiceConfigurationIdentifier: issueServiceConfigurationIdentifier,
         ])
     }
 
@@ -139,7 +159,7 @@ class ProjectProperties extends ProjectEntityProperties {
     @DSLMethod(count = 2)
     def autoValidationStamp(boolean autoCreate = true, boolean autoCreateIfNotPredefined = false) {
         property('net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType', [
-                autoCreate: autoCreate,
+                autoCreate               : autoCreate,
                 autoCreateIfNotPredefined: autoCreateIfNotPredefined,
         ])
     }

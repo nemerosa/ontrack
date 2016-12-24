@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.stash.property;
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +15,31 @@ import java.util.Optional;
 public class StashConfigurator implements GitConfigurator {
 
     private final PropertyService propertyService;
+    private final IssueServiceRegistry issueServiceRegistry;
 
     @Autowired
-    public StashConfigurator(PropertyService propertyService) {
+    public StashConfigurator(PropertyService propertyService, IssueServiceRegistry issueServiceRegistry) {
         this.propertyService = propertyService;
+        this.issueServiceRegistry = issueServiceRegistry;
     }
 
     @Override
     public Optional<GitConfiguration> getConfiguration(Project project) {
         return propertyService.getProperty(project, StashProjectConfigurationPropertyType.class)
                 .option()
-                .map(StashProjectConfigurationProperty::getGitConfiguration);
+                .map(this::getGitConfiguration);
+    }
+
+    private GitConfiguration getGitConfiguration(StashProjectConfigurationProperty property) {
+        return new StashGitConfiguration(
+                property,
+                getConfiguredIssueService(property)
+        );
+    }
+
+    private ConfiguredIssueService getConfiguredIssueService(StashProjectConfigurationProperty property) {
+        return issueServiceRegistry.getConfiguredIssueService(
+                property.getIssueServiceConfigurationIdentifier()
+        );
     }
 }

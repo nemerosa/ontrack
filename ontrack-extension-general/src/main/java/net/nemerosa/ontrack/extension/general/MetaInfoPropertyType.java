@@ -90,7 +90,7 @@ public class MetaInfoPropertyType extends AbstractPropertyType<MetaInfoProperty>
     public String getSearchKey(MetaInfoProperty value) {
         return value.getItems().stream()
                 .map(
-                        item -> String.format("%s->%s", item.getName(), item.getValue())
+                        item -> String.format("%s:%s", item.getName(), item.getValue())
                 )
                 .collect(Collectors.joining(";"));
     }

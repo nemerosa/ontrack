@@ -13,8 +13,6 @@ The parameters are the following:
 | **url** | the URL of the Stash instance
 | user L user used to connect to Stash (optional)
 | password | password used to connect to Stash (optional)
-| indexationInterval | interval (in minutes) between each synchronisation (Ontrack maintains internally a clone of
-  the BitBucket repository)
 |===
 
 Example:
@@ -22,7 +20,7 @@ Example:
 [source,groovy]
 ----
 ontrack.configure {
-   stash 'MyStash', url: 'https://stask.example.com', indexationInterval: 30
+   stash 'MyStash', url: 'https://stask.example.com'
 }
 assert ontrack.config.stash.find { it == 'MyStash' } != null
 ----

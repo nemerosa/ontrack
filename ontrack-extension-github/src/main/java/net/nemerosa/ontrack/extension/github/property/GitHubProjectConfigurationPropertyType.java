@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature;
+import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -18,7 +21,9 @@ import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -28,11 +33,13 @@ public class GitHubProjectConfigurationPropertyType
         implements ConfigurationPropertyType<GitHubEngineConfiguration, GitHubProjectConfigurationProperty> {
 
     private final GitHubConfigurationService configurationService;
+    private final IssueServiceRegistry issueServiceRegistry;
 
     @Autowired
-    public GitHubProjectConfigurationPropertyType(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService) {
+    public GitHubProjectConfigurationPropertyType(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService, IssueServiceRegistry issueServiceRegistry) {
         super(extensionFeature);
         this.configurationService = configurationService;
+        this.issueServiceRegistry = issueServiceRegistry;
     }
 
     @Override
@@ -62,6 +69,16 @@ public class GitHubProjectConfigurationPropertyType
 
     @Override
     public Form getEditionForm(ProjectEntity entity, GitHubProjectConfigurationProperty value) {
+        // Gets the list of issue configurations
+        List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations =
+                new ArrayList<>(
+                        issueServiceRegistry.getAvailableIssueServiceConfigurations()
+                );
+        // Adds the configuration for THIS project
+        availableIssueServiceConfigurations.add(
+                0,
+                IssueServiceConfigurationRepresentation.self("GitHub issues", GitHubIssueServiceExtension.GITHUB_SERVICE_ID)
+        );
         return Form.create()
                 .with(
                         Selection.of("configuration")
@@ -85,6 +102,15 @@ public class GitHubProjectConfigurationPropertyType
                                 .max(60 * 24)
                                 .value(value != null ? value.getIndexationInterval() : 0)
                                 .help("@file:extension/github/help.net.nemerosa.ontrack.extension.github.model.GitHubConfiguration.indexationInterval.tpl.html")
+                )
+                .with(
+                        Selection.of("issueServiceConfigurationIdentifier")
+                                .label("Issue configuration")
+                                .help("Select an issue service that is used to associate tickets and issues to the source. " +
+                                        "If none is selected, the GitHub issues for this repository are used.")
+                                .optional()
+                                .items(availableIssueServiceConfigurations)
+                                .value(value != null ? value.getIssueServiceConfigurationIdentifier() : null)
                 );
 
     }
@@ -103,7 +129,8 @@ public class GitHubProjectConfigurationPropertyType
         return new GitHubProjectConfigurationProperty(
                 configuration,
                 node.path("repository").asText(),
-                node.path("indexationInterval").asInt()
+                node.path("indexationInterval").asInt(),
+                node.path("issueServiceConfigurationIdentifier").asText()
         );
     }
 
@@ -114,6 +141,7 @@ public class GitHubProjectConfigurationPropertyType
                         .with("configuration", value.getConfiguration().getName())
                         .with("repository", value.getRepository())
                         .with("indexationInterval", value.getIndexationInterval())
+                        .with("issueServiceConfigurationIdentifier", value.getIssueServiceConfigurationIdentifier())
                         .get()
         );
     }
@@ -128,7 +156,8 @@ public class GitHubProjectConfigurationPropertyType
         return new GitHubProjectConfigurationProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
                 replacementFunction.apply(value.getRepository()),
-                value.getIndexationInterval()
+                value.getIndexationInterval(),
+                value.getIssueServiceConfigurationIdentifier()
         );
     }
 

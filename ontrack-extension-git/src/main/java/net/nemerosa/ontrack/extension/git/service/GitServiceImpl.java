@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
@@ -62,7 +61,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private final Logger logger = LoggerFactory.getLogger(GitService.class);
 
     private final PropertyService propertyService;
-    private final IssueServiceRegistry issueServiceRegistry;
     private final JobScheduler jobScheduler;
     private final SecurityService securityService;
     private final TransactionService transactionService;
@@ -76,7 +74,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public GitServiceImpl(
             StructureService structureService,
             PropertyService propertyService,
-            IssueServiceRegistry issueServiceRegistry,
             JobScheduler jobScheduler,
             SecurityService securityService,
             TransactionService transactionService,
@@ -87,7 +84,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             SCMUtilsService scmService) {
         super(structureService, propertyService);
         this.propertyService = propertyService;
-        this.issueServiceRegistry = issueServiceRegistry;
         this.jobScheduler = jobScheduler;
         this.securityService = securityService;
         this.transactionService = transactionService;
@@ -100,12 +96,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     @Override
     public void forEachConfiguredProject(BiConsumer<Project, GitConfiguration> consumer) {
-        structureService.getProjectList().stream()
+        structureService.getProjectList()
                 .forEach(project -> {
                     Optional<GitConfiguration> configuration = getProjectConfiguration(project);
-                    if (configuration.isPresent()) {
-                        consumer.accept(project, configuration.get());
-                    }
+                    configuration.ifPresent(gitConfiguration -> consumer.accept(project, gitConfiguration));
                 });
     }
 
@@ -116,9 +110,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     .filter(branch -> branch.getType() != BranchType.TEMPLATE_DEFINITION)
                     .forEach(branch -> {
                         Optional<GitBranchConfiguration> configuration = getBranchConfiguration(branch);
-                        if (configuration.isPresent()) {
-                            consumer.accept(branch, configuration.get());
-                        }
+                        configuration.ifPresent(gitBranchConfiguration -> consumer.accept(branch, gitBranchConfiguration));
                     });
         }
     }
@@ -290,7 +282,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Configuration
             GitConfiguration configuration = getRequiredProjectConfiguration(changeLog.getProject());
             // Issue service
-            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+            ConfiguredIssueService configuredIssueService = configuration.getConfiguredIssueService().orElse(null);
             if (configuredIssueService == null) {
                 throw new IssueServiceNotConfiguredException();
             }
@@ -363,7 +355,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         GitBranchConfiguration branchConfiguration = getRequiredBranchConfiguration(branch);
         GitConfiguration configuration = branchConfiguration.getConfiguration();
         // Issue service
-        ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+        ConfiguredIssueService configuredIssueService = configuration.getConfiguredIssueService().orElse(null);
         if (configuredIssueService == null) {
             throw new GitBranchIssueServiceNotConfiguredException(branchId);
         }
@@ -395,7 +387,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Gets the Git client for this project
             GitRepositoryClient client = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
             // Issue service
-            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+            ConfiguredIssueService configuredIssueService = configuration.getConfiguredIssueService().orElse(null);
             if (configuredIssueService != null) {
                 // List of commits for this branch
                 List<RevCommit> revCommits = new ArrayList<>();
@@ -472,9 +464,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     @Override
     public OntrackGitCommitInfo getCommitInfo(ID branchId, String commit) {
-        /**
-         * The information is actually collected on all branches.
-         */
         return getOntrackGitCommitInfo(commit);
     }
 
@@ -520,11 +509,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public Ack projectSync(Project project, GitSynchronisationRequest request) {
         securityService.checkProjectFunction(project, ProjectConfig.class);
         Optional<GitConfiguration> projectConfiguration = getProjectConfiguration(project);
-        if (projectConfiguration.isPresent()) {
-            return Ack.validate(sync(projectConfiguration.get(), request).isPresent());
-        } else {
-            return Ack.NOK;
-        }
+        return projectConfiguration
+                .map(gitConfiguration -> Ack.validate(sync(gitConfiguration, request).isPresent()))
+                .orElse(Ack.NOK);
     }
 
     @Override
@@ -702,21 +689,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     private List<? extends MessageAnnotator> getMessageAnnotators(GitConfiguration gitConfiguration) {
         List<? extends MessageAnnotator> messageAnnotators;
-        String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
-        if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
-            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
-            if (configuredIssueService != null) {
-                // Gets the message annotator
-                Optional<MessageAnnotator> messageAnnotator = configuredIssueService.getMessageAnnotator();
-                // If present annotate the messages
-                if (messageAnnotator.isPresent()) {
-                    messageAnnotators = Collections.singletonList(messageAnnotator.get());
-                } else {
-                    messageAnnotators = Collections.emptyList();
-                }
-            } else {
-                messageAnnotators = Collections.emptyList();
-            }
+        ConfiguredIssueService configuredIssueService = gitConfiguration.getConfiguredIssueService().orElse(null);
+        if (configuredIssueService != null) {
+            // Gets the message annotator
+            Optional<MessageAnnotator> messageAnnotator = configuredIssueService.getMessageAnnotator();
+            // If present annotate the messages
+            messageAnnotators = messageAnnotator.map(Collections::singletonList).orElseGet(Collections::emptyList);
         } else {
             messageAnnotators = Collections.emptyList();
         }

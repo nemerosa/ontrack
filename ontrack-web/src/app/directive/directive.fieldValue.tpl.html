@@ -26,6 +26,13 @@
     <span class="label label-info" ng-repeat="item in field.value">{{item}}</span>
 </span>
 
+<!-- Type: named entries -->
+<span ng-if="field.type == 'namedEntries'">
+    <span class="label label-info" ng-repeat="item in field.value">
+        {{item.name}}: {{item.value}}
+    </span>
+</span>
+
 <!-- Date -->
 <span ng-if="field.type == 'date'" class="ot-field-value">{{field.value | date:'mediumDate'}}</span>
 

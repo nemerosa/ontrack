@@ -37,13 +37,7 @@ configuration_ property:
 * **Repository** - GitHub repository, like `nemerosa/ontrack`
 * Indexation interval - interval (in minutes) between each synchronisation
   (Ontrack maintains internally a clone of the GitHub repositories)
+* Issue configuration - issue service. If not set or set to "GitHub issues",
+  the issues of the repository will be used
 
 Branches can be <<usage-git,configured for Git>> independently.
-
-[[usage-github-issues]]
-===== Issue management
-
-When working with GitHub, the <<usage-issues,issue management>> is
-automatically the one from GitHub itself.
-
-NOTE: As for now, there is no way to use any other issue service.

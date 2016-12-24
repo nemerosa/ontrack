@@ -7,7 +7,6 @@ accessed through the user menu.
 It allows an administrator to:
 
 * manage the running [jobs](Architecture: jobs)
-* manage the error messages
 * see the state of the external connections
 * see the list of <<extending,extensions>>
 
@@ -53,9 +52,6 @@ currently selected through the filter will be impacted.
 
 The same _Actions_ menu allows also to clear the current filter and to display
 all the jobs.
-
-[[admin-console-errors]]
-==== Managing error messages
 
 [[admin-console-health]]
 ==== External connections

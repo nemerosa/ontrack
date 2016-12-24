@@ -2,24 +2,33 @@ package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
+@Transactional
 public class BuildIntervalFilterProvider extends AbstractBuildFilterProvider<BuildIntervalFilterData> {
 
-    private final StructureService structureService;
+    private final CoreBuildFilterRepository filterRepository;
 
     @Autowired
-    public BuildIntervalFilterProvider(StructureService structureService) {
-        this.structureService = structureService;
+    public BuildIntervalFilterProvider(CoreBuildFilterRepository filterRepository) {
+        this.filterRepository = filterRepository;
+    }
+
+    @Override
+    public String getType() {
+        return BuildIntervalFilterProvider.class.getName();
     }
 
     @Override
@@ -57,8 +66,8 @@ public class BuildIntervalFilterProvider extends AbstractBuildFilterProvider<Bui
     }
 
     @Override
-    public BuildFilter filter(ID branchId, BuildIntervalFilterData data) {
-        return new BuildIntervalFilter(structureService, data);
+    public List<Build> filterBranchBuilds(Branch branch, BuildIntervalFilterData data) {
+        return filterRepository.between(branch, data.getFrom(), data.getTo());
     }
 
     @Override

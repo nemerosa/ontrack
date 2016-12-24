@@ -108,6 +108,8 @@ public interface StructureRepository {
 
     Optional<PromotionLevel> getPromotionLevelByName(String project, String branch, String promotionLevel);
 
+    Optional<PromotionLevel> getPromotionLevelByName(Branch branch, String promotionLevel);
+
     Document getPromotionLevelImage(ID promotionLevelId);
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);
@@ -149,6 +151,8 @@ public interface StructureRepository {
     ValidationStamp getValidationStamp(ID validationStampId);
 
     Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp);
+
+    Optional<ValidationStamp> getValidationStampByName(Branch branch, String validationStamp);
 
     Document getValidationStampImage(ID validationStampId);
 

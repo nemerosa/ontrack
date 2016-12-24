@@ -7,12 +7,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
@@ -23,6 +26,15 @@ public final class TestUtils {
     private static final AtomicLong counter = new AtomicLong();
 
     private TestUtils() {
+    }
+
+    public static List<Integer> range(int from, int to) {
+        Validate.isTrue(to >= from, "'to' value must be greater or equal to the 'from' value.");
+        List<Integer> l = new ArrayList<>();
+        for (int i = from; i <= to; i++) {
+            l.add(i);
+        }
+        return l;
     }
 
     public static String uid(String prefix) {

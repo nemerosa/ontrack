@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.security.BranchFilterMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.repository.BuildFilterRepository;
 import net.nemerosa.ontrack.repository.TBuildFilter;
@@ -20,138 +20,171 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class BuildFilterServiceImpl implements BuildFilterService {
 
-    private final Collection<BuildFilterProvider<?>> buildFilterProviders;
+    private final Map<String, BuildFilterProvider<?>> buildFilterProviders;
     private final BuildFilterRepository buildFilterRepository;
     private final StructureService structureService;
     private final SecurityService securityService;
-    private final PropertyService propertyService;
 
     @Autowired
     public BuildFilterServiceImpl(
             Collection<BuildFilterProvider<?>> buildFilterProviders,
             BuildFilterRepository buildFilterRepository,
-            StructureService structureService, SecurityService securityService, PropertyService propertyService) {
-        this.buildFilterProviders = buildFilterProviders;
+            StructureService structureService,
+            SecurityService securityService) {
+        this.buildFilterProviders = buildFilterProviders.stream()
+                .collect(Collectors.toMap(
+                        BuildFilterProvider::getType,
+                        Function.identity()
+                ));
         this.buildFilterRepository = buildFilterRepository;
         this.structureService = structureService;
         this.securityService = securityService;
-        this.propertyService = propertyService;
     }
 
     @Override
-    public BuildFilter defaultFilter() {
-        return DefaultBuildFilter.INSTANCE;
+    public BuildFilterProviderData<?> defaultFilterProviderData() {
+        return standardFilterProviderData(10).build();
     }
 
-    public class DefaultStandardFilterBuilder implements StandardFilterBuilder {
+    @Override
+    public BuildFilterProviderData<?> lastPromotedBuildsFilterData() {
+        BuildFilterProvider<?> provider =
+                getBuildFilterProviderByType(PromotionLevelBuildFilterProvider.class.getName())
+                        .orElseThrow(() -> new BuildFilterProviderNotFoundException(
+                                PromotionLevelBuildFilterProvider.class.getName())
+                        );
+        return provider.withData(null);
+    }
+
+    public class DefaultStandardFilterProviderDataBuilder implements StandardFilterProviderDataBuilder {
 
         private StandardBuildFilterData data;
 
-        public DefaultStandardFilterBuilder(int count) {
+        public DefaultStandardFilterProviderDataBuilder(int count) {
             data = StandardBuildFilterData.of(count);
         }
 
         @Override
-        public BuildFilter build() {
-            return new StandardBuildFilter(data, propertyService, structureService);
+        public BuildFilterProviderData<?> build() {
+            BuildFilterProvider<?> provider =
+                    getBuildFilterProviderByType(StandardBuildFilterProvider.class.getName())
+                            .orElseThrow(() -> new BuildFilterProviderNotFoundException(
+                                    StandardBuildFilterProvider.class.getName())
+                            );
+            //noinspection unchecked
+            return ((BuildFilterProvider<StandardBuildFilterData>) provider).withData(data);
         }
 
         @Override
-        public StandardFilterBuilder withSincePromotionLevel(String sincePromotionLevel) {
+        public StandardFilterProviderDataBuilder withSincePromotionLevel(String sincePromotionLevel) {
             data = data.withSincePromotionLevel(sincePromotionLevel);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withWithPromotionLevel(String withPromotionLevel) {
+        public StandardFilterProviderDataBuilder withWithPromotionLevel(String withPromotionLevel) {
             data = data.withWithPromotionLevel(withPromotionLevel);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withAfterDate(LocalDate afterDate) {
+        public StandardFilterProviderDataBuilder withAfterDate(LocalDate afterDate) {
             data = data.withAfterDate(afterDate);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withBeforeDate(LocalDate beforeDate) {
+        public StandardFilterProviderDataBuilder withBeforeDate(LocalDate beforeDate) {
             data = data.withBeforeDate(beforeDate);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withSinceValidationStamp(String sinceValidationStamp) {
+        public StandardFilterProviderDataBuilder withSinceValidationStamp(String sinceValidationStamp) {
             data = data.withSinceValidationStamp(sinceValidationStamp);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withSinceValidationStampStatus(String sinceValidationStampStatus) {
+        public StandardFilterProviderDataBuilder withSinceValidationStampStatus(String sinceValidationStampStatus) {
             data = data.withSinceValidationStampStatus(sinceValidationStampStatus);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withWithValidationStamp(String withValidationStamp) {
+        public StandardFilterProviderDataBuilder withWithValidationStamp(String withValidationStamp) {
             data = data.withWithValidationStamp(withValidationStamp);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withWithValidationStampStatus(String withValidationStampStatus) {
+        public StandardFilterProviderDataBuilder withWithValidationStampStatus(String withValidationStampStatus) {
             data = data.withWithValidationStampStatus(withValidationStampStatus);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withWithProperty(String withProperty) {
+        public StandardFilterProviderDataBuilder withWithProperty(String withProperty) {
             data = data.withWithProperty(withProperty);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withWithPropertyValue(String withPropertyValue) {
+        public StandardFilterProviderDataBuilder withWithPropertyValue(String withPropertyValue) {
             data = data.withWithPropertyValue(withPropertyValue);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withSinceProperty(String sinceProperty) {
+        public StandardFilterProviderDataBuilder withSinceProperty(String sinceProperty) {
             data = data.withSinceProperty(sinceProperty);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withSincePropertyValue(String sincePropertyValue) {
+        public StandardFilterProviderDataBuilder withSincePropertyValue(String sincePropertyValue) {
             data = data.withSincePropertyValue(sincePropertyValue);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withLinkedFrom(String linkedFrom) {
+        public StandardFilterProviderDataBuilder withLinkedFrom(String linkedFrom) {
             data = data.withLinkedFrom(linkedFrom);
             return this;
         }
 
         @Override
-        public StandardFilterBuilder withLinkedTo(String linkedTo) {
+        public StandardFilterProviderDataBuilder withLinkedFromPromotion(String linkedFromPromotion) {
+            data = data.withLinkedFromPromotion(linkedFromPromotion);
+            return this;
+        }
+
+        @Override
+        public StandardFilterProviderDataBuilder withLinkedTo(String linkedTo) {
             data = data.withLinkedTo(linkedTo);
+            return this;
+        }
+
+        @Override
+        public StandardFilterProviderDataBuilder withLinkedToPromotion(String linkedToPromotion) {
+            data = data.withLinkedToPromotion(linkedToPromotion);
             return this;
         }
     }
 
     @Override
-    public StandardFilterBuilder standardFilter(int count) {
-        return new DefaultStandardFilterBuilder(count);
+    public StandardFilterProviderDataBuilder standardFilterProviderData(int count) {
+        return new DefaultStandardFilterProviderDataBuilder(count);
     }
 
     @Override
@@ -180,15 +213,40 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public Collection<BuildFilterForm> getBuildFilterForms(ID branchId) {
-        return buildFilterProviders.stream()
+        return buildFilterProviders.values().stream()
                 .map(provider -> provider.newFilterForm(branchId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public BuildFilter computeFilter(ID branchId, String type, JsonNode jsonData) {
-        Optional<BuildFilter> optFilter = getBuildFilterProviderByType(type).map(provider -> getBuildFilter(branchId, provider, jsonData));
-        return optFilter.get();
+    public <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, JsonNode parameters) {
+        Optional<? extends BuildFilterProvider<T>> o = getBuildFilterProviderByType(filterType);
+        if (o.isPresent()) {
+            //noinspection unchecked
+            return getBuildFilterProviderData(o.get(), parameters);
+        } else {
+            throw new BuildFilterProviderNotFoundException(filterType);
+        }
+    }
+
+    @Override
+    public <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, T parameters) {
+        Optional<? extends BuildFilterProvider<T>> o = getBuildFilterProviderByType(filterType);
+        if (o.isPresent()) {
+            //noinspection unchecked
+            return o.get().withData(parameters);
+        } else {
+            throw new BuildFilterProviderNotFoundException(filterType);
+        }
+    }
+
+    protected <T> BuildFilterProviderData<T> getBuildFilterProviderData(BuildFilterProvider<T> provider, JsonNode parameters) {
+        Optional<T> data = provider.parse(parameters);
+        if (data.isPresent()) {
+            return BuildFilterProviderData.of(provider, data.get());
+        } else {
+            throw new BuildFilterProviderDataParsingException(provider.getClass().getName());
+        }
     }
 
     @Override
@@ -282,18 +340,9 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         );
     }
 
-    private <T> BuildFilter getBuildFilter(ID branchId, BuildFilterProvider<T> provider, JsonNode jsonData) {
-        return provider.parse(jsonData)
-                .map(data -> provider.filter(branchId, data))
-                .orElse(defaultFilter());
-    }
-
+    @SuppressWarnings("unchecked")
     private <T> Optional<? extends BuildFilterProvider<T>> getBuildFilterProviderByType(String type) {
-        Optional<? extends BuildFilterProvider<?>> first = buildFilterProviders.stream()
-                .filter(provider -> type.equals(provider.getClass().getName()))
-                .findFirst();
-        //noinspection unchecked
-        return (Optional<? extends BuildFilterProvider<T>>) first;
+        return Optional.ofNullable((BuildFilterProvider<T>) buildFilterProviders.get(type));
     }
 
     @SuppressWarnings("unchecked")
@@ -308,7 +357,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                         branch,
                         shared,
                         name,
-                        provider.getClass().getName(),
+                        provider.getType(),
                         parsedData
                 )
         );

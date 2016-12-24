@@ -1,0 +1,52 @@
+@startuml
+control Scheduler
+control DefaultMetricsExporter
+
+boundary MetricsSource
+
+boundary MetricsService
+note right of MetricsService
+    Current implementation is ""DropwizardMetricServices""
+    Performs too many transformations and does not preserve
+    custom metrics
+end note
+
+control MetricRegistry
+
+control InfluxDbReporter
+boundary InfluxDbSender
+database InfluxDB
+
+== Writing metrics ==
+
+Scheduler -> DefaultMetricsExporter: export()
+note right
+    Every ""ontrack.config.metrics-period"" seconds (defaults to ""60"")
+end note
+
+loop For each metric source
+    DefaultMetricsExporter -> MetricsSource: getMetrics()
+    MetricsSource --> DefaultMetricsExporter: collection of metrics
+    loop For each metric
+        DefaultMetricsExporter -> MetricsService: write(metric)
+        MetricsService -> MetricRegistry: register(metric)
+        note right
+            Depending on the type of metric, this can be a more
+            specific method.
+        end note
+    end
+end
+
+== Exporting metrics ==
+
+Scheduler -> InfluxDbReporter: report()
+note right
+    Every ""ontrack.metrics.influxdb.period"" second (defaults to ""60"")
+end note
+InfluxDbReporter -> MetricRegistry:Gets all metrics
+MetricRegistry --> InfluxDbReporter: metrics
+InfluxDbReporter -> InfluxDbReporter: classifies / transforms metrics
+InfluxDbReporter -> InfluxDbSender: appendPoints()
+InfluxDbSender -> InfluxDb: ""HTTP POST""
+
+@enduml

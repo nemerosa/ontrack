@@ -463,10 +463,11 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     private void assertBuildLinkedToFilter(Branch source, Branch target, String pattern, List<Build> expected) {
         asUserWithView(source, target).call {
-            def builds = structureService.getFilteredBuilds(
-                    source.id,
-                    buildFilterService.standardFilter(10).withLinkedTo(pattern).build()
-            )
+            def builds = buildFilterService
+                    .standardFilterProviderData(10)
+                    .withLinkedTo(pattern)
+                    .build()
+                    .filterBranchBuilds(source)
             assert expected*.id == builds*.id
         }
     }
@@ -502,10 +503,11 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     private void assertBuildLinkedFromFilter(Branch source, Branch target, String pattern, List<Build> expected) {
         asUserWithView(source, target).call {
-            def builds = structureService.getFilteredBuilds(
-                    target.id,
-                    buildFilterService.standardFilter(10).withLinkedFrom(pattern).build()
-            )
+            def builds = buildFilterService
+                    .standardFilterProviderData(10)
+                    .withLinkedFrom(pattern)
+                    .build()
+                    .filterBranchBuilds(target)
             assert expected*.id == builds*.id
         }
     }

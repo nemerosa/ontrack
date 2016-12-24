@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.git.resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration;
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitBuildInfo;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.service.GitService;
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -17,10 +19,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
@@ -49,7 +51,7 @@ public class GitChangeLogResourceDecoratorTest {
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
 
-        List<BuildView> buildView = Arrays.asList(1, 2).stream()
+        List<BuildView> buildView = Stream.of(1, 2)
                 .map(it -> BuildView.of(
                         Build.of(
                                 branch,
@@ -78,7 +80,10 @@ public class GitChangeLogResourceDecoratorTest {
 
         when(gitService.getProjectConfiguration(project)).thenReturn(
                 Optional.of(
-                        BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("jira:MyJIRA")
+                        new BasicGitActualConfiguration(
+                                BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
+                                MockIssueServiceConfiguration.configuredIssueService("MyTest")
+                        )
                 )
         );
 
@@ -167,7 +172,7 @@ public class GitChangeLogResourceDecoratorTest {
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
 
-        List<BuildView> buildView = Arrays.asList(1, 2).stream()
+        List<BuildView> buildView = Stream.of(1, 2)
                 .map(it -> BuildView.of(
                         Build.of(
                                 branch,
@@ -194,7 +199,10 @@ public class GitChangeLogResourceDecoratorTest {
 
         when(gitService.getProjectConfiguration(project)).thenReturn(
                 Optional.of(
-                        BasicGitConfiguration.empty().withName("MyConfig")
+                        new BasicGitActualConfiguration(
+                                BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
+                                null
+                        )
                 )
         );
 

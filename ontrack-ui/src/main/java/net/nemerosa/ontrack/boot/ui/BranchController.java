@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateDefinitionException;
 import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateInstanceException;
@@ -145,19 +145,23 @@ public class BranchController extends AbstractResourceController {
 
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
     public BranchBuildView buildView(@PathVariable ID branchId) {
-        // Using the default filter
-        BuildFilter buildFilter = buildFilterService.defaultFilter();
-        return buildViewWithFilter(branchId, buildFilter);
+        return buildViewWithFilter(
+                branchId,
+                buildFilterService.defaultFilterProviderData()
+        );
 
     }
 
     @RequestMapping(value = "branches/{branchId}/view/{filterType:.*}", method = RequestMethod.GET)
-    public BranchBuildView buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
+    public <T> BranchBuildView buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
         JsonNode jsonParameters = requestParametersToJson(request);
-        // Defines the filter using a service
-        BuildFilter buildFilter = buildFilterService.computeFilter(branchId, filterType, jsonParameters);
+        // Gets the filter provider
+        BuildFilterProviderData<T> buildFilterProvider = buildFilterService.getBuildFilterProviderData(filterType, jsonParameters);
         // Gets the build view
-        return buildViewWithFilter(branchId, buildFilter);
+        return buildViewWithFilter(
+                branchId,
+                buildFilterProvider
+        );
     }
 
     /**
@@ -170,10 +174,10 @@ public class BranchController extends AbstractResourceController {
                         Selection.of("sourceBranch")
                                 .label("Source branch")
                                 .help("Branch to copy configuration from")
-                                        // All branches for all projects
+                                // All branches for all projects
                                 .items(structureService.getProjectList().stream()
                                         .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
-                                                // Keeps only the different branches
+                                        // Keeps only the different branches
                                         .filter(branch -> !branchId.equals(branch.getId()))
                                         .collect(Collectors.toList()))
                 )
@@ -324,7 +328,7 @@ public class BranchController extends AbstractResourceController {
                                 .label("Absence policy")
                                 .help("Defines what to do with a branch template instance when the corresponding " +
                                         "name is not defined any longer.")
-                                .items(Arrays.asList(TemplateSynchronisationAbsencePolicy.values()).stream()
+                                .items(Arrays.stream(TemplateSynchronisationAbsencePolicy.values())
                                         .map(Describable::toDescription)
                                         .collect(Collectors.toList()))
                                 .itemId("id")
@@ -460,12 +464,12 @@ public class BranchController extends AbstractResourceController {
         return branchTemplateService.connectTemplateInstance(branchId, request);
     }
 
-
-    private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
+    private <T> BranchBuildView buildViewWithFilter(ID branchId,
+                                                    BuildFilterProviderData<T> buildFilterProviderData) {
         // Gets the branch
         Branch branch = getBranch(branchId);
         // Gets the list of builds
-        List<Build> builds = structureService.getFilteredBuilds(branchId, buildFilter);
+        List<Build> builds = buildFilterProviderData.filterBranchBuilds(branch);
         // Gets the list of build diff actions
         List<Action> buildDiffActions = extensionManager.getExtensions(BuildDiffExtension.class)
                 .stream()

@@ -19,9 +19,9 @@ public class OntrackConfigProperties {
     private final Logger logger = LoggerFactory.getLogger(OntrackConfigProperties.class);
 
     /**
-     * Maximum number of application messages to retain
+     * Maximum number of days to keep the log entries
      */
-    private int applicationLogMaxEntries = 1000;
+    private int applicationLogRetentionDays = 7;
 
     /**
      * Home directory

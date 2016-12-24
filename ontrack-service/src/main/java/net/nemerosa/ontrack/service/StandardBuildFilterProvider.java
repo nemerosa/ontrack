@@ -2,11 +2,12 @@ package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +15,30 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@Transactional
 public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<StandardBuildFilterData> {
 
     private final StructureService structureService;
     private final ValidationRunStatusService validationRunStatusService;
     private final PropertyService propertyService;
+    private final CoreBuildFilterRepository coreBuildFilterRepository;
 
     @Autowired
-    public StandardBuildFilterProvider(StructureService structureService, ValidationRunStatusService validationRunStatusService, PropertyService propertyService) {
+    public StandardBuildFilterProvider(
+            StructureService structureService,
+            ValidationRunStatusService validationRunStatusService,
+            PropertyService propertyService,
+            CoreBuildFilterRepository coreBuildFilterRepository
+    ) {
         this.structureService = structureService;
         this.validationRunStatusService = validationRunStatusService;
         this.propertyService = propertyService;
+        this.coreBuildFilterRepository = coreBuildFilterRepository;
+    }
+
+    @Override
+    public String getType() {
+        return StandardBuildFilterProvider.class.getName();
     }
 
     @Override
@@ -33,8 +47,11 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
     }
 
     @Override
-    public BuildFilter filter(ID branchId, StandardBuildFilterData data) {
-        return new StandardBuildFilter(data, propertyService, structureService);
+    public List<Build> filterBranchBuilds(Branch branch, StandardBuildFilterData data) {
+        return coreBuildFilterRepository.standardFilter(
+                branch,
+                data
+        );
     }
 
     @Override
@@ -157,11 +174,25 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                                 .optional()
                 )
                 .with(
+                        Text.of("linkedFromPromotion")
+                                .label("Linked from promotion level")
+                                .help("The build must be linked FROM a build having this promotion (requires \"Linked from\")")
+                                .length(40)
+                                .optional()
+                )
+                .with(
                         Text.of("linkedTo")
                                 .label("Linked to")
                                 .help("The build must be linked TO the builds selected by the pattern.\n" +
                                         "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
                                 )
+                                .length(40)
+                                .optional()
+                )
+                .with(
+                        Text.of("linkedToPromotion")
+                                .label("Linked to promotion level")
+                                .help("The build must be linked TO a build having this promotion (requires \"Linked to\")")
                                 .length(40)
                                 .optional()
                 )
@@ -185,7 +216,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .fill("withProperty", data.getWithProperty())
                 .fill("withPropertyValue", data.getWithPropertyValue())
                 .fill("linkedFrom", data.getLinkedFrom())
-                .fill("linkedTo", data.getLinkedTo())
+                .fill("linkedFromPromotion", data.getLinkedFromPromotion())
+                .fill("linkedToPromotion", data.getLinkedToPromotion())
                 ;
     }
 
@@ -205,8 +237,9 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withWithProperty(JsonUtils.get(data, "withProperty", null))
                 .withWithPropertyValue(JsonUtils.get(data, "withPropertyValue", null))
                 .withLinkedFrom(JsonUtils.get(data, "linkedFrom", null))
+                .withLinkedFromPromotion(JsonUtils.get(data, "linkedFromPromotion", null))
                 .withLinkedTo(JsonUtils.get(data, "linkedTo", null))
-                ;
+                .withLinkedToPromotion(JsonUtils.get(data, "linkedToPromotion", null));
         return Optional.of(filter);
     }
 

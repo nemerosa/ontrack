@@ -1,0 +1,135 @@
+<ot-view>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <div class="well">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form class="form-inline">
+                                <!-- Navigation -->
+                                <div class="form-group">
+                                    <button ng-click="previousPage()" class="btn btn-default" ng-disabled="!logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</button>
+                                </div>
+                                <div class="form-group">
+                                    <button ng-click="nextPage()" class="btn btn-default" ng-disabled="!logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</button>
+                                </div>
+                                <!-- Actions -->
+                                <div class="form-group">
+                                    <button ng-click="refreshList()" class="btn btn-info">
+                                        <i class="fa fa-refresh"></i>&nbsp;Refresh log
+                                    </button>
+                                    <button ng-click="deleteAll()" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i>&nbsp;Delete all entries
+                                    </button>
+                                </div>
+                            </form>
+                            <br/>
+                            <form class="form-inline">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <!-- After -->
+                                        <div class="form-group">
+                                            <label for="filter-after">After</label>
+                                            <input id="filter-after" ng-model="logFilter.afterDate" name="logFilterAfterDate"
+                                                   type="text" class="form-control"
+                                                   datepicker-popup="EEE dd MMM yyyy"
+                                                   is-open="openedAfter"
+                                            />
+                                            <input id="filter-after-time" ng-model="logFilter.afterTime" name="logFilterAfterTime"
+                                                   type="time" class="form-control"
+                                                   size="6"
+                                                   placeholder="HH:mm"
+                                                   pattern="[0-9]{2}:[0-9]{2}"
+                                            />
+                                        </div>
+                                        <!-- Before -->
+                                        <div class="form-group">
+                                            <label for="filter-before">Before</label>
+                                            <input id="filter-before" ng-model="logFilter.beforeDate" name="logFilterBeforeDate"
+                                                   type="text" class="form-control"
+                                                   datepicker-popup="EEE dd MMM yyyy"
+                                                   is-open="openedBefore"
+                                            />
+                                            <input id="filter-before-time" ng-model="logFilter.beforeTime" name="logFilterBeforeTime"
+                                                   type="time" class="form-control"
+                                                   size="6"
+                                                   placeholder="HH:mm"
+                                                   pattern="[0-9]{2}:[0-9]{2}"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top: 0.5em;">
+                                    <div class="col-md-8">
+                                        <!-- Authentication -->
+                                        <div class="form-group">
+                                            <label for="filter-authentication">Authentication</label>
+                                            <input id=filter-authentication type="text" class="form-control" ng-model="logFilter.authentication" size="8" />
+                                        </div>
+                                        <!-- Text -->
+                                        <div class="form-group">
+                                            <label for="filter-text">Free text</label>
+                                            <input id="filter-text" type="text" class="form-control" ng-model="logFilter.text" size="40" />
+                                        </div>
+                                        <!-- Commands -->
+                                        <div class="form-group">
+                                            <button ng-click="filterLogs()" class="btn btn-info">
+                                                <i class="fa fa-filter"></i>&nbsp;Filter
+                                            </button>
+                                        </div>
+                                        <div class="form-group">
+                                            <button ng-click="resetFilter()" class="btn btn-default">
+                                                <i class="fa fa-ban"></i>&nbsp;Reset filter
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Timestamp</th>
+                        <th>Type</th>
+                        <th>Information</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-show="logs.resources.length == 0">
+                        <td class="success" colspan="5">
+                            No log entry - everything is OK!
+                        </td>
+                    </tr>
+                    <tr ng-repeat="log in logs.resources" class="ot-application-log-{{log.level | lowercase}}">
+                        <td>
+                            {{log.level}}
+                        </td>
+                        <td>
+                            {{log.timestamp | date:'fullDate'}}
+                            {{log.timestamp | date:'mediumTime'}}
+                        </td>
+                        <td>
+                            <code>{{log.type.name}}</code>
+                            {{log.type.description}}
+                        </td>
+                        <td>
+                            {{log.information}}
+                        </td>
+                        <td>
+                            <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
+                                Details...
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</ot-view>

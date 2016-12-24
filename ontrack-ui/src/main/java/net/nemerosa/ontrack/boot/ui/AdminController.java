@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -15,10 +16,7 @@ import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.actuate.health.Health;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -55,14 +53,17 @@ public class AdminController extends AbstractResourceController {
     /**
      * Gets the list of application log entries
      */
-    @RequestMapping(value = "logs", method = RequestMethod.GET)
-    public Resources<ApplicationLogEntry> getLogEntries(Page page) {
+    @GetMapping(value = "logs")
+    public Resources<ApplicationLogEntry> getLogEntries(ApplicationLogEntryFilter filter, Page page) {
         // Gets the entries
-        List<ApplicationLogEntry> entries = applicationLogService.getLogEntries(page);
+        List<ApplicationLogEntry> entries = applicationLogService.getLogEntries(
+                filter,
+                page
+        );
         // Builds the resources
         Resources<ApplicationLogEntry> resources = Resources.of(
                 entries,
-                uri(on(getClass()).getLogEntries(page))
+                uri(on(getClass()).getLogEntries(filter, page))
         );
         // Pagination information
         int offset = page.getOffset();
@@ -74,6 +75,7 @@ public class AdminController extends AbstractResourceController {
         if (offset > 0) {
             pagination = pagination.withPrev(
                     uri(on(AdminController.class).getLogEntries(
+                            filter,
                             new Page(
                                     Math.max(0, offset - count),
                                     count
@@ -85,6 +87,7 @@ public class AdminController extends AbstractResourceController {
         if (offset + count < total) {
             pagination = pagination.withNext(
                     uri(on(AdminController.class).getLogEntries(
+                            filter,
                             new Page(
                                     offset + count,
                                     count
@@ -94,6 +97,15 @@ public class AdminController extends AbstractResourceController {
         }
         // OK
         return resources.withPagination(pagination);
+    }
+
+    /**
+     * Deletes all application log entries
+     */
+    @DeleteMapping(value = "logs")
+    public Ack deleteLogEntries() {
+        applicationLogService.deleteLogEntries();
+        return Ack.OK;
     }
 
     /**

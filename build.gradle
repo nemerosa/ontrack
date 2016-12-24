@@ -18,6 +18,14 @@ plugins {
 }
 
 /**
+ * Profiles
+ */
+
+ext {
+    documentationProfile = project.hasProperty('documentation')
+}
+
+/**
  * Meta information
  */
 
@@ -147,16 +155,18 @@ configure(javaProjects) {
 
     // Javadoc
 
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
+    if (documentationProfile) {
+        task javadocJar(type: Jar) {
+            classifier = 'javadoc'
+            from javadoc
+        }
 
-    // Sources
+        // Sources
 
-    task sourceJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
+        task sourceJar(type: Jar) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
     }
 
     // POM file
@@ -208,8 +218,10 @@ configure(javaProjects) {
     // Archives for Javadoc and Sources
 
     artifacts {
-        archives javadocJar
-        archives sourceJar
+        if (documentationProfile) {
+            archives javadocJar
+            archives sourceJar
+        }
         archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: pomFile
     }
 
@@ -275,5 +287,5 @@ task testReport(type: TestReport) {
  */
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
+    gradleVersion = '3.2.1'
 }

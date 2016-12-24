@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.extension.stash.property;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class StashGitConfigurationTest {
 
@@ -16,10 +14,11 @@ public class StashGitConfigurationTest {
                         new StashConfiguration(
                                 "server",
                                 "http://stash.mycompany.com",
-                                "", "", 0, ""
-                        ), "nemerosa", "ontrack"
-                )
-        );
+                                "", ""
+                        ), "nemerosa", "ontrack",
+                        0, ""
+                ),
+                null);
         assertFalse(gitConfiguration.isCloud());
         assertEquals("http://stash.mycompany.com/projects/nemerosa/repos/ontrack/commits/{commit}", gitConfiguration.getCommitLink());
         assertEquals("http://stash.mycompany.com/projects/nemerosa/repos/ontrack/browse/{path}?at={commit}", gitConfiguration.getFileAtCommitLink());
@@ -33,10 +32,11 @@ public class StashGitConfigurationTest {
                         new StashConfiguration(
                                 "cloud",
                                 "https://bitbucket.org",
-                                "", "", 0, ""
-                        ), "nemerosa", "ontrack"
-                )
-        );
+                                "", ""
+                        ), "nemerosa", "ontrack",
+                        0, ""
+                ),
+                null);
         assertTrue(gitConfiguration.isCloud());
         assertEquals("https://bitbucket.org/nemerosa/ontrack/commits/{commit}", gitConfiguration.getCommitLink());
         assertEquals("https://bitbucket.org/nemerosa/ontrack/src/{commit}/{path}", gitConfiguration.getFileAtCommitLink());

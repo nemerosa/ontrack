@@ -10,6 +10,8 @@ buildscript {
     }
 }
 
+import org.asciidoctor.gradle.AsciidoctorTask
+
 apply plugin: 'groovy'
 apply plugin: 'spring-boot'
 apply plugin: 'org.asciidoctor.convert'
@@ -25,75 +27,74 @@ dependencies {
     compile libraries.commons_io as String
 }
 
-task generateDoc(type: JavaExec) {
-    dependsOn 'classes'
-    dependsOn ':ontrack-dsl:classes'
-    main = 'net.nemerosa.ontrack.docs.DSLDocGenerator'
-    classpath = sourceSets.main.runtimeClasspath
-    args = [
-            project(':ontrack-dsl').file('src/main/groovy'),
-            'build',
-    ]
+if (documentationProfile) {
 
-    inputs.dir project(':ontrack-dsl').file('src/main/groovy')
-    outputs.file 'build/dsl-generated.json'
-    outputs.file 'build/dsl-generated.adoc'
-}
+    task generateDoc(type: JavaExec) {
+        dependsOn 'classes'
+        dependsOn ':ontrack-dsl:classes'
+        main = 'net.nemerosa.ontrack.docs.DSLDocGenerator'
+        classpath = sourceSets.main.runtimeClasspath
+        args = [
+                project(':ontrack-dsl').file('src/main/groovy'),
+                'build',
+        ]
 
-task prepareGeneratedDoc(type: Copy) {
-    dependsOn 'generateDoc'
-    from 'build'
-    include 'dsl-generated.adoc'
-    into 'src/docs/asciidoc'
-}
-
-import org.asciidoctor.gradle.AsciidoctorTask
-
-// HTML specific settings
-task generateHtml(type: AsciidoctorTask, description: 'Generates HTML documentation.', group: 'Documentation') {
-    backend = 'html5'
-    attributes = [
-            'ontrack-version'    : project.versioning.info.display,
-            'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
-            'toc'                : 'left',
-            'icons'              : 'font',
-    ]
-}
-
-// PDF specific settings
-task generatePdf(type: AsciidoctorTask, description: 'Generates PDF documentation.', group: 'Documentation') {
-    mustRunAfter 'generateHtml'
-    backend = 'pdf'
-    attributes = [
-            'ontrack-version'    : project.versioning.info.display,
-            'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
-            'toc'                : 'left',
-            'icons'              : 'font',
-            'imagesdir'          : file('build/asciidoc/html5'),
-    ]
-}
-
-// common Asciidoctor settings
-tasks.withType(AsciidoctorTask) { docTask ->
-    dependsOn 'prepareGeneratedDoc'
-    requires 'asciidoctor-diagram'
-    logDocuments = true
-    sources {
-        include 'index.adoc'
+        inputs.dir project(':ontrack-dsl').file('src/main/groovy')
+        outputs.file 'build/dsl-generated.json'
+        outputs.file 'build/dsl-generated.adoc'
     }
-}
 
-build.dependsOn 'generateHtml'
-build.dependsOn 'generatePdf'
-
-rootProject.tasks.publicationPackage {
-    dependsOn generateHtml
-    dependsOn generatePdf
-    from("${generateHtml.outputDir}/html5") {
-        into 'html5'
+    task prepareGeneratedDoc(type: Copy) {
+        dependsOn 'generateDoc'
+        from 'build'
+        include 'dsl-generated.adoc'
+        into 'src/docs/asciidoc'
     }
-    from ("${generatePdf.outputDir}/pdf") {
-        include '*.pdf'
-        into 'pdf'
+
+    // HTML specific settings
+    task generateHtml(type: AsciidoctorTask, description: 'Generates HTML documentation.', group: 'Documentation') {
+        backend = 'html5'
+        attributes = [
+                'ontrack-version'    : project.versioning.info.display,
+                'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
+                'icons'              : 'font',
+        ]
+    }
+
+    // PDF specific settings
+    task generatePdf(type: AsciidoctorTask, description: 'Generates PDF documentation.', group: 'Documentation') {
+        mustRunAfter 'generateHtml'
+        backend = 'pdf'
+        attributes = [
+                'ontrack-version'    : project.versioning.info.display,
+                'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
+                'icons'              : 'font',
+                'imagesdir'          : file('build/asciidoc/html5'),
+        ]
+    }
+
+    // common Asciidoctor settings
+    tasks.withType(AsciidoctorTask) { docTask ->
+        dependsOn 'prepareGeneratedDoc'
+        requires 'asciidoctor-diagram'
+        logDocuments = true
+        sources {
+            include 'index.adoc'
+        }
+    }
+
+    build.dependsOn 'generateHtml'
+    build.dependsOn 'generatePdf'
+
+    rootProject.tasks.publicationPackage {
+        dependsOn generateHtml
+        dependsOn generatePdf
+        from("${generateHtml.outputDir}/html5") {
+            into 'html5'
+        }
+        from("${generatePdf.outputDir}/pdf") {
+            include '*.pdf'
+            into 'pdf'
+        }
     }
 }

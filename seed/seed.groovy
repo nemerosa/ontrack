@@ -197,6 +197,7 @@ integrationTest
 dockerLatest
 osPackages
 build
+-Pdocumentation
 -PitJdbcWait=20
 -PitJdbcHost=dockerhost
 -PbowerOptions='--allow-root'
@@ -212,7 +213,7 @@ build
     }
     publishers {
         buildDescription '', '${VERSION_DISPLAY}', '', ''
-        archiveJunit("**/build/test-results/*.xml")
+        archiveJunit("**/build/test-results/**/*.xml")
         archiveArtifacts {
             pattern 'build/distributions/ontrack-*-delivery.zip'
             pattern 'build/distributions/ontrack*.deb'
@@ -220,7 +221,7 @@ build
         }
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
-                '**/target/**,**/node_modules/**,**/vendor/**',
+                '**/build/**,**/node_modules/**,**/vendor/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
         downstreamParameterized {
@@ -712,7 +713,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
     }
     label 'master'
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         ontrackDsl {

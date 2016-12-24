@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.*
+import net.nemerosa.ontrack.dsl.Branch
+import net.nemerosa.ontrack.dsl.MetaInfo
+import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
+import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import net.nemerosa.ontrack.shell.Shell
@@ -1474,7 +1477,7 @@ class ACCDSL extends AbstractACCDSL {
     void 'Configuration - Stash'() {
         def name = uid('S')
         ontrack.configure {
-            stash name, url: 'http://localhost:443/stash', indexationInterval: 0
+            stash name, url: 'http://localhost:443/stash'
         }
         assert ontrack.config.stash.find { it == name } != null
     }
@@ -1483,7 +1486,7 @@ class ACCDSL extends AbstractACCDSL {
     void 'Project configuration - Stash'() {
         def name = uid('S')
         ontrack.configure {
-            stash name, url: 'http://localhost:443/stash', indexationInterval: 0
+            stash name, url: 'http://localhost:443/stash'
         }
         def projectName = uid('P')
         // Sets the configuration
@@ -1507,6 +1510,36 @@ class ACCDSL extends AbstractACCDSL {
             gitHub name, oauth2Token: 'ABCDEF'
         }
         assert ontrack.config.gitHub.find { it == name } != null
+    }
+
+    @Test
+    void 'Configuration - GitLab'() {
+        def name = uid('GL')
+        ontrack.configure {
+            gitLab name, url: 'https://gitlab.acme.com', user: 'user', password: 'abcdef'
+        }
+        assert ontrack.config.gitLab.find { it == name } != null
+    }
+
+    @Test
+    void 'Project configuration - GitLab'() {
+        def name = uid('GL')
+        ontrack.configure {
+            gitLab name, url: 'https://gitlab.acme.com', user: 'user', password: 'abcdef'
+        }
+        def projectName = uid('P')
+        // Sets the configuration
+        ontrack.project(projectName) {
+            config {
+                gitLab name, repository: "nemerosa/ontrack", indexationInterval: 10, issueServiceConfigurationIdentifier: 'self'
+            }
+        }
+        // Gets the configuration
+        def gitLab = ontrack.project(projectName).config.gitLab
+        assert gitLab != null
+        assert gitLab.configuration.name == name
+        assert gitLab.repository == 'nemerosa/ontrack'
+        assert gitLab.issueServiceConfigurationIdentifier == 'self'
     }
 
     @Test

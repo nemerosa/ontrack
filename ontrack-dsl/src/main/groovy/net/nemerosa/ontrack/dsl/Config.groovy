@@ -32,6 +32,24 @@ class Config {
     }
 
     /**
+     * Management of GitLab configurations
+     */
+
+    @DSLMethod
+    def gitLab(Map<String, ?> parameters, String name) {
+        def params = parameters + [name: name]
+        ontrack.post(
+                'extension/gitlab/configurations/create',
+                params
+        )
+    }
+
+    @DSLMethod(see = "gitLab")
+    List<String> getGitLab() {
+        ontrack.get('extension/gitlab/configurations/descriptors').resources.collect { it.id }
+    }
+
+    /**
      * Creates or update a GitHub configuration.
      */
 

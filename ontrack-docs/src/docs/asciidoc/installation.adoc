@@ -32,7 +32,7 @@ The Ontrack image exposes the ports `443` and `8080`.
 Two volumes are defined:
 
 * `/var/ontrack/data` - contains the data for Ontrack (files & database) but also the log files. This is typically provided through a data volume container.
-* `/var/ontrack/conf` - contains the configuration files for Ontrack (see later).
+* `/var/ontrack/conf` - contains the <<configuration-properties,configuration files>> for Ontrack (see later).
 
 [[installation-docker-basic]]
 ==== Basic deployment
@@ -85,7 +85,7 @@ The following directories are created:
 | Directory | Description
 
 | `/opt/ontrack` | Binaries and scripts
-| `/usr/lib/ontrack` | Working and <<configuration,configuration>> directory
+| `/usr/lib/ontrack` | Working and <<configuration-properties,configuration>> directory
 | `/var/log/ontrack` | Logging directory
 |===
 
@@ -150,7 +150,7 @@ The following directories are created:
 | Directory | Description
 
 | `/opt/ontrack` | Binaries and scripts
-| `/usr/lib/ontrack` | Working and <<configuration,configuration>> directory
+| `/usr/lib/ontrack` | Working and <<configuration-properties,configuration>> directory
 | `/var/log/ontrack` | Logging directory
 |===
 
@@ -175,148 +175,6 @@ The optional `/etc/default/ontrack` file can be used to define the
 JAVA_OPTIONS=-Xmx2048m
 ----
 
-[[installation-digitalocean]]
-=== Installing at DigitalOcean
-
-Ontrack has scripts which allow an easy installation on
-https://www.digitalocean.com[DigitalOcean].
-
-Ontrack itself is deployed there, as a
-https://ontrack.nemerosa.net[demonstration installation]. Its deployment is
-part of the the continuous delivery pipeline of Ontrack itself.
-
-NOTE: All the examples below are applicable for
-      https://ontrack.nemerosa.net[Ontrack @ Ontrack] and must be adapted for
-      your own situation.
-
-[[installation-digitalocean-preparation]]
-==== Preparation (only once)
-
-Clone the latest version of Ontrack and switch to the version you want to
-install:
-
-   git checkout {ontrack-version}
-
-The https://docs.docker.com/machine/[Docker Machine] must be installed.
-
-Edit the `~/.gradle/gradle.properties` file and add the following information:
-
-[source,bash]
-----
-# Your DigitalOcean token
-digitalOceanAccessToken = xxx
-# Name of the Docker Machine to create locally
-# It will also be used as the droplet name
-productionMachine = ontrack
-# Digital Ocean region where to create the droplet
-productionRegion = fra1
-# Relative location (can be absolute) of the production
-# configuration files
-productionConf = gradle/env/prod
-# Final URL of the production server
-# Used for acceptance testing only
-productionUrl = https://ontrack.nemerosa.net
-----
-
-Create the DigitalOcean droplet:
-
-[source,bash]
-----
-./gradlew -b production.gradle productionSetup
-----
-
-This creates an `ontrack` Docker Machine. An IP will be assigned to it, and
-this is the moment to configure your DNS and/or floating IP if you have a
-domain to assign to it.
-
-HINT: You can copy the `~/.docker/machine/machines/ontrack` Docker Machine
-      configuration to another host.
-
-Make sure the local `gradle/env/prod` directory (configured as `productionConf`)
-contains the following files:
-
-* `ontrack_nemerosa_net.jks` - the Java keystore containing the certificate for the `ontrack.nemerosa.net` name
-* `application-prod.yml` with SSH configuration:
-
-[source,yaml]
-----
-server:
-  ssl:
-    key-alias: server
-    key-store: "config/ontrack_nemerosa_net.jks"
-    key-store-password: "xxx"
-----
-
-NOTE: This must of course be adapted to your own environment!
-
-Configure the environment of the production server:
-
-[source,bash]
-----
-./gradlew -b production.gradle  productionEnv
-----
-
-This will upload the production configuration files onto the droplet.
-
-[[installation-digitalocean-backup]]
-==== Backing up the data (if applicable)
-
-[source,bash]
-----
-./gradlew -b production.gradle productionBackup
-----
-
-This will create a `backup-<version>.tgz` file in the `build` directory.
-
-[[installation-digitalocean-restoring]]
-==== Restoring data (if needed)
-
-Restore the data using an existing `backup.tgz` file:
-
-[source,bash]
-----
-./gradlew -b production.gradle productionRestore -Pbackup=<path/to/backup.tgz>
-----
-
-[[installation-digitalocean-installing]]
-==== Installing Ontrack
-
-Starts a new version of Ontrack:
-
-[source,bash]
-----
-./gradlew -b production.gradle productionUpgrade -PontrackVersion=2.13.7
-----
-
-[[installation-digitalocean-tests]]
-==== Running tests
-
-In order to validate the installation, you should run:
-
-[source,bash]
-----
-./gradlew -b production.gradle productionTest
-----
-
-This command relies on the `productionUrl` parameter being correctly configured.
-
-[[installation-digitalocean-logs]]
-==== Accessing the logs
-
-Logs can be accessed using Docker commands. If `ontrack` is the name of the
-Docker Machine, then:
-
-[source,bash]
-----
-# Displays the log in real time
-docker logs -f `docker-machine config ontrack` ontrack
-# Downloads the log in a ontrack.log file
-docker logs `docker-machine config ontrack` ontrack > ontrack.log
-----
-
-[[installation-dockercloud]]
-=== Installing on Docker Cloud
-
 [[installation-sa]]
 === Standalone installation
 
@@ -334,7 +192,7 @@ Start it using `java -jar ontrack.jar` with the following options:
 
 to specify the location of the H2 database files.
 
-<<configuration,Options>> can also be specified in an `application.yml` file in
+<<configuration-properties,Options>> can also be specified in an `application.yml` file in
 the working directory.
 
 For example:
@@ -376,3 +234,5 @@ or the command line option:
 ----
 --server.port=9999
 ----
+
+See <<configuration-properties>> for the list of all available properties.

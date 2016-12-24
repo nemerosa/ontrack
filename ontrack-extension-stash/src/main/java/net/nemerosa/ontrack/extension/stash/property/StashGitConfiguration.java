@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.stash.property;
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.model.support.UserPassword;
 
 import java.util.Optional;
@@ -10,9 +11,11 @@ import static java.lang.String.format;
 public class StashGitConfiguration implements GitConfiguration {
 
     private final StashProjectConfigurationProperty property;
+    private final ConfiguredIssueService configuredIssueService;
 
-    public StashGitConfiguration(StashProjectConfigurationProperty property) {
+    public StashGitConfiguration(StashProjectConfigurationProperty property, ConfiguredIssueService configuredIssueService) {
         this.property = property;
+        this.configuredIssueService = configuredIssueService;
     }
 
     @Override
@@ -69,12 +72,12 @@ public class StashGitConfiguration implements GitConfiguration {
 
     @Override
     public int getIndexationInterval() {
-        return property.getConfiguration().getIndexationInterval();
+        return property.getIndexationInterval();
     }
 
     @Override
-    public String getIssueServiceConfigurationIdentifier() {
-        return property.getConfiguration().getIssueServiceConfigurationIdentifier();
+    public Optional<ConfiguredIssueService> getConfiguredIssueService() {
+        return Optional.ofNullable(configuredIssueService);
     }
 
     protected String getFileAtCommitLinkFormat() {
