@@ -41,12 +41,6 @@ allprojects {
 apply from: "$rootDir/gradle/dependencies.gradle"
 
 /**
- * Build task (used only as an anchor point at the root level)
- */
-
-task build
-
-/**
  * Integration test environment
  */
 

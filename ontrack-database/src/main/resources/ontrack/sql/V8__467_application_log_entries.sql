@@ -1,7 +1,7 @@
--- 34. Application log entries (#467)
+-- Application log entries (#467)
 
 CREATE TABLE APPLICATION_LOG_ENTRIES (
-  ID             INTEGER      NOT NULL AUTO_INCREMENT,
+  ID             SERIAL       NOT NULL,
   LEVEL          VARCHAR(10)  NOT NULL,
   TIMESTAMP      VARCHAR(24)  NOT NULL,
   AUTHENTICATION VARCHAR(40),

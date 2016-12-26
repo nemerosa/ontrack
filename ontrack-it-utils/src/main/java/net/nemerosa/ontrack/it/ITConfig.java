@@ -34,7 +34,7 @@ public class ITConfig {
     @Bean
     public DataSource dataSource() throws IOException {
         // Configuration using system properties
-        String dbURL = System.getProperty("it.jdbc.url", "jdbc:postgresql://postgresql/ontrack");
+        String dbURL = System.getProperty("it.jdbc.url", "jdbc:postgresql://localhost/ontrack");
         String dbUser = System.getProperty("it.jdbc.user", "ontrack");
         String dbPassword = System.getProperty("it.jdbc.password", "ontrack");
 
