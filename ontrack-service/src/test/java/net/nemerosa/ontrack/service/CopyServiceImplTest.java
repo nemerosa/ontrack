@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.api.support.TestPropertyType;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -316,7 +317,8 @@ public class CopyServiceImplTest {
                 )
         );
         // Validation stamps for source
-        ValidationStamp sourceValidationStamp = ValidationStamp.of(sourceBranch, nd("smoke", "Smoke test for P1"));
+        ValidationStamp sourceValidationStamp = ValidationStamp.of(sourceBranch, nd("smoke", "Smoke test for P1"))
+                .withSignature(Signature.of(LocalDateTime.of(2016, 12,27, 19, 24), "test"));
         when(structureService.getValidationStampListForBranch(ID.of(1))).thenReturn(
                 Collections.singletonList(
                         sourceValidationStamp

@@ -55,9 +55,9 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         int[] ids = doCreateProjects();
         List<Project> list = asUser().with(ProjectList.class).call(structureService::getProjectList);
         assertTrue(list.size() >= 3);
-        assertTrue(list.stream().filter(p -> p.id() == ids[0]).findFirst().isPresent());
-        assertTrue(list.stream().filter(p -> p.id() == ids[1]).findFirst().isPresent());
-        assertTrue(list.stream().filter(p -> p.id() == ids[2]).findFirst().isPresent());
+        assertTrue(list.stream().anyMatch(p -> p.id() == ids[0]));
+        assertTrue(list.stream().anyMatch(p -> p.id() == ids[1]));
+        assertTrue(list.stream().anyMatch(p -> p.id() == ids[2]));
     }
 
     @Test
@@ -69,9 +69,9 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
                 .with(ids[1], ProjectEdit.class)
                 .call(structureService::getProjectList);
         assertEquals(2, list.size());
-        assertTrue(list.stream().filter(p -> p.id() == ids[0]).findFirst().isPresent());
-        assertTrue(list.stream().filter(p -> p.id() == ids[1]).findFirst().isPresent());
-        assertTrue(!list.stream().filter(p -> p.id() == ids[2]).findFirst().isPresent());
+        assertTrue(list.stream().anyMatch(p -> p.id() == ids[0]));
+        assertTrue(list.stream().anyMatch(p -> p.id() == ids[1]));
+        assertTrue(list.stream().noneMatch(p -> p.id() == ids[2]));
     }
 
     @Test
@@ -195,6 +195,7 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
             int i = 0;
             ids[i++] = structureService.newProject(Project.of(nameDescription())).id();
             ids[i++] = structureService.newProject(Project.of(nameDescription())).id();
+            //noinspection UnusedAssignment
             ids[i++] = structureService.newProject(Project.of(nameDescription())).id();
             return ids;
         });
