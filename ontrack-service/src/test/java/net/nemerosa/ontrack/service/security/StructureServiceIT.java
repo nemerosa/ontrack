@@ -51,6 +51,30 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    public void newPromotionLevel() throws Exception {
+        PromotionLevel promotionLevel = doCreatePromotionLevel();
+        assertNotNull(promotionLevel);
+        PromotionLevel pl = asUser().with(promotionLevel, ProjectView.class).call(() -> structureService.getPromotionLevel(promotionLevel.getId()));
+        assertEquals(promotionLevel, pl);
+    }
+
+    @Test
+    public void newValidationStamp() throws Exception {
+        ValidationStamp validationStamp = doCreateValidationStamp();
+        assertNotNull(validationStamp);
+        ValidationStamp vs = asUser().with(validationStamp, ProjectView.class).call(() -> structureService.getValidationStamp(validationStamp.getId()));
+        assertEquals(validationStamp, vs);
+    }
+
+    @Test
+    public void newBuild() throws Exception {
+        Build build = doCreateBuild();
+        assertNotNull(build);
+        Build b = asUser().with(build, ProjectView.class).call(() -> structureService.getBuild(build.getId()));
+        assertEquals(build, b);
+    }
+
+    @Test
     public void getProjectList_all() throws Exception {
         int[] ids = doCreateProjects();
         List<Project> list = asUser().with(ProjectList.class).call(structureService::getProjectList);
