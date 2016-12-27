@@ -106,7 +106,7 @@ public class StructureServiceImpl implements StructureService {
     public Project newProject(Project project) {
         isEntityNew(project, "Project must be defined");
         securityService.checkGlobalFunction(ProjectCreation.class);
-        Project newProject = structureRepository.newProject(project);
+        Project newProject = structureRepository.newProject(project.withSignature(securityService.getCurrentSignature()));
         eventPostService.post(eventFactory.newProject(newProject));
         return newProject;
     }
@@ -169,7 +169,7 @@ public class StructureServiceImpl implements StructureService {
         // Security
         securityService.checkProjectFunction(branch.getProject().id(), BranchCreate.class);
         // Creating the branch
-        Branch newBranch = structureRepository.newBranch(branch);
+        Branch newBranch = structureRepository.newBranch(branch.withSignature(securityService.getCurrentSignature()));
         // Event
         eventPostService.post(eventFactory.newBranch(newBranch));
         // OK
@@ -578,7 +578,9 @@ public class StructureServiceImpl implements StructureService {
         // Security
         securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelCreate.class);
         // Repository
-        PromotionLevel newPromotionLevel = structureRepository.newPromotionLevel(promotionLevel);
+        PromotionLevel newPromotionLevel = structureRepository.newPromotionLevel(
+                promotionLevel.withSignature(securityService.getCurrentSignature())
+        );
         // Event
         eventPostService.post(eventFactory.newPromotionLevel(newPromotionLevel));
         // OK
@@ -820,7 +822,9 @@ public class StructureServiceImpl implements StructureService {
         // Security
         securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ValidationStampCreate.class);
         // Repository
-        ValidationStamp newValidationStamp = structureRepository.newValidationStamp(validationStamp);
+        ValidationStamp newValidationStamp = structureRepository.newValidationStamp(
+                validationStamp.withSignature(securityService.getCurrentSignature())
+        );
         // Event
         eventPostService.post(eventFactory.newValidationStamp(newValidationStamp));
         // OK
