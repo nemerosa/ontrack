@@ -32,7 +32,6 @@ ext {
             commons_io                  : 'commons-io:commons-io:2.5',
             jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.8.1',
             guava                       : 'com.google.guava:guava:19.0',
-            dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             postgresql                  : 'org.postgresql:postgresql:9.4.1208',
             flyway                      : 'org.flywaydb:flyway-core:4.0',
             args4j                      : 'args4j:args4j:2.33',
