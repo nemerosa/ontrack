@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.graphql
 
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -29,6 +31,33 @@ class BuildQLIT extends AbstractQLITSupport {
         def data = run("""{builds (id: ${build.id}) { creation { user time } } }""")
         assert data.builds.first().creation.user == 'test'
         assert data.builds.first().creation.time == '2016-11-25T14:43:00'
+    }
+
+    @Test
+    void 'Build property'() {
+        def build = doCreateBuild()
+        setProperty(build, TestSimplePropertyType, new TestSimpleProperty("value 1"))
+        def data = run("""{
+            builds(id: ${build.id}) {
+                properties { 
+                    simpleValue { 
+                        type { 
+                            typeName 
+                            name
+                            description
+                        }
+                        value
+                        editable
+                    }
+                }
+            }
+        }""")
+        def p = data.builds.first()['properties']
+        assert p.simpleValue.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
+        assert p.simpleValue.type.name == 'Simple value'
+        assert p.simpleValue.type.description == 'Value.'
+        assert p.simpleValue.value == '{"value":"value 1"}'
+        assert p.simpleValue.editable == false
     }
 
 }

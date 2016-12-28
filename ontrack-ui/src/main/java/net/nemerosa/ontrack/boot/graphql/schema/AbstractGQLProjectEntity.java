@@ -59,6 +59,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                         .description("List of properties")
                         // FIXME Arguments for the list of properties
                         .type(projectEntityPropertiesType())
+                        .dataFetcher(projectEntityPropertiesDataFetcher())
                         .build()
         );
         // Links
@@ -95,6 +96,17 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
         return definitions;
     }
 
+    private DataFetcher projectEntityPropertiesDataFetcher() {
+        return environment -> {
+            Object source = environment.getSource();
+            if (projectEntityClass.isInstance(source)) {
+                return source;
+            } else {
+                return null;
+            }
+        };
+    }
+
     private GraphQLOutputType projectEntityPropertiesType() {
         return newObject()
                 .name(projectEntityClass.getSimpleName() + "Properties")
@@ -112,6 +124,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                         .name(propertyFieldName(propertyType))
                         .description(propertyType.getDescription())
                         .type(property.getType())
+                        .dataFetcher(projectEntityPropertyDataFetcher(propertyType))
                         .build())
                 // OK
                 .collect(Collectors.toList());
@@ -192,4 +205,19 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
         };
     }
 
+    private <P> DataFetcher projectEntityPropertyDataFetcher(PropertyType<P> propertyType) {
+        return environment -> {
+            Object source = environment.getSource();
+            if (projectEntityClass.isInstance(source)) {
+                @SuppressWarnings("unchecked")
+                T projectEntity = (T) source;
+                return propertyService.<P>getProperty(
+                        projectEntity,
+                        propertyType.getClass().getName()
+                );
+            } else {
+                return null;
+            }
+        };
+    }
 }
