@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
 import static net.nemerosa.ontrack.test.TestUtils.*;
 
 public class PromotionViewTest {
@@ -13,11 +15,11 @@ public class PromotionViewTest {
         PromotionView view = new PromotionView(
                 PromotionLevel.of(
                         Branch.of(
-                                Project.of(new NameDescription("P", "Project")).withId(ID.of(1)),
+                                Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE),
                                 new NameDescription("B", "Branch")
-                        ).withId(ID.of(1)),
+                        ).withId(ID.of(1)).withSignature(SIGNATURE),
                         new NameDescription("PL", "Promotion level")
-                ),
+                ).withSignature(SIGNATURE),
                 null
         );
         assertJsonWrite(
@@ -37,9 +39,12 @@ public class PromotionViewTest {
                                                 .with("name", "P")
                                                 .with("description", "Project")
                                                 .with("disabled", false)
+                                                .with("signature", SIGNATURE_OBJECT)
                                                 .end())
+                                        .with("signature", SIGNATURE_OBJECT)
                                         .end())
                                 .with("image", false)
+                                .with("signature", SIGNATURE_OBJECT)
                                 .end())
                         .with("promotionRun", (String) null)
                         .end(),
@@ -50,9 +55,9 @@ public class PromotionViewTest {
 
     @Test
     public void build_json() throws JsonProcessingException {
-        Project project = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
-        Branch branch = Branch.of(project, new NameDescription("B", "Branch")).withId(ID.of(1));
-        PromotionLevel promotionLevel = PromotionLevel.of(branch, new NameDescription("PL", "Promotion level"));
+        Project project = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE);
+        Branch branch = Branch.of(project, new NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE);
+        PromotionLevel promotionLevel = PromotionLevel.of(branch, new NameDescription("PL", "Promotion level")).withSignature(SIGNATURE);
         Build build = Build.of(branch, new NameDescription("11", "Build 11"), Signature.of(dateTime(), "User"));
         PromotionView view = new PromotionView(
                 promotionLevel,
@@ -83,9 +88,12 @@ public class PromotionViewTest {
                                                 .with("name", "P")
                                                 .with("description", "Project")
                                                 .with("disabled", false)
+                                                .with("signature", SIGNATURE_OBJECT)
                                                 .end())
+                                        .with("signature", SIGNATURE_OBJECT)
                                         .end())
                                 .with("image", false)
+                                .with("signature", SIGNATURE_OBJECT)
                                 .end())
                         .with("promotionRun", object()
                                 .with("build", object()

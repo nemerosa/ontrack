@@ -16,7 +16,9 @@ public class PromotionLevel implements ProjectEntity {
     public static PromotionLevel of(Branch branch, NameDescription nameDescription) {
         Entity.isEntityDefined(branch, "Branch must be defined");
         Entity.isEntityDefined(branch.getProject(), "Project must be defined");
-        return new PromotionLevel(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), branch, false);
+        return new PromotionLevel(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), branch, false,
+                Signature.none()
+        );
     }
 
     private final ID id;
@@ -26,6 +28,8 @@ public class PromotionLevel implements ProjectEntity {
     @JsonView({PromotionLevel.class, PromotionView.class, PromotionRunView.class})
     private final Branch branch;
     private final Boolean image;
+    @Wither
+    private final Signature signature;
 
     @Override
     public Project getProject() {
@@ -43,11 +47,11 @@ public class PromotionLevel implements ProjectEntity {
     }
 
     public PromotionLevel withId(ID id) {
-        return new PromotionLevel(id, name, description, branch, image);
+        return new PromotionLevel(id, name, description, branch, image, signature);
     }
 
     public PromotionLevel withImage(boolean image) {
-        return new PromotionLevel(id, name, description, branch, image);
+        return new PromotionLevel(id, name, description, branch, image, signature);
     }
 
     public static Form form() {
@@ -66,7 +70,8 @@ public class PromotionLevel implements ProjectEntity {
                 nameDescription.getName(),
                 nameDescription.getDescription(),
                 branch,
-                image
+                image,
+                signature
         );
     }
 }

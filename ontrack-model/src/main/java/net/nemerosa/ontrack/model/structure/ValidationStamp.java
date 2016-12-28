@@ -14,7 +14,8 @@ public class ValidationStamp implements ProjectEntity {
     public static ValidationStamp of(Branch branch, NameDescription nameDescription) {
         Entity.isEntityDefined(branch, "Branch must be defined");
         Entity.isEntityDefined(branch.getProject(), "Project must be defined");
-        return new ValidationStamp(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), branch, null, false);
+        return new ValidationStamp(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), branch, null, false,
+                Signature.none());
     }
 
     private final ID id;
@@ -25,6 +26,8 @@ public class ValidationStamp implements ProjectEntity {
     private final Branch branch;
     private final User owner;
     private final Boolean image;
+    @Wither
+    private final Signature signature;
 
     @Override
     public Project getProject() {
@@ -42,11 +45,11 @@ public class ValidationStamp implements ProjectEntity {
     }
 
     public ValidationStamp withId(ID id) {
-        return new ValidationStamp(id, name, description, branch, owner, image);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature);
     }
 
     public ValidationStamp withImage(boolean image) {
-        return new ValidationStamp(id, name, description, branch, owner, image);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature);
     }
 
     public static Form form() {
@@ -67,7 +70,8 @@ public class ValidationStamp implements ProjectEntity {
                 nameDescription.getDescription(),
                 branch,
                 owner,
-                image
+                image,
+                signature
         );
     }
 }

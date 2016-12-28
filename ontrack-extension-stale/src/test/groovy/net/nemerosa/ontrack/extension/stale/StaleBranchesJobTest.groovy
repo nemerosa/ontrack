@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.extension.stale
 import net.nemerosa.ontrack.job.JobRegistration
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.JobScheduler
-import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventQueryService
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Before
@@ -43,8 +41,7 @@ class StaleBranchesJobTest {
 
         staleJobService = new StaleJobServiceImpl(
                 structureService,
-                propertyService,
-                eventQueryService
+                propertyService
         )
 
         project = Project.of(nd('P', '')).withId(ID.of(1))
@@ -179,7 +176,7 @@ class StaleBranchesJobTest {
         verify(structureService).saveBranch(branch.withDisabled(true))
     }
 
-    public void configureBranchForPromotion() {
+    protected void configureBranchForPromotion() {
         def production = PromotionLevel.of(branch, nd('PRODUCTION', ''))
         when(structureService.getBranchStatusView(branch)).thenReturn(
                 new BranchStatusView(
@@ -344,18 +341,21 @@ class StaleBranchesJobTest {
     }
 
     protected def configureBranchCreationEvent(int branchAge) {
-        when(eventQueryService.getEvents(ProjectEntityType.BRANCH, branch.id, EventFactory.NEW_BRANCH, 0, 1)).thenReturn([
-                new Event(
-                        EventFactory.NEW_BRANCH,
-                        Signature.of(
-                                now.minusDays(branchAge),
-                                'test'
-                        ),
-                        [:],
-                        null,
-                        [:]
+        branch = branch.withSignature(
+                Signature.of(
+                        now.minusDays(branchAge),
+                        'test'
                 )
-        ])
+        )
+        // Last promotions
+        when(structureService.getBranchStatusView(branch)).thenReturn(
+                new BranchStatusView(
+                        branch,
+                        [],
+                        null,
+                        []
+                )
+        )
     }
 
     protected def configureBuild(int buildAge) {
@@ -369,6 +369,14 @@ class StaleBranchesJobTest {
                         )
                 )
         ))
+        when(structureService.getBranchStatusView(branch)).thenReturn(
+                new BranchStatusView(
+                        branch,
+                        [],
+                        null,
+                        []
+                )
+        )
     }
 
 }

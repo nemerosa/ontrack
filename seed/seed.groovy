@@ -429,7 +429,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
@@ -473,7 +475,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
         credentialsBinding {
             file 'GPG_KEY_FILE', 'GPGKeyRing'
         }
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         // Publication
@@ -570,7 +574,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
     deliveryPipelineConfiguration('Release', 'Site')
     preparePipelineJob delegate, false
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
             gradle """\
@@ -604,7 +610,9 @@ if (production) {
         deliveryPipelineConfiguration('Release', 'Production')
         preparePipelineJob delegate, false
         wrappers {
-            injectPasswords()
+            injectPasswords {
+                injectGlobalPasswords()
+            }
         }
         steps {
             gradle '''\
@@ -642,7 +650,9 @@ productionUpgrade
         deliveryPipelineConfiguration('Release', 'Production acceptance')
         preparePipelineJob delegate
         wrappers {
-            injectPasswords()
+            injectPasswords {
+                injectGlobalPasswords()
+            }
         }
         steps {
             gradle '''\
@@ -687,7 +697,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
     }
     label 'master'
     wrappers {
-        injectPasswords()
+        injectPasswords {
+            injectGlobalPasswords()
+        }
     }
     steps {
         ontrackDsl {

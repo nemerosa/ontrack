@@ -1,6 +1,16 @@
 [[appendix-deprecations]]
 === Deprecations and migration notes
 
+[[appendix-deprecations-2.28]]
+==== Since 2.28
+
+BitBucket global configurations are no longer associated with issue services,
+only project BitBucket configurations are. This is an alignment with the way
+the other SCM connections are working in Ontrack.
+
+Upgrading to 2.28 performs an automated migration of the global configuration
+settings to the project ones.
+
 [[appendix-deprecations-2.16]]
 ==== Since 2.16
 

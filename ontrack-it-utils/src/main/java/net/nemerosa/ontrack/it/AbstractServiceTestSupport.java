@@ -83,6 +83,25 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         });
     }
 
+    protected <T> void setProperty(ProjectEntity projectEntity, Class<? extends PropertyType<T>> propertyTypeClass, T data) throws Exception {
+        asUser().with(projectEntity, ProjectEdit.class).execute(() ->
+                propertyService.editProperty(
+                        projectEntity,
+                        propertyTypeClass,
+                        data
+                )
+        );
+    }
+
+    protected <T> T getProperty(ProjectEntity projectEntity, Class<? extends PropertyType<T>> propertyTypeClass) throws Exception {
+        return asUser().with(projectEntity, ProjectEdit.class).call(() ->
+                propertyService.getProperty(
+                        projectEntity,
+                        propertyTypeClass
+                ).getValue()
+        );
+    }
+
     protected Project doCreateProject() throws Exception {
         return doCreateProject(nameDescription());
     }
@@ -194,6 +213,10 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
 
     protected UserCall asUser() {
         return new UserCall();
+    }
+
+    protected AdminCall asAdmin() {
+        return new AdminCall();
     }
 
     protected UserCall asUserWithView(ProjectEntity... entities) {
@@ -338,5 +361,13 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         public AccountCall withId(int id) {
             return new AccountCall(account.withId(ID.of(id)));
         }
+    }
+
+    protected static class AdminCall extends AccountCall<AdminCall> {
+
+        public AdminCall() {
+            super("admin", SecurityRole.ADMINISTRATOR);
+        }
+
     }
 }
