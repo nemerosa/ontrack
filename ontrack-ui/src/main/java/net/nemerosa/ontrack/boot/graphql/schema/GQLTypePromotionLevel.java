@@ -6,10 +6,7 @@ import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
-import net.nemerosa.ontrack.model.structure.PromotionRun;
-import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
@@ -29,8 +26,13 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntityWithSignature
     private final StructureService structureService;
     private final GQLTypePromotionRun promotionRun;
 
-    public GQLTypePromotionLevel(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypePromotionRun promotionRun) {
-        super(uriBuilder, securityService, PromotionLevel.class, decorators);
+    public GQLTypePromotionLevel(URIBuilder uriBuilder,
+                                 SecurityService securityService,
+                                 List<ResourceDecorator<?>> decorators,
+                                 StructureService structureService,
+                                 GQLTypePromotionRun promotionRun,
+                                 PropertyService propertyService) {
+        super(uriBuilder, securityService, PromotionLevel.class, decorators, propertyService);
         this.structureService = structureService;
         this.promotionRun = promotionRun;
     }

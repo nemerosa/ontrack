@@ -4,10 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +35,10 @@ public class GQLTypeProject extends AbstractGQLProjectEntityWithSignature<Projec
     public GQLTypeProject(URIBuilder uriBuilder,
                           SecurityService securityService,
                           List<ResourceDecorator<?>> decorators,
-                          StructureService structureService, GQLTypeBranch branch) {
-        super(uriBuilder, securityService, Project.class, decorators);
+                          StructureService structureService,
+                          GQLTypeBranch branch,
+                          PropertyService propertyService) {
+        super(uriBuilder, securityService, Project.class, decorators, propertyService);
         this.structureService = structureService;
         this.branch = branch;
     }

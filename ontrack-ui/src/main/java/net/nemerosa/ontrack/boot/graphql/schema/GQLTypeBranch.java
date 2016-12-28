@@ -45,11 +45,12 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithSignature<Branch>
                          List<ResourceDecorator<?>> decorators,
                          StructureService structureService,
                          BuildFilterService buildFilterService,
+                         PropertyService propertyService,
                          GQLTypeBuild build,
                          GQLTypePromotionLevel promotionLevel,
                          GQLTypeValidationStamp validationStamp,
                          GQLInputBuildStandardFilter inputBuildStandardFilter) {
-        super(uriBuilder, securityService, Branch.class, decorators);
+        super(uriBuilder, securityService, Branch.class, decorators, propertyService);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;

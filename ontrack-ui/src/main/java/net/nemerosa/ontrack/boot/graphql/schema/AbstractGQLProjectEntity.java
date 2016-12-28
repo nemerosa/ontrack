@@ -1,14 +1,12 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
 import com.google.common.collect.ImmutableMap;
-import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.TypeResolverProxy;
+import graphql.schema.*;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
@@ -26,15 +24,17 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
 
     private final Class<T> projectEntityClass;
     private final List<ResourceDecorator<?>> decorators;
+    private final PropertyService propertyService;
 
     public AbstractGQLProjectEntity(
             URIBuilder uriBuilder,
             SecurityService securityService,
             Class<T> projectEntityClass,
-            List<ResourceDecorator<?>> decorators) {
+            List<ResourceDecorator<?>> decorators, PropertyService propertyService) {
         super(uriBuilder, securityService);
         this.projectEntityClass = projectEntityClass;
         this.decorators = decorators;
+        this.propertyService = propertyService;
     }
 
     protected GraphQLInterfaceType projectEntityInterface() {
@@ -42,7 +42,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                 .name(PROJECT_ENTITY)
                 // Common fields
                 .fields(baseProjectEntityInterfaceFields())
-                // TODO Properties
                 // TODO Type resolver not set, but it should
                 .typeResolver(new TypeResolverProxy())
                 // OK
@@ -51,6 +50,14 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
         List<GraphQLFieldDefinition> definitions = baseProjectEntityInterfaceFields();
+        // Properties
+        definitions.add(
+                newFieldDefinition()
+                        .name("properties")
+                        .description("List of properties")
+                        .type(projectEntityPropertiesType())
+                        .build()
+        );
         // Links
         List<String> linkNames = decorators.stream()
                 .filter(decorator -> decorator.appliesFor(projectEntityClass))
@@ -83,6 +90,19 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
         }
         // OK
         return definitions;
+    }
+
+    private GraphQLOutputType projectEntityPropertiesType() {
+        return newObject()
+                .name(projectEntityClass.getSimpleName() + "Properties")
+                .description("List of properties for " + projectEntityClass.getSimpleName())
+                .fields(projectEntityProperties())
+                .build();
+    }
+
+    private List<GraphQLFieldDefinition> projectEntityProperties() {
+        // FIXME Method net.nemerosa.ontrack.boot.graphql.schema.AbstractGQLProjectEntity.projectEntityProperties
+        return Collections.emptyList();
     }
 
     private List<GraphQLFieldDefinition> baseProjectEntityInterfaceFields() {

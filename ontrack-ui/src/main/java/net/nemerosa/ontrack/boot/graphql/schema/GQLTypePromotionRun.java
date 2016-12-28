@@ -5,6 +5,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
+import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
@@ -21,8 +22,11 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntityWithSignature<P
 
     public static final String PROMOTION_RUN = "PromotionRun";
 
-    public GQLTypePromotionRun(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators) {
-        super(uriBuilder, securityService, PromotionRun.class, decorators);
+    public GQLTypePromotionRun(URIBuilder uriBuilder,
+                               SecurityService securityService,
+                               List<ResourceDecorator<?>> decorators,
+                               PropertyService propertyService) {
+        super(uriBuilder, securityService, PromotionRun.class, decorators, propertyService);
     }
 
     @Override

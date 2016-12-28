@@ -6,10 +6,7 @@ import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.model.structure.StructureService;
-import net.nemerosa.ontrack.model.structure.ValidationRun;
-import net.nemerosa.ontrack.model.structure.ValidationStamp;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
@@ -29,8 +26,13 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntityWithSignatur
     private final StructureService structureService;
     private final GQLTypeValidationRun validationRun;
 
-    public GQLTypeValidationStamp(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypeValidationRun validationRun) {
-        super(uriBuilder, securityService, ValidationStamp.class, decorators);
+    public GQLTypeValidationStamp(URIBuilder uriBuilder,
+                                  SecurityService securityService,
+                                  List<ResourceDecorator<?>> decorators,
+                                  StructureService structureService,
+                                  PropertyService propertyService,
+                                  GQLTypeValidationRun validationRun) {
+        super(uriBuilder, securityService, ValidationStamp.class, decorators, propertyService);
         this.structureService = structureService;
         this.validationRun = validationRun;
     }
