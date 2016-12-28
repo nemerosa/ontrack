@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static net.nemerosa.ontrack.model.structure.Replacement.replacementFn;
+import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 
 public class CopyServiceImplIT extends AbstractServiceTestSupport {
@@ -45,8 +46,9 @@ public class CopyServiceImplIT extends AbstractServiceTestSupport {
         });
 
         // Request
+        String targetProjectName = uid("P");
         ProjectCloneRequest request = new ProjectCloneRequest(
-                "P2",
+                targetProjectName,
                 sourceBranch.getId(),
                 Arrays.asList(
                         new Replacement("P1", "P2"),
@@ -58,13 +60,18 @@ public class CopyServiceImplIT extends AbstractServiceTestSupport {
         Project clonedProject = asAdmin()
                 .call(() -> service.cloneProject(sourceProject, request));
 
+        assertEquals(targetProjectName, clonedProject.getName());
+
         // Checks the branch is created
-        Branch clonedBranch = structureService.findBranchByName(clonedProject.getName(), "B2").orElseThrow(
-                () -> new AssertionError("Cloned branch not found")
+        Branch clonedBranch = asUserWithView(clonedProject).call(() ->
+                structureService.findBranchByName(clonedProject.getName(), "B2")
+                        .orElseThrow(
+                                () -> new AssertionError("Cloned branch not found")
+                        )
         );
 
         // Checks the copy of properties for the project
-        TestSimpleProperty property = asUser().withView(clonedProject).call(() ->
+        TestSimpleProperty property = asUserWithView(clonedProject).call(() ->
                 propertyService.getProperty(
                         clonedProject,
                         TestSimplePropertyType.class
@@ -74,7 +81,7 @@ public class CopyServiceImplIT extends AbstractServiceTestSupport {
         assertEquals("http://wiki/P2", property.getValue());
 
         // Checks the copy of properties for the branch
-        property = asUser().withView(clonedProject).call(() ->
+        property = asUserWithView(clonedProject).call(() ->
                 propertyService.getProperty(
                         clonedBranch,
                         TestSimplePropertyType.class
@@ -192,11 +199,11 @@ public class CopyServiceImplIT extends AbstractServiceTestSupport {
         );
 
         // Checks the promotion level was created
-        Optional<PromotionLevel> oPL = structureService.findPromotionLevelByName(
+        Optional<PromotionLevel> oPL = asUserWithView(targetBranch).call(() -> structureService.findPromotionLevelByName(
                 targetBranch.getProject().getName(),
                 targetBranch.getName(),
                 "copper"
-        );
+        ));
         assertTrue(oPL.isPresent());
         // Checks the copy of properties for the promotion levels
         TestSimpleProperty p = getProperty(oPL.orElse(null), TestSimplePropertyType.class);
@@ -232,11 +239,11 @@ public class CopyServiceImplIT extends AbstractServiceTestSupport {
         );
 
         // Checks the validation stamp was created
-        Optional<ValidationStamp> oVS = structureService.findValidationStampByName(
+        Optional<ValidationStamp> oVS = asUserWithView(targetBranch).call(() -> structureService.findValidationStampByName(
                 targetBranch.getProject().getName(),
                 targetBranch.getName(),
                 "smoke"
-        );
+        ));
         assertTrue(oVS.isPresent());
         // Checks the copy of properties for the validation stamps
         TestSimpleProperty p = getProperty(oVS.orElse(null), TestSimplePropertyType.class);
