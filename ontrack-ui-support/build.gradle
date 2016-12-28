@@ -3,4 +3,6 @@ dependencies {
     compile project(':ontrack-extension-api')
     compile libraries.spring_webmvc
     compile libraries.spring_boot_starter_web
+
+    testCompile project(':ontrack-model').sourceSets.test.output
 }
