@@ -20,4 +20,10 @@ class GraphqlUtilsTest {
         assert lowerCamelCase("Abc def") == "abcDef"
     }
 
+    @Test
+    void 'Lower camel case more complex cases'() {
+        assert lowerCamelCase("prefix:suffix") == "prefixSuffix"
+        assert lowerCamelCase("prefix: suffix") == "prefixSuffix"
+    }
+
 }

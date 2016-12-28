@@ -174,6 +174,22 @@ public final class GraphqlUtils {
     }
 
     public static String lowerCamelCase(String text) {
-        return StringUtils.uncapitalize(StringUtils.remove(WordUtils.capitalizeFully(text, ' '), " "));
+        if (text == null) {
+            return null;
+        } else if (StringUtils.isBlank(text)) {
+            return "";
+        } else {
+            return StringUtils.uncapitalize(
+                    StringUtils.remove(
+                            WordUtils.capitalizeFully(
+                                    StringUtils.replacePattern(
+                                            text,
+                                            "[^A-Za-z0-9]",
+                                            " "
+                                    ),
+                                    ' '),
+                            " ")
+            );
+        }
     }
 }
