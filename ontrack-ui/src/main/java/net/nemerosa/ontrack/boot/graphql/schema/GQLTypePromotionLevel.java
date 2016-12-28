@@ -31,8 +31,9 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntityWithSignature
                                  List<ResourceDecorator<?>> decorators,
                                  StructureService structureService,
                                  GQLTypePromotionRun promotionRun,
-                                 PropertyService propertyService) {
-        super(uriBuilder, securityService, PromotionLevel.class, decorators, propertyService);
+                                 PropertyService propertyService,
+                                 GQLTypeProperty property) {
+        super(uriBuilder, securityService, PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL, decorators, propertyService, property);
         this.structureService = structureService;
         this.promotionRun = promotionRun;
     }

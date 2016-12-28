@@ -31,8 +31,9 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntityWithSignatur
                                   List<ResourceDecorator<?>> decorators,
                                   StructureService structureService,
                                   PropertyService propertyService,
-                                  GQLTypeValidationRun validationRun) {
-        super(uriBuilder, securityService, ValidationStamp.class, decorators, propertyService);
+                                  GQLTypeValidationRun validationRun,
+                                  GQLTypeProperty property) {
+        super(uriBuilder, securityService, ValidationStamp.class, ProjectEntityType.VALIDATION_STAMP, decorators, propertyService, property);
         this.structureService = structureService;
         this.validationRun = validationRun;
     }

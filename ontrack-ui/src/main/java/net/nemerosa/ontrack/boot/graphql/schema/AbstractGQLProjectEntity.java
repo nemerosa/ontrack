@@ -5,9 +5,7 @@ import graphql.schema.*;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import net.nemerosa.ontrack.model.structure.Signature;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 
@@ -23,18 +21,22 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     public static final String PROJECT_ENTITY = "ProjectEntity";
 
     private final Class<T> projectEntityClass;
+    private final ProjectEntityType projectEntityType;
     private final List<ResourceDecorator<?>> decorators;
     private final PropertyService propertyService;
+    private final GQLTypeProperty property;
 
     public AbstractGQLProjectEntity(
             URIBuilder uriBuilder,
             SecurityService securityService,
             Class<T> projectEntityClass,
-            List<ResourceDecorator<?>> decorators, PropertyService propertyService) {
+            ProjectEntityType projectEntityType, List<ResourceDecorator<?>> decorators, PropertyService propertyService, GQLTypeProperty property) {
         super(uriBuilder, securityService);
         this.projectEntityClass = projectEntityClass;
+        this.projectEntityType = projectEntityType;
         this.decorators = decorators;
         this.propertyService = propertyService;
+        this.property = property;
     }
 
     protected GraphQLInterfaceType projectEntityInterface() {
@@ -55,6 +57,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                 newFieldDefinition()
                         .name("properties")
                         .description("List of properties")
+                        // FIXME Arguments for the list of properties
                         .type(projectEntityPropertiesType())
                         .build()
         );
@@ -101,8 +104,21 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     }
 
     private List<GraphQLFieldDefinition> projectEntityProperties() {
-        // FIXME Method net.nemerosa.ontrack.boot.graphql.schema.AbstractGQLProjectEntity.projectEntityProperties
-        return Collections.emptyList();
+        return propertyService.getPropertyTypes().stream()
+                // Gets properties which supports this type of entity
+                .filter(propertyType -> propertyType.getSupportedEntityTypes().contains(projectEntityType))
+                // Gets as a field definition
+                .map(propertyType -> newFieldDefinition()
+                        .name(propertyFieldName(propertyType))
+                        .description(propertyType.getDescription())
+                        .type(property.getType())
+                        .build())
+                // OK
+                .collect(Collectors.toList());
+    }
+
+    private String propertyFieldName(PropertyType<?> propertyType) {
+        return GraphqlUtils.lowerCamelCase(propertyType.getName());
     }
 
     private List<GraphQLFieldDefinition> baseProjectEntityInterfaceFields() {

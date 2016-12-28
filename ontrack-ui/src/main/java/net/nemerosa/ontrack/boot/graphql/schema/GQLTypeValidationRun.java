@@ -4,6 +4,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.model.structure.ValidationRun;
@@ -30,8 +31,9 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntityWithSignature<
                                 SecurityService securityService,
                                 List<ResourceDecorator<?>> decorators,
                                 GQLTypeValidationRunStatus validationRunStatus,
-                                PropertyService propertyService) {
-        super(uriBuilder, securityService, ValidationRun.class, decorators, propertyService);
+                                PropertyService propertyService,
+                                GQLTypeProperty property) {
+        super(uriBuilder, securityService, ValidationRun.class, ProjectEntityType.VALIDATION_RUN, decorators, propertyService, property);
         this.validationRunStatus = validationRunStatus;
     }
 

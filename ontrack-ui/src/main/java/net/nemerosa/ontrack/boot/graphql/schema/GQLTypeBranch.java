@@ -49,8 +49,9 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithSignature<Branch>
                          GQLTypeBuild build,
                          GQLTypePromotionLevel promotionLevel,
                          GQLTypeValidationStamp validationStamp,
-                         GQLInputBuildStandardFilter inputBuildStandardFilter) {
-        super(uriBuilder, securityService, Branch.class, decorators, propertyService);
+                         GQLInputBuildStandardFilter inputBuildStandardFilter,
+                         GQLTypeProperty property) {
+        super(uriBuilder, securityService, Branch.class, ProjectEntityType.BRANCH, decorators, propertyService, property);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;

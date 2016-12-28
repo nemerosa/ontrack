@@ -37,8 +37,9 @@ public class GQLTypeProject extends AbstractGQLProjectEntityWithSignature<Projec
                           List<ResourceDecorator<?>> decorators,
                           StructureService structureService,
                           GQLTypeBranch branch,
-                          PropertyService propertyService) {
-        super(uriBuilder, securityService, Project.class, decorators, propertyService);
+                          PropertyService propertyService,
+                          GQLTypeProperty property) {
+        super(uriBuilder, securityService, Project.class, ProjectEntityType.PROJECT, decorators, propertyService, property);
         this.structureService = structureService;
         this.branch = branch;
     }

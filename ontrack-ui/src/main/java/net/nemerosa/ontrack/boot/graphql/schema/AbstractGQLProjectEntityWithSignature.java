@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
@@ -14,9 +15,9 @@ public abstract class AbstractGQLProjectEntityWithSignature<T extends ProjectEnt
             URIBuilder uriBuilder,
             SecurityService securityService,
             Class<T> projectEntityClass,
-            List<ResourceDecorator<?>> decorators,
-            PropertyService propertyService
-    ) {
-        super(uriBuilder, securityService, projectEntityClass, decorators, propertyService);
+            ProjectEntityType projectEntityType, List<ResourceDecorator<?>> decorators,
+            PropertyService propertyService,
+            GQLTypeProperty property) {
+        super(uriBuilder, securityService, projectEntityClass, projectEntityType, decorators, propertyService, property);
     }
 }

@@ -37,8 +37,9 @@ public class GQLTypeBuild extends AbstractGQLProjectEntityWithSignature<Build> {
                         SecurityService securityService,
                         List<ResourceDecorator<?>> decorators,
                         StructureService structureService,
-                        PropertyService propertyService) {
-        super(uriBuilder, securityService, Build.class, decorators, propertyService);
+                        PropertyService propertyService,
+                        GQLTypeProperty property) {
+        super(uriBuilder, securityService, Build.class, ProjectEntityType.BUILD, decorators, propertyService, property);
         this.structureService = structureService;
     }
 
