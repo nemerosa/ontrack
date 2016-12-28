@@ -8,6 +8,8 @@ import java.util.List;
 
 import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 
 public class BranchTest {
@@ -16,8 +18,8 @@ public class BranchTest {
     public void collection_without_projects() throws JsonProcessingException {
         Project project = Project.of(new NameDescription("PRJ", "Project"));
         List<Branch> branches = Arrays.asList(
-                Branch.of(project, new NameDescription("B1", "Branch 1")),
-                Branch.of(project, new NameDescription("B2", "Branch 2"))
+                Branch.of(project, new NameDescription("B1", "Branch 1")).withSignature(SIGNATURE),
+                Branch.of(project, new NameDescription("B2", "Branch 2")).withSignature(SIGNATURE)
         );
 
         assertJsonWrite(
@@ -28,6 +30,7 @@ public class BranchTest {
                                 .with("description", "Branch 1")
                                 .with("disabled", false)
                                 .with("type", "CLASSIC")
+                                .with("signature", SIGNATURE_OBJECT)
                                 .end())
                         .with(object()
                                 .with("id", 0)
@@ -35,6 +38,7 @@ public class BranchTest {
                                 .with("description", "Branch 2")
                                 .with("disabled", false)
                                 .with("type", "CLASSIC")
+                                .with("signature", SIGNATURE_OBJECT)
                                 .end())
                         .end(),
                 branches,
@@ -44,8 +48,8 @@ public class BranchTest {
 
     @Test
     public void branch_with_project() throws JsonProcessingException {
-        Project project = Project.of(new NameDescription("PRJ", "Project"));
-        Branch branch = Branch.of(project, new NameDescription("B", "Branch"));
+        Project project = Project.of(new NameDescription("PRJ", "Project")).withSignature(SIGNATURE);
+        Branch branch = Branch.of(project, new NameDescription("B", "Branch")).withSignature(SIGNATURE);
 
         assertJsonWrite(
                 object()
@@ -59,7 +63,9 @@ public class BranchTest {
                                 .with("name", "PRJ")
                                 .with("description", "Project")
                                 .with("disabled", false)
+                                .with("signature", SIGNATURE_OBJECT)
                                 .end())
+                        .with("signature", SIGNATURE_OBJECT)
                         .end(),
                 branch,
                 Branch.class
