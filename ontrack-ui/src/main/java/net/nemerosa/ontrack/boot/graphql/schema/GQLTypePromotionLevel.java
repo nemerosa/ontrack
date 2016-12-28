@@ -5,12 +5,10 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
-import net.nemerosa.ontrack.model.events.EventFactory;
-import net.nemerosa.ontrack.model.events.EventQueryService;
-import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
+import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
@@ -18,20 +16,21 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 @Component
-public class GQLTypePromotionLevel extends AbstractGQLProjectEntityWithoutSignature<PromotionLevel> {
+public class GQLTypePromotionLevel extends AbstractGQLProjectEntityWithSignature<PromotionLevel> {
 
     public static final String PROMOTION_LEVEL = "PromotionLevel";
 
     private final StructureService structureService;
     private final GQLTypePromotionRun promotionRun;
 
-    public GQLTypePromotionLevel(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypePromotionRun promotionRun, EventQueryService eventQueryService) {
-        super(uriBuilder, securityService, PromotionLevel.class, decorators, eventQueryService);
+    public GQLTypePromotionLevel(URIBuilder uriBuilder, SecurityService securityService, List<ResourceDecorator<?>> decorators, StructureService structureService, GQLTypePromotionRun promotionRun) {
+        super(uriBuilder, securityService, PromotionLevel.class, decorators);
         this.structureService = structureService;
         this.promotionRun = promotionRun;
     }
@@ -73,7 +72,8 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntityWithoutSignat
     }
 
     @Override
-    protected EventType getEventCreationType() {
-        return EventFactory.NEW_PROMOTION_LEVEL;
+    protected Optional<Signature> getSignature(PromotionLevel entity) {
+        return Optional.ofNullable(entity.getSignature());
     }
+
 }

@@ -8,14 +8,8 @@ import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.events.EventFactory;
-import net.nemerosa.ontrack.model.events.EventQueryService;
-import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.BranchType;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLInt;
@@ -33,7 +28,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Branch> {
+public class GQLTypeBranch extends AbstractGQLProjectEntityWithSignature<Branch> {
 
     public static final String BRANCH = "Branch";
 
@@ -53,9 +48,8 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
                          GQLTypeBuild build,
                          GQLTypePromotionLevel promotionLevel,
                          GQLTypeValidationStamp validationStamp,
-                         EventQueryService eventQueryService,
                          GQLInputBuildStandardFilter inputBuildStandardFilter) {
-        super(uriBuilder, securityService, Branch.class, decorators, eventQueryService);
+        super(uriBuilder, securityService, Branch.class, decorators);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;
@@ -194,7 +188,8 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithoutSignature<Bran
     }
 
     @Override
-    protected EventType getEventCreationType() {
-        return EventFactory.NEW_BRANCH;
+    protected Optional<Signature> getSignature(Branch entity) {
+        return Optional.ofNullable(entity.getSignature());
     }
+
 }
