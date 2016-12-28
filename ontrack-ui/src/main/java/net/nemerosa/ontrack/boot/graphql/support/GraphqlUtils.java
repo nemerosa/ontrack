@@ -4,6 +4,8 @@ import graphql.schema.*;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -171,4 +173,7 @@ public final class GraphqlUtils {
         };
     }
 
+    public static String lowerCamelCase(String text) {
+        return StringUtils.uncapitalize(StringUtils.remove(WordUtils.capitalizeFully(text, ' '), " "));
+    }
 }
