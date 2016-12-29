@@ -56,8 +56,16 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
         List<GraphQLFieldDefinition> definitions = baseProjectEntityInterfaceFields();
-        // TODO Properties list
-        // FIXME Arguments for the list of properties
+        // Properties list
+        definitions.add(
+                newFieldDefinition()
+                        .name("properties")
+                        .description("List of properties")
+                        // FIXME Arguments for the list of properties
+                        .type(GraphqlUtils.stdList(property.getType()))
+                        .dataFetcher(projectEntityPropertiesDataFetcher())
+                        .build()
+        );
         // Properties
         definitions.addAll(projectEntityPropertyFields());
         // Links
@@ -92,26 +100,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
         }
         // OK
         return definitions;
-    }
-
-    private List<GraphQLFieldDefinition> projectEntityPropertyFields() {
-        return propertyService.getPropertyTypes().stream()
-                // Gets properties which supports this type of entity
-                .filter(propertyType -> propertyType.getSupportedEntityTypes().contains(projectEntityType))
-                // Gets as a field definition
-                .map(propertyType -> newFieldDefinition()
-                        .name(propertyFieldName(propertyType))
-                        .description(propertyType.getDescription())
-                        .type(property.getType())
-                        .dataFetcher(projectEntityPropertyDataFetcher(propertyType))
-                        .build())
-                // OK
-                .collect(Collectors.toList());
-    }
-
-    private String propertyFieldName(PropertyType<?> propertyType) {
-        String baseName = StringUtils.uncapitalize(propertyType.getClass().getSimpleName());
-        return StringUtils.substringBeforeLast(baseName, "Type");
     }
 
     private List<GraphQLFieldDefinition> baseProjectEntityInterfaceFields() {
@@ -183,6 +171,33 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                 return Collections.emptyMap();
             }
         };
+    }
+
+    private DataFetcher projectEntityPropertiesDataFetcher() {
+        return GraphqlUtils.fetcher(
+                projectEntityClass,
+                propertyService::getProperties
+        );
+    }
+
+    private List<GraphQLFieldDefinition> projectEntityPropertyFields() {
+        return propertyService.getPropertyTypes().stream()
+                // Gets properties which supports this type of entity
+                .filter(propertyType -> propertyType.getSupportedEntityTypes().contains(projectEntityType))
+                // Gets as a field definition
+                .map(propertyType -> newFieldDefinition()
+                        .name(propertyFieldName(propertyType))
+                        .description(propertyType.getDescription())
+                        .type(property.getType())
+                        .dataFetcher(projectEntityPropertyDataFetcher(propertyType))
+                        .build())
+                // OK
+                .collect(Collectors.toList());
+    }
+
+    private String propertyFieldName(PropertyType<?> propertyType) {
+        String baseName = StringUtils.uncapitalize(propertyType.getClass().getSimpleName());
+        return StringUtils.substringBeforeLast(baseName, "Type");
     }
 
     private <P> DataFetcher projectEntityPropertyDataFetcher(PropertyType<P> propertyType) {

@@ -34,7 +34,7 @@ class BuildQLIT extends AbstractQLITSupport {
     }
 
     @Test
-    void 'Build property'() {
+    void 'Build property by name'() {
         def build = doCreateBuild()
         setProperty(build, TestSimplePropertyType, new TestSimpleProperty("value 1"))
         def data = run("""{
@@ -50,12 +50,45 @@ class BuildQLIT extends AbstractQLITSupport {
                 }
             }
         }""")
-        def p = data.builds.first()
-        assert p.testSimpleProperty.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
-        assert p.testSimpleProperty.type.name == 'Simple value'
-        assert p.testSimpleProperty.type.description == 'Value.'
-        assert p.testSimpleProperty.value == '{"value":"value 1"}'
-        assert p.testSimpleProperty.editable == false
+        def p = data.builds.first().testSimpleProperty
+        assert p.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
+        assert p.type.name == 'Simple value'
+        assert p.type.description == 'Value.'
+        assert p.value == '{"value":"value 1"}'
+        assert p.editable == false
+    }
+
+    @Test
+    void 'Build property by list'() {
+        def build = doCreateBuild()
+        setProperty(build, TestSimplePropertyType, new TestSimpleProperty("value 2"))
+        def data = run("""{
+            builds(id: ${build.id}) {
+                properties { 
+                    type { 
+                        typeName 
+                        name
+                        description
+                    }
+                    value
+                    editable
+                }
+            }
+        }""")
+
+        def p = data.builds.first().properties.find { it.type.name == 'Simple value' }
+        assert p.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
+        assert p.type.name == 'Simple value'
+        assert p.type.description == 'Value.'
+        assert p.value == '{"value":"value 2"}'
+        assert p.editable == false
+
+        p = data.builds.first().properties.find { it.type.name == 'Configuration value' }
+        assert p.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestPropertyType'
+        assert p.type.name == 'Configuration value'
+        assert p.type.description == 'Value.'
+        assert p.value == null
+        assert p.editable == false
     }
 
 }
