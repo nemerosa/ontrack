@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static graphql.Scalars.GraphQLBoolean;
-import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
@@ -48,7 +47,7 @@ public class GQLTypeProperty extends AbstractGQLType {
                         newFieldDefinition()
                                 .name("value")
                                 .description("JSON representation of the value")
-                                .type(GraphQLString)
+                                .type(GQLScalarJSON.INSTANCE)
                                 .dataFetcher(GraphqlUtils.fetcher(Property.class, this::getValue))
                                 .build()
                 )

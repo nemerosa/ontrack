@@ -54,7 +54,7 @@ class BuildQLIT extends AbstractQLITSupport {
         assert p.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
         assert p.type.name == 'Simple value'
         assert p.type.description == 'Value.'
-        assert p.value == '{"value":"value 1"}'
+        assert p.value.value.asText() == 'value 1'
         assert p.editable == false
     }
 
@@ -80,7 +80,7 @@ class BuildQLIT extends AbstractQLITSupport {
         assert p.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
         assert p.type.name == 'Simple value'
         assert p.type.description == 'Value.'
-        assert p.value == '{"value":"value 2"}'
+        assert p.value.value.asText() == 'value 2'
         assert p.editable == false
 
         p = data.builds.first().properties.find { it.type.name == 'Configuration value' }
@@ -115,7 +115,7 @@ class BuildQLIT extends AbstractQLITSupport {
         assert p.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
         assert p.type.name == 'Simple value'
         assert p.type.description == 'Value.'
-        assert p.value == '{"value":"value 2"}'
+        assert p.value.value.asText() == 'value 2'
         assert p.editable == false
     }
 
@@ -143,7 +143,7 @@ class BuildQLIT extends AbstractQLITSupport {
         assert p.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
         assert p.type.name == 'Simple value'
         assert p.type.description == 'Value.'
-        assert p.value == '{"value":"value 2"}'
+        assert p.value.value.asText() == 'value 2'
         assert p.editable == false
     }
 
