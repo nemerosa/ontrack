@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -69,7 +70,14 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                                         .type(GraphQLString)
                                         .build()
                         )
-                        // TODO Filter on value being filled or not
+                        .argument(
+                                newArgument()
+                                        .name("hasValue")
+                                        .description("Keeps properties having a value")
+                                        .type(GraphQLBoolean)
+                                        .defaultValue(false)
+                                        .build()
+                        )
                         .type(GraphqlUtils.stdList(property.getType()))
                         .dataFetcher(projectEntityPropertiesDataFetcher())
                         .build()
@@ -187,6 +195,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
             if (projectEntityClass.isInstance(o)) {
                 // Filters
                 Optional<String> typeFilter = GraphqlUtils.getStringArgument(environment, "type");
+                boolean hasValue = GraphqlUtils.getBooleanArgument(environment, "hasValue", false);
                 // Gets the raw list
                 return propertyService.getProperties((ProjectEntity) o).stream()
                         // Filter by type
@@ -197,6 +206,8 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                                 ))
                                 .orElse(true)
                         )
+                        // Filter by value
+                        .filter(property -> !hasValue || !property.isEmpty())
                         // OK
                         .collect(Collectors.toList());
             } else {
