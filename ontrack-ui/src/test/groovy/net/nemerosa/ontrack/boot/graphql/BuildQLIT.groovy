@@ -39,25 +39,23 @@ class BuildQLIT extends AbstractQLITSupport {
         setProperty(build, TestSimplePropertyType, new TestSimpleProperty("value 1"))
         def data = run("""{
             builds(id: ${build.id}) {
-                properties { 
-                    simpleValue { 
-                        type { 
-                            typeName 
-                            name
-                            description
-                        }
-                        value
-                        editable
+                testSimpleProperty { 
+                    type { 
+                        typeName 
+                        name
+                        description
                     }
+                    value
+                    editable
                 }
             }
         }""")
-        def p = data.builds.first()['properties']
-        assert p.simpleValue.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
-        assert p.simpleValue.type.name == 'Simple value'
-        assert p.simpleValue.type.description == 'Value.'
-        assert p.simpleValue.value == '{"value":"value 1"}'
-        assert p.simpleValue.editable == false
+        def p = data.builds.first()
+        assert p.testSimpleProperty.type.typeName == 'net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType'
+        assert p.testSimpleProperty.type.name == 'Simple value'
+        assert p.testSimpleProperty.type.description == 'Value.'
+        assert p.testSimpleProperty.value == '{"value":"value 1"}'
+        assert p.testSimpleProperty.editable == false
     }
 
 }

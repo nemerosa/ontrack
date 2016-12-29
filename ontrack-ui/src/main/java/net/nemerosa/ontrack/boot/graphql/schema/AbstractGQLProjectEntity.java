@@ -1,13 +1,17 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
 import com.google.common.collect.ImmutableMap;
-import graphql.schema.*;
+import graphql.schema.DataFetcher;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.TypeResolverProxy;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,16 +56,10 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
         List<GraphQLFieldDefinition> definitions = baseProjectEntityInterfaceFields();
+        // TODO Properties list
+        // FIXME Arguments for the list of properties
         // Properties
-        definitions.add(
-                newFieldDefinition()
-                        .name("properties")
-                        .description("List of properties")
-                        // FIXME Arguments for the list of properties
-                        .type(projectEntityPropertiesType())
-                        .dataFetcher(projectEntityPropertiesDataFetcher())
-                        .build()
-        );
+        definitions.addAll(projectEntityPropertyFields());
         // Links
         List<String> linkNames = decorators.stream()
                 .filter(decorator -> decorator.appliesFor(projectEntityClass))
@@ -96,26 +94,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
         return definitions;
     }
 
-    private DataFetcher projectEntityPropertiesDataFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (projectEntityClass.isInstance(source)) {
-                return source;
-            } else {
-                return null;
-            }
-        };
-    }
-
-    private GraphQLOutputType projectEntityPropertiesType() {
-        return newObject()
-                .name(projectEntityClass.getSimpleName() + "Properties")
-                .description("List of properties for " + projectEntityClass.getSimpleName())
-                .fields(projectEntityProperties())
-                .build();
-    }
-
-    private List<GraphQLFieldDefinition> projectEntityProperties() {
+    private List<GraphQLFieldDefinition> projectEntityPropertyFields() {
         return propertyService.getPropertyTypes().stream()
                 // Gets properties which supports this type of entity
                 .filter(propertyType -> propertyType.getSupportedEntityTypes().contains(projectEntityType))
@@ -131,7 +110,8 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     }
 
     private String propertyFieldName(PropertyType<?> propertyType) {
-        return GraphqlUtils.lowerCamelCase(propertyType.getName());
+        String baseName = StringUtils.uncapitalize(propertyType.getClass().getSimpleName());
+        return StringUtils.substringBeforeLast(baseName, "Type");
     }
 
     private List<GraphQLFieldDefinition> baseProjectEntityInterfaceFields() {
