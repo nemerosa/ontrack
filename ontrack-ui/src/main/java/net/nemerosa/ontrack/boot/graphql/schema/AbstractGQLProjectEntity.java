@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLString;
+import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
@@ -61,7 +62,14 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                 newFieldDefinition()
                         .name("properties")
                         .description("List of properties")
-                        // FIXME Arguments for the list of properties
+                        .argument(
+                                newArgument()
+                                        .name("type")
+                                        .description("Fully qualified name of the property type")
+                                        .type(GraphQLString)
+                                        .build()
+                        )
+                        // TODO Filter on value being filled or not
                         .type(GraphqlUtils.stdList(property.getType()))
                         .dataFetcher(projectEntityPropertiesDataFetcher())
                         .build()
@@ -174,10 +182,27 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     }
 
     private DataFetcher projectEntityPropertiesDataFetcher() {
-        return GraphqlUtils.fetcher(
-                projectEntityClass,
-                propertyService::getProperties
-        );
+        return environment -> {
+            Object o = environment.getSource();
+            if (projectEntityClass.isInstance(o)) {
+                // Filters
+                Optional<String> typeFilter = GraphqlUtils.getStringArgument(environment, "type");
+                // Gets the raw list
+                return propertyService.getProperties((ProjectEntity) o).stream()
+                        // Filter by type
+                        .filter(property -> typeFilter
+                                .map(typeFilterName -> StringUtils.equals(
+                                        typeFilterName,
+                                        property.getTypeDescriptor().getTypeName()
+                                ))
+                                .orElse(true)
+                        )
+                        // OK
+                        .collect(Collectors.toList());
+            } else {
+                return null;
+            }
+        };
     }
 
     private List<GraphQLFieldDefinition> projectEntityPropertyFields() {
