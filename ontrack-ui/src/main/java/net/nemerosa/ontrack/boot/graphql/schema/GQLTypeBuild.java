@@ -20,6 +20,7 @@ import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
+import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.fetcher;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
@@ -42,6 +43,8 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
                 .name(BUILD)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
+                // TODO Ref to project
+                // TODO Ref to branch
                 // Promotion runs
                 .field(
                         newFieldDefinition()
@@ -82,8 +85,24 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
                                 .dataFetcher(buildValidationRunsFetcher())
                                 .build()
                 )
+                // Build links
+                .field(
+                        newFieldDefinition()
+                                .name("linkedBuilds")
+                                .description("Builds this build is linked to")
+                                .type(stdList(new GraphQLTypeReference(BUILD)))
+                                .dataFetcher(buildLinkedToFetcher())
+                                .build()
+                )
                 // OK
                 .build();
+    }
+
+    private DataFetcher buildLinkedToFetcher() {
+        return fetcher(
+                Build.class,
+                structureService::getBuildLinksTo
+        );
     }
 
     private DataFetcher buildValidationRunsFetcher() {

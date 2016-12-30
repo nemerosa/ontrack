@@ -66,6 +66,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                 .type(GraphqlUtils.newEnumType(BranchType.class))
                                 .build()
                 )
+                // TODO Ref to project
                 // Promotion levels
                 .field(
                         newFieldDefinition()

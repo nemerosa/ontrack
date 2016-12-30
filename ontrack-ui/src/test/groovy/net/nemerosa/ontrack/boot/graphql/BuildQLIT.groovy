@@ -147,4 +147,20 @@ class BuildQLIT extends AbstractQLITSupport {
         assert p.editable == false
     }
 
+    @Test
+    void 'Build links are empty by default'() {
+        def build = doCreateBuild()
+
+        def data = run("""{
+            builds(id: ${build.id}) {
+                linkedBuilds {
+                    name
+                }
+            }
+        }""")
+
+        assert data.builds.first().linkedBuilds != null
+        assert data.builds.first().linkedBuilds.empty
+    }
+
 }
