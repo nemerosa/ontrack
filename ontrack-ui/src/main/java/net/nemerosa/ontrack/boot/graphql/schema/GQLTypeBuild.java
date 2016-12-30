@@ -43,8 +43,14 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
                 .name(BUILD)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
-                // TODO Ref to project
-                // TODO Ref to branch
+                // Ref to branch
+                .field(
+                        newFieldDefinition()
+                                .name("branch")
+                                .description("Reference to branch")
+                                .type(new GraphQLTypeReference(GQLTypeBranch.BRANCH))
+                                .build()
+                )
                 // Promotion runs
                 .field(
                         newFieldDefinition()
@@ -101,7 +107,7 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
     private DataFetcher buildLinkedToFetcher() {
         return fetcher(
                 Build.class,
-                structureService::getBuildLinksTo
+                structureService::getBuildLinksFrom
         );
     }
 

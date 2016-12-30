@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
@@ -66,7 +67,14 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                 .type(GraphqlUtils.newEnumType(BranchType.class))
                                 .build()
                 )
-                // TODO Ref to project
+                // Ref to project
+                .field(
+                        newFieldDefinition()
+                                .name("project")
+                                .description("Reference to project")
+                                .type(new GraphQLTypeReference(GQLTypeProject.PROJECT))
+                                .build()
+                )
                 // Promotion levels
                 .field(
                         newFieldDefinition()

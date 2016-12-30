@@ -163,4 +163,37 @@ class BuildQLIT extends AbstractQLITSupport {
         assert data.builds.first().linkedBuilds.empty
     }
 
+    @Test
+    void 'Build links'() {
+        def build = doCreateBuild()
+        def targetBuild = doCreateBuild()
+
+        asAdmin().execute {
+            structureService.addBuildLink build, targetBuild
+        }
+
+        def data = run("""{
+            builds(id: ${build.id}) {
+                linkedBuilds {
+                    name
+                    branch {
+                        name
+                        project {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+
+        def links = data.builds.first().linkedBuilds
+        assert links != null
+        assert links.size() == 1
+
+        def link = links.first()
+        assert link.name == targetBuild.name
+        assert link.branch.name == targetBuild.branch.name
+        assert link.branch.project.name == targetBuild.branch.project.name
+    }
+
 }
