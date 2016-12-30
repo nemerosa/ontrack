@@ -4,8 +4,10 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
+import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountService;
+import net.nemerosa.ontrack.model.security.GlobalPermission;
+import net.nemerosa.ontrack.model.security.PermissionTargetType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +19,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.fetcher;
 
 @Component
-public class GQLTypeAccount extends AbstractGQLType {
+public class GQLTypeAccount implements GQLType {
 
     public static final String ACCOUNT = "Account";
 
@@ -25,8 +27,7 @@ public class GQLTypeAccount extends AbstractGQLType {
     private final GQLTypeGlobalRole globalRole;
 
     @Autowired
-    public GQLTypeAccount(URIBuilder uriBuilder, SecurityService securityService, AccountService accountService, GQLTypeGlobalRole globalRole) {
-        super(uriBuilder, securityService);
+    public GQLTypeAccount(AccountService accountService, GQLTypeGlobalRole globalRole) {
         this.accountService = accountService;
         this.globalRole = globalRole;
     }

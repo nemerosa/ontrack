@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Property;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,15 +15,14 @@ import static graphql.schema.GraphQLObjectType.newObject;
  * Description of a {@link net.nemerosa.ontrack.model.structure.Property}.
  */
 @Component
-public class GQLTypeProperty extends AbstractGQLType {
+public class GQLTypeProperty implements GQLType {
 
     public static final String PROPERTY = "Property";
 
     private final GQLTypePropertyType propertyType;
 
     @Autowired
-    public GQLTypeProperty(URIBuilder uriBuilder, SecurityService securityService, GQLTypePropertyType propertyType) {
-        super(uriBuilder, securityService);
+    public GQLTypeProperty(GQLTypePropertyType propertyType) {
         this.propertyType = propertyType;
     }
 

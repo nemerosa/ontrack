@@ -9,6 +9,10 @@ import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 
 import java.util.List;
 
+/**
+ * @deprecated Extends directly {@link AbstractGQLProjectEntity}.
+ */
+@Deprecated
 public abstract class AbstractGQLProjectEntityWithSignature<T extends ProjectEntity> extends AbstractGQLProjectEntity<T> {
 
     public AbstractGQLProjectEntityWithSignature(
@@ -18,6 +22,6 @@ public abstract class AbstractGQLProjectEntityWithSignature<T extends ProjectEnt
             ProjectEntityType projectEntityType, List<ResourceDecorator<?>> decorators,
             PropertyService propertyService,
             GQLTypeProperty property) {
-        super(uriBuilder, securityService, projectEntityClass, projectEntityType, decorators, propertyService, property);
+        super(projectEntityClass, projectEntityType, propertyService, property);
     }
 }

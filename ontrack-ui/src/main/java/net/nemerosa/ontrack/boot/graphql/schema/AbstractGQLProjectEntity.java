@@ -7,13 +7,13 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.TypeResolverProxy;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.common.Time;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLBoolean;
@@ -28,19 +28,14 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
 
     private final Class<T> projectEntityClass;
     private final ProjectEntityType projectEntityType;
-    private final List<ResourceDecorator<?>> decorators;
     private final PropertyService propertyService;
     private final GQLTypeProperty property;
 
     public AbstractGQLProjectEntity(
-            URIBuilder uriBuilder,
-            SecurityService securityService,
             Class<T> projectEntityClass,
-            ProjectEntityType projectEntityType, List<ResourceDecorator<?>> decorators, PropertyService propertyService, GQLTypeProperty property) {
-        super(uriBuilder, securityService);
+            ProjectEntityType projectEntityType, PropertyService propertyService, GQLTypeProperty property) {
         this.projectEntityClass = projectEntityClass;
         this.projectEntityType = projectEntityType;
-        this.decorators = decorators;
         this.propertyService = propertyService;
         this.property = property;
     }
@@ -84,36 +79,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
         );
         // Properties
         definitions.addAll(projectEntityPropertyFields());
-        // Links
-        List<String> linkNames = decorators.stream()
-                .filter(decorator -> decorator.appliesFor(projectEntityClass))
-                .flatMap(decorator -> decorator.getLinkNames().stream())
-                .distinct()
-                .collect(Collectors.toList());
-        if (linkNames != null && !linkNames.isEmpty()) {
-            definitions.add(
-                    newFieldDefinition()
-                            .name("links")
-                            .description("Links")
-                            .type(
-                                    newObject()
-                                            .name(projectEntityClass.getSimpleName() + "Links")
-                                            .description(projectEntityClass.getSimpleName() + " links")
-                                            .fields(
-                                                    linkNames.stream()
-                                                            .map(linkName -> newFieldDefinition()
-                                                                    .name(linkName)
-                                                                    .type(GraphQLString)
-                                                                    .build()
-                                                            )
-                                                            .collect(Collectors.toList())
-                                            )
-                                            .build()
-                            )
-                            .dataFetcher(projectEntityLinksFetcher())
-                            .build()
-            );
-        }
         // OK
         return definitions;
     }
@@ -172,22 +137,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
 
     protected abstract Optional<Signature> getSignature(T entity);
 
-
-    private DataFetcher projectEntityLinksFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (projectEntityClass.isInstance(source)) {
-                for (ResourceDecorator<?> decorator : decorators) {
-                    if (decorator.appliesFor(projectEntityClass)) {
-                        return getLinks(decorator, source);
-                    }
-                }
-                return Collections.emptyMap();
-            } else {
-                return Collections.emptyMap();
-            }
-        };
-    }
 
     private DataFetcher projectEntityPropertiesDataFetcher() {
         return environment -> {

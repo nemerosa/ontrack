@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static graphql.Scalars.GraphQLBoolean;
@@ -13,14 +10,9 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeValidationRunStatusID extends AbstractGQLType {
+public class GQLTypeValidationRunStatusID implements GQLType {
 
     public static final String VALIDATION_RUN_STATUS_ID = "ValidationRunStatusID";
-
-    @Autowired
-    public GQLTypeValidationRunStatusID(URIBuilder uriBuilder, SecurityService securityService) {
-        super(uriBuilder, securityService);
-    }
 
     @Override
     public GraphQLObjectType getType() {
