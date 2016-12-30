@@ -3,13 +3,10 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.model.structure.ValidationRun;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,19 +18,17 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeValidationRun extends AbstractGQLProjectEntityWithSignature<ValidationRun> {
+public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun> {
 
     public static final String VALIDATION_RUN = "ValidationRun";
 
     private final GQLTypeValidationRunStatus validationRunStatus;
 
-    public GQLTypeValidationRun(URIBuilder uriBuilder,
-                                SecurityService securityService,
-                                List<ResourceDecorator<?>> decorators,
-                                GQLTypeValidationRunStatus validationRunStatus,
+    public GQLTypeValidationRun(GQLTypeValidationRunStatus validationRunStatus,
                                 PropertyService propertyService,
-                                GQLTypeProperty property) {
-        super(uriBuilder, securityService, ValidationRun.class, ProjectEntityType.VALIDATION_RUN, decorators, propertyService, property);
+                                GQLTypeProperty property,
+                                List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(ValidationRun.class, ProjectEntityType.VALIDATION_RUN, propertyService, property, projectEntityFieldContributors);
         this.validationRunStatus = validationRunStatus;
     }
 

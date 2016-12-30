@@ -3,13 +3,10 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,16 +16,14 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 @Component
-public class GQLTypePromotionRun extends AbstractGQLProjectEntityWithSignature<PromotionRun> {
+public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> {
 
     public static final String PROMOTION_RUN = "PromotionRun";
 
-    public GQLTypePromotionRun(URIBuilder uriBuilder,
-                               SecurityService securityService,
-                               List<ResourceDecorator<?>> decorators,
-                               PropertyService propertyService,
-                               GQLTypeProperty property) {
-        super(uriBuilder, securityService, PromotionRun.class, ProjectEntityType.PROMOTION_RUN, decorators, propertyService, property);
+    public GQLTypePromotionRun(PropertyService propertyService,
+                               GQLTypeProperty property,
+                               List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, propertyService, property, projectEntityFieldContributors);
     }
 
     @Override

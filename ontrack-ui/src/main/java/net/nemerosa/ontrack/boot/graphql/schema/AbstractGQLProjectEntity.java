@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.structure.*;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLBoolean;
@@ -22,7 +19,7 @@ import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
-public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends AbstractGQLType {
+public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implements GQLType {
 
     public static final String PROJECT_ENTITY = "ProjectEntity";
 
@@ -30,14 +27,19 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     private final ProjectEntityType projectEntityType;
     private final PropertyService propertyService;
     private final GQLTypeProperty property;
+    private final List<GQLProjectEntityFieldContributor> projectEntityFieldContributors;
 
     public AbstractGQLProjectEntity(
             Class<T> projectEntityClass,
-            ProjectEntityType projectEntityType, PropertyService propertyService, GQLTypeProperty property) {
+            ProjectEntityType projectEntityType,
+            PropertyService propertyService,
+            GQLTypeProperty property,
+            List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
         this.projectEntityClass = projectEntityClass;
         this.projectEntityType = projectEntityType;
         this.propertyService = propertyService;
         this.property = property;
+        this.projectEntityFieldContributors = projectEntityFieldContributors;
     }
 
     protected GraphQLInterfaceType projectEntityInterface() {
@@ -54,6 +56,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
         List<GraphQLFieldDefinition> definitions = baseProjectEntityInterfaceFields();
         // Properties list
+        // TODO Extract as contributor
         definitions.add(
                 newFieldDefinition()
                         .name("properties")
@@ -78,7 +81,16 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> extends 
                         .build()
         );
         // Properties
+        // TODO Extract as contributor
         definitions.addAll(projectEntityPropertyFields());
+        // For all contributors
+        definitions.addAll(
+                projectEntityFieldContributors.stream()
+                        .map(contributor -> contributor.getFields(projectEntityClass, projectEntityType))
+                        .filter(Objects::nonNull)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList())
+        );
         // OK
         return definitions;
     }

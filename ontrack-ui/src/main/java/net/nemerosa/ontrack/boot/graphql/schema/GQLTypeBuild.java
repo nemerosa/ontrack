@@ -6,10 +6,7 @@ import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,20 +23,18 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeBuild extends AbstractGQLProjectEntityWithSignature<Build> {
+public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
 
     public static final String BUILD = "Build";
 
     private final StructureService structureService;
 
     @Autowired
-    public GQLTypeBuild(URIBuilder uriBuilder,
-                        SecurityService securityService,
-                        List<ResourceDecorator<?>> decorators,
-                        StructureService structureService,
+    public GQLTypeBuild(StructureService structureService,
                         PropertyService propertyService,
-                        GQLTypeProperty property) {
-        super(uriBuilder, securityService, Build.class, ProjectEntityType.BUILD, decorators, propertyService, property);
+                        GQLTypeProperty property,
+                        List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(Build.class, ProjectEntityType.BUILD, propertyService, property, projectEntityFieldContributors);
         this.structureService = structureService;
     }
 

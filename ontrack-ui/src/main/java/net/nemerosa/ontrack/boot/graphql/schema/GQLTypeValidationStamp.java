@@ -5,10 +5,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -19,21 +16,19 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 @Component
-public class GQLTypeValidationStamp extends AbstractGQLProjectEntityWithSignature<ValidationStamp> {
+public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationStamp> {
 
     public static final String VALIDATION_STAMP = "ValidationStamp";
 
     private final StructureService structureService;
     private final GQLTypeValidationRun validationRun;
 
-    public GQLTypeValidationStamp(URIBuilder uriBuilder,
-                                  SecurityService securityService,
-                                  List<ResourceDecorator<?>> decorators,
-                                  StructureService structureService,
+    public GQLTypeValidationStamp(StructureService structureService,
                                   PropertyService propertyService,
                                   GQLTypeValidationRun validationRun,
-                                  GQLTypeProperty property) {
-        super(uriBuilder, securityService, ValidationStamp.class, ProjectEntityType.VALIDATION_STAMP, decorators, propertyService, property);
+                                  GQLTypeProperty property,
+                                  List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(ValidationStamp.class, ProjectEntityType.VALIDATION_STAMP, propertyService, property, projectEntityFieldContributors);
         this.structureService = structureService;
         this.validationRun = validationRun;
     }

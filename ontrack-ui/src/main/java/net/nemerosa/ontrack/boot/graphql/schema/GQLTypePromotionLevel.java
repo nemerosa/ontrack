@@ -5,10 +5,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -19,21 +16,21 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 @Component
-public class GQLTypePromotionLevel extends AbstractGQLProjectEntityWithSignature<PromotionLevel> {
+public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLevel> {
 
     public static final String PROMOTION_LEVEL = "PromotionLevel";
 
     private final StructureService structureService;
     private final GQLTypePromotionRun promotionRun;
 
-    public GQLTypePromotionLevel(URIBuilder uriBuilder,
-                                 SecurityService securityService,
-                                 List<ResourceDecorator<?>> decorators,
-                                 StructureService structureService,
+    public GQLTypePromotionLevel(StructureService structureService,
                                  GQLTypePromotionRun promotionRun,
                                  PropertyService propertyService,
-                                 GQLTypeProperty property) {
-        super(uriBuilder, securityService, PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL, decorators, propertyService, property);
+                                 GQLTypeProperty property,
+                                 List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL, propertyService, property,
+                projectEntityFieldContributors
+        );
         this.structureService = structureService;
         this.promotionRun = promotionRun;
     }

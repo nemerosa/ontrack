@@ -8,10 +8,7 @@ import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +25,7 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLTypeBranch extends AbstractGQLProjectEntityWithSignature<Branch> {
+public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
 
     public static final String BRANCH = "Branch";
 
@@ -40,18 +37,16 @@ public class GQLTypeBranch extends AbstractGQLProjectEntityWithSignature<Branch>
     private final GQLInputBuildStandardFilter inputBuildStandardFilter;
 
     @Autowired
-    public GQLTypeBranch(URIBuilder uriBuilder,
-                         SecurityService securityService,
-                         List<ResourceDecorator<?>> decorators,
-                         StructureService structureService,
+    public GQLTypeBranch(StructureService structureService,
                          BuildFilterService buildFilterService,
                          PropertyService propertyService,
                          GQLTypeBuild build,
                          GQLTypePromotionLevel promotionLevel,
                          GQLTypeValidationStamp validationStamp,
                          GQLInputBuildStandardFilter inputBuildStandardFilter,
-                         GQLTypeProperty property) {
-        super(uriBuilder, securityService, Branch.class, ProjectEntityType.BRANCH, decorators, propertyService, property);
+                         GQLTypeProperty property,
+                         List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(Branch.class, ProjectEntityType.BRANCH, propertyService, property, projectEntityFieldContributors);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;
