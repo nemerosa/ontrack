@@ -7,7 +7,10 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.TypeResolverProxy;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.common.Time;
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.structure.Signature;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -80,9 +83,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
                         .dataFetcher(projectEntityPropertiesDataFetcher())
                         .build()
         );
-        // Properties
-        // TODO Extract as contributor
-        definitions.addAll(projectEntityPropertyFields());
         // For all contributors
         definitions.addAll(
                 projectEntityFieldContributors.stream()
@@ -177,39 +177,4 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
         };
     }
 
-    private List<GraphQLFieldDefinition> projectEntityPropertyFields() {
-        return propertyService.getPropertyTypes().stream()
-                // Gets properties which supports this type of entity
-                .filter(propertyType -> propertyType.getSupportedEntityTypes().contains(projectEntityType))
-                // Gets as a field definition
-                .map(propertyType -> newFieldDefinition()
-                        .name(propertyFieldName(propertyType))
-                        .description(propertyType.getDescription())
-                        .type(property.getType())
-                        .dataFetcher(projectEntityPropertyDataFetcher(propertyType))
-                        .build())
-                // OK
-                .collect(Collectors.toList());
-    }
-
-    private String propertyFieldName(PropertyType<?> propertyType) {
-        String baseName = StringUtils.uncapitalize(propertyType.getClass().getSimpleName());
-        return StringUtils.substringBeforeLast(baseName, "Type");
-    }
-
-    private <P> DataFetcher projectEntityPropertyDataFetcher(PropertyType<P> propertyType) {
-        return environment -> {
-            Object source = environment.getSource();
-            if (projectEntityClass.isInstance(source)) {
-                @SuppressWarnings("unchecked")
-                T projectEntity = (T) source;
-                return propertyService.<P>getProperty(
-                        projectEntity,
-                        propertyType.getClass().getName()
-                );
-            } else {
-                return null;
-            }
-        };
-    }
 }
