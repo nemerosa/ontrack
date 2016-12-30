@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.boot.graphql
 
 import graphql.GraphQLException
+import net.nemerosa.ontrack.extension.api.support.TestDecorationData
+import net.nemerosa.ontrack.extension.api.support.TestDecorator
+import net.nemerosa.ontrack.extension.api.support.TestDecoratorPropertyType
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.junit.Test
 
@@ -62,11 +65,96 @@ class BranchQLIT extends AbstractQLITSupport {
     }
 
     @Test
-    void 'Branch signature' () {
+    void 'Branch signature'() {
         def branch = doCreateBranch()
         def data = run("""{branches (id: ${branch.id}) { creation { user time } } }""")
         assert data.branches.first().creation.user == 'user'
         assert data.branches.first().creation.time.charAt(10) == 'T'
+    }
+
+    @Test
+    void 'Branch without decorations'() {
+        def branch = doCreateBranch()
+        def data = run("""{
+                branches (id: ${branch.id}) {
+                    decorations {
+                        decorationType
+                        data
+                        error
+                    }
+                }   
+            }""")
+        def decorations = data.branches.first().decorations
+        assert decorations != null
+        assert decorations.empty
+    }
+
+    @Test
+    void 'Branch with decorations'() {
+        def branch = doCreateBranch()
+        setProperty branch, TestDecoratorPropertyType, new TestDecorationData("XXX", true)
+
+        def data = run("""{
+                branches (id: ${branch.id}) {
+                    decorations {
+                        decorationType
+                        data
+                        error
+                    }
+                }   
+            }""")
+
+        def decorations = data.branches.first().decorations
+        assert decorations != null
+        assert decorations.size() == 1
+        def decoration = decorations.first()
+        assert decoration.decorationType == TestDecorator.class.name
+        assert decoration.data.value.asText() == 'XXX'
+
+    }
+
+    @Test
+    void 'Branch with filtered decorations and match'() {
+        def branch = doCreateBranch()
+        setProperty branch, TestDecoratorPropertyType, new TestDecorationData("XXX", true)
+
+        def data = run("""{
+                branches (id: ${branch.id}) {
+                    decorations(type: "${TestDecorator.class.name}") {
+                        decorationType
+                        data
+                        error
+                    }
+                }   
+            }""")
+
+        def decorations = data.branches.first().decorations
+        assert decorations != null
+        assert decorations.size() == 1
+        def decoration = decorations.first()
+        assert decoration.decorationType == TestDecorator.class.name
+        assert decoration.data.value.asText() == 'XXX'
+
+    }
+
+    @Test
+    void 'Branch with filtered decorations and no match'() {
+        def branch = doCreateBranch()
+        setProperty branch, TestDecoratorPropertyType, new TestDecorationData("XXX", true)
+
+        def data = run("""{
+                branches (id: ${branch.id}) {
+                    decorations(type: "unknown.Decorator") {
+                        decorationType
+                        data
+                        error
+                    }
+                }   
+            }""")
+
+        def decorations = data.branches.first().decorations
+        assert decorations != null
+        assert decorations.empty
     }
 
 }
