@@ -6,6 +6,7 @@ import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.structure.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -23,12 +24,11 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
     private final StructureService structureService;
     private final GQLTypePromotionRun promotionRun;
 
+    @Autowired
     public GQLTypePromotionLevel(StructureService structureService,
                                  GQLTypePromotionRun promotionRun,
-                                 PropertyService propertyService,
-                                 GQLTypeProperty property,
                                  List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL, propertyService, property,
+        super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL,
                 projectEntityFieldContributors
         );
         this.structureService = structureService;

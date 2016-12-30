@@ -5,8 +5,8 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
-import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,10 +20,9 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
 
     public static final String PROMOTION_RUN = "PromotionRun";
 
-    public GQLTypePromotionRun(PropertyService propertyService,
-                               GQLTypeProperty property,
-                               List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, propertyService, property, projectEntityFieldContributors);
+    @Autowired
+    public GQLTypePromotionRun(List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, projectEntityFieldContributors);
     }
 
     @Override

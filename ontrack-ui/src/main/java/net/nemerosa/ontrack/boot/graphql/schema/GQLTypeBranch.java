@@ -39,14 +39,12 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     @Autowired
     public GQLTypeBranch(StructureService structureService,
                          BuildFilterService buildFilterService,
-                         PropertyService propertyService,
                          GQLTypeBuild build,
                          GQLTypePromotionLevel promotionLevel,
                          GQLTypeValidationStamp validationStamp,
                          GQLInputBuildStandardFilter inputBuildStandardFilter,
-                         GQLTypeProperty property,
                          List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(Branch.class, ProjectEntityType.BRANCH, propertyService, property, projectEntityFieldContributors);
+        super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;

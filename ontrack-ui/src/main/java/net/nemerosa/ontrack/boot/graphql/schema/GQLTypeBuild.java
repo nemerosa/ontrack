@@ -31,10 +31,8 @@ public class GQLTypeBuild extends AbstractGQLProjectEntity<Build> {
 
     @Autowired
     public GQLTypeBuild(StructureService structureService,
-                        PropertyService propertyService,
-                        GQLTypeProperty property,
                         List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(Build.class, ProjectEntityType.BUILD, propertyService, property, projectEntityFieldContributors);
+        super(Build.class, ProjectEntityType.BUILD, projectEntityFieldContributors);
         this.structureService = structureService;
     }
 

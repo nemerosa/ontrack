@@ -9,16 +9,12 @@ import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLString;
-import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
@@ -28,20 +24,14 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
 
     private final Class<T> projectEntityClass;
     private final ProjectEntityType projectEntityType;
-    private final PropertyService propertyService;
-    private final GQLTypeProperty property;
     private final List<GQLProjectEntityFieldContributor> projectEntityFieldContributors;
 
     public AbstractGQLProjectEntity(
             Class<T> projectEntityClass,
             ProjectEntityType projectEntityType,
-            PropertyService propertyService,
-            GQLTypeProperty property,
             List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
         this.projectEntityClass = projectEntityClass;
         this.projectEntityType = projectEntityType;
-        this.propertyService = propertyService;
-        this.property = property;
         this.projectEntityFieldContributors = projectEntityFieldContributors;
     }
 
@@ -58,31 +48,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
         List<GraphQLFieldDefinition> definitions = baseProjectEntityInterfaceFields();
-        // Properties list
-        // TODO Extract as contributor
-        definitions.add(
-                newFieldDefinition()
-                        .name("properties")
-                        .description("List of properties")
-                        .argument(
-                                newArgument()
-                                        .name("type")
-                                        .description("Fully qualified name of the property type")
-                                        .type(GraphQLString)
-                                        .build()
-                        )
-                        .argument(
-                                newArgument()
-                                        .name("hasValue")
-                                        .description("Keeps properties having a value")
-                                        .type(GraphQLBoolean)
-                                        .defaultValue(false)
-                                        .build()
-                        )
-                        .type(GraphqlUtils.stdList(property.getType()))
-                        .dataFetcher(projectEntityPropertiesDataFetcher())
-                        .build()
-        );
         // For all contributors
         definitions.addAll(
                 projectEntityFieldContributors.stream()
@@ -148,33 +113,5 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
     }
 
     protected abstract Optional<Signature> getSignature(T entity);
-
-
-    private DataFetcher projectEntityPropertiesDataFetcher() {
-        return environment -> {
-            Object o = environment.getSource();
-            if (projectEntityClass.isInstance(o)) {
-                // Filters
-                Optional<String> typeFilter = GraphqlUtils.getStringArgument(environment, "type");
-                boolean hasValue = GraphqlUtils.getBooleanArgument(environment, "hasValue", false);
-                // Gets the raw list
-                return propertyService.getProperties((ProjectEntity) o).stream()
-                        // Filter by type
-                        .filter(property -> typeFilter
-                                .map(typeFilterName -> StringUtils.equals(
-                                        typeFilterName,
-                                        property.getTypeDescriptor().getTypeName()
-                                ))
-                                .orElse(true)
-                        )
-                        // Filter by value
-                        .filter(property -> !hasValue || !property.isEmpty())
-                        // OK
-                        .collect(Collectors.toList());
-            } else {
-                return null;
-            }
-        };
-    }
 
 }

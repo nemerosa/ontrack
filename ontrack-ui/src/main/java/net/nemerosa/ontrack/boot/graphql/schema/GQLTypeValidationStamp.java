@@ -6,6 +6,7 @@ import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.structure.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -23,12 +24,11 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
     private final StructureService structureService;
     private final GQLTypeValidationRun validationRun;
 
+    @Autowired
     public GQLTypeValidationStamp(StructureService structureService,
-                                  PropertyService propertyService,
                                   GQLTypeValidationRun validationRun,
-                                  GQLTypeProperty property,
                                   List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(ValidationStamp.class, ProjectEntityType.VALIDATION_STAMP, propertyService, property, projectEntityFieldContributors);
+        super(ValidationStamp.class, ProjectEntityType.VALIDATION_STAMP, projectEntityFieldContributors);
         this.structureService = structureService;
         this.validationRun = validationRun;
     }

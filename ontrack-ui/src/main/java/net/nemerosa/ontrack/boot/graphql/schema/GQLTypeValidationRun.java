@@ -4,9 +4,9 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.model.structure.ValidationRun;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,11 +24,10 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
 
     private final GQLTypeValidationRunStatus validationRunStatus;
 
+    @Autowired
     public GQLTypeValidationRun(GQLTypeValidationRunStatus validationRunStatus,
-                                PropertyService propertyService,
-                                GQLTypeProperty property,
                                 List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(ValidationRun.class, ProjectEntityType.VALIDATION_RUN, propertyService, property, projectEntityFieldContributors);
+        super(ValidationRun.class, ProjectEntityType.VALIDATION_RUN, projectEntityFieldContributors);
         this.validationRunStatus = validationRunStatus;
     }
 

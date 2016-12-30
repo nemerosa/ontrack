@@ -31,10 +31,8 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
     @Autowired
     public GQLTypeProject(StructureService structureService,
                           GQLTypeBranch branch,
-                          PropertyService propertyService,
-                          GQLTypeProperty property,
                           List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(Project.class, ProjectEntityType.PROJECT, propertyService, property, projectEntityFieldContributors);
+        super(Project.class, ProjectEntityType.PROJECT, projectEntityFieldContributors);
         this.structureService = structureService;
         this.branch = branch;
     }
