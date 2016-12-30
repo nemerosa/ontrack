@@ -6,12 +6,8 @@ import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountService;
-import net.nemerosa.ontrack.model.security.GlobalPermission;
-import net.nemerosa.ontrack.model.security.PermissionTargetType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -60,12 +56,11 @@ public class GQLTypeAccount implements GQLType {
                                 .build()
                 )
                 .field(
-                        // FIXME Only one is possible
                         newFieldDefinition()
-                                .name("globalRoles")
-                                .description("List of global permissions")
-                                .type(GraphqlUtils.stdList(globalRole.getType()))
-                                .dataFetcher(accountGlobalRolesFetcher())
+                                .name("globalRole")
+                                .description("Global role for the account")
+                                .type(globalRole.getType())
+                                .dataFetcher(accountGlobalRoleFetcher())
                                 .build()
                 )
                 .field(
@@ -83,12 +78,11 @@ public class GQLTypeAccount implements GQLType {
         return fetcher(Account.class, accountService::getProjectPermissionsForAccount);
     }
 
-    private DataFetcher accountGlobalRolesFetcher() {
-        return fetcher(Account.class, (Account account) -> accountService.getGlobalPermissions().stream()
-                .filter(gp -> (gp.getTarget().getType() == PermissionTargetType.ACCOUNT) &&
-                        (gp.getTarget().getId() == account.id()))
-                .map(GlobalPermission::getRole)
-                .collect(Collectors.toList()));
+    private DataFetcher accountGlobalRoleFetcher() {
+        return fetcher(
+                Account.class,
+                account -> accountService.getGlobalRoleForAccount(account).orElse(null)
+        );
     }
 
     private DataFetcher accountAccountGroupsFetcher() {

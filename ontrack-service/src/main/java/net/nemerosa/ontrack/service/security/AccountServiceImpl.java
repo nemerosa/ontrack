@@ -354,6 +354,12 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<GlobalRole> getGlobalRoleForAccount(Account account) {
+        return roleRepository.findGlobalRoleByAccount(account.id())
+                .flatMap(rolesService::getGlobalRole);
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),

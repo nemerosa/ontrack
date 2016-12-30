@@ -150,4 +150,12 @@ public interface AccountService {
      * @return List of project roles
      */
     Collection<ProjectRoleAssociation> getProjectPermissionsForAccount(Account account);
+
+    /**
+     * Gets the optional global role for an account
+     *
+     * @param account Account
+     * @return Optional role
+     */
+    Optional<GlobalRole> getGlobalRoleForAccount(Account account);
 }
