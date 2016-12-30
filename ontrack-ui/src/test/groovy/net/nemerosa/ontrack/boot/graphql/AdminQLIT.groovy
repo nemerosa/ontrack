@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.boot.graphql
 
 import graphql.GraphQLException
-import net.nemerosa.ontrack.model.security.AccountGroupManagement
-import net.nemerosa.ontrack.model.security.AccountInput
-import net.nemerosa.ontrack.model.security.AccountManagement
-import net.nemerosa.ontrack.model.security.AccountService
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
@@ -104,6 +101,47 @@ class AdminQLIT extends AbstractQLITSupport {
         }
         assert data.accounts.first().globalRoles.first().id == 'CONTROLLER'
         assert data.accounts.first().globalRoles.first().name == 'Controller'
+    }
+
+    @Test
+    void 'Account authorized projects'() {
+        def p1 = doCreateProject()
+        def p2 = doCreateProject()
+        def a = doCreateAccount()
+        def data = asAdmin().call {
+            accountService.saveProjectPermission(
+                    p1.id,
+                    PermissionTargetType.ACCOUNT,
+                    a.id(),
+                    new PermissionInput("PARTICIPANT")
+            )
+            accountService.saveProjectPermission(
+                    p2.id,
+                    PermissionTargetType.ACCOUNT,
+                    a.id(),
+                    new PermissionInput("OWNER")
+            )
+            return run("""{
+                accounts(id: ${a.id}) {
+                    authorizedProjects {
+                        role {
+                            id
+                        }
+                        project {
+                            name
+                        }
+                    }
+                }
+            }""")
+        }
+        def projects = data.accounts.first().authorizedProjects
+        assert projects.size() == 2
+
+        assert projects.get(0).role.id == "PARTICIPANT"
+        assert projects.get(0).project.name == p1.name
+
+        assert projects.get(1).role.id == "OWNER"
+        assert projects.get(1).project.name == p2.name
     }
 
 }

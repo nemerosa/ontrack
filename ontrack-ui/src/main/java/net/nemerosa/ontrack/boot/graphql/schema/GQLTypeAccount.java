@@ -25,11 +25,13 @@ public class GQLTypeAccount implements GQLType {
 
     private final AccountService accountService;
     private final GQLTypeGlobalRole globalRole;
+    private final GQLTypeAuthorizedProject authorizedProject;
 
     @Autowired
-    public GQLTypeAccount(AccountService accountService, GQLTypeGlobalRole globalRole) {
+    public GQLTypeAccount(AccountService accountService, GQLTypeGlobalRole globalRole, GQLTypeAuthorizedProject authorizedProject) {
         this.accountService = accountService;
         this.globalRole = globalRole;
+        this.authorizedProject = authorizedProject;
     }
 
     @Override
@@ -58,25 +60,30 @@ public class GQLTypeAccount implements GQLType {
                                 .build()
                 )
                 .field(
+                        // FIXME Only one is possible
                         newFieldDefinition()
                                 .name("globalRoles")
                                 .description("List of global permissions")
                                 .type(GraphqlUtils.stdList(globalRole.getType()))
-                                .dataFetcher(accountGlobalRolesFetchers())
+                                .dataFetcher(accountGlobalRolesFetcher())
                                 .build()
                 )
                 .field(
                         newFieldDefinition()
                                 .name("authorizedProjects")
                                 .description("List of authorized projects")
-                                .type(GraphqlUtils.stdList(new GraphQLTypeReference(GQLTypeProject.PROJECT)))
-                                // FIXME .dataFetcher(accountGlobalRolesFetchers())
+                                .type(GraphqlUtils.stdList(authorizedProject.getType()))
+                                .dataFetcher(accountAuthorizedProjectsFetcher())
                                 .build()
                 )
                 .build();
     }
 
-    private DataFetcher accountGlobalRolesFetchers() {
+    private DataFetcher accountAuthorizedProjectsFetcher() {
+        return fetcher(Account.class, accountService::getProjectPermissionsForAccount);
+    }
+
+    private DataFetcher accountGlobalRolesFetcher() {
         return fetcher(Account.class, (Account account) -> accountService.getGlobalPermissions().stream()
                 .filter(gp -> (gp.getTarget().getType() == PermissionTargetType.ACCOUNT) &&
                         (gp.getTarget().getId() == account.id()))

@@ -142,4 +142,12 @@ public interface AccountService {
      * Deletes a project permission.
      */
     Ack deleteProjectPermission(ID projectId, PermissionTargetType type, int id);
+
+    /**
+     * Gets the list of project permissions for a given account
+     *
+     * @param account Account to get the permissions for
+     * @return List of project roles
+     */
+    Collection<ProjectRoleAssociation> getProjectPermissionsForAccount(Account account);
 }

@@ -62,24 +62,24 @@ public class AccountServiceImpl implements AccountService {
                 .withGlobalRole(
                         roleRepository.findGlobalRoleByAccount(raw.getAccount().id()).flatMap(rolesService::getGlobalRole)
                 )
-                        // Project roles
+                // Project roles
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByAccount(raw.getAccount().id(), rolesService::getProjectRoleAssociation)
                 )
-                        // Groups from the repository
+                // Groups from the repository
                 .withGroups(
                         accountGroupRepository.findByAccount(raw.getAccount().id()).stream()
                                 .map(this::groupWithACL)
                                 .collect(Collectors.toList())
                 )
-                        // Group contributions
+                // Group contributions
                 .withGroups(
                         accountGroupContributors.stream()
                                 .flatMap(accountGroupContributor -> accountGroupContributor.collectGroups(raw).stream())
                                 .map(this::groupWithACL)
                                 .collect(Collectors.toList())
                 )
-                        // OK
+                // OK
                 .lock();
     }
 
@@ -338,6 +338,22 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    @Override
+    public Collection<ProjectRoleAssociation> getProjectPermissionsForAccount(Account account) {
+        return roleRepository.findProjectRoleAssociationsByAccount(
+                account.id(),
+                rolesService::getProjectRoleAssociation
+        )
+                .stream()
+                // Filter by authorisation
+                .filter(projectRoleAssociation -> securityService.isProjectFunctionGranted(
+                        projectRoleAssociation.getProjectId(),
+                        ProjectAuthorisationMgt.class
+                ))
+                // OK
+                .collect(Collectors.toList());
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),
@@ -421,11 +437,11 @@ public class AccountServiceImpl implements AccountService {
                 .withGlobalRole(
                         roleRepository.findGlobalRoleByGroup(group.id()).flatMap(rolesService::getGlobalRole)
                 )
-                        // Project roles
+                // Project roles
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByGroup(group.id(), rolesService::getProjectRoleAssociation)
                 )
-                        // OK
+                // OK
                 .lock();
     }
 }
