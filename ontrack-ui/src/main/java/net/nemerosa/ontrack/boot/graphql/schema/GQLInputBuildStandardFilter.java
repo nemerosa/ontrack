@@ -1,17 +1,32 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
+import net.nemerosa.ontrack.json.JsonUtils;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
 
 @Component
-public class GQLInputBuildStandardFilter {
+public class GQLInputBuildStandardFilter implements GQLInputType<BuildFilterProviderData<?>> {
 
+    private final BuildFilterService buildFilterService;
+
+    @Autowired
+    public GQLInputBuildStandardFilter(BuildFilterService buildFilterService) {
+        this.buildFilterService = buildFilterService;
+    }
+
+    @Override
     public GraphQLInputType getInputType() {
         return GraphQLInputObjectType.newInputObject()
                 .name("StandardBuildFilter")
@@ -56,6 +71,22 @@ public class GQLInputBuildStandardFilter {
                         "The build must be linked TO a build having this promotion (requires \"linkedTo\")"
                 ))
                 .build();
+    }
+
+    @Override
+    public BuildFilterProviderData<?> convert(Object filter) {
+        if (filter == null) {
+            return buildFilterService.standardFilterProviderData(10).build();
+        } else {
+            if (!(filter instanceof Map)) {
+                throw new IllegalStateException("Filter is expected to be a map");
+            } else {
+                @SuppressWarnings("unchecked")
+                Map<String, ?> map = (Map<String, ?>) filter;
+                JsonNode node = JsonUtils.fromMap(map);
+                return buildFilterService.standardFilterProviderData(node);
+            }
+        }
     }
 
     private GraphQLInputObjectField formField(String fieldName, String description) {

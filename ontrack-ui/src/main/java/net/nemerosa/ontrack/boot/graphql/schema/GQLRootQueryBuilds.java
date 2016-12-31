@@ -4,7 +4,6 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
@@ -26,15 +25,20 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
 
     public static final String PROJECT_ARGUMENT = "project";
     public static final String BRANCH_ARGUMENT = "branch";
+    public static final String BUILD_BRANCH_FILTER_ARGUMENT = "buildBranchFilter";
     private final StructureService structureService;
-    private final BuildFilterService buildFilterService;
     private final GQLTypeBuild build;
+    private final GQLInputBuildStandardFilter inputBuildStandardFilter;
 
     @Autowired
-    public GQLRootQueryBuilds(StructureService structureService, BuildFilterService buildFilterService, GQLTypeBuild build) {
+    public GQLRootQueryBuilds(
+            StructureService structureService,
+            GQLTypeBuild build,
+            GQLInputBuildStandardFilter inputBuildStandardFilter
+    ) {
         this.structureService = structureService;
-        this.buildFilterService = buildFilterService;
         this.build = build;
+        this.inputBuildStandardFilter = inputBuildStandardFilter;
     }
 
     @Override
@@ -63,6 +67,13 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                                 .type(GraphQLString)
                                 .build()
                 )
+                .argument(
+                        newArgument()
+                                .name(BUILD_BRANCH_FILTER_ARGUMENT)
+                                .description("Filter to apply for the builds on the branch - requires 'branch' to be filled.")
+                                .type(inputBuildStandardFilter.getInputType())
+                                .build()
+                )
                 .dataFetcher(buildFetcher())
                 .build();
     }
@@ -72,6 +83,7 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
             Integer id = environment.getArgument("id");
             Optional<String> oProject = GraphqlUtils.getStringArgument(environment, PROJECT_ARGUMENT);
             Optional<String> oBranch = GraphqlUtils.getStringArgument(environment, BRANCH_ARGUMENT);
+            Object branchFilter = environment.getArgument(BUILD_BRANCH_FILTER_ARGUMENT);
             // Per ID
             if (id != null) {
                 checkArgList(environment, "id");
@@ -86,9 +98,8 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                     // Gets the branch
                     Branch branch = structureService.findBranchByName(oProject.get(), oBranch.get())
                             .orElseThrow(() -> new BranchNotFoundException(oProject.get(), oBranch.get()));
-                    // Gets the first builds
-                    // TODO Configurable branch filter
-                    BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(10).build();
+                    // Configurable branch filter
+                    BuildFilterProviderData<?> filter = inputBuildStandardFilter.convert(branchFilter);
                     // Runs the filter
                     return filter.filterBranchBuilds(branch);
                 }

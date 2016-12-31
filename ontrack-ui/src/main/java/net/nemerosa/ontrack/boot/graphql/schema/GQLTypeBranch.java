@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static graphql.Scalars.GraphQLBoolean;
@@ -148,14 +145,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 else if (filter == null) {
                     buildFilter = buildFilterService.standardFilterProviderData(count).build();
                 } else {
-                    if (!(filter instanceof Map)) {
-                        throw new IllegalStateException("Filter is expected to be a map");
-                    } else {
-                        @SuppressWarnings("unchecked")
-                        Map<String, ?> map = (Map<String, ?>) filter;
-                        JsonNode node = JsonUtils.fromMap(map);
-                        buildFilter = buildFilterService.standardFilterProviderData(node);
-                    }
+                    buildFilter = inputBuildStandardFilter.convert(filter);
                 }
                 // Result
                 List<Build> builds = buildFilter.filterBranchBuilds(branch);
