@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.graphql
 
+import graphql.GraphQLException
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.security.BuildCreate
@@ -9,6 +10,8 @@ import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.Test
 
 import java.time.LocalDateTime
+
+import static net.nemerosa.ontrack.test.TestUtils.uid
 
 class BuildQLIT extends AbstractQLITSupport {
 
@@ -194,6 +197,68 @@ class BuildQLIT extends AbstractQLITSupport {
         assert link.name == targetBuild.name
         assert link.branch.name == targetBuild.branch.name
         assert link.branch.project.name == targetBuild.branch.project.name
+    }
+
+    @Test(expected = GraphQLException)
+    void 'By branch not found'() {
+        def project = doCreateProject()
+        def branchName = uid('B')
+
+        run("""{
+            builds(project: "${project.name}", branch: "${branchName}") {
+                name
+            }
+        }""")
+    }
+
+    @Test
+    void 'By branch'() {
+        def build = doCreateBuild()
+
+        def data = run("""{
+            builds(project: "${build.project.name}", branch: "${build.branch.name}") {
+                id
+            }
+        }""")
+
+        assert data.builds.first().id == build.id()
+    }
+
+    @Test(expected = GraphQLException)
+    void 'By project not found'() {
+        def projectName = uid('P')
+
+        run("""{
+            builds(project: "${projectName}") {
+                name
+            }
+        }""")
+    }
+
+    @Test
+    void 'By project'() {
+        def build = doCreateBuild()
+
+        def data = run("""{
+            builds(project: "${build.project.name}") {
+                id
+            }
+        }""")
+
+        assert data.builds.first().id == build.id()
+    }
+
+    @Test
+    void 'No argument means no result'() {
+        doCreateBuild()
+
+        def data = run("""{
+            builds {
+                id
+            }
+        }""")
+
+        assert data.builds.empty
     }
 
 }
