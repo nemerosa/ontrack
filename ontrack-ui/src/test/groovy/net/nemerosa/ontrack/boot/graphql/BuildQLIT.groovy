@@ -5,12 +5,12 @@ import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.Test
 
 import java.time.LocalDateTime
 
+import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 class BuildQLIT extends AbstractQLITSupport {
@@ -22,7 +22,7 @@ class BuildQLIT extends AbstractQLITSupport {
             structureService.newBuild(
                     Build.of(
                             branch,
-                            NameDescription.nd('1', ''),
+                            nd('1', ''),
                             Signature.of(
                                     LocalDateTime.of(2016, 11, 25, 14, 43),
                                     "test"
@@ -259,6 +259,45 @@ class BuildQLIT extends AbstractQLITSupport {
         }""")
 
         assert data.builds.empty
+    }
+
+    @Test
+    void 'Branch filter'() {
+        // Builds
+        def branch = doCreateBranch()
+        def build1 = doCreateBuild(branch, nd('1', ''))
+        doCreateBuild(branch, nd('2', ''))
+        def pl = doCreatePromotionLevel(branch, nd('PL', ''))
+        doPromote(build1, pl, '')
+        // Query
+        def data = run("""{
+            builds(
+                    project: "${branch.project.name}", 
+                    branch: "${branch.name}", 
+                    buildBranchFilter: {withPromotionLevel: "PL"}) {
+                id
+            }
+        }""")
+        // Results
+        assert data.builds.size() == 1
+        assert data.builds.get(0).id == build1.id()
+    }
+
+    @Test(expected = GraphQLException)
+    void 'Branch filter requires a branch'() {
+        // Builds
+        def branch = doCreateBranch()
+        def build1 = doCreateBuild(branch, nd('1', ''))
+        doCreateBuild(branch, nd('2', ''))
+        def pl = doCreatePromotionLevel(branch, nd('PL', ''))
+        doPromote(build1, pl, '')
+        // Query
+        run("""{
+            builds( 
+                    buildBranchFilter: {withPromotionLevel: "PL"}) {
+                id
+            }
+        }""")
     }
 
 }

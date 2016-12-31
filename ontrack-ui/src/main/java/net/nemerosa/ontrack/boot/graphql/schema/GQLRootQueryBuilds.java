@@ -113,6 +113,14 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                     return structureService.buildSearch(project.getId(), form);
                 }
             }
+            // Branch filter only - not accepted
+            else if (branchFilter != null) {
+                throw new IllegalStateException(String.format(
+                        "%s must be used together with %s",
+                        BUILD_BRANCH_FILTER_ARGUMENT,
+                        BRANCH_ARGUMENT
+                ));
+            }
             // None
             else {
                 return Collections.emptyList();
