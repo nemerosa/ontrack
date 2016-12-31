@@ -26,19 +26,24 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
     public static final String PROJECT_ARGUMENT = "project";
     public static final String BRANCH_ARGUMENT = "branch";
     public static final String BUILD_BRANCH_FILTER_ARGUMENT = "buildBranchFilter";
+    public static final String BUILD_PROJECT_FILTER_ARGUMENT = "buildProjectFilter";
+
     private final StructureService structureService;
     private final GQLTypeBuild build;
     private final GQLInputBuildStandardFilter inputBuildStandardFilter;
+    private final GQLInputBuildSearchForm inputBuildSearchForm;
 
     @Autowired
     public GQLRootQueryBuilds(
             StructureService structureService,
             GQLTypeBuild build,
-            GQLInputBuildStandardFilter inputBuildStandardFilter
+            GQLInputBuildStandardFilter inputBuildStandardFilter,
+            GQLInputBuildSearchForm inputBuildSearchForm
     ) {
         this.structureService = structureService;
         this.build = build;
         this.inputBuildStandardFilter = inputBuildStandardFilter;
+        this.inputBuildSearchForm = inputBuildSearchForm;
     }
 
     @Override
@@ -74,6 +79,13 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                                 .type(inputBuildStandardFilter.getInputType())
                                 .build()
                 )
+                .argument(
+                        newArgument()
+                                .name(BUILD_PROJECT_FILTER_ARGUMENT)
+                                .description("Filter to apply for the builds on the project - requires 'project' to be filled.")
+                                .type(inputBuildSearchForm.getInputType())
+                                .build()
+                )
                 .dataFetcher(buildFetcher())
                 .build();
     }
@@ -84,6 +96,7 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
             Optional<String> oProject = GraphqlUtils.getStringArgument(environment, PROJECT_ARGUMENT);
             Optional<String> oBranch = GraphqlUtils.getStringArgument(environment, BRANCH_ARGUMENT);
             Object branchFilter = environment.getArgument(BUILD_BRANCH_FILTER_ARGUMENT);
+            Object projectFilter = environment.getArgument(BUILD_PROJECT_FILTER_ARGUMENT);
             // Per ID
             if (id != null) {
                 checkArgList(environment, "id");
@@ -108,8 +121,8 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                     // Gets the project
                     Project project = structureService.findProjectByName(oProject.get())
                             .orElseThrow(() -> new ProjectNotFoundException(oProject.get()));
-                    // TODO Build search form as argument
-                    BuildSearchForm form = new BuildSearchForm().withMaximumCount(10);
+                    // Build search form as argument
+                    BuildSearchForm form = inputBuildSearchForm.convert(projectFilter);
                     return structureService.buildSearch(project.getId(), form);
                 }
             }
@@ -119,6 +132,14 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                         "%s must be used together with %s",
                         BUILD_BRANCH_FILTER_ARGUMENT,
                         BRANCH_ARGUMENT
+                ));
+            }
+            // Project filter only - not accepted
+            else if (projectFilter != null) {
+                throw new IllegalStateException(String.format(
+                        "%s must be used together with %s",
+                        BUILD_PROJECT_FILTER_ARGUMENT,
+                        PROJECT_ARGUMENT
                 ));
             }
             // None

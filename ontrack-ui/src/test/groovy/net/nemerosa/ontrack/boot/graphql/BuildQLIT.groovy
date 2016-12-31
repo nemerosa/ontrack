@@ -300,4 +300,40 @@ class BuildQLIT extends AbstractQLITSupport {
         }""")
     }
 
+    @Test(expected = GraphQLException)
+    void 'Project filter requires a project'() {
+        // Builds
+        doCreateBuild()
+        // Query
+        run("""{
+            builds( 
+                    buildProjectFilter: {promotionName: "PL"}) {
+                id
+            }
+        }""")
+    }
+
+    @Test(expected = GraphQLException)
+    void 'Project filter'() {
+        // Builds
+        def project = doCreateProject()
+        def branch1 = doCreateBranch(project, nd('1.0', ''))
+        doCreateBuild(branch1, nd('1.0.0', ''))
+        def branch2 = doCreateBranch(project, nd('2.0', ''))
+        doCreateBuild(branch2, nd('2.0.0', ''))
+        doCreateBuild(branch2, nd('2.0.1', ''))
+        // Query
+        def data = run("""{
+            builds( 
+                    project: "${project.name}",
+                    buildProjectFilter: {branchName: "2.0"}) {
+                name
+            }
+        }""")
+        // Results
+        assert data.builds.size() == 2
+        assert data.builds.get(0).name == '2.0.1'
+        assert data.builds.get(1).name == '2.0.0'
+    }
+
 }
