@@ -1,0 +1,48 @@
+[[integration-graphql]]
+=== GraphQL support
+
+Since version 2.29, Ontrack provides some support for
+http://graphql.org/[GraphQL].
+
+NOTE: While most of the Ontrack model is covered, only the query mode
+is supported right now. Support for mutations might be integrated in
+later releases.
+
+The GraphQL end point is available at the `/graphql` context path. For example,
+if Ontrack is available at http://localhost:8080, then the GraphQL end point
+is available at http://localhost:8080/graphql.
+
+Ontrack supports all capabilities of GraphQL schema introspection.
+
+Example of a GraphQL query, to get the list of builds having a given
+promotion level for a branch:
+
+[source,json]
+----
+{
+   builds (project: "PRJ", branch: "BRCH",
+           filter: {withPromotionLevel: "PROMOTION"}) {
+      name
+   }
+}
+----
+
+[[integration-graphql-graphiql]]
+=== GraphiQL support
+
+Ontrack supports https://github.com/graphql/graphiql[GraphiQL] and allows
+to experiment with Ontrack GraphQL queries directly in your browser.
+
+You can access the GraphiQL IDE page by clicking on the _GraphiQL_ command
+in the top right corner of the home page of Ontrack:
+
+image::images/graphiql-command.png[GraphiQL Command,300]
+
+You can then type and experiment with your GraphQL queries:
+
+image::images/graphiql-ide.png[GraphiQL IDE,600]
+
+IMPORTANT: The access rights used for your GraphQL queries are inherited
+from your Ontrack connection. Connect with your user in Ontrack before
+switching to the GraphiQL IDE. Login in from within GraphiQL is not
+supported yet.
