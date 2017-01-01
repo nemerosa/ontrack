@@ -39,7 +39,6 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
                 .name(VALIDATION_STAMP)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
-                // TODO Image
                 // Validation runs
                 .field(
                         newFieldDefinition()

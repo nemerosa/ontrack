@@ -41,7 +41,6 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
-                // TODO Image
                 // Promotion runs
                 .field(
                         newFieldDefinition()

@@ -157,4 +157,34 @@ class BranchQLIT extends AbstractQLITSupport {
         assert decorations.empty
     }
 
+    @Test
+    void 'Promotion level image link'() {
+        def pl = doCreatePromotionLevel()
+        def data = run("""{
+            branches (id: ${pl.branch.id}) {
+                promotionLevels {
+                    links {
+                        _image
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().promotionLevels.first().links._image == "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:,${pl.id}"
+    }
+
+    @Test
+    void 'Validation stamp image link'() {
+        def vs = doCreateValidationStamp()
+        def data = run("""{
+            branches (id: ${vs.branch.id}) {
+                validationStamps {
+                    links {
+                        _image
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().validationStamps.first().links._image == "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampImage_:,${vs.id}"
+    }
+
 }
