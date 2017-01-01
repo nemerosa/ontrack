@@ -300,7 +300,7 @@ class ProjectQLIT extends AbstractQLITSupport {
                 }
             }
         }""")
-        assert data.projects.branches.builds.edges.node.promotionRuns.promotionLevel.name.flatten() == ['PL2', 'PL1']
+        assert data.projects.branches.builds.edges.node.promotionRuns.promotionLevel.name.flatten() as Set == ['PL2', 'PL1'] as Set
     }
 
     @Test
