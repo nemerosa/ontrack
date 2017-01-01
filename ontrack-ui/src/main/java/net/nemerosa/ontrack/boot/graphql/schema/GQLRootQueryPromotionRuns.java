@@ -16,40 +16,40 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
 @Component
-public class GQLRootQueryValidationRuns implements GQLRootQuery {
+public class GQLRootQueryPromotionRuns implements GQLRootQuery {
 
     private final StructureService structureService;
-    private final GQLTypeValidationRun validationRun;
+    private final GQLTypePromotionRun promotionRun;
 
     @Autowired
-    public GQLRootQueryValidationRuns(StructureService structureService, GQLTypeValidationRun validationRun) {
+    public GQLRootQueryPromotionRuns(StructureService structureService, GQLTypePromotionRun promotionRun) {
         this.structureService = structureService;
-        this.validationRun = validationRun;
+        this.promotionRun = promotionRun;
     }
 
     @Override
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
-                .name("validationRuns")
-                .type(stdList(validationRun.getType()))
+                .name("promotionRuns")
+                .type(stdList(promotionRun.getType()))
                 .argument(
                         newArgument()
                                 .name("id")
-                                .description("ID of the validation run to look for")
+                                .description("ID of the promotion run to look for")
                                 .type(new GraphQLNonNull(GraphQLInt))
                                 .build()
                 )
-                .dataFetcher(validationRunFetcher())
+                .dataFetcher(promotionRunFetcher())
                 .build();
     }
 
-    private DataFetcher validationRunFetcher() {
+    private DataFetcher promotionRunFetcher() {
         return environment -> {
             Integer id = environment.getArgument("id");
             if (id != null) {
                 // Fetch by ID
                 return Collections.singletonList(
-                        structureService.getValidationRun(ID.of(id))
+                        structureService.getPromotionRun(ID.of(id))
                 );
             }
             // Empty list
