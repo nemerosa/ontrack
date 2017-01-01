@@ -173,6 +173,26 @@ class BranchQLIT extends AbstractQLITSupport {
     }
 
     @Test
+    void 'Promotion level branch reference'() {
+        def pl = doCreatePromotionLevel()
+        def data = run("""{
+            branches (id: ${pl.branch.id}) {
+                promotionLevels {
+                    branch {
+                        id
+                        project {
+                            id
+                        }
+                    }
+                }
+            }
+        }""")
+        def p = data.branches.first().promotionLevels.first()
+        assert p.branch.id == pl.branch.id()
+        assert p.branch.project.id == pl.branch.project.id()
+    }
+
+    @Test
     void 'Validation stamp image link'() {
         def vs = doCreateValidationStamp()
         def data = run("""{
@@ -185,6 +205,26 @@ class BranchQLIT extends AbstractQLITSupport {
             }
         }""")
         assert data.branches.first().validationStamps.first().links._image == "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampImage_:,${vs.id}"
+    }
+
+    @Test
+    void 'Validation stamp branch reference'() {
+        def vs = doCreateValidationStamp()
+        def data = run("""{
+            branches (id: ${vs.branch.id}) {
+                validationStamps {
+                    branch {
+                        id
+                        project {
+                            id
+                        }
+                    }
+                }
+            }
+        }""")
+        def v = data.branches.first().validationStamps.first()
+        assert v.branch.id == vs.branch.id()
+        assert v.branch.project.id == vs.branch.project.id()
     }
 
 }

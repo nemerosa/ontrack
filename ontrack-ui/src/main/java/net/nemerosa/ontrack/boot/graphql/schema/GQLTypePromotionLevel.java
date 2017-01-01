@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.structure.*;
@@ -41,6 +42,14 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
+                // Ref to branch
+                .field(
+                        newFieldDefinition()
+                                .name("branch")
+                                .description("Reference to branch")
+                                .type(new GraphQLTypeReference(GQLTypeBranch.BRANCH))
+                                .build()
+                )
                 // Promotion runs
                 .field(
                         newFieldDefinition()
