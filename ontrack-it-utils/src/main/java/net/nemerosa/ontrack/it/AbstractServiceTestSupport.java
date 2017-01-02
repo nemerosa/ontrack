@@ -93,6 +93,18 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         });
     }
 
+    protected AccountGroup doCreateAccountGroupWithGlobalRole(String role) throws Exception {
+        AccountGroup group = doCreateAccountGroup();
+        return asUser().with(AccountGroupManagement.class).call(() -> {
+            accountService.saveGlobalPermission(
+                    PermissionTargetType.GROUP,
+                    group.id(),
+                    new PermissionInput(role)
+            );
+            return group;
+        });
+    }
+
     protected <T> void setProperty(ProjectEntity projectEntity, Class<? extends PropertyType<T>> propertyTypeClass, T data) throws Exception {
         asUser().with(projectEntity, ProjectEdit.class).execute(() ->
                 propertyService.editProperty(

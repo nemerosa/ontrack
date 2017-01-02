@@ -15,6 +15,9 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.fetcher;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
 
+/**
+ * @see AccountGroup
+ */
 @Component
 public class GQLTypeAccountGroup implements GQLType {
 
@@ -23,10 +26,12 @@ public class GQLTypeAccountGroup implements GQLType {
     public static final String ACCOUNTS_FIELD = "accounts";
 
     private final AccountService accountService;
+    private final GQLTypeGlobalRole globalRole;
 
     @Autowired
-    public GQLTypeAccountGroup(AccountService accountService) {
+    public GQLTypeAccountGroup(AccountService accountService, GQLTypeGlobalRole globalRole) {
         this.accountService = accountService;
+        this.globalRole = globalRole;
     }
 
     @Override
@@ -41,6 +46,15 @@ public class GQLTypeAccountGroup implements GQLType {
                         .description("List of associated accounts")
                         .type(stdList(new GraphQLTypeReference(GQLTypeAccount.ACCOUNT)))
                         .dataFetcher(fetcher(AccountGroup.class, this::getAccountsForGroup))
+                )
+                // Global role
+                .field(field -> field.name("globalRole")
+                        .description("Global role for the account group")
+                        .type(globalRole.getType())
+                        .dataFetcher(fetcher(
+                                AccountGroup.class,
+                                group -> accountService.getGlobalRoleForAccountGroup(group).orElse(null)
+                        ))
                 )
                 // OK
                 .build();

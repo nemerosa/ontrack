@@ -213,4 +213,23 @@ class AdminQLIT extends AbstractQLITSupport {
         assert projects.get(1).project.name == p2.name
     }
 
+    @Test
+    void 'Account group global role'() {
+        def g = doCreateAccountGroupWithGlobalRole('CONTROLLER')
+        def data = asUser()
+                .with(AccountManagement)
+                .with(AccountGroupManagement).call {
+            run("""{
+                accountGroups(id: ${g.id}) {
+                    globalRole {
+                        id
+                        name
+                    }
+                }
+            }""")
+        }
+        assert data.accountGroups.first().globalRole.id == 'CONTROLLER'
+        assert data.accountGroups.first().globalRole.name == 'Controller'
+    }
+
 }
