@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
-import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
@@ -92,7 +91,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("builds")
-                                .type(GraphqlUtils.connectionList(build.getType()))
+                                .type(GraphqlUtils.stdList(build.getType()))
                                 // Last builds
                                 .argument(
                                         newArgument()
@@ -148,9 +147,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                     buildFilter = inputBuildStandardFilter.convert(filter);
                 }
                 // Result
-                List<Build> builds = buildFilter.filterBranchBuilds(branch);
-                // As a connection list
-                return new SimpleListConnection(builds).get(environment);
+                return buildFilter.filterBranchBuilds(branch);
             } else {
                 return Collections.emptyList();
             }

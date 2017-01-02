@@ -254,8 +254,8 @@ class ProjectQLIT extends AbstractQLITSupport {
             }
         }""")
         def validationRunStatuses = data.projects.branches.validationStamps.validationRuns.edges.node.validationRunStatuses.flatten()
-        assert validationRunStatuses.statusID.id == ['EXPLAINED', 'INVESTIGATING', 'FAILED']
-        assert validationRunStatuses.description == ['Explained', 'Investigating', 'Validation failed']
+        assert validationRunStatuses.statusID.id as Set == ['EXPLAINED', 'INVESTIGATING', 'FAILED'] as Set
+        assert validationRunStatuses.description as Set == ['Explained', 'Investigating', 'Validation failed'] as Set
     }
 
     @Test
@@ -287,20 +287,16 @@ class ProjectQLIT extends AbstractQLITSupport {
             projects (id: ${project.id}) {
                 branches (name: "${branch.name}") {
                     builds(count: 1) {
-                        edges {
-                            node {
-                                promotionRuns {
-                                    promotionLevel {
-                                        name
-                                    }
-                                }
+                        promotionRuns {
+                            promotionLevel {
+                                name
                             }
                         }
                     }
                 }
             }
         }""")
-        assert data.projects.branches.builds.edges.node.promotionRuns.promotionLevel.name.flatten() as Set == ['PL2', 'PL1'] as Set
+        assert data.projects.branches.builds.promotionRuns.promotionLevel.name.flatten() as Set == ['PL2', 'PL1'] as Set
     }
 
     @Test
@@ -332,20 +328,16 @@ class ProjectQLIT extends AbstractQLITSupport {
             projects (id: ${project.id}) {
                 branches (name: "${branch.name}") {
                     builds(count: 1) {
-                        edges {
-                            node {
-                                promotionRuns(promotion: "PL1") {
-                                    promotionLevel {
-                                        name
-                                    }
-                                }
+                        promotionRuns(promotion: "PL1") {
+                            promotionLevel {
+                                name
                             }
                         }
                     }
                 }
             }
         }""")
-        assert data.projects.branches.builds.edges.node.promotionRuns.promotionLevel.name.flatten() == ['PL1']
+        assert data.projects.branches.builds.promotionRuns.promotionLevel.name.flatten() == ['PL1']
     }
 
     @Test
@@ -400,16 +392,12 @@ class ProjectQLIT extends AbstractQLITSupport {
                 branches(name: "${branchName}") {
                     name
                     builds {
-                        edges {
-                            node {
-                                name
-                            }
-                        }
+                        name
                     }
                 }
             }
         }""")
-        assert data.projects.branches.builds.edges.node.name.flatten() == [b.name]
+        assert data.projects.branches.builds.name.flatten() == [b.name]
     }
 
     @Test
@@ -425,16 +413,12 @@ class ProjectQLIT extends AbstractQLITSupport {
                 branches(name: "${branch.name}") {
                     name
                     builds(count: 5) {
-                        edges {
-                            node {
-                                name
-                            }
-                        }
+                        name
                     }
                 }
             }
         }""")
-        assert data.projects.branches.builds.edges.node.name.flatten() == ['20', '19', '18', '17', '16']
+        assert data.projects.branches.builds.name.flatten() == ['20', '19', '18', '17', '16']
     }
 
 }

@@ -24,28 +24,20 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {withValidationStamp: "VS"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == [build.name]
+        assert data.branches.first().builds.name.flatten() == [build.name]
 
         data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {withValidationStamp: "NONE"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == []
+        assert data.branches.first().builds.name.flatten() == []
     }
 
     @Test
@@ -57,23 +49,19 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {withValidationStamp: "VS"}) {
-                    edges {
-                        node {
-                            name
-                            validationRuns {
-                                validationRunStatuses {
-                                    statusID {
-                                        id
-                                    }
-                                }
+                    name
+                    validationRuns {
+                        validationRunStatuses {
+                            statusID {
+                                id
                             }
                         }
                     }
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == [build.name]
-        assert data.branches.first().builds.edges.node.validationRuns.validationRunStatuses.statusID.id.flatten() == ['PASSED']
+        assert data.branches.first().builds.name.flatten() == [build.name]
+        assert data.branches.first().builds.validationRuns.validationRunStatuses.statusID.id.flatten() == ['PASSED']
     }
 
     @Test
@@ -86,15 +74,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {withValidationStamp: "VS", withValidationStampStatus: "PASSED"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['2']
+        assert data.branches.first().builds.name.flatten() == ['2']
     }
 
     @Test
@@ -108,15 +92,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {sinceValidationStamp: "VS"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['3', '2']
+        assert data.branches.first().builds.name.flatten() == ['3', '2']
     }
 
     @Test
@@ -131,15 +111,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {sinceValidationStamp: "VS", sinceValidationStampStatus: "PASSED"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3', '2']
+        assert data.branches.first().builds.name.flatten() == ['4', '3', '2']
     }
 
     @Test
@@ -153,15 +129,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {withPromotionLevel: "COPPER"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['3', '1']
+        assert data.branches.first().builds.name.flatten() == ['3', '1']
     }
 
     @Test
@@ -176,15 +148,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {sincePromotionLevel: "COPPER"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3']
+        assert data.branches.first().builds.name.flatten() == ['4', '3']
     }
 
     @Test
@@ -204,15 +172,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {sincePromotionLevel: "BRONZE", withPromotionLevel: "COPPER"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '2']
+        assert data.branches.first().builds.name.flatten() == ['4', '2']
     }
 
     @Test
@@ -225,15 +189,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {afterDate: "2016-12-01", beforeDate: "2016-12-03"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['2']
+        assert data.branches.first().builds.name.flatten() == ['2']
     }
 
     @Test
@@ -246,15 +206,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {withProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['3', '1']
+        assert data.branches.first().builds.name.flatten() == ['3', '1']
     }
 
     @Test
@@ -267,15 +223,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {withProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", withPropertyValue: "1"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['1']
+        assert data.branches.first().builds.name.flatten() == ['1']
     }
 
     @Test
@@ -289,15 +241,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(filter: {sinceProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType"}) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3']
+        assert data.branches.first().builds.name.flatten() == ['4', '3']
     }
 
     @Test
@@ -314,15 +262,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
                     sinceProperty: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType",
                     sincePropertyValue: "1"
                  }) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['4', '3', '2', '1']
+        assert data.branches.first().builds.name.flatten() == ['4', '3', '2', '1']
     }
 
     @Test
@@ -347,16 +291,12 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
                     builds(filter: {
                         linkedFrom: "${branch2.project.name}:*"
                      }) {
-                        edges {
-                            node {
-                                name
-                            }
-                        }
+                        name
                     }
                 }
             }""")
         }
-        assert data.branches.first().builds.edges.node.name.flatten() == ['1.0']
+        assert data.branches.first().builds.name.flatten() == ['1.0']
     }
 
     @Test
@@ -381,16 +321,12 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
                     builds(filter: {
                         linkedTo: "${branch1.project.name}:*"
                      }) {
-                        edges {
-                            node {
-                                name
-                            }
-                        }
+                        name
                     }
                 }
             }""")
         }
-        assert data.branches.first().builds.edges.node.name.flatten() == ['2.0']
+        assert data.branches.first().builds.name.flatten() == ['2.0']
     }
 
     @Test
@@ -410,15 +346,11 @@ class BranchBuildsFilterQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 builds(lastPromotions: true) {
-                    edges {
-                        node {
-                            name
-                        }
-                    }
+                    name
                 }
             }
         }""")
-        assert data.branches.first().builds.edges.node.name.flatten() == ['5', '3', '2']
+        assert data.branches.first().builds.name.flatten() == ['5', '3', '2']
     }
 
 }
