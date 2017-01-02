@@ -11,8 +11,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 
@@ -40,6 +42,14 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     }
 
     protected Account doCreateAccount() throws Exception {
+        return doCreateAccount(Collections.emptyList());
+    }
+
+    protected Account doCreateAccount(AccountGroup accountGroup) throws Exception {
+        return doCreateAccount(Collections.singletonList(accountGroup));
+    }
+
+    protected Account doCreateAccount(List<AccountGroup> accountGroups) throws Exception {
         return asUser().with(AccountManagement.class).call(() -> {
             String name = uid("A");
             return accountService.create(
@@ -48,7 +58,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                             "Test " + name,
                             name + "@test.com",
                             "test",
-                            Collections.emptyList()
+                            accountGroups.stream().map(Entity::id).collect(Collectors.toList())
                     )
             );
         });

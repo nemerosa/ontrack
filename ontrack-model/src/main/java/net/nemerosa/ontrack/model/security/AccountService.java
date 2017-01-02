@@ -158,4 +158,12 @@ public interface AccountService {
      * @return Optional role
      */
     Optional<GlobalRole> getGlobalRoleForAccount(Account account);
+
+    /**
+     * Gets the list of accounts associated with this account group.
+     *
+     * @param accountGroup Account group
+     * @return List of accounts
+     */
+    List<Account> getAccountsForGroup(AccountGroup accountGroup);
 }

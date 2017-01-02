@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AuthenticationSource;
-import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
-import net.nemerosa.ontrack.model.security.SecurityRole;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -143,6 +140,21 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM ACCOUNTS WHERE LOWER(NAME) LIKE :filter ORDER BY NAME",
                 params("filter", String.format("%%%s%%", StringUtils.lowerCase(token))),
+                (rs, num) -> toAccount(
+                        rs,
+                        authenticationSourceFunction
+                )
+        );
+    }
+
+    @Override
+    public List<Account> getAccountsForGroup(AccountGroup accountGroup, Function<String, AuthenticationSource> authenticationSourceFunction) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT A.* FROM ACCOUNTS A " +
+                        "INNER JOIN ACCOUNT_GROUP_LINK L ON L.ACCOUNT = A.ID " +
+                        "WHERE L.ACCOUNTGROUP = :accountGroupId " +
+                        "ORDER BY A.NAME ASC",
+                params("accountGroupId", accountGroup.id()),
                 (rs, num) -> toAccount(
                         rs,
                         authenticationSourceFunction

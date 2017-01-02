@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -31,4 +32,13 @@ public interface AccountRepository {
     Account getAccount(ID accountId, Function<String, AuthenticationSource> authenticationSourceFunction);
 
     List<Account> findByNameToken(String token, Function<String, AuthenticationSource> authenticationSourceFunction);
+
+    /**
+     * Gets the list of accounts associated with this account group.
+     *
+     * @param accountGroup                 Account group
+     * @param authenticationSourceFunction Access to the authentication sources
+     * @return List of accounts
+     */
+    List<Account> getAccountsForGroup(AccountGroup accountGroup, Function<String, AuthenticationSource> authenticationSourceFunction);
 }

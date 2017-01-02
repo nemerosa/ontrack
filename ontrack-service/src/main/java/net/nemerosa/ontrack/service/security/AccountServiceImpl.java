@@ -360,6 +360,11 @@ public class AccountServiceImpl implements AccountService {
                 .flatMap(rolesService::getGlobalRole);
     }
 
+    @Override
+    public List<Account> getAccountsForGroup(AccountGroup accountGroup) {
+        return accountRepository.getAccountsForGroup(accountGroup, authenticationSourceService::getAuthenticationSource);
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),
