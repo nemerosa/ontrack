@@ -14,18 +14,74 @@ is available at http://localhost:8080/graphql.
 
 Ontrack supports all capabilities of GraphQL schema introspection.
 
-Example of a GraphQL query, to get the list of builds having a given
-promotion level for a branch:
+Example of a GraphQL query, to get the list of branches for a project:
 
-[source,json]
+[source]
 ----
 {
-   builds (project: "PRJ", branch: "BRCH",
-           filter: {withPromotionLevel: "PROMOTION"}) {
-      name
+   projects (id: 10) {
+      branches {
+         id
+         name
+      }
    }
 }
 ----
+
+[[integration-graphql-curl]]
+=== Calling with Curl
+
+One basic way to integration with the GraphQL interface of Ontrack is to use
+https://curl.haxx.se/[Curl].
+
+Given the following file:
+
+[source]
+.query.json
+----
+{
+   query: "{ projects (id: $projectId) { branches { id name }}}",
+   variables: {
+      projectId: 10
+   }
+}
+----
+
+You can `POST` this file to the Ontrack GraphQL end point, for example:
+
+[source,bash]
+----
+curl -X POST --user user http://localhost:8080/graphql --data @query.json
+----
+
+[[integration-graphql-dsl]]
+=== Using the DSL
+
+The simplest way is to use the <<dsl,Ontrack DSL>> to run a query:
+
+[source,groovy]
+----
+def result = ontrack.graphQLQuery(
+   '''{
+      projects (id: $projectId) {
+         id
+         branches {
+            id
+            name
+         }
+      }
+   }''',
+   [
+      projectId: 10,
+   ]
+)
+
+assert result.errors != null && result.errors.empty
+assert result.data.projects.size() == 1
+assert result.data.projects.get(0).id == 10
+----
+
+See the <<dsl-ontrack-graphQLQuery,`graphQLQuery`>> documentation for more details.
 
 [[integration-graphql-graphiql]]
 === GraphiQL support
