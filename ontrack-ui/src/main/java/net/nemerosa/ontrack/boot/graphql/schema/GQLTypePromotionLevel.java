@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
-import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
+import net.nemerosa.ontrack.boot.graphql.support.ConnectionList;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.structure.*;
@@ -72,7 +72,7 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                 // Gets all the promotion runs
                 List<PromotionRun> promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.getId());
                 // As a connection list
-                return new SimpleListConnection(promotionRuns).get(environment);
+                return new ConnectionList(promotionRuns).get(environment);
             } else {
                 return Collections.emptyList();
             }

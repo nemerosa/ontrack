@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.boot.graphql.schema;
 
-import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
+import net.nemerosa.ontrack.boot.graphql.support.ConnectionList;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.boot.graphql.support.Relay;
 import net.nemerosa.ontrack.model.structure.*;
@@ -69,14 +69,13 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
             if (source instanceof ValidationStamp) {
                 ValidationStamp validationStamp = (ValidationStamp) source;
                 // Gets all the validation runs
-                // TODO Use environment for limits?
                 List<ValidationRun> validationRuns = structureService.getValidationRunsForValidationStamp(
                         validationStamp.getId(),
                         0,
                         Integer.MAX_VALUE
                 );
                 // As a connection list
-                return new SimpleListConnection(validationRuns).get(environment);
+                return new ConnectionList(validationRuns).get(environment);
             } else {
                 return Collections.emptyList();
             }

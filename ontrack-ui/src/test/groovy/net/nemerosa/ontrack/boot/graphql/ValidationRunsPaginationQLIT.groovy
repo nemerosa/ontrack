@@ -15,15 +15,13 @@ class ValidationRunsPaginationQLIT extends AbstractQLITSupport {
     void setup() {
         branch = doCreateBranch()
         def vs = doCreateValidationStamp(branch, nd('VS', ''))
-        (1..20).each { buildNo ->
+        (1..100).each { buildNo ->
             def build = doCreateBuild(branch, nd("${buildNo}", ''))
-            (1..5).each { runNo ->
-                doValidateBuild(
-                        build,
-                        vs,
-                        runNo > 1 ? ValidationRunStatusID.STATUS_PASSED : ValidationRunStatusID.STATUS_FAILED
-                )
-            }
+            doValidateBuild(
+                    build,
+                    vs,
+                    ValidationRunStatusID.STATUS_PASSED
+            )
         }
     }
 
@@ -36,6 +34,8 @@ class ValidationRunsPaginationQLIT extends AbstractQLITSupport {
                         pageInfo {
                             hasNextPage
                             hasPreviousPage
+                            startCursor
+                            endCursor
                         }
                         edges {
                             node {
@@ -62,6 +62,8 @@ class ValidationRunsPaginationQLIT extends AbstractQLITSupport {
                         pageInfo {
                             hasNextPage
                             hasPreviousPage
+                            startCursor
+                            endCursor
                         }
                         edges {
                             node {
@@ -77,6 +79,64 @@ class ValidationRunsPaginationQLIT extends AbstractQLITSupport {
         assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasPreviousPage == false
         assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasNextPage == true
         assert data.branches.first().validationStamps.first().validationRuns.edges.size() == 20
+    }
+
+    @Test
+    void 'Getting 20 first runs and then the next page'() {
+        def data = run("""{
+            branches (id: ${branch.id}) {
+                validationStamps(name: "VS") {
+                    validationRuns(first: 20) {
+                        pageInfo {
+                            hasNextPage
+                            hasPreviousPage
+                            startCursor
+                            endCursor
+                        }
+                        edges {
+                            node {
+                                build {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasPreviousPage == false
+        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasNextPage == true
+        assert data.branches.first().validationStamps.first().validationRuns.edges.size() == 20
+        assert data.branches.first().validationStamps.first().validationRuns.edges.get(0).node.build.name == "100"
+        def endCursor = data.branches.first().validationStamps.first().validationRuns.pageInfo.endCursor
+
+        // Gets the next page
+        data = run("""{
+            branches (id: ${branch.id}) {
+                validationStamps(name: "VS") {
+                    validationRuns(first: 20, after: "${endCursor}") {
+                        pageInfo {
+                            hasNextPage
+                            hasPreviousPage
+                            startCursor
+                            endCursor
+                        }
+                        edges {
+                            node {
+                                build {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasPreviousPage == true
+        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasNextPage == true
+        assert data.branches.first().validationStamps.first().validationRuns.edges.size() == 20
+        assert data.branches.first().validationStamps.first().validationRuns.edges.get(0).node.build.name == "80"
+
     }
 
 }
