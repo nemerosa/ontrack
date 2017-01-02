@@ -100,7 +100,6 @@ public final class GraphqlUtils {
                         Relay.edgeType(
                                 type.getName() + "Edge",
                                 type,
-                                null,
                                 Collections.emptyList()
                         ),
                         Collections.emptyList()
@@ -108,7 +107,7 @@ public final class GraphqlUtils {
         );
     }
 
-    public static OptionalInt getIntArgument(DataFetchingEnvironment environment, String name) {
+    public static OptionalInt getIntArgument(DataFetchingEnvironment environment, @SuppressWarnings("SameParameterValue") String name) {
         Object value = environment.getArgument(name);
         if (value instanceof Integer) {
             return OptionalInt.of((Integer) value);
@@ -117,7 +116,7 @@ public final class GraphqlUtils {
         }
     }
 
-    public static boolean getBooleanArgument(DataFetchingEnvironment environment, String name, boolean defaultValue) {
+    public static boolean getBooleanArgument(DataFetchingEnvironment environment, String name, @SuppressWarnings("SameParameterValue") boolean defaultValue) {
         Object value = environment.getArgument(name);
         if (value instanceof Boolean) {
             return (Boolean) value;
