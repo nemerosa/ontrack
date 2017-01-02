@@ -5,6 +5,7 @@ import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountGroup;
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService;
 import net.nemerosa.ontrack.model.security.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,14 +27,23 @@ public class GQLTypeAccountGroup implements GQLType {
     public static final String ACCOUNTS_FIELD = "accounts";
 
     private final AccountService accountService;
+    private final AccountGroupMappingService accountGroupMappingService;
     private final GQLTypeGlobalRole globalRole;
     private final GQLTypeAuthorizedProject authorizedProject;
+    private final GQLTypeAccountGroupMapping accountGroupMapping;
 
     @Autowired
-    public GQLTypeAccountGroup(AccountService accountService, GQLTypeGlobalRole globalRole, GQLTypeAuthorizedProject authorizedProject) {
+    public GQLTypeAccountGroup(AccountService accountService,
+                               AccountGroupMappingService accountGroupMappingService,
+                               GQLTypeGlobalRole globalRole,
+                               GQLTypeAuthorizedProject authorizedProject,
+                               GQLTypeAccountGroupMapping accountGroupMapping
+    ) {
         this.accountService = accountService;
+        this.accountGroupMappingService = accountGroupMappingService;
         this.globalRole = globalRole;
         this.authorizedProject = authorizedProject;
+        this.accountGroupMapping = accountGroupMapping;
     }
 
     @Override
@@ -61,10 +71,19 @@ public class GQLTypeAccountGroup implements GQLType {
                 // Authorised projects
                 .field(field -> field.name("authorizedProjects")
                         .description("List of authorized projects")
-                        .type(GraphqlUtils.stdList(authorizedProject.getType()))
+                        .type(stdList(authorizedProject.getType()))
                         .dataFetcher(fetcher(
                                 AccountGroup.class,
                                 accountService::getProjectPermissionsForAccountGroup
+                        ))
+                )
+                // Mappings
+                .field(field -> field.name("mappings")
+                        .description("Mappings for this group")
+                        .type(stdList(accountGroupMapping.getType()))
+                        .dataFetcher(fetcher(
+                                AccountGroup.class,
+                                accountGroupMappingService::getMappingsForGroup
                         ))
                 )
                 // OK

@@ -7,10 +7,15 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
+import static net.nemerosa.ontrack.test.TestUtils.uid
+
 class AdminQLIT extends AbstractQLITSupport {
 
     @Autowired
     private AccountService accountService
+
+    @Autowired
+    private AccountGroupMappingService mappingService
 
     @Test(expected = GraphQLException)
     void 'List of groups needs authorisation'() {
@@ -271,6 +276,36 @@ class AdminQLIT extends AbstractQLITSupport {
 
         assert projects.get(1).role.id == "OWNER"
         assert projects.get(1).project.name == p2.name
+    }
+
+    @Test
+    void 'Account group mappings'() {
+        def mappingName = uid('M')
+        def group = doCreateAccountGroup()
+        asAdmin().execute {
+            def mapping = mappingService.newMapping(
+                    'ldap',
+                    new AccountGroupMappingInput(
+                            mappingName,
+                            group.id
+                    )
+            )
+            def data = run("""{
+                accountGroups (id: ${group.id}) {
+                    mappings {
+                        id
+                        type
+                        name
+                    }
+                }
+            }""")
+            def g = data.accountGroups.first()
+            def mappings = g.mappings
+            assert mappings.size() == 1
+            assert mappings.first().id == mapping.id()
+            assert mappings.first().type == 'ldap'
+            assert mappings.first().name == mappingName
+        }
     }
 
 }
