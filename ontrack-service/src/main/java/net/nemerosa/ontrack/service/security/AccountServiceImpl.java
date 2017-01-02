@@ -371,6 +371,22 @@ public class AccountServiceImpl implements AccountService {
                 .flatMap(rolesService::getGlobalRole);
     }
 
+    @Override
+    public Collection<ProjectRoleAssociation> getProjectPermissionsForAccountGroup(AccountGroup group) {
+        return roleRepository.findProjectRoleAssociationsByGroup(
+                group.id(),
+                rolesService::getProjectRoleAssociation
+        )
+                .stream()
+                // Filter by authorisation
+                .filter(projectRoleAssociation -> securityService.isProjectFunctionGranted(
+                        projectRoleAssociation.getProjectId(),
+                        ProjectAuthorisationMgt.class
+                ))
+                // OK
+                .collect(Collectors.toList());
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),

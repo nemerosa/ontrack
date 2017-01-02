@@ -174,4 +174,12 @@ public interface AccountService {
      * @return Optional role
      */
     Optional<GlobalRole> getGlobalRoleForAccountGroup(AccountGroup group);
+
+    /**
+     * Gets the list of project permissions for a given account group
+     *
+     * @param group Account group to get the permissions for
+     * @return List of project roles
+     */
+    Collection<ProjectRoleAssociation> getProjectPermissionsForAccountGroup(AccountGroup group);
 }

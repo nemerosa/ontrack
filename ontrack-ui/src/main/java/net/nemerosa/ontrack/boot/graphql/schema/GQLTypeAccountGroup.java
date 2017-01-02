@@ -27,11 +27,13 @@ public class GQLTypeAccountGroup implements GQLType {
 
     private final AccountService accountService;
     private final GQLTypeGlobalRole globalRole;
+    private final GQLTypeAuthorizedProject authorizedProject;
 
     @Autowired
-    public GQLTypeAccountGroup(AccountService accountService, GQLTypeGlobalRole globalRole) {
+    public GQLTypeAccountGroup(AccountService accountService, GQLTypeGlobalRole globalRole, GQLTypeAuthorizedProject authorizedProject) {
         this.accountService = accountService;
         this.globalRole = globalRole;
+        this.authorizedProject = authorizedProject;
     }
 
     @Override
@@ -54,6 +56,15 @@ public class GQLTypeAccountGroup implements GQLType {
                         .dataFetcher(fetcher(
                                 AccountGroup.class,
                                 group -> accountService.getGlobalRoleForAccountGroup(group).orElse(null)
+                        ))
+                )
+                // Authorised projects
+                .field(field -> field.name("authorizedProjects")
+                        .description("List of authorized projects")
+                        .type(GraphqlUtils.stdList(authorizedProject.getType()))
+                        .dataFetcher(fetcher(
+                                AccountGroup.class,
+                                accountService::getProjectPermissionsForAccountGroup
                         ))
                 )
                 // OK

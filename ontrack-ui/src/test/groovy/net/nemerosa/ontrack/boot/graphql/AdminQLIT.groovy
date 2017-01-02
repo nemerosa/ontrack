@@ -232,4 +232,45 @@ class AdminQLIT extends AbstractQLITSupport {
         assert data.accountGroups.first().globalRole.name == 'Controller'
     }
 
+    @Test
+    void 'Account group authorized projects'() {
+        def p1 = doCreateProject()
+        def p2 = doCreateProject()
+        def g = doCreateAccountGroup()
+        def data = asAdmin().call {
+            accountService.saveProjectPermission(
+                    p1.id,
+                    PermissionTargetType.GROUP,
+                    g.id(),
+                    new PermissionInput("PARTICIPANT")
+            )
+            accountService.saveProjectPermission(
+                    p2.id,
+                    PermissionTargetType.GROUP,
+                    g.id(),
+                    new PermissionInput("OWNER")
+            )
+            return run("""{
+                accountGroups(id: ${g.id}) {
+                    authorizedProjects {
+                        role {
+                            id
+                        }
+                        project {
+                            name
+                        }
+                    }
+                }
+            }""")
+        }
+        def projects = data.accountGroups.first().authorizedProjects
+        assert projects.size() == 2
+
+        assert projects.get(0).role.id == "PARTICIPANT"
+        assert projects.get(0).project.name == p1.name
+
+        assert projects.get(1).role.id == "OWNER"
+        assert projects.get(1).project.name == p2.name
+    }
+
 }
