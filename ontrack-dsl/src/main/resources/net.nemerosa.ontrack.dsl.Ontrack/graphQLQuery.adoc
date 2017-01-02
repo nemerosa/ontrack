@@ -1,0 +1,19 @@
+The `graphQLQuery` runs a http://graphql.org/[GraphQL] query against the Ontrack model.
+
+It returns a JSON representation of an https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/ExecutionResult.java[`ExecutionResult`]
+object containing both the data and any error message.
+
+[source,groovy]
+----
+def result = ontrack.graphQLQuery("""{
+    projects(name: "P") {
+        name
+        branches {
+            name
+        }
+    }
+}""")
+
+assert result.errors != null && result.errors.empty
+assert result.data.projects.get(0).name == "P"
+----
