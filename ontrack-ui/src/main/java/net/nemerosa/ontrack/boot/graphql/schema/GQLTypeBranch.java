@@ -14,8 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static graphql.Scalars.GraphQLBoolean;
-import static graphql.Scalars.GraphQLInt;
+import static graphql.Scalars.*;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -84,6 +83,10 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                         newFieldDefinition()
                                 .name("validationStamps")
                                 .type(stdList(validationStamp.getType()))
+                                .argument(arg -> arg.name("name")
+                                        .description("Filters on the validation stamp")
+                                        .type(GraphQLString)
+                                )
                                 .dataFetcher(branchValidationStampsFetcher())
                                 .build()
                 )
@@ -169,9 +172,18 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     private DataFetcher branchValidationStampsFetcher() {
         return environment -> {
             Object source = environment.getSource();
+            Optional<String> name = GraphqlUtils.getStringArgument(environment, "name");
             if (source instanceof Branch) {
                 Branch branch = (Branch) source;
-                return structureService.getValidationStampListForBranch(branch.getId());
+                if (name.isPresent()) {
+                    return structureService.findValidationStampByName(
+                            branch.getProject().getName(), branch.getName(), name.get()
+                    )
+                            .map(Collections::singletonList)
+                            .orElse(Collections.emptyList());
+                } else {
+                    return structureService.getValidationStampListForBranch(branch.getId());
+                }
             } else {
                 return Collections.emptyList();
             }
