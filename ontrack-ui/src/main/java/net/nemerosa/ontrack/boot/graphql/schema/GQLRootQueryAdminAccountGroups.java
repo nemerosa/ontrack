@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.graphql.schema;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
 import net.nemerosa.ontrack.model.security.AccountGroup;
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService;
 import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +16,6 @@ import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
-import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.checkArgList;
 import static net.nemerosa.ontrack.boot.graphql.support.GraphqlUtils.stdList;
@@ -26,13 +26,19 @@ public class GQLRootQueryAdminAccountGroups implements GQLRootQuery {
 
     public static final String ID_ARGUMENT = "id";
     public static final String NAME_ARGUMENT = "name";
+    public static final String MAPPING_ARGUMENT = "mapping";
 
     private final AccountService accountService;
+    private final AccountGroupMappingService accountGroupMappingService;
     private final GQLTypeAccountGroup accountGroup;
 
     @Autowired
-    public GQLRootQueryAdminAccountGroups(AccountService accountService, GQLTypeAccountGroup accountGroup) {
+    public GQLRootQueryAdminAccountGroups(AccountService accountService,
+                                          AccountGroupMappingService accountGroupMappingService,
+                                          GQLTypeAccountGroup accountGroup
+    ) {
         this.accountService = accountService;
+        this.accountGroupMappingService = accountGroupMappingService;
         this.accountGroup = accountGroup;
     }
 
@@ -41,19 +47,17 @@ public class GQLRootQueryAdminAccountGroups implements GQLRootQuery {
         return newFieldDefinition()
                 .name("accountGroups")
                 .type(stdList(accountGroup.getType()))
-                .argument(
-                        newArgument()
-                                .name(ID_ARGUMENT)
-                                .description("Searching by ID")
-                                .type(GraphQLInt)
-                                .build()
+                .argument(arg -> arg.name(ID_ARGUMENT)
+                        .description("Searching by ID")
+                        .type(GraphQLInt)
                 )
-                .argument(
-                        newArgument()
-                                .name(NAME_ARGUMENT)
-                                .description("Searching by looking for a string in the name or the description")
-                                .type(GraphQLString)
-                                .build()
+                .argument(arg -> arg.name(NAME_ARGUMENT)
+                        .description("Searching by looking for a string in the name or the description")
+                        .type(GraphQLString)
+                )
+                .argument(arg -> arg.name(MAPPING_ARGUMENT)
+                        .description("Searching by looking for a mapping")
+                        .type(GraphQLString)
                 )
                 .dataFetcher(adminAccountGroupsFetcher())
                 .build();
@@ -63,6 +67,7 @@ public class GQLRootQueryAdminAccountGroups implements GQLRootQuery {
         return environment -> {
             Integer id = environment.getArgument(ID_ARGUMENT);
             String name = environment.getArgument(NAME_ARGUMENT);
+            String mapping = environment.getArgument(MAPPING_ARGUMENT);
             if (id != null) {
                 checkArgList(environment, ID_ARGUMENT);
                 return Collections.singletonList(
@@ -74,6 +79,13 @@ public class GQLRootQueryAdminAccountGroups implements GQLRootQuery {
                 if (StringUtils.isNotBlank(name)) {
                     filter = filter.and(
                             group -> contains(group.getName(), name) || contains(group.getDescription(), name)
+                    );
+                }
+                // Filter by mapping
+                if (StringUtils.isNotBlank(mapping)) {
+                    filter = filter.and(
+                            group -> accountGroupMappingService.getMappingsForGroup(group).stream()
+                                    .anyMatch(m -> StringUtils.equals(mapping, m.getName()))
                     );
                 }
                 // Getting the list

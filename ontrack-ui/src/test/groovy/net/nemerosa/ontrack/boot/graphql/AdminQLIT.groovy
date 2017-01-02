@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.graphql
 import graphql.GraphQLException
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -30,7 +29,7 @@ class AdminQLIT extends AbstractQLITSupport {
     @Test
     void 'List of groups'() {
         asUser().with(AccountGroupManagement).call {
-            def g = accountService.createGroup(NameDescription.nd(TestUtils.uid('G'), '')).id()
+            def g = accountService.createGroup(NameDescription.nd(uid('G'), '')).id()
             def data = run("""{ accountGroups { id name } }""")
             assert data.accountGroups.find { it.id == g } != null
         }
@@ -305,6 +304,29 @@ class AdminQLIT extends AbstractQLITSupport {
             assert mappings.first().id == mapping.id()
             assert mappings.first().type == 'ldap'
             assert mappings.first().name == mappingName
+        }
+    }
+
+    @Test
+    void 'Account group filtered by mapping'() {
+        def mappingName = uid('M')
+        def group1 = doCreateAccountGroup()
+        doCreateAccountGroup()
+        doCreateAccountGroup()
+        asAdmin().execute {
+            mappingService.newMapping(
+                    'ldap',
+                    new AccountGroupMappingInput(
+                            mappingName,
+                            group1.id
+                    )
+            )
+            def data = run("""{
+                accountGroups (mapping: "${mappingName}") {
+                    id
+                }
+            }""")
+            assert data.accountGroups*.id as Set == [group1.id()] as Set
         }
     }
 
