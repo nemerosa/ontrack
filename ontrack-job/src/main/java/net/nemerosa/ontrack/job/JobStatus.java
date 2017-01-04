@@ -69,4 +69,8 @@ public class JobStatus {
     public String getProgressText() {
         return progress != null ? progress.getText() : "";
     }
+
+    public boolean canBeStopped() {
+        return running;
+    }
 }

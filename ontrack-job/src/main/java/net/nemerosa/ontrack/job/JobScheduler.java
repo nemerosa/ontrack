@@ -127,4 +127,14 @@ public interface JobScheduler {
      * Gets the job key for a job id
      */
     Optional<JobKey> getJobKey(long id);
+
+    /**
+     * Stops a running a job.
+     *
+     * @param key Key of the job to run
+     * @return <code>true</code> if the job was stopped, <code>false</code> if the job could not be stopped or was
+     * not running.
+     * @throws JobNotScheduledException If the job is not scheduled
+     */
+    boolean stop(JobKey key);
 }

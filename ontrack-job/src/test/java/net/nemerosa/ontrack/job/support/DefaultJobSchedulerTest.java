@@ -213,6 +213,28 @@ public class DefaultJobSchedulerTest {
     }
 
     @Test
+    public void stop() throws InterruptedException {
+        JobScheduler jobScheduler = createJobScheduler();
+
+        LongCountJob longCountJob = new LongCountJob();
+        jobScheduler.schedule(longCountJob, Schedule.EVERY_MINUTE);
+
+        // Waits for the start
+        Thread.sleep(1500);
+
+        // Checks it's running
+        Optional<JobStatus> jobStatus = jobScheduler.getJobStatus(longCountJob.getKey());
+        assertTrue("Job is running", jobStatus.isPresent() && jobStatus.get().isRunning());
+
+        // Stops the job
+        assertTrue("Job has been stopped", jobScheduler.stop(longCountJob.getKey()));
+
+        // Checks it has actually been stopped
+        jobStatus = jobScheduler.getJobStatus(longCountJob.getKey());
+        assertTrue("Job is actually stopped", jobStatus.isPresent() && !jobStatus.get().isRunning());
+    }
+
+    @Test
     public void keys() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
 

@@ -164,4 +164,15 @@ public class AdminController extends AbstractResourceController {
                 .orElse(Ack.NOK);
     }
 
+    /**
+     * Stopping a job
+     */
+    @RequestMapping(value = "jobs/{id:\\d+}/stop", method = RequestMethod.DELETE)
+    public Ack stopJob(@PathVariable long id) {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        return jobScheduler.getJobKey(id)
+                .map(key -> Ack.validate(jobScheduler.stop(key)))
+                .orElse(Ack.NOK);
+    }
+
 }

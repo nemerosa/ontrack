@@ -122,6 +122,16 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
+    public boolean stop(JobKey key) {
+        JobScheduledService existingService = services.get(key);
+        if (existingService != null) {
+            return existingService.cancel(true);
+        } else {
+            throw new JobNotScheduledException(key);
+        }
+    }
+
+    @Override
     public Collection<JobKey> getAllJobKeys() {
         return services.keySet();
     }
@@ -237,15 +247,17 @@ public class DefaultJobScheduler implements JobScheduler {
             fireImmediately(false, Collections.emptyMap());
         }
 
-        public void cancel(boolean forceStop) {
+        public boolean cancel(boolean forceStop) {
             if (scheduledFuture != null) {
                 scheduledFuture.cancel(false);
             }
             // The decorated task might still run
             CompletableFuture<?> future = this.completableFuture.get();
-            if (forceStop && future != null && !future.isDone() && !future.isCancelled()) {
-                future.cancel(true);
-            }
+            return forceStop &&
+                    future != null &&
+                    !future.isDone() &&
+                    !future.isCancelled() &&
+                    future.cancel(true);
         }
 
         public CompletableFuture<?> fireImmediately(boolean force, Map<String, ?> parameters) {
