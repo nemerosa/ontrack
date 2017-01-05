@@ -123,6 +123,50 @@ of Ontrack.
 [[extending-graphql-queries]]
 ===== Root queries
 
+Your extension can contribute to the root query by creating a component
+implementing the `GQLRootQuery` interface:
+
+[source,java]
+----
+@Component
+public class AccountGraphQLRootQuery implements GQLRootQuery {
+
+    private final AccountType accountType;
+
+    @Autowired
+    public AccountGraphQLRootQuery(AccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    @Override
+    public GraphQLFieldDefinition getFieldDefinition() {
+        return GraphQLFieldDefinition.newFieldDefinition()
+                .name("accounts")
+                .argument(a -> a.name("username")
+                        .description("User name pattern")
+                        .type(GraphQLString)
+                )
+                .type(accountType.getType())
+                .dataFetcher(...)
+                .build();
+    }
+}
+----
+
+This root query can then be used into your GraphQL queries:
+
+[source]
+----
+{
+   accounts(username: "admin*") {
+      username
+      identity {
+         name
+      }
+   }
+}
+----
+
 [[extending-graphql-fields]]
 ===== Extra fields
 
