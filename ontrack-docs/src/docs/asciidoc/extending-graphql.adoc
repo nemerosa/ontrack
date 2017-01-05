@@ -88,6 +88,38 @@ public class AccountType implements GQLType {
 }
 ----
 
+You can also create GraphQL types dynamically by using introspection of your
+model classes.
+
+Given the following model:
+
+[source,java]
+----
+@Data
+public class Person {
+   private final String name;
+}
+@Data
+public class Account {
+   private final String username;
+   private final Person identity;
+}
+----
+
+You can generate the `Account` type by using:
+
+[source,java]
+----
+@Override
+public GraphQLObjectType getType() {
+   return GraphQLBeanConverter.asObjectType(Account.class);
+}
+----
+
+CAUTION: The `GraphQLBeanConverter.asObjectType` is still very
+*experimental* and its implementation is likely to change in the next versions
+of Ontrack.
+
 [[extending-graphql-queries]]
 ===== Root queries
 
