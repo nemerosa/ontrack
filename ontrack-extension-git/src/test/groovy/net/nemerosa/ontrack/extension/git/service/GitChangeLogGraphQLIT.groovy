@@ -133,7 +133,7 @@ class GitChangeLogGraphQLIT extends AbstractQLITSupport {
             // Getting the change log between build 5 and 7
             def data = run("""{
                 branches(id: ${branch.id}) {
-                    gitChangeLog(from: '5', to: '7') {
+                    gitChangeLog(from: "5", to: "7") {
                         commits {
                             commit {
                                 shortMessage

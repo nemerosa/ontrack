@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -166,6 +167,18 @@ public final class GraphqlUtils {
             if (sourceType.isInstance(o)) {
                 @SuppressWarnings("unchecked") T t = (T) o;
                 return fn.apply(t);
+            } else {
+                return null;
+            }
+        };
+    }
+
+    public static <T, R> DataFetcher fetcher(Class<T> sourceType, BiFunction<DataFetchingEnvironment, T, R> fn) {
+        return environment -> {
+            Object o = environment.getSource();
+            if (sourceType.isInstance(o)) {
+                @SuppressWarnings("unchecked") T t = (T) o;
+                return fn.apply(environment, t);
             } else {
                 return null;
             }
