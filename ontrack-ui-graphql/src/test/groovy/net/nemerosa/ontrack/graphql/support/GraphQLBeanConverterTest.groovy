@@ -17,4 +17,27 @@ class GraphQLBeanConverterTest {
         ]
     }
 
+    @Test
+    void 'Composite type'() {
+        def type = GraphQLBeanConverter.asObjectType(Account)
+        assert type.name == 'Account'
+        def fields = type.fieldDefinitions.collectEntries { [it.name, it.type.name] }
+        assert fields == [
+                username: 'String',
+                password: 'String',
+                identity: 'Person',
+        ]
+    }
+
+    @Test
+    void 'Composite type with three levels'() {
+        def type = GraphQLBeanConverter.asObjectType(OnBehalf)
+        assert type.name == 'OnBehalf'
+        def fields = type.fieldDefinitions.collectEntries { [it.name, it.type.name] }
+        assert fields == [
+                delegate: 'Account',
+                account : 'Account',
+        ]
+    }
+
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
+import net.nemerosa.ontrack.graphql.support.GQLScalarJSON;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.structure.Property;

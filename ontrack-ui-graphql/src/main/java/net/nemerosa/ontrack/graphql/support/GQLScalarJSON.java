@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql.schema;
+package net.nemerosa.ontrack.graphql.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

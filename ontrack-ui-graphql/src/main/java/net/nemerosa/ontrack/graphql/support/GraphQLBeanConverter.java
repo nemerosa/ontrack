@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.support;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
@@ -10,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +99,10 @@ public class GraphQLBeanConverter {
             return GraphQLBoolean;
         } else if (String.class.isAssignableFrom(type)) {
             return GraphQLString;
+        } else if (JsonNode.class.isAssignableFrom(type)) {
+            return GQLScalarJSON.INSTANCE;
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            return GQLScalarLocalDateTime.INSTANCE;
         } else {
             return null;
         }
