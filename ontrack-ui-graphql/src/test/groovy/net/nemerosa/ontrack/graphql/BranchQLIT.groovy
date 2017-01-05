@@ -10,15 +10,6 @@ import org.junit.Test
 class BranchQLIT extends AbstractQLITSupport {
 
     @Test
-    void 'Branch links'() {
-        def branch = doCreateBranch()
-
-        def data = run("""{branches (id: ${branch.id}) { name links { _page } } }""")
-        assert data.branches.first().name == branch.name
-        assert data.branches.first().links._page == "urn:test:#:entity:BRANCH:${branch.id}"
-    }
-
-    @Test
     void 'Branch by ID'() {
         def branch = doCreateBranch()
 
@@ -158,21 +149,6 @@ class BranchQLIT extends AbstractQLITSupport {
     }
 
     @Test
-    void 'Promotion level image link'() {
-        def pl = doCreatePromotionLevel()
-        def data = run("""{
-            branches (id: ${pl.branch.id}) {
-                promotionLevels {
-                    links {
-                        _image
-                    }
-                }
-            }
-        }""")
-        assert data.branches.first().promotionLevels.first().links._image == "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:,${pl.id}"
-    }
-
-    @Test
     void 'Promotion level branch reference'() {
         def pl = doCreatePromotionLevel()
         def data = run("""{
@@ -190,21 +166,6 @@ class BranchQLIT extends AbstractQLITSupport {
         def p = data.branches.first().promotionLevels.first()
         assert p.branch.id == pl.branch.id()
         assert p.branch.project.id == pl.branch.project.id()
-    }
-
-    @Test
-    void 'Validation stamp image link'() {
-        def vs = doCreateValidationStamp()
-        def data = run("""{
-            branches (id: ${vs.branch.id}) {
-                validationStamps {
-                    links {
-                        _image
-                    }
-                }
-            }
-        }""")
-        assert data.branches.first().validationStamps.first().links._image == "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampImage_:,${vs.id}"
     }
 
     @Test

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
 import graphql.GraphQLException
-import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -28,14 +27,6 @@ class ProjectQLIT extends AbstractQLITSupport {
     @Test(expected = GraphQLException)
     void 'Project by ID and name is not authorised'() {
         run("""{projects(id: 1, name: "test") { name }}""")
-    }
-
-    @Test
-    void 'Project links'() {
-        def p = doCreateProject()
-        def data = asUser().with(p, ProjectEdit).call { run("{projects(id: ${p.id}) { name links { _update } }}") }
-        assert data.projects.first().name == p.name
-        assert data.projects.first().links._update == "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:${p.id},"
     }
 
     @Test
