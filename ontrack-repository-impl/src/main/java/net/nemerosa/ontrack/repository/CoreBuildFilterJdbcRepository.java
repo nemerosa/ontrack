@@ -154,7 +154,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
             // withPropertyValue
             String withPropertyValue = data.getWithPropertyValue();
             if (StringUtils.isNotBlank(withPropertyValue)) {
-                sql.append(" AND PP.SEARCHKEY ~ :withPropertyValue");
+                criteria.append(" AND PP.SEARCHKEY ~ :withPropertyValue");
                 params.addValue("withPropertyValue", withPropertyValue);
             }
         }
