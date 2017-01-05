@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.git.graphql;
 
 import graphql.schema.GraphQLObjectType;
+import net.nemerosa.ontrack.extension.git.model.GitUICommit;
 import net.nemerosa.ontrack.graphql.schema.GQLType;
+import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,11 +14,7 @@ public class GitUICommitGQLType implements GQLType {
 
     @Override
     public GraphQLObjectType getType() {
-        return GraphQLObjectType.newObject()
-                .name("GitUICommit")
-                // TODO Fields
-                // OK
-                .build();
+        return GraphQLBeanConverter.asObjectType(GitUICommit.class);
     }
 
 }

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql
+package net.nemerosa.ontrack.graphql.support
 
 import org.junit.Test
 
