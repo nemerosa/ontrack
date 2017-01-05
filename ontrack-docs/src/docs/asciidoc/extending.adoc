@@ -227,6 +227,7 @@ Ontrack provides the following extension points:
 * <<extending-metrics, Metrics>> - allows to contribute to the
   <<monitoring,metrics>> exported by Ontrack
 * <<extending-event-types, Event types>> - allows to define additional event types.
+* <<extending-graphql, GraphQL>> - allows contributions to the <<integration-graphql,GraphQL>> Ontrack schema.
 *  **TODO** Entity action - allows to add an action for the page of an entity
 *  **TODO** Entity information - allows to add some information into the page of an entity
 *  **TODO** Search extension - provides a search end point for global text based searches
@@ -375,3 +376,5 @@ include::extending-user-menu.adoc[]
 include::extending-pages.adoc[]
 
 include::extending-event-types.adoc[]
+
+include::extending-graphql.adoc[]

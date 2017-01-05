@@ -102,3 +102,12 @@ IMPORTANT: The access rights used for your GraphQL queries are inherited
 from your Ontrack connection. Connect with your user in Ontrack before
 switching to the GraphiQL IDE. Login in from within GraphiQL is not
 supported yet.
+
+
+[[integration-graphql-extending]]
+=== Extending the GraphQL schema
+
+The core Ontrack GraphQL query schema can be extended by custom
+<<extending,extensions>>.
+
+See <<extending-graphql>> for more information.

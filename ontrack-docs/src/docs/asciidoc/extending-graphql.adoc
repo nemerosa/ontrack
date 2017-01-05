@@ -1,0 +1,98 @@
+[[extending-graphql]]
+==== Extending GraphQL
+
+Extensions can contribute to the Ontrack <<integration-graphql,GraphQL>> core
+schema:
+
+* custom types
+* root queries
+* additional fields in <<model,project entities>>
+
+[[extending-graphql-module]]
+===== Preparing the extension
+
+In your extension module, import the `ontrack-ui-graphql` module:
+
+[source,groovy]
+----
+dependencies {
+   compile "net.nemerosa.ontrack:ontrack-ui-graphql:${ontrackVersion}"
+}
+----
+
+If you want to write <<extending-graphql-testing,integration tests>> for your
+GraphQL extension, you have to include the GraphQL testing utilities:
+
+[source,groovy]
+----
+dependencies {
+   compile "net.nemerosa.ontrack:ontrack-ui-graphql:${ontrackVersion}:tests"
+}
+----
+
+[[extending-graphql-types]]
+===== Custom types
+
+To define an extra type, you create a component which implements the
+`GQLType` interface:
+
+[source,java]
+----
+@Component
+public class PersonType implements GQLType {
+    @Override
+    public GraphQLObjectType getType() {
+        return GraphQLObjectType.newObject()
+                .name("Person")
+                .field(f -> f.name("name")
+                        .description("Name of the person")
+                        .type(GraphQLString)
+                )
+                .build();
+    }
+}
+----
+
+TIP: See the https://github.com/graphql-java/graphql-java[graphql-java]
+documentation for the description of the type construction.
+
+You can use this component in other ones, like in queries, field definitions
+or other types, like shown below:
+
+[source,java]
+----
+@Component
+public class AccountType implements GQLType {
+
+    private final PersonType personType;
+
+    @Autowired
+    public AccountType (PersonType personType) {
+        this.personType = personType;
+    }
+
+    @Override
+    public GraphQLObjectType getType() {
+        return GraphQLObjectType.newObject()
+                .name("Account")
+                .field(f -> f.name("username")
+                        .description("Account name")
+                        .type(GraphQLString)
+                )
+                .field(f -> f.name("identity")
+                        .description("Identity")
+                        .type(personType.getType())
+                )
+                .build();
+    }
+}
+----
+
+[[extending-graphql-queries]]
+===== Root queries
+
+[[extending-graphql-fields]]
+===== Extra fields
+
+[[extending-graphql-testing]]
+===== Testing GraphQL
