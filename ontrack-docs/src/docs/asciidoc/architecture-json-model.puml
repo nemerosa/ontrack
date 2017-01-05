@@ -23,20 +23,25 @@ package "ui-support" {
 
 }
 
+package "ui-graphql" {
+    class AbstractGQLProjectEntity
+    interface GQLProjectEntityFieldContributor
+
+    AbstractGQLProjectEntity --> "*" GQLProjectEntityFieldContributor: contributors
+}
+
 package "ui" {
     class BuildResourceDecorator
     class BuildController <<controller>>
+    class GQLProjectEntityLinksFieldContributor
 
     BuildResourceDecorator --> BuildController
 
     BuildResourceDecorator --|> AbstractLinkResourceDecorator
     BuildResourceDecorator o--> "1" ResourceDecorationContributorService
 
-    package "graphql" {
-        class AbstractGQLProjectEntity
-
-        AbstractGQLProjectEntity --> "*" ResourceDecorator: decorators
-    }
+    GQLProjectEntityLinksFieldContributor ..|> GQLProjectEntityFieldContributor
+    GQLProjectEntityLinksFieldContributor --> "*" ResourceDecorator: decorators
 
 }
 
