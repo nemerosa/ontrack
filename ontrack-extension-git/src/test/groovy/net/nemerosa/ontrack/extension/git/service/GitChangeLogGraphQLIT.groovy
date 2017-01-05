@@ -155,12 +155,12 @@ class GitChangeLogGraphQLIT extends AbstractQLITSupport {
                     branch.project.name,
                     branch.name,
                     '5'
-            ).orElseThrow({new BuildNotFoundException(branch.project.name, branch.name, '5') }).id()
+            ).orElseThrow({ new BuildNotFoundException(branch.project.name, branch.name, '5') }).id()
             int build7 = structureService.findBuildByName(
                     branch.project.name,
                     branch.name,
                     '7'
-            ).orElseThrow({new BuildNotFoundException(branch.project.name, branch.name, '5') }).id()
+            ).orElseThrow({ new BuildNotFoundException(branch.project.name, branch.name, '5') }).id()
             // Getting the change log between build 5 and 7
             def data = run("""{
                 gitChangeLog(from: ${build5}, to: ${build7}) {
@@ -171,7 +171,7 @@ class GitChangeLogGraphQLIT extends AbstractQLITSupport {
                     }
                 }
             }""")
-            def messages = data.branches.first().gitChangeLog.commits*.commit.shortMessage
+            def messages = data.gitChangeLog.commits*.commit.shortMessage
             assert messages == ['Commit 7', 'Commit 6']
         }
     }
