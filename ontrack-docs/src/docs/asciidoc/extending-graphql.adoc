@@ -126,5 +126,26 @@ of Ontrack.
 [[extending-graphql-fields]]
 ===== Extra fields
 
+[[extending-graphql-scalars]]
+===== Built-in scalar fields
+
+The Ontrack GraphQL module adds the following scalar types, which you can
+use in your field or type definitions:
+
+* `GQLScalarJSON.INSTANCE` - maps to a `JsonNode`
+* `GQLScalarLocalDateTime.INSTANCE` - maps to a `LocalDateTime`
+
+You can use them directly in your definitions:
+
+[source,java]
+----
+...
+.field(f -> f.name("content").type(GQLScalarJSON.INSTANCE))
+.field(f -> f.name("timestamp").type(GQLScalarLocalDateTime.INSTANCE))
+...
+----
+
 [[extending-graphql-testing]]
 ===== Testing GraphQL
+
+TODO
