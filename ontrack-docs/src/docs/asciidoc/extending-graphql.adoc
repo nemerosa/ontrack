@@ -170,6 +170,62 @@ This root query can then be used into your GraphQL queries:
 [[extending-graphql-fields]]
 ===== Extra fields
 
+The Ontrack GraphQL extension mechanism allows contributions to the
+<<model,project entities>> like the projects, builds, etc.
+
+For example, to contribute a `owner` field of type `Account` on the `Branch`
+project entity:
+
+[source,java]
+----
+@Component
+public class BranchOwnerGraphQLFieldContributor
+   implements GQLProjectEntityFieldContributor {
+
+   private final AccountType accountType;
+
+   @Autowired
+   public BranchOwnerGraphQLFieldContributor(AccountType accountType) {
+      this.accountType = accountType;
+   }
+
+   @Override
+   public List<GraphQLFieldDefinition> getFields(
+         Class<? extends ProjectEntity> projectEntityClass,
+         ProjectEntityType projectEntityType) {
+     return Collections.singletonList(
+             GraphQLFieldDefinition.newFieldDefinition()
+                     .name("owner")
+                     .type(accountType.getType())
+                     .dataFetcher(GraphqlUtils.fetcher(
+                        Branch.class,
+                        (environment, branch) -> return ...
+                     ))
+                     .build()
+     );
+}
+----
+
+You can now use the `owner` field in your queries:
+
+[source]
+----
+{
+   branches(id: 1) {
+      name
+      project {
+         name
+      }
+      owner {
+         username
+         identity {
+            name
+         }
+      }
+   }
+}
+----
+
 [[extending-graphql-scalars]]
 ===== Built-in scalar fields
 
