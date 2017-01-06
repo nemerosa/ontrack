@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.model.support.EnvService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -18,9 +17,13 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
-@Component
-public class DefaultConfidentialStore implements ConfidentialStore {
-    public static final String ENCODING = "UTF-8";
+/**
+ * Storing the keys as files in a directory.
+ */
+public class FileConfidentialStore implements ConfidentialStore {
+
+    private static final String ENCODING = "UTF-8";
+
     private final SecureRandom sr = new SecureRandom();
 
     /**
@@ -38,11 +41,11 @@ public class DefaultConfidentialStore implements ConfidentialStore {
     private final SecretKey masterKey;
 
     @Autowired
-    public DefaultConfidentialStore(EnvService envService) throws IOException, InterruptedException {
+    public FileConfidentialStore(EnvService envService) throws IOException, InterruptedException {
         this(envService.getWorkingDir("security", "secrets"));
     }
 
-    public DefaultConfidentialStore(File rootDir) throws IOException, InterruptedException {
+    public FileConfidentialStore(File rootDir) throws IOException, InterruptedException {
         this.rootDir = rootDir;
 
         File masterSecret = new File(rootDir, "master.key");
