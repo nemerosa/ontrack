@@ -50,7 +50,7 @@ public class Migration {
             cleanup();
         }
 
-        /**
+        /*
          * Global data
          */
 
@@ -69,7 +69,7 @@ public class Migration {
         // STORAGE
         copy("STORAGE", "STORE", "NAME", "DATA::JSONB");
 
-        /**
+        /*
          * Entities
          */
 
@@ -97,7 +97,7 @@ public class Migration {
         // VALIDATION_RUN_STATUSES
         copy("VALIDATION_RUN_STATUSES", "ID", "VALIDATIONRUNID", "VALIDATIONRUNSTATUSID", "CREATION", "CREATOR", "DESCRIPTION");
 
-        /**
+        /*
          * Branch templating
          */
 
@@ -113,7 +113,7 @@ public class Migration {
         // BRANCH_TEMPLATE_INSTANCE_PARAMS
         copy("BRANCH_TEMPLATE_INSTANCE_PARAMS", "BRANCHID", "NAME", "VALUE");
 
-        /**
+        /*
          * Entity data
          */
 
@@ -136,7 +136,7 @@ public class Migration {
             copyEvents();
         }
 
-        /**
+        /*
          * ACL
          */
 
@@ -228,12 +228,12 @@ public class Migration {
     private void copyWithTmp(String table, String tmpCreation, String... columns) {
         String h2Query = format("SELECT * FROM %s", table);
 
-        String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
+        String insert = Arrays.stream(columns).map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
         String postgresqlUpdate = format(
                 "INSERT INTO TMP_%s (%s) VALUES (%s)",
                 table,
                 insert,
-                Arrays.asList(columns).stream()
+                Arrays.stream(columns)
                         .map(column -> "?" + (StringUtils.contains(column, "::") ? "::" + StringUtils.substringAfter(column, "::") : ""))
                         .collect(Collectors.joining(","))
         );
@@ -318,7 +318,7 @@ public class Migration {
                 "VALIDATION_RUNS",
                 "VALIDATION_STAMPS",
         };
-        tx(() -> Arrays.asList(tables).stream().forEach(table -> {
+        tx(() -> Arrays.stream(tables).forEach(table -> {
             Integer max = postgresql.queryForObject(
                     format("SELECT MAX(ID) AS ID FROM %s", table),
                     Collections.emptyMap(),
@@ -379,8 +379,8 @@ public class Migration {
     private void copy(String table, String... columns) {
         String h2Query = format("SELECT * FROM %s", table);
 
-        String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
-        String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
+        String insert = Arrays.stream(columns).map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
+        String values = Arrays.stream(columns).map(column -> ":" + column).collect(Collectors.joining(","));
         String postgresqlUpdate = format("INSERT INTO %s (%s) VALUES (%s)", table, insert, values);
 
         tx(() -> simpleMigration(
