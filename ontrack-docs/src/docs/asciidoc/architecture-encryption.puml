@@ -1,0 +1,57 @@
+@startuml
+
+participant Client
+box "Services" #lightblue
+    control EncryptionService
+    participant CryptoConfidentialKey
+    control ConfidentialStore
+    database Store
+end box
+
+== Initialisation ==
+
+-> ConfidentialStore: new(directory)
+alt If ""master.key"" file does not exist
+    ConfidentialStore -> ConfidentialStore: generates master key
+    ConfidentialStore -> Store: creates ""master.key"" file
+end
+ConfidentialStore -> Store: reads ""master.key"" file
+ConfidentialStore -> ConfidentialStore: stores master key
+
+-> EncryptionService: new(ConfidentialStore)
+create CryptoConfidentialKey
+EncryptionService -> CryptoConfidentialKey: new
+CryptoConfidentialKey -> CryptoConfidentialKey
+note right
+    Key name:
+    ""net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption""
+end note
+CryptoConfidentialKey -> ConfidentialStore: load(key)
+ConfidentialStore -> Store: reads key file
+ConfidentialStore -> ConfidentialStore: decrypts key content with master key
+ConfidentialStore --> CryptoConfidentialKey: decrypted key
+alt If key does not exist yet
+    CryptoConfidentialKey -> ConfidentialStore: generates random sequence
+    ConfidentialStore --> CryptoConfidentialKey: random bytes
+    CryptoConfidentialKey -> ConfidentialStore: stores key
+    ConfidentialStore -> ConfidentialStore: encrypts with master key
+    ConfidentialStore -> Store: stores in key file
+end
+CryptoConfidentialKey -> CryptoConfidentialKey: stores internal key
+CryptoConfidentialKey --> EncryptionService: key
+
+== Encryption ==
+
+Client -> EncryptionService: encrypt(secret)
+EncryptionService -> CryptoConfidentialKey: encrypts with internal key
+CryptoConfidentialKey --> EncryptionService: encrypted
+EncryptionService --> Client: encrypted
+
+== Decription ==
+
+Client -> EncryptionService: decrypt(encrypted)
+EncryptionService -> CryptoConfidentialKey: decrypts with internal key
+CryptoConfidentialKey --> EncryptionService: decrypted
+EncryptionService --> Client: secret
+
+@enduml
