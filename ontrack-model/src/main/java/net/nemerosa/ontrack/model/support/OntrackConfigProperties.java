@@ -50,6 +50,11 @@ public class OntrackConfigProperties {
      */
     private JobConfigProperties jobs = new JobConfigProperties();
 
+    /**
+     * ID of the key store to use
+     */
+    private String keyStore = "file";
+
     @PostConstruct
     public void log() {
         if (!configurationTest) {

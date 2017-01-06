@@ -22,4 +22,13 @@ public interface ConfidentialStore {
      * This enables implementations to consult other entropy sources, if it's available.
      */
     byte[] randomBytes(int size);
+
+    /**
+     * Gets the unique ID for this store, which allows for its selection in
+     * {@link net.nemerosa.ontrack.model.support.OntrackConfigProperties}.
+     *
+     * @return A unique ID
+     * @see
+     */
+    String getId();
 }
