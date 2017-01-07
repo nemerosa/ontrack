@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.ConfidentialStore;
+import net.nemerosa.ontrack.model.security.EncryptionException;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -23,6 +24,21 @@ public class CryptoConfidentialKey implements ConfidentialKey {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public String exportKey() throws IOException {
+        return Base64.getEncoder().encodeToString(
+                confidentialStore.load(id)
+        );
+    }
+
+    @Override
+    public void importKey(String key) throws IOException {
+        confidentialStore.store(
+                id,
+                Base64.getDecoder().decode(key)
+        );
     }
 
     private SecretKey getKey() {

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import javax.crypto.Cipher;
+import java.io.IOException;
 
 public interface ConfidentialKey {
 
@@ -16,4 +17,8 @@ public interface ConfidentialKey {
     String encrypt(String plain);
 
     String decrypt(String crypted);
+
+    String exportKey() throws IOException;
+
+    void importKey(String key) throws IOException;
 }

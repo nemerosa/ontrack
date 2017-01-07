@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.ConfidentialStore;
+import net.nemerosa.ontrack.model.security.EncryptionException;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * Default encryption service
@@ -33,5 +36,23 @@ public class EncryptionServiceImpl implements EncryptionService {
     @Override
     public String decrypt(String crypted) {
         return crypted != null ? key.decrypt(crypted) : null;
+    }
+
+    @Override
+    public String exportKey() {
+        try {
+            return key.exportKey();
+        } catch (IOException e) {
+            throw new EncryptionException(e);
+        }
+    }
+
+    @Override
+    public void importKey(String payload) {
+        try {
+            key.importKey(payload);
+        } catch (IOException e) {
+            throw new EncryptionException(e);
+        }
     }
 }
