@@ -5,6 +5,10 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        // TODO Remove when using spring-vault release
+        maven {
+            url 'https://repo.spring.io/libs-milestone'
+        }
     }
 }
 
