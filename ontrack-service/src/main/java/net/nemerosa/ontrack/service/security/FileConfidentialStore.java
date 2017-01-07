@@ -2,9 +2,11 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.model.support.EnvService;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
@@ -22,6 +24,7 @@ import java.security.SecureRandom;
  * Storing the keys as files in a directory.
  */
 @Component
+@ConditionalOnProperty(name = OntrackConfigProperties.KEY_STORE, havingValue = "file", matchIfMissing = true)
 public class FileConfidentialStore implements ConfidentialStore {
 
     private static final String ENCODING = "UTF-8";
@@ -45,11 +48,6 @@ public class FileConfidentialStore implements ConfidentialStore {
     @Autowired
     public FileConfidentialStore(EnvService envService) throws IOException, InterruptedException {
         this(envService.getWorkingDir("security", "secrets"));
-    }
-
-    @Override
-    public String getId() {
-        return "file";
     }
 
     public FileConfidentialStore(File rootDir) throws IOException, InterruptedException {
