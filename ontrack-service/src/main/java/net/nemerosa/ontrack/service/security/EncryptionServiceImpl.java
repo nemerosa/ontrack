@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.ConfidentialStore;
-import net.nemerosa.ontrack.model.security.EncryptionException;
-import net.nemerosa.ontrack.model.security.EncryptionService;
+import net.nemerosa.ontrack.model.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -40,6 +42,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     @Override
     public String exportKey() {
+        checkAdmin();
         try {
             return key.exportKey();
         } catch (IOException e) {
@@ -49,10 +52,31 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     @Override
     public void importKey(String payload) {
+        checkAdmin();
         try {
             key.importKey(payload);
         } catch (IOException e) {
             throw new EncryptionException(e);
+        }
+    }
+
+    private void checkAdmin() {
+        boolean authorised;
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof AccountHolder)) {
+            Account account = ((AccountHolder) authentication.getPrincipal()).getAccount();
+            authorised = account.isGranted(ApplicationManagement.class) &&
+                    account.isGranted(GlobalSettings.class);
+        } else {
+            authorised = false;
+        }
+        // NOT GRANTED
+        if (!authorised) {
+            throw new AccessDeniedException(
+                    "The current used has attempted to import/export keys without being authorised: " +
+                            (authentication != null ? authentication.getName() : "anonymous")
+            );
         }
     }
 }

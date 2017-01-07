@@ -21,7 +21,7 @@ public class CachedSettingsServiceImpl implements CachedSettingsService {
     public CachedSettingsServiceImpl(Collection<SettingsProvider<?>> settingsProviders) {
         this.settingsProviders = settingsProviders.stream()
                 .collect(Collectors.toMap(
-                        settingsProvider -> settingsProvider.getSettingsClass(),
+                        SettingsProvider::getSettingsClass,
                         settingsProvider -> settingsProvider
                 ));
     }
