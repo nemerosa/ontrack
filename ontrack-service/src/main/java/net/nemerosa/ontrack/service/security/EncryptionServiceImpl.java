@@ -17,9 +17,9 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
 
     @Autowired
-    public EncryptionServiceImpl(ConfidentialStoreService confidentialStoreService) {
+    public EncryptionServiceImpl(ConfidentialStore confidentialStore) {
         this(new CryptoConfidentialKey(
-                confidentialStoreService.getConfidentialStore(),
+                confidentialStore,
                 "net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption"
         ));
     }
