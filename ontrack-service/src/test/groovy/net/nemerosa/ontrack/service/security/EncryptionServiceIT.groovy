@@ -12,7 +12,8 @@ import java.nio.charset.Charset
 
 class EncryptionServiceIT extends AbstractServiceTestSupport {
 
-    static final String KEY_PAYLOAD = Base64.encoder.encodeToString('test'.getBytes(Charset.forName('UTF-8')))
+    static
+    final String KEY_PAYLOAD = Base64.encoder.encodeToString('test for a very seccret key'.getBytes(Charset.forName('UTF-8')))
 
     @Autowired
     private EncryptionService encryptionService
@@ -61,9 +62,16 @@ class EncryptionServiceIT extends AbstractServiceTestSupport {
     @Test
     void 'Import and export'() {
         asUser().with(GlobalSettings, ApplicationManagement).call {
-            encryptionService.importKey(KEY_PAYLOAD)
-            def encoded = encryptionService.exportKey()
-            assert encoded == KEY_PAYLOAD
+            String old = encryptionService.exportKey()
+            try {
+                encryptionService.importKey(KEY_PAYLOAD)
+                def encoded = encryptionService.exportKey()
+                assert encoded == KEY_PAYLOAD
+            } finally {
+                if (old != null) {
+                    encryptionService.importKey(old)
+                }
+            }
         }
     }
 
