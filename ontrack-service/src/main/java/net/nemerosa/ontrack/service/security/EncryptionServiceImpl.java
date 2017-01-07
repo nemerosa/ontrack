@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.security.ConfidentialStore;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.common.Utils;
+import net.nemerosa.ontrack.model.security.AbstractConfidentialStore;
 import net.nemerosa.ontrack.model.support.EnvService;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -18,18 +20,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
 
 /**
  * Storing the keys as files in a directory.
  */
 @Component
 @ConditionalOnProperty(name = OntrackConfigProperties.KEY_STORE, havingValue = "file", matchIfMissing = true)
-public class FileConfidentialStore implements ConfidentialStore {
+public class FileConfidentialStore extends AbstractConfidentialStore {
 
     private static final String ENCODING = "UTF-8";
-
-    private final SecureRandom sr = new SecureRandom();
 
     /**
      * Directory that stores individual keys.
@@ -52,6 +51,10 @@ public class FileConfidentialStore implements ConfidentialStore {
 
     public FileConfidentialStore(File rootDir) throws IOException, InterruptedException {
         this.rootDir = rootDir;
+        LoggerFactory.getLogger(FileConfidentialStore.class).info(
+                "[key-store] Using file based key store at {}",
+                rootDir.getAbsolutePath()
+        );
 
         File masterSecret = new File(rootDir, "master.key");
         if (!masterSecret.exists()) {
@@ -63,10 +66,10 @@ public class FileConfidentialStore implements ConfidentialStore {
     }
 
     /**
-     * Persists the payload of {@link ConfidentialKey} to the disk.
+     * Persists the payload of a key to the disk.
      */
     @Override
-    public void store(ConfidentialKey key, byte[] payload) throws IOException {
+    public void store(String key, byte[] payload) throws IOException {
         CipherOutputStream cos = null;
         FileOutputStream fos = null;
         try {
@@ -76,7 +79,7 @@ public class FileConfidentialStore implements ConfidentialStore {
             cos.write(payload);
             cos.write(MAGIC);
         } catch (GeneralSecurityException e) {
-            throw new IOException("Failed to persist the key: " + key.getId(), e);
+            throw new IOException("Failed to persist the key: " + key, e);
         } finally {
             IOUtils.closeQuietly(cos);
             IOUtils.closeQuietly(fos);
@@ -84,12 +87,12 @@ public class FileConfidentialStore implements ConfidentialStore {
     }
 
     /**
-     * Reverse operation of {@link #store(ConfidentialKey, byte[])}
+     * Reverse operation of {@link #store(String, byte[])}
      *
      * @return null the data has not been previously persisted.
      */
     @Override
-    public byte[] load(ConfidentialKey key) throws IOException {
+    public byte[] load(String key) throws IOException {
         CipherInputStream cis = null;
         FileInputStream fis = null;
         try {
@@ -102,7 +105,7 @@ public class FileConfidentialStore implements ConfidentialStore {
             byte[] bytes = IOUtils.toByteArray(cis);
             return verifyMagic(bytes);
         } catch (GeneralSecurityException e) {
-            throw new IOException("Failed to persist the key: " + key.getId(), e);
+            throw new IOException("Failed to persist the key: " + key, e);
         } finally {
             IOUtils.closeQuietly(cis);
             IOUtils.closeQuietly(fis);
@@ -125,14 +128,8 @@ public class FileConfidentialStore implements ConfidentialStore {
         return truncated;
     }
 
-    private File getFileFor(ConfidentialKey key) {
-        return new File(rootDir, key.getId());
-    }
-
-    public byte[] randomBytes(int size) {
-        byte[] random = new byte[size];
-        sr.nextBytes(random);
-        return random;
+    private File getFileFor(String key) {
+        return new File(rootDir, key);
     }
 
     private static final byte[] MAGIC = "::::MAGIC::::".getBytes();
