@@ -18,17 +18,19 @@ import static net.nemerosa.ontrack.extension.vault.VaultExtensionFeature.VAULT_K
 public class VaultConfidentialStore extends AbstractConfidentialStore {
 
     private final VaultOperations vaultOperations;
+    private final VaultConfigProperties configProperties;
 
     @Autowired
-    public VaultConfidentialStore(VaultOperations vaultOperations) {
+    public VaultConfidentialStore(VaultOperations vaultOperations, VaultConfigProperties configProperties) {
         this.vaultOperations = vaultOperations;
+        this.configProperties = configProperties;
         LoggerFactory.getLogger(VaultConfidentialStore.class).info(
                 "[key-store] Using Vault store"
         );
     }
 
     protected String getPath(String key) {
-        return String.format("ontrack/secrets/key/%s", key);
+        return String.format("%s/%s", configProperties.getPrefix(), key);
     }
 
     @Override
