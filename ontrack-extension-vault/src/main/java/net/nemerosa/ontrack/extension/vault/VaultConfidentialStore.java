@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.vault;
 
 import net.nemerosa.ontrack.model.security.AbstractConfidentialStore;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,19 +36,20 @@ public class VaultConfidentialStore extends AbstractConfidentialStore {
 
     @Override
     public void store(String key, byte[] payload) throws IOException {
+        Validate.notNull(payload, "Key payload must not be null");
         vaultOperations.write(
                 getPath(key),
-                payload
+                new Key(payload)
         );
     }
 
     @Override
     public byte[] load(String key) throws IOException {
-        VaultResponseSupport<byte[]> support = vaultOperations.read(
+        VaultResponseSupport<Key> support = vaultOperations.read(
                 getPath(key),
-                byte[].class
+                Key.class
         );
-        return support != null ? support.getData() : null;
+        return support != null ? support.getData().getPayload() : null;
     }
 
 }
