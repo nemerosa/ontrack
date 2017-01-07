@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.security.ConfidentialStore;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -28,10 +30,10 @@ public class CryptoConfidentialKey implements ConfidentialKey {
             if (secret == null) {
                 synchronized (this) {
                     if (secret == null) {
-                        byte[] payload = confidentialStore.load(this);
+                        byte[] payload = confidentialStore.load(id);
                         if (payload == null) {
                             payload = confidentialStore.randomBytes(256);
-                            confidentialStore.store(this, payload);
+                            confidentialStore.store(id, payload);
                         }
                         // Due to the stupid US export restriction JDK only ships 128bit version.
                         secret = new SecretKeySpec(payload, 0, 128 / 8, ALGORITHM);

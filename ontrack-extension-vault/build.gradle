@@ -1,0 +1,21 @@
+import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
+
+apply plugin: OntrackExtensionPlugin
+apply plugin: 'groovy'
+
+// TODO Remove when using spring-vault release
+repositories {
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
+}
+
+dependencies {
+    compile project(':ontrack-extension-support')
+    compile 'org.springframework.vault:spring-vault-core:1.0.0.M1'
+
+    testCompile project(':ontrack-it-utils')
+    testCompile libraries.groovy
+    testRuntime project(':ontrack-service')
+    testRuntime project(':ontrack-repository-impl')
+}
