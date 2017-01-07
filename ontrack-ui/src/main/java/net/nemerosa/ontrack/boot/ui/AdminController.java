@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.job.JobStatus;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter;
@@ -16,6 +17,8 @@ import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,13 +33,15 @@ public class AdminController extends AbstractResourceController {
     private final ApplicationLogService applicationLogService;
     private final HealthEndpoint healthEndpoint;
     private final SecurityService securityService;
+    private final EncryptionService encryptionService;
 
     @Autowired
-    public AdminController(JobScheduler jobScheduler, ApplicationLogService applicationLogService, HealthEndpoint healthEndpoint, SecurityService securityService) {
+    public AdminController(JobScheduler jobScheduler, ApplicationLogService applicationLogService, HealthEndpoint healthEndpoint, SecurityService securityService, EncryptionService encryptionService) {
         this.jobScheduler = jobScheduler;
         this.applicationLogService = applicationLogService;
         this.healthEndpoint = healthEndpoint;
         this.securityService = securityService;
+        this.encryptionService = encryptionService;
     }
 
     /**
@@ -164,4 +169,20 @@ public class AdminController extends AbstractResourceController {
                 .orElse(Ack.NOK);
     }
 
+    /**
+     * Exporting the encryption key
+     */
+    @GetMapping("/encryption")
+    public HttpEntity<String> exportEncryptionKey() {
+        return ResponseEntity.ok(encryptionService.exportKey());
+    }
+
+    /**
+     * Importing the encryption key
+     */
+    @PutMapping("/encryption")
+    public HttpEntity<String> importEncryptionKey(@RequestBody String payload) {
+        encryptionService.importKey(payload);
+        return ResponseEntity.accepted().body(payload);
+    }
 }
