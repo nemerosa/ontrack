@@ -22,6 +22,6 @@ public class VaultConfigProperties {
     /**
      * Key prefix
      */
-    private String prefix = "ontrack/secrets/key";
+    private String prefix = "secret/ontrack/key";
 
 }
