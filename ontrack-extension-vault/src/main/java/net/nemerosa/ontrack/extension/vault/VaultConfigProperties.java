@@ -19,4 +19,9 @@ public class VaultConfigProperties {
      */
     private String token = "test";
 
+    /**
+     * Key prefix
+     */
+    private String prefix = "ontrack/secrets/key";
+
 }
