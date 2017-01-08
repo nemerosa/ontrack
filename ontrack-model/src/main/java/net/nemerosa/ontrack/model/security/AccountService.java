@@ -182,4 +182,20 @@ public interface AccountService {
      * @return List of project roles
      */
     Collection<ProjectRoleAssociation> getProjectPermissionsForAccountGroup(AccountGroup group);
+
+    /**
+     * List of groups having the given global role
+     *
+     * @param globalRole Global role to search for
+     * @return List of matching account groups
+     */
+    Collection<AccountGroup> findAccountGroupsByGlobalRole(GlobalRole globalRole);
+
+    /**
+     * List of accounts having the given global role
+     *
+     * @param globalRole Global role to search for
+     * @return List of matching accounts
+     */
+    Collection<Account> findAccountsByGlobalRole(GlobalRole globalRole);
 }

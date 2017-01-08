@@ -387,6 +387,16 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Collection<AccountGroup> findAccountGroupsByGlobalRole(GlobalRole globalRole) {
+        return roleRepository.findAccountGroupsByGlobalRole(globalRole, this::getAccountGroup);
+    }
+
+    @Override
+    public Collection<Account> findAccountsByGlobalRole(GlobalRole globalRole) {
+        return roleRepository.findAccountsByGlobalRole(globalRole, this::getAccount);
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),
