@@ -248,4 +248,24 @@ You can use them directly in your definitions:
 [[extending-graphql-testing]]
 ===== Testing GraphQL
 
-TODO
+In your tests, create a test class which extends `AbstractQLITSupport` and
+use the `run` method to execute a GraphQL query:
+
+[source,groovy]
+----
+MyTestIT extends AbstractQLITSupport {
+   @Test
+   void my_test() {
+     def p = doCreateProject()
+     def data = run("""{
+      projects(id: ${p.id}) {
+         name
+      }
+     }""")
+     assert data.projects.first().name == p.name
+   }
+}
+----
+
+TIP: While it is possible to run GraphQL tests in Java, it's easier to do
+using Groovy.

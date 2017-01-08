@@ -17,3 +17,14 @@ dependencies {
     testRuntime project(':ontrack-repository-impl')
 
 }
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+assemble.dependsOn testJar
+
+artifacts {
+    archives testJar
+}
