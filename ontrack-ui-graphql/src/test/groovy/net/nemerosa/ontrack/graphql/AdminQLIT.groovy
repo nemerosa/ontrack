@@ -408,4 +408,43 @@ class AdminQLIT extends AbstractQLITSupport {
         }
     }
 
+    @Test
+    void 'List of mappings filter by group'() {
+        def mappingName1 = uid('M')
+        def mappingName2 = uid('M')
+        def group1 = doCreateAccountGroup()
+        def group2 = doCreateAccountGroup()
+        asAdmin().execute {
+            mappingService.newMapping(
+                    'ldap',
+                    new AccountGroupMappingInput(
+                            mappingName1,
+                            group1.id
+                    )
+            )
+            mappingService.newMapping(
+                    'ldap',
+                    new AccountGroupMappingInput(
+                            mappingName2,
+                            group2.id
+                    )
+            )
+            def data = run("""{
+                accountGroupMappings(type: "ldap", group: "${group1.name}") {
+                    name
+                    type
+                    group {
+                        id
+                    }
+                }
+            }""")
+            def mapping1 = data.accountGroupMappings.find { it.name == mappingName1 }
+            assert mapping1 != null
+            assert mapping1.type == 'ldap'
+            assert mapping1.group.id == group1.id()
+            def mapping2 = data.accountGroupMappings.find { it.name == mappingName2 }
+            assert mapping2 == null
+        }
+    }
+
 }

@@ -23,6 +23,7 @@ public class GQLRootQueryAdminAccountGroupMappings implements GQLRootQuery {
 
     private static final String MAPPING_TYPE_ARGUMENT = "type";
     private static final String MAPPING_NAME_ARGUMENT = "name";
+    private static final String MAPPING_GROUP_ARGUMENT = "group";
 
     private final AccountGroupMappingService accountGroupMappingService;
     private final GQLTypeAccountGroupMapping accountGroupMapping;
@@ -46,6 +47,9 @@ public class GQLRootQueryAdminAccountGroupMappings implements GQLRootQuery {
                 .argument(a -> a.name(MAPPING_NAME_ARGUMENT)
                         .description("Mapping name")
                         .type(GraphQLString))
+                .argument(a -> a.name(MAPPING_GROUP_ARGUMENT)
+                        .description("Group name")
+                        .type(GraphQLString))
                 .dataFetcher(adminAccountGroupMappingsFetcher())
                 .build();
     }
@@ -58,6 +62,13 @@ public class GQLRootQueryAdminAccountGroupMappings implements GQLRootQuery {
             if (nameArgument.isPresent()) {
                 filter = filter.and(agm ->
                         StringUtils.equals(nameArgument.get(), agm.getName())
+                );
+            }
+            // Filter on group
+            Optional<String> groupArgument = GraphqlUtils.getStringArgument(environment, MAPPING_GROUP_ARGUMENT);
+            if (groupArgument.isPresent()) {
+                filter = filter.and(agm ->
+                        StringUtils.equals(groupArgument.get(), agm.getGroup().getName())
                 );
             }
             // List
