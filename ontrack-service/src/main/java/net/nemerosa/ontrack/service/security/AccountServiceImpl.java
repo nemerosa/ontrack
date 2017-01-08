@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
@@ -395,6 +396,16 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Collection<Account> findAccountsByGlobalRole(GlobalRole globalRole) {
         return roleRepository.findAccountsByGlobalRole(globalRole, this::getAccount);
+    }
+
+    @Override
+    public Collection<AccountGroup> findAccountGroupsByProjectRole(Project project, ProjectRole projectRole) {
+        return roleRepository.findAccountGroupsByProjectRole(project, projectRole, this::getAccountGroup);
+    }
+
+    @Override
+    public Collection<Account> findAccountsByProjectRole(Project project, ProjectRole projectRole) {
+        return roleRepository.findAccountsByProjectRole(project, projectRole, this::getAccount);
     }
 
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {

@@ -507,4 +507,51 @@ class AdminQLIT extends AbstractQLITSupport {
         }
     }
 
+    @Test
+    void 'Project roles from the project'() {
+        def participantGroup = doCreateAccountGroup()
+        def participantInGroup = doCreateAccount(participantGroup)
+        def directOwner = doCreateAccount()
+        // Project and authorisations
+        def project = doCreateProject()
+        asAdmin().execute {
+            accountService.saveProjectPermission(project.id, PermissionTargetType.GROUP, participantGroup.id(), PermissionInput.of('PARTICIPANT'))
+            accountService.saveProjectPermission(project.id, PermissionTargetType.ACCOUNT, directOwner.id(), PermissionInput.of('OWNER'))
+            // Query
+            def data = run("""{
+                projects(id: ${project.id}) {
+                    name
+                    projectRoles {
+                        id
+                        groups {
+                            id
+                            accounts {
+                                id
+                            }
+                        }
+                        accounts {
+                            id
+                        }
+                    }
+                }
+            }""")
+            // Checks
+            def p = data.projects.first()
+            assert p.name == project.name
+            // Owner
+            def owner = p.projectRoles.find { it.id == 'OWNER' }
+            assert owner != null
+            assert owner.groups.empty
+            assert owner.accounts.first().id == directOwner.id()
+            // Participant
+            def participant = p.projectRoles.find { it.id == 'PARTICIPANT' }
+            assert participant != null
+            assert participant.groups.first().id == participantGroup.id()
+            assert participant.groups.first().accounts.first().id == participantInGroup.id()
+            assert participant.accounts.empty
+            // Other role
+            assert p.projectRoles.find { it.id == 'VALIDATION_MANAGER' } != null
+        }
+    }
+
 }

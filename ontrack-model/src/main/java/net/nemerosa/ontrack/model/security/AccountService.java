@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.Project;
 
 import java.util.Collection;
 import java.util.List;
@@ -198,4 +199,22 @@ public interface AccountService {
      * @return List of matching accounts
      */
     Collection<Account> findAccountsByGlobalRole(GlobalRole globalRole);
+
+    /**
+     * List of groups having the given project role
+     *
+     * @param project     Project
+     * @param projectRole Role to search for
+     * @return List of matching account groups
+     */
+    Collection<AccountGroup> findAccountGroupsByProjectRole(Project project, ProjectRole projectRole);
+
+    /**
+     * List of accounts having the given project role
+     *
+     * @param project     Project
+     * @param projectRole Role to search for
+     * @return List of matching accounts
+     */
+    Collection<Account> findAccountsByProjectRole(Project project, ProjectRole projectRole);
 }
