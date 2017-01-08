@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,9 @@ public class GQLTypeAccountGroupMapping implements GQLType {
                 .field(GraphqlUtils.idField())
                 .field(GraphqlUtils.stringField("name", "Name of the mapping"))
                 .field(GraphqlUtils.stringField("type", "Type of the mapping"))
+                .field(f -> f.name("group")
+                        .description("Associated group")
+                        .type(new GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
                 .build();
     }
 
