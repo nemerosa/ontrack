@@ -228,6 +228,7 @@ Ontrack provides the following extension points:
   <<monitoring,metrics>> exported by Ontrack
 * <<extending-event-types, Event types>> - allows to define additional event types.
 * <<extending-graphql, GraphQL>> - allows contributions to the <<integration-graphql,GraphQL>> Ontrack schema.
+* <<extending-encryption, Encryption key store>> - allows to define a custom store for the <<integration-encryption,encryption keys>>.
 *  **TODO** Entity action - allows to add an action for the page of an entity
 *  **TODO** Entity information - allows to add some information into the page of an entity
 *  **TODO** Search extension - provides a search end point for global text based searches
@@ -383,3 +384,5 @@ include::extending-kotlin.adoc[]
 include::extending-settings.adoc[]
 
 include::extending-security.adoc[]
+
+include::extending-encryption.adoc[]
