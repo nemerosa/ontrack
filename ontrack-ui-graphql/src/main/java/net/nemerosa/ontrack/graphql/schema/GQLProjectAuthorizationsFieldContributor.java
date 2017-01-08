@@ -1,22 +1,24 @@
-package net.nemerosa.ontrack.graphql;
+package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
-import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor;
-import net.nemerosa.ontrack.graphql.schema.GQLTypeProjectAuthorization;
+import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.security.ProjectRole;
 import net.nemerosa.ontrack.model.security.RolesService;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static graphql.Scalars.GraphQLString;
 import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher;
 import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList;
 
@@ -48,6 +50,10 @@ public class GQLProjectAuthorizationsFieldContributor implements GQLProjectEntit
                             .name("projectRoles")
                             .description("Authorisations for the project")
                             .type(stdList(projectAuthorization.getType()))
+                            .argument(a -> a.name("role")
+                                    .description("Filter by role name")
+                                    .type(GraphQLString)
+                            )
                             .dataFetcher(projectAuthorizationsFetcher())
                             .build()
             );
@@ -60,6 +66,9 @@ public class GQLProjectAuthorizationsFieldContributor implements GQLProjectEntit
         return fetcher(
                 Project.class,
                 (environment, project) -> rolesService.getProjectRoles().stream()
+                        .filter(GraphqlUtils.getStringArgument(environment, "role")
+                                .map(s -> (Predicate<ProjectRole>) pr -> StringUtils.equals(s, pr.getId()))
+                                .orElseGet(() -> pr -> true))
                         .map(projectRole -> getProjectAuthorizations(project, projectRole))
                         .collect(Collectors.toList())
         );

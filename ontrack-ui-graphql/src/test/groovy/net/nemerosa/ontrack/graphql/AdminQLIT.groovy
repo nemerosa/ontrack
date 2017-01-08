@@ -554,4 +554,47 @@ class AdminQLIT extends AbstractQLITSupport {
         }
     }
 
+    @Test
+    void 'Project roles from the project, filtered by role'() {
+        def participantGroup = doCreateAccountGroup()
+        doCreateAccount(participantGroup)
+        def directOwner = doCreateAccount()
+        // Project and authorisations
+        def project = doCreateProject()
+        asAdmin().execute {
+            accountService.saveProjectPermission(project.id, PermissionTargetType.GROUP, participantGroup.id(), PermissionInput.of('PARTICIPANT'))
+            accountService.saveProjectPermission(project.id, PermissionTargetType.ACCOUNT, directOwner.id(), PermissionInput.of('OWNER'))
+            // Query
+            def data = run("""{
+                projects(id: ${project.id}) {
+                    name
+                    projectRoles(role: "OWNER") {
+                        id
+                        groups {
+                            id
+                            accounts {
+                                id
+                            }
+                        }
+                        accounts {
+                            id
+                        }
+                    }
+                }
+            }""")
+            // Checks
+            def p = data.projects.first()
+            assert p.name == project.name
+            // Owner
+            def owner = p.projectRoles.find { it.id == 'OWNER' }
+            assert owner != null
+            assert owner.groups.empty
+            assert owner.accounts.first().id == directOwner.id()
+            // Participant
+            assert p.projectRoles.find { it.id == 'PARTICIPANT' } == null
+            // Other role
+            assert p.projectRoles.find { it.id == 'VALIDATION_MANAGER' } == null
+        }
+    }
+
 }
