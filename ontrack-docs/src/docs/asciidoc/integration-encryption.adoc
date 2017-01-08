@@ -45,12 +45,45 @@ two files will be typically present:
 [[integration-encryption-jdbc]]
 ==== JDBC confidential store
 
-TODO
+This store manages the keys directly in the Ontrack database. It can be
+selected by setting the `ontrack.config.key-store`
+<<configuration-properties,configuration property>> to `jdbc`.
+
+WARNING: This store is intrinsically insecure since it stores the keys
+in the same location where the secrets are themselves stored.
+
+No further configuration is needed.
 
 [[integration-encryption-vault]]
 ==== Vault confidential store
 
-TODO
+By setting the `ontrack.config.key-store`
+<<configuration-properties,configuration property>> to `vault`, Ontrack
+will use https://www.vaultproject.io/[Vault] to store its encryption keys.
+
+Following configuration properties are available to configure the connection
+to Vault:
+
+|===
+| Property | Default | Description
+
+| `ontrack.config.vault.uri`
+| http://localhost:8200
+| URI to the Vault end point
+
+| `ontrack.config.vault.token`
+| `test`
+| Token authentication
+
+| `ontrack.config.vault.prefix`
+| `secret/ontrack/key`
+| Path prefix for the storage of the keys
+
+WARNING: As of now, the support for Vault storage is *experimental* and is
+subject to change in later releases. In particular, the authentication
+mechanism might change.
+
+|===
 
 [[integration-encryption-migration]]
 ==== Migrating encryption keys
