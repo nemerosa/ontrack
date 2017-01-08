@@ -88,9 +88,49 @@ mechanism might change.
 [[integration-encryption-migration]]
 ==== Migrating encryption keys
 
-TODO
+In the event you want to migrate the encryption keys from one type of
+storage to another, follow this procedure.
+
+NOTE: In the procedure below, `${ONTRACK_URL}` designates the Ontrack URL
+and `${ONTRACK_ADMIN_USER}` the name of an Ontrack user which has the
+`ADMINISTRATOR` <<security,role>>.
+
+Using the initial configuration for the store, start by exporting the key:
+
+[source,bash]
+----
+curl ${ONTRACK_URL}/admin/encryption \
+   --user ${ONTRACK_ADMIN_USER} \
+   --output ontrack.key
+----
+
+This command will export the encryption key into the local `ontrack/key` file.
+
+Start Ontrack using the new configuration.
+
+WARNING: There might be errors are startup, when some <<architecture-jobs,jobs>>
+start to collect some data from the external applications. Those errors can
+be safely ignored for now.
+
+Import the key file into Ontrack:
+
+[source,bash]
+----
+curl ${ONTRACK_URL}/admin/encryption \
+   --user ${ONTRACK_ADMIN_USER} \
+   -X PUT \
+   -H "Content-Type: text/plain" \
+   --data @ontrack.key
+----
+
+Restart Ontrack.
 
 [[integration-encryption-lost]]
 ==== Losing the encryption keys
+
+TODO
+
+[[integration-encryption-extending]]
+==== Adding custom confidential store
 
 TODO
