@@ -159,6 +159,8 @@ IMPORTANT: All job tasks run with _administrator_ privileges. _Job tasks_ can
 throw runtime exceptions - they will be caught by the _job scheduler_ and
 displayed in the <<admin-console-jobs, administration console>>.
 
+include::architecture-encryption.adoc[]
+
 [[architecture-build-filters]]
 ==== Build filters
 

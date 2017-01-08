@@ -49,4 +49,7 @@ ontrack.config.jobs.pool-size = 10
 
 # Interval (in minutes) between each refresh of the job list
 ontrack.config.jobs.orchestration = 2
+
+# Confidential store for the encryption keys
+ontrack.config.key-store = file
 ----
