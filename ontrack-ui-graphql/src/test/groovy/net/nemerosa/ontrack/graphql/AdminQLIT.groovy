@@ -475,8 +475,36 @@ class AdminQLIT extends AbstractQLITSupport {
             assert g.accounts.find { it.id == controllerInGroup.id() } != null
             assert controllerRole.accounts.find { it.id == directController.id() } != null
         }
+    }
 
-
+    @Test
+    void 'Global roles and associated accounts and groups, filtered by role'() {
+        def controllerGroup = doCreateAccountGroupWithGlobalRole('CONTROLLER')
+        def controllerInGroup = doCreateAccount(controllerGroup)
+        def directController = doCreateAccountWithGlobalRole('CONTROLLER')
+        asAdmin().execute {
+            def data = run("""{
+                globalRoles(role: "CONTROLLER") {
+                    id
+                    groups {
+                        id
+                        accounts {
+                            id
+                        }
+                    }
+                    accounts {
+                        id
+                    }
+                }
+            }""")
+            assert data.globalRoles.find { it.id == 'ADMINISTRATOR' } == null
+            def controllerRole = data.globalRoles.find { it.id == 'CONTROLLER' }
+            assert controllerRole != null
+            def g = controllerRole.groups.find { it.id == controllerGroup.id() }
+            assert g != null
+            assert g.accounts.find { it.id == controllerInGroup.id() } != null
+            assert controllerRole.accounts.find { it.id == directController.id() } != null
+        }
     }
 
 }
