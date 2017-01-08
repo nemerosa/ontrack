@@ -128,9 +128,16 @@ Restart Ontrack.
 [[integration-encryption-lost]]
 ==== Losing the encryption keys
 
-TODO
+In case you lose the encryption keys, the consequence will be that the secrets
+stored by Ontrack won't be able to be decrypted. This will typically make the
+external applications your Ontrack instance connects to unreachable.
+
+The only to fix this is to reenter the secrets.
+
+CAUTION: Some pages might not display correctly if some applications are not
+reachable.
 
 [[integration-encryption-extending]]
 ==== Adding custom confidential store
 
-TODO
+See <<extending-encryption>>.
