@@ -17,14 +17,18 @@ import java.util.Collections;
 @Configuration
 public class JobOrchestrationConfig {
 
-    @Autowired
-    private OntrackConfigProperties configProperties;
+    private final OntrackConfigProperties configProperties;
+
+    private final JobScheduler jobScheduler;
+
+    private final Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers;
 
     @Autowired
-    private JobScheduler jobScheduler;
-
-    @Autowired(required = false)
-    private Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers;
+    public JobOrchestrationConfig(OntrackConfigProperties configProperties, JobScheduler jobScheduler, Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers) {
+        this.configProperties = configProperties;
+        this.jobScheduler = jobScheduler;
+        this.jobOrchestratorSuppliers = jobOrchestratorSuppliers;
+    }
 
     @Bean
     public JobOrchestrator jobOrchestrator() {
