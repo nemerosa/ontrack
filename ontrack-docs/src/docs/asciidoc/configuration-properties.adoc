@@ -49,4 +49,8 @@ ontrack.config.jobs.pool-size = 10
 
 # Interval (in minutes) between each refresh of the job list
 ontrack.config.jobs.orchestration = 2
+
+# Set to true to not start any job at application startup
+# The administrator can restore the scheduling jobs manually
+ontrack.config.jobs.paused-at-startup = false
 ----
