@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.job.support;
 import com.google.common.collect.ImmutableSet;
 import net.nemerosa.ontrack.common.FutureUtils;
 import net.nemerosa.ontrack.job.*;
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -32,7 +34,11 @@ public class DefaultJobSchedulerTest {
     }
 
     protected JobScheduler createJobScheduler() {
-        return new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE, false);
+        return createJobScheduler(false);
+    }
+
+    protected JobScheduler createJobScheduler(boolean initiallyPaused) {
+        return new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE, initiallyPaused);
     }
 
     @Test
@@ -42,6 +48,50 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         Thread.sleep(3000);
         assertTrue(job.getCount() >= 2);
+    }
+
+    @Test
+    public void scheduler_paused_at_startup() throws InterruptedException {
+        JobScheduler jobScheduler = createJobScheduler(true);
+        CountJob job = new CountJob();
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        Thread.sleep(3000);
+        assertTrue(job.getCount() == 0); // Job did not run
+        // Resumes the execution and waits
+        jobScheduler.resume();
+        Thread.sleep(2000);
+        // The job has run
+        assertTrue(job.getCount() >= 2);
+    }
+
+    @Test
+    public void scheduler_paused_at_startup_with_orchestration() throws InterruptedException {
+        // Creates a job scheduler
+        JobScheduler jobScheduler = createJobScheduler(true);
+        // Job orchestration
+        CountJob countJob = new CountJob();
+        JobOrchestrator jobOrchestrator = new JobOrchestrator(
+                jobScheduler,
+                "Orchestrator",
+                Collections.singletonList(
+                        () -> Stream.of(
+                                JobRegistration.of(countJob).withSchedule(Schedule.EVERY_SECOND)
+                        )
+                )
+        );
+        // Registers the orchestrator
+        jobScheduler.schedule(jobOrchestrator, Schedule.EVERY_SECOND);
+        // Waits some time...
+        Thread.sleep(3000);
+        // ... and the job should not have run
+        assertEquals(countJob.getCount(), 0);
+        // ... and the orchestrator must not have run
+        Optional<JobStatus> orchestratorStatus = jobScheduler.getJobStatus(jobOrchestrator.getKey());
+        assertTrue(
+                orchestratorStatus.isPresent() &&
+                        orchestratorStatus.get().getRunCount() == 0 &&
+                        !orchestratorStatus.get().isRunning()
+        );
     }
 
     @Test
