@@ -32,7 +32,7 @@ public class DefaultJobSchedulerTest {
     }
 
     protected JobScheduler createJobScheduler() {
-        return new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE);
+        return new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE, false);
     }
 
     @Test
