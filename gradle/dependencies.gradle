@@ -5,6 +5,7 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        jcenter()
     }
 }
 
@@ -13,8 +14,8 @@ allprojects {
  */
 
 ext {
-    springBootVersion = '1.4.0.RELEASE'
-    springVersion = '4.3.2.RELEASE'
+    springBootVersion = '1.4.1.RELEASE'
+    springVersion = '4.3.3.RELEASE'
     springSecurityVersion = '4.1.1.RELEASE'
     httpClientVersion = '4.5.2'
     slf4jVersion = '1.7.21'

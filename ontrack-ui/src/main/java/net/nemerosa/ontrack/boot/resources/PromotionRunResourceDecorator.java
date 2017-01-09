@@ -5,51 +5,57 @@ import net.nemerosa.ontrack.boot.ui.PromotionRunController;
 import net.nemerosa.ontrack.boot.ui.PropertyController;
 import net.nemerosa.ontrack.model.security.PromotionRunDelete;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
+import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import net.nemerosa.ontrack.ui.resource.LinkDefinition;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Arrays;
 
+import static net.nemerosa.ontrack.ui.resource.LinkDefinitions.*;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @Component
-public class PromotionRunResourceDecorator extends AbstractResourceDecorator<PromotionRun> {
+public class PromotionRunResourceDecorator extends AbstractLinkResourceDecorator<PromotionRun> {
 
     public PromotionRunResourceDecorator() {
         super(PromotionRun.class);
     }
 
     @Override
-    public List<Link> links(PromotionRun promotionRun, ResourceContext resourceContext) {
-        return resourceContext.links()
+    protected Iterable<LinkDefinition<PromotionRun>> getLinkDefinitions() {
+        return Arrays.asList(
                 // Self
-                .self(on(PromotionRunController.class).getPromotionRun(promotionRun.getId()))
+                self(promotionRun -> on(PromotionRunController.class).getPromotionRun(promotionRun.getId())),
                 // List of runs for the build and promotion level
-                .link(
+                link(
                         "_all",
-                        on(PromotionRunController.class).getPromotionRunsForBuildAndPromotionLevel(
+                        promotionRun -> on(PromotionRunController.class).getPromotionRunsForBuildAndPromotionLevel(
                                 promotionRun.getBuild().getId(),
                                 promotionRun.getPromotionLevel().getId()
                         )
-                )
+                ),
                 // Deletion
-                .delete(on(PromotionRunController.class).deletePromotionRun(promotionRun.getId()), PromotionRunDelete.class, promotionRun.projectId())
+                delete(
+                        promotionRun -> on(PromotionRunController.class).deletePromotionRun(promotionRun.getId()),
+                        PromotionRunDelete.class
+                ),
                 // Actual properties for this item
-                .link("_properties", on(PropertyController.class).getProperties(promotionRun.getProjectEntityType(), promotionRun.getId()))
+                link(
+                        "_properties",
+                        promotionRun -> on(PropertyController.class).getProperties(promotionRun.getProjectEntityType(), promotionRun.getId())
+                ),
                 // Image
-                .link(
+                link(
                         Link.IMAGE_LINK,
-                        on(PromotionLevelController.class).getPromotionLevelImage_(
+                        promotionRun -> on(PromotionLevelController.class).getPromotionLevelImage_(
                                 null,
                                 promotionRun.getPromotionLevel().getId()
                         )
-                )
+                ),
                 // Page
-                .page(promotionRun)
-                // OK
-                .build();
+                page()
+        );
     }
 
 }

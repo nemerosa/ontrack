@@ -10,6 +10,8 @@ import java.util.Collections;
 import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 
 public class BranchStatusViewTest {
@@ -17,9 +19,9 @@ public class BranchStatusViewTest {
     @Test
     public void branch_status_view_to_json() throws JsonProcessingException {
         Project project = Project.of(nd("PRJ", "Project")).withId(ID.of(1));
-        Branch branch = Branch.of(project, nd("master", "")).withId(ID.of(10));
+        Branch branch = Branch.of(project, nd("master", "")).withId(ID.of(10)).withSignature(SIGNATURE);
 
-        PromotionLevel silver = PromotionLevel.of(branch, nd("silver", "")).withId(ID.of(100));
+        PromotionLevel silver = PromotionLevel.of(branch, nd("silver", "")).withId(ID.of(100)).withSignature(SIGNATURE);
 
         Signature signature = Signature.of("test").withTime(LocalDateTime.of(2016, 3, 24, 14, 36));
 
@@ -50,6 +52,7 @@ public class BranchStatusViewTest {
                         .with("description", "")
                         .with("disabled", false)
                         .with("type", "CLASSIC")
+                        .with("signature", SIGNATURE_OBJECT)
                         .end()
                 )
                 .with("decorations", array().end())
@@ -72,6 +75,7 @@ public class BranchStatusViewTest {
                                                 .with("name", "silver")
                                                 .with("description", "")
                                                 .with("image", false)
+                                                .with("signature", SIGNATURE_OBJECT)
                                                 .end()
                                         )
                                         .with("promotionRun", object()
@@ -105,6 +109,7 @@ public class BranchStatusViewTest {
                                 .with("name", "silver")
                                 .with("description", "")
                                 .with("image", false)
+                                .with("signature", SIGNATURE_OBJECT)
                                 .end()
                         )
                         .with("promotionRun", object()

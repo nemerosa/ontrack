@@ -65,4 +65,12 @@ public interface AccountGroupMappingRepository {
      * @return Acknowledgment
      */
     Ack deleteMapping(ID id);
+
+    /**
+     * Gets the list of mappings for a given group.
+     *
+     * @param group Group to get the mappings to
+     * @return List of mappings (never null)
+     */
+    List<AccountGroupMapping> getMappingsForGroup(AccountGroup group);
 }

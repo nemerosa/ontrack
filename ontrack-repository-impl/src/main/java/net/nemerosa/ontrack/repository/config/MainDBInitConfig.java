@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Component
 public class MainDBInitConfig extends AbstractDBInitConfig {
 
-    public static final int VERSION = 35;
+    public static final int VERSION = 37;
 
     private final ApplicationContext applicationContext;
 

@@ -46,10 +46,10 @@ public class PropertyControllerIT extends AbstractWebTestSupport {
         assertNotNull("Properties should not be null", properties);
         Optional<Property<?>> property = properties.getResources().stream()
                 .map(Resource::getData)
-                .filter(p -> "Value".equals(p.getType().getName()))
+                .filter(p -> "Simple value".equals(p.getType().getName()))
                 .findFirst();
-        assertTrue("At least the Value property should have been found", property.isPresent());
-        assertTrue("The Value property should be editable", property.get().isEditable());
+        assertTrue("At least the Simple value property should have been found", property.isPresent());
+        assertTrue("The Simple value property should be editable", property.get().isEditable());
     }
 
     /**
@@ -69,10 +69,10 @@ public class PropertyControllerIT extends AbstractWebTestSupport {
         assertNotNull("Properties should not be null", properties);
         Optional<Property<?>> property = properties.getResources().stream()
                 .map(Resource::getData)
-                .filter(p -> "Value".equals(p.getType().getName()))
+                .filter(p -> "Simple value".equals(p.getType().getName()))
                 .findFirst();
-        assertTrue("At least the Value property should have been found", property.isPresent());
-        assertFalse("The Value property should not be editable", property.get().isEditable());
+        assertTrue("At least the Simple value property should have been found", property.isPresent());
+        assertFalse("The Simple value property should not be editable", property.get().isEditable());
     }
 
     /**

@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
+import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,8 +49,10 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
     @Test
     public void branch() throws IOException {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Projet créé")).withId(ID.of(1));
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1));
+        Project p = Project.of(new NameDescription("P", "Projet créé")).withId(ID.of(1))
+                .withSignature(SIGNATURE);
+        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+                .withSignature(SIGNATURE);
         // Message
         HttpOutputMessage message = mock(HttpOutputMessage.class);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -75,6 +79,7 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
                                         .with("name", "P")
                                         .with("description", "Projet créé")
                                         .with("disabled", false)
+                                        .with("signature", SIGNATURE_OBJECT)
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                                         .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
@@ -87,6 +92,7 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
                                         .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
+                        .with("signature", SIGNATURE_OBJECT)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
                         .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:1")

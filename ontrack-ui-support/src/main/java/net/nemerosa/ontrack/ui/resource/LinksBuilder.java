@@ -39,7 +39,7 @@ public interface LinksBuilder {
     LinksBuilder entityPage(String name, boolean allowed, ProjectEntity projectEntity);
 
     default LinksBuilder page(ProjectEntity projectEntity) {
-        return entityPage("_page", true, projectEntity);
+        return entityPage(Link.PAGE, true, projectEntity);
     }
 
     LinksBuilder page(String name, Class<? extends GlobalFunction> fn, String path, Object... arguments);

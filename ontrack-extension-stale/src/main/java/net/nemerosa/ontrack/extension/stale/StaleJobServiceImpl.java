@@ -2,9 +2,6 @@ package net.nemerosa.ontrack.extension.stale;
 
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.job.*;
-import net.nemerosa.ontrack.model.events.Event;
-import net.nemerosa.ontrack.model.events.EventFactory;
-import net.nemerosa.ontrack.model.events.EventQueryService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +23,11 @@ public class StaleJobServiceImpl implements StaleJobService {
 
     private final StructureService structureService;
     private final PropertyService propertyService;
-    private final EventQueryService eventQueryService;
 
     @Autowired
-    public StaleJobServiceImpl(StructureService structureService, PropertyService propertyService, EventQueryService eventQueryService) {
+    public StaleJobServiceImpl(StructureService structureService, PropertyService propertyService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
-        this.eventQueryService = eventQueryService;
     }
 
     @Override
@@ -156,19 +151,12 @@ public class StaleJobServiceImpl implements StaleJobService {
         Optional<Build> oBuild = structureService.getLastBuild(branch.getId());
         if (!oBuild.isPresent()) {
             trace(branch.getProject(), "[%s] No available build - taking branch's creation time", branch.getName());
-            // Takes the branch creation time
-            List<Event> events = eventQueryService.getEvents(
-                    ProjectEntityType.BRANCH,
-                    branch.getId(),
-                    EventFactory.NEW_BRANCH,
-                    0,
-                    1
-            );
-            if (events.isEmpty()) {
+            // Takes the branch creation time from the branch itself
+            if (branch.getSignature() != null && branch.getSignature().getTime() != null) {
+                lastTime = branch.getSignature().getTime();
+            } else {
                 trace(branch.getProject(), "[%s] No available branch creation date - keeping the branch", branch.getName());
                 lastTime = Time.now();
-            } else {
-                lastTime = events.get(0).getSignature().getTime();
             }
         } else {
             Build build = oBuild.get();

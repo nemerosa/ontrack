@@ -239,4 +239,12 @@ class Ontrack {
     Document download(String url) {
         httpClient.download(url)
     }
+
+    @DSLMethod(count = 2)
+    def graphQLQuery(String query, Map<String, ?> variables = [:]) {
+        return post('graphql', [
+                query    : query,
+                variables: variables,
+        ])
+    }
 }

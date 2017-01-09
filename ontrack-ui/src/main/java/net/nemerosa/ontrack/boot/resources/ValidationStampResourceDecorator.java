@@ -5,50 +5,82 @@ import net.nemerosa.ontrack.model.security.ValidationStampDelete;
 import net.nemerosa.ontrack.model.security.ValidationStampEdit;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.ValidationStamp;
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
+import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import net.nemerosa.ontrack.ui.resource.LinkDefinition;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Arrays;
 
+import static net.nemerosa.ontrack.ui.resource.LinkDefinitions.*;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @Component
-public class ValidationStampResourceDecorator extends AbstractResourceDecorator<ValidationStamp> {
+public class ValidationStampResourceDecorator extends AbstractLinkResourceDecorator<ValidationStamp> {
 
     public ValidationStampResourceDecorator() {
         super(ValidationStamp.class);
     }
 
     @Override
-    public List<Link> links(ValidationStamp validationStamp, ResourceContext resourceContext) {
-        return resourceContext.links()
-                .self(on(ValidationStampController.class).getValidationStamp(validationStamp.getId()))
+    protected Iterable<LinkDefinition<ValidationStamp>> getLinkDefinitions() {
+        return Arrays.asList(
+                link(
+                        Link.SELF,
+                        validationStamp -> on(ValidationStampController.class).getValidationStamp(validationStamp.getId())
+                ),
                 // Branch link
-                .link("_branch", on(BranchController.class).getBranch(validationStamp.getBranch().getId()))
+                link(
+                        "_branch",
+                        validationStamp -> on(BranchController.class).getBranch(validationStamp.getBranch().getId())
+                ),
                 // Project link
-                .link("_project", on(ProjectController.class).getProject(validationStamp.getBranch().getProject().getId()))
+                link(
+                        "_project",
+                        validationStamp -> on(ProjectController.class).getProject(validationStamp.getBranch().getProject().getId())
+                ),
                 // Image link
-                .link(Link.IMAGE_LINK, on(ValidationStampController.class).getValidationStampImage_(null, validationStamp.getId()))
+                link(
+                        Link.IMAGE_LINK,
+                        validationStamp -> on(ValidationStampController.class).getValidationStampImage_(null, validationStamp.getId())
+                ),
                 // Update link
-                .update(on(ValidationStampController.class).updateValidationStampForm(validationStamp.getId()), ValidationStampEdit.class, validationStamp.projectId())
+                link(
+                        Link.UPDATE,
+                        validationStamp -> on(ValidationStampController.class).updateValidationStampForm(validationStamp.getId()),
+                        withProjectFn(ValidationStampEdit.class)
+                ),
                 // Delete link
-                .delete(on(ValidationStampController.class).deleteValidationStamp(validationStamp.getId()), ValidationStampDelete.class, validationStamp.projectId())
+                link(
+                        Link.DELETE,
+                        validationStamp -> on(ValidationStampController.class).deleteValidationStamp(validationStamp.getId()),
+                        withProjectFn(ValidationStampDelete.class)
+                ),
                 // TODO Next validation stamp
                 // TODO Previous validation stamp
                 // Actual properties for this validation stamp
-                .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.VALIDATION_STAMP, validationStamp.getId()))
+                link(
+                        "_properties",
+                        validationStamp -> on(PropertyController.class).getProperties(ProjectEntityType.VALIDATION_STAMP, validationStamp.getId())
+                ),
                 // Decorations
-                .link("_decorations", on(DecorationsController.class).getDecorations(validationStamp.getProjectEntityType(), validationStamp.getId()))
+                link(
+                        "_decorations",
+                        validationStamp -> on(DecorationsController.class).getDecorations(validationStamp.getProjectEntityType(), validationStamp.getId())
+                ),
                 // List of runs
-                .link("_runs", on(ValidationRunController.class).getValidationRunsForValidationStamp(validationStamp.getId(), 0, 10))
+                link(
+                        "_runs",
+                        validationStamp -> on(ValidationRunController.class).getValidationRunsForValidationStamp(validationStamp.getId(), 0, 10)
+                ),
                 // Events
-                .link("_events", on(EventController.class).getEvents(validationStamp.getProjectEntityType(), validationStamp.getId(), 0, 10))
+                link(
+                        "_events",
+                        validationStamp -> on(EventController.class).getEvents(validationStamp.getProjectEntityType(), validationStamp.getId(), 0, 10)
+                ),
                 // Page
-                .page(validationStamp)
-                // OK
-                .build();
+                page()
+        );
     }
 
 }

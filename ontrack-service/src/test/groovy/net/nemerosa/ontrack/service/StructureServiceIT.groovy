@@ -20,6 +20,38 @@ class StructureServiceIT extends AbstractServiceTestSupport {
     @Autowired
     private StructureService structureService
 
+    @Test
+    void 'Project signature at creation'() {
+        def e = doCreateProject()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
+    @Test
+    void 'Branch signature at creation'() {
+        def e = doCreateBranch()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
+    @Test
+    void 'Promotion level signature at creation'() {
+        def e = doCreatePromotionLevel()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
+    @Test
+    void 'Validation stamp signature at creation'() {
+        def e = doCreateValidationStamp()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
     /**
      * Regression test for #76.
      *

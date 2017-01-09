@@ -30,6 +30,14 @@ public final class JsonUtils {
         return mapper.valueToTree(value);
     }
 
+    public static String toJSONString(Object value) {
+        try {
+            return mapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new JsonParseException(e);
+        }
+    }
+
     public static ObjectBuilder object() {
         return new ObjectBuilder(factory);
     }

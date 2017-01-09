@@ -22,4 +22,12 @@ public interface ResourceDecorator<T> {
     default T decorateBeforeSerialization(T bean) {
         return bean;
     }
+
+    /**
+     * Gets the list of link names this resource decorator can provide.
+     */
+    default List<String> getLinkNames() {
+        return Collections.emptyList();
+    }
+
 }

@@ -63,4 +63,9 @@ public class AccountGroupMappingServiceImpl implements AccountGroupMappingServic
         getMapping(mapping, id);
         return accountGroupMappingRepository.deleteMapping(id);
     }
+
+    @Override
+    public List<AccountGroupMapping> getMappingsForGroup(AccountGroup group) {
+        return accountGroupMappingRepository.getMappingsForGroup(group);
+    }
 }

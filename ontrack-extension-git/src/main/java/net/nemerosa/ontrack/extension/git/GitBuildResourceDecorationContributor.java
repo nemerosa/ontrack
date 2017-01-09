@@ -5,15 +5,18 @@ import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.ui.resource.LinksBuilder;
+import net.nemerosa.ontrack.ui.resource.LinkDefinition;
+import net.nemerosa.ontrack.ui.resource.LinkDefinitions;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Component
-public class GitBuildResourceDecorationContributor implements ResourceDecorationContributor {
+public class GitBuildResourceDecorationContributor implements ResourceDecorationContributor<Build> {
 
     private final GitService gitService;
 
@@ -23,25 +26,26 @@ public class GitBuildResourceDecorationContributor implements ResourceDecoration
     }
 
     @Override
-    public void contribute(LinksBuilder linksBuilder, ProjectEntity projectEntity) {
-        if (projectEntity.getProjectEntityType() == ProjectEntityType.BUILD) {
-            Build build = (Build) projectEntity;
-            if (gitService.isBranchConfiguredForGit(build.getBranch())) {
-                BuildDiffRequest request = new BuildDiffRequest();
-                request.setFrom(build.getId());
-                linksBuilder.link(
+    public List<LinkDefinition<Build>> getLinkDefinitions() {
+        return Arrays.asList(
+                LinkDefinitions.link(
                         "_changeLog",
-                        MvcUriComponentsBuilder.on(GitController.class).changeLog(request),
-                        ProjectView.class,
-                        build
-                );
-                linksBuilder.page(
+                        build -> MvcUriComponentsBuilder.on(GitController.class).changeLog(new BuildDiffRequest().withFrom(build.getId())),
+                        (build, resourceContext) -> resourceContext.isProjectFunctionGranted(build, ProjectView.class) &&
+                                gitService.isBranchConfiguredForGit(build.getBranch())
+                ),
+                LinkDefinitions.page(
                         "_changeLogPage",
-                        "extension/git/changelog",
-                        ProjectView.class,
-                        build
-                );
-            }
-        }
+                        (build, resourceContext) -> resourceContext.isProjectFunctionGranted(build, ProjectView.class) &&
+                                gitService.isBranchConfiguredForGit(build.getBranch())
+                        ,
+                        "extension/git/changelog"
+                )
+        );
+    }
+
+    @Override
+    public <T extends ProjectEntity> boolean applyTo(Class<T> projectClass) {
+        return Build.class.isAssignableFrom(projectClass);
     }
 }

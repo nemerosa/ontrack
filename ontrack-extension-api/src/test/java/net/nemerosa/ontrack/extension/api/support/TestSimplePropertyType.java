@@ -25,7 +25,7 @@ public class TestSimplePropertyType extends AbstractPropertyType<TestSimplePrope
 
     @Override
     public String getName() {
-        return "Value";
+        return "Simple value";
     }
 
     @Override
