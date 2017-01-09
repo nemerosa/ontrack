@@ -41,7 +41,9 @@ task publicationPackage(type: Zip) {
         afterEvaluate {
             if (tasks.findByName('jar')) {
                 dependsOn assemble
-                from jar
+                if (jar.isEnabled()) {
+                    from jar
+                }
                 if (documentationProfile) {
                     if (tasks.findByName('javadocJar')) from javadocJar
                     if (tasks.findByName('sourceJar')) from sourceJar
