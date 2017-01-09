@@ -127,4 +127,11 @@ public interface JobScheduler {
      * Gets the job key for a job id
      */
     Optional<JobKey> getJobKey(long id);
+
+    /**
+     * Checks the general status of the scheduler.
+     *
+     * @return <code>true</code> if the scheduler is paused.
+     */
+    boolean isPaused();
 }

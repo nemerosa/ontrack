@@ -215,6 +215,21 @@
                                 Clear filter
                             </a></li>
 
+                            <li ng-show="jobs && jobs._pause">
+                                <a class="ot-action" title="Stops running new jobs - current executions are not stopped."
+                                    ng-click="pauseJobs()">
+                                    <span class="fa fa-pause"></span>
+                                    Stops running jobs
+                                </a>
+                            </li>
+
+                            <li ng-show="jobs && jobs._resume">
+                                <a class="ot-action" ng-click="resumeJobs()">
+                                    <span class="fa fa-play"></span>
+                                    Resumes running jobs
+                                </a>
+                            </li>
+
                             <li><a class="ot-action" ng-click="pauseAllSelected()">
                                 <span class="fa fa-pause"></span>
                                 Pause all visible jobs
@@ -225,6 +240,14 @@
                                 Resume all visible jobs
                             </a></li>
                         </ul>
+                    </div>
+
+                    <!-- Scheduler status -->
+                    <div class="form-group" ng-show="jobs && jobs._resume">
+                        <b class="form-control-static text-danger">
+                            Execution of jobs has been stopped.
+                            <a class="ot-action" ng-click="resumeJobs()">Resume their execution.</a>
+                        </b>
                     </div>
 
                 </div>

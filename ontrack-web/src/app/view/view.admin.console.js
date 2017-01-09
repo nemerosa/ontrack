@@ -106,6 +106,20 @@ angular.module('ot.view.admin.console', [
             });
         };
 
+        // Pausing all jobs
+        $scope.pauseJobs = function() {
+            if ($scope.jobs && $scope.jobs._pause) {
+                ot.pageCall($http.put($scope.jobs._pause)).then(loadJobs);
+            }
+        };
+
+        // Resuming all jobs
+        $scope.resumeJobs = function() {
+            if ($scope.jobs && $scope.jobs._resume) {
+                ot.pageCall($http.put($scope.jobs._resume)).then(loadJobs);
+            }
+        };
+
         // Pausing a job
         $scope.pauseJob = function (job) {
             ot.pageCall($http.post(job._pause)).then(function (ack) {

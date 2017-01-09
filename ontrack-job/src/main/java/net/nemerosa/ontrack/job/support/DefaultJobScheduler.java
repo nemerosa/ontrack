@@ -82,6 +82,11 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
+    public boolean isPaused() {
+        return schedulerPaused.get();
+    }
+
+    @Override
     public boolean pause(JobKey key) {
         JobScheduledService existingService = services.get(key);
         if (existingService != null) {
