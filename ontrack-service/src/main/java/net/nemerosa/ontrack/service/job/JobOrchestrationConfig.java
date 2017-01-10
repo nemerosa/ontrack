@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Configuration
 public class JobOrchestrationConfig {
@@ -28,11 +28,15 @@ public class JobOrchestrationConfig {
     public JobOrchestrationConfig(
             OntrackConfigProperties configProperties,
             JobScheduler jobScheduler,
-            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-                    Optional<Collection<JobOrchestratorSupplier>> jobOrchestratorSuppliers) {
+            Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers) {
         this.configProperties = configProperties;
         this.jobScheduler = jobScheduler;
-        this.jobOrchestratorSuppliers = jobOrchestratorSuppliers.orElse(Collections.emptyList());
+        this.jobOrchestratorSuppliers = jobOrchestratorSuppliers;
+    }
+
+    @Bean
+    public JobOrchestratorSupplier nopJobOrchestratorSupplier() {
+        return Stream::empty;
     }
 
     @Bean
