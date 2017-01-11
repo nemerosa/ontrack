@@ -245,7 +245,9 @@ public class DefaultJobScheduler implements JobScheduler {
 
         @Override
         public void run() {
-            fireImmediately(false, Collections.emptyMap());
+            if (!schedulerPaused.get()) {
+                fireImmediately(false, Collections.emptyMap());
+            }
         }
 
         public void cancel(boolean forceStop) {
@@ -415,10 +417,9 @@ public class DefaultJobScheduler implements JobScheduler {
          * <p>
          * * not disabled
          * * AND (forced OR not paused)
-         * * AND schedule NOT paused
          */
         private boolean canRunNow(boolean force) {
-            return !job.isDisabled() && (!paused.get() || force) && !schedulerPaused.get();
+            return !job.isDisabled() && (!paused.get() || force);
         }
     }
 }
