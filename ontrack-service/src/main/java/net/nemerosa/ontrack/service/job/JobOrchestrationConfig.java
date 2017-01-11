@@ -13,31 +13,18 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.stream.Stream;
 
 @Configuration
 public class JobOrchestrationConfig {
 
-    private final OntrackConfigProperties configProperties;
+    @Autowired
+    private OntrackConfigProperties configProperties;
 
-    private final JobScheduler jobScheduler;
-
-    private final Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers;
+    @Autowired
+    private JobScheduler jobScheduler;
 
     @Autowired(required = false)
-    public JobOrchestrationConfig(
-            OntrackConfigProperties configProperties,
-            JobScheduler jobScheduler,
-            Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers) {
-        this.configProperties = configProperties;
-        this.jobScheduler = jobScheduler;
-        this.jobOrchestratorSuppliers = jobOrchestratorSuppliers;
-    }
-
-    @Bean
-    public JobOrchestratorSupplier nopJobOrchestratorSupplier() {
-        return Stream::empty;
-    }
+    private Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers;
 
     @Bean
     public JobOrchestrator jobOrchestrator() {
