@@ -23,14 +23,20 @@ public class DefaultJobScheduler implements JobScheduler {
     private final JobListener jobListener;
 
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
-    private final AtomicBoolean schedulerPaused = new AtomicBoolean(false);
+    private final AtomicBoolean schedulerPaused;
 
     private final AtomicLong idGenerator = new AtomicLong();
 
-    public DefaultJobScheduler(JobDecorator jobDecorator, ScheduledExecutorService scheduledExecutorService, JobListener jobListener) {
+    public DefaultJobScheduler(
+            JobDecorator jobDecorator,
+            ScheduledExecutorService scheduledExecutorService,
+            JobListener jobListener,
+            boolean initiallyPaused
+    ) {
         this.jobDecorator = jobDecorator;
         this.scheduledExecutorService = scheduledExecutorService;
         this.jobListener = jobListener;
+        this.schedulerPaused = new AtomicBoolean(initiallyPaused);
     }
 
     @Override
@@ -79,6 +85,11 @@ public class DefaultJobScheduler implements JobScheduler {
     @Override
     public void resume() {
         schedulerPaused.set(false);
+    }
+
+    @Override
+    public boolean isPaused() {
+        return schedulerPaused.get();
     }
 
     @Override
@@ -244,7 +255,9 @@ public class DefaultJobScheduler implements JobScheduler {
 
         @Override
         public void run() {
-            fireImmediately(false, Collections.emptyMap());
+            if (!schedulerPaused.get()) {
+                fireImmediately(false, Collections.emptyMap());
+            }
         }
 
         public boolean cancel(boolean forceStop) {
@@ -416,10 +429,9 @@ public class DefaultJobScheduler implements JobScheduler {
          * <p>
          * * not disabled
          * * AND (forced OR not paused)
-         * * AND schedule NOT paused
          */
         private boolean canRunNow(boolean force) {
-            return !job.isDisabled() && (!paused.get() || force) && !schedulerPaused.get();
+            return !job.isDisabled() && (!paused.get() || force);
         }
     }
 }

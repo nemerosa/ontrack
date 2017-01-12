@@ -26,7 +26,7 @@ public class TestPropertyType extends AbstractPropertyType<TestProperty> impleme
 
     @Override
     public String getName() {
-        return "Value";
+        return "Configuration value";
     }
 
     @Override

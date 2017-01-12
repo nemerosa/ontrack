@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 
 import java.time.LocalDate;

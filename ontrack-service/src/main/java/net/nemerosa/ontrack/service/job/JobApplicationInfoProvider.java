@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -28,7 +29,7 @@ public class JobApplicationInfoProvider implements ApplicationInfoProvider {
     public List<ApplicationInfo> getApplicationInfoList() {
         return securityService.asAdmin(() -> jobScheduler.getJobStatuses().stream()
                 .map(this::getApplicationInfo)
-                .filter(info -> info != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList())
         );
     }

@@ -19,23 +19,27 @@ import java.util.concurrent.ScheduledExecutorService;
 @Configuration
 public class JobConfig {
 
-    @Autowired
-    private OntrackConfigProperties ontrackConfigProperties;
+    private final OntrackConfigProperties ontrackConfigProperties;
+
+    private final DefaultJobDecorator jobDecorator;
+
+    private final ApplicationLogService logService;
+
+    private final MetricRegistry metricRegistry;
+
+    private final CounterService counterService;
+
+    private final SettingsRepository settingsRepository;
 
     @Autowired
-    private DefaultJobDecorator jobDecorator;
-
-    @Autowired
-    private ApplicationLogService logService;
-
-    @Autowired
-    private MetricRegistry metricRegistry;
-
-    @Autowired
-    private CounterService counterService;
-
-    @Autowired
-    private SettingsRepository settingsRepository;
+    public JobConfig(OntrackConfigProperties ontrackConfigProperties, DefaultJobDecorator jobDecorator, ApplicationLogService logService, MetricRegistry metricRegistry, CounterService counterService, SettingsRepository settingsRepository) {
+        this.ontrackConfigProperties = ontrackConfigProperties;
+        this.jobDecorator = jobDecorator;
+        this.logService = logService;
+        this.metricRegistry = metricRegistry;
+        this.counterService = counterService;
+        this.settingsRepository = settingsRepository;
+    }
 
     @Bean
     public JobListener jobListener() {
@@ -63,7 +67,8 @@ public class JobConfig {
         return new DefaultJobScheduler(
                 jobDecorator,
                 jobExecutorService(),
-                jobListener()
+                jobListener(),
+                ontrackConfigProperties.getJobs().isPausedAtStartup()
         );
     }
 

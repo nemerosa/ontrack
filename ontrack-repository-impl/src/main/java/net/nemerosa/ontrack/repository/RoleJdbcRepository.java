@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.security.ProjectRoleAssociation;
+import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -10,6 +12,7 @@ import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -107,6 +110,60 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
                         "DELETE FROM GROUP_PROJECT_AUTHORIZATIONS WHERE ACCOUNTGROUP = :accountGroupId AND PROJECT = :projectId",
                         params("accountGroupId", accountGroupId).addValue("projectId", projectId)
                 )
+        );
+    }
+
+    @Override
+    public Collection<AccountGroup> findAccountGroupsByGlobalRole(GlobalRole globalRole, Function<ID, AccountGroup> accountGroupLoader) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT G.* FROM ACCOUNT_GROUPS G " +
+                        "INNER JOIN GROUP_GLOBAL_AUTHORIZATIONS A " +
+                        "ON A.ACCOUNTGROUP = G.ID " +
+                        "WHERE A.ROLE = :role " +
+                        "ORDER BY G.NAME",
+                params("role", globalRole.getId()),
+                (rs, num) -> accountGroupLoader.apply(id(rs))
+        );
+    }
+
+    @Override
+    public Collection<Account> findAccountsByGlobalRole(GlobalRole globalRole, Function<ID, Account> accountLoader) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT G.* FROM ACCOUNTS G " +
+                        "INNER JOIN GLOBAL_AUTHORIZATIONS A " +
+                        "ON A.ACCOUNT = G.ID " +
+                        "WHERE A.ROLE = :role " +
+                        "ORDER BY G.NAME",
+                params("role", globalRole.getId()),
+                (rs, num) -> accountLoader.apply(id(rs))
+        );
+    }
+
+    @Override
+    public Collection<AccountGroup> findAccountGroupsByProjectRole(Project project, ProjectRole projectRole, Function<ID, AccountGroup> accountGroupLoader) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT G.* FROM ACCOUNT_GROUPS G " +
+                        "INNER JOIN GROUP_PROJECT_AUTHORIZATIONS A " +
+                        "ON A.ACCOUNTGROUP = G.ID " +
+                        "WHERE A.ROLE = :role " +
+                        "AND A.PROJECT = :project " +
+                        "ORDER BY G.NAME",
+                params("role", projectRole.getId()).addValue("project", project.id()),
+                (rs, num) -> accountGroupLoader.apply(id(rs))
+        );
+    }
+
+    @Override
+    public Collection<Account> findAccountsByProjectRole(Project project, ProjectRole projectRole, Function<ID, Account> accountLoader) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT G.* FROM ACCOUNTS G " +
+                        "INNER JOIN PROJECT_AUTHORIZATIONS A " +
+                        "ON A.ACCOUNT = G.ID " +
+                        "WHERE A.ROLE = :role " +
+                        "AND A.PROJECT = :project " +
+                        "ORDER BY G.NAME",
+                params("role", projectRole.getId()).addValue("project", project.id()),
+                (rs, num) -> accountLoader.apply(id(rs))
         );
     }
 

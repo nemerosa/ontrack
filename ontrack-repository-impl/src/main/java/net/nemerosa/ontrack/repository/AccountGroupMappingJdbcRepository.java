@@ -59,11 +59,11 @@ public class AccountGroupMappingJdbcRepository extends AbstractJdbcRepository im
         try {
             return getMapping(
                     ID.of(dbCreate(
-                                    "INSERT INTO ACCOUNT_GROUP_MAPPING(MAPPING, SOURCE, GROUPID) " +
-                                            "VALUES(:mapping, :source, :groupId)",
-                                    params("mapping", mapping)
-                                            .addValue("source", input.getName())
-                                            .addValue("groupId", input.getGroup().get())
+                            "INSERT INTO ACCOUNT_GROUP_MAPPING(MAPPING, SOURCE, GROUPID) " +
+                                    "VALUES(:mapping, :source, :groupId)",
+                            params("mapping", mapping)
+                                    .addValue("source", input.getName())
+                                    .addValue("groupId", input.getGroup().get())
                             )
                     )
             );
@@ -107,6 +107,15 @@ public class AccountGroupMappingJdbcRepository extends AbstractJdbcRepository im
                         "DELETE FROM ACCOUNT_GROUP_MAPPING WHERE ID = :id",
                         params("id", id.get())
                 )
+        );
+    }
+
+    @Override
+    public List<AccountGroupMapping> getMappingsForGroup(AccountGroup group) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM ACCOUNT_GROUP_MAPPING WHERE GROUPID = :groupId",
+                params("groupId", group.id()),
+                this::toAccountGroupMapping
         );
     }
 

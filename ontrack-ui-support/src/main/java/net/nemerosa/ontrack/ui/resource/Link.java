@@ -16,6 +16,7 @@ public class Link {
     public static final String UPDATE = "_update";
     public static final String DELETE = "_delete";
     public static final String IMAGE_LINK = "_image";
+    public static final String PAGE = "_page";
 
     @JsonIgnore
     private final String name;

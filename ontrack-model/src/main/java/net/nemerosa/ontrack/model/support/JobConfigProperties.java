@@ -15,4 +15,9 @@ public class JobConfigProperties {
      */
     private int orchestration = 2;
 
+    /**
+     * Pausing the jobs at startup?
+     */
+    private boolean pausedAtStartup = false;
+
 }

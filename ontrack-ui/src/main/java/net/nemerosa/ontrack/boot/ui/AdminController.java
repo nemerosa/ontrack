@@ -116,7 +116,18 @@ public class AdminController extends AbstractResourceController {
         return Resources.of(
                 jobScheduler.getJobStatuses(),
                 uri(on(getClass()).getJobs())
-        );
+        )
+                .with(
+                        "_pause",
+                        uri(on(getClass()).pauseAllJobs()),
+                        !jobScheduler.isPaused()
+                )
+                .with(
+                        "_resume",
+                        uri(on(getClass()).resumeAllJobs()),
+                        jobScheduler.isPaused()
+                )
+                ;
     }
 
     /**
@@ -128,6 +139,26 @@ public class AdminController extends AbstractResourceController {
         return jobScheduler.getJobKey(id)
                 .map(key -> Ack.validate(jobScheduler.fireImmediately(key) != null))
                 .orElse(Ack.NOK);
+    }
+
+    /**
+     * Pauses all job executions
+     */
+    @PutMapping("jobs/pause")
+    public Ack pauseAllJobs() {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        jobScheduler.pause();
+        return Ack.OK;
+    }
+
+    /**
+     * Resumes all job executions
+     */
+    @PutMapping("jobs/resume")
+    public Ack resumeAllJobs() {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        jobScheduler.resume();
+        return Ack.OK;
     }
 
     /**

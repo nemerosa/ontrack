@@ -4,16 +4,19 @@ import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.ui.resource.LinksBuilder;
+import net.nemerosa.ontrack.ui.resource.LinkDefinition;
+import net.nemerosa.ontrack.ui.resource.LinkDefinitions;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.List;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @Component
-public class GitProjectResourceDecorationContributor implements ResourceDecorationContributor {
+public class GitProjectResourceDecorationContributor implements ResourceDecorationContributor<Project> {
 
     private final GitService gitService;
 
@@ -23,16 +26,19 @@ public class GitProjectResourceDecorationContributor implements ResourceDecorati
     }
 
     @Override
-    public void contribute(LinksBuilder linksBuilder, ProjectEntity projectEntity) {
-        if (projectEntity.getProjectEntityType() == ProjectEntityType.PROJECT) {
-            Project project = (Project) projectEntity;
-            if (gitService.getProjectConfiguration(project).isPresent()) {
-                linksBuilder.link(
+    public List<LinkDefinition<Project>> getLinkDefinitions() {
+        return Collections.singletonList(
+                LinkDefinitions.link(
                         "_gitSync",
-                        on(GitController.class).getProjectGitSyncInfo(project.getId()),
-                        ProjectConfig.class, projectEntity
-                );
-            }
-        }
+                        project -> on(GitController.class).getProjectGitSyncInfo(project.getId()),
+                        (project, rc) -> rc.isProjectFunctionGranted(project, ProjectConfig.class) &&
+                                gitService.getProjectConfiguration(project).isPresent()
+                )
+        );
+    }
+
+    @Override
+    public <T extends ProjectEntity> boolean applyTo(Class<T> projectClass) {
+        return Project.class.isAssignableFrom(projectClass);
     }
 }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.Project;
 
 import java.util.Collection;
 import java.util.List;
@@ -142,4 +143,78 @@ public interface AccountService {
      * Deletes a project permission.
      */
     Ack deleteProjectPermission(ID projectId, PermissionTargetType type, int id);
+
+    /**
+     * Gets the list of project permissions for a given account
+     *
+     * @param account Account to get the permissions for
+     * @return List of project roles
+     */
+    Collection<ProjectRoleAssociation> getProjectPermissionsForAccount(Account account);
+
+    /**
+     * Gets the optional global role for an account
+     *
+     * @param account Account
+     * @return Optional role
+     */
+    Optional<GlobalRole> getGlobalRoleForAccount(Account account);
+
+    /**
+     * Gets the list of accounts associated with this account group.
+     *
+     * @param accountGroup Account group
+     * @return List of accounts
+     */
+    List<Account> getAccountsForGroup(AccountGroup accountGroup);
+
+    /**
+     * Gets the optional global role for an account group.
+     *
+     * @param group Account group
+     * @return Optional role
+     */
+    Optional<GlobalRole> getGlobalRoleForAccountGroup(AccountGroup group);
+
+    /**
+     * Gets the list of project permissions for a given account group
+     *
+     * @param group Account group to get the permissions for
+     * @return List of project roles
+     */
+    Collection<ProjectRoleAssociation> getProjectPermissionsForAccountGroup(AccountGroup group);
+
+    /**
+     * List of groups having the given global role
+     *
+     * @param globalRole Global role to search for
+     * @return List of matching account groups
+     */
+    Collection<AccountGroup> findAccountGroupsByGlobalRole(GlobalRole globalRole);
+
+    /**
+     * List of accounts having the given global role
+     *
+     * @param globalRole Global role to search for
+     * @return List of matching accounts
+     */
+    Collection<Account> findAccountsByGlobalRole(GlobalRole globalRole);
+
+    /**
+     * List of groups having the given project role
+     *
+     * @param project     Project
+     * @param projectRole Role to search for
+     * @return List of matching account groups
+     */
+    Collection<AccountGroup> findAccountGroupsByProjectRole(Project project, ProjectRole projectRole);
+
+    /**
+     * List of accounts having the given project role
+     *
+     * @param project     Project
+     * @param projectRole Role to search for
+     * @return List of matching accounts
+     */
+    Collection<Account> findAccountsByProjectRole(Project project, ProjectRole projectRole);
 }

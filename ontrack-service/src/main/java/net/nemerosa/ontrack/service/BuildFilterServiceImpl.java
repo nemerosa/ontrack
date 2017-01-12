@@ -188,6 +188,14 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @Override
+    public BuildFilterProviderData<?> standardFilterProviderData(JsonNode node) {
+        return getBuildFilterProviderData(
+                StandardBuildFilterProvider.class.getName(),
+                node
+        );
+    }
+
+    @Override
     public Collection<BuildFilterResource<?>> getBuildFilters(ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         // Are we logged?

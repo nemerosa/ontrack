@@ -1,0 +1,11 @@
+@startuml
+class GQLBranch
+class GQLBuild {
+
+}
+class GQLProjectEntity {
+
+}
+
+GQLBuild --> GQLProjectEntity
+@enduml

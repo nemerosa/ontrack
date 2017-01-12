@@ -137,4 +137,11 @@ public interface JobScheduler {
      * @throws JobNotScheduledException If the job is not scheduled
      */
     boolean stop(JobKey key);
+
+    /**
+     * Checks the general status of the scheduler.
+     *
+     * @return <code>true</code> if the scheduler is paused.
+     */
+    boolean isPaused();
 }

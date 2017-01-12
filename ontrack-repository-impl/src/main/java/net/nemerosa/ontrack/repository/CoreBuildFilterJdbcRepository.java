@@ -54,32 +54,9 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
     @Override
     public List<Build> standardFilter(Branch branch, StandardBuildFilterData data) {
         // Query root
-        StringBuilder sql = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
-                "                LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
-                "                LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID" +
-                "                LEFT JOIN (" +
-                "                    SELECT R.BUILDID,  R.VALIDATIONSTAMPID, VRS.VALIDATIONRUNSTATUSID " +
-                "                    FROM VALIDATION_RUNS R" +
-                "                    INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = R.ID ORDER BY ID DESC LIMIT 1)" +
-                "                    AND R.ID = (SELECT MAX(ID) FROM VALIDATION_RUNS WHERE BUILDID = R.BUILDID AND VALIDATIONSTAMPID = R.VALIDATIONSTAMPID)" +
-                "                    ) S ON S.BUILDID = B.ID" +
-                "                LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID" +
-                // FROM BUILDS
-                "                LEFT JOIN BUILD_LINKS BLFROM ON BLFROM.TARGETBUILDID = B.ID" +
-                "                LEFT JOIN BUILDS BDFROM ON BDFROM.ID = BLFROM.BUILDID" +
-                "                LEFT JOIN BRANCHES BRFROM ON BRFROM.ID = BDFROM.BRANCHID" +
-                "                LEFT JOIN PROJECTS PJFROM ON PJFROM.ID = BRFROM.PROJECTID" +
-                "                LEFT JOIN PROMOTION_RUNS PRFROM ON PRFROM.BUILDID = BDFROM.ID" +
-                "                LEFT JOIN PROMOTION_LEVELS PLFROM ON PLFROM.ID = PRFROM.PROMOTIONLEVELID" +
-                // TO BUILDS
-                "                LEFT JOIN BUILD_LINKS BLTO ON BLTO.BUILDID = B.ID" +
-                "                LEFT JOIN BUILDS BDTO ON BDTO.ID = BLTO.TARGETBUILDID" +
-                "                LEFT JOIN BRANCHES BRTO ON BRTO.ID = BDTO.BRANCHID" +
-                "                LEFT JOIN PROJECTS PJTO ON PJTO.ID = BRTO.PROJECTID" +
-                "                LEFT JOIN PROMOTION_RUNS PRTO ON PRTO.BUILDID = BDTO.ID" +
-                "                LEFT JOIN PROMOTION_LEVELS PLTO ON PLTO.ID = PRTO.PROMOTIONLEVELID" +
-                // Branch criteria
-                "                WHERE B.BRANCHID = :branch");
+        StringBuilder tables = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B ");
+        // Criterias
+        StringBuilder criteria = new StringBuilder(" WHERE B.BRANCHID = :branch");
 
         // Parameters
         MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
@@ -107,21 +84,24 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         // withPromotionLevel
         String withPromotionLevel = data.getWithPromotionLevel();
         if (StringUtils.isNotBlank(withPromotionLevel)) {
-            sql.append(" AND PL.NAME = :withPromotionLevel");
+            tables.append(
+                    " LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
+                            " LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID");
+            criteria.append(" AND PL.NAME = :withPromotionLevel");
             params.addValue("withPromotionLevel", withPromotionLevel);
         }
 
         // afterDate
         LocalDate afterDate = data.getAfterDate();
         if (afterDate != null) {
-            sql.append(" AND B.CREATION >= :afterDate");
+            criteria.append(" AND B.CREATION >= :afterDate");
             params.addValue("afterDate", dateTimeForDB(afterDate.atTime(0, 0)));
         }
 
         // beforeDate
         LocalDate beforeDate = data.getBeforeDate();
         if (beforeDate != null) {
-            sql.append(" AND B.CREATION <= :beforeDate");
+            criteria.append(" AND B.CREATION <= :beforeDate");
             params.addValue("beforeDate", dateTimeForDB(beforeDate.atTime(23, 59, 59)));
         }
 
@@ -144,28 +124,37 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         // withValidationStamp
         String withValidationStamp = data.getWithValidationStamp();
         if (StringUtils.isNotBlank(withValidationStamp)) {
+            tables.append(
+                    "  LEFT JOIN (" +
+                            " SELECT R.BUILDID,  R.VALIDATIONSTAMPID, VRS.VALIDATIONRUNSTATUSID " +
+                            " FROM VALIDATION_RUNS R" +
+                            " INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = R.ID ORDER BY ID DESC LIMIT 1)" +
+                            " AND R.ID = (SELECT MAX(ID) FROM VALIDATION_RUNS WHERE BUILDID = R.BUILDID AND VALIDATIONSTAMPID = R.VALIDATIONSTAMPID)" +
+                            " ) S ON S.BUILDID = B.ID"
+            );
             // Gets the validation stamp ID
             int validationStampId = getValidationStampId(branch, withValidationStamp);
-            sql.append(" AND (S.VALIDATIONSTAMPID = :validationStampId");
+            criteria.append(" AND (S.VALIDATIONSTAMPID = :validationStampId");
             params.addValue("validationStampId", validationStampId);
             // withValidationStampStatus
             String withValidationStampStatus = data.getWithValidationStampStatus();
             if (StringUtils.isNotBlank(withValidationStampStatus)) {
-                sql.append(" AND S.VALIDATIONRUNSTATUSID = :withValidationStampStatus");
+                criteria.append(" AND S.VALIDATIONRUNSTATUSID = :withValidationStampStatus");
                 params.addValue("withValidationStampStatus", withValidationStampStatus);
             }
-            sql.append(")");
+            criteria.append(")");
         }
 
         // withProperty
         String withProperty = data.getWithProperty();
         if (StringUtils.isNotBlank(withProperty)) {
-            sql.append(" AND PP.TYPE = :withProperty");
+            tables.append(" LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID");
+            criteria.append(" AND PP.TYPE = :withProperty");
             params.addValue("withProperty", withProperty);
             // withPropertyValue
             String withPropertyValue = data.getWithPropertyValue();
             if (StringUtils.isNotBlank(withPropertyValue)) {
-                sql.append(" AND PP.SEARCHKEY REGEXP :withPropertyValue");
+                criteria.append(" AND PP.SEARCHKEY REGEXP :withPropertyValue");
                 params.addValue("withPropertyValue", withPropertyValue);
             }
         }
@@ -187,23 +176,33 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         // linkedFrom
         String linkedFrom = data.getLinkedFrom();
         if (isNotBlank(linkedFrom)) {
+            tables.append(
+                    " LEFT JOIN BUILD_LINKS BLFROM ON BLFROM.TARGETBUILDID = B.ID" +
+                            " LEFT JOIN BUILDS BDFROM ON BDFROM.ID = BLFROM.BUILDID" +
+                            " LEFT JOIN BRANCHES BRFROM ON BRFROM.ID = BDFROM.BRANCHID" +
+                            " LEFT JOIN PROJECTS PJFROM ON PJFROM.ID = BRFROM.PROJECTID"
+            );
             String project = StringUtils.substringBefore(linkedFrom, ":");
-            sql.append(" AND PJFROM.NAME = :fromProject");
+            criteria.append(" AND PJFROM.NAME = :fromProject");
             params.addValue("fromProject", project);
             String buildPattern = StringUtils.substringAfter(linkedFrom, ":");
             if (StringUtils.isNotBlank(buildPattern)) {
                 if (StringUtils.contains(buildPattern, "*")) {
-                    sql.append(" AND BDFROM.NAME LIKE :buildFrom");
+                    criteria.append(" AND BDFROM.NAME LIKE :buildFrom");
                     params.addValue("buildFrom", StringUtils.replace(buildPattern, "*", "%"));
                 } else {
-                    sql.append(" AND BDFROM.NAME = :buildFrom");
+                    criteria.append(" AND BDFROM.NAME = :buildFrom");
                     params.addValue("buildFrom", buildPattern);
                 }
             }
             // linkedFromPromotion
             String linkedFromPromotion = data.getLinkedFromPromotion();
             if (StringUtils.isNotBlank(linkedFromPromotion)) {
-                sql.append(" AND PLFROM.NAME = :linkedFromPromotion");
+                tables.append(
+                        " LEFT JOIN PROMOTION_RUNS PRFROM ON PRFROM.BUILDID = BDFROM.ID" +
+                                " LEFT JOIN PROMOTION_LEVELS PLFROM ON PLFROM.ID = PRFROM.PROMOTIONLEVELID"
+                );
+                criteria.append(" AND PLFROM.NAME = :linkedFromPromotion");
                 params.addValue("linkedFromPromotion", linkedFromPromotion);
             }
         }
@@ -211,41 +210,52 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         // linkedTo
         String linkedTo = data.getLinkedTo();
         if (isNotBlank(linkedTo)) {
+            tables.append(
+                    " LEFT JOIN BUILD_LINKS BLTO ON BLTO.BUILDID = B.ID" +
+                            " LEFT JOIN BUILDS BDTO ON BDTO.ID = BLTO.TARGETBUILDID" +
+                            " LEFT JOIN BRANCHES BRTO ON BRTO.ID = BDTO.BRANCHID" +
+                            " LEFT JOIN PROJECTS PJTO ON PJTO.ID = BRTO.PROJECTID"
+            );
             String project = StringUtils.substringBefore(linkedTo, ":");
-            sql.append(" AND PJTO.NAME = :toProject");
+            criteria.append(" AND PJTO.NAME = :toProject");
             params.addValue("toProject", project);
             String buildPattern = StringUtils.substringAfter(linkedTo, ":");
             if (StringUtils.isNotBlank(buildPattern)) {
                 if (StringUtils.contains(buildPattern, "*")) {
-                    sql.append(" AND BDTO.NAME LIKE :buildTo");
+                    criteria.append(" AND BDTO.NAME LIKE :buildTo");
                     params.addValue("buildTo", StringUtils.replace(buildPattern, "*", "%"));
                 } else {
-                    sql.append(" AND BDTO.NAME = :buildTo");
+                    criteria.append(" AND BDTO.NAME = :buildTo");
                     params.addValue("buildTo", buildPattern);
                 }
             }
             // linkedToPromotion
             String linkedToPromotion = data.getLinkedToPromotion();
             if (StringUtils.isNotBlank(linkedToPromotion)) {
-                sql.append(" AND PLTO.NAME = :linkedToPromotion");
+                tables.append(
+                        " LEFT JOIN PROMOTION_RUNS PRTO ON PRTO.BUILDID = BDTO.ID" +
+                                " LEFT JOIN PROMOTION_LEVELS PLTO ON PLTO.ID = PRTO.PROMOTIONLEVELID"
+                );
+                criteria.append(" AND PLTO.NAME = :linkedToPromotion");
                 params.addValue("linkedToPromotion", linkedToPromotion);
             }
         }
 
         // Since build?
         if (sinceBuildId != null) {
-            sql.append(" AND B.ID >= :sinceBuildId");
+            criteria.append(" AND B.ID >= :sinceBuildId");
             params.addValue("sinceBuildId", sinceBuildId);
         }
 
-        // Ordering
-        sql.append(" ORDER BY B.ID DESC");
-        // Limit
-        sql.append(" LIMIT :count");
+        // Final SQL
+        String sql = String.format(
+                "%s %s ORDER BY B.ID DESC LIMIT :count",
+                tables,
+                criteria);
         params.addValue("count", data.getCount());
 
         // Running the query
-        return loadBuilds(sql.toString(), params);
+        return loadBuilds(sql, params);
     }
 
     private List<Build> loadBuilds(String sql, MapSqlParameterSource params) {
