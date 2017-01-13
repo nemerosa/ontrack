@@ -461,7 +461,7 @@ public class DefaultJobSchedulerTest {
     }
 
     @Test
-    public void run_once_job() {
+    public void run_once_job() throws InterruptedException {
         // Job to fire once
         JobKey key = JobCategory.of("once").getType("short").getKey("1");
         AtomicInteger count = new AtomicInteger();
@@ -496,13 +496,14 @@ public class DefaultJobSchedulerTest {
         // Waits for its result
         FutureUtils.wait("Short job", future, 2);
         // Checks the job is unregistered
+        Thread.sleep(100);
         assertFalse("Job is unregistered", jobScheduler.getJobStatus(key).isPresent());
         // Checks it has run
         assertEquals("Job has run", 1, count.get());
     }
 
     @Test
-    public void run_once_long_job() {
+    public void run_once_long_job() throws InterruptedException {
         // Job to fire once
         JobKey key = JobCategory.of("once").getType("long").getKey("1");
         AtomicInteger count = new AtomicInteger();
@@ -541,11 +542,11 @@ public class DefaultJobSchedulerTest {
         Future<?> future = jobScheduler.runOnce(job);
         // Checks it IS registered
         Optional<JobStatus> status = jobScheduler.getJobStatus(key);
-        assertTrue("Job is registered", status.isPresent());
-        assertTrue("Job is running", status.get().isRunning());
+        assertTrue("Job is registered and running", status.isPresent() && status.get().isRunning());
         // Waits for its result
         FutureUtils.wait("Long job", future, 4);
         // Checks the job is unregistered
+        Thread.sleep(100);
         assertFalse("Job is unregistered", jobScheduler.getJobStatus(key).isPresent());
         // Checks it has run
         assertEquals("Job has run", 1, count.get());

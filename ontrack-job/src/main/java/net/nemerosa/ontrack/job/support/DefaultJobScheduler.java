@@ -74,8 +74,10 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     protected boolean unschedule(JobKey key, boolean forceStop) {
+        logger.debug("[job]{} Unscheduling job", key);
         JobScheduledService existingService = services.remove(key);
         if (existingService != null) {
+            logger.debug("[job]{} Stopping running job", key);
             existingService.cancel(forceStop);
             return true;
         } else {
@@ -193,14 +195,20 @@ public class DefaultJobScheduler implements JobScheduler {
     @Override
     public ListenableFuture<?> runOnce(Job job) {
         JobKey key = job.getKey();
+        logger.info("[job]*{} Scheduling job after unique run", key);
         // Registers the job, without any schedule
         schedule(job, Schedule.NONE);
         // Fires it immedietely
         ListenableFuture<?> future = fireImmediately(key);
+        // Unscheduling
+        Runnable unscheduling = () -> {
+            logger.info("[job]*{} Unscheduling job after unique run", key);
+            unschedule(key);
+        };
         // On completion, unschedules the job
         future.addCallback(
-                result -> unschedule(key),
-                ex -> unschedule(key)
+                result -> unscheduling.run(),
+                ex -> unscheduling.run()
         );
         return future;
     }
@@ -276,6 +284,7 @@ public class DefaultJobScheduler implements JobScheduler {
 
         public boolean cancel(boolean forceStop) {
             if (scheduledFuture != null) {
+                logger.debug("[job]{} Cancelling schedule", job.getKey());
                 scheduledFuture.cancel(false);
             }
             // The decorated task might still run
