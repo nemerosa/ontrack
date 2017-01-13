@@ -4,11 +4,17 @@ import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.job.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -169,12 +175,12 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public CompletableFuture<?> fireImmediately(JobKey jobKey) {
+    public ListenableFuture<?> fireImmediately(JobKey jobKey) {
         return fireImmediately(jobKey, Collections.emptyMap());
     }
 
     @Override
-    public CompletableFuture<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters) {
+    public ListenableFuture<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters) {
         // Gets the existing scheduled service
         JobScheduledService jobScheduledService = services.get(jobKey);
         if (jobScheduledService == null) {
@@ -185,14 +191,18 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public Future<?> runOnce(Job job) {
+    public ListenableFuture<?> runOnce(Job job) {
         JobKey key = job.getKey();
         // Registers the job, without any schedule
         schedule(job, Schedule.NONE);
         // Fires it immedietely
-        CompletableFuture<?> future = fireImmediately(key);
+        ListenableFuture<?> future = fireImmediately(key);
         // On completion, unschedules the job
-        return future.whenComplete((o, throwable) -> unschedule(key));
+        future.addCallback(
+                result -> unschedule(key),
+                ex -> unschedule(key)
+        );
+        return future;
     }
 
     private class JobScheduledService implements Runnable {
@@ -205,7 +215,7 @@ public class DefaultJobScheduler implements JobScheduler {
         private final AtomicBoolean paused;
 
         private final AtomicReference<Map<String, ?>> runParameters = new AtomicReference<>();
-        private final AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
+        private final AtomicReference<ListenableFuture<?>> currentExecution = new AtomicReference<>();
 
         private final AtomicReference<JobRunProgress> runProgress = new AtomicReference<>();
         private final AtomicLong runCount = new AtomicLong();
@@ -213,6 +223,8 @@ public class DefaultJobScheduler implements JobScheduler {
         private final AtomicLong lastRunDurationMs = new AtomicLong();
         private final AtomicLong lastErrorCount = new AtomicLong();
         private final AtomicReference<String> lastError = new AtomicReference<>(null);
+
+        private final AsyncListenableTaskExecutor listenableTaskExecutor;
 
         private JobScheduledService(Job job, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old, boolean pausedAtStartup) {
             this.id = idGenerator.incrementAndGet();
@@ -243,6 +255,8 @@ public class DefaultJobScheduler implements JobScheduler {
                 logger.debug("[job]{} Job not scheduled since period = 0", job.getKey());
                 scheduledFuture = null;
             }
+            // Task executor
+            listenableTaskExecutor = new ConcurrentTaskExecutor(scheduledExecutorService);
         }
 
         public long getId() {
@@ -265,7 +279,7 @@ public class DefaultJobScheduler implements JobScheduler {
                 scheduledFuture.cancel(false);
             }
             // The decorated task might still run
-            CompletableFuture<?> future = this.completableFuture.get();
+            ListenableFuture<?> future = this.currentExecution.get();
             return forceStop &&
                     future != null &&
                     !future.isDone() &&
@@ -273,11 +287,11 @@ public class DefaultJobScheduler implements JobScheduler {
                     future.cancel(true);
         }
 
-        public CompletableFuture<?> fireImmediately(boolean force, Map<String, ?> parameters) {
-            return completableFuture.updateAndGet(cf -> optionallyFireTask(cf, force, parameters));
+        public ListenableFuture<?> fireImmediately(boolean force, Map<String, ?> parameters) {
+            return currentExecution.updateAndGet(cf -> optionallyFireTask(cf, force, parameters));
         }
 
-        protected CompletableFuture<?> optionallyFireTask(CompletableFuture<?> runningCompletableFuture, boolean force, Map<String, ?> parameters) {
+        protected ListenableFuture<?> optionallyFireTask(ListenableFuture<?> runningCompletableFuture, boolean force, Map<String, ?> parameters) {
             if (runningCompletableFuture != null) {
                 /*
                  * If the task is already running, we do not run it in concurrency,
@@ -289,11 +303,21 @@ public class DefaultJobScheduler implements JobScheduler {
             }
         }
 
-        protected CompletableFuture<Void> fireTask(boolean force, Map<String, ?> parameters) {
+        protected ListenableFuture<?> fireTask(boolean force, Map<String, ?> parameters) {
             runParameters.set(parameters);
-            return CompletableFuture
-                    .runAsync(jobDecorator.decorate(job, new MonitoredTask(force)), scheduledExecutorService)
-                    .whenComplete((ignored, ex) -> completableFuture.set(null));
+            // Task to run
+            MonitoredTask monitoredTask = new MonitoredTask(force);
+            // Decorates this task
+            Runnable decoratedTask = jobDecorator.decorate(job, monitoredTask);
+            // Runs it
+            ListenableFuture<?> listenableFuture = listenableTaskExecutor.submitListenable(decoratedTask);
+            // Unsetting on completion
+            listenableFuture.addCallback(
+                    result -> currentExecution.set(null),
+                    ex -> currentExecution.set(null)
+            );
+            // OK
+            return listenableFuture;
         }
 
         public JobStatus getJobStatus() {
@@ -303,7 +327,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     job.getKey(),
                     schedule,
                     job.getDescription(),
-                    completableFuture.get() != null,
+                    currentExecution.get() != null,
                     valid,
                     paused.get(),
                     job.isDisabled(),
