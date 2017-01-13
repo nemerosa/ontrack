@@ -302,6 +302,7 @@ public class DefaultJobScheduler implements JobScheduler {
 
         protected ListenableFuture<?> optionallyFireTask(ListenableFuture<?> runningCompletableFuture, boolean force, Map<String, ?> parameters) {
             if (runningCompletableFuture != null) {
+                logger.debug("[job]{} Returning already running job", job.getKey());
                 /*
                  * If the task is already running, we do not run it in concurrency,
                  * even if force is set to true
