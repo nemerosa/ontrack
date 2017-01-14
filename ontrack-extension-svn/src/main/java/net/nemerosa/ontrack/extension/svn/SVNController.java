@@ -172,40 +172,6 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     }
 
     /**
-     * Indexation of a range (form)
-     */
-    @RequestMapping(value = "configurations/{name:.*}/indexation/range", method = RequestMethod.GET)
-    @ResponseBody
-    public Form indexRange(@PathVariable String name) {
-        // Gets the latest revision info
-        LastRevisionInfo lastRevisionInfo = getLastRevisionInfo(name);
-        // If none, use the start revision
-        if (lastRevisionInfo.isNone()) {
-            // Gets the start revision
-            return new IndexationRange(
-                    getConfiguration(name).getIndexationStart(),
-                    lastRevisionInfo.getRepositoryRevision()
-            ).asForm();
-        }
-        // Uses this information to get a form
-        else {
-            return new IndexationRange(
-                    lastRevisionInfo.getRevision(),
-                    lastRevisionInfo.getRepositoryRevision()
-            ).asForm();
-        }
-    }
-
-    /**
-     * Indexation of a range
-     */
-    @RequestMapping(value = "configurations/{name:.*}/indexation/range", method = RequestMethod.POST)
-    @ResponseBody
-    public Ack indexRange(@PathVariable String name, @RequestBody IndexationRange range) {
-        return indexationService.indexRange(name, range);
-    }
-
-    /**
      * Full indexation
      */
     @RequestMapping(value = "configurations/{name:.*}/indexation/full", method = RequestMethod.POST)

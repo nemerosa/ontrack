@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.job;
 import net.nemerosa.ontrack.job.support.JobNotScheduledException;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
@@ -101,17 +100,6 @@ public interface JobScheduler {
      * @throws JobNotScheduledException If the job is not scheduled
      */
     Future<?> fireImmediately(JobKey jobKey);
-
-    /**
-     * Fires a job immediately, without waiting the schedule, and passes additional parameters.
-     *
-     * @param jobKey     Key of the job to fire immediately
-     * @param parameters List of parameters to give for this job execution
-     * @return Future for the job execution
-     * @throws JobNotScheduledException If the job is not scheduled
-     * @see JobRunListener#getParam(String)
-     */
-    Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters);
 
     /**
      * Gets the job key for a job id

@@ -10,7 +10,10 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -178,18 +181,13 @@ public class DefaultJobScheduler implements JobScheduler {
 
     @Override
     public ListenableFuture<?> fireImmediately(JobKey jobKey) {
-        return fireImmediately(jobKey, Collections.emptyMap());
-    }
-
-    @Override
-    public ListenableFuture<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters) {
         // Gets the existing scheduled service
         JobScheduledService jobScheduledService = services.get(jobKey);
         if (jobScheduledService == null) {
             throw new JobNotScheduledException(jobKey);
         }
         // Fires the job immediately
-        return jobScheduledService.fireImmediately(true, parameters);
+        return jobScheduledService.fireImmediately(true);
     }
 
     private class JobScheduledService implements Runnable {
@@ -201,7 +199,6 @@ public class DefaultJobScheduler implements JobScheduler {
 
         private final AtomicBoolean paused;
 
-        private final AtomicReference<Map<String, ?>> runParameters = new AtomicReference<>();
         private final AtomicReference<ListenableFuture<?>> currentExecution = new AtomicReference<>();
 
         private final AtomicReference<JobRunProgress> runProgress = new AtomicReference<>();
@@ -257,7 +254,7 @@ public class DefaultJobScheduler implements JobScheduler {
         @Override
         public void run() {
             if (!schedulerPaused.get()) {
-                fireImmediately(false, Collections.emptyMap());
+                fireImmediately(false);
             }
         }
 
@@ -275,11 +272,11 @@ public class DefaultJobScheduler implements JobScheduler {
                     future.cancel(true);
         }
 
-        public ListenableFuture<?> fireImmediately(boolean force, Map<String, ?> parameters) {
-            return currentExecution.updateAndGet(cf -> optionallyFireTask(cf, force, parameters));
+        public ListenableFuture<?> fireImmediately(boolean force) {
+            return currentExecution.updateAndGet(cf -> optionallyFireTask(cf, force));
         }
 
-        protected ListenableFuture<?> optionallyFireTask(ListenableFuture<?> runningCompletableFuture, boolean force, Map<String, ?> parameters) {
+        protected ListenableFuture<?> optionallyFireTask(ListenableFuture<?> runningCompletableFuture, boolean force) {
             if (runningCompletableFuture != null) {
                 logger.debug("[job]{} Returning already running job", job.getKey());
                 /*
@@ -288,12 +285,11 @@ public class DefaultJobScheduler implements JobScheduler {
                  */
                 return runningCompletableFuture;
             } else {
-                return fireTask(force, parameters);
+                return fireTask(force);
             }
         }
 
-        protected ListenableFuture<?> fireTask(boolean force, Map<String, ?> parameters) {
-            runParameters.set(parameters);
+        protected ListenableFuture<?> fireTask(boolean force) {
             // Task to run
             MonitoredTask monitoredTask = new MonitoredTask(force);
             // Decorates this task
@@ -320,7 +316,6 @@ public class DefaultJobScheduler implements JobScheduler {
                     valid,
                     paused.get(),
                     job.isDisabled(),
-                    runParameters.get(),
                     runProgress.get(),
                     runCount.get(),
                     lastRunDate.get(),
@@ -368,17 +363,6 @@ public class DefaultJobScheduler implements JobScheduler {
                 runProgress.set(progress);
             }
 
-            @Override
-            public <T> Optional<T> getParam(String key) {
-                Map<String, ?> parameters = runParameters.get();
-                if (parameters != null) {
-                    @SuppressWarnings("unchecked")
-                    T t = (T) parameters.get(key);
-                    return Optional.ofNullable(t);
-                } else {
-                    return Optional.empty();
-                }
-            }
         }
 
         private class MonitoredTask implements Runnable {
@@ -422,8 +406,6 @@ public class DefaultJobScheduler implements JobScheduler {
                             throw ex;
                         } finally {
                             runProgress.set(null);
-                            // Removes any parameter
-                            runParameters.set(null);
                             // Starting
                             jobListener.onJobComplete(job.getKey());
                         }
