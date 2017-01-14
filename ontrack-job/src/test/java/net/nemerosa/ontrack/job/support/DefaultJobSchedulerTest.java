@@ -366,7 +366,8 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // After some seconds, the job keeps running
         Thread.sleep(2500);
-        assertEquals(3, job.getCount());
+        int count = job.getCount();
+        assertTrue(count >= 2);
         // Invalidates the job
         job.invalidate();
         // The status indicates the job is no longer valid, but is still there
@@ -376,7 +377,7 @@ public class DefaultJobSchedulerTest {
         assertNull(status.getNextRunDate());
         // After some seconds, the job has not run
         Thread.sleep(1000);
-        assertEquals(3, job.getCount());
+        assertEquals(count, job.getCount());
         // ... and it's gone
         assertFalse(jobScheduler.getJobStatus(job.getKey()).isPresent());
     }
