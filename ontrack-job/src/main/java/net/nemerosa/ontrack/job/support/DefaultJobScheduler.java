@@ -4,9 +4,6 @@ import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.job.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.task.AsyncListenableTaskExecutor;
-import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -14,10 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -180,14 +174,14 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public ListenableFuture<?> fireImmediately(JobKey jobKey) {
+    public Optional<Future<?>> fireImmediately(JobKey jobKey) {
         // Gets the existing scheduled service
         JobScheduledService jobScheduledService = services.get(jobKey);
         if (jobScheduledService == null) {
             throw new JobNotScheduledException(jobKey);
         }
         // Fires the job immediately
-        return jobScheduledService.fireImmediately(true);
+        return jobScheduledService.doRun(true);
     }
 
     private class JobScheduledService implements Runnable {
@@ -199,16 +193,13 @@ public class DefaultJobScheduler implements JobScheduler {
 
         private final AtomicBoolean paused;
 
-        private final AtomicReference<ListenableFuture<?>> currentExecution = new AtomicReference<>();
-
+        private final AtomicBoolean running = new AtomicBoolean(false);
         private final AtomicReference<JobRunProgress> runProgress = new AtomicReference<>();
         private final AtomicLong runCount = new AtomicLong();
         private final AtomicReference<LocalDateTime> lastRunDate = new AtomicReference<>();
         private final AtomicLong lastRunDurationMs = new AtomicLong();
         private final AtomicLong lastErrorCount = new AtomicLong();
         private final AtomicReference<String> lastError = new AtomicReference<>(null);
-
-        private final AsyncListenableTaskExecutor listenableTaskExecutor;
 
         private JobScheduledService(Job job, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old, boolean pausedAtStartup) {
             this.id = idGenerator.incrementAndGet();
@@ -239,8 +230,6 @@ public class DefaultJobScheduler implements JobScheduler {
                 logger.debug("[job]{} Job not scheduled since period = 0", job.getKey());
                 scheduledFuture = null;
             }
-            // Task executor
-            listenableTaskExecutor = new ConcurrentTaskExecutor(scheduledExecutorService);
         }
 
         public long getId() {
@@ -254,55 +243,98 @@ public class DefaultJobScheduler implements JobScheduler {
         @Override
         public void run() {
             if (!schedulerPaused.get()) {
-                fireImmediately(false);
+                doRun(false);
             }
+        }
+
+        protected Optional<Future<?>> doRun(boolean force) {
+            logger.debug("[job]{} Trying to run now - forced = {}", job.getKey(), force);
+            if (job.isValid()) {
+                if (canRunNow(force)) {
+                    // Task to run
+                    Runnable run = getRun();
+                    // Scheduling
+                    return Optional.of(
+                            scheduledExecutorService.submit(run)
+                    );
+                } else {
+                    logger.debug("[job]{} Not allowed to run now", job.getKey());
+                    return Optional.empty();
+                }
+            } else {
+                logger.debug("[job]{} Not valid - removing from schedule", job.getKey());
+                unschedule(job.getKey(), false);
+                return Optional.empty();
+            }
+        }
+
+        private Runnable getRun() {
+            JobRunListener jobRunListener = new DefaultJobRunListener();
+            // Initial task
+            Runnable rootTask = () -> job.getTask().run(jobRunListener);
+            // Decorated task
+            Runnable decoratedTask = jobDecorator.decorate(job, rootTask);
+            // Run indicator
+            Runnable runnable = new MonitoredRun(decoratedTask, new MonitoredRunListenerAdapter() {
+                @Override
+                public void onStart() {
+                    running.set(true);
+                }
+
+                @Override
+                public void onCompletion() {
+                    running.set(false);
+                }
+            });
+            // Monitoring the run
+            MonitoredRunListener monitoredRunListener = new MonitoredRunListener() {
+                @Override
+                public void onStart() {
+                    logger.debug("[job]{} Running now", job.getKey());
+                    lastRunDate.set(Time.now());
+                    runCount.incrementAndGet();
+                    // Starting
+                    jobListener.onJobStart(job.getKey());
+                }
+
+                @Override
+                public void onSuccess(long duration) {
+                    lastRunDurationMs.set(duration);
+                    logger.debug("[job]{} Ran in {} ms", job.getKey(), duration);
+                    // Starting
+                    jobListener.onJobEnd(job.getKey(), duration);
+                    // No error - resetting the counters
+                    lastErrorCount.set(0);
+                    lastError.set(null);
+                }
+
+                @Override
+                public void onFailure(Exception ex) {
+                    lastErrorCount.incrementAndGet();
+                    lastError.set(ex.getMessage());
+                    logger.error("[job]{} Error: {}", job.getKey(), ex.getMessage());
+                    // Reporter
+                    jobListener.onJobError(getJobStatus(), ex);
+                }
+
+                @Override
+                public void onCompletion() {
+                    runProgress.set(null);
+                    // Starting
+                    jobListener.onJobComplete(job.getKey());
+                }
+            };
+            // Monitored task
+            return new MonitoredRun(runnable, monitoredRunListener);
         }
 
         public boolean cancel(boolean forceStop) {
             if (scheduledFuture != null) {
                 logger.debug("[job]{} Cancelling schedule", job.getKey());
-                scheduledFuture.cancel(false);
-            }
-            // The decorated task might still run
-            ListenableFuture<?> future = this.currentExecution.get();
-            return forceStop &&
-                    future != null &&
-                    !future.isDone() &&
-                    !future.isCancelled() &&
-                    future.cancel(true);
-        }
-
-        public ListenableFuture<?> fireImmediately(boolean force) {
-            return currentExecution.updateAndGet(cf -> optionallyFireTask(cf, force));
-        }
-
-        protected ListenableFuture<?> optionallyFireTask(ListenableFuture<?> runningCompletableFuture, boolean force) {
-            if (runningCompletableFuture != null) {
-                logger.debug("[job]{} Returning already running job", job.getKey());
-                /*
-                 * If the task is already running, we do not run it in concurrency,
-                 * even if force is set to true
-                 */
-                return runningCompletableFuture;
+                return scheduledFuture.cancel(forceStop);
             } else {
-                return fireTask(force);
+                return false;
             }
-        }
-
-        protected ListenableFuture<?> fireTask(boolean force) {
-            // Task to run
-            MonitoredTask monitoredTask = new MonitoredTask(force);
-            // Decorates this task
-            Runnable decoratedTask = jobDecorator.decorate(job, monitoredTask);
-            // Runs it
-            ListenableFuture<?> listenableFuture = listenableTaskExecutor.submitListenable(decoratedTask);
-            // Unsetting on completion
-            listenableFuture.addCallback(
-                    result -> currentExecution.set(null),
-                    ex -> currentExecution.set(null)
-            );
-            // OK
-            return listenableFuture;
         }
 
         public JobStatus getJobStatus() {
@@ -312,7 +344,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     job.getKey(),
                     schedule,
                     job.getDescription(),
-                    currentExecution.get() != null,
+                    running.get(),
                     valid,
                     paused.get(),
                     job.isDisabled(),
@@ -365,68 +397,15 @@ public class DefaultJobScheduler implements JobScheduler {
 
         }
 
-        private class MonitoredTask implements Runnable {
-
-            private final boolean force;
-
-            private MonitoredTask(boolean force) {
-                this.force = force;
-            }
-
-            @Override
-            public void run() {
-                logger.debug("[job]{} Trying to run now - forced = {}", job.getKey(), force);
-                if (job.isValid()) {
-                    if (canRunNow(force)) {
-                        try {
-                            logger.debug("[job]{} Running now", job.getKey());
-                            lastRunDate.set(Time.now());
-                            runCount.incrementAndGet();
-                            // Starting
-                            jobListener.onJobStart(job.getKey());
-                            // Runs the job
-                            long _start = System.currentTimeMillis();
-                            job.getTask().run(new DefaultJobRunListener());
-                            // No error, counting time
-                            long _end = System.currentTimeMillis();
-                            lastRunDurationMs.set(_end - _start);
-                            logger.debug("[job]{} Ran in {} ms", job.getKey(), lastRunDurationMs.get());
-                            // Starting
-                            jobListener.onJobEnd(job.getKey(), lastRunDurationMs.get());
-                            // No error - resetting the counters
-                            lastErrorCount.set(0);
-                            lastError.set(null);
-                        } catch (Exception ex) {
-                            lastErrorCount.incrementAndGet();
-                            lastError.set(ex.getMessage());
-                            logger.error("[job]{} Error: {}", job.getKey(), ex.getMessage());
-                            // Reporter
-                            jobListener.onJobError(getJobStatus(), ex);
-                            // Rethrows the error
-                            throw ex;
-                        } finally {
-                            runProgress.set(null);
-                            // Starting
-                            jobListener.onJobComplete(job.getKey());
-                        }
-                    } else {
-                        logger.debug("[job]{} Not allowed to run now", job.getKey());
-                    }
-                } else {
-                    logger.debug("[job]{} Not valid - removing from schedule", job.getKey());
-                    unschedule(job.getKey(), false);
-                }
-            }
-        }
-
         /**
          * A job can run if:
          * <p>
          * * not disabled
-         * * AND (forced OR not paused)
+         * * AND not running
+         * * AND (not paused OR force)
          */
         private boolean canRunNow(boolean force) {
-            return !job.isDisabled() && (!paused.get() || force);
+            return !job.isDisabled() && !running.get() && (!paused.get() || force);
         }
     }
 }

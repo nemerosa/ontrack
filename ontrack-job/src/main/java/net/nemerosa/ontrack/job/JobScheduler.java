@@ -99,7 +99,7 @@ public interface JobScheduler {
      * @return Future for the job execution
      * @throws JobNotScheduledException If the job is not scheduled
      */
-    Future<?> fireImmediately(JobKey jobKey);
+    Optional<Future<?>> fireImmediately(JobKey jobKey);
 
     /**
      * Gets the job key for a job id

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,6 +21,8 @@ import static org.junit.Assert.*;
 public class DefaultJobSchedulerTest {
 
     private ScheduledExecutorService scheduledExecutorService;
+
+    private final Supplier<RuntimeException> noFutureException = () -> new IllegalStateException("No future being returned.");
 
     @Before
     public void before() {
@@ -116,7 +119,7 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.everySeconds(60).after(60));
         assertEquals(0, job.getCount());
         // Fires immediately and waits for the result
-        jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
+        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, TimeUnit.SECONDS);
         assertEquals(1, job.getCount());
     }
 
@@ -130,13 +133,15 @@ public class DefaultJobSchedulerTest {
         Thread.sleep(2000);
         assertEquals(0, job.getCount());
         // Checks its status
-        assertTrue(jobScheduler.getJobStatus(job.getKey()).get().isRunning());
+        Optional<JobStatus> jobStatus = jobScheduler.getJobStatus(job.getKey());
+        assertTrue(jobStatus.isPresent() && jobStatus.get().isRunning());
         // Fires immediately and waits for the result
-        Future<?> future = jobScheduler.fireImmediately(job.getKey());
+        Future<?> future = jobScheduler.fireImmediately(job.getKey()).orElse(null);
+        assertNull("Job is not fired because already running", future);
         // The job is already running, count is still 0
         assertEquals(0, job.getCount());
         // Waits until completion
-        future.get(1, TimeUnit.MINUTES);
+        Thread.sleep(2000);
         assertEquals(1, job.getCount());
     }
 
@@ -188,7 +193,8 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // The job is now running
         Thread.sleep(1000);
-        assertTrue(jobScheduler.getJobStatus(job.getKey()).get().isRunning());
+        Optional<JobStatus> status = jobScheduler.getJobStatus(job.getKey());
+        assertTrue(status.isPresent() && status.get().isRunning());
         // Now, removes the job
         jobScheduler.unschedule(job.getKey());
         // Waits a bit, and checks the job has stopped running
@@ -204,14 +210,16 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // After some seconds, the job keeps running and has only failed
         Thread.sleep(2500);
-        JobStatus status = jobScheduler.getJobStatus(job.getKey()).get();
+        JobStatus status = jobScheduler.getJobStatus(job.getKey()).orElse(null);
+        assertNotNull(status);
         assertEquals(3, status.getLastErrorCount());
         assertEquals("Failure", status.getLastError());
         // Now, fixes the job
         job.setFail(false);
         // Waits a bit, and checks the job is now OK
         Thread.sleep(2500);
-        status = jobScheduler.getJobStatus(job.getKey()).get();
+        status = jobScheduler.getJobStatus(job.getKey()).orElse(null);
+        assertNotNull(status);
         assertEquals(0, status.getLastErrorCount());
         assertNull(status.getLastError());
     }
@@ -347,10 +355,10 @@ public class DefaultJobSchedulerTest {
         // Invalidates the job
         job.invalidate();
         // The status indicates the job is no longer valid, but is still there
-        Optional<JobStatus> status = jobScheduler.getJobStatus(job.getKey());
-        assertTrue(status.isPresent());
-        assertFalse(status.get().isValid());
-        assertNull(status.get().getNextRunDate());
+        JobStatus status = jobScheduler.getJobStatus(job.getKey()).orElse(null);
+        assertNotNull(status);
+        assertFalse(status.isValid());
+        assertNull(status.getNextRunDate());
         // After some seconds, the job has not run
         Thread.sleep(1000);
         assertEquals(3, job.getCount());
@@ -373,7 +381,7 @@ public class DefaultJobSchedulerTest {
         Thread.sleep(2500);
         assertEquals(3, job.getCount());
         // Forcing the run
-        jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
+        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, TimeUnit.SECONDS);
         System.out.println("*****");
         assertEquals(4, job.getCount());
     }
@@ -388,7 +396,7 @@ public class DefaultJobSchedulerTest {
         // After a few seconds, the count has NOT moved
         assertEquals(0, job.getCount());
         // Forcing the run
-        jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
+        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, TimeUnit.SECONDS);
         assertEquals(1, job.getCount());
     }
 
@@ -404,7 +412,9 @@ public class DefaultJobSchedulerTest {
         // Pausing the job
         jobScheduler.pause(job.getKey());
         // Not paused
-        assertFalse(jobScheduler.getJobStatus(job.getKey()).get().isPaused());
+        JobStatus status = jobScheduler.getJobStatus(job.getKey()).orElse(null);
+        assertNotNull(status);
+        assertFalse(status.isPaused());
     }
 
     @Test
@@ -418,7 +428,8 @@ public class DefaultJobSchedulerTest {
         // After a few seconds, the count has NOT moved
         assertEquals(0, job.getCount());
         // Forcing the run
-        jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
+        Optional<Future<?>> future = jobScheduler.fireImmediately(job.getKey());
+        assertFalse("Job not fired", future.isPresent());
         // ... to not avail
         assertEquals(0, job.getCount());
     }
@@ -432,7 +443,8 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_MINUTE.after(1));
         // Forcing the run
         Thread.sleep(2500);
-        jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
+        Optional<Future<?>> future = jobScheduler.fireImmediately(job.getKey());
+        assertFalse("Job not fired", future.isPresent());
         // ... to not avail
         assertEquals(0, job.getCount());
         // ... and it's now gone
