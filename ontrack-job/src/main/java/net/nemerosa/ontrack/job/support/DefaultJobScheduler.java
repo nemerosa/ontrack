@@ -192,27 +192,6 @@ public class DefaultJobScheduler implements JobScheduler {
         return jobScheduledService.fireImmediately(true, parameters);
     }
 
-    @Override
-    public ListenableFuture<?> runOnce(Job job) {
-        JobKey key = job.getKey();
-        logger.info("[job]*{} Scheduling job after unique run", key);
-        // Registers the job, without any schedule
-        schedule(job, Schedule.NONE);
-        // Fires it immedietely
-        ListenableFuture<?> future = fireImmediately(key);
-        // Unscheduling
-        Runnable unscheduling = () -> {
-            logger.info("[job]*{} Unscheduling job after unique run", key);
-            unschedule(key);
-        };
-        // On completion, unschedules the job
-        future.addCallback(
-                result -> unscheduling.run(),
-                ex -> unscheduling.run()
-        );
-        return future;
-    }
-
     private class JobScheduledService implements Runnable {
 
         private final long id;
