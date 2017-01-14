@@ -24,7 +24,6 @@ class JobMetricsTest {
                         true,
                         false,
                         false,
-                        [:],
                         null,
                         2,
                         null,
