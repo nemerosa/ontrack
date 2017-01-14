@@ -21,6 +21,39 @@ of jobs to register will be determined regularly.
 The _job scheduler_ is in charge to collect all _registered jobs_ and to run
 them all.
 
+[[architecture-jobs-overview]]
+===== Job architecture overview
+
+This section explains the underlying concepts behind running the jobs in Ontrack.
+
+When a job is registered, it is associated with a schedule. This schedule is dynamic and can be changed
+with the time. For example, the indexation of a Git repository for a project is scheduled every 30 minutes,
+but then, is changed to 60 minutes. The job registration schedule is then changed to every 60 minutes.
+
+A job provides the following key elements:
+
+* a unique identifier: the _job key_
+* a task to run, provided as a `JobRun` interface:
+
+[source,java]
+----
+@FunctionalInterface
+public interface JobRun {
+    void run(JobRunListener runListener);
+}
+----
+
+TIP: The task defined by the job can use the provided `JobRunListener`  to provide feedback on the execution or to
+execution messages.
+
+The job task is wrapped into a `Runnable` which is responsible to collect statistics about the job execution, like
+number of runs, durations, etc.
+
+In the end, the `JobScheduler` can be associated with a `JobDecorator` to return another `Runnable` layer if needed.
+
+The job scheduler is responsible to orchestrate the jobs. The list of jobs is maintained in memory using an index
+associating the job itself, its schedule and its current scheduled task (as a `ScheduledFuture`).
+
 [[architecture-jobs-registration]]
 ===== Job registration
 
