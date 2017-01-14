@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.job.support;
 import com.google.common.collect.ImmutableSet;
 import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +27,14 @@ public class DefaultJobSchedulerTest {
 
     @Before
     public void before() {
-        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService = Executors.newScheduledThreadPool(
+                5,
+                new BasicThreadFactory.Builder()
+                        .daemon(true)
+                        .namingPattern("test-job-%s")
+                        .build()
+
+        );
     }
 
     @After
@@ -272,25 +280,27 @@ public class DefaultJobSchedulerTest {
     public void stop() throws InterruptedException {
         JobScheduler jobScheduler = createJobScheduler();
 
-        LongCountJob longCountJob = new LongCountJob();
-        jobScheduler.schedule(longCountJob, Schedule.EVERY_MINUTE);
+        InterruptibleJob job = new InterruptibleJob();
+        jobScheduler.schedule(job, Schedule.EVERY_MINUTE);
 
         // Waits for the start
         Thread.sleep(1500);
 
         // Checks it's running
-        JobStatus jobStatus = jobScheduler.getJobStatus(longCountJob.getKey()).orElse(null);
+        JobStatus jobStatus = jobScheduler.getJobStatus(job.getKey()).orElse(null);
         assertNotNull(jobStatus);
         assertTrue("Job is running", jobStatus.isRunning());
 
         // Stops the job
-        assertTrue("Job has been stopped", jobScheduler.stop(longCountJob.getKey()));
+        System.out.println("Stopping the job.");
+        assertTrue("Job has been stopped", jobScheduler.stop(job.getKey()));
 
         // Stopping the job is done asynchronously
-        Thread.sleep(2_000);
+        Thread.sleep(100);
+        System.out.println("Checking job is stopped.");
 
         // Checks it has actually been stopped
-        jobStatus = jobScheduler.getJobStatus(longCountJob.getKey()).orElse(null);
+        jobStatus = jobScheduler.getJobStatus(job.getKey()).orElse(null);
         assertNotNull("Job is still scheduled", jobStatus);
         assertFalse("Job is actually stopped", jobStatus.isRunning());
     }

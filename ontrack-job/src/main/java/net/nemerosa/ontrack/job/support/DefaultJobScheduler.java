@@ -44,15 +44,15 @@ public class DefaultJobScheduler implements JobScheduler {
 
     @Override
     public void schedule(Job job, Schedule schedule) {
-        logger.info("[job]{} Scheduling with {}", job.getKey(), schedule);
+        logger.info("[scheduler][job]{} Scheduling with {}", job.getKey(), schedule);
         // Manages existing schedule
         JobScheduledService existingService = services.remove(job.getKey());
         if (existingService != null) {
-            logger.info("[job]{} Stopping existing schedule", job.getKey());
+            logger.info("[scheduler][job]{} Stopping existing schedule", job.getKey());
             existingService.cancel(false);
         }
         // Creates and starts the scheduled service
-        logger.info("[job]{} Starting service", job.getKey());
+        logger.info("[scheduler][job]{} Starting service", job.getKey());
         // Copy stats from old schedule
         JobScheduledService jobScheduledService = new JobScheduledService(
                 job,
@@ -71,10 +71,10 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     protected boolean unschedule(JobKey key, boolean forceStop) {
-        logger.debug("[job]{} Unscheduling job", key);
+        logger.debug("[scheduler][job]{} Unscheduling job", key);
         JobScheduledService existingService = services.remove(key);
         if (existingService != null) {
-            logger.debug("[job]{} Stopping running job", key);
+            logger.debug("[scheduler][job]{} Stopping running job", key);
             existingService.cancel(forceStop);
             return true;
         } else {
@@ -293,7 +293,7 @@ public class DefaultJobScheduler implements JobScheduler {
             MonitoredRunListener monitoredRunListener = new MonitoredRunListener() {
                 @Override
                 public void onStart() {
-                    logger.debug("[job]{} Running now", job.getKey());
+                    logger.debug("[job]{} On start", job.getKey());
                     lastRunDate.set(Time.now());
                     runCount.incrementAndGet();
                     // Starting
@@ -303,7 +303,7 @@ public class DefaultJobScheduler implements JobScheduler {
                 @Override
                 public void onSuccess(long duration) {
                     lastRunDurationMs.set(duration);
-                    logger.debug("[job]{} Ran in {} ms", job.getKey(), duration);
+                    logger.debug("[job]{} Success in {} ms", job.getKey(), duration);
                     // Starting
                     jobListener.onJobEnd(job.getKey(), duration);
                     // No error - resetting the counters
@@ -315,7 +315,9 @@ public class DefaultJobScheduler implements JobScheduler {
                 public void onFailure(Exception ex) {
                     lastErrorCount.incrementAndGet();
                     lastError.set(ex.getMessage());
-                    logger.error("[job]{} Error: {}", job.getKey(), ex.getMessage());
+                    // Only writing the error in debug mode, we count on the job listener
+                    // to log the error properly
+                    logger.debug("[job]{} Failure: {}", job.getKey(), ex.getMessage());
                     // Reporter
                     jobListener.onJobError(getJobStatus(), ex);
                 }
@@ -334,7 +336,15 @@ public class DefaultJobScheduler implements JobScheduler {
 
         public boolean cancel(boolean forceStop) {
             if (scheduledFuture != null) {
-                logger.debug("[job]{} Cancelling schedule", job.getKey());
+                logger.debug("[job]{} Stopping job (forcing = {})", job.getKey(), forceStop);
+                currentExecution.updateAndGet(
+                        current -> {
+                            if (current != null) {
+                                current.cancel(forceStop);
+                            }
+                            return null;
+                        }
+                );
                 return scheduledFuture.cancel(forceStop);
             } else {
                 return false;
