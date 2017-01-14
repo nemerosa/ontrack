@@ -54,8 +54,7 @@ public class JobOrchestratorTest {
         // Orchestration is registered as a job, but does not run since we have a NONE schedule
         scheduler.schedule(orchestrator, Schedule.NONE);
         Optional<JobStatus> status = scheduler.getJobStatus(key);
-        assertTrue(status.isPresent());
-        assertNull(status.get().getNextRunDate());
+        assertTrue(status.isPresent() && status.get().getNextRunDate() != null);
 
         // Puts a job in the list
         jobs.add(new JobRegistration(new TestJob("1"), Schedule.NONE));
