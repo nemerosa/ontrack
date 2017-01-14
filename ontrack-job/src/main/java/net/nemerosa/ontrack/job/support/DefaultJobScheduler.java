@@ -193,7 +193,7 @@ public class DefaultJobScheduler implements JobScheduler {
 
         private final AtomicBoolean paused;
 
-        private final AtomicBoolean running = new AtomicBoolean(false);
+        private final AtomicReference<Future<?>> currentExecution = new AtomicReference<>();
         private final AtomicReference<JobRunProgress> runProgress = new AtomicReference<>();
         private final AtomicLong runCount = new AtomicLong();
         private final AtomicReference<LocalDateTime> lastRunDate = new AtomicReference<>();
@@ -250,16 +250,23 @@ public class DefaultJobScheduler implements JobScheduler {
         protected Optional<Future<?>> doRun(boolean force) {
             logger.debug("[job]{} Trying to run now - forced = {}", job.getKey(), force);
             if (job.isValid()) {
-                if (canRunNow(force)) {
+                if (job.isDisabled()) {
+                    logger.debug("[job]{} Not allowed to run now because disabled", job.getKey());
+                    return Optional.empty();
+                } else if (paused.get() && !force) {
+                    logger.debug("[job]{} Not allowed to run now because paused", job.getKey());
+                    return Optional.empty();
+                } else if (currentExecution.get() != null) {
+                    logger.debug("[job]{} Not allowed to run now because already running", job.getKey());
+                    return Optional.empty();
+                } else {
                     // Task to run
                     Runnable run = getRun();
                     // Scheduling
-                    return Optional.of(
-                            scheduledExecutorService.submit(run)
-                    );
-                } else {
-                    logger.debug("[job]{} Not allowed to run now", job.getKey());
-                    return Optional.empty();
+                    logger.debug("[job]{} Job task submitted", job.getKey());
+                    Future<?> execution = scheduledExecutorService.submit(run);
+                    currentExecution.set(execution);
+                    return Optional.of(execution);
                 }
             } else {
                 logger.debug("[job]{} Not valid - removing from schedule", job.getKey());
@@ -277,13 +284,9 @@ public class DefaultJobScheduler implements JobScheduler {
             // Run indicator
             Runnable runnable = new MonitoredRun(decoratedTask, new MonitoredRunListenerAdapter() {
                 @Override
-                public void onStart() {
-                    running.set(true);
-                }
-
-                @Override
                 public void onCompletion() {
-                    running.set(false);
+                    logger.debug("[job]{} Removed job execution", job.getKey());
+                    currentExecution.set(null);
                 }
             });
             // Monitoring the run
@@ -320,6 +323,7 @@ public class DefaultJobScheduler implements JobScheduler {
                 @Override
                 public void onCompletion() {
                     runProgress.set(null);
+                    logger.debug("[job]{} Job completed.", job.getKey());
                     // Starting
                     jobListener.onJobComplete(job.getKey());
                 }
@@ -344,7 +348,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     job.getKey(),
                     schedule,
                     job.getDescription(),
-                    running.get(),
+                    currentExecution.get() != null,
                     valid,
                     paused.get(),
                     job.isDisabled(),
@@ -397,15 +401,5 @@ public class DefaultJobScheduler implements JobScheduler {
 
         }
 
-        /**
-         * A job can run if:
-         * <p>
-         * * not disabled
-         * * AND not running
-         * * AND (not paused OR force)
-         */
-        private boolean canRunNow(boolean force) {
-            return !job.isDisabled() && !running.get() && (!paused.get() || force);
-        }
     }
 }

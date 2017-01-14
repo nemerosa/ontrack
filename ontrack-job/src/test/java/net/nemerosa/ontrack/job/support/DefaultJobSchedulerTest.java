@@ -279,15 +279,20 @@ public class DefaultJobSchedulerTest {
         Thread.sleep(1500);
 
         // Checks it's running
-        Optional<JobStatus> jobStatus = jobScheduler.getJobStatus(longCountJob.getKey());
-        assertTrue("Job is running", jobStatus.isPresent() && jobStatus.get().isRunning());
+        JobStatus jobStatus = jobScheduler.getJobStatus(longCountJob.getKey()).orElse(null);
+        assertNotNull(jobStatus);
+        assertTrue("Job is running", jobStatus.isRunning());
 
         // Stops the job
         assertTrue("Job has been stopped", jobScheduler.stop(longCountJob.getKey()));
 
+        // Stopping the job is done asynchronously
+        Thread.sleep(2_000);
+
         // Checks it has actually been stopped
-        jobStatus = jobScheduler.getJobStatus(longCountJob.getKey());
-        assertTrue("Job is actually stopped", jobStatus.isPresent() && !jobStatus.get().isRunning());
+        jobStatus = jobScheduler.getJobStatus(longCountJob.getKey()).orElse(null);
+        assertNotNull("Job is still scheduled", jobStatus);
+        assertFalse("Job is actually stopped", jobStatus.isRunning());
     }
 
     @Test
