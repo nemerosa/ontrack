@@ -13,6 +13,10 @@ spring:
     username: ontrack
     password: ontrack
 
+# Compression of web resources
+server:
+  compression:
+    enabled: true
 
 # Management
 management:
