@@ -70,7 +70,7 @@ public class DefaultJobSchedulerTest {
         jobScheduler.resume();
         Thread.sleep(2000);
         // The job has run
-        assertTrue(job.getCount() >= 2);
+        assertTrue(job.getCount() >= 1);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         Thread.sleep(2500);
         int count = job.getCount();
-        assertTrue(count == 3);
+        assertTrue(count >= 2);
         // Then every minute
         jobScheduler.schedule(job, new Schedule(1, 1, TimeUnit.MINUTES));
         // Checks after three more seconds than the count has not moved
@@ -220,7 +220,8 @@ public class DefaultJobSchedulerTest {
         Thread.sleep(2500);
         JobStatus status = jobScheduler.getJobStatus(job.getKey()).orElse(null);
         assertNotNull(status);
-        assertEquals(3, status.getLastErrorCount());
+        long lastErrorCount = status.getLastErrorCount();
+        assertTrue(lastErrorCount >= 2);
         assertEquals("Failure", status.getLastError());
         // Now, fixes the job
         job.setFail(false);
@@ -239,17 +240,18 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // After some seconds, the job keeps running
         Thread.sleep(2500);
-        assertEquals(3, job.getCount());
+        int count = job.getCount();
+        assertTrue(count >= 2);
         // Pauses
         pause.accept(jobScheduler, job);
         // After some seconds, the job has not run
         Thread.sleep(2000);
-        assertEquals(3, job.getCount());
+        assertEquals(count, job.getCount());
         // Resumes the job
         resume.accept(jobScheduler, job);
         // After some seconds, the job has started again
         Thread.sleep(2000);
-        assertEquals(5, job.getCount());
+        assertTrue(job.getCount() > count);
     }
 
     @Test
@@ -390,16 +392,16 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         Thread.sleep(2500);
         // After a few seconds, the count has moved
-        assertEquals(3, job.getCount());
+        int count = job.getCount();
+        assertTrue(count >= 2);
         // Pauses the job now
         jobScheduler.pause(job.getKey());
         // Not running
         Thread.sleep(2500);
-        assertEquals(3, job.getCount());
+        assertEquals(count, job.getCount());
         // Forcing the run
         jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, TimeUnit.SECONDS);
-        System.out.println("*****");
-        assertEquals(4, job.getCount());
+        assertTrue(job.getCount() > count);
     }
 
     @Test
