@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.job.*;
 
+@Deprecated
 public class CountJob implements Job {
 
     private int count = 0;

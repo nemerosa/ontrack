@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job.support;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -123,11 +124,12 @@ public class SynchronousScheduledExecutorService implements ScheduledExecutorSer
     }
 
     public void shutdown() {
-        throw shutdownNotSupported();
+        // NOP
     }
 
     public List<Runnable> shutdownNow() {
-        throw shutdownNotSupported();
+        // NOP
+        return Collections.emptyList();
     }
 
     public <T> Future<T> submit(Callable<T> callable) {
