@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.job.support;
 import com.google.common.collect.ImmutableSet;
 import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,14 +26,7 @@ public class DefaultJobSchedulerTest {
 
     @Before
     public void before() {
-        scheduledExecutorService = Executors.newScheduledThreadPool(
-                5,
-                new BasicThreadFactory.Builder()
-                        .daemon(true)
-                        .namingPattern("test-job-%s")
-                        .build()
-
-        );
+        scheduledExecutorService = new SynchronousScheduledExecutorService();
     }
 
     @After
