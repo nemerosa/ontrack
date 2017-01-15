@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobRun;
 
+@Deprecated
 public class ErrorJob implements Job {
 
     private boolean fail = true;

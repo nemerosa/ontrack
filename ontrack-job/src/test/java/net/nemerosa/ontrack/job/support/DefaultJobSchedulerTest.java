@@ -171,23 +171,23 @@ public class DefaultJobSchedulerTest {
     public void statuses() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
 
-        LongCountJob longCountJob = new LongCountJob();
-        jobScheduler.schedule(longCountJob, Schedule.EVERY_SECOND);
+        TestJob longJob = TestJob.of("long").withWait(5_000);
+        jobScheduler.schedule(longJob, Schedule.EVERY_MINUTE);
 
-        CountJob countJob = new CountJob();
-        jobScheduler.schedule(countJob, Schedule.EVERY_SECOND.after(60));
+        TestJob shortJob = TestJob.of("short");
+        jobScheduler.schedule(shortJob, Schedule.EVERY_SECOND.after(60));
 
-        // After 2 seconds, the long job is already running, not the short one
-        Thread.sleep(2000);
+        // The long job is already running, not the short one
+        scheduledExecutorService.runNextPendingCommand();
         Map<JobKey, JobStatus> statuses = jobScheduler.getJobStatuses().stream().collect(Collectors.toMap(
                 JobStatus::getKey,
                 status -> status
         ));
 
-        JobStatus longStatus = statuses.get(longCountJob.getKey());
+        JobStatus longStatus = statuses.get(longJob.getKey());
         assertTrue(longStatus.isRunning());
 
-        JobStatus shortStatus = statuses.get(countJob.getKey());
+        JobStatus shortStatus = statuses.get(shortJob.getKey());
         assertFalse(shortStatus.isRunning());
     }
 

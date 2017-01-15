@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobRun;
 
+@Deprecated
 public class OtherTypeJob implements Job {
 
     private int count = 0;
