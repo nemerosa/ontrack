@@ -71,7 +71,7 @@ public class DefaultJobScheduler implements JobScheduler {
             existingService.cancel(false);
         }
         // Creates and starts the scheduled service
-        logger.info("[scheduler][job]{} Starting service", job.getKey());
+        logger.info("[scheduler][job]{} Starting scheduled service", job.getKey());
         // Copy stats from old schedule
         JobScheduledService jobScheduledService = new JobScheduledService(
                 job,
@@ -271,16 +271,16 @@ public class DefaultJobScheduler implements JobScheduler {
         }
 
         protected Optional<Future<?>> doRun(boolean force) {
-            logger.debug("[job]{} Trying to run now - forced = {}", job.getKey(), force);
+            logger.debug("[job][run]{} Trying to run now - forced = {}", job.getKey(), force);
             if (job.isValid()) {
                 if (job.isDisabled()) {
-                    logger.debug("[job]{} Not allowed to run now because disabled", job.getKey());
+                    logger.debug("[job][run]{} Not allowed to run now because disabled", job.getKey());
                     return Optional.empty();
                 } else if (paused.get() && !force) {
-                    logger.debug("[job]{} Not allowed to run now because paused", job.getKey());
+                    logger.debug("[job][run]{} Not allowed to run now because paused", job.getKey());
                     return Optional.empty();
                 } else if (currentExecution.get() != null) {
-                    logger.debug("[job]{} Not allowed to run now because already running", job.getKey());
+                    logger.debug("[job][run]{} Not allowed to run now because already running", job.getKey());
                     return Optional.empty();
                 } else {
                     // Task to run
@@ -288,13 +288,13 @@ public class DefaultJobScheduler implements JobScheduler {
                     // Gets the executor for this job
                     ExecutorService executor = getExecutorService(job);
                     // Scheduling
-                    logger.debug("[job]{} Job task submitted asynchronously", job.getKey());
+                    logger.debug("[job][run]{} Job task submitted asynchronously", job.getKey());
                     Future<?> execution = executor.submit(run);
                     currentExecution.set(execution);
                     return Optional.of(execution);
                 }
             } else {
-                logger.debug("[job]{} Not valid - removing from schedule", job.getKey());
+                logger.debug("[job][run]{} Not valid - removing from schedule", job.getKey());
                 unschedule(job.getKey(), false);
                 return Optional.empty();
             }
@@ -310,7 +310,7 @@ public class DefaultJobScheduler implements JobScheduler {
             Runnable runnable = new MonitoredRun(decoratedTask, new MonitoredRunListenerAdapter() {
                 @Override
                 public void onCompletion() {
-                    logger.debug("[job]{} Removed job execution", job.getKey());
+                    logger.debug("[job][task]{} Removed job execution", job.getKey());
                     currentExecution.set(null);
                 }
             });
@@ -318,7 +318,7 @@ public class DefaultJobScheduler implements JobScheduler {
             MonitoredRunListener monitoredRunListener = new MonitoredRunListener() {
                 @Override
                 public void onStart() {
-                    logger.debug("[job]{} On start", job.getKey());
+                    logger.debug("[job][task]{} On start", job.getKey());
                     lastRunDate.set(Time.now());
                     runCount.incrementAndGet();
                     // Starting
@@ -328,7 +328,7 @@ public class DefaultJobScheduler implements JobScheduler {
                 @Override
                 public void onSuccess(long duration) {
                     lastRunDurationMs.set(duration);
-                    logger.debug("[job]{} Success in {} ms", job.getKey(), duration);
+                    logger.debug("[job][task]{} Success in {} ms", job.getKey(), duration);
                     // Starting
                     jobListener.onJobEnd(job.getKey(), duration);
                     // No error - resetting the counters
@@ -342,7 +342,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     lastError.set(ex.getMessage());
                     // Only writing the error in debug mode, we count on the job listener
                     // to log the error properly
-                    logger.debug("[job]{} Failure: {}", job.getKey(), ex.getMessage());
+                    logger.debug("[job][task]{} Failure: {}", job.getKey(), ex.getMessage());
                     // Reporter
                     jobListener.onJobError(getJobStatus(), ex);
                 }
@@ -350,7 +350,7 @@ public class DefaultJobScheduler implements JobScheduler {
                 @Override
                 public void onCompletion() {
                     runProgress.set(null);
-                    logger.debug("[job]{} Job completed.", job.getKey());
+                    logger.debug("[job][task]{} Job completed.", job.getKey());
                     // Starting
                     jobListener.onJobComplete(job.getKey());
                 }
@@ -427,7 +427,7 @@ public class DefaultJobScheduler implements JobScheduler {
             @Override
             public void progress(JobRunProgress progress) {
                 jobListener.onJobProgress(job.getKey(), progress);
-                logger.debug("[job]{} {}",
+                logger.debug("[job][progress]{} {}",
                         job.getKey(),
                         progress.getText()
                 );
