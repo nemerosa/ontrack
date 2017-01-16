@@ -10,27 +10,30 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 
 public class DefaultJobSchedulerTest {
 
     private SynchronousScheduledExecutorService schedulerPool;
-    private ExecutorService jobPool;
+    private SynchronousScheduledExecutorService jobPool;
 
     private final Supplier<RuntimeException> noFutureException = () -> new IllegalStateException("No future being returned.");
 
     @Before
     public void before() {
         schedulerPool = new SynchronousScheduledExecutorService();
-        jobPool = Executors.newFixedThreadPool(5);
+        jobPool = new SynchronousScheduledExecutorService();
     }
 
     @After
@@ -44,20 +47,12 @@ public class DefaultJobSchedulerTest {
     }
 
     protected JobScheduler createJobScheduler(boolean initiallyPaused) {
-        return createJobScheduler(initiallyPaused, (pool, job) -> jobPool);
-    }
-
-    protected JobScheduler createJobScheduler(BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider) {
-        return createJobScheduler(false, jobPoolProvider);
-    }
-
-    protected JobScheduler createJobScheduler(boolean initiallyPaused, BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider) {
         return new DefaultJobScheduler(
                 NOPJobDecorator.INSTANCE,
                 schedulerPool,
                 NOPJobListener.INSTANCE,
                 initiallyPaused,
-                jobPoolProvider
+                (pool, job) -> jobPool
         );
     }
 
@@ -66,8 +61,8 @@ public class DefaultJobSchedulerTest {
         JobScheduler jobScheduler = createJobScheduler();
         TestJob job = TestJob.of();
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
-        tick_ms(2_000);
-        assertEquals(3, job.getCount());
+        tick_seconds(3);
+        assertEquals(4, job.getCount());
     }
 
     @Test
@@ -75,8 +70,8 @@ public class DefaultJobSchedulerTest {
         JobScheduler jobScheduler = createJobScheduler();
         TestJob job = TestJob.of();
         jobScheduler.schedule(job, Schedule.EVERY_SECOND.after(1));
-        tick_ms(2_000);
-        assertEquals(2, job.getCount());
+        tick_seconds(3);
+        assertEquals(3, job.getCount());
     }
 
     @Test
@@ -84,11 +79,11 @@ public class DefaultJobSchedulerTest {
         JobScheduler jobScheduler = createJobScheduler(true);
         TestJob job = TestJob.of();
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
-        tick_ms(3_000);
+        tick_seconds(3);
         assertEquals(0, job.getCount()); // Job did not run
         // Resumes the execution and waits
         jobScheduler.resume();
-        tick_ms(2_000);
+        tick_seconds(2);
         // The job has run
         assertEquals(2, job.getCount());
     }
@@ -264,15 +259,14 @@ public class DefaultJobSchedulerTest {
     }
 
     protected void test_with_pause(BiConsumer<JobScheduler, TestJob> pause, BiConsumer<JobScheduler, TestJob> resume) throws InterruptedException, ExecutionException, TimeoutException {
-        SynchronousScheduledExecutorService syncJobPool = new SynchronousScheduledExecutorService();
-        JobScheduler jobScheduler = createJobScheduler((pool, job) -> syncJobPool);
+        JobScheduler jobScheduler = createJobScheduler();
         TestJob job = TestJob.of();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // Runs a few times
         times(2, () -> {
             schedulerPool.tick(1, SECONDS);
-            syncJobPool.tick(1, SECONDS);
+            jobPool.tick(1, SECONDS);
         });
         int count = job.getCount();
         assertEquals(2, count);
@@ -281,7 +275,7 @@ public class DefaultJobSchedulerTest {
         // After some seconds, the job has not run
         times(2, () -> {
             schedulerPool.tick(1, SECONDS);
-            syncJobPool.tick(1, SECONDS);
+            jobPool.tick(1, SECONDS);
         });
         assertEquals(count, job.getCount());
         // Resumes the job
@@ -289,7 +283,7 @@ public class DefaultJobSchedulerTest {
         // After some seconds, the job has started again
         times(2, () -> {
             schedulerPool.tick(1, SECONDS);
-            syncJobPool.tick(1, SECONDS);
+            jobPool.tick(1, SECONDS);
         });
         assertEquals(4, job.getCount());
     }
@@ -524,6 +518,16 @@ public class DefaultJobSchedulerTest {
         for (int i = 0; i < count; i++) {
             code.run();
         }
+    }
+
+    /**
+     * Runs the scheduler for x seconds with intervals of 1/2 seconds.
+     */
+    protected void tick_seconds(int count) {
+        times(count * 2, () -> {
+            schedulerPool.tick(500, MILLISECONDS);
+            jobPool.runUntilIdle();
+        });
     }
 
 }
