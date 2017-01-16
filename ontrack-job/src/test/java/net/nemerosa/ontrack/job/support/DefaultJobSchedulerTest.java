@@ -12,10 +12,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 
 public class DefaultJobSchedulerTest {
@@ -42,12 +44,20 @@ public class DefaultJobSchedulerTest {
     }
 
     protected JobScheduler createJobScheduler(boolean initiallyPaused) {
+        return createJobScheduler(initiallyPaused, (pool, job) -> jobPool);
+    }
+
+    protected JobScheduler createJobScheduler(BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider) {
+        return createJobScheduler(false, jobPoolProvider);
+    }
+
+    protected JobScheduler createJobScheduler(boolean initiallyPaused, BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider) {
         return new DefaultJobScheduler(
                 NOPJobDecorator.INSTANCE,
                 schedulerPool,
                 NOPJobListener.INSTANCE,
                 initiallyPaused,
-                (pool, job) -> jobPool
+                jobPoolProvider
         );
     }
 
@@ -254,24 +264,34 @@ public class DefaultJobSchedulerTest {
     }
 
     protected void test_with_pause(BiConsumer<JobScheduler, TestJob> pause, BiConsumer<JobScheduler, TestJob> resume) throws InterruptedException, ExecutionException, TimeoutException {
-        JobScheduler jobScheduler = createJobScheduler();
+        SynchronousScheduledExecutorService syncJobPool = new SynchronousScheduledExecutorService();
+        JobScheduler jobScheduler = createJobScheduler((pool, job) -> syncJobPool);
         TestJob job = TestJob.of();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
-        // After some seconds, the job keeps running
-        tick_ms(2_500);
+        // Runs a few times
+        times(2, () -> {
+            schedulerPool.tick(1, SECONDS);
+            syncJobPool.tick(1, SECONDS);
+        });
         int count = job.getCount();
-        assertEquals(3, count);
+        assertEquals(2, count);
         // Pauses
         pause.accept(jobScheduler, job);
         // After some seconds, the job has not run
-        tick_ms(2_000);
+        times(2, () -> {
+            schedulerPool.tick(1, SECONDS);
+            syncJobPool.tick(1, SECONDS);
+        });
         assertEquals(count, job.getCount());
         // Resumes the job
         resume.accept(jobScheduler, job);
         // After some seconds, the job has started again
-        tick_ms(2_000);
-        assertTrue(job.getCount() > count);
+        times(2, () -> {
+            schedulerPool.tick(1, SECONDS);
+            syncJobPool.tick(1, SECONDS);
+        });
+        assertEquals(4, job.getCount());
     }
 
     @Test
@@ -425,7 +445,7 @@ public class DefaultJobSchedulerTest {
         Thread.sleep(2500);
         assertEquals(count, job.getCount());
         // Forcing the run
-        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, TimeUnit.SECONDS);
+        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, SECONDS);
         assertTrue(job.getCount() > count);
     }
 
@@ -439,7 +459,7 @@ public class DefaultJobSchedulerTest {
         // After a few seconds, the count has NOT moved
         assertEquals(0, job.getCount());
         // Forcing the run
-        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, TimeUnit.SECONDS);
+        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, SECONDS);
         assertEquals(1, job.getCount());
     }
 
@@ -492,6 +512,18 @@ public class DefaultJobSchedulerTest {
         assertEquals(0, job.getCount());
         // ... and it's now gone
         assertFalse(jobScheduler.getJobStatus(job.getKey()).isPresent());
+    }
+
+    /**
+     * Runs a piece of codes a given number of times
+     *
+     * @param count Number of times to run
+     * @param code  Code to run
+     */
+    public static void times(int count, Runnable code) {
+        for (int i = 0; i < count; i++) {
+            code.run();
+        }
     }
 
 }
