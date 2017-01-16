@@ -5,6 +5,10 @@ import net.nemerosa.ontrack.job.JobCategory;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobRun;
 
+/**
+ * @deprecated Use {@link net.nemerosa.ontrack.job.support.TestJob} instead.
+ */
+@Deprecated
 public class TestJob implements Job {
 
     private final String name;

@@ -8,14 +8,10 @@ import net.nemerosa.ontrack.job.Fixtures;
 import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobRun;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class TestJob implements Job {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestJob.class);
 
     public static TestJob of() {
         return of("test");
@@ -52,12 +48,20 @@ public class TestJob implements Job {
                 }
             }
             count++;
-            LOGGER.info("TEST JOB {} Count = {}", name, count);
+            listener.message("TEST JOB %s Count = %d", name, count);
         };
     }
 
     public void invalidate() {
         this.valid = false;
+    }
+
+    public void pause() {
+        setDisabled(true);
+    }
+
+    public void resume() {
+        setDisabled(false);
     }
 
     public void setDisabled(boolean disabled) {
