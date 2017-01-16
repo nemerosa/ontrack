@@ -160,7 +160,7 @@ public class DefaultJobScheduler implements JobScheduler {
     public boolean stop(JobKey key) {
         JobScheduledService existingService = services.get(key);
         if (existingService != null) {
-            return existingService.cancel(true);
+            return existingService.stop();
         } else {
             throw new JobNotScheduledException(key);
         }
@@ -359,21 +359,24 @@ public class DefaultJobScheduler implements JobScheduler {
             return new MonitoredRun(runnable, monitoredRunListener);
         }
 
-        public boolean cancel(boolean forceStop) {
-            if (scheduledFuture != null) {
-                logger.debug("[job]{} Stopping job (forcing = {})", job.getKey(), forceStop);
-                currentExecution.updateAndGet(
-                        current -> {
-                            if (current != null) {
-                                current.cancel(forceStop);
-                            }
-                            return null;
+        public boolean stop() {
+            logger.debug("[job]{} Stopping job", job.getKey());
+            return currentExecution.updateAndGet(
+                    current -> {
+                        if (current != null) {
+                            current.cancel(true);
                         }
-                );
-                return scheduledFuture.cancel(forceStop);
-            } else {
-                return false;
+                        return null;
+                    }
+            ) == null;
+        }
+
+        public boolean cancel(boolean forceStop) {
+            logger.debug("[job]{} Cancelling job (forcing = {})", job.getKey(), forceStop);
+            if (forceStop) {
+                stop();
             }
+            return scheduledFuture != null && scheduledFuture.cancel(forceStop);
         }
 
         public JobStatus getJobStatus() {

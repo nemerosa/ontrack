@@ -136,13 +136,13 @@ public class DefaultJobSchedulerTest {
         // Initially every second
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // Checks it has run
-        tick_ms(2_000);
+        tick_seconds(2);
         int count = job.getCount();
-        assertEquals(2, count);
+        assertEquals(3, count);
         // Then every minute
         jobScheduler.schedule(job, new Schedule(1, 1, TimeUnit.MINUTES));
         // Checks after three more seconds than the count has not moved
-        tick_ms(3_000);
+        tick_seconds(3);
         assertEquals(count, job.getCount());
     }
 
@@ -153,22 +153,23 @@ public class DefaultJobSchedulerTest {
         // Fires far in the future
         jobScheduler.schedule(job, Schedule.EVERY_MINUTE.after(10));
         // Not fired, even after 10 seconds
-        tick_ms(10_000);
+        tick_seconds(10);
         assertEquals(0, job.getCount());
         // Fires immediately and waits for the result
         jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException);
-        schedulerPool.runNextPendingCommand();
+        jobPool.runUntilIdle();
         assertEquals(1, job.getCount());
     }
 
     @Test
     public void fire_immediately_in_concurrency() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        LongCountJob job = new LongCountJob();
+        TestJob job = TestJob.of();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
-        // After 2 seconds, nothing has happened yet
-        Thread.sleep(2000);
+        // Job is started and scheduled
+        schedulerPool.runUntilIdle();
+        // ... but nothing has happened yet
         assertEquals(0, job.getCount());
         // Checks its status
         Optional<JobStatus> jobStatus = jobScheduler.getJobStatus(job.getKey());
@@ -179,7 +180,7 @@ public class DefaultJobSchedulerTest {
         // The job is already running, count is still 0
         assertEquals(0, job.getCount());
         // Waits until completion
-        Thread.sleep(2000);
+        jobPool.runUntilIdle();
         assertEquals(1, job.getCount());
     }
 
@@ -210,55 +211,56 @@ public class DefaultJobSchedulerTest {
     @Test
     public void removing_a_running_job() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        CountJob job = new CountJob();
+        TestJob job = TestJob.of();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // After some seconds, the job keeps running
-        Thread.sleep(2500);
-        assertEquals(3, job.getCount());
+        tick_seconds(3);
+        assertEquals(4, job.getCount());
         // Now, removes the job
         jobScheduler.unschedule(job.getKey());
         // Waits a bit, and checks the job has stopped running
-        Thread.sleep(2500);
-        assertEquals(3, job.getCount());
+        tick_seconds(3);
+        assertEquals(4, job.getCount());
     }
 
     @Test
     public void removing_a_long_running_job() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        LongCountJob job = new LongCountJob();
+        TestJob job = TestJob.of();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // The job is now running
-        Thread.sleep(1000);
+        schedulerPool.runNextPendingCommand();
         Optional<JobStatus> status = jobScheduler.getJobStatus(job.getKey());
         assertTrue(status.isPresent() && status.get().isRunning());
         // Now, removes the job
         jobScheduler.unschedule(job.getKey());
         // Waits a bit, and checks the job has stopped running
-        Thread.sleep(1000);
+        jobPool.runUntilIdle();
         assertEquals(0, job.getCount());
     }
 
     @Test
     public void job_failures() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        ErrorJob job = new ErrorJob();
+        TestJob job = TestJob.of().withFail(true);
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // After some seconds, the job keeps running and has only failed
-        Thread.sleep(2500);
+        tick_seconds(3);
         JobStatus status = jobScheduler.getJobStatus(job.getKey()).orElse(null);
         assertNotNull(status);
         long lastErrorCount = status.getLastErrorCount();
-        assertTrue(lastErrorCount >= 2);
-        assertEquals("Failure", status.getLastError());
+        assertEquals(4, lastErrorCount);
+        assertEquals("Task failure", status.getLastError());
         // Now, fixes the job
         job.setFail(false);
         // Waits a bit, and checks the job is now OK
-        Thread.sleep(2500);
+        tick_seconds(2);
         status = jobScheduler.getJobStatus(job.getKey()).orElse(null);
         assertNotNull(status);
+        assertEquals(2, job.getCount());
         assertEquals(0, status.getLastErrorCount());
         assertNull(status.getLastError());
     }
@@ -321,11 +323,11 @@ public class DefaultJobSchedulerTest {
     public void stop() throws InterruptedException {
         JobScheduler jobScheduler = createJobScheduler();
 
-        InterruptibleJob job = new InterruptibleJob();
-        jobScheduler.schedule(job, Schedule.EVERY_MINUTE);
+        TestJob job = TestJob.of();
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
 
-        // Waits for the start
-        Thread.sleep(1500);
+        // Kicks the scheduling of the job
+        schedulerPool.runNextPendingCommand();
 
         // Checks it's running
         JobStatus jobStatus = jobScheduler.getJobStatus(job.getKey()).orElse(null);
@@ -335,10 +337,6 @@ public class DefaultJobSchedulerTest {
         // Stops the job
         System.out.println("Stopping the job.");
         assertTrue("Job has been stopped", jobScheduler.stop(job.getKey()));
-
-        // Stopping the job is done asynchronously
-        Thread.sleep(100);
-        System.out.println("Checking job is stopped.");
 
         // Checks it has actually been stopped
         jobStatus = jobScheduler.getJobStatus(job.getKey()).orElse(null);
@@ -350,13 +348,12 @@ public class DefaultJobSchedulerTest {
     public void keys() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
 
-        LongCountJob longCountJob = new LongCountJob();
-        CountJob countJob = new CountJob();
+        TestJob longCountJob = TestJob.of("long");
+        TestJob countJob = TestJob.of("short");
+        TestJob otherTypeJob = TestJob.of("other").withCategory(Fixtures.TEST_OTHER_CATEGORY);
 
         jobScheduler.schedule(longCountJob, Schedule.EVERY_SECOND);
         jobScheduler.schedule(countJob, Schedule.EVERY_SECOND);
-        OtherTypeJob otherTypeJob = new OtherTypeJob();
-
         jobScheduler.schedule(otherTypeJob, Schedule.EVERY_SECOND);
 
         assertEquals(
@@ -399,11 +396,6 @@ public class DefaultJobSchedulerTest {
         assertFalse(jobScheduler.getJobStatus(JobCategory.of("test").getType("test").getKey("x")).isPresent());
     }
 
-    @Deprecated
-    protected void tick_ms(long ms) {
-        schedulerPool.tick(ms, TimeUnit.MILLISECONDS);
-    }
-
     @Test
     public void invalid_job() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
@@ -411,10 +403,9 @@ public class DefaultJobSchedulerTest {
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // After some seconds, the job keeps running
-        tick_ms(2_500);
-        schedulerPool.tick(2_500, TimeUnit.MILLISECONDS);
+        tick_seconds(3);
         int count = job.getCount();
-        assertEquals("Job ran three times", count, 3);
+        assertEquals("Job ran four times", 4, count);
         // Invalidates the job
         job.invalidate();
         // The status indicates the job is no longer valid, but is still there
@@ -423,7 +414,8 @@ public class DefaultJobSchedulerTest {
         assertFalse(status.isValid());
         assertNull(status.getNextRunDate());
         // After some seconds, the job has not run
-        tick_ms(1_500);
+        tick_seconds(1);
+        jobPool.runUntilIdle();
         assertEquals(count, job.getCount());
         // ... and it's gone
         assertFalse(jobScheduler.getJobStatus(job.getKey()).isPresent());
@@ -432,44 +424,46 @@ public class DefaultJobSchedulerTest {
     @Test
     public void paused_job_can_be_fired() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        CountJob job = new CountJob();
+        TestJob job = TestJob.of();
         // Initially every second
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
-        Thread.sleep(2500);
+        tick_seconds(2);
         // After a few seconds, the count has moved
         int count = job.getCount();
-        assertTrue(count >= 2);
+        assertEquals(3, count);
         // Pauses the job now
         jobScheduler.pause(job.getKey());
         // Not running
-        Thread.sleep(2500);
+        tick_seconds(2);
         assertEquals(count, job.getCount());
         // Forcing the run
-        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, SECONDS);
+        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException);
+        jobPool.runUntilIdle();
         assertTrue(job.getCount() > count);
     }
 
     @Test
     public void not_scheduled_job_can_be_fired() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        CountJob job = new CountJob();
+        TestJob job = TestJob.of();
         // No schedule
         jobScheduler.schedule(job, Schedule.NONE);
-        Thread.sleep(1500);
+        tick_seconds(2);
         // After a few seconds, the count has NOT moved
         assertEquals(0, job.getCount());
         // Forcing the run
-        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException).get(1, SECONDS);
+        jobScheduler.fireImmediately(job.getKey()).orElseThrow(noFutureException);
+        jobPool.runUntilIdle();
         assertEquals(1, job.getCount());
     }
 
     @Test
     public void not_scheduled_job_cannot_be_paused() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        CountJob job = new CountJob();
+        TestJob job = TestJob.of();
         // No schedule
         jobScheduler.schedule(job, Schedule.NONE);
-        Thread.sleep(1500);
+        tick_seconds(2);
         // After a few seconds, the count has NOT moved
         assertEquals(0, job.getCount());
         // Pausing the job
@@ -483,11 +477,11 @@ public class DefaultJobSchedulerTest {
     @Test
     public void disabled_job_cannot_be_fired() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        PauseableJob job = new PauseableJob();
+        TestJob job = TestJob.of();
         job.pause();
         // Initially every second
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
-        Thread.sleep(2500);
+        tick_seconds(2);
         // After a few seconds, the count has NOT moved
         assertEquals(0, job.getCount());
         // Forcing the run
@@ -500,12 +494,11 @@ public class DefaultJobSchedulerTest {
     @Test
     public void invalid_job_cannot_be_fired() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
-        ValidJob job = new ValidJob();
+        TestJob job = TestJob.of();
         job.invalidate();
         // Schedules, but not now
         jobScheduler.schedule(job, Schedule.EVERY_MINUTE.after(1));
         // Forcing the run
-        Thread.sleep(2500);
         Optional<Future<?>> future = jobScheduler.fireImmediately(job.getKey());
         assertFalse("Job not fired", future.isPresent());
         // ... to not avail

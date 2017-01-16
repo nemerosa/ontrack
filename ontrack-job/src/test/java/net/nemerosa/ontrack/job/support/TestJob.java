@@ -4,10 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.job.Fixtures;
-import net.nemerosa.ontrack.job.Job;
-import net.nemerosa.ontrack.job.JobKey;
-import net.nemerosa.ontrack.job.JobRun;
+import net.nemerosa.ontrack.job.*;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,11 +15,26 @@ public class TestJob implements Job {
     }
 
     public static TestJob of(String name) {
-        return new TestJob(name, 0, 0L, true, false);
+        return new TestJob(
+                name,
+                0,
+                Fixtures.TEST_CATEGORY,
+                "test",
+                false,
+                0L,
+                true,
+                false
+        );
     }
 
     private final String name;
     private int count = 0;
+    @Wither
+    private JobCategory category;
+    @Wither
+    private String type;
+    @Wither
+    private boolean fail = false;
     @Wither
     private long wait = 0;
     private boolean valid = true;
@@ -30,7 +42,7 @@ public class TestJob implements Job {
 
     @Override
     public JobKey getKey() {
-        return Fixtures.TEST_CATEGORY.getType(name).getKey(name);
+        return category.getType(type).getKey(name);
     }
 
     public int getCount() {
@@ -46,6 +58,9 @@ public class TestJob implements Job {
                 } catch (InterruptedException e) {
                     throw new RuntimeException("Job was interrupted", e);
                 }
+            }
+            if (fail) {
+                throw new RuntimeException("Task failure");
             }
             count++;
             listener.message("TEST JOB %s Count = %d", name, count);
