@@ -106,7 +106,7 @@ public class DefaultJobSchedulerTest {
         // Registers the orchestrator
         jobScheduler.schedule(jobOrchestrator, Schedule.EVERY_SECOND);
         // Waits some time...
-        tick_ms(3000);
+        tick_seconds(3);
         // ... and the job should not have run
         assertEquals(0, job.getCount());
         // ... and the orchestrator must not have run
@@ -118,8 +118,13 @@ public class DefaultJobSchedulerTest {
         );
         // Resumes the job scheduler
         jobScheduler.resume();
-        // Waits for one second
-        tick_ms(1_000);
+        // Resumes all jobs
+        schedulerPool.runUntilIdle();
+        // Waits for one second for the orchestrator to kick off
+        tick_seconds(1);
+        // Forces the registration of pending jobs
+        schedulerPool.runUntilIdle();
+        jobPool.runUntilIdle();
         // The job managed by the orchestrator must have run
         assertEquals(1, job.getCount());
     }
@@ -394,6 +399,7 @@ public class DefaultJobSchedulerTest {
         assertFalse(jobScheduler.getJobStatus(JobCategory.of("test").getType("test").getKey("x")).isPresent());
     }
 
+    @Deprecated
     protected void tick_ms(long ms) {
         schedulerPool.tick(ms, TimeUnit.MILLISECONDS);
     }
