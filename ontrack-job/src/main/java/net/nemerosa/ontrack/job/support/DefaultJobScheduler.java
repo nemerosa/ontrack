@@ -15,6 +15,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class DefaultJobScheduler implements JobScheduler {
@@ -22,8 +23,9 @@ public class DefaultJobScheduler implements JobScheduler {
     private final Logger logger = LoggerFactory.getLogger(JobScheduler.class);
 
     private final JobDecorator jobDecorator;
-    private final ScheduledExecutorService scheduledExecutorService;
+    private final ScheduledExecutorService schedulerPool;
     private final JobListener jobListener;
+    private final BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider;
 
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
     private final AtomicBoolean schedulerPaused;
@@ -32,14 +34,31 @@ public class DefaultJobScheduler implements JobScheduler {
 
     public DefaultJobScheduler(
             JobDecorator jobDecorator,
-            ScheduledExecutorService scheduledExecutorService,
+            ScheduledExecutorService schedulerPool,
             JobListener jobListener,
             boolean initiallyPaused
     ) {
+        this(
+                jobDecorator,
+                schedulerPool,
+                jobListener,
+                initiallyPaused,
+                (executorService, job) -> executorService
+        );
+    }
+
+    public DefaultJobScheduler(
+            JobDecorator jobDecorator,
+            ScheduledExecutorService schedulerPool,
+            JobListener jobListener,
+            boolean initiallyPaused,
+            BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider
+    ) {
         this.jobDecorator = jobDecorator;
-        this.scheduledExecutorService = scheduledExecutorService;
+        this.schedulerPool = schedulerPool;
         this.jobListener = jobListener;
         this.schedulerPaused = new AtomicBoolean(initiallyPaused);
+        this.jobPoolProvider = jobPoolProvider;
     }
 
     @Override
@@ -57,7 +76,7 @@ public class DefaultJobScheduler implements JobScheduler {
         JobScheduledService jobScheduledService = new JobScheduledService(
                 job,
                 schedule,
-                scheduledExecutorService,
+                schedulerPool,
                 existingService,
                 jobListener.isPausedAtStartup(job.getKey())
         );
@@ -184,6 +203,10 @@ public class DefaultJobScheduler implements JobScheduler {
         return jobScheduledService.doRun(true);
     }
 
+    protected ExecutorService getExecutorService(Job job) {
+        return jobPoolProvider.apply(schedulerPool, job);
+    }
+
     private class JobScheduledService implements Runnable {
 
         private final long id;
@@ -262,9 +285,11 @@ public class DefaultJobScheduler implements JobScheduler {
                 } else {
                     // Task to run
                     Runnable run = getRun();
+                    // Gets the executor for this job
+                    ExecutorService executor = getExecutorService(job);
                     // Scheduling
-                    logger.debug("[job]{} Job task submitted", job.getKey());
-                    Future<?> execution = scheduledExecutorService.submit(run);
+                    logger.debug("[job]{} Job task submitted asynchronously", job.getKey());
+                    Future<?> execution = executor.submit(run);
                     currentExecution.set(execution);
                     return Optional.of(execution);
                 }
