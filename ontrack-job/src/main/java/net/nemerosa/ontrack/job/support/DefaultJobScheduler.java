@@ -256,6 +256,20 @@ public class DefaultJobScheduler implements JobScheduler {
             // Converting all units to milliseconds
             long initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.getInitialPeriod(), schedule.getUnit());
             long period = TimeUnit.MILLISECONDS.convert(schedule.getPeriod(), schedule.getUnit());
+            // Scattering
+            if (scattering) {
+                // Computes the hash for the job key
+                int hash = job.getKey().hashCode();
+                // Period to consider
+                long scatteringMax = (long)(period * scatteringRatio);
+                if (scatteringMax > 0) {
+                    // Modulo on the period
+                    long delay = hash % scatteringMax;
+                    logger.debug("[job]{} Scattering enabled - additional delay: {} ms", job.getKey(), delay);
+                    // Adding to the initial delay
+                    initialPeriod += delay;
+                }
+            }
             // Scheduling now
             if (schedule.getPeriod() > 0) {
                 scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
