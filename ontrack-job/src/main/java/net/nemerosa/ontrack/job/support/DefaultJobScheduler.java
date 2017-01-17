@@ -241,13 +241,16 @@ public class DefaultJobScheduler implements JobScheduler {
                 lastErrorCount.set(old.lastErrorCount.get());
                 lastError.set(old.lastError.get());
             }
+            // Converting all units to milliseconds
+            long initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.getInitialPeriod(), schedule.getUnit());
+            long period = TimeUnit.MILLISECONDS.convert(schedule.getPeriod(), schedule.getUnit());
             // Scheduling now
             if (schedule.getPeriod() > 0) {
                 scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
                         this,
-                        schedule.getInitialPeriod(),
-                        schedule.getPeriod(),
-                        schedule.getUnit()
+                        initialPeriod,
+                        period,
+                        TimeUnit.MILLISECONDS
                 );
             } else {
                 logger.debug("[job]{} Job not scheduled since period = 0", job.getKey());
