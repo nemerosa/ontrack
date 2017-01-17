@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.job.*;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,8 @@ public class DefaultJobScheduler implements JobScheduler {
 
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
     private final AtomicBoolean schedulerPaused;
+    private final boolean scattering;
+    private final double scatteringRatio;
 
     private final AtomicLong idGenerator = new AtomicLong();
 
@@ -36,14 +39,18 @@ public class DefaultJobScheduler implements JobScheduler {
             JobDecorator jobDecorator,
             ScheduledExecutorService schedulerPool,
             JobListener jobListener,
-            boolean initiallyPaused
+            boolean initiallyPaused,
+            boolean scattering,
+            double scatteringRatio
     ) {
         this(
                 jobDecorator,
                 schedulerPool,
                 jobListener,
                 initiallyPaused,
-                (executorService, job) -> executorService
+                (executorService, job) -> executorService,
+                scattering,
+                scatteringRatio
         );
     }
 
@@ -52,13 +59,18 @@ public class DefaultJobScheduler implements JobScheduler {
             ScheduledExecutorService schedulerPool,
             JobListener jobListener,
             boolean initiallyPaused,
-            BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider
+            BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider,
+            boolean scattering,
+            double scatteringRatio
     ) {
+        Validate.inclusiveBetween(0.0, 1.0, scatteringRatio);
         this.jobDecorator = jobDecorator;
         this.schedulerPool = schedulerPool;
         this.jobListener = jobListener;
         this.schedulerPaused = new AtomicBoolean(initiallyPaused);
         this.jobPoolProvider = jobPoolProvider;
+        this.scattering = scattering;
+        this.scatteringRatio = scatteringRatio;
     }
 
     @Override

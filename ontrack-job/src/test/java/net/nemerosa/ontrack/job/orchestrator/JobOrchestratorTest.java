@@ -33,7 +33,7 @@ public class JobOrchestratorTest {
     protected JobScheduler createJobScheduler() {
         return new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, new OutputJobListener(
                 System.out::println
-        ), false);
+        ), false, false, 1.0);
     }
 
     @Test
