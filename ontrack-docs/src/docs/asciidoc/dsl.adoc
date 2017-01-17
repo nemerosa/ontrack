@@ -524,6 +524,14 @@ This would return a JSON like:
 ]
 ----
 
+The tool always returns its response as JSON and its output can be pipelined with tools like
+https://stedolan.github.io/jq/[`jq`]. For example:
+
+[source,bash]
+----
+cat project-list.groovy | ontrack-dsl-shell.jar --url https://ontrack.nemerosa.net | jq .
+----
+
 NOTE: The JAR is a
 http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#build-tool-plugins-gradle-repackage-configuration[real executable],
 so there is no need to use `java -jar` on Unix like systems or MacOS.
