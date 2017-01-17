@@ -6,6 +6,5 @@ dependencies {
     compile libraries.slf4j_api
 
     testCompile libraries.guava
-
-//    testRuntime libraries.slf4j_log4j
+    testRuntime libraries.slf4j_log4j
 }

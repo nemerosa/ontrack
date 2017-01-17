@@ -162,6 +162,20 @@ angular.module('ot.view.admin.console', [
             });
         };
 
+        // Stops a job
+        $scope.stopJob = function (job) {
+            ot.pageCall($http.delete(job._stop)).then(function (ack) {
+                // Notification
+                if (ack.success) {
+                    otNotificationService.success("Job was stopped.");
+                } else {
+                    otNotificationService.warning("Job could not be stopped.");
+                }
+                // Reloads the jobs in any case
+                loadJobs();
+            });
+        };
+
         // Showing the error for a status message
         $scope.showError = function (config) {
             config.errorShown = true;

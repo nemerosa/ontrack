@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.job;
 import net.nemerosa.ontrack.job.support.JobNotScheduledException;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
@@ -100,33 +99,22 @@ public interface JobScheduler {
      * @return Future for the job execution
      * @throws JobNotScheduledException If the job is not scheduled
      */
-    Future<?> fireImmediately(JobKey jobKey);
-
-    /**
-     * Fires a job immediately, without waiting the schedule, and passes additional parameters.
-     *
-     * @param jobKey     Key of the job to fire immediately
-     * @param parameters List of parameters to give for this job execution
-     * @return Future for the job execution
-     * @throws JobNotScheduledException If the job is not scheduled
-     * @see JobRunListener#getParam(String)
-     */
-    Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters);
-
-    /**
-     * Runs a job once.
-     * <p>
-     * Registers the job, runs it and unregisters it.
-     *
-     * @param job Job to run
-     * @return Future for the job execution
-     */
-    Future<?> runOnce(Job job);
+    Optional<Future<?>> fireImmediately(JobKey jobKey);
 
     /**
      * Gets the job key for a job id
      */
     Optional<JobKey> getJobKey(long id);
+
+    /**
+     * Stops a running a job.
+     *
+     * @param key Key of the job to run
+     * @return <code>true</code> if the job was stopped, <code>false</code> if the job could not be stopped or was
+     * not running.
+     * @throws JobNotScheduledException If the job is not scheduled
+     */
+    boolean stop(JobKey key);
 
     /**
      * Checks the general status of the scheduler.

@@ -40,12 +40,11 @@ public class SVNConfigurationResourceDecorator extends AbstractResourceDecorator
                 .self(on(SVNController.class).getConfiguration(configuration.getName()))
                 .link(Link.UPDATE, on(SVNController.class).updateConfigurationForm(configuration.getName()))
                 .link(Link.DELETE, on(SVNController.class).deleteConfiguration(configuration.getName()))
-                        // Indexation
+                // Indexation
                 .link("_indexation", on(SVNController.class).getLastRevisionInfo(configuration.getName()), globalSettingsGranted)
-                .link("_indexationRange", on(SVNController.class).indexRange(configuration.getName()), globalSettingsGranted)
                 .link("_indexationFromLatest", on(SVNController.class).indexFromLatest(configuration.getName()), globalSettingsGranted)
                 .link("_indexationFull", on(SVNController.class).full(configuration.getName()), globalSettingsGranted)
-                        // OK
+                // OK
                 .build();
     }
 }

@@ -9,10 +9,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 
@@ -40,6 +40,8 @@ public class JobOrchestratorTest {
     public void orchestrator_initial_jobs() throws InterruptedException, ExecutionException {
         JobScheduler scheduler = createJobScheduler();
 
+        Supplier<RuntimeException> notScheduledException = () -> new RuntimeException("Not scheduled");
+
         List<JobRegistration> jobs = new ArrayList<>();
 
         JobOrchestratorSupplier jobOrchestrationSupplier = jobs::stream;
@@ -53,21 +55,21 @@ public class JobOrchestratorTest {
 
         // Orchestration is registered as a job, but does not run since we have a NONE schedule
         scheduler.schedule(orchestrator, Schedule.NONE);
-        Optional<JobStatus> status = scheduler.getJobStatus(key);
-        assertTrue(status.isPresent());
-        assertNull(status.get().getNextRunDate());
+        JobStatus status = scheduler.getJobStatus(key).orElse(null);
+        assertNotNull(status);
+        assertNull(status.getNextRunDate());
 
         // Puts a job in the list
         jobs.add(new JobRegistration(new TestJob("1"), Schedule.NONE));
         // ... and launches the orchestration
-        scheduler.fireImmediately(key).get();
+        scheduler.fireImmediately(key).orElseThrow(notScheduledException).get();
         // ... tests the job has been registered
         assertTrue(scheduler.getJobStatus(TestJob.getKey("1")).isPresent());
 
         // Puts the second job in the list
         jobs.add(new JobRegistration(new TestJob("2"), Schedule.NONE));
         // ... and launches the orchestration
-        scheduler.fireImmediately(key).get();
+        scheduler.fireImmediately(key).orElseThrow(notScheduledException).get();
         // ... tests the jobs are registered
         assertTrue(scheduler.getJobStatus(TestJob.getKey("1")).isPresent());
         assertTrue(scheduler.getJobStatus(TestJob.getKey("2")).isPresent());
@@ -75,7 +77,7 @@ public class JobOrchestratorTest {
         // Removes the first job in the list
         jobs.remove(0);
         // ... and launches the orchestration
-        scheduler.fireImmediately(key).get();
+        scheduler.fireImmediately(key).orElseThrow(notScheduledException).get();
         // ... tests the jobs are registered
         assertFalse(scheduler.getJobStatus(TestJob.getKey("1")).isPresent());
         assertTrue(scheduler.getJobStatus(TestJob.getKey("2")).isPresent());

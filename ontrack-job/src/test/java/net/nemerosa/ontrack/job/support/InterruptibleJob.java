@@ -5,29 +5,28 @@ import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobRun;
 
-public class LongCountJob implements Job {
+public class InterruptibleJob implements Job {
 
     private int count = 0;
 
     @Override
     public JobKey getKey() {
-        return Fixtures.TEST_CATEGORY.getType("long-count").getKey("long-count");
-    }
-
-    public int getCount() {
-        return count;
+        return Fixtures.TEST_CATEGORY.getType("interruptible-count").getKey("interruptible-count");
     }
 
     @Override
     public JobRun getTask() {
         return (listener) -> {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            while (count < 50) {
+                try {
+                    listener.message("IN JOB - running for count %d", count);
+                    Thread.sleep(100);
+                    count++;
+                } catch (InterruptedException e) {
+                    listener.message("IN JOB - interrupted");
+                    throw new RuntimeException(e);
+                }
             }
-            count++;
-            System.out.println("Count = " + count);
         };
     }
 

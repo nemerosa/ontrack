@@ -309,6 +309,11 @@
                                 ng-click="resumeJob(job)"
                                 class="fa fa-refresh fa-2x ot-command"></span>
                         <span
+                                ng-if="job._stop"
+                                title="Stops this job"
+                                ng-click="stopJob(job)"
+                                class="fa fa-stop fa-2x ot-command"></span>
+                        <span
                                 ng-if="job._delete"
                                 title="Deletes this job"
                                 ng-click="deleteJob(job)"

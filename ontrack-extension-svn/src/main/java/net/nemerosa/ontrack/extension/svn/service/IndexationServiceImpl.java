@@ -5,10 +5,8 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.model.support.ConfigurationServiceListener;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
-import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
 import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.model.SVNIndexationException;
@@ -17,6 +15,7 @@ import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ConfigurationServiceListener;
 import net.nemerosa.ontrack.model.support.StartupService;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
@@ -39,8 +38,6 @@ import java.util.function.Consumer;
 
 @Service
 public class IndexationServiceImpl implements IndexationService, StartupService, ConfigurationServiceListener<SVNConfiguration> {
-
-    private static final String INDEXATION_RANGE_PARAMETER = "range";
 
     private final Logger logger = LoggerFactory.getLogger(IndexationService.class);
     private final TransactionTemplate transactionTemplate;
@@ -89,16 +86,6 @@ public class IndexationServiceImpl implements IndexationService, StartupService,
     public Ack indexFromLatest(String name) {
         SVNConfiguration configuration = configurationService.getConfiguration(name);
         jobScheduler.fireImmediately(getIndexationJobKey(configuration));
-        return Ack.OK;
-    }
-
-    @Override
-    public Ack indexRange(String name, IndexationRange range) {
-        SVNConfiguration configuration = configurationService.getConfiguration(name);
-        jobScheduler.fireImmediately(
-                getIndexationJobKey(configuration),
-                Collections.singletonMap(INDEXATION_RANGE_PARAMETER, range)
-        );
         return Ack.OK;
     }
 
@@ -164,32 +151,21 @@ public class IndexationServiceImpl implements IndexationService, StartupService,
     protected void indexFromLatest(SVNRepository repository, JobRunListener runListener) {
         securityService.checkGlobalFunction(GlobalSettings.class);
         try (Transaction ignored = transactionService.start()) {
-            // Range of the indexation
-            long from;
-            long to;
-            // Gets the indexation range if any
-            Optional<IndexationRange> range = runListener.getParam(INDEXATION_RANGE_PARAMETER);
-            if (range.isPresent()) {
-                from = range.get().getFrom();
-                to = range.get().getTo();
-            } else {
-                // Loads the repository information
-                SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
-                // Last scanned revision
-                long lastScannedRevision = revisionDao.getLast(repository.getId());
-                if (lastScannedRevision <= 0) {
-                    lastScannedRevision = repository.getConfiguration().getIndexationStart();
-                }
-                // HEAD revision
-                long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
-                // Logging
-                logger.info("[svn-indexation] Repository={}, LastScannedRevision={}", repository.getId(), lastScannedRevision);
-                // Range
-                from = lastScannedRevision + 1;
-                to = repositoryRevision;
+            // Loads the repository information
+            SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
+            // Last scanned revision
+            long lastScannedRevision = revisionDao.getLast(repository.getId());
+            if (lastScannedRevision <= 0) {
+                lastScannedRevision = repository.getConfiguration().getIndexationStart();
             }
+            // HEAD revision
+            long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
+            // Logging
+            logger.info("[svn-indexation] Repository={}, LastScannedRevision={}", repository.getId(), lastScannedRevision);
+            // Range
+            long from = lastScannedRevision + 1;
             // Request index of the range
-            indexRange(repository, from, to, runListener);
+            indexRange(repository, from, repositoryRevision, runListener);
         }
 
     }
