@@ -259,7 +259,7 @@ public class DefaultJobScheduler implements JobScheduler {
             // Scattering
             if (scattering) {
                 // Computes the hash for the job key
-                int hash = job.getKey().hashCode();
+                int hash = Math.abs(job.getKey().hashCode());
                 // Period to consider
                 long scatteringMax = (long)(period * scatteringRatio);
                 if (scatteringMax > 0) {
