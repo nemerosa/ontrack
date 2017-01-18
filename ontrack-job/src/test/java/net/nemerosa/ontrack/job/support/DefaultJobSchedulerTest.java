@@ -52,7 +52,9 @@ public class DefaultJobSchedulerTest {
                 schedulerPool,
                 NOPJobListener.INSTANCE,
                 initiallyPaused,
-                (pool, job) -> jobPool
+                (pool, job) -> jobPool,
+                false,
+                1.0
         );
     }
 

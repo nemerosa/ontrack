@@ -10,6 +10,7 @@ public class JobStatus {
     private final long id;
     private final JobKey key;
     private final Schedule schedule;
+    private final Schedule actualSchedule;
     private final String description;
     private final boolean running;
     private final boolean valid;

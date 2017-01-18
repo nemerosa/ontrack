@@ -78,6 +78,9 @@ Schedule.everyMinutes(15).after(5)
 
 TIP: see the `Schedule` class for more options.
 
+By enabling the <<configuration-properties,scattering options>>, one can
+control the schedule by adding a startup delay at the beginning of the job.
+
 The `Job` interface must define the unique for the job. A key in unique
 within a type within a category.
 

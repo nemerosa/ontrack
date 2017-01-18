@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.job.Schedule
 import org.junit.Test
 import org.mockito.Mockito
 
+import java.util.concurrent.TimeUnit
+
 import static org.mockito.Mockito.when
 
 class JobMetricsTest {
@@ -19,6 +21,7 @@ class JobMetricsTest {
                         1,
                         JobCategory.of('MyCategory').getType('MyType').getKey('MyKey'),
                         Schedule.EVERY_DAY,
+                        Schedule.EVERY_DAY.convertTo(TimeUnit.MILLISECONDS),
                         "",
                         false,
                         true,

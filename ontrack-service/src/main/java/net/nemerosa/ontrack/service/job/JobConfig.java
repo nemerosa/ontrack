@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.job.JobListener;
 import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.job.support.DefaultJobScheduler;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
+import net.nemerosa.ontrack.model.support.JobConfigProperties;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import net.nemerosa.ontrack.model.support.SettingsRepository;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -64,11 +65,14 @@ public class JobConfig {
 
     @Bean
     public JobScheduler jobScheduler() {
+        JobConfigProperties jobConfigProperties = ontrackConfigProperties.getJobs();
         return new DefaultJobScheduler(
                 jobDecorator,
                 jobExecutorService(),
                 jobListener(),
-                ontrackConfigProperties.getJobs().isPausedAtStartup()
+                jobConfigProperties.isPausedAtStartup(),
+                jobConfigProperties.isScattering(),
+                jobConfigProperties.getScatteringRatio()
         );
     }
 

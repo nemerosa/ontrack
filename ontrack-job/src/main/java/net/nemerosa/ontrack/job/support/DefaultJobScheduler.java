@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.job.*;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,8 @@ public class DefaultJobScheduler implements JobScheduler {
 
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
     private final AtomicBoolean schedulerPaused;
+    private final boolean scattering;
+    private final double scatteringRatio;
 
     private final AtomicLong idGenerator = new AtomicLong();
 
@@ -36,14 +39,18 @@ public class DefaultJobScheduler implements JobScheduler {
             JobDecorator jobDecorator,
             ScheduledExecutorService schedulerPool,
             JobListener jobListener,
-            boolean initiallyPaused
+            boolean initiallyPaused,
+            boolean scattering,
+            double scatteringRatio
     ) {
         this(
                 jobDecorator,
                 schedulerPool,
                 jobListener,
                 initiallyPaused,
-                (executorService, job) -> executorService
+                (executorService, job) -> executorService,
+                scattering,
+                scatteringRatio
         );
     }
 
@@ -52,13 +59,18 @@ public class DefaultJobScheduler implements JobScheduler {
             ScheduledExecutorService schedulerPool,
             JobListener jobListener,
             boolean initiallyPaused,
-            BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider
+            BiFunction<ExecutorService, Job, ExecutorService> jobPoolProvider,
+            boolean scattering,
+            double scatteringRatio
     ) {
+        Validate.inclusiveBetween(0.0, 1.0, scatteringRatio);
         this.jobDecorator = jobDecorator;
         this.schedulerPool = schedulerPool;
         this.jobListener = jobListener;
         this.schedulerPaused = new AtomicBoolean(initiallyPaused);
         this.jobPoolProvider = jobPoolProvider;
+        this.scattering = scattering;
+        this.scatteringRatio = scatteringRatio;
     }
 
     @Override
@@ -212,6 +224,7 @@ public class DefaultJobScheduler implements JobScheduler {
         private final long id;
         private final Job job;
         private final Schedule schedule;
+        private final Schedule actualSchedule;
         private final ScheduledFuture<?> scheduledFuture;
 
         private final AtomicBoolean paused;
@@ -241,13 +254,36 @@ public class DefaultJobScheduler implements JobScheduler {
                 lastErrorCount.set(old.lastErrorCount.get());
                 lastError.set(old.lastError.get());
             }
+            // Converting all units to milliseconds
+            long initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.getInitialPeriod(), schedule.getUnit());
+            long period = TimeUnit.MILLISECONDS.convert(schedule.getPeriod(), schedule.getUnit());
+            // Scattering
+            if (scattering) {
+                // Computes the hash for the job key
+                int hash = Math.abs(job.getKey().hashCode());
+                // Period to consider
+                long scatteringMax = (long) (period * scatteringRatio);
+                if (scatteringMax > 0) {
+                    // Modulo on the period
+                    long delay = hash % scatteringMax;
+                    logger.debug("[job]{} Scattering enabled - additional delay: {} ms", job.getKey(), delay);
+                    // Adding to the initial delay
+                    initialPeriod += delay;
+                }
+            }
+            // Actual schedule
+            actualSchedule = new Schedule(
+                    initialPeriod,
+                    period,
+                    TimeUnit.MILLISECONDS
+            );
             // Scheduling now
             if (schedule.getPeriod() > 0) {
                 scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
                         this,
-                        schedule.getInitialPeriod(),
-                        schedule.getPeriod(),
-                        schedule.getUnit()
+                        initialPeriod,
+                        period,
+                        TimeUnit.MILLISECONDS
                 );
             } else {
                 logger.debug("[job]{} Job not scheduled since period = 0", job.getKey());
@@ -385,6 +421,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     id,
                     job.getKey(),
                     schedule,
+                    actualSchedule,
                     job.getDescription(),
                     currentExecution.get() != null,
                     valid,
