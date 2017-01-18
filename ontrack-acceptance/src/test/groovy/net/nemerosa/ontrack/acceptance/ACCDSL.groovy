@@ -81,7 +81,7 @@ class ACCDSL extends AbstractACCDSL {
             (1..5).each { branch("B${it}") }
         }
         // Checks the branches
-        assert ontrack.project(name).branches*.name == (1..5).collect { "B${it}" }
+        assert ontrack.project(name).branches*.name == (5..1).collect { "B${it}" }
     }
 
     @Test
