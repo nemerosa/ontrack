@@ -50,4 +50,12 @@ public class Schedule {
     public boolean sameDelayThan(Schedule schedule) {
         return this.period == schedule.period && this.unit.equals(schedule.unit);
     }
+
+    public Schedule convertTo(TimeUnit target) {
+        return new Schedule(
+                target.convert(initialPeriod, unit),
+                target.convert(period, unit),
+                target
+        );
+    }
 }
