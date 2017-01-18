@@ -42,7 +42,7 @@ class ProjectQLIT extends AbstractQLITSupport {
         doCreateBranch(p, NameDescription.nd("B1", ""))
         doCreateBranch(p, NameDescription.nd("B2", ""))
         def data = run("{projects(id: ${p.id}) { name branches { name } }}")
-        assert data.projects.branches.name.flatten() == ["B1", "B2"]
+        assert data.projects.branches.name.flatten() == ["B2", "B1"]
     }
 
     @Test

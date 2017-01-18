@@ -29,7 +29,7 @@ class BranchQLIT extends AbstractQLITSupport {
         doCreateBranch(project, NameDescription.nd("B2", ""))
 
         def data = run("""{branches (project: "${project.name}") { name } }""")
-        assert data.branches.name == ['B1', 'B2']
+        assert data.branches.name == ['B2', 'B1']
     }
 
     @Test
