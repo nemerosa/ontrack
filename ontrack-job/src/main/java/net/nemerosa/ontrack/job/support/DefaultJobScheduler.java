@@ -224,6 +224,7 @@ public class DefaultJobScheduler implements JobScheduler {
         private final long id;
         private final Job job;
         private final Schedule schedule;
+        private final Schedule actualSchedule;
         private final ScheduledFuture<?> scheduledFuture;
 
         private final AtomicBoolean paused;
@@ -261,7 +262,7 @@ public class DefaultJobScheduler implements JobScheduler {
                 // Computes the hash for the job key
                 int hash = Math.abs(job.getKey().hashCode());
                 // Period to consider
-                long scatteringMax = (long)(period * scatteringRatio);
+                long scatteringMax = (long) (period * scatteringRatio);
                 if (scatteringMax > 0) {
                     // Modulo on the period
                     long delay = hash % scatteringMax;
@@ -270,6 +271,12 @@ public class DefaultJobScheduler implements JobScheduler {
                     initialPeriod += delay;
                 }
             }
+            // Actual schedule
+            actualSchedule = new Schedule(
+                    initialPeriod,
+                    period,
+                    TimeUnit.MILLISECONDS
+            );
             // Scheduling now
             if (schedule.getPeriod() > 0) {
                 scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
@@ -414,6 +421,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     id,
                     job.getKey(),
                     schedule,
+                    actualSchedule,
                     job.getDescription(),
                     currentExecution.get() != null,
                     valid,
