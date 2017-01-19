@@ -21,7 +21,7 @@ public class AsciiDocGenerator {
         try (PrintWriter writer = new PrintWriter(indexFile)) {
             adocIndex(writer, doc);
         }
-        // TODO One file per class
+        // One file per class
         doc.getClasses().values()
                 .stream()
                 .filter(dslDocClass -> !dslDocClass.isPropertyClass())
@@ -41,6 +41,7 @@ public class AsciiDocGenerator {
     }
 
     private void adocIndex(PrintWriter writer, DSLDoc doc) throws IOException, ClassNotFoundException {
+        // TODO Converts to a writer
         GStringTemplateEngine engine = new GStringTemplateEngine();
         // Loads the text
         String text = IOUtils.toString(AsciiDocGenerator.class.getResource("/templates/index.adoc"), "UTF-8");
@@ -90,7 +91,7 @@ public class AsciiDocGenerator {
                                 dslDocMethod.getId(),
                                 dslDocMethod.getName(),
                                 dslDocMethod.getSignature(),
-                                dslDocMethod.getDescription())
+                                safe(dslDocMethod.getDescription()))
                 );
         writer.format("|===%n");
         // Methods
@@ -132,6 +133,7 @@ public class AsciiDocGenerator {
 
     private void adocSample(PrintWriter writer, String sample) {
         if (StringUtils.isNotBlank(sample)) {
+            writer.format("%nSample:%n");
             writer.format("%n[source,groovy]%n");
             writer.format("----%n");
             writer.println(sample);
@@ -141,14 +143,13 @@ public class AsciiDocGenerator {
 
     private void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod, boolean indent) {
         writer.format("%n[[dsl-%s-%s]]%n", docClass.getId(), docMethod.getId());
-        writer.format("%s %s%n", StringUtils.repeat("=", indent ? 6 : 5), docMethod.getSignature());
-        if (StringUtils.isNotBlank(docMethod.getDescription())) {
-            writer.format("%n%s%n", docMethod.getDescription());
-        }
-        if (StringUtils.isNotBlank(docMethod.getLongDescription())) {
-            writer.format("%n%s%n", docMethod.getLongDescription());
-        }
-        adocSample(writer, docMethod.getSample());
+        writer.format("|===%n");
+        writer.format("| %s%n%n", docMethod.getName());
+        writer.format("| `%s`%n%n%s%n%n",
+                docMethod.getSignature(),
+                safe(docMethod.getDescription())
+        );
+        writer.format("%n");
         // References
         if (!docMethod.getReferences().isEmpty()) {
             writer.format(
@@ -158,6 +159,16 @@ public class AsciiDocGenerator {
                             .collect(Collectors.joining(", "))
             );
         }
+        writer.format("|===%n%n");
+
+        writer.format("%s%n%n", safe(docMethod.getLongDescription()));
+
+        adocSample(writer, docMethod.getSample());
+
+    }
+
+    private String safe(String value) {
+        return StringUtils.isNotBlank(value) ? value : "";
     }
 
     private static String getRefLink(DSLDocClass ref) {
