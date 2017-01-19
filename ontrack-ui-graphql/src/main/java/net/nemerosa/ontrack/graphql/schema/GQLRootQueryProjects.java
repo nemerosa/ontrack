@@ -5,10 +5,13 @@ import graphql.schema.GraphQLFieldDefinition;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
@@ -22,11 +25,13 @@ public class GQLRootQueryProjects implements GQLRootQuery {
 
     private final StructureService structureService;
     private final GQLTypeProject project;
+    private final GQLInputPropertyFilter propertyFilter;
 
     @Autowired
-    public GQLRootQueryProjects(StructureService structureService, GQLTypeProject project) {
+    public GQLRootQueryProjects(StructureService structureService, GQLTypeProject project, GQLInputPropertyFilter propertyFilter) {
         this.structureService = structureService;
         this.project = project;
+        this.propertyFilter = propertyFilter;
     }
 
     @Override
@@ -48,6 +53,7 @@ public class GQLRootQueryProjects implements GQLRootQuery {
                                 .type(GraphQLString)
                                 .build()
                 )
+                .argument(propertyFilter.asArgument())
                 .dataFetcher(projectFetcher())
                 .build();
     }
@@ -73,10 +79,23 @@ public class GQLRootQueryProjects implements GQLRootQuery {
                         .map(Collections::singletonList)
                         .orElse(Collections.emptyList());
             }
-            // TODO Other criterias
-            // Whole list
+            // Other criterias
             else {
-                return structureService.getProjectList();
+                // Filter to use
+                Predicate<Project> filter = p -> true;
+                // Property filter?
+                Object propertyFilterArg = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME);
+                if (propertyFilterArg != null) {
+                    GQLInputPropertyFilter.PropertyFilter filterObject = propertyFilter.convert(propertyFilterArg);
+                    if (filterObject != null && StringUtils.isNotBlank(filterObject.getType())) {
+                        filter = filter.and(propertyFilter.getFilter(filterObject));
+                    }
+                }
+                // Whole list
+                return structureService.getProjectList()
+                        .stream()
+                        .filter(filter)
+                        .collect(Collectors.toList());
             }
         };
     }

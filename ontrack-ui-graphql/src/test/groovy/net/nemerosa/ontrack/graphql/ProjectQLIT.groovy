@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.graphql
 
 import graphql.GraphQLException
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -410,6 +412,66 @@ class ProjectQLIT extends AbstractQLITSupport {
             }
         }""")
         assert data.projects.branches.builds.name.flatten() == ['20', '19', '18', '17', '16']
+    }
+
+    @Test
+    void 'Projects filtered by property type'() {
+        // Projects
+        def p1 = doCreateProject()
+        /*def p2 = */doCreateProject()
+        def p3 = doCreateProject()
+        def p4 = doCreateProject()
+        // Properties
+        setProperty(p1, TestSimplePropertyType, new TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType, new TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType, new TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        def data = run("""{
+            projects(withProperty: {type: "${TestSimplePropertyType.class.name}"}) {
+                name
+            }
+        }""")
+        assert data.projects*.name as Set == [p1.name, p3.name, p4.name] as Set
+    }
+
+    @Test
+    void 'Projects filtered by property type and value pattern'() {
+        // Projects
+        def p1 = doCreateProject()
+        /*def p2 = */doCreateProject()
+        def p3 = doCreateProject()
+        def p4 = doCreateProject()
+        // Properties
+        setProperty(p1, TestSimplePropertyType, new TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType, new TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType, new TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        def data = run("""{
+            projects(withProperty: {type: "${TestSimplePropertyType.class.name}", value: "P*"}) {
+                name
+            }
+        }""")
+        assert data.projects*.name as Set == [p1.name, p3.name] as Set
+    }
+
+    @Test
+    void 'Projects filtered by property type and value'() {
+        // Projects
+        def p1 = doCreateProject()
+        /*def p2 = */doCreateProject()
+        def p3 = doCreateProject()
+        def p4 = doCreateProject()
+        // Properties
+        setProperty(p1, TestSimplePropertyType, new TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType, new TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType, new TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        def data = run("""{
+            projects(withProperty: {type: "${TestSimplePropertyType.class.name}", value: "P1"}) {
+                name
+            }
+        }""")
+        assert data.projects*.name as Set == [p1.name] as Set
     }
 
 }
