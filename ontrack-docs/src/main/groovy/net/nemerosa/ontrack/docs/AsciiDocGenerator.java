@@ -21,12 +21,22 @@ public class AsciiDocGenerator {
             adocIndex(writer, doc);
         }
         // TODO One file per class
-//        doc.getClasses().values()
-//                .stream()
-//                .filter(dslDocClass -> !dslDocClass.isPropertyClass())
-//                .forEach(
-//                        dslDocClass -> adocClass(writer, dslDocClass)
-//                );
+        doc.getClasses().values()
+                .stream()
+                .filter(dslDocClass -> !dslDocClass.isPropertyClass())
+                .forEach(
+                        dslDocClass -> adocClass(dir, dslDocClass)
+                );
+    }
+
+    private void adocClass(File dir, DSLDocClass docClass) {
+        File clsFile = new File(dir, String.format("dsl-%s.adoc", docClass.getId()));
+        System.out.format("[doc] Writing class %s in %s%n", docClass.getName(), clsFile.getName());
+        try (PrintWriter writer = new PrintWriter(clsFile)) {
+            adocClass(writer, docClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void adocIndex(PrintWriter writer, DSLDoc doc) throws IOException, ClassNotFoundException {
