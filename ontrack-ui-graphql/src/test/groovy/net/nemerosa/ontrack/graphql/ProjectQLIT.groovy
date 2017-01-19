@@ -447,7 +447,7 @@ class ProjectQLIT extends AbstractQLITSupport {
         setProperty(p4, TestSimplePropertyType, new TestSimpleProperty("X1"))
         // Looks for projects having this property
         def data = run("""{
-            projects(withProperty: {type: "${TestSimplePropertyType.class.name}", value: "P*"}) {
+            projects(withProperty: {type: "${TestSimplePropertyType.class.name}", value: "P"}) {
                 name
             }
         }""")
