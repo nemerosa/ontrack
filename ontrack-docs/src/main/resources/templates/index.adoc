@@ -1,0 +1,3 @@
+<% doc.classes.values().each { docClass -> %>
+include dsl-${docClass.id}.adoc[]
+<% } %>

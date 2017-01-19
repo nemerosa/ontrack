@@ -1,19 +1,42 @@
 package net.nemerosa.ontrack.docs;
 
+import groovy.text.GStringTemplateEngine;
+import groovy.text.Template;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class AsciiDocGenerator {
 
-    public void generate(PrintWriter writer, DSLDoc doc) {
-        doc.getClasses().values()
-                .stream()
-                .filter(dslDocClass -> !dslDocClass.isPropertyClass())
-                .forEach(
-                        dslDocClass -> adocClass(writer, dslDocClass)
-                );
+    public void generate(File dir, DSLDoc doc) throws IOException, ClassNotFoundException {
+        // Index file
+        File indexFile = new File(dir, "dsl-index.adoc");
+        System.out.format("[doc] Writing index %s%n", indexFile.getName());
+        try (PrintWriter writer = new PrintWriter(indexFile)) {
+            adocIndex(writer, doc);
+        }
+        // TODO One file per class
+//        doc.getClasses().values()
+//                .stream()
+//                .filter(dslDocClass -> !dslDocClass.isPropertyClass())
+//                .forEach(
+//                        dslDocClass -> adocClass(writer, dslDocClass)
+//                );
+    }
+
+    private void adocIndex(PrintWriter writer, DSLDoc doc) throws IOException, ClassNotFoundException {
+        GStringTemplateEngine engine = new GStringTemplateEngine();
+        // Loads the text
+        String text = IOUtils.toString(AsciiDocGenerator.class.getResource("/templates/index.adoc"), "UTF-8");
+        // Template
+        Template template = engine.createTemplate(text);
+        // Generates the content
+        template.make(Collections.singletonMap("doc", doc)).writeTo(writer);
     }
 
     private void adocClass(PrintWriter writer, DSLDocClass docClass) {
