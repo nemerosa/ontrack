@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class AsciiDocGenerator {
@@ -75,6 +76,23 @@ public class AsciiDocGenerator {
         if (propertyClass != null) {
             adocPropertyClass(writer, docClass, propertyClass);
         }
+        // Tables of methods
+        writer.format("%n.Method summary%n");
+        writer.format("|===%n");
+        writer.format("| Method | Description%n%n");
+        docClass.getMethods()
+                .stream()
+                .sorted(Comparator.comparing(DSLDocMethod::getName))
+                .forEach(dslDocMethod ->
+                        writer.format(
+                                "| <<dsl-%s-%s,`%s`>> | `%s`%n%n%s%n%n",
+                                docClass.getId(),
+                                dslDocMethod.getId(),
+                                dslDocMethod.getName(),
+                                dslDocMethod.getSignature(),
+                                dslDocMethod.getDescription())
+                );
+        writer.format("|===%n");
         // Methods
         docClass.getMethods().forEach(
                 dslDocMethod -> adocMethod(writer, docClass, dslDocMethod, false)
