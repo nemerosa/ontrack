@@ -37,7 +37,26 @@ public class AsciiDocGenerator {
     }
 
     private void adocIndex(PrintWriter writer, DSLDoc doc) throws IOException, ClassNotFoundException {
-        // TODO Class summary
+        // Class summary
+        writer.format("%n|===%n");
+        writer.format("3+| Class summary%n");
+        writer.format("h| Class | |%n%n");
+        // Ontrack
+        writer.format("| <<dsl-ontrack,Ontrack>> | - | <<dsl-ontrack-methods,Methods>> %n%n");
+        // Other classes
+        doc.getClasses().values()
+                .stream()
+                .filter(c -> !StringUtils.equals("ontrack", c.getId()))
+                .filter(c -> !c.isPropertyClass())
+                .sorted(Comparator.comparing(DSLDocClass::getName))
+                .forEach(docClass -> writer.format("| <<dsl-%s,%s>> | %s | <<dsl-%s-methods,Methods>>%n%n",
+                        docClass.getId(),
+                        docClass.getName(),
+                        docClass.getProperties().get() != null ? String.format("<<dsl-%s-properties,Properties>>", docClass.getId()) : "",
+                        docClass.getId()
+                ));
+
+        writer.format("%n|===%n");
         // Only Ontrack at the beginning
         writer.format("include::dsl-ontrack.adoc[]%n%n");
         // All classes but Ontrack
