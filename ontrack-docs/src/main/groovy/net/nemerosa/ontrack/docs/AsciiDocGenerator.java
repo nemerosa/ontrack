@@ -172,7 +172,7 @@ public class AsciiDocGenerator {
     private void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod, boolean property) {
         writer.format("%n[[dsl-%s-%s]]%n", docClass.getId(), docMethod.getId());
         writer.format("|===%n");
-        writer.format("| %s%s%n%n", property ? "Configuration: " : ":", docMethod.getName());
+        writer.format("| %s%s%n%n", property ? "Configuration: " : "", docMethod.getName());
         writer.format("a| `%s`%n%n%s%n%n",
                 docMethod.getSignature(),
                 safe(docMethod.getDescription())
