@@ -95,9 +95,12 @@ public class AsciiDocGenerator {
                 );
         writer.format("|===%n");
         // Methods
-        docClass.getMethods().forEach(
-                dslDocMethod -> adocMethod(writer, docClass, dslDocMethod, false)
-        );
+        docClass.getMethods()
+                .stream()
+                .sorted(Comparator.comparing(DSLDocMethod::getName))
+                .forEach(
+                        dslDocMethod -> adocMethod(writer, docClass, dslDocMethod, false)
+                );
         // Separator
         writer.println();
     }
@@ -145,7 +148,7 @@ public class AsciiDocGenerator {
         writer.format("%n[[dsl-%s-%s]]%n", docClass.getId(), docMethod.getId());
         writer.format("|===%n");
         writer.format("| %s%n%n", docMethod.getName());
-        writer.format("| `%s`%n%n%s%n%n",
+        writer.format("a| `%s`%n%n%s%n%n",
                 docMethod.getSignature(),
                 safe(docMethod.getDescription())
         );
@@ -159,11 +162,9 @@ public class AsciiDocGenerator {
                             .collect(Collectors.joining(", "))
             );
         }
-        writer.format("|===%n%n");
-
         writer.format("%s%n%n", safe(docMethod.getLongDescription()));
-
         adocSample(writer, docMethod.getSample());
+        writer.format("|===%n%n");
 
     }
 
