@@ -75,9 +75,13 @@ public class AsciiDocGenerator {
         // Properties
         DSLDocClass propertyClass = docClass.getProperties().get();
         if (propertyClass != null) {
+            // Link to methods
+            writer.format("%n<<dsl-%s-methods,Methods>>%n", docClass.getId());
+            // Properties section
             adocPropertyClass(writer, docClass, propertyClass);
         }
         // Tables of methods
+        writer.format("[[dsl-%s-methods]]%n", docClass.getId());
         writer.format("|===%n");
         writer.format("2+h| Method summary%n");
         writer.format("| Method | Description%n%n");
@@ -107,14 +111,17 @@ public class AsciiDocGenerator {
 
     private void adocPropertyClass(PrintWriter writer, DSLDocClass docClass, DSLDocClass propertyClass) {
         writer.format("[[dsl-%s-properties]]%n", docClass.getId());
-        writer.format("===== Properties%n");
-        // Description
-        if (StringUtils.isNotBlank(propertyClass.getDescription())) {
-            writer.format("%n%s%n", propertyClass.getDescription());
-        }
-        if (StringUtils.isNotBlank(propertyClass.getLongDescription())) {
-            writer.format("%n%s%n", propertyClass.getLongDescription());
-        }
+        writer.format("|===%n");
+
+        /*
+         * Properties header
+         */
+
+        writer.format("2+h| Properties%n");
+        writer.format("2+a| %s%n%n%s%n%n",
+                safe(propertyClass.getDescription()),
+                safe(propertyClass.getLongDescription())
+        );
         // See also section
         if (!propertyClass.getReferences().isEmpty()) {
             writer.format(
@@ -126,6 +133,14 @@ public class AsciiDocGenerator {
         }
         // Sample
         adocSample(writer, propertyClass.getSample());
+
+        /*
+         * End of properties
+         */
+
+        writer.format("|===%n");
+
+
         // Methods
         propertyClass.getMethods().forEach(
                 dslDocMethod -> adocMethod(writer, propertyClass, dslDocMethod, true)
