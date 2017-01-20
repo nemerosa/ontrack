@@ -37,6 +37,7 @@ public class AsciiDocGenerator {
     }
 
     private void adocIndex(PrintWriter writer, DSLDoc doc) throws IOException, ClassNotFoundException {
+        // TODO Class summary
         // Only Ontrack at the beginning
         writer.format("include::dsl-ontrack.adoc[]%n%n");
         // All classes but Ontrack
