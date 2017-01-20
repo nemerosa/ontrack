@@ -45,9 +45,9 @@ if (documentationProfile) {
 
     task prepareGeneratedDoc(type: Copy) {
         dependsOn 'generateDoc'
-        from 'build'
-        include 'dsl-generated.adoc'
-        into 'src/docs/asciidoc'
+        from 'build/dsl'
+        include '*.adoc'
+        into 'src/docs/asciidoc/generated'
     }
 
     // HTML specific settings
