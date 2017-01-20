@@ -78,8 +78,8 @@ public class AsciiDocGenerator {
             adocPropertyClass(writer, docClass, propertyClass);
         }
         // Tables of methods
-        writer.format("%n.Method summary%n");
         writer.format("|===%n");
+        writer.format("2+h| Method summary%n");
         writer.format("| Method | Description%n%n");
         docClass.getMethods()
                 .stream()
