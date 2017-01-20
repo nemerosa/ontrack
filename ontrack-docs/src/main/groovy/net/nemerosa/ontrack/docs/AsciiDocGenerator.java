@@ -43,6 +43,7 @@ public class AsciiDocGenerator {
         doc.getClasses().values()
                 .stream()
                 .filter(c -> !StringUtils.equals("ontrack", c.getId()))
+                .filter(c -> !c.isPropertyClass())
                 .sorted(Comparator.comparing(DSLDocClass::getName))
                 .forEach(docClass ->
                         writer.format("include::dsl-%s.adoc[]%n%n", docClass.getId())
