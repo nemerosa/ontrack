@@ -1,14 +1,10 @@
 package net.nemerosa.ontrack.docs;
 
-import groovy.text.GStringTemplateEngine;
-import groovy.text.Template;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -41,14 +37,9 @@ public class AsciiDocGenerator {
     }
 
     private void adocIndex(PrintWriter writer, DSLDoc doc) throws IOException, ClassNotFoundException {
-        // TODO Converts to a writer
-        GStringTemplateEngine engine = new GStringTemplateEngine();
-        // Loads the text
-        String text = IOUtils.toString(AsciiDocGenerator.class.getResource("/templates/index.adoc"), "UTF-8");
-        // Template
-        Template template = engine.createTemplate(text);
-        // Generates the content
-        template.make(Collections.singletonMap("doc", doc)).writeTo(writer);
+        doc.getClasses().values().forEach(docClass ->
+                writer.format("include::dsl-%s.adoc[]%n%n", docClass.getId())
+        );
     }
 
     private void adocClass(PrintWriter writer, DSLDocClass docClass) {
