@@ -76,7 +76,7 @@ public class AsciiDocGenerator {
         DSLDocClass propertyClass = docClass.getProperties().get();
         if (propertyClass != null) {
             // Link to methods
-            writer.format("%n<<dsl-%s-methods,Methods>>%n", docClass.getId());
+            writer.format("%nGo to the <<dsl-%s-methods,methods>>%n", docClass.getId());
             // Properties section
             adocPropertyClass(writer, docClass, propertyClass);
         }
@@ -117,7 +117,7 @@ public class AsciiDocGenerator {
          * Properties header
          */
 
-        writer.format("2+h| Properties%n");
+        writer.format("2+h| Configuration properties%n");
         writer.format("2+a| %s%n%n%s%n%n",
                 safe(propertyClass.getDescription()),
                 safe(propertyClass.getLongDescription())
@@ -135,7 +135,26 @@ public class AsciiDocGenerator {
         adocSample(writer, propertyClass.getSample());
 
         /*
-         * End of properties
+         * Properties summary
+         */
+
+        writer.format("2+h| Configuration property summary%n");
+        writer.format("| Property | Description%n%n");
+        propertyClass.getMethods()
+                .stream()
+                .sorted(Comparator.comparing(DSLDocMethod::getName))
+                .forEach(dslDocMethod ->
+                        writer.format(
+                                "| <<dsl-%s-%s,`%s`>> | `%s`%n%n%s%n%n",
+                                docClass.getId(),
+                                dslDocMethod.getId(),
+                                dslDocMethod.getName(),
+                                dslDocMethod.getSignature(),
+                                safe(dslDocMethod.getDescription()))
+                );
+
+        /*
+         * End of properties header
          */
 
         writer.format("|===%n");
@@ -159,10 +178,10 @@ public class AsciiDocGenerator {
         }
     }
 
-    private void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod, boolean indent) {
+    private void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod, boolean property) {
         writer.format("%n[[dsl-%s-%s]]%n", docClass.getId(), docMethod.getId());
         writer.format("|===%n");
-        writer.format("| %s%n%n", docMethod.getName());
+        writer.format("| %s%s%n%n", property ? "Configuration: " : ":", docMethod.getName());
         writer.format("a| `%s`%n%n%s%n%n",
                 docMethod.getSignature(),
                 safe(docMethod.getDescription())
