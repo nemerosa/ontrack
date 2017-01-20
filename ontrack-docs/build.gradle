@@ -36,12 +36,11 @@ if (documentationProfile) {
         classpath = sourceSets.main.runtimeClasspath
         args = [
                 project(':ontrack-dsl').file('src/main/groovy'),
-                'build',
+                'build/dsl',
         ]
 
         inputs.dir project(':ontrack-dsl').file('src/main/groovy')
-        outputs.file 'build/dsl-generated.json'
-        outputs.file 'build/dsl-generated.adoc'
+        outputs.dir 'build/dsl'
     }
 
     task prepareGeneratedDoc(type: Copy) {
