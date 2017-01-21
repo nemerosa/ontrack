@@ -167,7 +167,7 @@ public class AsciiDocGenerator {
                 .forEach(dslDocMethod ->
                         writer.format(
                                 "| <<dsl-%s-%s,`%s`>> | `%s`%n%n%s%n%n",
-                                docClass.getId(),
+                                propertyClass.getId(),
                                 dslDocMethod.getId(),
                                 dslDocMethod.getName(),
                                 dslDocMethod.getSignature(),
