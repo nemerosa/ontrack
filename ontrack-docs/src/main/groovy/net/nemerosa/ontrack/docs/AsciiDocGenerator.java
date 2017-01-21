@@ -49,11 +49,11 @@ public class AsciiDocGenerator {
                 .filter(c -> !StringUtils.equals("ontrack", c.getId()))
                 .filter(c -> !c.isPropertyClass())
                 .sorted(Comparator.comparing(DSLDocClass::getName))
-                .forEach(docClass -> writer.format("| <<dsl-%s,%s>> | %s | <<dsl-%s-methods,Methods>>%n%n",
+                .forEach(docClass -> writer.format("| <<dsl-%s,%s>> | %s | %s%n%n",
                         docClass.getId(),
                         docClass.getName(),
                         docClass.getProperties().get() != null ? String.format("<<dsl-%s-properties,Properties>>", docClass.getId()) : "",
-                        docClass.getId()
+                        docClass.getMethods().isEmpty() ? "" : String.format("<<dsl-%s-methods,Methods>>", docClass.getId())
                 ));
 
         writer.format("%n|===%n");
@@ -100,30 +100,32 @@ public class AsciiDocGenerator {
             adocPropertyClass(writer, docClass, propertyClass);
         }
         // Tables of methods
-        writer.format("[[dsl-%s-methods]]%n", docClass.getId());
-        writer.format("|===%n");
-        writer.format("2+h| Method summary%n");
-        writer.format("| Method | Description%n%n");
-        docClass.getMethods()
-                .stream()
-                .sorted(Comparator.comparing(DSLDocMethod::getName))
-                .forEach(dslDocMethod ->
-                        writer.format(
-                                "| <<dsl-%s-%s,`%s`>> | `%s`%n%n%s%n%n",
-                                docClass.getId(),
-                                dslDocMethod.getId(),
-                                dslDocMethod.getName(),
-                                dslDocMethod.getSignature(),
-                                safe(dslDocMethod.getDescription()))
-                );
-        writer.format("|===%n");
-        // Methods
-        docClass.getMethods()
-                .stream()
-                .sorted(Comparator.comparing(DSLDocMethod::getName))
-                .forEach(
-                        dslDocMethod -> adocMethod(writer, docClass, dslDocMethod, false)
-                );
+        if (!docClass.getMethods().isEmpty()) {
+            writer.format("[[dsl-%s-methods]]%n", docClass.getId());
+            writer.format("|===%n");
+            writer.format("2+h| Method summary%n");
+            writer.format("| Method | Description%n%n");
+            docClass.getMethods()
+                    .stream()
+                    .sorted(Comparator.comparing(DSLDocMethod::getName))
+                    .forEach(dslDocMethod ->
+                            writer.format(
+                                    "| <<dsl-%s-%s,`%s`>> | `%s`%n%n%s%n%n",
+                                    docClass.getId(),
+                                    dslDocMethod.getId(),
+                                    dslDocMethod.getName(),
+                                    dslDocMethod.getSignature(),
+                                    safe(dslDocMethod.getDescription()))
+                    );
+            writer.format("|===%n");
+            // Methods
+            docClass.getMethods()
+                    .stream()
+                    .sorted(Comparator.comparing(DSLDocMethod::getName))
+                    .forEach(
+                            dslDocMethod -> adocMethod(writer, docClass, dslDocMethod, false)
+                    );
+        }
         // Separator
         writer.println();
     }
