@@ -6,14 +6,14 @@ The `name` is the identifier of the configuration - if it already exists, it wil
 
 The parameters are the following:
 
-|===
-| Parameter | Description
+!===
+! Parameter ! Description
 
-| *url* | the URL to the GitLab application, without any repository nor project reference
-| *user* | user used to connect to GitHub
-| *password* | *Personal Access Token* associated with the user
-| ignoreSslCertificate | Set to `true` if SSL checks must be disabled (optional, default to `false`)
-|===
+! *url* ! the URL to the GitLab application, without any repository nor project reference
+! *user* ! user used to connect to GitHub
+! *password* ! *Personal Access Token* associated with the user
+! ignoreSslCertificate ! Set to `true` if SSL checks must be disabled (optional, default to `false`)
+!===
 
 WARNING: The `password` field must be a *Personal Access Token* - using the actual password is *not* supported.
 

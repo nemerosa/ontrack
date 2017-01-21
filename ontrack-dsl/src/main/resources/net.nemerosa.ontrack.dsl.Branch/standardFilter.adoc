@@ -13,73 +13,73 @@ IMPORTANT: Builds are always returned from the most recent one to
 The `standardFilter` method accepts the following parameters:
 
 
-|===
-| Parameter | Description
+!===
+! Parameter ! Description
 
-| `count`
-| Maximum number of builds to be returned. Defaults to `10`.
+! `count`
+! Maximum number of builds to be returned. Defaults to `10`.
 
-| `sincePromotionLevel`
-| Name of a <<model,promotion level>>. After reaching the first build having
+! `sincePromotionLevel`
+! Name of a <<model,promotion level>>. After reaching the first build having
   this promotion, no further build is returned.
 
-| `withPromotionLevel`
-| Name of a <<model,promotion level>>. Only builds having this promotion are
+! `withPromotionLevel`
+! Name of a <<model,promotion level>>. Only builds having this promotion are
   returned.
 
-| `afterDate`
-| https://en.wikipedia.org/wiki/ISO_8601[ISO 8601] date. Only builds having
+! `afterDate`
+! https://en.wikipedia.org/wiki/ISO_8601[ISO 8601] date. Only builds having
   been created on or after this date are returned.
 
-| `beforeDate`
-| https://en.wikipedia.org/wiki/ISO_8601[ISO 8601] date. Only builds having
+! `beforeDate`
+! https://en.wikipedia.org/wiki/ISO_8601[ISO 8601] date. Only builds having
   been created on or before this date are returned.
 
-| `sinceValidationStamp`
-| Name of a <<model,validation stamp>>. After reaching the first build having
+! `sinceValidationStamp`
+! Name of a <<model,validation stamp>>. After reaching the first build having
   this validation (whatever the status), no further build is returned.
 
-| `sinceValidationStampStatus`
-| Refines the `sinceValidationStamp` criteria to check on the status of the
+! `sinceValidationStampStatus`
+! Refines the `sinceValidationStamp` criteria to check on the status of the
   validation.
 
-| `withValidationStamp`
-| Name of a <<model,validation stamp>>. Only builds having this validation
+! `withValidationStamp`
+! Name of a <<model,validation stamp>>. Only builds having this validation
   (whatever the status) are returned.
 
-|`withValidationStampStatus`
-| Refines the `withValidationStamp` criteria to check on the status of the
+!`withValidationStampStatus`
+! Refines the `withValidationStamp` criteria to check on the status of the
   validation.
 
-| `withProperty`
-| Qualified name of a property (full class name of the `PropertyType`). Only
+! `withProperty`
+! Qualified name of a property (full class name of the `PropertyType`). Only
   builds having this property being set are returned.
 
-| `withPropertyValue`
-| Refines the `withProperty` criteria to check the property value. The way the
+! `withPropertyValue`
+! Refines the `withProperty` criteria to check the property value. The way the
   value is matched with the actual value depends on the property.
 
-| `sinceProperty`
-| Qualified name of a property (full class name of the `PropertyType`).After
+! `sinceProperty`
+! Qualified name of a property (full class name of the `PropertyType`).After
   reaching the first build having this property being set, no further build
   is returned.
 
-| `sincePropertyValue`
-| Refines the `sinceProperty` criteria to check the property value. The way the
+! `sincePropertyValue`
+! Refines the `sinceProperty` criteria to check the property value. The way the
   value is matched with the actual value depends on the property.
 
-| `linkedFrom`
-| Selects builds which are _linked from_ the build selected by the criteria.
+! `linkedFrom`
+! Selects builds which are _linked from_ the build selected by the criteria.
   See <<builds-links>> for the exact syntax.
 
-| `linkedFromPromotion`
-| The build must be linked FROM a build having this promotion (requires "Linked from")
+! `linkedFromPromotion`
+! The build must be linked FROM a build having this promotion (requires "Linked from")
 
-| `linkedTo`
-| Selects builds which are _linked to_ the build selected by the criteria.
+! `linkedTo`
+! Selects builds which are _linked to_ the build selected by the criteria.
   See <<builds-links>> for the exact syntax.
 
-| `linkedToPromotion`
-| The build must be linked TO a build having this promotion (requires "Linked to")
+! `linkedToPromotion`
+! The build must be linked TO a build having this promotion (requires "Linked to")
 
-|===
+!===

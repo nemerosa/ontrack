@@ -6,15 +6,15 @@ The `name` is the identifier of the configuration - if it already exists, it wil
 
 The parameters are the following:
 
-|===
-| Parameter | Description
+!===
+! Parameter ! Description
 
-| **url** | the GitHub URL - is set by default to `https://github.com` if not filled in, allowing for using GitHub
+! **url** ! the GitHub URL - is set by default to `https://github.com` if not filled in, allowing for using GitHub
   enterprise as well
-| user |user used to connect to GitHub (optional)
-| password | password used to connect to GitHub (optional)
-| oauth2Token | OAuth token to use instead of a user/password (optional)
-|===
+! user !user used to connect to GitHub (optional)
+! password ! password used to connect to GitHub (optional)
+! oauth2Token ! OAuth token to use instead of a user/password (optional)
+!===
 
 See <<usage-github>> to know the meaning of those parameters.
 
