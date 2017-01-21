@@ -209,6 +209,24 @@ public class AsciiDocGenerator {
         );
         writer.format("%n");
         // References
+        if (StringUtils.isNotBlank(docMethod.getSee())) {
+            // Gets the target method
+            DSLDocMethod targetMethod = docClass.getMethods().stream()
+                    .filter(m -> StringUtils.equals(docMethod.getSee(), m.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(String.format(
+                            "Cannot find method with ID <%s> in class <%s>",
+                            docMethod.getSee(),
+                            docClass.getName()
+                    )));
+            // Link
+            writer.format(
+                    "%nSee <<dsl-%s-%s,%s>>%n",
+                    docClass.getId(),
+                    docMethod.getSee(),
+                    targetMethod.getName()
+            );
+        }
         if (!docMethod.getReferences().isEmpty()) {
             writer.format(
                     "%nSee: %s%n",
