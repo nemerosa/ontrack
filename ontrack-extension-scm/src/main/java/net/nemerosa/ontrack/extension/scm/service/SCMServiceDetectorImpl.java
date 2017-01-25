@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.service;
 
 import net.nemerosa.ontrack.model.structure.Branch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,10 +11,10 @@ import java.util.Optional;
 @Component
 public class SCMServiceDetectorImpl implements SCMServiceDetector {
 
-    private List<SCMServiceProvider> scmServiceProviders;
+    private final List<SCMServiceProvider> scmServiceProviders;
 
-    @Autowired(required = false)
-    private void setScmServiceProviders(List<SCMServiceProvider> scmServiceProviders) {
+    @Autowired
+    public SCMServiceDetectorImpl(List<SCMServiceProvider> scmServiceProviders) {
         this.scmServiceProviders = scmServiceProviders;
     }
 
