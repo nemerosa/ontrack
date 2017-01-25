@@ -5,20 +5,21 @@ import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class LinkDefinitions {
 
-    public static <T extends ProjectEntity, P extends ProjectFunction> BiFunction<T, ResourceContext, Boolean> withProjectFn(Class<P> projectFn) {
+    public static <T extends ProjectEntity, P extends ProjectFunction> BiPredicate<T, ResourceContext> withProjectFn(Class<P> projectFn) {
         return (T e, ResourceContext resourceContext) -> resourceContext.isProjectFunctionGranted(e, projectFn);
     }
 
-    public static <T extends ProjectEntity, G extends GlobalFunction> BiFunction<T, ResourceContext, Boolean> withGlobalFn(Class<G> globalFn) {
+    public static <T extends ProjectEntity, G extends GlobalFunction> BiPredicate<T, ResourceContext> withGlobalFn(Class<G> globalFn) {
         return (T e, ResourceContext resourceContext) -> resourceContext.isGlobalFunctionGranted(globalFn);
     }
 
     public static <T extends ProjectEntity> LinkDefinition<T> link(String name, BiFunction<T, ResourceContext, Object> linkFn,
-                                                                   BiFunction<T, ResourceContext, Boolean> checkFn) {
+                                                                   BiPredicate<T, ResourceContext> checkFn) {
         return new SimpleLinkDefinition<>(
                 name,
                 linkFn,
@@ -48,7 +49,7 @@ public class LinkDefinitions {
         );
     }
 
-    public static <T extends ProjectEntity> LinkDefinition<T> link(String name, Function<T, Object> linkFn, BiFunction<T, ResourceContext, Boolean> checkFn) {
+    public static <T extends ProjectEntity> LinkDefinition<T> link(String name, Function<T, Object> linkFn, BiPredicate<T, ResourceContext> checkFn) {
         return link(
                 name,
                 (t, resourceContext) -> linkFn.apply(t),
@@ -81,10 +82,18 @@ public class LinkDefinitions {
         );
     }
 
-    public static <T extends ProjectEntity> LinkDefinition<T> page(String name, BiFunction<T, ResourceContext, Boolean> checkFn, String path, Object... arguments) {
+    public static <T extends ProjectEntity> LinkDefinition<T> page(String name, BiPredicate<T, ResourceContext> checkFn, String path, Object... arguments) {
+        return page(
+                name,
+                checkFn,
+                (r, rc) -> String.format(path, arguments)
+        );
+    }
+
+    public static <T extends ProjectEntity> LinkDefinition<T> page(String name, BiPredicate<T, ResourceContext> checkFn, BiFunction<T, ResourceContext, String> pathFn) {
         return new PagePathLinkDefinition<>(
                 name,
-                String.format(path, arguments),
+                pathFn,
                 checkFn
         );
     }
