@@ -36,10 +36,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             int id = dbCreate(
-                    "INSERT INTO PROJECTS(NAME, DESCRIPTION, DISABLED) VALUES (:name, :description, :disabled)",
+                    "INSERT INTO PROJECTS(NAME, DESCRIPTION, DISABLED, CREATION, CREATOR) VALUES (:name, :description, :disabled, :creation, :creator)",
                     params("name", project.getName())
                             .addValue("description", project.getDescription())
                             .addValue("disabled", project.isDisabled())
+                            .addValue("creation", dateTimeForDB(project.getSignature().getTime()))
+                            .addValue("creator", project.getSignature().getUser().getName())
             );
             // Returns with ID
             return project.withId(id(id));
@@ -128,7 +130,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public List<Branch> getBranchesForProject(ID projectId) {
         Project project = getProject(projectId);
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM BRANCHES WHERE PROJECTID = :projectId ORDER BY NAME",
+                "SELECT * FROM BRANCHES WHERE PROJECTID = :projectId ORDER BY ID DESC",
                 params("projectId", projectId.getValue()),
                 (rs, rowNum) -> toBranch(rs, id -> project)
         );
@@ -139,11 +141,13 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             int id = dbCreate(
-                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION, DISABLED) VALUES (:projectId, :name, :description, :disabled)",
+                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION, DISABLED, CREATION, CREATOR) VALUES (:projectId, :name, :description, :disabled, :creation, :creator)",
                     params("name", branch.getName())
                             .addValue("description", branch.getDescription())
                             .addValue("disabled", branch.isDisabled())
                             .addValue("projectId", branch.getProject().id())
+                            .addValue("creation", dateTimeForDB(branch.getSignature().getTime()))
+                            .addValue("creator", branch.getSignature().getUser().getName())
             );
             // Returns with ID
             return branch.withId(id(id));
@@ -471,11 +475,13 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
             // Insertion
             int id = dbCreate(
-                    "INSERT INTO PROMOTION_LEVELS(BRANCHID, NAME, DESCRIPTION, ORDERNB) VALUES (:branchId, :name, :description, :orderNb)",
+                    "INSERT INTO PROMOTION_LEVELS(BRANCHID, NAME, DESCRIPTION, ORDERNB, CREATION, CREATOR) VALUES (:branchId, :name, :description, :orderNb, :creation, :creator)",
                     params("name", promotionLevel.getName())
                             .addValue("description", promotionLevel.getDescription())
                             .addValue("branchId", promotionLevel.getBranch().id())
                             .addValue("orderNb", orderNb)
+                            .addValue("creation", dateTimeForDB(promotionLevel.getSignature().getTime()))
+                            .addValue("creator", promotionLevel.getSignature().getUser().getName())
             );
             return promotionLevel.withId(id(id));
         } catch (DuplicateKeyException ex) {
@@ -675,7 +681,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<PromotionRun> getPromotionRunsForPromotionLevel(PromotionLevel promotionLevel) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC",
+                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC, ID DESC",
                 params("promotionLevelId", promotionLevel.id()),
                 (rs, rowNum) -> toPromotionRun(rs,
                         this::getBuild,
@@ -732,11 +738,13 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
             // Insertion
             int id = dbCreate(
-                    "INSERT INTO VALIDATION_STAMPS(BRANCHID, NAME, DESCRIPTION, ORDERNB) VALUES (:branchId, :name, :description, :orderNb)",
+                    "INSERT INTO VALIDATION_STAMPS(BRANCHID, NAME, DESCRIPTION, ORDERNB, CREATION, CREATOR) VALUES (:branchId, :name, :description, :orderNb, :creation, :creator)",
                     params("name", validationStamp.getName())
                             .addValue("description", validationStamp.getDescription())
                             .addValue("branchId", validationStamp.getBranch().id())
                             .addValue("orderNb", orderNb)
+                            .addValue("creation", dateTimeForDB(validationStamp.getSignature().getTime()))
+                            .addValue("creator", validationStamp.getSignature().getUser().getName())
             );
             return validationStamp.withId(id(id));
         } catch (DuplicateKeyException ex) {
@@ -963,7 +971,9 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs.getString("name"),
                         rs.getString("description")
                 )
-        ).withId(id(rs)).withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
+        ).withId(id(rs))
+                .withSignature(readSignature(rs))
+                .withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
     }
 
     protected ValidationStamp toValidationStamp(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
@@ -973,7 +983,9 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs.getString("name"),
                         rs.getString("description")
                 )
-        ).withId(id(rs)).withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
+        ).withId(id(rs))
+                .withSignature(readSignature(rs))
+                .withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
     }
 
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
@@ -987,6 +999,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 )
         )
                 .withId(branchId)
+                .withSignature(readSignature(rs))
                 .withType(getBranchType(branchId))
                 .withDisabled(rs.getBoolean("disabled"));
     }
@@ -1007,6 +1020,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 rs.getString("description")
         ))
                 .withId(id(rs.getInt("id")))
+                .withSignature(readSignature(rs))
                 .withDisabled(rs.getBoolean("disabled"));
     }
 

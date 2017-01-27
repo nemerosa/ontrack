@@ -164,7 +164,7 @@ public class EventFactoryImplTest {
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 2
-        assert e.renderText() == "Value property has changed for promotion level COPPER."
+        assert e.renderText() == "Configuration value property has changed for promotion level COPPER."
     }
 
     @Test
@@ -173,7 +173,7 @@ public class EventFactoryImplTest {
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 2
-        assert e.renderText() == "Value property has been removed from promotion level COPPER."
+        assert e.renderText() == "Configuration value property has been removed from promotion level COPPER."
     }
 
     @Test
@@ -182,7 +182,7 @@ public class EventFactoryImplTest {
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 1
-        assert e.renderText() == "Value property has changed for project P."
+        assert e.renderText() == "Configuration value property has changed for project P."
     }
 
     @Test
@@ -191,7 +191,7 @@ public class EventFactoryImplTest {
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 1
-        assert e.renderText() == "Value property has been removed from project P."
+        assert e.renderText() == "Configuration value property has been removed from project P."
     }
 
     private static PromotionRun promotionRun() {

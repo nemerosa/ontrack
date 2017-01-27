@@ -5,4 +5,6 @@ include::integration-jenkins.adoc[]
 
 include::integration-metrics.adoc[]
 
+include::integration-graphql.adoc[]
+
 include::integration-encryption.adoc[]

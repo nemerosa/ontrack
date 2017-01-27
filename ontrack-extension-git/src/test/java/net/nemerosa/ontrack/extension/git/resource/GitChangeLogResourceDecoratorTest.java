@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.nemerosa.ontrack.extension.git.model.BasicGitActualConfiguration;
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitBuildInfo;
@@ -48,19 +49,20 @@ public class GitChangeLogResourceDecoratorTest {
 
     @Test
     public void gitChangeLogWithIssues() throws JsonProcessingException {
-        Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
-        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
+        Signature signature = Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user");
+        Project project = Project.of(nd("P", "Project")).withId(ID.of(1)).withSignature(signature);
+        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10)).withSignature(signature);
 
         List<BuildView> buildView = Stream.of(1, 2)
                 .map(it -> BuildView.of(
                         Build.of(
                                 branch,
                                 nd(String.valueOf(it), "Build " + it),
-                                Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+                                signature
                         ).withId(
                                 ID.of(it)
                         )
-                        )
+                )
                 )
                 .collect(Collectors.toList());
 
@@ -87,6 +89,13 @@ public class GitChangeLogResourceDecoratorTest {
                 )
         );
 
+        ObjectNode signatureObject = object()
+                .with("time", "2014-12-05T21:53:00Z")
+                .with("user", object()
+                        .with("name", "user")
+                        .end())
+                .end();
+
         assertResourceJson(
                 mapper,
                 object()
@@ -95,6 +104,7 @@ public class GitChangeLogResourceDecoratorTest {
                                 .with("name", "P")
                                 .with("description", "Project")
                                 .with("disabled", false)
+                                .with("signature", signatureObject)
                                 .end())
                         .with("scmBuildFrom", object()
                                 .with("buildView", object()
@@ -102,18 +112,14 @@ public class GitChangeLogResourceDecoratorTest {
                                                 .with("id", 1)
                                                 .with("name", "1")
                                                 .with("description", "Build 1")
-                                                .with("signature", object()
-                                                        .with("time", "2014-12-05T21:53:00Z")
-                                                        .with("user", object()
-                                                                .with("name", "user")
-                                                                .end())
-                                                        .end())
+                                                .with("signature", signatureObject)
                                                 .with("branch", object()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
                                                         .with("disabled", false)
                                                         .with("type", "CLASSIC")
+                                                        .with("signature", signatureObject)
                                                         .end())
                                                 .end())
                                         .with("decorations", array().end())
@@ -130,18 +136,14 @@ public class GitChangeLogResourceDecoratorTest {
                                                 .with("id", 2)
                                                 .with("name", "2")
                                                 .with("description", "Build 2")
-                                                .with("signature", object()
-                                                        .with("time", "2014-12-05T21:53:00Z")
-                                                        .with("user", object()
-                                                                .with("name", "user")
-                                                                .end())
-                                                        .end())
+                                                .with("signature", signatureObject)
                                                 .with("branch", object()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
                                                         .with("disabled", false)
                                                         .with("type", "CLASSIC")
+                                                        .with("signature", signatureObject)
                                                         .end())
                                                 .end())
                                         .with("decorations", array().end())
@@ -169,17 +171,20 @@ public class GitChangeLogResourceDecoratorTest {
 
     @Test
     public void gitChangeLogWithoutIssues() throws JsonProcessingException {
-        Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
-        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
+
+        Signature signature = Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user");
+
+        Project project = Project.of(nd("P", "Project")).withId(ID.of(1)).withSignature(signature);
+        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10)).withSignature(signature);
 
         List<BuildView> buildView = Stream.of(1, 2)
                 .map(it -> BuildView.of(
                         Build.of(
                                 branch,
                                 nd(String.valueOf(it), "Build " + it),
-                                Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+                                signature
                         ).withId(ID.of(it))
-                        )
+                )
                 )
                 .collect(Collectors.toList());
 
@@ -206,6 +211,13 @@ public class GitChangeLogResourceDecoratorTest {
                 )
         );
 
+        ObjectNode signatureObject = object()
+                .with("time", "2014-12-05T21:53:00Z")
+                .with("user", object()
+                        .with("name", "user")
+                        .end())
+                .end();
+
         assertResourceJson(
                 mapper,
                 object()
@@ -214,6 +226,7 @@ public class GitChangeLogResourceDecoratorTest {
                                 .with("name", "P")
                                 .with("description", "Project")
                                 .with("disabled", false)
+                                .with("signature", signatureObject)
                                 .end())
                         .with("scmBuildFrom", object()
                                 .with("buildView", object()
@@ -221,18 +234,14 @@ public class GitChangeLogResourceDecoratorTest {
                                                 .with("id", 1)
                                                 .with("name", "1")
                                                 .with("description", "Build 1")
-                                                .with("signature", object()
-                                                        .with("time", "2014-12-05T21:53:00Z")
-                                                        .with("user", object()
-                                                                .with("name", "user")
-                                                                .end())
-                                                        .end())
+                                                .with("signature", signatureObject)
                                                 .with("branch", object()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
                                                         .with("disabled", false)
                                                         .with("type", "CLASSIC")
+                                                        .with("signature", signatureObject)
                                                         .end())
                                                 .end())
                                         .with("decorations", array().end())
@@ -249,18 +258,14 @@ public class GitChangeLogResourceDecoratorTest {
                                                 .with("id", 2)
                                                 .with("name", "2")
                                                 .with("description", "Build 2")
-                                                .with("signature", object()
-                                                        .with("time", "2014-12-05T21:53:00Z")
-                                                        .with("user", object()
-                                                                .with("name", "user")
-                                                                .end())
-                                                        .end())
+                                                .with("signature", signatureObject)
                                                 .with("branch", object()
                                                         .with("id", 10)
                                                         .with("name", "B")
                                                         .with("description", "Branch")
                                                         .with("disabled", false)
                                                         .with("type", "CLASSIC")
+                                                        .with("signature", signatureObject)
                                                         .end())
                                                 .end())
                                         .with("decorations", array().end())

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
@@ -62,24 +63,24 @@ public class AccountServiceImpl implements AccountService {
                 .withGlobalRole(
                         roleRepository.findGlobalRoleByAccount(raw.getAccount().id()).flatMap(rolesService::getGlobalRole)
                 )
-                        // Project roles
+                // Project roles
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByAccount(raw.getAccount().id(), rolesService::getProjectRoleAssociation)
                 )
-                        // Groups from the repository
+                // Groups from the repository
                 .withGroups(
                         accountGroupRepository.findByAccount(raw.getAccount().id()).stream()
                                 .map(this::groupWithACL)
                                 .collect(Collectors.toList())
                 )
-                        // Group contributions
+                // Group contributions
                 .withGroups(
                         accountGroupContributors.stream()
                                 .flatMap(accountGroupContributor -> accountGroupContributor.collectGroups(raw).stream())
                                 .map(this::groupWithACL)
                                 .collect(Collectors.toList())
                 )
-                        // OK
+                // OK
                 .lock();
     }
 
@@ -338,6 +339,75 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    @Override
+    public Collection<ProjectRoleAssociation> getProjectPermissionsForAccount(Account account) {
+        return roleRepository.findProjectRoleAssociationsByAccount(
+                account.id(),
+                rolesService::getProjectRoleAssociation
+        )
+                .stream()
+                // Filter by authorisation
+                .filter(projectRoleAssociation -> securityService.isProjectFunctionGranted(
+                        projectRoleAssociation.getProjectId(),
+                        ProjectAuthorisationMgt.class
+                ))
+                // OK
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<GlobalRole> getGlobalRoleForAccount(Account account) {
+        return roleRepository.findGlobalRoleByAccount(account.id())
+                .flatMap(rolesService::getGlobalRole);
+    }
+
+    @Override
+    public List<Account> getAccountsForGroup(AccountGroup accountGroup) {
+        return accountRepository.getAccountsForGroup(accountGroup, authenticationSourceService::getAuthenticationSource);
+    }
+
+    @Override
+    public Optional<GlobalRole> getGlobalRoleForAccountGroup(AccountGroup group) {
+        return roleRepository.findGlobalRoleByGroup(group.id())
+                .flatMap(rolesService::getGlobalRole);
+    }
+
+    @Override
+    public Collection<ProjectRoleAssociation> getProjectPermissionsForAccountGroup(AccountGroup group) {
+        return roleRepository.findProjectRoleAssociationsByGroup(
+                group.id(),
+                rolesService::getProjectRoleAssociation
+        )
+                .stream()
+                // Filter by authorisation
+                .filter(projectRoleAssociation -> securityService.isProjectFunctionGranted(
+                        projectRoleAssociation.getProjectId(),
+                        ProjectAuthorisationMgt.class
+                ))
+                // OK
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<AccountGroup> findAccountGroupsByGlobalRole(GlobalRole globalRole) {
+        return roleRepository.findAccountGroupsByGlobalRole(globalRole, this::getAccountGroup);
+    }
+
+    @Override
+    public Collection<Account> findAccountsByGlobalRole(GlobalRole globalRole) {
+        return roleRepository.findAccountsByGlobalRole(globalRole, this::getAccount);
+    }
+
+    @Override
+    public Collection<AccountGroup> findAccountGroupsByProjectRole(Project project, ProjectRole projectRole) {
+        return roleRepository.findAccountGroupsByProjectRole(project, projectRole, this::getAccountGroup);
+    }
+
+    @Override
+    public Collection<Account> findAccountsByProjectRole(Project project, ProjectRole projectRole) {
+        return roleRepository.findAccountsByProjectRole(project, projectRole, this::getAccount);
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),
@@ -421,11 +491,11 @@ public class AccountServiceImpl implements AccountService {
                 .withGlobalRole(
                         roleRepository.findGlobalRoleByGroup(group.id()).flatMap(rolesService::getGlobalRole)
                 )
-                        // Project roles
+                // Project roles
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByGroup(group.id(), rolesService::getProjectRoleAssociation)
                 )
-                        // OK
+                // OK
                 .lock();
     }
 }

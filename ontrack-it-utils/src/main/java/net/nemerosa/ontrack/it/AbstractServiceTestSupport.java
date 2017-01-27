@@ -14,8 +14,10 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 
@@ -28,9 +30,29 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     protected StructureService structureService;
 
     @Autowired
+    protected PropertyService propertyService;
+
+    @Autowired
     private SettingsManagerService settingsManagerService;
 
+    protected AccountGroup doCreateAccountGroup() throws Exception {
+        return asUser().with(AccountGroupManagement.class).call(() -> {
+            String name = uid("G");
+            return accountService.createGroup(
+                    NameDescription.nd(name, "")
+            );
+        });
+    }
+
     protected Account doCreateAccount() throws Exception {
+        return doCreateAccount(Collections.emptyList());
+    }
+
+    protected Account doCreateAccount(AccountGroup accountGroup) throws Exception {
+        return doCreateAccount(Collections.singletonList(accountGroup));
+    }
+
+    protected Account doCreateAccount(List<AccountGroup> accountGroups) throws Exception {
         return asUser().with(AccountManagement.class).call(() -> {
             String name = uid("A");
             return accountService.create(
@@ -39,7 +61,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                             "Test " + name,
                             name + "@test.com",
                             "test",
-                            Collections.emptyList()
+                            accountGroups.stream().map(Entity::id).collect(Collectors.toList())
                     )
             );
         });
@@ -74,6 +96,37 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         });
     }
 
+    protected AccountGroup doCreateAccountGroupWithGlobalRole(String role) throws Exception {
+        AccountGroup group = doCreateAccountGroup();
+        return asUser().with(AccountGroupManagement.class).call(() -> {
+            accountService.saveGlobalPermission(
+                    PermissionTargetType.GROUP,
+                    group.id(),
+                    new PermissionInput(role)
+            );
+            return group;
+        });
+    }
+
+    protected <T> void setProperty(ProjectEntity projectEntity, Class<? extends PropertyType<T>> propertyTypeClass, T data) throws Exception {
+        asUser().with(projectEntity, ProjectEdit.class).execute(() ->
+                propertyService.editProperty(
+                        projectEntity,
+                        propertyTypeClass,
+                        data
+                )
+        );
+    }
+
+    protected <T> T getProperty(ProjectEntity projectEntity, Class<? extends PropertyType<T>> propertyTypeClass) throws Exception {
+        return asUser().with(projectEntity, ProjectEdit.class).call(() ->
+                propertyService.getProperty(
+                        projectEntity,
+                        propertyTypeClass
+                ).getValue()
+        );
+    }
+
     protected Project doCreateProject() throws Exception {
         return doCreateProject(nameDescription());
     }
@@ -99,13 +152,37 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     }
 
     protected Build doCreateBuild(Branch branch, NameDescription nameDescription) throws Exception {
+        return doCreateBuild(branch, nameDescription, Signature.of("test"));
+    }
+
+    protected Build doCreateBuild(Branch branch, NameDescription nameDescription, Signature signature) throws Exception {
         return asUser().with(branch.projectId(), BuildCreate.class).call(() -> structureService.newBuild(
                 Build.of(
                         branch,
                         nameDescription,
-                        Signature.of("test")
+                        signature
                 )
         ));
+    }
+
+    public ValidationRun doValidateBuild(Build build, ValidationStamp vs, ValidationRunStatusID statusId) throws Exception {
+        return asUser().with(build, ValidationRunCreate.class).call(() ->
+                structureService.newValidationRun(
+                        ValidationRun.of(
+                                build,
+                                vs,
+                                1,
+                                Signature.of("test"),
+                                statusId,
+                                ""
+                        )
+                )
+        );
+    }
+
+    public ValidationRun doValidateBuild(Build build, String vsName, ValidationRunStatusID statusId) throws Exception {
+        ValidationStamp vs = doCreateValidationStamp(build.getBranch(), NameDescription.nd(vsName, ""));
+        return doValidateBuild(build, vs, statusId);
     }
 
     protected PromotionLevel doCreatePromotionLevel() throws Exception {
@@ -149,8 +226,22 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         );
     }
 
+    protected <T> void doSetProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyType, T data) throws Exception {
+        asUser().with(entity, ProjectEdit.class).call(() ->
+                propertyService.editProperty(
+                        entity,
+                        propertyType,
+                        data
+                )
+        );
+    }
+
     protected UserCall asUser() {
         return new UserCall();
+    }
+
+    protected AdminCall asAdmin() {
+        return new AdminCall();
     }
 
     protected AnonymousCall asAnonymous() {
@@ -310,5 +401,13 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         public AccountCall withId(int id) {
             return new AccountCall(account.withId(ID.of(id)));
         }
+    }
+
+    protected static class AdminCall extends AccountCall<AdminCall> {
+
+        public AdminCall() {
+            super("admin", SecurityRole.ADMINISTRATOR);
+        }
+
     }
 }

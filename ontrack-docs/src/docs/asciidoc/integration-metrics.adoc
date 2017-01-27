@@ -67,6 +67,8 @@ in a local `application.yml` file:
   database in InfluxDB to send metrics to
 * `ontrack.metrics.influxdb.period` (defaults to `60`) interval (in seconds)
   at which the data is sent to InfluxDB
+* `ontrack.metrics.influxdb.retention-policy` (defaults to `autogen`) retention policy. Use `default` for InfluxDB
+  version < 1.0.0
 
 For example, the following `application.yml` enables export to the
 `influxdb` host:

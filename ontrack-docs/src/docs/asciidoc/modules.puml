@@ -11,6 +11,7 @@ component [repository-impl]
 component [repository-support]
 component [service]
 component [ui]
+component [ui-graphql]
 component [ui-support]
 component [web]
 
@@ -41,7 +42,10 @@ component [web]
 [ui] --> [service]
 [ui] --> [repository-impl]
 [ui] --> [web]
+[ui] --> [ui-graphql]
 
 [ui-support] --> [extension-api]
+
+[ui-graphql] --> [ui-support]
 
 @enduml

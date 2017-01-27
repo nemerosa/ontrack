@@ -34,6 +34,7 @@
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.apache.catalina.util.SessionIdGeneratorBase" level="DEBUG"/>
     <logger name="net.nemerosa.ontrack" level="DEBUG"/>
+    <logger name="net.nemerosa.ontrack.job" level="INFO"/>
     <logger name="net.nemerosa.ontrack.extension.svn.client.SVNClient" level="WARN"/>
     <!--<logger name="net.nemerosa.ontrack.boot.metrics" level="TRACE"/>-->
 

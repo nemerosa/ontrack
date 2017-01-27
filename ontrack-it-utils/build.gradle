@@ -2,6 +2,7 @@ dependencies {
     compile project(':ontrack-common')
     compile project(':ontrack-model')
     compile project(':ontrack-test-utils')
+    compile project(':ontrack-ui-support')
     compile libraries.spring_context
     compile libraries.spring_jdbc
     compile libraries.spring_test

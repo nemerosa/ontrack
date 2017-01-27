@@ -25,10 +25,11 @@ public class ProjectFavouriteServiceImpl implements ProjectFavouriteService {
     @Override
     public boolean isProjectFavourite(Project project) {
         return securityService.isProjectFunctionGranted(project, ProjectView.class) &&
-                securityService.getAccount().map(account -> repository.isProjectFavourite(
-                        account.id(),
-                        project.id()
-                )).orElse(false);
+                securityService.getAccount().filter(account -> account.getId().isSet())
+                        .map(account -> repository.isProjectFavourite(
+                                account.id(),
+                                project.id()
+                        )).orElse(false);
     }
 
     @Override

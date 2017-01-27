@@ -20,6 +20,38 @@ class StructureServiceIT extends AbstractServiceTestSupport {
     @Autowired
     private StructureService structureService
 
+    @Test
+    void 'Project signature at creation'() {
+        def e = doCreateProject()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
+    @Test
+    void 'Branch signature at creation'() {
+        def e = doCreateBranch()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
+    @Test
+    void 'Promotion level signature at creation'() {
+        def e = doCreatePromotionLevel()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
+    @Test
+    void 'Validation stamp signature at creation'() {
+        def e = doCreateValidationStamp()
+        assert e.signature != null
+        assert e.signature.time != null
+        assert !e.signature.user.anonymous
+    }
+
     /**
      * Regression test for #76.
      *
@@ -165,6 +197,20 @@ class StructureServiceIT extends AbstractServiceTestSupport {
         // Incorrect pattern (unmatched parenthesis)
         builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBuildName('.*1)')) }
         assert builds.empty: "No match, but no failure"
+    }
+
+    @Test
+    void 'Branches ordered in inverse chronological order'() {
+        def project = doCreateProject()
+        def b20 = doCreateBranch(project, nd('2.0', ''))
+        def b21 = doCreateBranch(project, nd('2.1', ''))
+        def b10 = doCreateBranch(project, nd('1.0', ''))
+        // Gets the list of branches
+        def branches = asUserWithView(project).call {
+            structureService.getBranchesForProject(project.id)
+        }
+        // Checks the order
+        assert branches*.name == [ '1.0', '2.1', '2.0' ]
     }
 
 }

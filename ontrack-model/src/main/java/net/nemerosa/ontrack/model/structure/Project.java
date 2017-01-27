@@ -16,17 +16,21 @@ public class Project implements ProjectEntity {
     private final String description;
     @Wither
     private final boolean disabled;
+    @Wither
+    private final Signature signature;
 
     public Project withId(ID id) {
-        return new Project(id, name, description, disabled);
+        return new Project(id, name, description, disabled, signature);
     }
 
     public static Project of(NameDescriptionState nameDescription) {
-        return new Project(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), nameDescription.isDisabled());
+        return new Project(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), nameDescription.isDisabled(),
+                Signature.none());
     }
 
     public static Project of(NameDescription nameDescription) {
-        return new Project(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), false);
+        return new Project(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), false,
+                Signature.none());
     }
 
     @Override

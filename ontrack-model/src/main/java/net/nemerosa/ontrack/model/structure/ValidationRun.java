@@ -110,4 +110,12 @@ public class ValidationRun implements ProjectEntity {
     public ValidationRunStatus getLastStatus() {
         return validationRunStatuses.get(0);
     }
+
+    /**
+     * Gets the signature of the last status
+     */
+    @Override
+    public Signature getSignature() {
+        return getLastStatus().getSignature();
+    }
 }

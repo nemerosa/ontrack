@@ -47,4 +47,12 @@ public interface ProjectEntity extends Entity {
     @JsonIgnore
     String getEntityDisplayName();
 
+    /**
+     * Creation signature of the project entity.
+     *
+     * @return Creation signature for the project entity.
+     */
+    Signature getSignature();
+
+
 }

@@ -242,4 +242,20 @@ class Branch extends AbstractProjectResource {
     String getType() {
         node.type
     }
+
+    @DSLMethod("Gets the disabled state of the branch")
+    boolean isDisabled() {
+        return node.disabled as boolean
+    }
+
+    @DSLMethod("Disables the branch")
+    def disable() {
+        ontrack.put(link('disable'), null)
+    }
+
+    @DSLMethod("Enables the branch")
+    def enable() {
+        ontrack.put(link('enable'), null)
+    }
+
 }

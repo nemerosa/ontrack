@@ -27,6 +27,8 @@ public class Branch implements ProjectEntity {
     })
     @JsonProperty("project")
     private final Project project;
+    @Wither
+    private final Signature signature;
 
     public static Branch of(Project project, NameDescription nameDescription) {
         return of(project, nameDescription.asState());
@@ -39,7 +41,8 @@ public class Branch implements ProjectEntity {
                 nameDescription.getDescription(),
                 nameDescription.isDisabled(),
                 BranchType.CLASSIC,
-                project
+                project,
+                Signature.none()
         );
     }
 
@@ -54,7 +57,7 @@ public class Branch implements ProjectEntity {
     }
 
     public Branch withId(ID id) {
-        return new Branch(id, name, description, disabled, type, project);
+        return new Branch(id, name, description, disabled, type, project, signature);
     }
 
     public static Form form() {
