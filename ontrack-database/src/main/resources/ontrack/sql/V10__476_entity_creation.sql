@@ -1,4 +1,4 @@
--- 37. Project entity creation (#476)
+-- Index on promotion & validation names (#472)
 
 ALTER TABLE PROJECTS ADD CREATION VARCHAR(24);
 ALTER TABLE PROJECTS ADD CREATOR VARCHAR(40);

@@ -1,1 +1,6 @@
-// Only resources
+dependencies {
+    compile libraries.spring_context
+    compile libraries.spring_jdbc
+    compile libraries.flyway
+    compile project(':ontrack-model')
+}
