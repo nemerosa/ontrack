@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.LinkDefinition;
 import net.nemerosa.ontrack.ui.resource.LinkDefinitions;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributor;
@@ -38,7 +39,7 @@ public class SVNBranchResourceDecorationContributor implements ResourceDecoratio
     }
 
     @Override
-    public boolean applyTo(Class projectClass) {
-        return Branch.class.isAssignableFrom(projectClass);
+    public boolean applyTo(ProjectEntityType projectEntityType) {
+        return projectEntityType == ProjectEntityType.BRANCH;
     }
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.ui.resource;
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,11 @@ public class ResourceDecorationContributorServiceImpl implements ResourceDecorat
     }
 
     @Override
-    public <T extends ProjectEntity> List<LinkDefinition<T>> getLinkDefinitions(Class<T> projectClass) {
+    public <T extends ProjectEntity> List<LinkDefinition<T>> getLinkDefinitions(ProjectEntityType projectEntityType) {
         List<LinkDefinition<T>> definitions = new ArrayList<>();
         Collection<ResourceDecorationContributor> contributors = applicationContext.getBeansOfType(ResourceDecorationContributor.class).values();
         contributors.forEach(contributor -> {
-            if (contributor.applyTo(projectClass)) {
+            if (contributor.applyTo(projectEntityType)) {
                 @SuppressWarnings("unchecked")
                 ResourceDecorationContributor<T> tResourceDecorationContributor = (ResourceDecorationContributor<T>) contributor;
                 definitions.addAll(tResourceDecorationContributor.getLinkDefinitions());

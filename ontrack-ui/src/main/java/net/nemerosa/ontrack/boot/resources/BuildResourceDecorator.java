@@ -135,7 +135,7 @@ public class BuildResourceDecorator extends AbstractLinkResourceDecorator<Build>
                         page()
                 ),
                 // Contributions
-                resourceDecorationContributorService.getLinkDefinitions(Build.class)
+                resourceDecorationContributorService.getLinkDefinitions(ProjectEntityType.BUILD)
         );
     }
 

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.ui.resource;
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 import java.util.List;
 
@@ -20,8 +21,8 @@ public interface ResourceDecorationContributor<P extends ProjectEntity> {
     /**
      * Does this contributor applies to the given project entity class?
      *
-     * @param projectClass Project entity class to get the link definitions for
+     * @param projectEntityType Project entity type to get the link definitions for
      * @return true if applicable
      */
-    boolean applyTo(Class<? extends ProjectEntity> projectClass);
+    boolean applyTo(ProjectEntityType projectEntityType);
 }
