@@ -21,8 +21,7 @@ public interface ResourceDecorationContributor<P extends ProjectEntity> {
      * Does this contributor applies to the given project entity class?
      *
      * @param projectClass Project entity class to get the link definitions for
-     * @param <T>          Type of project entity
      * @return true if applicable
      */
-    <T extends ProjectEntity> boolean applyTo(Class<T> projectClass);
+    boolean applyTo(Class<? extends ProjectEntity> projectClass);
 }

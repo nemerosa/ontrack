@@ -45,7 +45,7 @@ public class GitBuildResourceDecorationContributor implements ResourceDecoration
     }
 
     @Override
-    public <T extends ProjectEntity> boolean applyTo(Class<T> projectClass) {
+    public boolean applyTo(Class<? extends ProjectEntity> projectClass) {
         return Build.class.isAssignableFrom(projectClass);
     }
 }
