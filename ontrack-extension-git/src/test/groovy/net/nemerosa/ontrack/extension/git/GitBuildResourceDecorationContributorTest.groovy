@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.git.service.GitService
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.junit.Before
 import org.junit.Test
 
@@ -19,12 +18,12 @@ class GitBuildResourceDecorationContributorTest {
 
     @Test
     void 'No change log link on a project'() {
-        assert !contributor.applyTo(Project)
+        assert !contributor.applyTo(ProjectEntityType.PROJECT)
     }
 
     @Test
     void 'No change log link on a branch'() {
-        assert !contributor.applyTo(Branch)
+        assert !contributor.applyTo(ProjectEntityType.BRANCH)
     }
 
 }

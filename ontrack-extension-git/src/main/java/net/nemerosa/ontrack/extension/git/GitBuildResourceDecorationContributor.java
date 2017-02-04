@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.LinkDefinition;
 import net.nemerosa.ontrack.ui.resource.LinkDefinitions;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributor;
@@ -45,7 +45,7 @@ public class GitBuildResourceDecorationContributor implements ResourceDecoration
     }
 
     @Override
-    public <T extends ProjectEntity> boolean applyTo(Class<T> projectClass) {
-        return Build.class.isAssignableFrom(projectClass);
+    public boolean applyTo(ProjectEntityType projectEntityType) {
+        return projectEntityType == ProjectEntityType.BUILD;
     }
 }

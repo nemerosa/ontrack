@@ -98,7 +98,7 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
                         // Page
                         page()
                 ),
-                resourceDecorationContributorService.getLinkDefinitions(Project.class)
+                resourceDecorationContributorService.getLinkDefinitions(ProjectEntityType.PROJECT)
         );
     }
 

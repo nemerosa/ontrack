@@ -15,7 +15,7 @@
 #        password: ontrack
 
 # Base
-FROM java:openjdk-8u66-jdk
+FROM java:openjdk-8u111-jdk
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>

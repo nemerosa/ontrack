@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.git;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.LinkDefinition;
 import net.nemerosa.ontrack.ui.resource.LinkDefinitions;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributor;
@@ -38,7 +38,7 @@ public class GitProjectResourceDecorationContributor implements ResourceDecorati
     }
 
     @Override
-    public <T extends ProjectEntity> boolean applyTo(Class<T> projectClass) {
-        return Project.class.isAssignableFrom(projectClass);
+    public boolean applyTo(ProjectEntityType projectEntityType) {
+        return projectEntityType == ProjectEntityType.PROJECT;
     }
 }

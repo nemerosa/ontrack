@@ -260,12 +260,12 @@ public class DefaultJobScheduler implements JobScheduler {
             // Scattering
             if (scattering) {
                 // Computes the hash for the job key
-                int hash = Math.abs(job.getKey().hashCode());
+                int hash = Math.abs(job.getKey().toString().hashCode()) % 10000;
                 // Period to consider
                 long scatteringMax = (long) (period * scatteringRatio);
                 if (scatteringMax > 0) {
                     // Modulo on the period
-                    long delay = hash % scatteringMax;
+                    long delay = (hash * scatteringMax) / 10000;
                     logger.debug("[job]{} Scattering enabled - additional delay: {} ms", job.getKey(), delay);
                     // Adding to the initial delay
                     initialPeriod += delay;
