@@ -1,107 +1,8 @@
 /**
- * Production tasks
- *
- * Standalone tasks.
+ * Production tests.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'net.nemerosa:http-client-json:1.1.0'
-        classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.4'
-    }
-}
-
-import net.nemerosa.httpclient.*
-import net.nemerosa.httpclient.json.*
-import net.nemerosa.ontrack.gradle.ComposeStop
-import net.nemerosa.ontrack.gradle.ComposeUp
-import net.nemerosa.ontrack.gradle.DOSetup
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
-
-class ProductionVersion extends DefaultTask {
-
-    private String version
-
-    @TaskAction
-    void run() {
-        def client = new JsonClientImpl(
-                ClientBuilder
-                        .create(project.properties.productionUrl, false)
-                        .withLogger({ println "[${name}][HTTP] ${it}" })
-                        .build(),
-                true
-        )
-        try {
-            version = client.get('info').version.full.asText()
-        } catch (ClientGeneralException ignored) {
-            println "[${name}] Cannot connect to the production URL at ${project.properties.productionUrl}"
-            version = null
-        }
-        println "[${name}] Version = ${version}"
-    }
-
-    String getVersion() {
-        return version
-    }
-}
-
-task productionSetup(type: DOSetup) {
-    apiToken = project.properties.digitalOceanAccessToken
-    dropletName = project.properties.productionMachine
-    region = project.properties.productionRegion
-    size = '1gb'
-    backups = true
-}
-
-task productionEnv {
-    mustRunAfter productionSetup
-    doFirst {
-        project.exec {
-            executable 'docker-machine'
-            args = ['ssh', project.properties.productionMachine, 'mkdir -p /var/ontrack']
-        }
-        project.exec {
-            executable 'docker-machine'
-            args = ['ssh', project.properties.productionMachine, 'mkdir -p /var/ontrack/data']
-        }
-        project.exec {
-            executable 'docker-machine'
-            args = ['ssh', project.properties.productionMachine, 'rm -rf /var/ontrack/conf']
-        }
-        project.exec {
-            executable 'docker-machine'
-            args = ['scp', '-r', project.properties.productionConf, "${project.properties.productionMachine}:/var/ontrack/conf"]
-        }
-    }
-}
-
-task productionVersion(type: ProductionVersion)
-
-task productionStop(type: ComposeStop) {
-    machine = project.properties.productionMachine
-    dir = file("${rootDir}/gradle/compose")
-    projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
-    projectName = 'prod'
-    remove = false
-    environment = [ONTRACK_VERSION: ontrackVersion]
-}
-
-task productionStart(type: ComposeUp) {
-    dependsOn 'productionStop'
-    machine = project.properties.productionMachine
-    dir = file("${rootDir}/gradle/compose")
-    projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
-    projectName = 'prod'
-    forceRecreate = true
-    environment = [
-            ONTRACK_VERSION: ontrackVersion,
-            ONTRACK_POSTGRES_PASSWORD: productionPostgresPassword,
-    ]
-    mustRunAfter productionEnv
-}
 
 task productionTest(type: RemoteAcceptanceTest) {
     disableSsl = false // Production test must use a valid SSL certificate
@@ -109,14 +10,4 @@ task productionTest(type: RemoteAcceptanceTest) {
     acceptanceUrl = project.properties.productionUrl
     acceptanceTimeout = 600 // 10 minutes for the startup...
     acceptanceImplicitWait = 30
-}
-
-task productionInstall {
-    dependsOn productionSetup
-    dependsOn productionEnv
-    dependsOn productionStart
-}
-
-task productionUpgrade {
-    dependsOn productionStart
 }

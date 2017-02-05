@@ -621,17 +621,29 @@ if (production) {
             injectPasswords {
                 injectGlobalPasswords()
             }
+            environmentVariables {
+                env 'ONTRACK_VERSION', '${VERSION}'
+            }
+            credentialsBinding {
+                file 'NEMEROSA_ONTRACK_DOCKER_CA', 'NEMEROSA_ONTRACK_DOCKER_CA'
+                file 'NEMEROSA_ONTRACK_DOCKER_KEY', 'NEMEROSA_ONTRACK_DOCKER_KEY'
+                file 'NEMEROSA_ONTRACK_DOCKER_CERT', 'NEMEROSA_ONTRACK_DOCKER_CERT'
+            }
         }
         steps {
-            gradle '''\
---build-file production.gradle
---info
---profile
---console plain
---stacktrace
-productionUpgrade
--PontrackVersion=${VERSION}
--PproductionPostgresPassword=${ONTRACK_POSTGRESQL_PASSWORD}
+            shell '''\
+#!/bin/bash
+cd publication/gradle/compose
+docker-compose \\
+   --tlsverify \\
+   --tlscacert="${NEMEROSA_ONTRACK_DOCKER_CA}" \\
+   --tlscert="${NEMEROSA_ONTRACK_DOCKER_CERT}" \\
+   --tlskey="${NEMEROSA_ONTRACK_DOCKER_KEY}" \\
+   --host="tcp://ontrack.nemerosa.net:2376" \\
+   --project prod \\
+   --file docker-compose.yml \\
+   --file docker-compose-prod.yml \\
+   up -d
 '''
         }
         publishers {

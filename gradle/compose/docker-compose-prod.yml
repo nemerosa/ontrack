@@ -32,7 +32,7 @@ ontrack:
 
 # Postgresql database
 postgresql:
-  image: postgres:9.5.2
+  restart: always
   environment:
     POSTGRES_DB      : ontrack
     POSTGRES_USER    : ontrack
