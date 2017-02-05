@@ -616,15 +616,7 @@ if (production) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Release', 'Production')
-        parameters {
-            // Link based on full version
-            stringParam('VERSION', '', '')
-            // ... and Git commit
-            stringParam('COMMIT', '', '')
-        }
-        label 'master'
-        extractDeliveryArtifacts delegate, [] as String[]
-
+        preparePipelineJob delegate, false
         wrappers {
             injectPasswords {
                 injectGlobalPasswords()
