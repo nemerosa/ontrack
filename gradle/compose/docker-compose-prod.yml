@@ -1,29 +1,32 @@
-# InfluxDB container
-influxdb:
-  restart: always
-  volumes:
-    # Keeping data on the host
-    - "/var/influxdb/data:/data"
+version: "2"
 
-# Grafana container
-grafana:
-  restart: always
-  ports:
-    - "3000:3000"
-  volumes:
-    # Editable dashboards
-    - "/usr/lib/grafana/dashboards:/usr/lib/grafana/dashboards"
+services:
+  # InfluxDB container
+  influxdb:
+    restart: always
+    volumes:
+      # Keeping data on the host
+      - "/var/influxdb/data:/data"
 
-# Ontrack container
-ontrack:
-  restart: always
-  image: nemerosa/ontrack:${ONTRACK_VERSION}
-  environment:
-      PROFILE: prod
-  volumes:
-    - "/var/ontrack/conf:/var/ontrack/conf"
-    - "/var/ontrack/data:/var/ontrack/data"
-      # Using the random source from the host
-    - "/dev/random:/dev/random"
-  ports:
-    - "443:443"
+  # Grafana container
+  grafana:
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      # Editable dashboards
+      - "/usr/lib/grafana/dashboards:/usr/lib/grafana/dashboards"
+
+  # Ontrack container
+  ontrack:
+    restart: always
+    image: nemerosa/ontrack:${ONTRACK_VERSION}
+    environment:
+        PROFILE: prod
+    volumes:
+      - "/var/ontrack/conf:/var/ontrack/conf"
+      - "/var/ontrack/data:/var/ontrack/data"
+        # Using the random source from the host
+      - "/dev/random:/dev/random"
+    ports:
+      - "443:443"
