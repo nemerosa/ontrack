@@ -13,6 +13,8 @@ import org.junit.Assert
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
+import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertTrue
 
 /**
  * Ontrack DSL tests.
@@ -266,6 +268,21 @@ class ACCDSL extends AbstractACCDSL {
         def run = runs.get(0)
         def deleteLink = run.link('delete')
         assert deleteLink == "${baseURL}/structure/promotionRuns/${run.id}" as String
+    }
+
+    @Test
+    void 'Branch disabled flag'() {
+        def branch = createBranch()
+        // Checks the branch is not disabled
+        assertFalse("Branch is not disabled", branch.disabled)
+        // Disables the branch
+        branch.disable()
+        branch = ontrack.branch(branch.project, branch.name)
+        assertTrue("Branch is disabled", branch.disabled)
+        // Enables the branch
+        branch.enable()
+        branch = ontrack.branch(branch.project, branch.name)
+        assertFalse("Branch is not disabled", branch.disabled)
     }
 
     @Test
@@ -1772,6 +1789,13 @@ shell.put('BUILD', build)
         // Gets the output
         def text = output.toString()
         assert text.trim() == 'BUILD=3'
+    }
+
+    protected Branch createBranch() {
+        def testBranch = doCreateBranch()
+        def projectName = testBranch.project.name.asText() as String
+        def branchName = testBranch.name.asText() as String
+        return ontrack.branch(projectName, branchName)
     }
 
     protected Branch createBuildsAndPromotions() {

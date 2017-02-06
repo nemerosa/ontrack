@@ -20,7 +20,7 @@ public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> ext
     public List<Link> links(T resource, ResourceContext resourceContext) {
         LinksBuilder linksBuilder = resourceContext.links();
         for (LinkDefinition<T> linkDefinition : linkDefinitions.get()) {
-            if (linkDefinition.getCheckFn().apply(resource, resourceContext)) {
+            if (linkDefinition.getCheckFn().test(resource, resourceContext)) {
                 linksBuilder = linkDefinition.addLink(linksBuilder, resource, resourceContext);
             }
         }

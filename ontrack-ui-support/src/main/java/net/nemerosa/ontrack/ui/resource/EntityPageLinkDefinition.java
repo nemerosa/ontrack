@@ -3,12 +3,12 @@ package net.nemerosa.ontrack.ui.resource;
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 @Data
 public class EntityPageLinkDefinition<T extends ProjectEntity> implements LinkDefinition<T> {
 
-    private final BiFunction<T, ResourceContext, Boolean> checkFn;
+    private final BiPredicate<T, ResourceContext> checkFn;
 
     @Override
     public String getName() {
