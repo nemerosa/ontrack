@@ -633,7 +633,7 @@ if (production) {
         steps {
             shell '''\
 #!/bin/bash
-cd publication/gradle/compose
+cd gradle/compose
 docker-compose \\
    --tlsverify \\
    --tlscacert="${NEMEROSA_ONTRACK_DOCKER_CA}" \\
