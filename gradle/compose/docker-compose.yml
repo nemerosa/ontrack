@@ -6,7 +6,7 @@ influxdb:
 
 # Grafana container
 grafana:
-  build: ./common/grafana
+  image: grafana/grafana:4.1.1
   links:
     - "influxdb:influxdb"
 
