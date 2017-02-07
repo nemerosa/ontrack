@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.dsl
 
-import groovy.json.JsonBuilder
+import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.json.JsonSlurper
 import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.doc.DSLMethod
@@ -18,7 +18,16 @@ class Ontrack {
      * HTTP client
      */
     private final OTHttpClient httpClient
+
+    /**
+     * JSON parser
+     */
     private final JsonSlurper jsonSlurper = new JsonSlurper()
+
+    /**
+     * JSON writer
+     */
+    private final ObjectMapper objectMapper = new ObjectMapper()
 
     /**
      * Construction of the Ontrack client, based on a raw HTTP client
@@ -158,7 +167,7 @@ class Ontrack {
         httpClient.post(
                 url,
                 new StringEntity(
-                        new JsonBuilder(data).toPrettyString(),
+                        asJSON(data),
                         ContentType.create("application/json", "UTF-8")
                 )
         ) { jsonSlurper.parseText(it) }
@@ -169,7 +178,7 @@ class Ontrack {
         httpClient.put(
                 url,
                 new StringEntity(
-                        new JsonBuilder(data).toPrettyString(),
+                        asJSON(data),
                         ContentType.create("application/json", "UTF-8")
                 )
         ) { jsonSlurper.parseText(it) }
@@ -246,5 +255,9 @@ class Ontrack {
                 query    : query,
                 variables: variables,
         ])
+    }
+
+    protected String asJSON(Object data) {
+        return objectMapper.writeValueAsString(data)
     }
 }
