@@ -36,7 +36,7 @@ public class ResourceDecorationContributorServiceImpl implements ResourceDecorat
                 } catch (Exception ex) {
                     // Logging
                     logService.log(
-                            ApplicationLogEntry.error(
+                            ApplicationLogEntry.fatal(
                                     ex,
                                     NameDescription.nd(
                                             "ui-resource-decoration",
@@ -47,7 +47,6 @@ public class ResourceDecorationContributorServiceImpl implements ResourceDecorat
                                     .withDetail("ui-resource-type", projectEntityType.name())
                                     .withDetail("ui-resource-decorator", contributor.getClass().getName())
                     );
-                    // TODO Object store?
                 }
             }
         });

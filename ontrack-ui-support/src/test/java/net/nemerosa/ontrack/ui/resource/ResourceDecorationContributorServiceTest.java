@@ -164,7 +164,6 @@ public class ResourceDecorationContributorServiceTest {
         assertEquals("_page1", linkDefinitions.get(0).getName());
         // Checks error log
         verify(logService, times(1)).log(any(ApplicationLogEntry.class));
-        // TODO Checks errors object
     }
 
 }
