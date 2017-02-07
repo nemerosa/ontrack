@@ -40,7 +40,7 @@ public class ResourceDecorationContributorServiceImpl implements ResourceDecorat
                                     ex,
                                     NameDescription.nd(
                                             "ui-resource-decoration",
-                                            "UI resource decoration"
+                                            "Issue when collecting UI resource decoration"
                                     ),
                                     contributor.getClass().getName()
                             )

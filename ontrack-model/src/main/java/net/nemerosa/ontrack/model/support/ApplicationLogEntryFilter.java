@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
 
 import java.time.LocalDateTime;
 
@@ -16,10 +17,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ApplicationLogEntryFilter {
 
+    @Wither
     private ApplicationLogEntryLevel level;
+    @Wither
     private LocalDateTime before;
+    @Wither
     private LocalDateTime after;
+    @Wither
     private String authentication;
+    @Wither
     private String text;
 
     public static ApplicationLogEntryFilter none() {

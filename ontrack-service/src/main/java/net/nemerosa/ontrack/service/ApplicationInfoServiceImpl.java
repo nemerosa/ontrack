@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +31,7 @@ public class ApplicationInfoServiceImpl implements ApplicationInfoService {
     public List<ApplicationInfo> getApplicationInfoList() {
         return providers.stream()
                 .flatMap(provider -> provider.getApplicationInfoList().stream())
-                .filter(info -> info != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 }
