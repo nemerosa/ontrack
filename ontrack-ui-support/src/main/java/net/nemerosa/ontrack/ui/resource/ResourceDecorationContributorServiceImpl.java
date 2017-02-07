@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.ui.resource;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,17 +12,16 @@ import java.util.List;
 @Service
 public class ResourceDecorationContributorServiceImpl implements ResourceDecorationContributorService {
 
-    private final ApplicationContext applicationContext;
+    private final Collection<ResourceDecorationContributor> contributors;
 
     @Autowired
-    public ResourceDecorationContributorServiceImpl(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public ResourceDecorationContributorServiceImpl(Collection<ResourceDecorationContributor> contributors) {
+        this.contributors = contributors;
     }
 
     @Override
     public <T extends ProjectEntity> List<LinkDefinition<T>> getLinkDefinitions(ProjectEntityType projectEntityType) {
         List<LinkDefinition<T>> definitions = new ArrayList<>();
-        Collection<ResourceDecorationContributor> contributors = applicationContext.getBeansOfType(ResourceDecorationContributor.class).values();
         contributors.forEach(contributor -> {
             if (contributor.applyTo(projectEntityType)) {
                 @SuppressWarnings("unchecked")
