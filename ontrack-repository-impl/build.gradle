@@ -6,4 +6,5 @@ dependencies {
     compile libraries.slf4j_api
 
     testCompile project(':ontrack-it-utils')
+    testRuntime project(':ontrack-service')
 }
