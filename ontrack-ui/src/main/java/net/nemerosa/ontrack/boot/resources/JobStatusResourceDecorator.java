@@ -50,6 +50,13 @@ public class JobStatusResourceDecorator extends AbstractResourceDecorator<JobSta
                         resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
                                 && jobStatus.canBeDeleted()
                 )
+                // Stopping a job
+                .link(
+                        "_stop",
+                        on(AdminController.class).stopJob(jobStatus.getId()),
+                        resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
+                                && jobStatus.canBeStopped()
+                )
                 // OK
                 .build();
     }

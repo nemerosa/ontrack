@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.events.EventFactory;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -35,6 +38,8 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final SecurityService securityService;
     private final ExtensionManager extensionManager;
+
+    private final Cache<String, PropertyType<?>> cache = CacheBuilder.newBuilder().build();
 
     @Autowired
     public PropertyServiceImpl(EventPostService eventPostService, EventFactory eventFactory, PropertyRepository propertyRepository, SecurityService securityService, ExtensionManager extensionManager) {
@@ -55,11 +60,22 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public <T> PropertyType<T> getPropertyTypeByName(String propertyTypeName) {
-        //noinspection unchecked
-        return (PropertyType<T>) getPropertyTypes().stream()
-                .filter(p -> StringUtils.equals(propertyTypeName, p.getClass().getName()))
-                .findFirst()
-                .orElseThrow(() -> new PropertyTypeNotFoundException(propertyTypeName));
+        try {
+            @SuppressWarnings("unchecked")
+            PropertyType<T> type = (PropertyType<T>) cache.get(propertyTypeName, () -> getPropertyTypes().stream()
+                    .filter(p -> StringUtils.equals(propertyTypeName, p.getClass().getName()))
+                    .findFirst()
+                    .orElse(null));
+            if (type != null) {
+                return type;
+            } else {
+                throw new PropertyTypeNotFoundException(propertyTypeName);
+            }
+        } catch (ExecutionException ex) {
+            PropertyTypeNotFoundException pex = new PropertyTypeNotFoundException(propertyTypeName);
+            pex.initCause(ex);
+            throw pex;
+        }
     }
 
     @Override
@@ -68,13 +84,13 @@ public class PropertyServiceImpl implements PropertyService {
         return getPropertyTypes().stream()
                 // ... filters them by entity
                 .filter(type -> type.getSupportedEntityTypes().contains(entity.getProjectEntityType()))
-                        // ... filters them by access right
+                // ... filters them by access right
                 .filter(type -> type.canView(entity, securityService))
-                        // ... loads them from the store
+                // ... loads them from the store
                 .map(type -> getProperty(type, entity))
-                        // .. flags with editionrights
+                // .. flags with editionrights
                 .map(prop -> prop.editable(prop.getType().canEdit(entity, securityService)))
-                        // ... and returns them
+                // ... and returns them
                 .collect(Collectors.toList());
     }
 

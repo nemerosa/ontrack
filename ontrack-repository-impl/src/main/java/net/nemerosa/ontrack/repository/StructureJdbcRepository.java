@@ -130,7 +130,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public List<Branch> getBranchesForProject(ID projectId) {
         Project project = getProject(projectId);
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM BRANCHES WHERE PROJECTID = :projectId ORDER BY NAME",
+                "SELECT * FROM BRANCHES WHERE PROJECTID = :projectId ORDER BY ID DESC",
                 params("projectId", projectId.getValue()),
                 (rs, rowNum) -> toBranch(rs, id -> project)
         );

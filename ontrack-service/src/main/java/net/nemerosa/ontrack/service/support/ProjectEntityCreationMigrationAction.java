@@ -15,7 +15,7 @@ public class ProjectEntityCreationMigrationAction implements DBMigrationAction {
 
     @Override
     public int getPatch() {
-        return 36;
+        return 37;
     }
 
     @Override

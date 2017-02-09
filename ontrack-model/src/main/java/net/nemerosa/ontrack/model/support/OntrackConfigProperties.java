@@ -24,6 +24,13 @@ public class OntrackConfigProperties {
     private int applicationLogRetentionDays = 7;
 
     /**
+     * Number of fatal errors to notify into the GUI.
+     *
+     * @see ApplicationLogEntryLevel#FATAL
+     */
+    private int applicationLogInfoMax = 10;
+
+    /**
      * Home directory
      */
     private String applicationWorkingDir = "work/files";

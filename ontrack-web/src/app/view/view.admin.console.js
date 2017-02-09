@@ -106,6 +106,20 @@ angular.module('ot.view.admin.console', [
             });
         };
 
+        // Pausing all jobs
+        $scope.pauseJobs = function() {
+            if ($scope.jobs && $scope.jobs._pause) {
+                ot.pageCall($http.put($scope.jobs._pause)).then(loadJobs);
+            }
+        };
+
+        // Resuming all jobs
+        $scope.resumeJobs = function() {
+            if ($scope.jobs && $scope.jobs._resume) {
+                ot.pageCall($http.put($scope.jobs._resume)).then(loadJobs);
+            }
+        };
+
         // Pausing a job
         $scope.pauseJob = function (job) {
             ot.pageCall($http.post(job._pause)).then(function (ack) {
@@ -142,6 +156,20 @@ angular.module('ot.view.admin.console', [
                     otNotificationService.success("Job schedule was removed.");
                 } else {
                     otNotificationService.warning("Job could not be removed.");
+                }
+                // Reloads the jobs in any case
+                loadJobs();
+            });
+        };
+
+        // Stops a job
+        $scope.stopJob = function (job) {
+            ot.pageCall($http.delete(job._stop)).then(function (ack) {
+                // Notification
+                if (ack.success) {
+                    otNotificationService.success("Job was stopped.");
+                } else {
+                    otNotificationService.warning("Job could not be stopped.");
                 }
                 // Reloads the jobs in any case
                 loadJobs();

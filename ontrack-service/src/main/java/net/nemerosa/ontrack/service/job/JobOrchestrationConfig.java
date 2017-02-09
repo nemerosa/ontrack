@@ -30,7 +30,7 @@ public class JobOrchestrationConfig {
     public JobOrchestrator jobOrchestrator() {
         return new JobOrchestrator(
                 jobScheduler,
-                "collection",
+                "Collection of jobs",
                 jobOrchestratorSuppliers
         );
     }

@@ -4,6 +4,8 @@ import graphql.GraphQLException
 import net.nemerosa.ontrack.extension.api.support.TestDecorationData
 import net.nemerosa.ontrack.extension.api.support.TestDecorator
 import net.nemerosa.ontrack.extension.api.support.TestDecoratorPropertyType
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.junit.Test
 
@@ -29,7 +31,7 @@ class BranchQLIT extends AbstractQLITSupport {
         doCreateBranch(project, NameDescription.nd("B2", ""))
 
         def data = run("""{branches (project: "${project.name}") { name } }""")
-        assert data.branches.name == ['B1', 'B2']
+        assert data.branches.name == ['B2', 'B1']
     }
 
     @Test
@@ -186,6 +188,66 @@ class BranchQLIT extends AbstractQLITSupport {
         def v = data.branches.first().validationStamps.first()
         assert v.branch.id == vs.branch.id()
         assert v.branch.project.id == vs.branch.project.id()
+    }
+
+    @Test
+    void 'Branches filtered by property type'() {
+        // Branches
+        def p1 = doCreateBranch()
+        /*def p2 = */doCreateBranch()
+        def p3 = doCreateBranch()
+        def p4 = doCreateBranch()
+        // Properties
+        setProperty(p1, TestSimplePropertyType, new TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType, new TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType, new TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        def data = run("""{
+            branches(withProperty: {type: "${TestSimplePropertyType.class.name}"}) {
+                name
+            }
+        }""")
+        assert data.branches*.name as Set == [p1.name, p3.name, p4.name] as Set
+    }
+
+    @Test
+    void 'Branches filtered by property type and value pattern'() {
+        // Branches
+        def p1 = doCreateBranch()
+        /*def p2 = */doCreateBranch()
+        def p3 = doCreateBranch()
+        def p4 = doCreateBranch()
+        // Properties
+        setProperty(p1, TestSimplePropertyType, new TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType, new TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType, new TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        def data = run("""{
+            branches(withProperty: {type: "${TestSimplePropertyType.class.name}", value: "P"}) {
+                name
+            }
+        }""")
+        assert data.branches*.name as Set == [p1.name, p3.name] as Set
+    }
+
+    @Test
+    void 'Branches filtered by property type and value'() {
+        // Branches
+        def p1 = doCreateBranch()
+        /*def p2 = */doCreateBranch()
+        def p3 = doCreateBranch()
+        def p4 = doCreateBranch()
+        // Properties
+        setProperty(p1, TestSimplePropertyType, new TestSimpleProperty("P1"))
+        setProperty(p3, TestSimplePropertyType, new TestSimpleProperty("P3"))
+        setProperty(p4, TestSimplePropertyType, new TestSimpleProperty("X1"))
+        // Looks for projects having this property
+        def data = run("""{
+            branches(withProperty: {type: "${TestSimplePropertyType.class.name}", value: "P1"}) {
+                name
+            }
+        }""")
+        assert data.branches*.name as Set == [p1.name] as Set
     }
 
 }

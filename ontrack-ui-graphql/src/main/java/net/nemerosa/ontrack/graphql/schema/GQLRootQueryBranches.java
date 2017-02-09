@@ -28,11 +28,13 @@ public class GQLRootQueryBranches implements GQLRootQuery {
 
     private final StructureService structureService;
     private final GQLTypeBranch branch;
+    private final GQLInputPropertyFilter propertyFilter;
 
     @Autowired
-    public GQLRootQueryBranches(StructureService structureService, GQLTypeBranch branch) {
+    public GQLRootQueryBranches(StructureService structureService, GQLTypeBranch branch, GQLInputPropertyFilter propertyFilter) {
         this.structureService = structureService;
         this.branch = branch;
+        this.propertyFilter = propertyFilter;
     }
 
     @Override
@@ -61,6 +63,7 @@ public class GQLRootQueryBranches implements GQLRootQuery {
                                 .type(GraphQLString)
                                 .build()
                 )
+                .argument(propertyFilter.asArgument())
                 .dataFetcher(branchFetcher())
                 .build();
     }
@@ -70,6 +73,7 @@ public class GQLRootQueryBranches implements GQLRootQuery {
             Integer id = environment.getArgument("id");
             String projectName = environment.getArgument("project");
             String name = environment.getArgument("name");
+            Object propertyFilterArg = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME);
             // Per ID
             if (id != null) {
                 checkArgList(environment, "id");
@@ -77,8 +81,8 @@ public class GQLRootQueryBranches implements GQLRootQuery {
                         structureService.getBranch(ID.of(id))
                 );
             }
-            // Per project name
-            else if (isNotBlank(projectName) || isNotBlank(name)) {
+            // Per project name, name or property filter
+            else if (isNotBlank(projectName) || isNotBlank(name) || propertyFilterArg != null) {
 
                 // Project filter
                 Predicate<Project> projectFilter = p -> true;
@@ -93,6 +97,14 @@ public class GQLRootQueryBranches implements GQLRootQuery {
                     branchFilter = branchFilter.and(b -> pattern.matcher(b.getName()).matches());
                 }
 
+                // Property filter?
+                if (propertyFilterArg != null) {
+                    GQLInputPropertyFilter.PropertyFilter filterObject = propertyFilter.convert(propertyFilterArg);
+                    if (filterObject != null && StringUtils.isNotBlank(filterObject.getType())) {
+                        branchFilter = branchFilter.and(propertyFilter.getFilter(filterObject));
+                    }
+                }
+
                 // Gets the list of authorised projects
                 return structureService.getProjectList().stream()
                         // Filter on the project
@@ -104,7 +116,7 @@ public class GQLRootQueryBranches implements GQLRootQuery {
                         // OK
                         .collect(Collectors.toList());
             }
-            // Whole list
+            // No result to return
             else {
                 return Collections.emptyList();
             }

@@ -242,7 +242,7 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
                         page()
                 ),
                 // Contributions
-                resourceDecorationContributorService.getLinkDefinitions(Branch.class)
+                resourceDecorationContributorService.getLinkDefinitions(ProjectEntityType.BRANCH)
         );
     }
 

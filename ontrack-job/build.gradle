@@ -5,7 +5,8 @@ dependencies {
     compile libraries.spring_context
     compile libraries.slf4j_api
 
+    testCompile project(':ontrack-test-utils')
+    testCompile libraries.commons_math
     testCompile libraries.guava
-
-//    testRuntime libraries.slf4j_log4j
+    testRuntime libraries.slf4j_log4j
 }

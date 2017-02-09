@@ -152,7 +152,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 buildSync(branch, branchConfiguration.get(), JobRunListener.logger(logger));
                 return Optional.empty();
             } else {
-                return Optional.of(jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch)));
+                return jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch));
             }
         }
         // Else, nothing has happened
@@ -521,7 +521,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository()).reset();
         }
         // Schedules the job
-        return Optional.of(jobScheduler.fireImmediately(getGitIndexationJobKey(gitConfiguration)));
+        return jobScheduler.fireImmediately(getGitIndexationJobKey(gitConfiguration));
     }
 
     @Override

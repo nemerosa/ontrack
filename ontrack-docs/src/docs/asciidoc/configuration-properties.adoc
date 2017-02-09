@@ -32,6 +32,9 @@ TIP: When applicable, the default value is mentioned.
 # Maximum number of days to keep the log entries
 ontrack.config.application-log-retention-days = 7
 
+# Maximum number of errors to display as notification in the GUI
+ontrack.config.application-log-info-max = 10
+
 # Directory which contains all the working files of Ontrack
 # It is usually set by the installation
 ontrack.config.application-working-dir = work/files
@@ -49,4 +52,20 @@ ontrack.config.jobs.pool-size = 10
 
 # Interval (in minutes) between each refresh of the job list
 ontrack.config.jobs.orchestration = 2
+
+# Set to true to not start any job at application startup
+# The administrator can restore the scheduling jobs manually
+ontrack.config.jobs.paused-at-startup = false
+
+# Enabling the scattering of jobs
+# When several jobs have the same schedule, this can create a peak of activity,
+# potentially harmful for the performances of the application
+# Enabling scattering allows jobs to be scheduled with an additional delay, computed
+# as a fraction of the period.
+ontrack.config.jobs.scattering = false
+
+# Scattering ratio. Maximum fraction of the period to take into account for the
+# scattering. For example, setting 0.5 would not add a dealy greater than half
+# the period of the job. Setting 0 would actually disable the scattering altogether.
+ontrack.config.jobs.scattering-ratio = 1.0
 ----
