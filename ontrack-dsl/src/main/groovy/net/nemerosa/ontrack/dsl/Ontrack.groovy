@@ -1,6 +1,12 @@
 package net.nemerosa.ontrack.dsl
 
-import groovy.json.JsonBuilder
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.core.Version
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.module.SimpleModule
 import groovy.json.JsonSlurper
 import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.doc.DSLMethod
@@ -18,7 +24,36 @@ class Ontrack {
      * HTTP client
      */
     private final OTHttpClient httpClient
+
+    /**
+     * JSON parser
+     */
     private final JsonSlurper jsonSlurper = new JsonSlurper()
+
+    /**
+     * JSON writer
+     */
+    private static final ObjectMapper objectMapper = createObjectMapper()
+
+    private static final ObjectMapper createObjectMapper() {
+        SimpleModule groovyModule = new SimpleModule(
+                "GroovyModule",
+                new Version(1, 0, 0, null, "net.nemerosa.ontrack", "ontrack-dsl-groovy")
+        )
+        groovyModule.addSerializer(GString, new JsonSerializer<GString>() {
+            @Override
+            void serialize(GString value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+                if (value != null) {
+                    gen.writeString(value.toString())
+                } else {
+                    gen.writeNull()
+                }
+            }
+        })
+        def o = new ObjectMapper()
+        o.registerModule(groovyModule)
+        return o
+    }
 
     /**
      * Construction of the Ontrack client, based on a raw HTTP client
@@ -158,7 +193,7 @@ class Ontrack {
         httpClient.post(
                 url,
                 new StringEntity(
-                        new JsonBuilder(data).toPrettyString(),
+                        asJSON(data),
                         ContentType.create("application/json", "UTF-8")
                 )
         ) { jsonSlurper.parseText(it) }
@@ -169,7 +204,7 @@ class Ontrack {
         httpClient.put(
                 url,
                 new StringEntity(
-                        new JsonBuilder(data).toPrettyString(),
+                        asJSON(data),
                         ContentType.create("application/json", "UTF-8")
                 )
         ) { jsonSlurper.parseText(it) }
@@ -246,5 +281,9 @@ class Ontrack {
                 query    : query,
                 variables: variables,
         ])
+    }
+
+    protected String asJSON(Object data) {
+        return objectMapper.writeValueAsString(data)
     }
 }

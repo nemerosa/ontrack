@@ -32,6 +32,9 @@ TIP: When applicable, the default value is mentioned.
 # Maximum number of days to keep the log entries
 ontrack.config.application-log-retention-days = 7
 
+# Maximum number of errors to display as notification in the GUI
+ontrack.config.application-log-info-max = 10
+
 # Directory which contains all the working files of Ontrack
 # It is usually set by the installation
 ontrack.config.application-working-dir = work/files

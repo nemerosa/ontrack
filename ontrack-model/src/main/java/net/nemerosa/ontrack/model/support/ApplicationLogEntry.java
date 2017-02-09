@@ -35,9 +35,17 @@ public class ApplicationLogEntry {
     @Wither(AccessLevel.PRIVATE)
     private final Map<String, String> details;
 
+    public static ApplicationLogEntry fatal(Throwable exception, NameDescription type, String information) {
+        return create(ApplicationLogEntryLevel.FATAL, exception, type, information);
+    }
+
     public static ApplicationLogEntry error(Throwable exception, NameDescription type, String information) {
+        return create(ApplicationLogEntryLevel.ERROR, exception, type, information);
+    }
+
+    private static ApplicationLogEntry create(ApplicationLogEntryLevel level, Throwable exception, NameDescription type, String information) {
         return new ApplicationLogEntry(
-                ApplicationLogEntryLevel.ERROR,
+                level,
                 Time.now(),
                 null,
                 type,

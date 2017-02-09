@@ -13,6 +13,7 @@ dependencies {
     compile libraries.http_client
     compile libraries.http_mime
     compile libraries.failsafe
+    compile libraries.jackson_databind
 }
 
 if (documentationProfile) {
