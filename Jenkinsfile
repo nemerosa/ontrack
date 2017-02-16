@@ -36,7 +36,6 @@ pipeline {
         stage('Integration tests') {
             agent {
                 dockerfile {
-                    label "docker"
                     reuseNode true
                 }
             }
