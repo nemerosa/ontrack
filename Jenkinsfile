@@ -11,18 +11,18 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''\
-./gradlew
-    clean
-    versionDisplay
-    versionFile
-    test
-    build
-    -Pdocumentation
-    -PbowerOptions='--allow-root\'
-    -Dorg.gradle.jvmargs=-Xmx1536m
-    --info
-    --stacktrace
-    --profile
+./gradlew \\
+    clean \\
+    versionDisplay \\
+    versionFile \\
+    test \\
+    build \\
+    -Pdocumentation \\
+    -PbowerOptions='--allow-root' \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --stacktrace \\
+    --profile \\
     --console plain
 '''
             }
