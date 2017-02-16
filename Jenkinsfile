@@ -6,9 +6,9 @@ pipeline {
 
     stages {
 
-        stage ('Build') {
-            steps {
-                docker.build('Dockerfile').inside {
+        docker.build('Dockerfile').inside {
+            stage('Build') {
+                steps {
                     sh '''\
 ./gradlew
     clean
