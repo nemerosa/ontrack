@@ -34,11 +34,6 @@ pipeline {
         }
 
         stage('Integration tests') {
-            agent {
-                dockerfile {
-                    reuseNode true
-                }
-            }
             steps {
                 sh '''\
 ./gradlew \\
