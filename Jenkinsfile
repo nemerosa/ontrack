@@ -47,8 +47,42 @@ pipeline {
             }
         }
 
-        // TODO Docker image
-        // TODO OS packages
+        stage('Docker image') {
+            steps {
+                sh '''\
+./gradlew \\
+    dockerLatest \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --stacktrace \\
+    --profile \\
+    --console plain
+'''
+            }
+        }
+
+        stage('OS packages') {
+            steps {
+                sh '''\
+./gradlew \\
+    osPackages \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --stacktrace \\
+    --profile \\
+    --console plain
+'''
+            }
+        }
+
+        // TODO Ontrack build
+        // TODO Local acceptance tests
+        // TODO Docker push
+        // TODO OS tests + DO tests in parallel
+        // TODO Release
+        // TODO Site
+        // TODO Production
+        // TODO Production tests
 
     }
 
