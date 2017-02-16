@@ -1,15 +1,17 @@
 pipeline {
 
-    agent {
-        label 'docker'
-    }
+    agent none
 
     stages {
 
         stage('Build') {
-            docker.build('Dockerfile').inside {
-                steps {
-                    sh '''\
+            agent {
+                dockerfile {
+                    label "docker"
+                }
+            }
+            steps {
+                sh '''\
 ./gradlew
     clean
     versionDisplay
@@ -24,7 +26,6 @@ pipeline {
     --profile
     --console plain
 '''
-                }
             }
         }
 
