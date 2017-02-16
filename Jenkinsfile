@@ -33,7 +33,23 @@ pipeline {
             }
         }
 
-        // TODO Integration tests
+        stage('Integration tests') {
+            agent {
+                reuseNode true
+            }
+            steps {
+                sh '''\
+./gradlew \\
+    integrationTest \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --stacktrace \\
+    --profile \\
+    --console plain
+'''
+            }
+        }
+
         // TODO Docker image
         // TODO OS packages
 
