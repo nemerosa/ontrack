@@ -1,15 +1,14 @@
 pipeline {
 
-    agent any
+    agent {
+        dockerfile {
+            label "docker"
+        }
+    }
 
     stages {
 
         stage('Build') {
-            agent {
-                dockerfile {
-                    label "docker"
-                }
-            }
             steps {
                 sh '''\
 ./gradlew
