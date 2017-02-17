@@ -13,12 +13,9 @@ pipeline {
 
     stages {
 
-        timestamps {
-            ansiColor {
-
-                stage('Build') {
-                    steps {
-                        sh '''\
+        stage('Build') {
+            steps {
+                sh '''\
 ./gradlew \\
     clean \\
     versionDisplay \\
@@ -33,12 +30,12 @@ pipeline {
     --profile \\
     --console plain
 '''
-                    }
-                }
+            }
+        }
 
-                stage('Integration tests') {
-                    steps {
-                        sh '''\
+        stage('Integration tests') {
+            steps {
+                sh '''\
 ./gradlew \\
     integrationTest \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -47,12 +44,12 @@ pipeline {
     --profile \\
     --console plain
 '''
-                    }
-                }
+            }
+        }
 
-                stage('Docker image') {
-                    steps {
-                        sh '''\
+        stage('Docker image') {
+            steps {
+                sh '''\
 ./gradlew \\
     dockerLatest \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -61,12 +58,12 @@ pipeline {
     --profile \\
     --console plain
 '''
-                    }
-                }
+            }
+        }
 
-                stage('OS packages') {
-                    steps {
-                        sh '''\
+        stage('OS packages') {
+            steps {
+                sh '''\
 ./gradlew \\
     osPackages \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -75,20 +72,17 @@ pipeline {
     --profile \\
     --console plain
 '''
-                    }
-                }
-
-                // TODO Ontrack build
-                // TODO Local acceptance tests
-                // TODO Docker push
-                // TODO OS tests + DO tests in parallel
-                // TODO Release
-                // TODO Site
-                // TODO Production
-                // TODO Production tests
-
             }
         }
+
+        // TODO Ontrack build
+        // TODO Local acceptance tests
+        // TODO Docker push
+        // TODO OS tests + DO tests in parallel
+        // TODO Release
+        // TODO Site
+        // TODO Production
+        // TODO Production tests
 
     }
 
