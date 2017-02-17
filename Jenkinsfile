@@ -30,11 +30,11 @@ pipeline {
     --profile \\
     --console plain
 '''
-            }
-        }
+//            }
+//        }
 
-        stage('Integration tests') {
-            steps {
+//        stage('Integration tests') {
+//            steps {
                 sh '''\
 ./gradlew \\
     integrationTest \\
@@ -44,11 +44,11 @@ pipeline {
     --profile \\
     --console plain
 '''
-            }
-        }
-
-        stage('Docker image') {
-            steps {
+//            }
+//        }
+//
+//        stage('Docker image') {
+//            steps {
                 sh '''\
 ./gradlew \\
     dockerLatest \\
@@ -58,11 +58,11 @@ pipeline {
     --profile \\
     --console plain
 '''
-            }
-        }
+//            }
+//        }
 
-        stage('OS packages') {
-            steps {
+//        stage('OS packages') {
+//            steps {
                 sh '''\
 ./gradlew \\
     osPackages \\
