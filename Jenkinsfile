@@ -19,6 +19,9 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''\
+git checkout -b ${BRANCH_NAME}
+'''
+                sh '''\
 ./gradlew \\
     clean \\
     versionDisplay \\
