@@ -36,6 +36,9 @@ git checkout -B ${BRANCH_NAME}
     --profile \\
     --console plain
 '''
+                // Reads version information
+                def props = readProperties file: 'build/version.properties'
+                env.VERSION = props.VERSION_DISPLAY
             }
         }
 
@@ -106,7 +109,7 @@ unzip delivery/ontrack-publication.zip -d publication
              sh '''\
 ./gradlew \\
    ciAcceptanceTest \\
-   -PacceptanceJar=publication/ontrack-acceptance-*.jar \\
+   -PacceptanceJar=publication/ontrack-acceptance-${VERSION}.jar \\
    -Dorg.gradle.jvmargs=-Xmx1536m \\
    --info \\
    --profile \\
