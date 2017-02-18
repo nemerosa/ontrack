@@ -19,7 +19,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''\
-git checkout -b ${BRANCH_NAME}
+git checkout -B ${BRANCH_NAME}
 '''
                 sh '''\
 ./gradlew \\
