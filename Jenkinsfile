@@ -81,6 +81,11 @@ git checkout -B ${BRANCH_NAME}
                // Saving the delivery ZIP for later
                stash includes: 'build/distributions/*-delivery.zip', name: 'delivery-zip'
             }
+            post {
+                always {
+                    archive 'build/distributions/*-delivery.zip'
+                }
+            }
         }
 
         // TODO Ontrack build
