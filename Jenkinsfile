@@ -84,13 +84,48 @@ git checkout -B ${BRANCH_NAME}
         }
 
         // TODO Ontrack build
-        // TODO Local acceptance tests
+
+        stage('Local acceptance tests') {
+           steps {
+             // Gets the delivery zip
+             dir('delivery') {
+                unstash 'delivery-zip'
+             }
+             // Unzips the delivery
+             sh '''\
+unzip delivery/build/distributions/*-delivery.zip -d delivery
+unzip delivery/ontrack-publication.zip -d publication
+'''
+             // Runs the acceptance tests
+             // TODO Docker host problem (-PciHost=dockerhost)
+             sh '''\
+./gradlew \\
+   ciAcceptanceTest \\
+   -PacceptanceJar=publication/ontrack-acceptance-*.jar \\
+   -Dorg.gradle.jvmargs=-Xmx1536m \\
+   --info \\
+   --profile \\
+   --console plain \\
+   --stacktrace
+             '''
+          }
+        }
+        // TODO Ontrack validation --> ACCEPTANCE
         // TODO Docker push
+        // TODO Ontrack validation --> DOCKER
         // TODO OS tests + DO tests in parallel
+        // TODO Ontrack validation --> ACCEPTANCE.DEBIAN
+        // TODO Ontrack validation --> ACCEPTANCE.CENTOS.6
+        // TODO Ontrack validation --> ACCEPTANCE.CENTOS.7
+        // TODO Ontrack validation --> ACCEPTANCE.DO
         // TODO Release
+        // TODO Ontrack promotion --> RELEASE
         // TODO Site
+        // TODO Ontrack validation --> SITE
         // TODO Production
+        // TODO Ontrack promotion --> ONTRACK
         // TODO Production tests
+        // TODO Ontrack validation --> ACCEPTANCE.PRODUCTION
 
     }
 
