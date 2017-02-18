@@ -78,6 +78,8 @@ git checkout -b ${BRANCH_NAME}
     --profile \\
     --console plain
 '''
+               // Saving the delivery ZIP for later
+               stash includes: 'build/distributions/*-delivery.zip', name: 'delivery-zip'
             }
         }
 
