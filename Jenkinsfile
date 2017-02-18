@@ -36,9 +36,11 @@ git checkout -B ${BRANCH_NAME}
     --profile \\
     --console plain
 '''
-                // Reads version information
-                def props = readProperties file: 'build/version.properties'
-                env.VERSION = props.VERSION_DISPLAY
+                script {
+                    // Reads version information
+                    def props = readProperties file: 'build/version.properties'
+                    env.VERSION = props.VERSION_DISPLAY
+                }
             }
         }
 
