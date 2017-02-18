@@ -10,6 +10,8 @@ pipeline {
     options {
         // General Jenkins job properties
         buildDiscarder(logRotator(numToKeepStr: '40'))
+        // Timestamps
+        timestamps()
     }
 
     stages {
