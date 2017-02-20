@@ -24,7 +24,7 @@ class OntrackLastReleases extends AbstractOntrackTask {
         List<Build> result = []
         // Gets all branches
         int count = 0
-        project.branches.reverse().each { branch ->
+        project.branches.each { branch ->
             // Only release/ branches
             if (count < releaseCount && branch.name ==~ /.*release-.*/) {
                 // ... and gets the last RELEASE build for each of them

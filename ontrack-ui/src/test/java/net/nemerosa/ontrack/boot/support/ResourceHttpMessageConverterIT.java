@@ -25,6 +25,7 @@ import java.util.Collections;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
 import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,22 +76,22 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
                         .with("disabled", false)
                         .with("type", "CLASSIC")
                         .with("project", object()
-                                        .with("id", 1)
-                                        .with("name", "P")
-                                        .with("description", "Projet créé")
-                                        .with("disabled", false)
-                                        .with("signature", SIGNATURE_OBJECT)
-                                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
-                                        .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
-                                        .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
-                                        .with("_buildSearch", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildSearchForm:1")
-                                        .with("_buildDiffActions", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildDiffActions:1")
-                                        .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
-                                        .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
-                                        .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
-                                        .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
-                                        .with("_page", "urn:test:#:entity:PROJECT:1")
-                                        .end()
+                                .with("id", 1)
+                                .with("name", "P")
+                                .with("description", "Projet créé")
+                                .with("disabled", false)
+                                .with("signature", SIGNATURE_OBJECT)
+                                .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                                .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
+                                .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
+                                .with("_buildSearch", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildSearchForm:1")
+                                .with("_buildDiffActions", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildDiffActions:1")
+                                .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
+                                .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
+                                .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
+                                .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                .with("_page", "urn:test:#:entity:PROJECT:1")
+                                .end()
                         )
                         .with("signature", SIGNATURE_OBJECT)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -112,6 +113,69 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
                         .end(),
                 node
         );
+    }
+
+    @Test
+    public void branch_disable_granted_for_automation() throws Exception {
+        // Objects
+        Project p = Project.of(new NameDescription("P", "Projet créé")).withId(ID.of(1))
+                .withSignature(SIGNATURE);
+        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+                .withSignature(SIGNATURE);
+        // Message
+        HttpOutputMessage message = mock(HttpOutputMessage.class);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        when(message.getBody()).thenReturn(output);
+        // Serialization
+        asGlobalRole("AUTOMATION").execute(() -> {
+                    try {
+                        converter.writeInternal(b, message);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+
+        // Content
+        String json = new String(output.toByteArray(), "UTF-8");
+
+        // Parsing
+        JsonNode node = ObjectMapperFactory.create().readTree(json);
+
+        // Disable link
+        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.BranchController#disableBranch:1", node.path("_disable").asText());
+    }
+
+    @Test
+    public void branch_enable_granted_for_automation() throws Exception {
+        // Objects
+        Project p = Project.of(new NameDescription("P", "Projet créé")).withId(ID.of(1))
+                .withSignature(SIGNATURE);
+        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+                .withDisabled(true)
+                .withSignature(SIGNATURE);
+        // Message
+        HttpOutputMessage message = mock(HttpOutputMessage.class);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        when(message.getBody()).thenReturn(output);
+        // Serialization
+        asGlobalRole("AUTOMATION").execute(() -> {
+                    try {
+                        converter.writeInternal(b, message);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+
+        // Content
+        String json = new String(output.toByteArray(), "UTF-8");
+
+        // Parsing
+        JsonNode node = ObjectMapperFactory.create().readTree(json);
+
+        // Enable link
+        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.BranchController#enableBranch:1", node.path("_enable").asText());
     }
 
 }
