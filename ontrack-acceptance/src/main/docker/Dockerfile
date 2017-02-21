@@ -7,10 +7,14 @@ VOLUME /ontrack/acceptance/results
 RUN mkdir -p /ontrack/acceptance/app
 
 # Startup script
-ADD acceptance.sh /ontrack/acceptance/app
+COPY acceptance.sh /ontrack/acceptance/app/
+RUN chmod a+x /ontrack/acceptance/app/acceptance.sh
 
 # Acceptance JAR
-ADD ontrack-acceptance.jar /ontrack/acceptance/app
+COPY ontrack-acceptance.jar /ontrack/acceptance/app/
+
+# General Java options
+ENV JAVA_OPTIONS ''
 
 # Selenium URL
 ENV ONTRACK_ACCEPTANCE_SELENIUM_URL ''

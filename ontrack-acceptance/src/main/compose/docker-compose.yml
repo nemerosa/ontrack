@@ -1,0 +1,17 @@
+version: "2.1"
+
+services:
+   ontrack:
+      image: nemerosa/ontrack:latest
+      environment:
+         PROFILE: acceptance
+   selenium:
+      image: selenium/standalone-firefox
+   ontrack-acceptance:
+      image: nemerosa/ontrack-acceptance:latest
+      depends_on:
+         - ontrack
+         - selenium
+      environment:
+         ONTRACK_ACCEPTANCE_SELENIUM_URL: http://selenium:4444
+         ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080

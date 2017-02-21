@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-java \
-    /ontrack/acceptance/app/acceptance.jar \
+exec java \
+    ${JAVA_OPTIONS} \
+    -jar /ontrack/acceptance/app/ontrack-acceptance.jar \
     --ontrack.selenium.url=${ONTRACK_ACCEPTANCE_SELENIUM_URL} \
     --ontrack.url=${ONTRACK_ACCEPTANCE_TARGET_URL} \
     --ontrack.admin=${ONTRACK_ACCEPTANCE_TARGET_ADMIN_PASSWORD} \
