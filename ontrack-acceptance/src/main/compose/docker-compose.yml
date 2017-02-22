@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
    ontrack:
-      image: nemerosa/ontrack:latest
+      image: nemerosa/ontrack:${ONTRACK_VERSION:-latest}
       environment:
          PROFILE: acceptance
    selenium:
