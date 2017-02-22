@@ -108,12 +108,13 @@ git checkout -B ${BRANCH_NAME}
 unzip delivery/build/distributions/*-delivery.zip -d delivery
 '''
              // Runs the acceptance tests
-             try {
-                sh """\
+             sh """\
 cd delivery/ontrack-acceptance
 docker-compose run --rm -e ONTRACK_VERSION=${version} ontrack_acceptance
 """
-             } finally {
+          }
+          post {
+             always {
                 sh """\
 cd delivery/ontrack-acceptance
 docker-compose down --volumes
@@ -121,7 +122,7 @@ docker-compose down --volumes
              }
           }
         }
-        
+
         // TODO Ontrack validation --> ACCEPTANCE
         // TODO Docker push
         // TODO Ontrack validation --> DOCKER
