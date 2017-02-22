@@ -7,7 +7,7 @@ services:
          PROFILE: acceptance
    selenium:
       image: selenium/standalone-firefox
-   ontrack-acceptance:
+   ontrack_acceptance:
       build: docker
       depends_on:
          - ontrack

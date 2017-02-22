@@ -106,22 +106,22 @@ git checkout -B ${BRANCH_NAME}
              // Unzips the delivery
              sh '''\
 unzip delivery/build/distributions/*-delivery.zip -d delivery
-unzip delivery/ontrack-publication.zip -d publication
 '''
              // Runs the acceptance tests
-             // TODO Docker host problem (-PciHost=dockerhost)
-             sh '''\
-./gradlew \\
-   ciAcceptanceTest \\
-   -PacceptanceJar=publication/ontrack-acceptance-${VERSION}.jar \\
-   -Dorg.gradle.jvmargs=-Xmx1536m \\
-   --info \\
-   --profile \\
-   --console plain \\
-   --stacktrace
-             '''
+             try {
+                sh """\
+cd delivery/ontrack-acceptance
+docker-compose run --rm -e ONTRACK_VERSION=${version} ontrack_acceptance
+"""
+             } finally {
+                sh """\
+cd delivery/ontrack-acceptance
+docker-compose down --volumes
+"""
+             }
           }
         }
+        
         // TODO Ontrack validation --> ACCEPTANCE
         // TODO Docker push
         // TODO Ontrack validation --> DOCKER
