@@ -41,7 +41,6 @@ git checkout -B ${BRANCH_NAME}
                 script {
                     // Reads version information
                     def props = readProperties file: 'build/version.properties'
-                    env.VERSION = props.VERSION_DISPLAY
                     version = props.VERSION_DISPLAY
                 }
             }
@@ -100,9 +99,6 @@ git checkout -B ${BRANCH_NAME}
 
         stage('Local acceptance tests') {
            steps {
-             // TODO Debug version information
-             echo "Environment version: ${env.VERSION}"
-             echo "Variable version: ${version}"
              // Gets the delivery zip
              dir('delivery') {
                 unstash 'delivery-zip'
