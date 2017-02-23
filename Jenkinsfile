@@ -110,7 +110,11 @@ unzip delivery/build/distributions/*-delivery.zip -d delivery
              // Runs the acceptance tests
              sh """\
 cd delivery/ontrack-acceptance
-docker-compose run --rm -e ONTRACK_VERSION=${version} ontrack_acceptance
+docker-compose build
+docker-compose run --rm \\
+    -e ONTRACK_VERSION=${version} \\
+    -e ONTRACK_ACCEPTANCE_RESULTS=`pwd`/build/acceptance \\
+    ontrack_acceptance
 """
           }
           post {
@@ -119,6 +123,7 @@ docker-compose run --rm -e ONTRACK_VERSION=${version} ontrack_acceptance
 cd delivery/ontrack-acceptance
 docker-compose down --volumes
 """
+                 junit 'delivery/ontrack-acceptance/build/acceptance/**/*.xml'
              }
           }
         }
