@@ -41,14 +41,24 @@ bootRepackage {
     customConfiguration = 'testRuntime'
 }
 
-task normaliseJar {
+task normaliseJar(type: Copy) {
+    dependsOn bootRepackage
     doFirst {
-        // Used for local testing only
-        ant.copy file: testJar.outputs.files.singleFile, tofile: "${buildDir}/libs/ontrack-acceptance.jar"
+        project.mkdir "${buildDir}/libs"
     }
+    from testJar.outputs.files.singleFile
+    into "${buildDir}/libs"
+    rename { "ontrack-acceptance.jar" }
 }
-normaliseJar.dependsOn bootRepackage
+
+task copyJarForDocker(type: Copy) {
+    dependsOn normaliseJar
+    from "${buildDir}/libs/ontrack-acceptance.jar"
+    into "${projectDir}/src/main/compose/docker"
+}
+
 assemble.dependsOn normaliseJar
+assemble.dependsOn copyJarForDocker
 
 /**
  * Local test definitions
