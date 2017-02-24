@@ -108,14 +108,6 @@ public class AcceptanceConfig {
         logger.accept(String.format(">>> Result file name: %s", resultFileName));
     }
 
-    @Deprecated
-    public void setSystemProperties() {
-        System.setProperty("ontrack.url", url);
-        System.setProperty("ontrack.admin", admin);
-        System.setProperty("ontrack.disableSsl", String.valueOf(disableSsl));
-        System.setProperty("ontrack.implicitWait", String.valueOf(implicitWait));
-    }
-
     public static AcceptanceConfig fromEnv() {
         AcceptanceConfig c = new AcceptanceConfig();
         c.setUrl(env("ontrack.acceptance.url", c.getUrl(), "Ontrack URL"));
