@@ -72,7 +72,8 @@ section).
 2. Launch all, some or one test in the `ontrack-acceptance` module after having
 set the following system properties:
 
-** `ontrack.url` - the URL of the running application to test
+** `ontrack.url` - the URL of the running application to test - defaults to
+   http://localhost:8080
 ** `ontrack.disableSSL` - `true` if the server is running with a self signed
 certificate, and if you're using `https`
 
@@ -99,16 +100,23 @@ java -jar ontrack-acceptance.jar <options>
 
 The options are:
 
-* `--option.url=<url>` to specify the `<url>` where `ontrack` is deployed. It
+* `--option.acceptance.url=<url>` to specify the `<url>` where `ontrack` is deployed. It
 defaults to http://localhost:8080
-* `--option.admin=<password>` to specify the administrator password. It
+* `--option.acceptance.admin=<password>` to specify the administrator password. It
 defaults to `admin`.
-* `--option.context=<context>` can be specified several time to define the
+* `--option.acceptance.context=<context>` can be specified several time to define the
 context(s) the acceptance tests are running in (like
-`--option.context=production` for example). According to the context, some
+`--option.acceptance.context=production` for example). According to the context, some
 tests can be excluded from the run.
 
-The results of the tests is written as a JUnit XML file, `ciAcceptance.xml`.
+The results of the tests is written as a JUnit XML file, in
+`build/acceptance/ontrack-acceptance.xml`.
+
+The directory can be changed using the `ontrack.acceptance.output-dir` argument
+or system property and defaults to `build/acceptance`.
+
+The JUnit result file name can be changed using the `ontrack.acceptance.result-file-name` argument
+or system property and defaults to `ontrack-acceptance.xml`.
 
 [[testing-dev]]
 ==== Developing tests

@@ -21,7 +21,7 @@ import static java.lang.String.format;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "ontrack")
+@ConfigurationProperties(prefix = "ontrack.acceptance")
 public class AcceptanceConfig {
 
     private final Logger logger = LoggerFactory.getLogger(AcceptanceConfig.class);
