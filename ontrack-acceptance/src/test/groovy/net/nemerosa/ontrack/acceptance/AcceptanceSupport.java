@@ -82,7 +82,7 @@ public abstract class AcceptanceSupport {
     }
 
     protected String getAdminPassword() {
-        return env("ontrack.admin", false, "admin", "Acceptance admin password");
+        return configRule.getConfig().getAdmin();
     }
 
     private OTHttpClientBuilder clientBuilder() {
@@ -91,11 +91,11 @@ public abstract class AcceptanceSupport {
     }
 
     protected boolean isSslDisabled() {
-        return "true".equals(env("ontrack.disableSsl", false, "false", "Disabling SSL checks"));
+        return configRule.getConfig().isDisableSsl();
     }
 
     protected String getBaseURL() {
-        return env("ontrack.url", true, null, "Base URL for the application to test");
+        return configRule.getConfig().getUrl();
     }
 
     private Client client(Supplier<OTHttpClient> otHttpClientSupplier) {
