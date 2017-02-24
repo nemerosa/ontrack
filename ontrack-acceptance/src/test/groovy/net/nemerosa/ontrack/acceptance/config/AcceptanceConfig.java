@@ -65,6 +65,7 @@ public class AcceptanceConfig {
                 );
     }
 
+    @Deprecated
     public void setSystemProperties() {
         System.setProperty("ontrack.url", url);
         System.setProperty("ontrack.admin", admin);

@@ -39,6 +39,7 @@ public abstract class AcceptanceSupport {
                 .end();
     }
 
+    @Deprecated
     public static String env(String property, boolean required, String defaultValue, String name) {
         String sys = System.getProperty(property);
         if (StringUtils.isNotBlank(sys)) {
