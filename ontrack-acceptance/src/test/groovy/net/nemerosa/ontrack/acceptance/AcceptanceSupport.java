@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.acceptance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.acceptance.config.AcceptanceConfigRule;
 import net.nemerosa.ontrack.client.*;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
+import org.junit.Rule;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -23,6 +25,12 @@ import static org.junit.Assert.fail;
 public abstract class AcceptanceSupport {
 
     private static final ObjectMapper mapper = ObjectMapperFactory.create();
+
+    /**
+     * Access to the configuration
+     */
+    @Rule
+    public AcceptanceConfigRule configRule = new AcceptanceConfigRule();
 
     /**
      * Waits for the application to be ready by performing a call

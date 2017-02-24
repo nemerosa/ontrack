@@ -103,6 +103,64 @@ public class AcceptanceConfig {
         System.setProperty("ontrack.implicitWait", String.valueOf(implicitWait));
     }
 
+    public static AcceptanceConfig fromEnv() {
+        AcceptanceConfig c = new AcceptanceConfig();
+        c.setUrl(env("ontrack.acceptance.url", c.getUrl(), "Ontrack URL"));
+        c.setSeleniumUrl(env("ontrack.acceptance.selenium-url", c.getSeleniumUrl(), "Selenium URL"));
+        c.setDisableSsl(envAsBoolean("ontrack.acceptance.disable-ssl", c.isDisableSsl(), "Disabling SSL"));
+        c.setAdmin(env("ontrack.acceptance.admin", c.getAdmin(), "Admin password"));
+        c.setContext(env("ontrack.acceptance.context", c.getContext(), "Test context"));
+        c.setTimeout(envAsInt("ontrack.acceptance.timeout", c.getTimeout(), "Timeout for Ontrack (s)"));
+        c.setImplicitWait(envAsInt("ontrack.acceptance.implicit-wait", c.getImplicitWait(), "GUI element wait (s)"));
+        c.setOutputDir(envAsFile("ontrack.acceptance.output-dir", c.getOutputDir(), "Output directory"));
+        c.setResultFileName(env("ontrack.acceptance.result-file-name", "ontrack-acceptance.xml", "Output directory"));
+        return c;
+    }
+
+    private static String env(String property, String defaultValue, String name) {
+        String sys = System.getProperty(property);
+        if (StringUtils.isNotBlank(sys)) {
+            return sys;
+        } else {
+            String envName = property.toUpperCase().replace(".", "_");
+            String env = System.getenv(envName);
+            if (StringUtils.isNotBlank(env)) {
+                return env;
+            } else {
+                return defaultValue;
+            }
+        }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static boolean envAsBoolean(String property, boolean defaultValue, String name) {
+        String value = env(property, null, name);
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return Boolean.valueOf(value);
+        }
+    }
+
+    private static int envAsInt(String property, int defaultValue, String name) {
+        String value = env(property, null, name);
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return Integer.parseInt(value, 10);
+        }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static File envAsFile(String property, File defaultValue, String name) {
+        String value = env(property, null, name);
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return new File(value);
+        }
+    }
+
     private class AcceptanceTargetCheck implements Callable<String> {
 
         @Override
