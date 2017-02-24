@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 import static java.lang.String.format;
 
@@ -93,6 +94,18 @@ public class AcceptanceConfig {
                         acceptanceTest != null &&
                                 Arrays.asList(acceptanceTest.value()).contains(context)
                 );
+    }
+
+    public void log(Consumer<String> logger) {
+        logger.accept(String.format(">>> Ontrack URL:      %s", url));
+        logger.accept(String.format(">>> Selenium URL:     %s", seleniumUrl));
+        logger.accept(String.format(">>> Disable SSL:      %s", disableSsl));
+        logger.accept(String.format(">>> Admin password:   %s", "admin".equals(admin) ? "admin" : "****"));
+        logger.accept(String.format(">>> Context:          %s", context));
+        logger.accept(String.format(">>> Timeout:          %s", timeout));
+        logger.accept(String.format(">>> Implicit wait:    %s", implicitWait));
+        logger.accept(String.format(">>> Output directory: %s", outputDir));
+        logger.accept(String.format(">>> Result file name: %s", resultFileName));
     }
 
     @Deprecated

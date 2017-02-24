@@ -26,10 +26,9 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
 
     @Override
     boolean run() throws Exception {
-        logger.info "Starting acceptance tests."
-        logger.info "Config URL    : ${config.url}"
-        logger.info "Config context: ${config.context}"
-        logger.info "Disabling SSL : ${config.disableSsl}"
+        logger.info "Starting acceptance tests..."
+        logger.info "Using Acceptance config..."
+        config.log { logger.info it }
 
         // Global config
         AcceptanceConfigRule.setGlobalConfig(config)
