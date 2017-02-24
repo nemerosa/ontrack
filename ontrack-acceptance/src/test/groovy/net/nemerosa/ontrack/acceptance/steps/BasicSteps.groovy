@@ -10,7 +10,7 @@ class BasicSteps {
     static HomePage loginAsAdmin(Browser browser) {
         browser.with {
             def home = goTo HomePage, [:]
-            home.login 'admin', adminPassword
+            home.login 'admin', browser.configuration.acceptanceConfig.admin
             waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
             waitUntil("Project creation button is displayed") { home.menuLoaded }
             home
