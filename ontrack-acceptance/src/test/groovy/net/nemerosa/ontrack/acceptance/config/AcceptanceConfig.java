@@ -1,7 +1,8 @@
-package net.nemerosa.ontrack.acceptance.boot;
+package net.nemerosa.ontrack.acceptance.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import net.nemerosa.ontrack.acceptance.boot.AcceptanceMissingURLException;
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest;
 import net.nemerosa.ontrack.client.*;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +20,7 @@ import static java.lang.String.format;
 @Data
 @Component
 @ConfigurationProperties(prefix = "ontrack")
-class AcceptanceConfig {
+public class AcceptanceConfig {
 
     private final Logger logger = LoggerFactory.getLogger(AcceptanceConfig.class);
 
