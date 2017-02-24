@@ -6,7 +6,6 @@ import org.junit.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 
-import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
