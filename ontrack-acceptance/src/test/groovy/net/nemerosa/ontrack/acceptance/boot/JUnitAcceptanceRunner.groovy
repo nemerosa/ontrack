@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance.boot
 
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig
+import net.nemerosa.ontrack.acceptance.config.AcceptanceConfigRule
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.runner.JUnitCore
@@ -30,8 +31,8 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         logger.info "Config context: ${config.context}"
         logger.info "Disabling SSL : ${config.disableSsl}"
 
-        // Config as system properties
-        config.setSystemProperties()
+        // Global config
+        AcceptanceConfigRule.setGlobalConfig(config)
 
         // JUnit runtime
         JUnitCore junit = new JUnitCore()
@@ -61,7 +62,7 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
                 .every { it.wasSuccessful() }
 
         // XML output
-        xmlRunListener.render(new File(config.resultFile))
+        xmlRunListener.render(new File(config.outputDir, config.resultFileName))
 
         // Result
         ok
