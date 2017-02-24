@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.*;
 
@@ -26,13 +27,42 @@ public class AcceptanceConfig {
 
     public static final String CONTEXT_ALL = "all";
 
-    private String url; // Required
+    /**
+     * URL of the Ontrack instance to test
+     */
+    private String url = "http://localhost:8080";
+    /**
+     * Optional Selenium Grid/Node URL
+     */
+    private String seleniumUrl = "";
+    /**
+     * Disabling the SSL checks
+     */
     private boolean disableSsl = false;
+    /**
+     * Admin password
+     */
     private String admin = "admin";
+    /**
+     * Tag for identifying the tests to run
+     */
     private String context = null;
+    /**
+     * Timeout in s to wait for Ontrack to start
+     */
     private int timeout = 120;
-    private int implicitWait = 5; // GUI implicit wait, in seconds
-    private String resultFile = "ontrack-acceptance.xml"; // Output for the test results
+    /**
+     * GUI elements waiting time (in s)
+     */
+    private int implicitWait = 5;
+    /**
+     * Output directory
+     */
+    private File outputDir = new File("build/acceptance");
+    /**
+     * Name for the results file.
+     */
+    private String resultFileName = "ontrack-acceptance.xml";
 
     @PostConstruct
     void check() throws InterruptedException, ExecutionException, TimeoutException {
