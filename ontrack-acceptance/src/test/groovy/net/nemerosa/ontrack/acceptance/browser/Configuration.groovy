@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.acceptance.browser
 
 import com.google.common.base.Function
 import com.google.common.base.Predicate
+import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
@@ -17,41 +18,40 @@ import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.Consumer
-import java.util.logging.Level
-
-import static net.nemerosa.ontrack.acceptance.AcceptanceSupport.env
 
 class Configuration {
-
-    static final String SELENIUM_URL = 'ontrack.selenium.url'
 
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class)
 
     private final WebDriver driver
 
+    private final AcceptanceConfig acceptanceConfig
     private final String baseUrl
     private final int implicitWait
     private final File screenshotDir
 
     private final AtomicLong screenshotIndex = new AtomicLong()
 
-    protected Configuration() {
-        // Configuration
-        baseUrl = env("ontrack.url", true, "http://localhost:8080", "Base URL")
-        implicitWait = Integer.parseInt(
-                env("ontrack.implicitWait", false, "5", "Implicit wait time for GUI components (in seconds)"),
-                10)
-        screenshotDir = new File(env("ontrack.acceptance.screenshots", false, "build/acceptance/screenshots", "Screenshot output directory")).getAbsoluteFile()
-        FileUtils.forceMkdir(screenshotDir)
-        // Logging
-        logger.info("[gui] Base URl      = {}", baseUrl)
-        logger.info("[gui] Implicit wait = {}s", implicitWait)
-        logger.info("[gui] Screenshots   = {}", screenshotDir)
-        // Web driver class
-        driver = initDriver()
-        driver.manage().deleteAllCookies()
-        driver.manage().window().setSize(new Dimension(1024, 768))
-        driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS)
+    protected Configuration(AcceptanceConfig config) {
+        try {
+            acceptanceConfig = config
+            // Configuration
+            baseUrl = config.url
+            implicitWait = config.implicitWait
+            screenshotDir = new File(config.outputDir, "screenshots").getAbsoluteFile()
+            FileUtils.forceMkdir(screenshotDir)
+            // Web driver class
+            driver = initDriver(config)
+            driver.manage().deleteAllCookies()
+            driver.manage().window().setSize(new Dimension(1024, 768))
+            driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS)
+        } catch (IOException ex) {
+            throw new ConfigurationException("Cannot initialise browser configuration", ex)
+        }
+    }
+
+    AcceptanceConfig getAcceptanceConfig() {
+        return acceptanceConfig
     }
 
     WebDriver getDriver() {
@@ -146,9 +146,9 @@ class Configuration {
         }
     }
 
-    static void driver(Consumer<Configuration> closure) {
+    static void driver(AcceptanceConfig config, Consumer<Configuration> closure) {
         // Loads the driver environment
-        Configuration configuration = new Configuration()
+        Configuration configuration = new Configuration(config)
         try {
             // Runs with the driver
             closure.accept(configuration)
@@ -158,28 +158,19 @@ class Configuration {
         }
     }
 
-    static String getAdminPassword() {
-        env('ontrack.admin', false, 'admin', "Admin password")
-    }
-
-    static WebDriver initDriver() throws IOException {
-        File loggingDir = new File(env("ontrack.acceptance.logs", false, "build/acceptance/logs", "Logging output directory")).getAbsoluteFile()
+    static WebDriver initDriver(AcceptanceConfig config) throws IOException {
+        File loggingDir = new File(config.outputDir, "logs").getAbsoluteFile()
         FileUtils.forceMkdir(loggingDir)
         logger.info("[gui] Browser logging directory at {}", loggingDir)
 
-        String seleniumUrl = env(SELENIUM_URL, false, "", "Selenium URL (defaults to local Firefox)")
-        if (seleniumUrl) {
-            logger.info("[gui] Using remote Selenium driver at ${seleniumUrl}")
+        if (config.seleniumUrl) {
             DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
-            desiredCapabilities.setBrowserName('firefox')
-            RemoteWebDriver webDriver = new RemoteWebDriver(
-                    new URL(seleniumUrl),
+            desiredCapabilities.setBrowserName("firefox")
+            return new RemoteWebDriver(
+                    new URL(config.seleniumUrl),
                     desiredCapabilities
             )
-            webDriver.setLogLevel(Level.FINER)
-            return webDriver
         } else {
-            logger.info("[gui] Using local Firefox Selenium driver")
             FirefoxProfile profile = new FirefoxProfile()
             profile.setPreference("webdriver.log.browser.file", new File(loggingDir, "browser.log").getAbsolutePath())
             profile.setPreference("webdriver.log.browser.level", "all")

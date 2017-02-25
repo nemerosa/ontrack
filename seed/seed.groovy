@@ -270,7 +270,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     publishers {
         buildDescription '', '${VERSION}', '', ''
-        archiveJunit('*-tests.xml')
+        archiveJunit('build/acceptance/*.xml')
         if (release) {
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
@@ -326,7 +326,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 """
         }
         publishers {
-            archiveJunit('*-tests.xml')
+            archiveJunit('build/acceptance/*.xml')
             // Use display version
             ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE.DEBIAN'
         }
@@ -358,7 +358,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 """
             }
             publishers {
-                archiveJunit('*-tests.xml')
+                archiveJunit('build/acceptance/*.xml')
                 ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', "ACCEPTANCE.CENTOS.${centOsVersion}" as String
             }
         }
@@ -451,7 +451,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
 
     }
     publishers {
-        archiveJunit('*-tests.xml')
+        archiveJunit('build/acceptance/*.xml')
         buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-publish") {
             parameters {
                 currentBuild()
@@ -667,7 +667,7 @@ productionTest
 '''
         }
         publishers {
-            archiveJunit('*-tests.xml')
+            archiveJunit('build/acceptance/*.xml')
             ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK.SMOKE'
             ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK'
         }

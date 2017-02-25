@@ -1,22 +1,25 @@
-# InfluxDB container
-influxdb:
-  # Makes all ports accessible on the host for testing
-  ports:
-    - "8083"
-    - "8086"
+version: "2"
 
-# Grafana
-grafana:
-  ports:
-    - "3000"
+services:
+  # InfluxDB container
+  influxdb:
+    # Makes all ports accessible on the host for testing
+    ports:
+      - "8083"
+      - "8086"
 
-# Ontrack container
-ontrack:
-  environment:
-      PROFILE: acceptance
-  volumes:
-    - "./ci/ontrack:/var/ontrack/conf"
-    # Better startup performances in CI and DO, do not use in Prod
-    - "/dev/urandom:/dev/random"
-  ports:
-    - "443"
+  # Grafana
+  grafana:
+    ports:
+      - "3000"
+
+  # Ontrack container
+  ontrack:
+    environment:
+        PROFILE: acceptance
+    volumes:
+      - "./ci/ontrack:/var/ontrack/conf"
+      # Better startup performances in CI and DO, do not use in Prod
+      - "/dev/urandom:/dev/random"
+    ports:
+      - "443"
