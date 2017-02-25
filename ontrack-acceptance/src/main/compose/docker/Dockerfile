@@ -17,7 +17,7 @@ COPY ontrack-acceptance.jar /ontrack/acceptance/app/
 ENV JAVA_OPTIONS ''
 
 # Selenium URL
-ENV ONTRACK_ACCEPTANCE_SELENIUM_URL ''
+ENV ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL ''
 
 # Target Ontrack URL
 ENV ONTRACK_ACCEPTANCE_TARGET_URL 'http://localhost:8080'
