@@ -37,6 +37,10 @@ public class AcceptanceConfig {
      */
     private String seleniumGridUrl = "";
     /**
+     * Optional URL to the Ontrack instance, useable from the Selenium node
+     */
+    private String seleniumTargetUrl = "";
+    /**
      * Disabling the SSL checks
      */
     private boolean disableSsl = false;
@@ -97,21 +101,23 @@ public class AcceptanceConfig {
     }
 
     public void log(Consumer<String> logger) {
-        logger.accept(String.format(">>> Ontrack URL:      %s", url));
-        logger.accept(String.format(">>> Selenium URL:     %s", seleniumGridUrl));
-        logger.accept(String.format(">>> Disable SSL:      %s", disableSsl));
-        logger.accept(String.format(">>> Admin password:   %s", "admin".equals(admin) ? "admin" : "****"));
-        logger.accept(String.format(">>> Context:          %s", context));
-        logger.accept(String.format(">>> Timeout:          %s", timeout));
-        logger.accept(String.format(">>> Implicit wait:    %s", implicitWait));
-        logger.accept(String.format(">>> Output directory: %s", outputDir));
-        logger.accept(String.format(">>> Result file name: %s", resultFileName));
+        logger.accept(String.format(">>> Ontrack URL:         %s", url));
+        logger.accept(String.format(">>> Selenium grid URL:   %s", seleniumGridUrl));
+        logger.accept(String.format(">>> Selenium target URL: %s", seleniumTargetUrl));
+        logger.accept(String.format(">>> Disable SSL:         %s", disableSsl));
+        logger.accept(String.format(">>> Admin password:      %s", "admin".equals(admin) ? "admin" : "****"));
+        logger.accept(String.format(">>> Context:             %s", context));
+        logger.accept(String.format(">>> Timeout:             %s", timeout));
+        logger.accept(String.format(">>> Implicit wait:       %s", implicitWait));
+        logger.accept(String.format(">>> Output directory:    %s", outputDir));
+        logger.accept(String.format(">>> Result file name:    %s", resultFileName));
     }
 
     public static AcceptanceConfig fromEnv() {
         AcceptanceConfig c = new AcceptanceConfig();
         c.setUrl(env("ontrack.acceptance.url", c.getUrl(), "Ontrack URL"));
-        c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-url", c.getSeleniumGridUrl(), "Selenium URL"));
+        c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-grid-url", c.getSeleniumGridUrl(), "Selenium Grid URL"));
+        c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-target-url", c.getSeleniumTargetUrl(), "Selenium Target URL"));
         c.setDisableSsl(envAsBoolean("ontrack.acceptance.disable-ssl", c.isDisableSsl(), "Disabling SSL"));
         c.setAdmin(env("ontrack.acceptance.admin", c.getAdmin(), "Admin password"));
         c.setContext(env("ontrack.acceptance.context", c.getContext(), "Test context"));

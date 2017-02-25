@@ -36,10 +36,12 @@ class Configuration {
         try {
             acceptanceConfig = config
             // Configuration
-            baseUrl = config.url
+            baseUrl = config.seleniumTargetUrl ?: config.url
             implicitWait = config.implicitWait
             screenshotDir = new File(config.outputDir, "screenshots").getAbsoluteFile()
             FileUtils.forceMkdir(screenshotDir)
+            // Logging
+            logger.info("Browser base URL: ${}", baseUrl)
             // Web driver class
             driver = initDriver(config)
             driver.manage().deleteAllCookies()
