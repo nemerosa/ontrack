@@ -113,7 +113,7 @@ cd delivery/ontrack-acceptance
 docker-compose build
 docker-compose run --rm \\
     -e ONTRACK_VERSION=${version} \\
-    -e ONTRACK_ACCEPTANCE_RESULTS=`pwd`/build/acceptance \\
+    -e ONTRACK_ACCEPTANCE_OUTPUT=`pwd`/build/acceptance \\
     ontrack_acceptance
 """
           }

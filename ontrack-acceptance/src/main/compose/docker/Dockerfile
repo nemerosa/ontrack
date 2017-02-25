@@ -2,7 +2,7 @@
 FROM openjdk:8u121-jdk
 
 # Directory for the test results
-VOLUME /ontrack/acceptance/results
+VOLUME /ontrack/acceptance/output
 
 RUN mkdir -p /ontrack/acceptance/app
 

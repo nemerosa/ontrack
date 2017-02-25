@@ -16,4 +16,4 @@ services:
          ONTRACK_ACCEPTANCE_SELENIUM_URL: http://selenium:4444
          ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
       volumes:
-        - "${ONTRACK_ACCEPTANCE_RESULTS:-./target}:/ontrack/acceptance/results"
+        - "${ONTRACK_ACCEPTANCE_OUTPUT:-./build/acceptance}:/ontrack/acceptance/output"
