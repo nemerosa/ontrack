@@ -22,6 +22,7 @@ pipeline {
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
+git clean -xfd
 '''
                 sh '''\
 ./gradlew \\
