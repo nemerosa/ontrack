@@ -163,11 +163,11 @@ class Configuration {
         FileUtils.forceMkdir(loggingDir)
         logger.info("[gui] Browser logging directory at {}", loggingDir)
 
-        if (config.seleniumUrl) {
+        if (config.seleniumGridUrl) {
             DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
             desiredCapabilities.setBrowserName("firefox")
             return new RemoteWebDriver(
-                    new URL(config.seleniumUrl),
+                    new URL(config.seleniumGridUrl),
                     desiredCapabilities
             )
         } else {

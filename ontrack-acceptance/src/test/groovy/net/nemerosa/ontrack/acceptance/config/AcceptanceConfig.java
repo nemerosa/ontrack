@@ -35,7 +35,7 @@ public class AcceptanceConfig {
     /**
      * Optional Selenium Grid/Node URL
      */
-    private String seleniumUrl = "";
+    private String seleniumGridUrl = "";
     /**
      * Disabling the SSL checks
      */
@@ -98,7 +98,7 @@ public class AcceptanceConfig {
 
     public void log(Consumer<String> logger) {
         logger.accept(String.format(">>> Ontrack URL:      %s", url));
-        logger.accept(String.format(">>> Selenium URL:     %s", seleniumUrl));
+        logger.accept(String.format(">>> Selenium URL:     %s", seleniumGridUrl));
         logger.accept(String.format(">>> Disable SSL:      %s", disableSsl));
         logger.accept(String.format(">>> Admin password:   %s", "admin".equals(admin) ? "admin" : "****"));
         logger.accept(String.format(">>> Context:          %s", context));
@@ -111,7 +111,7 @@ public class AcceptanceConfig {
     public static AcceptanceConfig fromEnv() {
         AcceptanceConfig c = new AcceptanceConfig();
         c.setUrl(env("ontrack.acceptance.url", c.getUrl(), "Ontrack URL"));
-        c.setSeleniumUrl(env("ontrack.acceptance.selenium-url", c.getSeleniumUrl(), "Selenium URL"));
+        c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-url", c.getSeleniumGridUrl(), "Selenium URL"));
         c.setDisableSsl(envAsBoolean("ontrack.acceptance.disable-ssl", c.isDisableSsl(), "Disabling SSL"));
         c.setAdmin(env("ontrack.acceptance.admin", c.getAdmin(), "Admin password"));
         c.setContext(env("ontrack.acceptance.context", c.getContext(), "Test context"));
