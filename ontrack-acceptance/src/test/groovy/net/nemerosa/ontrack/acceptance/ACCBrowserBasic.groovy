@@ -14,11 +14,11 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Basic GUI tests
  */
 @AcceptanceTestSuite
-@AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE])
+@AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE, AcceptanceTestContext.BROWSER_TEST])
 class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
-    @AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE])
+    @AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE, AcceptanceTestContext.BROWSER_TEST])
     void 'Home page is accessible'() {
         browser {
             goTo HomePage, [:]

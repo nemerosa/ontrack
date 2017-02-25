@@ -10,6 +10,10 @@ buildscript {
 apply plugin: 'groovy'
 apply plugin: 'spring-boot'
 
+ext {
+    seleniumVersion = '3.1.0'
+}
+
 dependencies {
     testCompile project(':ontrack-client')
     testCompile project(':ontrack-dsl')
@@ -18,9 +22,18 @@ dependencies {
     testCompile libraries.groovy
     testCompile libraries.spring_boot_starter
 
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
+    testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
 
     testRuntime libraries.log4j
+}
+
+//noinspection GroovyAssignabilityCheck
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.seleniumhq.selenium') {
+            details.useVersion seleniumVersion
+        }
+    }
 }
 
 /**

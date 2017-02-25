@@ -2,11 +2,11 @@ version: "2.1"
 
 services:
    ontrack:
-      image: nemerosa/ontrack:${ONTRACK_VERSION:-latest}
+      image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
       environment:
          PROFILE: acceptance
    selenium:
-      image: selenium/standalone-firefox
+      image: "selenium/standalone-firefox:3.1.0"
    ontrack_acceptance:
       build: docker
       depends_on:
