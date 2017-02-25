@@ -5,7 +5,7 @@ services:
       image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
       environment:
          PROFILE: acceptance
-         ONTRACK_CONFIG_CONFIGURATION_TEST: false
+         ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
    selenium:
       image: "selenium/standalone-firefox:3.1.0"
    ontrack_acceptance:
