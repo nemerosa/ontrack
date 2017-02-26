@@ -99,6 +99,9 @@ git clean -xfd
         // TODO Ontrack build
 
         stage('Local acceptance tests') {
+           options {
+             timeout(time: 15, unit: 'MINUTES')
+           }
            steps {
              // Gets the delivery zip
              dir('delivery') {
