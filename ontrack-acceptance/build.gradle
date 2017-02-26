@@ -31,7 +31,7 @@ dependencies {
 //noinspection GroovyAssignabilityCheck
 configurations.all {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        if (details.requested.group == 'org.seleniumhq.selenium') {
+        if (details.requested.group == 'org.seleniumhq.selenium' && details.requested.name != 'htmlunit-driver') {
             details.useVersion seleniumVersion
         }
     }
