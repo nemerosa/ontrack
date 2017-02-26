@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.acceptance.browser
 
 import com.google.common.base.Function
-import com.google.common.base.Predicate
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
@@ -113,10 +112,10 @@ class Configuration {
 
     void waitUntil(String message, int seconds, Closure<Boolean> closure) {
         try {
-            new WebDriverWait(driver, seconds).until(new Predicate<WebDriver>() {
+            new WebDriverWait(driver, seconds).until(new Function<WebDriver, Boolean>() {
                 @Override
-                boolean apply(WebDriver input) {
-                    closure()
+                Boolean apply(WebDriver input) {
+                    return closure()
                 }
             })
         } catch (TimeoutException ex) {
