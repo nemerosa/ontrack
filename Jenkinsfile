@@ -99,9 +99,6 @@ git clean -xfd
         // TODO Ontrack build
 
         stage('Local acceptance tests') {
-           options {
-             timeout(time: 15, unit: 'MINUTES')
-           }
            steps {
              // Gets the delivery zip
              dir('delivery') {
@@ -112,7 +109,8 @@ git clean -xfd
 unzip delivery/build/distributions/*-delivery.zip -d delivery
 '''
              // Runs the acceptance tests
-             sh """\
+               timeout(time: 15, unit: 'MINUTES') {
+                   sh """\
 cd delivery/ontrack-acceptance
 docker-compose build
 docker-compose run --rm \\
@@ -120,6 +118,7 @@ docker-compose run --rm \\
     -e ONTRACK_ACCEPTANCE_OUTPUT=`pwd`/build/acceptance \\
     ontrack_acceptance
 """
+               }
           }
           post {
              always {
