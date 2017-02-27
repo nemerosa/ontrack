@@ -6,8 +6,11 @@ services:
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
+         JAVA_OPTIONS: "-Xmx1024m"
    selenium:
       image: "selenium/standalone-firefox:3.1.0"
+      environment:
+         JAVA_OPTS: "-Xmx512m"
    ontrack_acceptance:
       build: docker
       depends_on:
