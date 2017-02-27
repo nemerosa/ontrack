@@ -73,8 +73,12 @@ class Configuration {
     }
 
     WebElement findElement(By by) {
+        return findElement(by, implicitWait)
+    }
+
+    WebElement findElement(By by, int waitingTime) {
         new FluentWait<WebDriver>(driver)
-                .withTimeout(implicitWait, TimeUnit.SECONDS)
+                .withTimeout(waitingTime, TimeUnit.SECONDS)
                 .pollingEvery(1, TimeUnit.SECONDS)
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
