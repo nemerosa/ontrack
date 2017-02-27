@@ -109,7 +109,7 @@ git clean -xfd
 unzip delivery/build/distributions/*-delivery.zip -d delivery
 '''
              // Runs the acceptance tests
-               timeout(time: 25, unit: 'MINUTES') {
+               timeout(time: 15, unit: 'MINUTES') {
                    sh """\
 cd delivery/ontrack-acceptance
 docker-compose build
