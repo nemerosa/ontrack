@@ -31,24 +31,20 @@ class Configuration {
 
     private final AtomicLong screenshotIndex = new AtomicLong()
 
-    protected Configuration(AcceptanceConfig config) {
-        try {
-            acceptanceConfig = config
-            // Configuration
-            baseUrl = config.seleniumTargetUrl ?: config.url
-            implicitWait = config.implicitWait
-            screenshotDir = new File(config.outputDir, "screenshots").getAbsoluteFile()
-            FileUtils.forceMkdir(screenshotDir)
-            // Logging
-            logger.info("Browser base URL: ${}", baseUrl)
-            // Web driver class
-            driver = initDriver(config)
-            driver.manage().deleteAllCookies()
-            driver.manage().window().setSize(new Dimension(1024, 768))
-            driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS)
-        } catch (IOException ex) {
-            throw new ConfigurationException("Cannot initialise browser configuration", ex)
-        }
+    Configuration(AcceptanceConfig config) {
+        acceptanceConfig = config
+        // Configuration
+        baseUrl = config.seleniumTargetUrl ?: config.url
+        implicitWait = config.implicitWait
+        screenshotDir = new File(config.outputDir, "screenshots").getAbsoluteFile()
+        FileUtils.forceMkdir(screenshotDir)
+        // Logging
+        logger.info("Browser base URL: ${}", baseUrl)
+        // Web driver class
+        driver = initDriver(config)
+        driver.manage().deleteAllCookies()
+        driver.manage().window().setSize(new Dimension(1024, 768))
+        driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS)
     }
 
     AcceptanceConfig getAcceptanceConfig() {
@@ -64,6 +60,7 @@ class Configuration {
     }
 
     void closeConfiguration() {
+        logger.info("[driver] Quitting driver")
         driver.quit()
     }
 
@@ -169,6 +166,7 @@ class Configuration {
         logger.info("[gui] Browser logging directory at {}", loggingDir)
 
         if (config.seleniumGridUrl) {
+            logger.info("[driver] Remote driver @ {}", config.seleniumGridUrl)
             DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
             desiredCapabilities.setBrowserName("firefox")
             return new RemoteWebDriver(
