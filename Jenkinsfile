@@ -127,7 +127,7 @@ docker-compose run --rm \\
 cd delivery/ontrack-acceptance
 docker-compose down --volumes
 """
-                 archive 'delivery/ontrack-acceptance/build/acceptance/*.xml'
+                 archive 'delivery/ontrack-acceptance/build/acceptance/**'
                  junit 'delivery/ontrack-acceptance/build/acceptance/*.xml'
              }
           }
