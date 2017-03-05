@@ -6,6 +6,7 @@ apply plugin: 'groovy'
 dependencies {
     compile project(':ontrack-extension-scm')
     compile project(':ontrack-repository-support')
+    compile project(':ontrack-ui-graphql')
     compile project(':ontrack-tx')
     compile libraries.spring_tx
 
@@ -13,6 +14,7 @@ dependencies {
 
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-issues').sourceSets.test.output
+    testCompile project(':ontrack-ui-graphql').sourceSets.test.output
     testCompile libraries.groovy
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
