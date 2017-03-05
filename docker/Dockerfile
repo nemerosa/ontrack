@@ -19,6 +19,11 @@ VOLUME /var/ontrack/conf
 # Directory which contains the extensions
 VOLUME /var/ontrack/extensions
 
+# Variable to host the directory files
+# WARNING: This MIGHT be different than the volume, depending on how this image
+# is used, with an external volume or in a child Dockerfile
+ENV EXTENSIONS_DIR /var/ontrack/extensions
+
 # Exposing the ports
 EXPOSE 443
 EXPOSE 8080
