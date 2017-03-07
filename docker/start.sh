@@ -8,7 +8,7 @@ rm -rf /opt/ontrack/config \
 
 # Launching the application
 exec java \
-    -Dloader.path=/var/ontrack/extensions \
+    -Dloader.path=${EXTENSIONS_DIR} \
     ${JAVA_OPTIONS} \
     -jar /opt/ontrack/ontrack.jar \
     "--spring.profiles.active=${PROFILE}" \

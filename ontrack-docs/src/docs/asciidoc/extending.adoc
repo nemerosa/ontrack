@@ -323,8 +323,10 @@ You can also create your own image. Create the following `Dockerfile`:
 ----
 # Base Ontrack image
 FROM nemerosa/ontrack:<yourversion>
+# Overrides the extension directory, as to NOT use a volume
+ENV EXTENSIONS_DIR /var/ontrack/your-extension
 # Copies the extensions in the target volume
-COPY extensions/*.jar /var/ontrack/extensions/
+COPY extensions/*.jar /var/ontrack/your-extension/
 ----
 
 We assume here that your extensions are packaged in an `extensions` folder
@@ -337,6 +339,9 @@ at the same level than your `Dockerfile`:
      |-- extension1.jar
      |-- extension2.jar
 ----
+
+NOTE: When using a _child_ `Dockerfile`, the extension directory has to be
+customized because we cannot use the `VOLUME` in this case.
 
 [[extending-deploying-os]]
 ===== Using the CentOS or Debian/Ubuntu package

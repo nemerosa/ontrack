@@ -14,11 +14,11 @@ allprojects {
  */
 
 ext {
-    springBootVersion = '1.4.1.RELEASE'
-    springVersion = '4.3.3.RELEASE'
-    springSecurityVersion = '4.1.1.RELEASE'
+    springBootVersion = '1.5.2.RELEASE'
+    springVersion = '4.3.7.RELEASE'
+    springSecurityVersion = '4.2.2.RELEASE'
     httpClientVersion = '4.5.2'
-    slf4jVersion = '1.7.21'
+    slf4jVersion = '1.7.24'
     metricsVersion = '3.1.2'
 }
 

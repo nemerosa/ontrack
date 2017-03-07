@@ -35,6 +35,7 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 public class IndexationServiceImpl implements IndexationService, StartupService, ConfigurationServiceListener<SVNConfiguration> {
@@ -318,7 +319,9 @@ public class IndexationServiceImpl implements IndexationService, StartupService,
         // Merge relationships (using a nested SVN client)
         try (Transaction ignored = transactionService.start(true)) {
             List<Long> mergedRevisions = svnClient.getMergedRevisions(repository, SVNUtils.toURL(repository.getConfiguration().getUrl(), branch), revision);
-            revisionDao.addMergedRevisions(repository.getId(), revision, mergedRevisions);
+            // Unique revisions
+            List<Long> uniqueMergedRevisions = mergedRevisions.stream().distinct().collect(Collectors.toList());
+            revisionDao.addMergedRevisions(repository.getId(), revision, uniqueMergedRevisions);
         }
         // Subversion events
         indexSVNEvents(repository, logEntry);
