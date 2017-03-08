@@ -206,7 +206,7 @@ task publicationGitHubReleaseJarShellUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack-dsl-shell.jar'
     fileType = 'application/zip'
-    file = project.file("publication/ontrack-dsl-shell-${ontrackVersion}.jar")
+    file = project.file("publication/ontrack-dsl-shell-${ontrackVersion}-executable.jar")
 }
 
 task publicationGitHubReleaseDebianUpload(type: GitHubReleaseUpload) {

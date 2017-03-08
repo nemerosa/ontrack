@@ -23,6 +23,11 @@ dependencies {
 
 bootRepackage {
     executable = true
+    classifier = 'executable'
+}
+
+rootProject.tasks.publicationPackage {
+    from bootRepackage
 }
 
 springBoot {
