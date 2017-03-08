@@ -166,9 +166,10 @@ class Configuration {
         logger.info("[gui] Browser logging directory at {}", loggingDir)
 
         if (config.seleniumGridUrl) {
-            logger.info("[driver] Remote driver @ {}", config.seleniumGridUrl)
+            logger.info("[driver] Remote driver = {}", config.seleniumGridUrl)
+            logger.info("[driver] Browser = {}", config.seleniumBrowserName)
             DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
-            desiredCapabilities.setBrowserName("firefox")
+            desiredCapabilities.setBrowserName(config.seleniumBrowserName)
             return new RemoteWebDriver(
                     new URL(config.seleniumGridUrl),
                     desiredCapabilities

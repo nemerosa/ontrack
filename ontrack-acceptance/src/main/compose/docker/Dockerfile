@@ -17,25 +17,20 @@ COPY ontrack-acceptance.jar /ontrack/acceptance/app/
 ENV JAVA_OPTIONS ''
 
 # Selenium URL
-ENV ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL ''
-
 # Target Ontrack URL
-ENV ONTRACK_ACCEPTANCE_TARGET_URL 'http://localhost:8080'
-
 # Target Ontrack admin password
-ENV ONTRACK_ACCEPTANCE_TARGET_ADMIN_PASSWORD 'admin'
-
 # Target Ontrack SSL disabled?
-ENV ONTRACK_ACCEPTANCE_TARGET_SSL_DISABLED 'false'
-
 # Acceptance test context
-ENV ONTRACK_ACCEPTANCE_CONTEXT 'all'
-
 # Acceptance timeout
-ENV ONTRACK_ACCEPTANCE_TIMEOUT '120'
-
 # Acceptance implicit wait
-ENV ONTRACK_ACCEPTANCE_IMPLICIT_WAIT '5'
+ENV ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL='' \
+    ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME='firefox' \
+    ONTRACK_ACCEPTANCE_TARGET_URL='http://localhost:8080' \
+    ONTRACK_ACCEPTANCE_TARGET_ADMIN_PASSWORD='admin' \
+    ONTRACK_ACCEPTANCE_TARGET_SSL_DISABLED='false' \
+    ONTRACK_ACCEPTANCE_CONTEXT='all' \
+    ONTRACK_ACCEPTANCE_TIMEOUT='120' \
+    ONTRACK_ACCEPTANCE_IMPLICIT_WAIT='5'
 
 # Running the acceptance application
 ENTRYPOINT /ontrack/acceptance/app/acceptance.sh

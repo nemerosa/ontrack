@@ -41,6 +41,10 @@ public class AcceptanceConfig {
      */
     private String seleniumTargetUrl = "";
     /**
+     * Selenium browser name
+     */
+    private String seleniumBrowserName = "firefox";
+    /**
      * Disabling the SSL checks
      */
     private boolean disableSsl = false;
@@ -103,6 +107,7 @@ public class AcceptanceConfig {
     public void log(Consumer<String> logger) {
         logger.accept(String.format(">>> Ontrack URL:         %s", url));
         logger.accept(String.format(">>> Selenium grid URL:   %s", seleniumGridUrl));
+        logger.accept(String.format(">>> Selenium browser:    %s", seleniumBrowserName));
         logger.accept(String.format(">>> Selenium target URL: %s", seleniumTargetUrl));
         logger.accept(String.format(">>> Disable SSL:         %s", disableSsl));
         logger.accept(String.format(">>> Admin password:      %s", "admin".equals(admin) ? "admin" : "****"));
@@ -117,6 +122,7 @@ public class AcceptanceConfig {
         AcceptanceConfig c = new AcceptanceConfig();
         c.setUrl(env("ontrack.acceptance.url", c.getUrl(), "Ontrack URL"));
         c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-grid-url", c.getSeleniumGridUrl(), "Selenium Grid URL"));
+        c.setSeleniumBrowserName(env("ontrack.acceptance.selenium-browser-name", c.getSeleniumBrowserName(), "Selenium Browser Name"));
         c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-target-url", c.getSeleniumTargetUrl(), "Selenium Target URL"));
         c.setDisableSsl(envAsBoolean("ontrack.acceptance.disable-ssl", c.isDisableSsl(), "Disabling SSL"));
         c.setAdmin(env("ontrack.acceptance.admin", c.getAdmin(), "Admin password"));
