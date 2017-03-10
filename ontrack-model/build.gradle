@@ -7,11 +7,10 @@ dependencies {
     compile project(':ontrack-job')
     compile 'com.google.guava:guava'
     compile 'org.springframework:spring-context'
-    compile libraries.spring_boot
     compile 'org.springframework.security:spring-security-core'
     compile libraries.validation_api
     compile libraries.slf4j_api
-    compile libraries.spring_boot_starter_actuator
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
 
     testCompile libraries.groovy
     testCompile project(':ontrack-test-utils')

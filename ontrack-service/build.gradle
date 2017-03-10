@@ -5,7 +5,6 @@ dependencies {
     compile project(':ontrack-repository')
     compile project(':ontrack-extension-api')
     compile project(':ontrack-job')
-    compile libraries.spring_boot
     compile 'org.springframework:spring-context'
     compile 'org.springframework:spring-tx'
     compile 'org.springframework.security:spring-security-core'
@@ -15,7 +14,7 @@ dependencies {
     compile 'commons-io:commons-io'
     compile libraries.groovy
     compile libraries.groovy_sandbox
-    compile libraries.spring_boot_starter_actuator
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile libraries.metrics_core
     compile 'org.jgrapht:jgrapht-core'
 

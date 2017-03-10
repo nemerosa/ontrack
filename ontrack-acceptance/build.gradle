@@ -16,7 +16,7 @@ dependencies {
     testCompile project(':ontrack-dsl-shell')
     testCompile project(':ontrack-test-utils')
     testCompile libraries.groovy
-    testCompile libraries.spring_boot_starter
+    testCompile 'org.springframework.boot:spring-boot-starter'
 
     testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
 

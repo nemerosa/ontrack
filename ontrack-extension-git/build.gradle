@@ -17,5 +17,5 @@ dependencies {
     testCompile libraries.groovy
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
-    testRuntime libraries.spring_boot_starter_web
+    testRuntime 'org.springframework.boot:spring-boot-starter-web'
 }

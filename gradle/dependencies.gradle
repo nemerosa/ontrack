@@ -28,16 +28,6 @@ ext {
 
 ext {
     libraries = [
-            // Spring boot
-            spring_boot                 : "org.springframework.boot:spring-boot:${springBootVersion}",
-            spring_boot_starter         : "org.springframework.boot:spring-boot-starter:${springBootVersion}",
-            spring_boot_starter_jdbc    : "org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}",
-            spring_boot_starter_test    : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
-            spring_boot_starter_web     : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
-            spring_boot_starter_actuator: "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
-            spring_boot_starter_aop     : "org.springframework.boot:spring-boot-starter-aop:${springBootVersion}",
-            spring_boot_starter_security: "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
-
             // HTTP client
             http_client                 : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
             http_mime                   : "org.apache.httpcomponents:httpmime:${httpClientVersion}",

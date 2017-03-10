@@ -11,7 +11,7 @@ dependencies {
     testCompile project(':ontrack-extension-api').sourceSets.test.output
     testCompile project(':ontrack-model').sourceSets.test.output
     testCompile libraries.groovy
-    testCompile libraries.spring_boot_starter_test
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')

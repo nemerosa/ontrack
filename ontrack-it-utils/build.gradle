@@ -7,9 +7,9 @@ dependencies {
     compile 'org.springframework:spring-jdbc'
     compile 'org.springframework:spring-test'
     compile 'org.springframework.security:spring-security-core'
-    compile libraries.spring_boot_starter_jdbc
+    compile 'org.springframework.boot:spring-boot-starter-jdbc'
     compile libraries.slf4j_api
-    compile libraries.spring_boot_starter_actuator
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
     
     runtime 'com.h2database:h2'
     runtime libraries.metrics_core
