@@ -1,7 +1,5 @@
-plugins {
-    id 'org.springframework.boot' version '1.5.2.RELEASE'
-    id 'groovy'
-}
+apply plugin: 'org.springframework.boot'
+apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-ui-support')

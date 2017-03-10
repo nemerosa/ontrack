@@ -1,12 +1,13 @@
 buildscript {
+    ext {
+        springBootVersion = '1.5.2.RELEASE'
+    }
     repositories {
         jcenter()
     }
     dependencies {
         classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
-    }
-    ext {
-        springBootVersion = '1.5.2.RELEASE'
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
     }
 }
 
@@ -59,6 +60,17 @@ configure(javaProjects) {
 
     apply plugin: 'java'
     apply plugin: 'maven'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+        }
+        dependencies {
+            dependency 'commons-io:commons-io:2.5'
+            dependency 'org.apache.commons:commons-lang3:3.4'
+        }
+    }
 
     dependencies {
         // TODO Lombok not to be released
