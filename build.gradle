@@ -70,11 +70,19 @@ configure(javaProjects) {
             dependency 'commons-io:commons-io:2.5'
             dependency 'org.apache.commons:commons-lang3:3.4'
             dependency 'org.projectlombok:lombok:1.16.10'
+            dependency 'net.jodah:failsafe:0.9.2'
+            dependency 'commons-logging:commons-logging:1.2'
+            dependency 'org.apache.commons:commons-math3:3.6.1'
+            dependency 'com.google.guava:guava:19.0'
+            dependency 'net.sf.dbinit:dbinit:1.4.0'
+            dependency 'args4j:args4j:2.33'
+            dependency 'org.jgrapht:jgrapht-core:0.9.2'
         }
     }
 
     dependencies {
         compileOnly 'org.projectlombok:lombok'
+        testCompile 'org.projectlombok:lombok'
         // Testing
         testCompile 'junit:junit'
         testCompile 'org.mockito:mockito-core'

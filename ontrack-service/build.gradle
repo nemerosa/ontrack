@@ -12,12 +12,12 @@ dependencies {
     compile libraries.spring_security_config
     compile libraries.spring_security_ldap
     compile libraries.slf4j_api
-    compile libraries.commons_io
+    compile 'commons-io:commons-io'
     compile libraries.groovy
     compile libraries.groovy_sandbox
     compile libraries.spring_boot_starter_actuator
     compile libraries.metrics_core
-    compile libraries.jgrapht
+    compile 'org.jgrapht:jgrapht-core'
 
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output

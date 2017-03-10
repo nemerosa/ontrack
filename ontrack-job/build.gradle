@@ -6,7 +6,7 @@ dependencies {
     compile libraries.slf4j_api
 
     testCompile project(':ontrack-test-utils')
-    testCompile libraries.commons_math
-    testCompile libraries.guava
+    testCompile 'org.apache.commons:commons-math3'
+    testCompile 'com.google.guava:guava'
     testRuntime libraries.slf4j_log4j
 }

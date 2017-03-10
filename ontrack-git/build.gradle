@@ -5,8 +5,8 @@ description = "Git client for Ontrack."
 dependencies {
     compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.1.201607150455-r'
     compile libraries.spring_tx
-    compile libraries.commons_io
-    compile libraries.guava
+    compile 'commons-io:commons-io'
+    compile 'com.google.guava:guava'
     compile project(':ontrack-common')
     compile libraries.groovy
     compile libraries.slf4j_api

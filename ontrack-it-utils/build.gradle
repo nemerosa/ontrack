@@ -11,7 +11,7 @@ dependencies {
     compile libraries.slf4j_api
     compile libraries.spring_boot_starter_actuator
     
-    runtime libraries.h2
+    runtime 'com.h2database:h2'
     runtime libraries.metrics_core
     runtime libraries.validation_impl
 }

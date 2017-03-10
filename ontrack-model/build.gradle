@@ -5,7 +5,7 @@ dependencies {
     compile project(':ontrack-common')
     compile project(':ontrack-json')
     compile project(':ontrack-job')
-    compile libraries.guava
+    compile 'com.google.guava:guava'
     compile libraries.spring_context
     compile libraries.spring_boot
     compile libraries.spring_security_core
