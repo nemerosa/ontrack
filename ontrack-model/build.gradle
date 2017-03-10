@@ -12,7 +12,7 @@ dependencies {
     compile libraries.slf4j_api
     compile 'org.springframework.boot:spring-boot-starter-actuator'
 
-    testCompile libraries.groovy
+    testCompile 'org.codehaus.groovy:groovy-all'
     testCompile project(':ontrack-test-utils')
 
 }

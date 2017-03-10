@@ -8,5 +8,5 @@ dependencies {
     compile project(':ontrack-tx')
     compile 'org.springframework:spring-tx'
 
-    testCompile libraries.groovy
+    testCompile 'org.codehaus.groovy:groovy-all'
 }

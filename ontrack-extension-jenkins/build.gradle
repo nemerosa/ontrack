@@ -7,6 +7,6 @@ dependencies {
     compile project(':ontrack-extension-support')
     compile 'org.springframework:spring-tx'
 
-    testCompile libraries.groovy
+    testCompile 'org.codehaus.groovy:groovy-all'
     testCompile project(':ontrack-test-utils')
 }

@@ -8,7 +8,7 @@ dependencies {
     compile 'org.springframework.security:spring-security-ldap'
 
     testCompile project(':ontrack-it-utils')
-    testCompile libraries.groovy
+    testCompile 'org.codehaus.groovy:groovy-all'
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
 }

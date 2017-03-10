@@ -12,8 +12,8 @@ dependencies {
     compile 'org.springframework.security:spring-security-ldap'
     compile libraries.slf4j_api
     compile 'commons-io:commons-io'
-    compile libraries.groovy
-    compile libraries.groovy_sandbox
+    compile 'org.codehaus.groovy:groovy-all'
+    compile 'org.kohsuke:groovy-sandbox'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile libraries.metrics_core
     compile 'org.jgrapht:jgrapht-core'

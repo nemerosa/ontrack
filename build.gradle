@@ -77,6 +77,7 @@ configure(javaProjects) {
             dependency 'net.sf.dbinit:dbinit:1.4.0'
             dependency 'args4j:args4j:2.33'
             dependency 'org.jgrapht:jgrapht-core:0.9.2'
+            dependency 'org.kohsuke:groovy-sandbox:1.10'
         }
     }
 

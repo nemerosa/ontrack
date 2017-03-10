@@ -8,6 +8,6 @@ dependencies {
     compile 'commons-io:commons-io'
     compile 'com.google.guava:guava'
     compile project(':ontrack-common')
-    compile libraries.groovy
+    compile 'org.codehaus.groovy:groovy-all'
     compile libraries.slf4j_api
 }
