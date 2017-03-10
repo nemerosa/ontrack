@@ -2,5 +2,5 @@ description = "JSON utilities."
 
 dependencies {
     compile libraries.jackson_databind
-    compile libraries.commons_lang3
+    compile 'org.apache.commons:commons-lang3'
 }

@@ -34,7 +34,7 @@ allprojects {
 }
 
 /**
- * Dependency management
+ * FIXME REMOVE Dependency management
  */
 
 apply from: "$rootDir/gradle/dependencies.gradle"
@@ -69,15 +69,15 @@ configure(javaProjects) {
         dependencies {
             dependency 'commons-io:commons-io:2.5'
             dependency 'org.apache.commons:commons-lang3:3.4'
+            dependency 'org.projectlombok:lombok:1.16.10'
         }
     }
 
     dependencies {
-        // TODO Lombok not to be released
-        compile libraries.lombok
+        compileOnly 'org.projectlombok:lombok'
         // Testing
-        testCompile libraries.junit
-        testCompile libraries.mockito
+        testCompile 'junit:junit'
+        testCompile 'org.mockito:mockito-core'
     }
 
     // Unit tests run with the `test` task

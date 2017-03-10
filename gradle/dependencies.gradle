@@ -29,7 +29,6 @@ ext {
 ext {
     libraries = [
             // Misc
-            commons_lang3               : 'org.apache.commons:commons-lang3:3.4',
             commons_io                  : 'commons-io:commons-io:2.5',
             commons_math                : 'org.apache.commons:commons-math3:3.6.1',
             jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.8.1',
