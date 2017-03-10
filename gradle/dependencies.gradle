@@ -28,10 +28,6 @@ ext {
 
 ext {
     libraries = [
-            // HTTP client
-            http_client                 : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
-            http_mime                   : "org.apache.httpcomponents:httpmime:${httpClientVersion}",
-
             // Groovy
             groovy                      : 'org.codehaus.groovy:groovy-all:2.4.7',
             groovy_sandbox              : 'org.kohsuke:groovy-sandbox:1.10',
