@@ -5,6 +5,9 @@ buildscript {
     dependencies {
         classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
     }
+    ext {
+        springBootVersion = '1.5.2.RELEASE'
+    }
 }
 
 plugins {
