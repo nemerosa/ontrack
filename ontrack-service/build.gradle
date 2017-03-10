@@ -8,9 +8,9 @@ dependencies {
     compile libraries.spring_boot
     compile 'org.springframework:spring-context'
     compile 'org.springframework:spring-tx'
-    compile libraries.spring_security_core
-    compile libraries.spring_security_config
-    compile libraries.spring_security_ldap
+    compile 'org.springframework.security:spring-security-core'
+    compile 'org.springframework.security:spring-security-config'
+    compile 'org.springframework.security:spring-security-ldap'
     compile libraries.slf4j_api
     compile 'commons-io:commons-io'
     compile libraries.groovy

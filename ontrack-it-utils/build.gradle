@@ -6,7 +6,7 @@ dependencies {
     compile 'org.springframework:spring-context'
     compile 'org.springframework:spring-jdbc'
     compile 'org.springframework:spring-test'
-    compile libraries.spring_security_core
+    compile 'org.springframework.security:spring-security-core'
     compile libraries.spring_boot_starter_jdbc
     compile libraries.slf4j_api
     compile libraries.spring_boot_starter_actuator

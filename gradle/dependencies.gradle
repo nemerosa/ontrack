@@ -28,11 +28,6 @@ ext {
 
 ext {
     libraries = [
-            // Spring security
-            spring_security_core        : "org.springframework.security:spring-security-core:${springSecurityVersion}",
-            spring_security_config      : "org.springframework.security:spring-security-config:${springSecurityVersion}",
-            spring_security_ldap        : "org.springframework.security:spring-security-ldap:${springSecurityVersion}",
-
             // Spring boot
             spring_boot                 : "org.springframework.boot:spring-boot:${springBootVersion}",
             spring_boot_starter         : "org.springframework.boot:spring-boot-starter:${springBootVersion}",

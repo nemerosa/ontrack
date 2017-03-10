@@ -5,7 +5,7 @@ apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-extension-support')
-    compile libraries.spring_security_ldap
+    compile 'org.springframework.security:spring-security-ldap'
 
     testCompile project(':ontrack-it-utils')
     testCompile libraries.groovy
