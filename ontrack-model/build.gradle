@@ -6,7 +6,7 @@ dependencies {
     compile project(':ontrack-json')
     compile project(':ontrack-job')
     compile 'com.google.guava:guava'
-    compile libraries.spring_context
+    compile 'org.springframework:spring-context'
     compile libraries.spring_boot
     compile libraries.spring_security_core
     compile libraries.validation_api

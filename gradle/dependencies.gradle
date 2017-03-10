@@ -28,14 +28,6 @@ ext {
 
 ext {
     libraries = [
-            // Spring
-            spring_context              : "org.springframework:spring-context:${springVersion}",
-            spring_context_support      : "org.springframework:spring-context-support:${springVersion}",
-            spring_jdbc                 : "org.springframework:spring-jdbc:${springVersion}",
-            spring_tx                   : "org.springframework:spring-tx:${springVersion}",
-            spring_webmvc               : "org.springframework:spring-webmvc:${springVersion}",
-            spring_test                 : "org.springframework:spring-test:${springVersion}",
-
             // Spring security
             spring_security_core        : "org.springframework.security:spring-security-core:${springSecurityVersion}",
             spring_security_config      : "org.springframework.security:spring-security-config:${springSecurityVersion}",

@@ -8,7 +8,7 @@ dependencies {
     compile project(':ontrack-repository-support')
     compile project(':ontrack-ui-graphql')
     compile project(':ontrack-tx')
-    compile libraries.spring_tx
+    compile 'org.springframework:spring-tx'
 
     compile 'org.tmatesoft.svnkit:svnkit:1.8.12'
 

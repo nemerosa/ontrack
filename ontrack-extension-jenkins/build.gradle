@@ -5,7 +5,7 @@ apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-extension-support')
-    compile libraries.spring_tx
+    compile 'org.springframework:spring-tx'
 
     testCompile libraries.groovy
     testCompile project(':ontrack-test-utils')

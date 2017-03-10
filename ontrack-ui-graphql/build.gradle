@@ -4,7 +4,7 @@ dependencies {
 
     compile project(':ontrack-ui-support')
     compile 'com.graphql-java:graphql-java:2.2.0'
-    compile libraries.spring_tx
+    compile 'org.springframework:spring-tx'
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')

@@ -3,9 +3,9 @@ dependencies {
     compile project(':ontrack-model')
     compile project(':ontrack-test-utils')
     compile project(':ontrack-ui-support')
-    compile libraries.spring_context
-    compile libraries.spring_jdbc
-    compile libraries.spring_test
+    compile 'org.springframework:spring-context'
+    compile 'org.springframework:spring-jdbc'
+    compile 'org.springframework:spring-test'
     compile libraries.spring_security_core
     compile libraries.spring_boot_starter_jdbc
     compile libraries.slf4j_api

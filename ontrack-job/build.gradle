@@ -2,7 +2,7 @@ description = "Abstract management of identified jobs."
 
 dependencies {
     compile project(':ontrack-common')
-    compile libraries.spring_context
+    compile 'org.springframework:spring-context'
     compile libraries.slf4j_api
 
     testCompile project(':ontrack-test-utils')

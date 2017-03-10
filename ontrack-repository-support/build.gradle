@@ -1,6 +1,6 @@
 dependencies {
     compile project(':ontrack-model')
-    compile libraries.spring_jdbc
+    compile 'org.springframework:spring-jdbc'
     compile('net.sf.dbinit:dbinit') {
         exclude group: 'org.slf4j'
     }
