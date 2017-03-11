@@ -1,5 +1,5 @@
-apply plugin: 'org.springframework.boot'
 apply plugin: 'groovy'
+apply plugin: 'org.springframework.boot'
 
 dependencies {
     compile project(':ontrack-ui-support')
@@ -22,7 +22,7 @@ dependencies {
     testCompile project(':ontrack-model').sourceSets.test.output
     testCompile project(':ontrack-ui-graphql').sourceSets.test.output
     testCompile 'org.codehaus.groovy:groovy-all'
-    compile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 
     // List of extensions to include in core
     runtime project(':ontrack-extension-general')
