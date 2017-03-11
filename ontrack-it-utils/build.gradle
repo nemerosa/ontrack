@@ -8,7 +8,7 @@ dependencies {
     compile 'org.springframework:spring-test'
     compile 'org.springframework.security:spring-security-core'
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
-    compile libraries.slf4j_api
+    compile 'org.slf4j:slf4j-api'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     
     runtime 'com.h2database:h2'

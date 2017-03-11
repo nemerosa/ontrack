@@ -28,11 +28,6 @@ ext {
 
 ext {
     libraries = [
-            // Logging
-            slf4j_api                   : "org.slf4j:slf4j-api:${slf4jVersion}",
-            slf4j_log4j                 : "org.slf4j:slf4j-log4j12:${slf4jVersion}",
-            log4j                       : 'log4j:log4j:1.2.17',
-
             // Metrics
             metrics_core                : "io.dropwizard.metrics:metrics-graphite:${metricsVersion}",
             metrics_graphite            : "io.dropwizard.metrics:metrics-graphite:${metricsVersion}",

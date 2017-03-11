@@ -9,7 +9,7 @@ dependencies {
     compile 'org.springframework:spring-context'
     compile 'org.springframework.security:spring-security-core'
     compile libraries.validation_api
-    compile libraries.slf4j_api
+    compile 'org.slf4j:slf4j-api'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
 
     testCompile 'org.codehaus.groovy:groovy-all'

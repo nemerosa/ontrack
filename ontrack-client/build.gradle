@@ -5,5 +5,5 @@ dependencies {
     compile project(':ontrack-json')
     compile 'org.apache.httpcomponents:httpclient'
     compile 'org.apache.httpcomponents:httpmime'
-    compile libraries.slf4j_api
+    compile 'org.slf4j:slf4j-api'
 }

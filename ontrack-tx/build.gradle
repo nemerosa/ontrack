@@ -1,5 +1,5 @@
 dependencies {
     compile 'com.google.guava:guava'
-    compile libraries.slf4j_api
+    compile 'org.slf4j:slf4j-api'
     compile 'org.springframework:spring-context'
 }
