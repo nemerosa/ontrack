@@ -21,20 +21,3 @@ ext {
     slf4jVersion = '1.7.24'
     metricsVersion = '3.1.2'
 }
-
-/**
- * List of dependencies
- */
-
-ext {
-    libraries = [
-            // Test
-            junit                       : 'junit:junit:4.12',
-            mockito                     : 'org.mockito:mockito-core:1.10.19',
-
-            // Other
-            lombok                      : 'org.projectlombok:lombok:1.16.10',
-            validation_api              : 'javax.validation:validation-api:1.1.0.Final',
-            validation_impl             : 'org.hibernate:hibernate-validator:5.2.4.Final',
-    ]
-}

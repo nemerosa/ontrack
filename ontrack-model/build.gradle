@@ -8,7 +8,7 @@ dependencies {
     compile 'com.google.guava:guava'
     compile 'org.springframework:spring-context'
     compile 'org.springframework.security:spring-security-core'
-    compile libraries.validation_api
+    compile 'javax.validation:validation-api'
     compile 'org.slf4j:slf4j-api'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
 
