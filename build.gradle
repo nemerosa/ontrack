@@ -34,10 +34,16 @@ allprojects {
 }
 
 /**
- * FIXME REMOVE Dependency management
+ * Resolution
  */
 
-apply from: "$rootDir/gradle/dependencies.gradle"
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
 
 /**
  * Java projects

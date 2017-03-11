@@ -8,7 +8,7 @@ buildscript {
 }
 
 apply plugin: 'groovy'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
 dependencies {
     testCompile project(':ontrack-client')

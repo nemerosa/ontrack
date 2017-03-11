@@ -9,7 +9,7 @@ buildscript {
 
 description = "DSL Shell for Ontrack."
 
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 apply plugin: 'groovy'
 
 dependencies {

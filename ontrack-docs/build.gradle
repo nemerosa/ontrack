@@ -13,7 +13,7 @@ buildscript {
 import org.asciidoctor.gradle.AsciidoctorTask
 
 apply plugin: 'groovy'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 apply plugin: 'org.asciidoctor.convert'
 
 asciidoctorj {
