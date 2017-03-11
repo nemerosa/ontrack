@@ -12,6 +12,6 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     
     runtime 'com.h2database:h2'
-    runtime libraries.metrics_core
+    runtime 'io.dropwizard.metrics:metrics-core'
     runtime libraries.validation_impl
 }
