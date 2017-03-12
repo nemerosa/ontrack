@@ -249,5 +249,5 @@ task testReport(type: TestReport) {
  */
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.4'
+    gradleVersion = '3.4.1'
 }
