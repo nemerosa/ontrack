@@ -383,16 +383,16 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
+        credentialsBinding {
+            usernamePassword 'DOCKER_HUB_USERNAME', 'DOCKER_HUB_PASSWORD', 'DOCKER_HUB'
         }
     }
     steps {
-        shell '''\
-docker login --username="nemerosa" --password="${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:${VERSION}
+        shell """\
+docker login --username="\${DOCKER_HUB_USERNAME}" --password="\${DOCKER_HUB_PASSWORD}"
+docker push nemerosa/ontrack:\${VERSION}
 docker logout
-'''
+"""
     }
     publishers {
         downstreamParameterized {
@@ -436,8 +436,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
+        credentialsBinding {
+            string 'DO_TOKEN', 'DO_TOKEN'
         }
     }
     steps {
@@ -481,9 +481,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
     wrappers {
         credentialsBinding {
             file 'GPG_KEY_FILE', 'GPGKeyRing'
-        }
-        injectPasswords {
-            injectGlobalPasswords()
+            usernamePassword 'GPG_KEY_ID', 'GPG_KEY_PASSWORD', 'GPG_KEY'
+            usernamePassword 'OSSRH_USER', 'OSSRH_PASSWORD', 'OSSRH'
+            usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
         }
     }
     steps {
@@ -503,7 +503,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 -Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
 -PossrhUser=\${OSSRH_USER}
 -PossrhPassword=\${OSSRH_PASSWORD}
--PgitHubUser=dcoraboeuf
+-PgitHubUser=\${GITHUB_USER}
 -PgitHubPassword=\${GITHUB_TOKEN}
 publicationRelease
 """
@@ -581,8 +581,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
     deliveryPipelineConfiguration('Release', 'Site')
     preparePipelineJob delegate, false
     wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
+        credentialsBinding {
+            usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
         }
     }
     steps {
@@ -618,9 +618,6 @@ if (production) {
         deliveryPipelineConfiguration('Release', 'Production')
         preparePipelineJob delegate, false
         wrappers {
-            injectPasswords {
-                injectGlobalPasswords()
-            }
             environmentVariables {
                 env 'ONTRACK_VERSION', '${VERSION}'
             }
@@ -667,11 +664,6 @@ docker-compose \\
         }
         deliveryPipelineConfiguration('Release', 'Production acceptance')
         preparePipelineJob delegate, true
-        wrappers {
-            injectPasswords {
-                injectGlobalPasswords()
-            }
-        }
         steps {
             // Runs the acceptance tests
             withXvfb delegate, """\
@@ -716,11 +708,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         artifactNumToKeep(1)
     }
     label 'master'
-    wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
-        }
-    }
     steps {
         ontrackDsl {
             log()
