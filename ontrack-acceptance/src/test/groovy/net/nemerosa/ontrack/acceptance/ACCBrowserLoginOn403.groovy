@@ -5,8 +5,6 @@ import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
-import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
-
 /**
  * GUI test which tests the login redirection in case of page not authorised
  */

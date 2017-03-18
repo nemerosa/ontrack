@@ -1,23 +1,26 @@
-# InfluxDB container
-influxdb:
-  # Makes all ports accessible on the host for testing
-  ports:
-    - "8083:8083"
+version: "2"
 
-# Grafana container
-grafana:
-  ports:
-    - "3000:3000"
+services:
+  # InfluxDB container
+  influxdb:
+    # Makes all ports accessible on the host for testing
+    ports:
+      - "8083:8083"
 
-# Ontrack container
-ontrack:
-  image: nemerosa/ontrack:${ONTRACK_VERSION}
-  environment:
-      PROFILE: acceptance
-  volumes:
-    # The /var/ontrack/conf on the DO machine is filled in from gradle/compose/ci/ontrack in the doEnv task
-    - "/var/ontrack/conf:/var/ontrack/conf"
-    # Better startup performances in CI and DO, do not use in Prod
-    - "/dev/urandom:/dev/random"
-  ports:
-    - "443:443"
+  # Grafana container
+  grafana:
+    ports:
+      - "3000:3000"
+
+  # Ontrack container
+  ontrack:
+    image: nemerosa/ontrack:${ONTRACK_VERSION}
+    environment:
+        PROFILE: acceptance
+    volumes:
+      # The /var/ontrack/conf on the DO machine is filled in from gradle/compose/ci/ontrack in the doEnv task
+      - "/var/ontrack/conf:/var/ontrack/conf"
+      # Better startup performances in CI and DO, do not use in Prod
+      - "/dev/urandom:/dev/random"
+    ports:
+      - "443:443"

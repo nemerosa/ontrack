@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 
-import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
 
 /**

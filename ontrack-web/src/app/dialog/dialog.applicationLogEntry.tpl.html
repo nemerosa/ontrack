@@ -17,6 +17,9 @@
         <dt>Information</dt>
         <dd>{{data.information}}</dd>
 
+        <dt ng-if="data.authentication">Authentication</dt>
+        <dd ng-if="data.authentication">{{data.authentication}}</dd>
+
         <dt ng-if="data.detailList">Details</dt>
         <dd ng-if="data.detailList">
             <ul>
