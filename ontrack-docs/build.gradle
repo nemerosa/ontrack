@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-        classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.0'
+        classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.4'
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE'
     }
 }
@@ -21,7 +21,7 @@ asciidoctorj {
 }
 
 dependencies {
-    asciidoctor 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+    asciidoctor 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.14'
     compile project(':ontrack-dsl')
     compile project(':ontrack-json')
     compile 'commons-io:commons-io'
