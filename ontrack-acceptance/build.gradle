@@ -8,7 +8,7 @@ buildscript {
 }
 
 apply plugin: 'groovy'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
 ext {
     seleniumVersion = '3.2.0'
@@ -19,8 +19,8 @@ dependencies {
     testCompile project(':ontrack-dsl')
     testCompile project(':ontrack-dsl-shell')
     testCompile project(':ontrack-test-utils')
-    testCompile libraries.groovy
-    testCompile libraries.spring_boot_starter
+    testCompile 'org.codehaus.groovy:groovy-all'
+    testCompile 'org.springframework.boot:spring-boot-starter'
 
     testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"

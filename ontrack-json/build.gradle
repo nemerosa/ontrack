@@ -1,6 +1,6 @@
 description = "JSON utilities."
 
 dependencies {
-    compile libraries.jackson_databind
-    compile libraries.commons_lang3
+    compile 'com.fasterxml.jackson.core:jackson-databind'
+    compile 'org.apache.commons:commons-lang3'
 }

@@ -220,8 +220,8 @@ public MyTest extends AbstractServiceTestSupport {
 
 Ontrack provides the following extension points:
 
-* <<extending-properties, Properties>> - allows to attach a property to an [entity](Model)
-* <<extending-decorators, Decorators>> - allows to display a decoration for an [entity](Model)
+* <<extending-properties, Properties>> - allows to attach a property to an <<model,entity>>
+* <<extending-decorators, Decorators>> - allows to display a decoration for an <<model,entity>>
 * <<extending-usermenu, User menu action>> - allows to add an entry in the connected user menu
 * <<extending-settings, Settings>> - allows to add an entry in the global settings
 * <<extending-metrics, Metrics>> - allows to contribute to the

@@ -5,15 +5,14 @@ dependencies {
     compile project(':ontrack-common')
     compile project(':ontrack-json')
     compile project(':ontrack-job')
-    compile libraries.guava
-    compile libraries.spring_context
-    compile libraries.spring_boot
-    compile libraries.spring_security_core
-    compile libraries.validation_api
-    compile libraries.slf4j_api
-    compile libraries.spring_boot_starter_actuator
+    compile 'com.google.guava:guava'
+    compile 'org.springframework:spring-context'
+    compile 'org.springframework.security:spring-security-core'
+    compile 'javax.validation:validation-api'
+    compile 'org.slf4j:slf4j-api'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
 
-    testCompile libraries.groovy
+    testCompile 'org.codehaus.groovy:groovy-all'
     testCompile project(':ontrack-test-utils')
 
 }

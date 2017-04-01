@@ -5,19 +5,18 @@ dependencies {
     compile project(':ontrack-repository')
     compile project(':ontrack-extension-api')
     compile project(':ontrack-job')
-    compile libraries.spring_boot
-    compile libraries.spring_context
-    compile libraries.spring_tx
-    compile libraries.spring_security_core
-    compile libraries.spring_security_config
-    compile libraries.spring_security_ldap
-    compile libraries.slf4j_api
-    compile libraries.commons_io
-    compile libraries.groovy
-    compile libraries.groovy_sandbox
-    compile libraries.spring_boot_starter_actuator
-    compile libraries.metrics_core
-    compile libraries.jgrapht
+    compile 'org.springframework:spring-context'
+    compile 'org.springframework:spring-tx'
+    compile 'org.springframework.security:spring-security-core'
+    compile 'org.springframework.security:spring-security-config'
+    compile 'org.springframework.security:spring-security-ldap'
+    compile 'org.slf4j:slf4j-api'
+    compile 'commons-io:commons-io'
+    compile 'org.codehaus.groovy:groovy-all'
+    compile 'org.kohsuke:groovy-sandbox'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'io.dropwizard.metrics:metrics-core'
+    compile 'org.jgrapht:jgrapht-core'
 
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output

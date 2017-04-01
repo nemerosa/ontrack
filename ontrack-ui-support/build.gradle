@@ -1,8 +1,8 @@
 dependencies {
     compile project(':ontrack-model')
     compile project(':ontrack-extension-api')
-    compile libraries.spring_webmvc
-    compile libraries.spring_boot_starter_web
+    compile 'org.springframework:spring-webmvc'
+    compile 'org.springframework.boot:spring-boot-starter-web'
 
     testCompile project(':ontrack-model').sourceSets.test.output
 }

@@ -9,11 +9,11 @@ buildscript {
 
 description = "DSL Shell for Ontrack."
 
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 apply plugin: 'groovy'
 
 dependencies {
-    compile libraries.args4j
+    compile 'args4j:args4j'
     compile 'org.slf4j:slf4j-api'
     compile 'org.apache.httpcomponents:httpclient'
     compile 'org.apache.httpcomponents:httpmime'

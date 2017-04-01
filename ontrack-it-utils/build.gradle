@@ -3,15 +3,15 @@ dependencies {
     compile project(':ontrack-model')
     compile project(':ontrack-test-utils')
     compile project(':ontrack-ui-support')
-    compile libraries.spring_context
-    compile libraries.spring_jdbc
-    compile libraries.spring_test
-    compile libraries.spring_security_core
-    compile libraries.spring_boot_starter_jdbc
-    compile libraries.slf4j_api
-    compile libraries.spring_boot_starter_actuator
+    compile 'org.springframework:spring-context'
+    compile 'org.springframework:spring-jdbc'
+    compile 'org.springframework:spring-test'
+    compile 'org.springframework.security:spring-security-core'
+    compile 'org.springframework.boot:spring-boot-starter-jdbc'
+    compile 'org.slf4j:slf4j-api'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
     
-    runtime libraries.h2
-    runtime libraries.metrics_core
-    runtime libraries.validation_impl
+    runtime 'com.h2database:h2'
+    runtime 'io.dropwizard.metrics:metrics-core'
+    runtime 'org.hibernate:hibernate-validator'
 }

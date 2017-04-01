@@ -11,7 +11,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'com.moowork.gradle:gradle-node-plugin:0.11'
-    compile 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
+    compile "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
 }
 
 if (documentationProfile) {

@@ -87,9 +87,10 @@ public class DSLDocExtractor {
                         getMethodId(methodDsl, method),
                         getMethodName(method),
                         getMethodSignature(groovyMethodDoc, method),
-                        getMethodDescription(docClass, methodDsl),
+                        getMethodDescription(methodDsl),
                         getMethodLongDescription(methodDsl, clazz, method),
-                        getMethodSample(methodDsl, clazz, method)
+                        getMethodSample(methodDsl, clazz, method),
+                        methodDsl.see()
                 );
                 docClass.getMethods().add(docMethod);
                 // Return type
@@ -186,14 +187,8 @@ public class DSLDocExtractor {
         }
     }
 
-    private String getMethodDescription(DSLDocClass docClass, DSLMethod methodDsl) throws IOException {
-        if (StringUtils.isNotBlank(methodDsl.see())) {
-            return String.format(
-                    "See <<dsl-%s-%s>>.",
-                    docClass.getId(),
-                    methodDsl.see()
-            );
-        } else if (StringUtils.isNotBlank(methodDsl.value())) {
+    private String getMethodDescription(DSLMethod methodDsl) throws IOException {
+        if (StringUtils.isNotBlank(methodDsl.value())) {
             return methodDsl.value();
         } else {
             return null;

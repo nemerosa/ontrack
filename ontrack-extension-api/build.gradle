@@ -1,6 +1,6 @@
 dependencies {
     compile project(':ontrack-model')
-    compile libraries.spring_boot_starter_actuator
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 configurations {
