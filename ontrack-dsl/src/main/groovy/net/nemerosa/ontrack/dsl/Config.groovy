@@ -191,7 +191,7 @@ class Config {
      * Predefined validation stamps
      */
 
-    @DSLMethod("Gets the list of validation stamps. See <<dsl-projectproperties-autoValidationStamp>>.")
+    @DSLMethod("Gets the list of validation stamps. See <<dsl-projectproperties-autoValidationStamp,`autoValidationStamp`>>.")
     List<PredefinedValidationStamp> getPredefinedValidationStamps() {
         ontrack.get('admin/predefinedValidationStamps').resources.collect {
             new PredefinedValidationStamp(
@@ -201,7 +201,7 @@ class Config {
         }
     }
 
-    @DSLMethod(value = "See <<dsl-projectproperties-autoValidationStamp>>.", count = 3)
+    @DSLMethod(value = "See <<dsl-projectproperties-autoValidationStamp,`autoValidationStamp`>>.", count = 3)
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false) {
         def vs = predefinedValidationStamps.find { it.name == name }
         if (vs) {
@@ -224,7 +224,7 @@ class Config {
         }
     }
 
-    @DSLMethod(value = "See <<dsl-projectproperties-autoValidationStamp>>.", count = 4, id = "predefinedValidationStamp-config")
+    @DSLMethod(value = "See <<dsl-projectproperties-autoValidationStamp,`autoValidationStamp`>>.", count = 4, id = "predefinedValidationStamp-config")
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def vs = predefinedValidationStamp(name, description, getIfExists)
         vs(closure)
@@ -235,7 +235,7 @@ class Config {
      * Predefined promotion levels
      */
 
-    @DSLMethod("Gets the list of promotion levels. See <<dsl-projectproperties-autoPromotionLevel>>.")
+    @DSLMethod("Gets the list of promotion levels. See <<dsl-projectproperties-autoPromotionLevel,`autoPromotionLevel`>>.")
     List<PredefinedPromotionLevel> getPredefinedPromotionLevels() {
         ontrack.get('admin/predefinedPromotionLevels').resources.collect {
             new PredefinedPromotionLevel(
@@ -245,7 +245,7 @@ class Config {
         }
     }
 
-    @DSLMethod(value = "See <<dsl-projectproperties-autoPromotionLevel>>.", count = 3)
+    @DSLMethod(value = "See <<dsl-projectproperties-autoPromotionLevel,autoPromotionLevel>>.", count = 3)
     PredefinedPromotionLevel predefinedPromotionLevel(String name, String description = '', boolean getIfExists = false) {
         def pl = predefinedPromotionLevels.find { it.name == name }
         if (pl) {
@@ -268,7 +268,7 @@ class Config {
         }
     }
 
-    @DSLMethod(value = "See <<dsl-projectproperties-autoPromotionLevel>>.", count = 4, id = "predefinedPromotionLevel-config")
+    @DSLMethod(value = "See <<dsl-projectproperties-autoPromotionLevel,`autoPromotionLevel`>>.", count = 4, id = "predefinedPromotionLevel-config")
     PredefinedPromotionLevel predefinedPromotionLevel(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def vs = predefinedPromotionLevel(name, description, getIfExists)
         vs(closure)

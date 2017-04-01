@@ -210,7 +210,7 @@ class Ontrack {
         ) { jsonSlurper.parseText(it) }
     }
 
-    @DSLMethod(value = "Uploads some arbitrary binary data on a relative path and returns some JSON. See <<dsl-ontrack-upload-type>>.")
+    @DSLMethod(value = "Uploads some arbitrary binary data on a relative path and returns some JSON. See <<dsl-ontrack-upload-type,`upload`>>.")
     def upload(String url, String name, Object o) {
         upload(url, name, o, 'application/x-octet-stream')
     }
