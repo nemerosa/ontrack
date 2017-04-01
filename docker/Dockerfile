@@ -42,4 +42,4 @@ ADD start.sh /opt/ontrack/start.sh
 
 # Running the application
 WORKDIR /opt/ontrack
-CMD ["sh", "/opt/ontrack/start.sh"]
+ENTRYPOINT ["/opt/ontrack/start.sh"]
