@@ -24,8 +24,6 @@ dependencies {
 
     testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
-
-    testRuntime 'org.slf4j:slf4j-log4j12'
 }
 
 //noinspection GroovyAssignabilityCheck
