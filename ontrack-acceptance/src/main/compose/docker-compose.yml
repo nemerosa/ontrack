@@ -10,7 +10,7 @@ services:
    selenium:
       image: "selenium/standalone-chrome:3.1.0"
       environment:
-         JAVA_OPTS: "-Xmx1024m"
+         JAVA_OPTS: "-Xmx2048m"
    ontrack_acceptance:
       build: docker
       depends_on:
