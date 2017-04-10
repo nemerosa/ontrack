@@ -6,7 +6,7 @@ accessed through the user menu.
 
 It allows an administrator to:
 
-* manage the running [jobs](Architecture: jobs)
+* manage the running <<architecture-jobs,jobs>>
 * see the state of the external connections
 * see the list of <<extending,extensions>>
 

@@ -5,15 +5,15 @@ buildscript {
     }
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-        classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.0'
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
+        classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.4'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE'
     }
 }
 
 import org.asciidoctor.gradle.AsciidoctorTask
 
 apply plugin: 'groovy'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 apply plugin: 'org.asciidoctor.convert'
 
 asciidoctorj {
@@ -21,10 +21,10 @@ asciidoctorj {
 }
 
 dependencies {
-    asciidoctor 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+    asciidoctor 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.14'
     compile project(':ontrack-dsl')
     compile project(':ontrack-json')
-    compile libraries.commons_io as String
+    compile 'commons-io:commons-io'
 }
 
 if (documentationProfile) {
@@ -36,19 +36,18 @@ if (documentationProfile) {
         classpath = sourceSets.main.runtimeClasspath
         args = [
                 project(':ontrack-dsl').file('src/main/groovy'),
-                'build',
+                'build/dsl',
         ]
 
         inputs.dir project(':ontrack-dsl').file('src/main/groovy')
-        outputs.file 'build/dsl-generated.json'
-        outputs.file 'build/dsl-generated.adoc'
+        outputs.dir 'build/dsl'
     }
 
     task prepareGeneratedDoc(type: Copy) {
         dependsOn 'generateDoc'
-        from 'build'
-        include 'dsl-generated.adoc'
-        into 'src/docs/asciidoc'
+        from 'build/dsl'
+        include '*.adoc'
+        into 'src/docs/asciidoc/generated'
     }
 
     // HTML specific settings

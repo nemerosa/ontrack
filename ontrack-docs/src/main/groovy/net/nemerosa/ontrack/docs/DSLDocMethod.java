@@ -42,6 +42,11 @@ public class DSLDocMethod {
     private final String sample;
 
     /**
+     * Method reference
+     */
+    private final String see;
+
+    /**
      * References
      */
     private final List<DSLDocClass> references = new ArrayList<>();

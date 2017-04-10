@@ -103,8 +103,8 @@ Provided by Spring Boot:
 
 Job metrics:
 
-* `job-category.Category.*` - [timer metrics](https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers) for the jobs in a given category (for example: `ontrack.counter.job-category.SVNIndexLatest`)
-* `job.*` - [timer metrics](https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers) for all the jobs
+* `job-category.Category.*` - https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] for the jobs in a given category (for example: `ontrack.counter.job-category.SVNIndexLatest`)
+* `job.*` - https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] for all the jobs
 * `gauge.jobs` - total number of jobs
 * `gauge.jobs.running` - number of running jobs
 * `gauge.jobs.disabled` - number of disabled jobs

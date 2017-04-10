@@ -13,4 +13,4 @@ include::appendix-certificates.adoc[]
 === DSL Reference
 
 // This documented in generated
-include::dsl-generated.adoc[]
+include::generated/dsl-index.adoc[]

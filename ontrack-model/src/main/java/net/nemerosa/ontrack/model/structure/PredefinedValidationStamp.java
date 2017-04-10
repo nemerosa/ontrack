@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
 
 /**
@@ -18,6 +19,7 @@ public class PredefinedValidationStamp implements Entity {
 
     private final ID id;
     private final String name;
+    @Wither
     private final String description;
     private final Boolean image;
 

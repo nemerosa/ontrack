@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.acceptance
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.acceptance.browser.Browser
+import net.nemerosa.ontrack.acceptance.browser.Configuration
 import net.nemerosa.ontrack.client.JsonClient
 import net.nemerosa.ontrack.client.JsonClientImpl
 import net.nemerosa.ontrack.client.OTHttpClientBuilder
@@ -152,6 +154,14 @@ class AcceptanceTestClient extends AcceptanceSupport {
             action()
         } finally {
             ontrack.config.grantProjectViewToAll = oldGrant
+        }
+    }
+
+    void browser(Closure closure) {
+        Configuration.driver(configRule.config) { config ->
+            Browser browser = new Browser(config)
+            closure.delegate = browser
+            closure(browser)
         }
     }
 }

@@ -4,5 +4,5 @@ apply plugin: OntrackExtensionPlugin
 
 dependencies {
     compile project(':ontrack-extension-support')
-    compile libraries.spring_tx
+    compile 'org.springframework:spring-tx'
 }

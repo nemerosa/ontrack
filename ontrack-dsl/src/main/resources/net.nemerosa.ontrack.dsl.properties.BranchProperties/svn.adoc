@@ -16,7 +16,7 @@ The parameters are:
 ** `tagPattern` for build name as tag pattern
 ** `revision` for build name as revision
 ** `revisionPattern` for build name containing the revision
-** see the [Subversion](Working with Subversion) documentation for more details
+** see the <<usage-subversion,Working with Subversion>> documentation for more details
 * `data` - optional - configuration data for the link, typically `[pattern: '...']` for `tagPattern` and `revisionPattern` links
 
 Example:

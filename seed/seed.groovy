@@ -270,7 +270,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     publishers {
         buildDescription '', '${VERSION}', '', ''
-        archiveJunit('*-tests.xml')
+        archiveJunit('build/acceptance/*.xml')
         if (release) {
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
@@ -326,7 +326,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 """
         }
         publishers {
-            archiveJunit('*-tests.xml')
+            archiveJunit('build/acceptance/*.xml')
             // Use display version
             ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE.DEBIAN'
         }
@@ -358,7 +358,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 """
             }
             publishers {
-                archiveJunit('*-tests.xml')
+                archiveJunit('build/acceptance/*.xml')
                 ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', "ACCEPTANCE.CENTOS.${centOsVersion}" as String
             }
         }
@@ -376,13 +376,13 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
+        credentialsBinding {
+            usernamePassword 'DOCKER_HUB_USERNAME', 'DOCKER_HUB_PASSWORD', 'DOCKER_HUB'
         }
     }
     steps {
         shell """\
-docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
+docker login --username="\${DOCKER_HUB_USERNAME}" --password="\${DOCKER_HUB_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION}
 docker logout
 """
@@ -429,8 +429,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
     preparePipelineJob delegate
     wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
+        credentialsBinding {
+            string 'DO_TOKEN', 'DO_TOKEN'
         }
     }
     steps {
@@ -451,7 +451,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
 
     }
     publishers {
-        archiveJunit('*-tests.xml')
+        archiveJunit('build/acceptance/*.xml')
         buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-publish") {
             parameters {
                 currentBuild()
@@ -474,9 +474,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
     wrappers {
         credentialsBinding {
             file 'GPG_KEY_FILE', 'GPGKeyRing'
-        }
-        injectPasswords {
-            injectGlobalPasswords()
+            usernamePassword 'GPG_KEY_ID', 'GPG_KEY_PASSWORD', 'GPG_KEY'
+            usernamePassword 'OSSRH_USER', 'OSSRH_PASSWORD', 'OSSRH'
+            usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
         }
     }
     steps {
@@ -496,7 +496,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 -Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
 -PossrhUser=\${OSSRH_USER}
 -PossrhPassword=\${OSSRH_PASSWORD}
--PgitHubUser=dcoraboeuf
+-PgitHubUser=\${GITHUB_USER}
 -PgitHubPassword=\${GITHUB_TOKEN}
 publicationRelease
 """
@@ -574,8 +574,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
     deliveryPipelineConfiguration('Release', 'Site')
     preparePipelineJob delegate, false
     wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
+        credentialsBinding {
+            usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
         }
     }
     steps {
@@ -609,11 +609,6 @@ if (production) {
         }
         deliveryPipelineConfiguration('Release', 'Production')
         preparePipelineJob delegate, false
-        wrappers {
-            injectPasswords {
-                injectGlobalPasswords()
-            }
-        }
         steps {
             gradle '''\
 --build-file production.gradle
@@ -649,11 +644,6 @@ productionUpgrade
         }
         deliveryPipelineConfiguration('Release', 'Production acceptance')
         preparePipelineJob delegate
-        wrappers {
-            injectPasswords {
-                injectGlobalPasswords()
-            }
-        }
         steps {
             gradle '''\
 --build-file production.gradle
@@ -667,7 +657,7 @@ productionTest
 '''
         }
         publishers {
-            archiveJunit('*-tests.xml')
+            archiveJunit('build/acceptance/*.xml')
             ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK.SMOKE'
             ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK'
         }
@@ -696,11 +686,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         artifactNumToKeep(1)
     }
     label 'master'
-    wrappers {
-        injectPasswords {
-            injectGlobalPasswords()
-        }
-    }
     steps {
         ontrackDsl {
             log()

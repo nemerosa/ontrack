@@ -6,7 +6,7 @@ apply plugin: 'groovy'
 dependencies {
     compile project(':ontrack-extension-support')
 
-    testCompile libraries.groovy
+    testCompile 'org.codehaus.groovy:groovy-all'
     testCompile project(':ontrack-it-utils')
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')

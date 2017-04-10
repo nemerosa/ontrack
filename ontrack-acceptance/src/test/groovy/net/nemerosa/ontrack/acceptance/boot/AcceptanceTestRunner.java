@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance.boot;
 
+import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig;
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;

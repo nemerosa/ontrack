@@ -1,5 +1,5 @@
 Links a <<templates,branch>> to an existing template. It will fail if the branch is already linked to a template
-or is a template definition itself. See <<dsl-branch-unlink>> to unlink a branch to its template.
+or is a template definition itself. See <<dsl-branch-unlink,`unlink`>> to unlink a branch to its template.
 
 The `templateName` is the name of the branch template, and the `parameters` map contains the values needed
 to instantiate the template.

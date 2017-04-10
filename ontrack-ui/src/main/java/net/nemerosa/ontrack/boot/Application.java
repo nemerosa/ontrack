@@ -1,16 +1,12 @@
 package net.nemerosa.ontrack.boot;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationPidFileWriter;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
 
-@Configuration
-@ComponentScan("net.nemerosa.ontrack")
-@EnableAutoConfiguration
+@SpringBootApplication(scanBasePackages = "net.nemerosa.ontrack")
 public class Application {
 
     /**

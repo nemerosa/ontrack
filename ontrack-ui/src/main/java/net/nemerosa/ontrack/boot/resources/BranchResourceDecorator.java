@@ -170,7 +170,7 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
                         link(
                                 "_enable",
                                 (Branch branch) -> on(BranchController.class).enableBranch(branch.getId()),
-                                (branch, resourceContext) -> resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
+                                (branch, resourceContext) -> resourceContext.isProjectFunctionGranted(branch.projectId(), BranchEdit.class)
                                         && branch.isDisabled()
                                         && branch.getType() != BranchType.TEMPLATE_DEFINITION
                         ),
@@ -178,7 +178,7 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
                         link(
                                 "_disable",
                                 (Branch branch) -> on(BranchController.class).disableBranch(branch.getId()),
-                                (branch, resourceContext) -> resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
+                                (branch, resourceContext) -> resourceContext.isProjectFunctionGranted(branch.projectId(), BranchEdit.class)
                                         && !branch.isDisabled()
                                         && branch.getType() != BranchType.TEMPLATE_DEFINITION
                         ),

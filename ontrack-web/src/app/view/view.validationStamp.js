@@ -65,6 +65,22 @@ angular.module('ot.view.validationStamp', [
                             });
                         }
                     },
+                    {
+                        condition: function () {
+                            return validationStamp._bulkUpdate;
+                        },
+                        id: 'bulkUpdateValidationStamp',
+                        name: "Bulk update",
+                        cls: 'ot-command-update',
+                        action: function () {
+                            otAlertService.confirm({
+                                title: "Validation stamps bulk update",
+                                message: "Updates all other validation stamps with the same name?"
+                            }).then(function () {
+                                return ot.call($http.put(validationStamp._bulkUpdate));
+                            }).then(loadValidationStamp);
+                        }
+                    },
                     ot.viewApiCommand($scope.validationStamp._self),
                     ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                 ];

@@ -1,7 +1,7 @@
 If the branch is a <<templates,template instance>>, returns a `TemplateInstance` object which contains the list of
 this instance parameters as a `Map` in the `parameters` property. Otherwise returns `null`.
 
-[source,groovy
+[source,groovy]
 ----
 ontrack.project('project') {
    branch('template') {
