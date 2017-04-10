@@ -256,7 +256,7 @@ public class StructureServiceImpl implements StructureService {
     @Override
     public List<PromotionRun> getPromotionRunsForPromotionLevel(ID promotionLevelId) {
         PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
-        return  structureRepository.getPromotionRunsForPromotionLevel(promotionLevel);
+        return structureRepository.getPromotionRunsForPromotionLevel(promotionLevel);
     }
 
     @Override
@@ -990,6 +990,50 @@ public class StructureServiceImpl implements StructureService {
                 );
             }
         }
+    }
+
+    @Override
+    public Ack bulkUpdateValidationStamps(ID validationStampId) {
+        // Checks access
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        // As admin
+        securityService.asAdmin(() -> {
+            ValidationStamp validationStamp = getValidationStamp(validationStampId);
+            // Defining or replacing the predefined validation stamp
+            Optional<PredefinedValidationStamp> o = predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.getName());
+            if (o.isPresent()) {
+                // Updating the predefined validation stamp description
+                predefinedValidationStampService.savePredefinedValidationStamp(
+                        o.get().withDescription(validationStamp.getDescription())
+                );
+                // Sets its image
+                Document image = getValidationStampImage(validationStampId);
+                predefinedValidationStampService.setPredefinedValidationStampImage(
+                        o.get().getId(),
+                        image
+                );
+            } else {
+                // Creating the predefined validation stamp
+                PredefinedValidationStamp predefinedValidationStamp = predefinedValidationStampService.newPredefinedValidationStamp(
+                        PredefinedValidationStamp.of(
+                                NameDescription.nd(
+                                        validationStamp.getName(),
+                                        validationStamp.getDescription()
+                                )
+                        )
+                );
+                // Sets its image
+                Document image = getValidationStampImage(validationStampId);
+                predefinedValidationStampService.setPredefinedValidationStampImage(
+                        predefinedValidationStamp.getId(),
+                        image
+                );
+            }
+            // For all validation stamps
+            structureRepository.bulkUpdateValidationStamps(validationStampId);
+        });
+        // OK
+        return Ack.OK;
     }
 
     protected <T> Optional<ValidationStamp> getValidationStampFromProperty(
