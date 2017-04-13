@@ -134,7 +134,20 @@ docker-compose down --volumes
         }
 
         // TODO Ontrack validation --> ACCEPTANCE
-        // TODO Docker push
+
+        // Docker push
+        stage('Docker publication') {
+            steps {
+                script {
+                    docker.withRegistry('', 'DOCKER_HUB') {
+                        def image = docker.withRegistry('').image("nemerosa/ontrack:${version}")
+                        image.push()
+                        // TODO If 2.x, pushes `latest` as well
+                    }
+                }
+            }
+        }
+
         // TODO Ontrack validation --> DOCKER
         // TODO OS tests + DO tests in parallel
         // TODO Ontrack validation --> ACCEPTANCE.DEBIAN
