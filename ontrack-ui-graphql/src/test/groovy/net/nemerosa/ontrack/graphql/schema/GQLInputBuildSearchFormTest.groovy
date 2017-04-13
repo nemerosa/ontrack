@@ -19,7 +19,7 @@ class GQLInputBuildSearchFormTest {
 
     @Test
     void 'Build exact match'() {
-        def form = new GQLInputBuildSearchForm().convert([buildName: '1.0.0-123', buildExactMatch: 'true']);
+        def form = new GQLInputBuildSearchForm().convert([buildName: '1.0.0-123', buildExactMatch: true]);
         assert form == new BuildSearchForm().withBuildName('1.0.0-123').withBuildExactMatch(true)
     }
 
