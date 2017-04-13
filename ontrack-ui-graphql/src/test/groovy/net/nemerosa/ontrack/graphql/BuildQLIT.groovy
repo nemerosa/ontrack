@@ -313,7 +313,7 @@ class BuildQLIT extends AbstractQLITSupport {
         }""")
     }
 
-    @Test(expected = GraphQLException)
+    @Test
     void 'Project filter'() {
         // Builds
         def project = doCreateProject()
