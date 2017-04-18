@@ -141,7 +141,7 @@ docker-compose down --volumes
                 input "Pushing version ${version} to the Docker Hub?"
                 script {
                     docker.withRegistry('', 'DOCKER_HUB') {
-                        def image = docker.withRegistry('').image("nemerosa/ontrack:${version}")
+                        def image = docker.image("nemerosa/ontrack:${version}")
                         image.push()
                         // TODO If 2.x, pushes `latest` as well
                     }
