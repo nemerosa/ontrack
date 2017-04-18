@@ -128,10 +128,12 @@ public class GraphQLBeanConverter {
                 Method writeMethod = descriptor.getWriteMethod();
                 if (writeMethod != null) {
                     Object arg = map.get(descriptor.getName());
-                    try {
-                        writeMethod.invoke(o, arg);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new IllegalStateException("Cannot set property " + descriptor.getName());
+                    if (arg != null) {
+                        try {
+                            writeMethod.invoke(o, arg);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            throw new IllegalStateException("Cannot set property " + descriptor.getName());
+                        }
                     }
                 }
             }

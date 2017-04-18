@@ -188,6 +188,15 @@ public interface StructureService {
 
     ValidationStamp getOrCreateValidationStamp(Branch branch, Integer validationStampId, String validationStampName);
 
+    /**
+     * Bulk update of all validation stamps in other projects/branches and in predefined validation stamps,
+     * following the model designed by the validation stamp ID.
+     *
+     * @param validationStampId ID of the validation stamp model
+     * @return Result of the update
+     */
+    Ack bulkUpdateValidationStamps(ID validationStampId);
+
     // Validation runs
 
     ValidationRun newValidationRun(ValidationRun validationRun);

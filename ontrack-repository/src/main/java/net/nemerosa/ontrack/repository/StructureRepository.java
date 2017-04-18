@@ -158,6 +158,8 @@ public interface StructureRepository {
 
     void setValidationStampImage(ID validationStampId, Document document);
 
+    void bulkUpdateValidationStamps(ID validationStampId);
+
     void saveValidationStamp(ValidationStamp validationStamp);
 
     Ack deleteValidationStamp(ID validationStampId);

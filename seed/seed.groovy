@@ -477,6 +477,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
             usernamePassword 'GPG_KEY_ID', 'GPG_KEY_PASSWORD', 'GPG_KEY'
             usernamePassword 'OSSRH_USER', 'OSSRH_PASSWORD', 'OSSRH'
             usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
+            usernamePassword 'DOCKER_HUB_USERNAME', 'DOCKER_HUB_PASSWORD', 'DOCKER_HUB'
         }
     }
     steps {
@@ -522,7 +523,7 @@ publicationMaven
             shell """\
 docker pull nemerosa/ontrack:\${VERSION}
 docker tag nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
-docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
+docker login --username="\${DOCKER_HUB_USERNAME}" --password="\${DOCKER_HUB_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION}
 docker push nemerosa/ontrack:latest
 docker logout
