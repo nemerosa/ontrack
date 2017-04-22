@@ -428,4 +428,30 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         assertNull(f2.getBranch());
     }
 
+    @Test
+    public void null_patterns() {
+        ValidationStampFilter f = filterRepository.newValidationStampFilter(
+                ValidationStampFilter.builder()
+                        .name(uid("F"))
+                        .patterns(null)
+                        .build()
+        );
+        f = filterRepository.getValidationStampFilter(f.getId());
+        assertNotNull(f.getPatterns());
+        assertTrue(f.getPatterns().isEmpty());
+    }
+
+    @Test
+    public void empty_patterns() {
+        ValidationStampFilter f = filterRepository.newValidationStampFilter(
+                ValidationStampFilter.builder()
+                        .name(uid("F"))
+                        .patterns(Collections.emptyList())
+                        .build()
+        );
+        f = filterRepository.getValidationStampFilter(f.getId());
+        assertNotNull(f.getPatterns());
+        assertTrue(f.getPatterns().isEmpty());
+    }
+
 }
