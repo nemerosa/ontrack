@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.model.structure;
 
+import net.nemerosa.ontrack.model.Ack;
+
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Accessing the {@link ValidationStampFilter} at all levels, and managing them.
@@ -29,6 +32,11 @@ public interface ValidationStampFilterService {
     List<ValidationStampFilter> getBranchValidationStampFilters(Branch branch, boolean includeAll);
 
     /**
+     * Gets a validation stamp filter by name for a branch
+     */
+    Optional<ValidationStampFilter> getValidationStampFilterByName(Branch branch, String name);
+
+    /**
      * Creates a filter
      */
     ValidationStampFilter newValidationStampFilter(ValidationStampFilter filter);
@@ -36,12 +44,12 @@ public interface ValidationStampFilterService {
     /**
      * Updates a filter
      */
-    ValidationStampFilter updateValidationStampFilter(ValidationStampFilter filter);
+    void saveValidationStampFilter(ValidationStampFilter filter);
 
     /**
      * Deletes a filter
      */
-    ValidationStampFilter deleteValidationStampFilter(ValidationStampFilter filter);
+    Ack deleteValidationStampFilter(ValidationStampFilter filter);
 
     /**
      * Shares a filter with project
@@ -53,4 +61,8 @@ public interface ValidationStampFilterService {
      */
     ValidationStampFilter shareValidationStampFilter(ValidationStampFilter filter);
 
+    /**
+     * Gets a validation stamp filter by ID
+     */
+    ValidationStampFilter getValidationStampFilter(ID id);
 }
