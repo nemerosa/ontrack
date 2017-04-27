@@ -133,7 +133,7 @@ angular.module('ot.view.branch', [
                         });
                         ot.call($http.put(
                             $scope.branch._reorderPromotionLevels,
-                            { ids: ids}
+                            {ids: ids}
                         ));
                     }
                 };
@@ -156,7 +156,7 @@ angular.module('ot.view.branch', [
                         });
                         ot.call($http.put(
                             $scope.branch._reorderValidationStamps,
-                            { ids: ids}
+                            {ids: ids}
                         ));
                     }
                 };
@@ -357,6 +357,8 @@ angular.module('ot.view.branch', [
                 loadValidationStamps();
                 // Loads the other branches
                 loadOtherBranches();
+                // Loads the validation stamp filters
+                loadBranchValidationStampFilters();
             });
         }
 
@@ -589,6 +591,33 @@ angular.module('ot.view.branch', [
                 }
             }
         }
+
+        /*
+         * Branch validation stamp filters
+         */
+
+        function loadBranchValidationStampFilters() {
+            ot.pageCall($http.get($scope.branch._allValidationStampFilters)).then(function (resources) {
+                $scope.branchValidationStampFilterResources = resources;
+            });
+        }
+
+        function selectValidationStampFilter(validationStampFilter) {
+            $scope.validationStampFilter = validationStampFilter;
+            // TODO Activation of the filter
+            if ($scope.validationStampFilter) {
+                // ...
+            }
+        }
+
+        $scope.newBranchValidationStampFilter = function () {
+            if ($scope.branch._validationStampFilterCreate) {
+                otFormService.create($scope.branch._validationStampFilterCreate, "Validation stamp filter").then(function (filter) {
+                    loadBranchValidationStampFilters();
+                    selectValidationStampFilter(filter);
+                });
+            }
+        };
 
     })
 ;

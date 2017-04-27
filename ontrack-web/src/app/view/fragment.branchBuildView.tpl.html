@@ -21,7 +21,27 @@
                   ng-click="toggleAutoRefresh()">
                 <span class="fa fa-refresh"></span>
              </button>
-            <!-- Validation stamp filtering -->
+            <!-- Validation stamp filters -->
+            <!-- TODO Colour according to selection of filter -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        title="Validation stamp filter"
+                        >
+                    <span class="fa fa-filter"></span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu ot-validationstampfilter-list" role="menu">
+                    <li ng-repeat="vsf in branchValidationStampFilterResources.resources">
+                        <a>{{vsf.name}}</a>
+                    </li>
+                    <li ng-if="branch._validationStampFilterCreate">
+                        <a>
+                            <span ng-click="newBranchValidationStampFilter()">New filter...</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- TODO OLD Validation stamp filtering -->
             <button class="ot-branch-build-view-validation-stamp-filter"
                     title="Filter the validation stamps"
                     ng-if="validationStampViews.length > 10"
