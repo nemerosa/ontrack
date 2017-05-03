@@ -17,9 +17,13 @@ angular.module('ot.dialog.validationStampRunView', [
                 validationRun._validationRunStatusChange,
                 'Status'
             ).then(function () {
+                if (config.callbackOnStatusChange) {
+                    config.callbackOnStatusChange();
+                } else {
                     // Goes to the validation run page
                     location.href = '#/validationRun/' + validationRun.id;
-                });
+                }
+            });
         };
     })
 ;
