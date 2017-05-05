@@ -472,7 +472,10 @@ angular.module('ot.view.branch', [
                     config: function () {
                         return {
                             buildView: buildView,
-                            validationStampRunView: validationStampRunView
+                            validationStampRunView: validationStampRunView,
+                            callbackOnStatusChange: function () {
+                                loadBranch();
+                            }
                         };
                     }
                 }
