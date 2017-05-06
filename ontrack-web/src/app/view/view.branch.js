@@ -5,7 +5,6 @@ angular.module('ot.view.branch', [
     'ot.service.form',
     'ot.service.structure',
     'ot.service.buildfilter',
-    'ot.service.validationstampfilter',
     'ot.service.copy',
     'ot.service.template',
     'ot.dialog.validationStampRunView',
@@ -20,7 +19,7 @@ angular.module('ot.view.branch', [
     })
     .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location,
                                         ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService,
-                                        otBuildFilterService, otValidationStampFilterService) {
+                                        otBuildFilterService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -46,27 +45,6 @@ angular.module('ot.view.branch', [
         $scope.toggleAutoRefresh = function () {
             $scope.autoRefresh = !$scope.autoRefresh;
             localStorage.setItem('autoRefresh', $scope.autoRefresh);
-        };
-
-        // Filtering of the validation stamps
-        $scope.filterValidationStamps = function () {
-            otValidationStampFilterService.selectValidationStampFilter($scope.branch, $scope.validationStampSelection).then(function (selection) {
-                $scope.validationStampSelection = selection;
-                otValidationStampFilterService.saveSelection($scope.branch, selection);
-            });
-        };
-        $scope.validationStampFilter = function (validationStampView) {
-            return !$scope.validationStampSelection || $scope.validationStampSelection.indexOf(validationStampView.validationStamp.name) >= 0;
-        };
-        $scope.validationStampRunViewFilter = function (validationStampRunView) {
-            return $scope.validationStampFilter({validationStamp: validationStampRunView.validationStamp});
-        };
-        $scope.validationStampFilterCount = function (plus) {
-            if ($scope.validationStampViews) {
-                return plus + $scope.validationStampViews.filter($scope.validationStampFilter).length;
-            } else {
-                return plus;
-            }
         };
 
         // Selected builds
@@ -203,8 +181,6 @@ angular.module('ot.view.branch', [
                         $scope.templateDefinition = templateDefinition;
                     });
                 }
-                // Initial validation stamp selection
-                $scope.validationStampSelection = otValidationStampFilterService.loadSelection($scope.branch);
                 // Branch commands
                 view.commands = [
                     {
@@ -607,10 +583,6 @@ angular.module('ot.view.branch', [
 
         $scope.selectBranchValidationStampFilter = function (validationStampFilter) {
             $scope.validationStampFilter = validationStampFilter;
-            // TODO Activation of the filter
-            if ($scope.validationStampFilter) {
-                // ...
-            }
         };
 
         $scope.clearBranchValidationStampFilter = function () {
@@ -623,6 +595,22 @@ angular.module('ot.view.branch', [
                     loadBranchValidationStampFilters();
                     $scope.selectBranchValidationStampFilter(filter);
                 });
+            }
+        };
+
+        $scope.validationStampFilterFn = function (validationStampView) {
+            return !$scope.validationStampFilter || $scope.validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0;
+        };
+
+        $scope.validationStampRunViewFilter = function (validationStampRunView) {
+            return $scope.validationStampFilterFn({validationStamp: validationStampRunView.validationStamp});
+        };
+
+        $scope.validationStampFilterCount = function (plus) {
+            if ($scope.validationStampViews) {
+                return plus + $scope.validationStampViews.filter($scope.validationStampFilterFn).length;
+            } else {
+                return plus;
             }
         };
 

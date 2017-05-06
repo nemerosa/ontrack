@@ -42,36 +42,21 @@
                     <!-- Reset filters -->
                     <li class="divider" ng-if="validationStampFilter"></li>
                     <li ng-if="validationStampFilter">
-                        <a>
-                            <span ng-click="clearBranchValidationStampFilter()">
-                                <span class="fa fa-eraser"></span>
-                                Clear validation stamp filter
-                            </span>
+                        <a ng-click="clearBranchValidationStampFilter()">
+                            <span class="fa fa-eraser"></span>
+                            Clear validation stamp filter
                         </a>
                     </li>
                     <!-- New filter -->
-                    <li class="divider"></li>
+                    <li ng-if="branch._validationStampFilterCreate" class="divider"></li>
                     <li ng-if="branch._validationStampFilterCreate">
-                        <a>
-                            <span ng-click="newBranchValidationStampFilter()">
-                                <span class="fa fa-plus"></span>
-                                New filter...
-                            </span>
+                        <a ng-click="newBranchValidationStampFilter()">
+                            <span class="fa fa-plus"></span>
+                            New filter...
                         </a>
                     </li>
                 </ul>
             </div>
-            <!-- TODO OLD Validation stamp filtering -->
-            <button class="ot-branch-build-view-validation-stamp-filter"
-                    title="Filter the validation stamps"
-                    ng-if="validationStampViews.length > 10"
-                    ng-class="{
-                    'ot-branch-build-view-validation-stamp-filter-enabled': validationStampSelection,
-                    'ot-branch-build-view-validation-stamp-filter-disabled': !validationStampSelection
-                    }"
-                    ng-click="filterValidationStamps()">
-                <span class="fa fa-filter"></span>
-            </button>
             <!-- Loading -->
             <button ng-show="loadingBuildView" class="btn btn-default" disabled="disabled">
                 <span class="fa fa-spinner fa-spin"></span>
@@ -79,14 +64,14 @@
             </button>
         </th>
         <!-- All validation stamps -->
-        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilter" class="ot-branch-build-view-validation">
+        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn" class="ot-branch-build-view-validation">
             <ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
         </th>
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
         <!-- For each validation stamp -->
-        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilter" class="ot-branch-build-view-validation">
+        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn" class="ot-branch-build-view-validation">
             <ot-entity-embedded-decorations decorations="validationStampView.decorations"></ot-entity-embedded-decorations>
         </th>
     </tr>
