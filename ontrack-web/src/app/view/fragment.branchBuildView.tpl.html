@@ -22,10 +22,13 @@
                 <span class="fa fa-refresh"></span>
              </button>
             <!-- Validation stamp filters -->
-            <!-- TODO Colour according to selection of filter -->
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                         title="Validation stamp filter"
+                        ng-class="{
+                            'btn-warning': validationStampFilter,
+                            'btn-default': !validationStampFilter
+                        }"
                         >
                     <span class="fa fa-filter"></span>
                     <span class="caret"></span>
