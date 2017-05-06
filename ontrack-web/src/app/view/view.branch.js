@@ -614,5 +614,14 @@ angular.module('ot.view.branch', [
             }
         };
 
+        $scope.editBranchValidationStampFilter = function (validationStampFilter) {
+            if (validationStampFilter._update) {
+                otFormService.update(validationStampFilter._update, "Validation stamp filter").then(function (vsf) {
+                    loadBranchValidationStampFilters();
+                    $scope.selectBranchValidationStampFilter(vsf);
+                });
+            }
+        };
+
     })
 ;

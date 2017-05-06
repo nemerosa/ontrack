@@ -37,8 +37,19 @@
                     <!-- List of filters -->
                     <li ng-repeat="vsf in branchValidationStampFilterResources.resources">
                         <a>
+                            <!-- Selected? -->
                             <span class="fa fa-check" ng-show="validationStampFilter && validationStampFilter.id == vsf.id"></span>
+                            <!-- Name -->
                             <span ng-click="selectBranchValidationStampFilter(vsf)">{{vsf.name}}</span>
+                            <!-- TODO Show filter type: branch, project or global -->
+                            <!-- TODO Sharing to project -->
+                            <!-- TODO Sharing to global -->
+                            <!-- TODO Editing -->
+                            <span class="ot-command-update ot-command"
+                                  title="Edit this filter"
+                                  ng-if="vsf._update"
+                                  ng-click="editBranchValidationStampFilter(vsf)"></span>
+                            <!-- TODO Deleting -->
                         </a>
                     </li>
                     <li ng-if="branchValidationStampFilterResources.resources.length == 0" role="presentation" class="dropdown-header">No validation stamp filter is available</li>
