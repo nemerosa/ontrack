@@ -33,7 +33,10 @@
                 <ul class="dropdown-menu ot-validationstampfilter-list" role="menu">
                     <!-- List of filters -->
                     <li ng-repeat="vsf in branchValidationStampFilterResources.resources">
-                        <a>{{vsf.name}}</a>
+                        <a>
+                            <span class="fa fa-check" ng-show="validationStampFilter && validationStampFilter.id == vsf.id"></span>
+                            <span ng-click="selectBranchValidationStampFilter(vsf)">{{vsf.name}}</span>
+                        </a>
                     </li>
                     <li ng-if="branchValidationStampFilterResources.resources.length == 0" role="presentation" class="dropdown-header">No validation stamp filter is available</li>
                     <!-- Reset filters -->

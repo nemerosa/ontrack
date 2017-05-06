@@ -605,23 +605,23 @@ angular.module('ot.view.branch', [
             });
         }
 
-        function selectValidationStampFilter(validationStampFilter) {
+        $scope.selectBranchValidationStampFilter = function (validationStampFilter) {
             $scope.validationStampFilter = validationStampFilter;
             // TODO Activation of the filter
             if ($scope.validationStampFilter) {
                 // ...
             }
-        }
+        };
 
         $scope.clearBranchValidationStampFilter = function () {
-            selectValidationStampFilter(undefined);
+            $scope.selectBranchValidationStampFilter(undefined);
         };
 
         $scope.newBranchValidationStampFilter = function () {
             if ($scope.branch._validationStampFilterCreate) {
                 otFormService.create($scope.branch._validationStampFilterCreate, "Validation stamp filter").then(function (filter) {
                     loadBranchValidationStampFilters();
-                    selectValidationStampFilter(filter);
+                    $scope.selectBranchValidationStampFilter(filter);
                 });
             }
         };
