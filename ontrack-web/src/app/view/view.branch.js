@@ -634,6 +634,11 @@ angular.module('ot.view.branch', [
             $scope.validationStampFilterEdition = true;
         };
 
+        $scope.stopDirectEditValidationStampFilter = function (validationStampFilter) {
+            $scope.selectBranchValidationStampFilter(validationStampFilter);
+            $scope.validationStampFilterEdition = false;
+        };
+
         $scope.removeValidationStampFromFilter = function (validationStampFilter, validationStampName) {
             if (validationStampFilter._update) {
                 var index = validationStampFilter.vsNames.indexOf(validationStampName);

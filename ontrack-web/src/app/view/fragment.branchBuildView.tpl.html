@@ -49,6 +49,11 @@
                                   title="Edit this filter using the current view"
                                   ng-if="vsf._update && !validationStampFilterEdition"
                                   ng-click="directEditValidationStampFilter(vsf)"></span>
+                            <!-- Edition mode: OFF -->
+                            <span class="ot-command fa fa-eye-slash"
+                                  title="Stop editing this filter using the current view"
+                                  ng-if="vsf._update && validationStampFilterEdition && validationStampFilter.id == vsf.id"
+                                  ng-click="stopDirectEditValidationStampFilter(vsf)"></span>
                             <!-- Editing -->
                             <span class="ot-command-update ot-command"
                                   title="Edit this filter"
