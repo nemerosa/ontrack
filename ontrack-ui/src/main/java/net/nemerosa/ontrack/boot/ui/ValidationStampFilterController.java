@@ -9,7 +9,8 @@ import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -88,12 +89,16 @@ public class ValidationStampFilterController extends AbstractResourceController 
     }
 
     @PostMapping("/branch/{branchId}/create")
-    public ValidationStampFilter createBranchValidationStampFilterForm(@SuppressWarnings("unused") @PathVariable ID branchId, @RequestBody NameDescription input) {
+    public ValidationStampFilter createBranchValidationStampFilterForm(@PathVariable ID branchId, @RequestBody NameDescription input) {
+        // Gets all validation stamp names
+        List<String> vsNames = structureService.getValidationStampListForBranch(branchId).stream()
+                .map(ValidationStamp::getName)
+                .collect(Collectors.toList());
         return filterService.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(input.getName())
                         .branch(structureService.getBranch(branchId))
-                        .vsNames(Collections.emptyList())
+                        .vsNames(vsNames)
                         .build()
         );
     }
