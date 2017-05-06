@@ -44,6 +44,11 @@
                             <!-- TODO Show filter type: branch, project or global -->
                             <!-- TODO Sharing to project -->
                             <!-- TODO Sharing to global -->
+                            <!-- Edition mode: ON -->
+                            <span class="ot-command fa fa-eye"
+                                  title="Edit this filter using the current view"
+                                  ng-if="vsf._update && !validationStampFilterEdition"
+                                  ng-click="directEditValidationStampFilter(vsf)"></span>
                             <!-- Editing -->
                             <span class="ot-command-update ot-command"
                                   title="Edit this filter"
@@ -78,13 +83,24 @@
             </button>
         </th>
         <!-- All validation stamps -->
-        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn" class="ot-branch-build-view-validation">
+        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn"
+            class="ot-branch-build-view-validation"
+            ng-class="{
+                'bg-info': validationStampFilter && validationStampFilter._update && validationStampFilterEdition
+            }"
+        >
             <ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
             <span
-                    ng-if="validationStampFilter && validationStampFilter._update"
+                    ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0"
                     ng-click="removeValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
                     title="Removes the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
-                    class="fa fa-minus-circle ot-action"
+                    class="fa fa-minus-circle text-danger ot-action"
+                    style="font-size: 50%; vertical-align: bottom;"></span>
+            <span
+                    ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0"
+                    ng-click="addValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
+                    title="Adds the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
+                    class="fa fa-plus-circle text-success ot-action"
                     style="font-size: 50%; vertical-align: bottom;"></span>
         </th>
     </tr>

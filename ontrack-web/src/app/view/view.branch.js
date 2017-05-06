@@ -586,20 +586,23 @@ angular.module('ot.view.branch', [
         };
 
         $scope.clearBranchValidationStampFilter = function () {
+            $scope.validationStampFilterEdition = false;
             $scope.selectBranchValidationStampFilter(undefined);
         };
 
         $scope.newBranchValidationStampFilter = function () {
             if ($scope.branch._validationStampFilterCreate) {
+                $scope.validationStampFilterEdition = false;
                 otFormService.create($scope.branch._validationStampFilterCreate, "Validation stamp filter").then(function (filter) {
                     loadBranchValidationStampFilters();
+                    $scope.validationStampFilterEdition = false;
                     $scope.selectBranchValidationStampFilter(filter);
                 });
             }
         };
 
         $scope.validationStampFilterFn = function (validationStampView) {
-            return !$scope.validationStampFilter || $scope.validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0;
+            return !$scope.validationStampFilter || $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0;
         };
 
         $scope.validationStampRunViewFilter = function (validationStampRunView) {
@@ -616,11 +619,19 @@ angular.module('ot.view.branch', [
 
         $scope.editBranchValidationStampFilter = function (validationStampFilter) {
             if (validationStampFilter._update) {
+                $scope.validationStampFilterEdition = false;
                 otFormService.update(validationStampFilter._update, "Validation stamp filter").then(function (vsf) {
                     loadBranchValidationStampFilters();
                     $scope.selectBranchValidationStampFilter(vsf);
                 });
             }
+        };
+
+        $scope.validationStampFilterEdition = false;
+
+        $scope.directEditValidationStampFilter = function (validationStampFilter) {
+            $scope.selectBranchValidationStampFilter(validationStampFilter);
+            $scope.validationStampFilterEdition = true;
         };
 
         $scope.removeValidationStampFromFilter = function (validationStampFilter, validationStampName) {
@@ -629,6 +640,23 @@ angular.module('ot.view.branch', [
                 if (index >= 0) {
                     var names = validationStampFilter.vsNames.slice(0); // Copy
                     names.splice(index, 1);
+                    ot.pageCall($http.put(validationStampFilter._update, {
+                        name: validationStampFilter.name,
+                        vsNames: names
+                    })).then(function (vsf) {
+                        loadBranchValidationStampFilters();
+                        $scope.selectBranchValidationStampFilter(vsf);
+                    });
+                }
+            }
+        };
+
+        $scope.addValidationStampFromFilter = function (validationStampFilter, validationStampName) {
+            if (validationStampFilter._update) {
+                var index = validationStampFilter.vsNames.indexOf(validationStampName);
+                if (index < 0) {
+                    var names = validationStampFilter.vsNames.slice(0); // Copy
+                    names.push(validationStampName);
                     ot.pageCall($http.put(validationStampFilter._update, {
                         name: validationStampFilter.name,
                         vsNames: names
