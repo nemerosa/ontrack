@@ -15,6 +15,7 @@ public class ValidationStampFilter implements Entity {
 
     @Wither
     private final ID id;
+    @Wither
     private final String name;
     @Wither
     private final Project project;
@@ -22,5 +23,15 @@ public class ValidationStampFilter implements Entity {
     private final Branch branch;
     @Wither
     private final List<String> vsNames;
+
+    public ValidationStampFilterScope getScope() {
+        if (branch != null) {
+            return ValidationStampFilterScope.BRANCH;
+        } else if (project != null) {
+            return ValidationStampFilterScope.PROJECT;
+        } else {
+            return ValidationStampFilterScope.GLOBAL;
+        }
+    }
 
 }

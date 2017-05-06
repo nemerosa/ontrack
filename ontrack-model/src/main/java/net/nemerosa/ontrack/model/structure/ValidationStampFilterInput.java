@@ -8,6 +8,6 @@ import java.util.List;
 public class ValidationStampFilterInput {
 
     private final String name;
-    private final List<String> patterns;
+    private final List<String> vsNames;
 
 }

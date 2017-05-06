@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.MultiSelection;
 import net.nemerosa.ontrack.model.form.MultiStrings;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.SelectableString;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,47 +27,6 @@ public class ValidationStampFilterController extends AbstractResourceController 
     public ValidationStampFilterController(StructureService structureService, ValidationStampFilterService filterService) {
         this.structureService = structureService;
         this.filterService = filterService;
-    }
-
-    @GetMapping("/global")
-    public Resources<ValidationStampFilter> getGlobalValidationStampFilters() {
-        return Resources.of(
-                filterService.getGlobalValidationStampFilters(),
-                uri(on(getClass()).getGlobalValidationStampFilters())
-        );
-    }
-
-    @GetMapping("/project/{projectId}")
-    public Resources<ValidationStampFilter> getProjectValidationStampFilters(@PathVariable ID projectId) {
-        return Resources.of(
-                filterService.getProjectValidationStampFilters(
-                        structureService.getProject(projectId),
-                        false
-                ),
-                uri(on(getClass()).getProjectValidationStampFilters(projectId))
-        );
-    }
-
-    @GetMapping("/project/{projectId}/all")
-    public Resources<ValidationStampFilter> getAllProjectValidationStampFilters(@PathVariable ID projectId) {
-        return Resources.of(
-                filterService.getProjectValidationStampFilters(
-                        structureService.getProject(projectId),
-                        true
-                ),
-                uri(on(getClass()).getAllProjectValidationStampFilters(projectId))
-        );
-    }
-
-    @GetMapping("/branch/{branchId}")
-    public Resources<ValidationStampFilter> getBranchValidationStampFilters(@PathVariable ID branchId) {
-        return Resources.of(
-                filterService.getBranchValidationStampFilters(
-                        structureService.getBranch(branchId),
-                        false
-                ),
-                uri(on(getClass()).getBranchValidationStampFilters(branchId))
-        );
     }
 
     @GetMapping("/branch/{branchId}/all")
@@ -103,27 +64,66 @@ public class ValidationStampFilterController extends AbstractResourceController 
         );
     }
 
-    // FIXME Optional<ValidationStampFilter> getValidationStampFilterByName(Branch branch, String name);
+    @GetMapping("/{validationStampFilterId}/update")
+    public Form getValidationStampFilterUpdateForm(@PathVariable ID validationStampFilterId) {
+        // Gets the validation stamp filter
+        ValidationStampFilter filter = filterService.getValidationStampFilter(validationStampFilterId);
+        // Base form (name)
+        Form form = Form.create().name().name(filter.getName());
+        // Scope
+        ValidationStampFilterScope scope = filter.getScope();
 
-    @GetMapping("/global/create")
-    public Form getNewGlobalValidationStampFilterForm() {
-        return Form.create()
-                .name()
-                .with(
-                        MultiStrings.of("patterns")
-                                .label("List of validation stamp patterns")
-                );
+        /*
+         * For a branch filter, we edit using the list of validation stamps of the branch.
+         * For a project filter, we edit using the list of validation stamps of all the branches.
+         * For a global filter, we edit using a list of strings.
+         */
+        if (scope == ValidationStampFilterScope.BRANCH) {
+            form = form.with(
+                    MultiSelection.of("vsNames")
+                            .label("Validation stamps")
+                            .items(
+                                    structureService.getValidationStampListForBranch(filter.getBranch().getId()).stream()
+                                            .map(ValidationStamp::getName)
+                                            .map(name -> SelectableString.of(name, filter.getVsNames()))
+                                            .collect(Collectors.toList())
+                            )
+            );
+        } else if (scope == ValidationStampFilterScope.PROJECT) {
+            form = form.with(
+                    MultiSelection.of("vsNames")
+                            .label("Validation stamps")
+                            .items(
+                                    structureService.getBranchesForProject(filter.getProject().getId()).stream()
+                                            .flatMap(branch -> structureService.getValidationStampListForBranch(branch.getId()).stream())
+                                            .map(ValidationStamp::getName)
+                                            .distinct()
+                                            .map(name -> SelectableString.of(name, filter.getVsNames()))
+                                            .collect(Collectors.toList())
+                            )
+            );
+        } else {
+            form = form.with(
+                    MultiStrings.of("vsNames")
+                            .label("Validation stamps")
+                            .value(filter.getVsNames())
+            );
+        }
+
+        // OK
+        return form;
     }
 
-    // FIXME ValidationStampFilter newValidationStampFilter(ValidationStampFilter filter);
+    @PutMapping("/{validationStampFilterId}/update")
+    public ValidationStampFilter updateValidationStampFilter(@PathVariable ID validationStampFilterId, @RequestBody ValidationStampFilterInput input) {
+        // Changes the validation stamp filter
+        ValidationStampFilter filter = filterService.getValidationStampFilter(validationStampFilterId)
+                .withName(input.getName())
+                .withVsNames(input.getVsNames());
+        // Saves it
+        filterService.saveValidationStampFilter(filter);
+        // OK
+        return filter;
+    }
 
-    // FIXME void saveValidationStampFilter(ValidationStampFilter filter);
-
-    // FIXME Ack deleteValidationStampFilter(ValidationStampFilter filter);
-
-    // FIXME ValidationStampFilter shareValidationStampFilter(ValidationStampFilter filter, Project project);
-
-    // FIXME ValidationStampFilter shareValidationStampFilter(ValidationStampFilter filter);
-
-    // FIXME ValidationStampFilter getValidationStampFilter(ID id);
 }
