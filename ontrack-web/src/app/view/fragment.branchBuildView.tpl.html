@@ -81,6 +81,7 @@
                     </li>
                 </ul>
             </div>
+            <!-- FIXME Filter: button to stop edition -->
             <!-- Loading -->
             <button ng-show="loadingBuildView" class="btn btn-default" disabled="disabled">
                 <span class="fa fa-spinner fa-spin"></span>
@@ -94,6 +95,7 @@
                 'bg-info': validationStampFilter && validationStampFilter._update && validationStampFilterEdition
             }"
         >
+            <!-- FIXME Filter: muted if in edition and not part of the filter -->
             <ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
             <span
                     ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0"
