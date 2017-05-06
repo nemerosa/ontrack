@@ -21,6 +21,6 @@ public class ValidationStampFilter implements Entity {
     @Wither
     private final Branch branch;
     @Wither
-    private final List<String> patterns;
+    private final List<String> vsNames;
 
 }

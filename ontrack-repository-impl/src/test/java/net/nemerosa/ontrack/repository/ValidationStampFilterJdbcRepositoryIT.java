@@ -36,7 +36,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         ValidationStampFilter filter = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         assertTrue(filter.getId().isSet());
@@ -47,14 +47,14 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         // Creates another filter with the same name
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
-                        .patterns(Collections.singletonList("OTHER.*"))
+                        .vsNames(Collections.singletonList("OTHER"))
                         .build()
         );
     }
@@ -67,7 +67,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                         .name("My filter")
                         .project(project)
                         .branch(Branch.of(project, NameDescription.nd("B", "")))
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
     }
@@ -78,7 +78,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         assertTrue(filter.getId().isSet());
@@ -90,7 +90,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         // Creates another filter with the same name
@@ -98,7 +98,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("OTHER.*"))
+                        .vsNames(Collections.singletonList("OTHER"))
                         .build()
         );
     }
@@ -108,14 +108,14 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         ValidationStampFilter filter = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         assertTrue(filter.getId().isSet());
@@ -127,7 +127,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .branch(branch)
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         assertTrue(filter.getId().isSet());
@@ -139,7 +139,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .branch(branch)
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         // Creates another filter with the same name
@@ -147,7 +147,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .branch(branch)
-                        .patterns(Collections.singletonList("OTHER.*"))
+                        .vsNames(Collections.singletonList("OTHER"))
                         .build()
         );
     }
@@ -157,14 +157,14 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         ValidationStampFilter filter = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .branch(branch)
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         assertTrue(filter.getId().isSet());
@@ -176,14 +176,14 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         ValidationStampFilter filter = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name("My filter")
                         .branch(branch)
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         assertTrue(filter.getId().isSet());
@@ -195,7 +195,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(name)
-                        .patterns(Collections.singletonList("GLOBAL.*"))
+                        .vsNames(Collections.singletonList("GLOBAL"))
                         .build()
         );
         // Project
@@ -203,7 +203,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name(name)
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("PROJECT.*"))
+                        .vsNames(Collections.singletonList("PROJECT"))
                         .build()
         );
         // Branch
@@ -211,7 +211,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name(name)
                         .branch(branch)
-                        .patterns(Collections.singletonList("BRANCH.*"))
+                        .vsNames(Collections.singletonList("BRANCH"))
                         .build()
         );
         // OK
@@ -226,7 +226,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 .collect(Collectors.toList());
         assertEquals(1, list.size());
         assertEquals(name, list.get(0).getName());
-        assertEquals(Collections.singletonList("GLOBAL.*"), list.get(0).getPatterns());
+        assertEquals(Collections.singletonList("GLOBAL"), list.get(0).getVsNames());
     }
 
     @Test
@@ -237,7 +237,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 .collect(Collectors.toList());
         assertEquals(1, list.size());
         assertEquals(name, list.get(0).getName());
-        assertEquals(Collections.singletonList("PROJECT.*"), list.get(0).getPatterns());
+        assertEquals(Collections.singletonList("PROJECT"), list.get(0).getVsNames());
     }
 
     @Test
@@ -248,7 +248,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 .collect(Collectors.toList());
         assertEquals(1, list.size());
         assertEquals(name, list.get(0).getName());
-        assertEquals(Collections.singletonList("BRANCH.*"), list.get(0).getPatterns());
+        assertEquals(Collections.singletonList("BRANCH"), list.get(0).getVsNames());
     }
 
     @Test
@@ -257,13 +257,13 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(name)
-                        .patterns(Collections.singletonList("GLOBAL.*"))
+                        .vsNames(Collections.singletonList("GLOBAL"))
                         .build()
         );
         ValidationStampFilter f = filterRepository.getValidationStampFilterByName(branch, name).orElse(null);
         assertNotNull(f);
         assertEquals(name, f.getName());
-        assertEquals(Collections.singletonList("GLOBAL.*"), f.getPatterns());
+        assertEquals(Collections.singletonList("GLOBAL"), f.getVsNames());
     }
 
     @Test
@@ -272,20 +272,20 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(name)
-                        .patterns(Collections.singletonList("GLOBAL.*"))
+                        .vsNames(Collections.singletonList("GLOBAL"))
                         .build()
         );
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(name)
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("PROJECT.*"))
+                        .vsNames(Collections.singletonList("PROJECT"))
                         .build()
         );
         ValidationStampFilter f = filterRepository.getValidationStampFilterByName(branch, name).orElse(null);
         assertNotNull(f);
         assertEquals(name, f.getName());
-        assertEquals(Collections.singletonList("PROJECT.*"), f.getPatterns());
+        assertEquals(Collections.singletonList("PROJECT"), f.getVsNames());
     }
 
     @Test
@@ -294,27 +294,27 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(name)
-                        .patterns(Collections.singletonList("GLOBAL.*"))
+                        .vsNames(Collections.singletonList("GLOBAL"))
                         .build()
         );
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(name)
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("PROJECT.*"))
+                        .vsNames(Collections.singletonList("PROJECT"))
                         .build()
         );
         filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(name)
                         .branch(branch)
-                        .patterns(Collections.singletonList("BRANCH.*"))
+                        .vsNames(Collections.singletonList("BRANCH"))
                         .build()
         );
         ValidationStampFilter f = filterRepository.getValidationStampFilterByName(branch, name).orElse(null);
         assertNotNull(f);
         assertEquals(name, f.getName());
-        assertEquals(Collections.singletonList("BRANCH.*"), f.getPatterns());
+        assertEquals(Collections.singletonList("BRANCH"), f.getVsNames());
     }
 
     @Test
@@ -329,12 +329,12 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         ValidationStampFilter f = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(uid("F"))
-                        .patterns(Collections.singletonList("GLOBAL.*"))
+                        .vsNames(Collections.singletonList("GLOBAL"))
                         .build()
         );
-        filterRepository.saveValidationStampFilter(f.withPatterns(Arrays.asList("GLOBAL.*", "ONTRACK")));
+        filterRepository.saveValidationStampFilter(f.withVsNames(Arrays.asList("GLOBAL", "ONTRACK")));
         f = filterRepository.getValidationStampFilter(f.getId());
-        assertEquals(Arrays.asList("GLOBAL.*", "ONTRACK"), f.getPatterns());
+        assertEquals(Arrays.asList("GLOBAL", "ONTRACK"), f.getVsNames());
     }
 
     @Test
@@ -343,12 +343,12 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name(uid("F"))
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("PROJECT.*"))
+                        .vsNames(Collections.singletonList("PROJECT"))
                         .build()
         );
-        filterRepository.saveValidationStampFilter(f.withPatterns(Arrays.asList("PROJECT.*", "ONTRACK")));
+        filterRepository.saveValidationStampFilter(f.withVsNames(Arrays.asList("PROJECT", "ONTRACK")));
         f = filterRepository.getValidationStampFilter(f.getId());
-        assertEquals(Arrays.asList("PROJECT.*", "ONTRACK"), f.getPatterns());
+        assertEquals(Arrays.asList("PROJECT", "ONTRACK"), f.getVsNames());
     }
 
     @Test
@@ -357,12 +357,12 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name(uid("F"))
                         .branch(branch)
-                        .patterns(Collections.singletonList("BRANCH.*"))
+                        .vsNames(Collections.singletonList("BRANCH"))
                         .build()
         );
-        filterRepository.saveValidationStampFilter(f.withPatterns(Arrays.asList("BRANCH.*", "ONTRACK")));
+        filterRepository.saveValidationStampFilter(f.withVsNames(Arrays.asList("BRANCH", "ONTRACK")));
         f = filterRepository.getValidationStampFilter(f.getId());
-        assertEquals(Arrays.asList("BRANCH.*", "ONTRACK"), f.getPatterns());
+        assertEquals(Arrays.asList("BRANCH", "ONTRACK"), f.getVsNames());
     }
 
     @Test
@@ -370,7 +370,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         ValidationStampFilter f = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(uid("F"))
-                        .patterns(Collections.singletonList("GLOBAL.*"))
+                        .vsNames(Collections.singletonList("GLOBAL"))
                         .build()
         );
         filterRepository.deleteValidationStampFilter(f.getId());
@@ -389,7 +389,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name(uid("F"))
                         .branch(branch)
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         ValidationStampFilter f2 = filterRepository.shareValidationStampFilter(f, branch.getProject());
@@ -404,7 +404,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name(uid("F"))
                         .branch(branch)
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         ValidationStampFilter f2 = filterRepository.shareValidationStampFilter(f);
@@ -419,7 +419,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                 ValidationStampFilter.builder()
                         .name(uid("F"))
                         .project(branch.getProject())
-                        .patterns(Collections.singletonList("CI.*"))
+                        .vsNames(Collections.singletonList("CI"))
                         .build()
         );
         ValidationStampFilter f2 = filterRepository.shareValidationStampFilter(f);
@@ -433,12 +433,12 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         ValidationStampFilter f = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(uid("F"))
-                        .patterns(null)
+                        .vsNames(null)
                         .build()
         );
         f = filterRepository.getValidationStampFilter(f.getId());
-        assertNotNull(f.getPatterns());
-        assertTrue(f.getPatterns().isEmpty());
+        assertNotNull(f.getVsNames());
+        assertTrue(f.getVsNames().isEmpty());
     }
 
     @Test
@@ -446,12 +446,12 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
         ValidationStampFilter f = filterRepository.newValidationStampFilter(
                 ValidationStampFilter.builder()
                         .name(uid("F"))
-                        .patterns(Collections.emptyList())
+                        .vsNames(Collections.emptyList())
                         .build()
         );
         f = filterRepository.getValidationStampFilter(f.getId());
-        assertNotNull(f.getPatterns());
-        assertTrue(f.getPatterns().isEmpty());
+        assertNotNull(f.getVsNames());
+        assertTrue(f.getVsNames().isEmpty());
     }
 
 }

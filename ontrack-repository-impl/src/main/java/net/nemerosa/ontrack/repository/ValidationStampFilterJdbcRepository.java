@@ -97,11 +97,11 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
         checkUnicity(filter);
         // Creation
         int id = dbCreate(
-                "INSERT INTO VALIDATION_STAMP_FILTERS(NAME, PROJECT, BRANCH, PATTERNS) VALUES (:name, :project, :branch, :patterns)",
+                "INSERT INTO VALIDATION_STAMP_FILTERS(NAME, PROJECT, BRANCH, VSNAMES) VALUES (:name, :project, :branch, :vsNames)",
                 params("name", filter.getName())
                         .addValue("project", filter.getProject() != null ? filter.getProject().id() : null)
                         .addValue("branch", filter.getBranch() != null ? filter.getBranch().id() : null)
-                        .addValue("patterns", savePatterns(filter.getPatterns()))
+                        .addValue("vsNames", saveVsNames(filter.getVsNames()))
         );
         // Returns with ID
         return filter.withId(id(id));
@@ -152,11 +152,11 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
     public void saveValidationStampFilter(ValidationStampFilter filter) {
         checkUnicity(filter);
         getNamedParameterJdbcTemplate().update(
-                "UPDATE VALIDATION_STAMP_FILTERS SET NAME = :name, PROJECT = :project, BRANCH = :branch, PATTERNS = :patterns WHERE ID = :id",
+                "UPDATE VALIDATION_STAMP_FILTERS SET NAME = :name, PROJECT = :project, BRANCH = :branch, VSNAMES = :vsNames WHERE ID = :id",
                 params("name", filter.getName())
                         .addValue("project", filter.getProject() != null ? filter.getProject().id() : null)
                         .addValue("branch", filter.getBranch() != null ? filter.getBranch().id() : null)
-                        .addValue("patterns", savePatterns(filter.getPatterns()))
+                        .addValue("vsNames", saveVsNames(filter.getVsNames()))
                         .addValue("id", filter.id())
         );
     }
@@ -207,14 +207,14 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
                 rs.getString("NAME"),
                 projectLoader.apply(rs.getObject("PROJECT", Integer.class)),
                 branchLoader.apply(rs.getObject("BRANCH", Integer.class)),
-                loadPatterns(rs.getString("PATTERNS"))
+                loadVsNames(rs.getString("VSNAMES"))
         );
     }
 
-    private List<String> loadPatterns(String patterns) {
-        if (StringUtils.isNotBlank(patterns)) {
+    private List<String> loadVsNames(String vsNames) {
+        if (StringUtils.isNotBlank(vsNames)) {
             // Parses as JSON list
-            JsonNode json = readJson(patterns);
+            JsonNode json = readJson(vsNames);
             if (json.isArray()) {
                 List<String> values = new ArrayList<>();
                 for (JsonNode node : json) {
@@ -229,11 +229,11 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
         }
     }
 
-    private String savePatterns(List<String> patterns) {
-        if (patterns == null) {
+    private String saveVsNames(List<String> vsNames) {
+        if (vsNames == null) {
             return null;
         } else {
-            return writeJson(patterns);
+            return writeJson(vsNames);
         }
     }
 }

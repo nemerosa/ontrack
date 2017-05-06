@@ -93,7 +93,7 @@ public class ValidationStampFilterController extends AbstractResourceController 
                 ValidationStampFilter.builder()
                         .name(input.getName())
                         .branch(structureService.getBranch(branchId))
-                        .patterns(Collections.emptyList())
+                        .vsNames(Collections.emptyList())
                         .build()
         );
     }

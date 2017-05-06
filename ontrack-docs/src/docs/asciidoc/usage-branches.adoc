@@ -72,3 +72,37 @@ be deleted or disabled.s
 
 Note that the _Stale branches_ property can also be set programmatically using
 the <<dsl-projectproperties-stale,DSL>>.
+
+[[branches-validation-stamp-filters]]
+==== Validation stamp filters
+
+When a branch defines many validation stamps, the view can become cluttered
+and not really useful any longer, because displaying too much information.
+
+_Validation stamp filters_ can be defined to restrict the view to a set
+of known validation stamps.
+
+Validation stamp filters can be selected in the branch view, just on the left
+of the list of validation stamp headers.
+
+A validation stamp filter is defined by:
+
+* a name
+* a list of validation stamp names to include
+
+When a validation stamp filter is created for a branch, only the name
+is required and all current validation stamps filters are included by default.
+
+To edit a filter, the user can either:
+
+* select it and _exclude_ displayed validation stamp filters by clicking
+on the small cross close to the validation stamp icon
+* edit the validation stamp filter directly. The edition dialog allows
+the edition of the name and the selection / edition of the validation stamps
+based on the current branch
+
+Finally, the filters can be shared at project level and for all project for the
+<<security,authorized users>>.
+
+A filter shared at project level is shown with a `(P)` close to its name
+and a global filter with a `(G)`.
