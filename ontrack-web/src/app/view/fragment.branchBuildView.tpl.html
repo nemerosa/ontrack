@@ -44,7 +44,7 @@
                             <!-- TODO Show filter type: branch, project or global -->
                             <!-- TODO Sharing to project -->
                             <!-- TODO Sharing to global -->
-                            <!-- TODO Editing -->
+                            <!-- Editing -->
                             <span class="ot-command-update ot-command"
                                   title="Edit this filter"
                                   ng-if="vsf._update"
@@ -80,6 +80,12 @@
         <!-- All validation stamps -->
         <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn" class="ot-branch-build-view-validation">
             <ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
+            <span
+                    ng-if="validationStampFilter && validationStampFilter._update"
+                    ng-click="removeValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
+                    title="Removes the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
+                    class="fa fa-minus-circle ot-action"
+                    style="font-size: 50%; vertical-align: bottom;"></span>
         </th>
     </tr>
     <!-- Validation stamps decorations -->
