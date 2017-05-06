@@ -31,13 +31,29 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu ot-validationstampfilter-list" role="menu">
+                    <!-- List of filters -->
                     <li ng-repeat="vsf in branchValidationStampFilterResources.resources">
                         <a>{{vsf.name}}</a>
                     </li>
                     <li ng-if="branchValidationStampFilterResources.resources.length == 0" role="presentation" class="dropdown-header">No validation stamp filter is available</li>
+                    <!-- Reset filters -->
+                    <li class="divider" ng-if="validationStampFilter"></li>
+                    <li ng-if="validationStampFilter">
+                        <a>
+                            <span ng-click="clearBranchValidationStampFilter()">
+                                <span class="fa fa-eraser"></span>
+                                Clear validation stamp filter
+                            </span>
+                        </a>
+                    </li>
+                    <!-- New filter -->
+                    <li class="divider"></li>
                     <li ng-if="branch._validationStampFilterCreate">
                         <a>
-                            <span ng-click="newBranchValidationStampFilter()">New filter...</span>
+                            <span ng-click="newBranchValidationStampFilter()">
+                                <span class="fa fa-plus"></span>
+                                New filter...
+                            </span>
                         </a>
                     </li>
                 </ul>

@@ -613,6 +613,10 @@ angular.module('ot.view.branch', [
             }
         }
 
+        $scope.clearBranchValidationStampFilter = function () {
+            selectValidationStampFilter(undefined);
+        };
+
         $scope.newBranchValidationStampFilter = function () {
             if ($scope.branch._validationStampFilterCreate) {
                 otFormService.create($scope.branch._validationStampFilterCreate, "Validation stamp filter").then(function (filter) {
