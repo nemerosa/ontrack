@@ -595,8 +595,9 @@ angular.module('ot.view.branch', [
                 $scope.validationStampFilterEdition = false;
                 otFormService.create($scope.branch._validationStampFilterCreate, "Validation stamp filter").then(function (filter) {
                     loadBranchValidationStampFilters();
-                    $scope.validationStampFilterEdition = false;
                     $scope.selectBranchValidationStampFilter(filter);
+                    // Enter in edition mode immediately
+                    $scope.validationStampFilterEdition = true;
                 });
             }
         };
