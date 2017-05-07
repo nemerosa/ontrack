@@ -628,6 +628,26 @@ angular.module('ot.view.branch', [
             }
         };
 
+        $scope.shareValidationStampFilterAtProject = function (validationStampFilter) {
+            if (validationStampFilter._shareAtProject) {
+                $scope.validationStampFilterEdition = false;
+                ot.pageCall($http.put(validationStampFilter._shareAtProject, {})).then(function (vsf) {
+                    loadBranchValidationStampFilters();
+                    $scope.selectBranchValidationStampFilter(vsf);
+                });
+            }
+        };
+
+        $scope.shareValidationStampFilterAtGlobal = function (validationStampFilter) {
+            if (validationStampFilter._shareAtGlobal) {
+                $scope.validationStampFilterEdition = false;
+                ot.pageCall($http.put(validationStampFilter._shareAtGlobal, {})).then(function (vsf) {
+                    loadBranchValidationStampFilters();
+                    $scope.selectBranchValidationStampFilter(vsf);
+                });
+            }
+        };
+
         $scope.deleteBranchValidationStampFilter = function (validationStampFilter) {
             if (validationStampFilter._delete) {
                 $scope.validationStampFilterEdition = false;

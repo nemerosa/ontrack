@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNotShareableException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiSelection;
 import net.nemerosa.ontrack.model.form.MultiStrings;
@@ -131,6 +132,26 @@ public class ValidationStampFilterController extends AbstractResourceController 
     public Ack deleteValidationStampFilter(@PathVariable ID validationStampFilterId) {
         return filterService.deleteValidationStampFilter(
                 filterService.getValidationStampFilter(validationStampFilterId)
+        );
+    }
+
+    @PutMapping("/{validationStampFilterId}/share/project")
+    public ValidationStampFilter shareValidationStampFilterAtProject(@PathVariable ID validationStampFilterId) {
+        ValidationStampFilter filter = filterService.getValidationStampFilter(validationStampFilterId);
+        if (filter.getBranch() == null) {
+            throw new ValidationStampFilterNotShareableException(filter.getName(), "no branch is associated with the filter");
+        }
+        return filterService.shareValidationStampFilter(
+                filter,
+                filter.getBranch().getProject()
+        );
+    }
+
+    @PutMapping("/{validationStampFilterId}/share/global")
+    public ValidationStampFilter shareValidationStampFilterAtGlobal(@PathVariable ID validationStampFilterId) {
+        ValidationStampFilter filter = filterService.getValidationStampFilter(validationStampFilterId);
+        return filterService.shareValidationStampFilter(
+                filter
         );
     }
 

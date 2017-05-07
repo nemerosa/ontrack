@@ -44,8 +44,16 @@
                             <!-- Show filter type: branch, project or global -->
                             <b title="Global scope" ng-if="vsf.scope == 'GLOBAL'">[G]</b>
                             <b title="Project scope - {{branch.project.name}}" ng-if="vsf.scope == 'PROJECT'">[P]</b>
-                            <!-- TODO Sharing to project -->
-                            <!-- TODO Sharing to global -->
+                            <!-- Sharing to project -->
+                            <span class="ot-command fa fa-share"
+                                  title="Share this filter at project level"
+                                  ng-if="vsf._shareAtProject"
+                                  ng-click="shareValidationStampFilterAtProject(vsf)"></span>
+                            <!-- Sharing to global -->
+                            <span class="ot-command fa fa-share-square"
+                                  title="Share this filter at global level"
+                                  ng-if="vsf._shareAtGlobal"
+                                  ng-click="shareValidationStampFilterAtGlobal(vsf)"></span>
                             <!-- Edition mode: ON -->
                             <span class="ot-command fa fa-eye"
                                   title="Edit this filter using the current view"
