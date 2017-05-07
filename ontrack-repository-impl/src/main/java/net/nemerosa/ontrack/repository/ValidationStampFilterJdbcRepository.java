@@ -190,12 +190,16 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
 
     @Override
     public ValidationStampFilter shareValidationStampFilter(ValidationStampFilter filter, Project project) {
-        return newValidationStampFilter(filter.withProject(project).withBranch(null).withId(ID.NONE));
+        ValidationStampFilter newFilter = filter.withProject(project).withBranch(null);
+        saveValidationStampFilter(newFilter);
+        return newFilter;
     }
 
     @Override
     public ValidationStampFilter shareValidationStampFilter(ValidationStampFilter filter) {
-        return newValidationStampFilter(filter.withProject(null).withBranch(null).withId(ID.NONE));
+        ValidationStampFilter newFilter = filter.withProject(null).withBranch(null);
+        saveValidationStampFilter(newFilter);
+        return newFilter;
     }
 
     private ValidationStampFilter toValidationStampFilter(

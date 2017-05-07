@@ -462,7 +462,7 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
                             .build()
             );
             ValidationStampFilter f2 = filterService.shareValidationStampFilter(f, branch.getProject());
-            assertTrue(f.id() != f2.id());
+            assertTrue(f.id() == f2.id());
             assertNotNull(f2.getProject());
             assertNull(f2.getBranch());
         });
@@ -480,7 +480,7 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
                             .build()
             );
             ValidationStampFilter f2 = filterService.shareValidationStampFilter(f);
-            assertTrue(f.id() != f2.id());
+            assertTrue(f.id() == f2.id());
             assertNull(f2.getProject());
             assertNull(f2.getBranch());
         });
@@ -498,9 +498,63 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
                             .build()
             );
             ValidationStampFilter f2 = filterService.shareValidationStampFilter(f);
-            assertTrue(f.id() != f2.id());
+            assertTrue(f.id() == f2.id());
             assertNull(f2.getProject());
             assertNull(f2.getBranch());
+        });
+    }
+
+    @Test
+    public void sharing_from_branch_to_project_remove_branch_filter() throws Exception {
+        asUser().with(branch, ProjectConfig.class).execute(() -> {
+            ValidationStampFilter f = filterService.newValidationStampFilter(
+                    ValidationStampFilter.builder()
+                            .name(uid("F"))
+                            .branch(branch)
+                            .vsNames(Collections.singletonList("BRANCH"))
+                            .build()
+            );
+            // Shares at project level
+            filterService.shareValidationStampFilter(f, branch.getProject());
+            // Gets filters for the branch
+            List<ValidationStampFilter> filters = filterService.getBranchValidationStampFilters(branch, false);
+            assertTrue("Branch has no longer any filter", filters.isEmpty());
+        });
+    }
+
+    @Test
+    public void sharing_from_branch_to_global_remove_branch_filter() throws Exception {
+        asUser().with(branch, ProjectConfig.class).with(GlobalSettings.class).execute(() -> {
+            ValidationStampFilter f = filterService.newValidationStampFilter(
+                    ValidationStampFilter.builder()
+                            .name(uid("F"))
+                            .branch(branch)
+                            .vsNames(Collections.singletonList("BRANCH"))
+                            .build()
+            );
+            // Shares at global level
+            filterService.shareValidationStampFilter(f);
+            // Gets filters for the branch
+            List<ValidationStampFilter> filters = filterService.getBranchValidationStampFilters(branch, false);
+            assertTrue("Branch has no longer any filter", filters.isEmpty());
+        });
+    }
+
+    @Test
+    public void sharing_from_project_to_global_remove_project_filter() throws Exception {
+        asUser().with(branch, ProjectConfig.class).with(GlobalSettings.class).execute(() -> {
+            ValidationStampFilter f = filterService.newValidationStampFilter(
+                    ValidationStampFilter.builder()
+                            .name(uid("F"))
+                            .project(branch.getProject())
+                            .vsNames(Collections.singletonList("PROJECT"))
+                            .build()
+            );
+            // Shares at global level
+            filterService.shareValidationStampFilter(f);
+            // Gets filters for the project
+            List<ValidationStampFilter> filters = filterService.getProjectValidationStampFilters(branch.getProject(), false);
+            assertTrue("Project has no longer any filter", filters.isEmpty());
         });
     }
 

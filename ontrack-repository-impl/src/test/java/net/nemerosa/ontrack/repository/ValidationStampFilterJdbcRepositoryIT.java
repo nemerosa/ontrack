@@ -393,7 +393,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                         .build()
         );
         ValidationStampFilter f2 = filterRepository.shareValidationStampFilter(f, branch.getProject());
-        assertTrue(f.id() != f2.id());
+        assertTrue(f.id() == f2.id());
         assertNotNull(f2.getProject());
         assertNull(f2.getBranch());
     }
@@ -408,7 +408,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                         .build()
         );
         ValidationStampFilter f2 = filterRepository.shareValidationStampFilter(f);
-        assertTrue(f.id() != f2.id());
+        assertTrue(f.id() == f2.id());
         assertNull(f2.getProject());
         assertNull(f2.getBranch());
     }
@@ -423,7 +423,7 @@ public class ValidationStampFilterJdbcRepositoryIT extends AbstractRepositoryTes
                         .build()
         );
         ValidationStampFilter f2 = filterRepository.shareValidationStampFilter(f);
-        assertTrue(f.id() != f2.id());
+        assertTrue(f.id() == f2.id());
         assertNull(f2.getProject());
         assertNull(f2.getBranch());
     }
