@@ -1,5 +1,36 @@
 <table class="ot-branch-build-view">
     <thead>
+    <tr>
+        <th colspan="3">
+            &nbsp;
+        </th>
+        <th colspan="{{validationStampFilterCount(3)}}">
+            <!-- Filter: edition - select all-->
+            <button class="btn btn-default ot-validation-stamp-filter-edition"
+                    ng-click="selectAllValidationStampFilter(validationStampFilter)"
+                    title="Add all validation stamps to the {{validationStampFilter.name}} filter"
+                    ng-show="validationStampFilter && validationStampFilterEdition">
+                <span class="fa fa-check-square-o"></span>
+                Select all for <b>{{validationStampFilter.name}}</b>
+            </button>
+            <!-- Filter: edition - select none -->
+            <button class="btn btn-default ot-validation-stamp-filter-edition"
+                    ng-click="selectNoneValidationStampFilter(validationStampFilter)"
+                    title="Remove all validation stamps from the {{validationStampFilter.name}} filter"
+                    ng-show="validationStampFilter && validationStampFilterEdition">
+                <span class="fa fa-square-o"></span>
+                Select none for <b>{{validationStampFilter.name}}</b>
+            </button>
+            <!-- Filter: button to stop edition -->
+            <button class="btn btn-default ot-validation-stamp-filter-edition"
+                    ng-click="stopDirectEditValidationStampFilter(validationStampFilter)"
+                    title="Done with the edition of the {{validationStampFilter.name}} filter"
+                    ng-show="validationStampFilter && validationStampFilterEdition">
+                <span class="fa fa-eye-slash"></span>
+                <b>{{validationStampFilter.name}}</b> done editing
+            </button>
+        </th>
+    </tr>
     <!-- Validation stamps -->
     <tr>
         <th colspan="3" rowspan="2">
@@ -95,14 +126,6 @@
                     </li>
                 </ul>
             </div>
-            <!-- Filter: button to stop edition -->
-            <button class="btn btn-default ot-validation-stamp-filter-edition"
-                    ng-click="stopDirectEditValidationStampFilter(validationStampFilter)"
-                    title="Done with the edition of the {{validationStampFilter.name}} filter"
-                    ng-show="validationStampFilter && validationStampFilterEdition">
-                <span class="fa fa-eye-slash"></span>
-                <b>{{validationStampFilter.name}}</b> done editing
-            </button>
             <!-- Loading -->
             <button ng-show="loadingBuildView" class="btn btn-default" disabled="disabled">
                 <span class="fa fa-spinner fa-spin"></span>
