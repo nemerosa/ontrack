@@ -257,9 +257,10 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
     @Test
     public void project_filters_only() throws Exception {
         String name = createFilters();
-        List<ValidationStampFilter> list = filterService.getProjectValidationStampFilters(branch.getProject(), false).stream()
+        List<ValidationStampFilter> list = asUser().withView(branch).call(() -> filterService.getProjectValidationStampFilters(branch.getProject(), false).stream()
                 .filter(f -> StringUtils.equals(name, f.getName()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
         assertEquals(1, list.size());
         assertEquals(name, list.get(0).getName());
         assertEquals(Collections.singletonList("PROJECT"), list.get(0).getVsNames());
@@ -268,9 +269,10 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
     @Test
     public void project_filters_include_all() throws Exception {
         String name = createFilters();
-        List<ValidationStampFilter> list = filterService.getProjectValidationStampFilters(branch.getProject(), true).stream()
+        List<ValidationStampFilter> list = asUser().withView(branch).call(() -> filterService.getProjectValidationStampFilters(branch.getProject(), true).stream()
                 .filter(f -> StringUtils.equals(name, f.getName()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
         assertEquals(1, list.size());
         assertEquals(name, list.get(0).getName());
         assertEquals(Collections.singletonList("PROJECT"), list.get(0).getVsNames());
@@ -279,9 +281,10 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
     @Test
     public void branch_filters_only() throws Exception {
         String name = createFilters();
-        List<ValidationStampFilter> list = filterService.getBranchValidationStampFilters(branch, false).stream()
+        List<ValidationStampFilter> list = asUser().withView(branch).call(() -> filterService.getBranchValidationStampFilters(branch, false).stream()
                 .filter(f -> StringUtils.equals(name, f.getName()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
         assertEquals(1, list.size());
         assertEquals(name, list.get(0).getName());
         assertEquals(Collections.singletonList("BRANCH"), list.get(0).getVsNames());
@@ -290,9 +293,10 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
     @Test
     public void branch_filters_include_all() throws Exception {
         String name = createFilters();
-        List<ValidationStampFilter> list = filterService.getBranchValidationStampFilters(branch, true).stream()
+        List<ValidationStampFilter> list = asUser().withView(branch).call(() -> filterService.getBranchValidationStampFilters(branch, true).stream()
                 .filter(f -> StringUtils.equals(name, f.getName()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
         assertEquals(1, list.size());
         assertEquals(name, list.get(0).getName());
         assertEquals(Collections.singletonList("BRANCH"), list.get(0).getVsNames());
@@ -308,7 +312,7 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
                         .vsNames(Collections.singletonList("GLOBAL"))
                         .build()
         ));
-        ValidationStampFilter f = filterService.getValidationStampFilterByName(branch, name).orElse(null);
+        ValidationStampFilter f = asUser().withView(branch).call(() -> filterService.getValidationStampFilterByName(branch, name).orElse(null));
         assertNotNull(f);
         assertEquals(name, f.getName());
         assertEquals(Collections.singletonList("GLOBAL"), f.getVsNames());
@@ -333,7 +337,7 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
                             .build()
             );
         });
-        ValidationStampFilter f = filterService.getValidationStampFilterByName(branch, name).orElse(null);
+        ValidationStampFilter f = asUser().withView(branch).call(() -> filterService.getValidationStampFilterByName(branch, name).orElse(null));
         assertNotNull(f);
         assertEquals(name, f.getName());
         assertEquals(Collections.singletonList("PROJECT"), f.getVsNames());
@@ -365,7 +369,7 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
                             .build()
             );
         });
-        ValidationStampFilter f = filterService.getValidationStampFilterByName(branch, name).orElse(null);
+        ValidationStampFilter f = asUser().withView(branch).call(() -> filterService.getValidationStampFilterByName(branch, name).orElse(null));
         assertNotNull(f);
         assertEquals(name, f.getName());
         assertEquals(Collections.singletonList("BRANCH"), f.getVsNames());
@@ -375,7 +379,7 @@ public class ValidationStampFilterServiceIT extends AbstractServiceTestSupport {
     @Test
     public void by_name_none() throws Exception {
         createFilters();
-        ValidationStampFilter f = filterService.getValidationStampFilterByName(branch, uid("FX")).orElse(null);
+        ValidationStampFilter f = asUser().withView(branch).call(() -> filterService.getValidationStampFilterByName(branch, uid("FX")).orElse(null));
         assertNull(f);
     }
 
