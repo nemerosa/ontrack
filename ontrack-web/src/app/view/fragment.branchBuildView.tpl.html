@@ -44,14 +44,14 @@
             </button>
             <!-- Auto refresh -->
             <button class="ot-branch-build-view-auto-refresh"
-                  ng-class="{
+                    ng-class="{
                     'ot-branch-build-view-auto-refresh-enabled': autoRefresh,
                     'ot-branch-build-view-auto-refresh-disabled': !autoRefresh
                     }"
-                  title="{{autoRefresh ? 'Auto refresh is enabled' : 'Auto refresh is disabled'}}"
-                  ng-click="toggleAutoRefresh()">
+                    title="{{autoRefresh ? 'Auto refresh is enabled' : 'Auto refresh is disabled'}}"
+                    ng-click="toggleAutoRefresh()">
                 <span class="fa fa-refresh"></span>
-             </button>
+            </button>
             <!-- Validation stamp filters -->
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -60,7 +60,7 @@
                             'btn-warning': validationStampFilter,
                             'btn-default': !validationStampFilter
                         }"
-                        >
+                >
                     <span class="fa fa-filter"></span>
                     <span class="caret"></span>
                 </button>
@@ -69,7 +69,8 @@
                     <li ng-repeat="vsf in branchValidationStampFilterResources.resources">
                         <a>
                             <!-- Selected? -->
-                            <span class="fa fa-check" ng-show="validationStampFilter && validationStampFilter.id == vsf.id"></span>
+                            <span class="fa fa-check"
+                                  ng-show="validationStampFilter && validationStampFilter.id == vsf.id"></span>
                             <!-- Name -->
                             <span ng-click="selectBranchValidationStampFilter(vsf)">{{vsf.name}}</span>
                             <!-- Show filter type: branch, project or global -->
@@ -107,7 +108,9 @@
                                   ng-click="deleteBranchValidationStampFilter(vsf)"></span>
                         </a>
                     </li>
-                    <li ng-if="branchValidationStampFilterResources.resources.length == 0" role="presentation" class="dropdown-header">No validation stamp filter is available</li>
+                    <li ng-if="branchValidationStampFilterResources.resources.length == 0" role="presentation"
+                        class="dropdown-header">No validation stamp filter is available
+                    </li>
                     <!-- Reset filters -->
                     <li class="divider" ng-if="validationStampFilter"></li>
                     <li ng-if="validationStampFilter">
@@ -137,31 +140,45 @@
             class="ot-branch-build-view-validation"
             ng-class="{
                 'ot-validation-stamp-filter-edition': validationStampFilter && validationStampFilter._update && validationStampFilterEdition
-            }"
-        >
-            <span ng-class="{
-                'ot-validation-stamp-filter-edition-on': validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0,
-                'ot-validation-stamp-filter-edition-off': validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0
-            }"><ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image></span>
-            <span
-                    ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0"
-                    ng-click="removeValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
-                    title="Removes the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
-                    class="fa fa-minus-circle text-danger ot-action"
-                    style="font-size: 50%; vertical-align: bottom;"></span>
-            <span
-                    ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0"
-                    ng-click="addValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
-                    title="Adds the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
-                    class="fa fa-plus-circle text-success ot-action"
-                    style="font-size: 50%; vertical-align: bottom;"></span>
+            }">
+            <!-- VS filter edition ON -->
+            <span ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition">
+                <span class="ot-action"
+                      ng-class="{
+                        'ot-validation-stamp-filter-edition-selected': validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0,
+                        'ot-validation-stamp-filter-edition-unselected': validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0
+                        }"
+                      ng-click="toggleValidationStampFromFilter(validationStampView.validationStamp.name)"
+                >
+                    <ot-entity-image entity="validationStampView.validationStamp"></ot-entity-image>
+                </span>
+                <span
+                        ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0"
+                        ng-click="removeValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
+                        title="Removes the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
+                        class="fa fa-minus-circle text-danger ot-action"
+                        style="font-size: 50%; vertical-align: bottom;"></span>
+                <span
+                        ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0"
+                        ng-click="addValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
+                        title="Adds the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
+                        class="fa fa-plus-circle text-success ot-action"
+                        style="font-size: 50%; vertical-align: bottom;"></span>
+            </span>
+            <!-- VS filter edition OFF -->
+            <span ng-if="!validationStampFilter || !validationStampFilter._update || !validationStampFilterEdition">
+                <ot-entity-image entity="validationStampView.validationStamp"
+                                 link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
+            </span>
         </th>
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
         <!-- For each validation stamp -->
-        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn" class="ot-branch-build-view-validation">
-            <ot-entity-embedded-decorations decorations="validationStampView.decorations"></ot-entity-embedded-decorations>
+        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn"
+            class="ot-branch-build-view-validation">
+            <ot-entity-embedded-decorations
+                    decorations="validationStampView.decorations"></ot-entity-embedded-decorations>
         </th>
     </tr>
     </thead>

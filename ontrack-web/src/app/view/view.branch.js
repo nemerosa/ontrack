@@ -691,11 +691,24 @@ angular.module('ot.view.branch', [
             if (validationStampFilter._update) {
                 ot.pageCall($http.put(validationStampFilter._update, {
                     name: validationStampFilter.name,
-                    vsNames: $scope.validationStampViews.map(function (vsv) { return vsv.validationStamp.name; })
+                    vsNames: $scope.validationStampViews.map(function (vsv) {
+                        return vsv.validationStamp.name;
+                    })
                 })).then(function (vsf) {
                     loadBranchValidationStampFilters();
                     $scope.selectBranchValidationStampFilter(vsf);
                 });
+            }
+        };
+
+        $scope.toggleValidationStampFromFilter = function (validationStampName) {
+            if ($scope.validationStampFilter && $scope.validationStampFilter._update) {
+                var index = $scope.validationStampFilter.vsNames.indexOf(validationStampName);
+                if (index >= 0) {
+                    $scope.removeValidationStampFromFilter($scope.validationStampFilter, validationStampName);
+                } else {
+                    $scope.addValidationStampFromFilter($scope.validationStampFilter, validationStampName);
+                }
             }
         };
 
