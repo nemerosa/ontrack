@@ -92,7 +92,7 @@
         <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn"
             class="ot-branch-build-view-validation"
             ng-class="{
-                'bg-info': validationStampFilter && validationStampFilter._update && validationStampFilterEdition
+                'ot-validation-stamp-filter-edition': validationStampFilter && validationStampFilter._update && validationStampFilterEdition
             }"
         >
             <!-- FIXME Filter: muted if in edition and not part of the filter -->
