@@ -578,11 +578,31 @@ angular.module('ot.view.branch', [
         function loadBranchValidationStampFilters() {
             ot.pageCall($http.get($scope.branch._allValidationStampFilters)).then(function (resources) {
                 $scope.branchValidationStampFilterResources = resources;
+                // Gets the validation stamp filter in the URL
+                var search = $location.search();
+                if (search.vsFilter) {
+                    // Gets the filter with same name
+                    var existingFilter = $scope.branchValidationStampFilterResources.resources.find(function (vsf) {
+                        //noinspection EqualityComparisonWithCoercionJS
+                        return vsf.name == search.vsFilter;
+                    });
+                    if (existingFilter) {
+                        $scope.selectBranchValidationStampFilter(existingFilter);
+                    }
+                }
             });
         }
 
         $scope.selectBranchValidationStampFilter = function (validationStampFilter) {
             $scope.validationStampFilter = validationStampFilter;
+            // Permalink
+            var search = $location.search();
+            if (validationStampFilter) {
+                search.vsFilter = validationStampFilter.name;
+            } else {
+                delete search.vsFilter;
+            }
+            $location.search(search);
         };
 
         $scope.clearBranchValidationStampFilter = function () {
