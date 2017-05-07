@@ -41,7 +41,9 @@
                             <span class="fa fa-check" ng-show="validationStampFilter && validationStampFilter.id == vsf.id"></span>
                             <!-- Name -->
                             <span ng-click="selectBranchValidationStampFilter(vsf)">{{vsf.name}}</span>
-                            <!-- TODO Show filter type: branch, project or global -->
+                            <!-- Show filter type: branch, project or global -->
+                            <b title="Global scope" ng-if="vsf.scope == 'GLOBAL'">[G]</b>
+                            <b title="Project scope - {{branch.project.name}}" ng-if="vsf.scope == 'PROJECT'">[P]</b>
                             <!-- TODO Sharing to project -->
                             <!-- TODO Sharing to global -->
                             <!-- Edition mode: ON -->
