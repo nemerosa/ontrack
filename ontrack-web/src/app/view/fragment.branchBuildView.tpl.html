@@ -95,8 +95,10 @@
                 'ot-validation-stamp-filter-edition': validationStampFilter && validationStampFilter._update && validationStampFilterEdition
             }"
         >
-            <!-- FIXME Filter: muted if in edition and not part of the filter -->
-            <ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
+            <span ng-class="{
+                'ot-validation-stamp-filter-edition-on': validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0,
+                'ot-validation-stamp-filter-edition-off': validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0
+            }"><ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image></span>
             <span
                     ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0"
                     ng-click="removeValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
