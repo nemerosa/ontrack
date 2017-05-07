@@ -39,6 +39,12 @@ public class ValidationStampFilterResourceDecorator extends AbstractResourceDeco
                         on(ValidationStampFilterController.class).getValidationStampFilterUpdateForm(resource.getId()),
                         canUpdate
                 )
+                // Delete if authorized
+                .link(
+                        Link.DELETE,
+                        on(ValidationStampFilterController.class).deleteValidationStampFilter(resource.getId()),
+                        canUpdate
+                )
                 // OK
                 .build();
     }

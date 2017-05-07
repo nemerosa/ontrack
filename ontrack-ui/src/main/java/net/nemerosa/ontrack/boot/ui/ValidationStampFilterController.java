@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiSelection;
 import net.nemerosa.ontrack.model.form.MultiStrings;
@@ -124,6 +125,13 @@ public class ValidationStampFilterController extends AbstractResourceController 
         filterService.saveValidationStampFilter(filter);
         // OK
         return filter;
+    }
+
+    @DeleteMapping("/{validationStampFilterId}/delete")
+    public Ack deleteValidationStampFilter(@PathVariable ID validationStampFilterId) {
+        return filterService.deleteValidationStampFilter(
+                filterService.getValidationStampFilter(validationStampFilterId)
+        );
     }
 
 }
