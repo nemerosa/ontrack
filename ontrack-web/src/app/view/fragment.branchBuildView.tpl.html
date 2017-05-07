@@ -81,7 +81,14 @@
                     </li>
                 </ul>
             </div>
-            <!-- FIXME Filter: button to stop edition -->
+            <!-- Filter: button to stop edition -->
+            <button class="btn btn-default ot-validation-stamp-filter-edition"
+                    ng-click="stopDirectEditValidationStampFilter(validationStampFilter)"
+                    title="Done with the edition of the {{validationStampFilter.name}} filter"
+                    ng-show="validationStampFilter && validationStampFilterEdition">
+                <span class="fa fa-eye-slash"></span>
+                <b>{{validationStampFilter.name}}</b> done editing
+            </button>
             <!-- Loading -->
             <button ng-show="loadingBuildView" class="btn btn-default" disabled="disabled">
                 <span class="fa fa-spinner fa-spin"></span>
