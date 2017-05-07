@@ -59,7 +59,11 @@
                                   title="Edit this filter"
                                   ng-if="vsf._update"
                                   ng-click="editBranchValidationStampFilter(vsf)"></span>
-                            <!-- TODO Deleting -->
+                            <!-- Deleting -->
+                            <span class="ot-command-delete ot-command"
+                                  title="Delete this filter"
+                                  ng-if="vsf._delete"
+                                  ng-click="deleteBranchValidationStampFilter(vsf)"></span>
                         </a>
                     </li>
                     <li ng-if="branchValidationStampFilterResources.resources.length == 0" role="presentation" class="dropdown-header">No validation stamp filter is available</li>

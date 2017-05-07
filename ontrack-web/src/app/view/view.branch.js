@@ -627,6 +627,21 @@ angular.module('ot.view.branch', [
             }
         };
 
+        $scope.deleteBranchValidationStampFilter = function (validationStampFilter) {
+            if (validationStampFilter._delete) {
+                $scope.validationStampFilterEdition = false;
+                otAlertService.confirm({
+                    title: "Validation stamp filter deletion",
+                    message: "Do you really want to delete the " + validationStampFilter.name + " validation stamp filter?"
+                }).then(function () {
+                    ot.pageCall($http.delete(validationStampFilter._delete)).then(function () {
+                        loadBranchValidationStampFilters();
+                        $scope.selectBranchValidationStampFilter(undefined);
+                    });
+                });
+            }
+        };
+
         $scope.validationStampFilterEdition = false;
 
         $scope.directEditValidationStampFilter = function (validationStampFilter) {
