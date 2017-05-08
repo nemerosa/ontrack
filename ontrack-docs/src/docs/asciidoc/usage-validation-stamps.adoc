@@ -72,3 +72,28 @@ In this case:
   the branch and is then used
 * in any other case, a new validation stamp is created in the branch, with the requested name (and with
   an empty image and a default description)
+
+[[validation-stamps-bulk-update]]
+==== Bulk update of validation stamps
+
+Validation stamps are attached to a <<model,branch>> but in reality, they are
+often duplicated in a project branches and among all the projects. Updating
+the description and the image of a validation stamp can fast become cumbersome.
+
+The <<validation-stamps-auto-predefined,predefined validation stamp>> can
+mitigate but this won't solve the issue when validation stamps are created
+<<validation-stamps-auto-creation-if-not-predefined,automatically>> even when
+not predefined.
+
+In order to update all the validation stamps having the same name, across all
+branches and all projects, you can use the _Buld update_ command in the
+validation stamp page:
+
+image::images/validation-stamp-bulk-update.png[Bulk update]
+
+A confirmation will be asked and all the validation stamps having the same
+name, across all branches and all projects, will be updated with the same
+image and the same description.
+
+A <<validation-stamps-auto-predefined,predefined validation stamp>> will
+also be updated or created.

@@ -71,4 +71,6 @@ shown any longer by default), and after again 300 days, they will be deleted
 be deleted or disabled.s
 
 Note that the _Stale branches_ property can also be set programmatically using
-the [DSL](DSL Property Stale Branches).
+the <<dsl-projectproperties-stale,DSL>>.
+
+include::usage-validation-stamp-filters.adoc[]

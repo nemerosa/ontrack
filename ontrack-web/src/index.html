@@ -76,8 +76,22 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu" role="menu">
+                            <!-- Filter box -->
+                            <li class="user-menu-filter" onclick="event.stopPropagation();">
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="user-menu-filter-addon">
+                                        <span class="fa fa-search"></span>
+                                    </span>
+                                    <input type="text"
+                                           ng-model="userMenuFilter"
+                                           placeholder="Search in the list"
+                                           aria-describedby="user-menu-filter-addon"
+                                           class="form-control"
+                                           />
+                                </div>
+                            </li>
                             <!-- All actions -->
-                            <li ng-repeat="action in user.actions">
+                            <li ng-repeat="action in user.actions | orderBy: 'name' | filter:{name: userMenuFilter}">
                                 <a ng-if="action.type == 'LINK'" id="{{action.id}}-link" href="#{{action.uri}}">{{action.name}}</a>
                                 <a ng-if="action.type == 'FORM'" id="{{action.id}}-form" ng-click="showActionForm(action)">{{action.name}}</a>
                             </li>

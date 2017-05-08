@@ -1,4 +1,4 @@
 dependencies {
     compile project(':ontrack-model')
-    compile libraries.spring_jdbc
+    compile 'org.springframework:spring-jdbc'
 }

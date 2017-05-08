@@ -277,7 +277,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     publishers {
         buildDescription '', '${VERSION}', '', ''
-        archiveJunit('*-tests.xml')
+        archiveJunit('build/acceptance/*.xml')
         if (release) {
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
@@ -333,7 +333,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 """
         }
         publishers {
-            archiveJunit('*-tests.xml')
+            archiveJunit('build/acceptance/*.xml')
             // Use display version
             ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE.DEBIAN'
         }
@@ -365,7 +365,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 """
             }
             publishers {
-                archiveJunit('*-tests.xml')
+                archiveJunit('build/acceptance/*.xml')
                 ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', "ACCEPTANCE.CENTOS.${centOsVersion}" as String
             }
         }
@@ -458,7 +458,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
 
     }
     publishers {
-        archiveJunit('*-tests.xml')
+        archiveJunit('build/acceptance/*.xml')
         buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-publish") {
             parameters {
                 currentBuild()
@@ -484,6 +484,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
             usernamePassword 'GPG_KEY_ID', 'GPG_KEY_PASSWORD', 'GPG_KEY'
             usernamePassword 'OSSRH_USER', 'OSSRH_PASSWORD', 'OSSRH'
             usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
+            usernamePassword 'DOCKER_HUB_USERNAME', 'DOCKER_HUB_PASSWORD', 'DOCKER_HUB'
         }
     }
     steps {
@@ -529,7 +530,7 @@ publicationMaven
             shell """\
 docker pull nemerosa/ontrack:\${VERSION}
 docker tag nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
-docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
+docker login --username="\${DOCKER_HUB_USERNAME}" --password="\${DOCKER_HUB_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION}
 docker push nemerosa/ontrack:latest
 docker logout
@@ -679,7 +680,7 @@ docker-compose \\
 """
         }
         publishers {
-            archiveJunit('*-tests.xml')
+            archiveJunit('build/acceptance/*.xml')
             ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ONTRACK.SMOKE'
             ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ONTRACK'
         }

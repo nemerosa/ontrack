@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ import static graphql.schema.GraphQLInputObjectType.newInputObject;
 
 public class GraphQLBeanConverter {
 
-    private static final Set<String> exclusions = ImmutableSet.of(
+    private static final Set<String> DEFAULT_EXCLUSIONS = ImmutableSet.of(
             "class"
     );
 
@@ -48,14 +49,23 @@ public class GraphQLBeanConverter {
     }
 
     public static GraphQLObjectType asObjectType(Class<?> type) {
+        return asObjectType(type, null);
+    }
+
+    public static GraphQLObjectType asObjectType(Class<?> type, Set<String> exclusions) {
         GraphQLObjectType.Builder builder = GraphQLObjectType.newObject()
                 .name(type.getSimpleName());
+        // Actual exclusions
+        Set<String> actualExclusions = new HashSet<>(DEFAULT_EXCLUSIONS);
+        if (exclusions != null) {
+            actualExclusions.addAll(exclusions);
+        }
         // Gets the properties for the type
         for (PropertyDescriptor descriptor : BeanUtils.getPropertyDescriptors(type)) {
             if (descriptor.getReadMethod() != null) {
                 String name = descriptor.getName();
                 // Excludes some names by defaults
-                if (!exclusions.contains(name)) {
+                if (!actualExclusions.contains(name)) {
                     String description = descriptor.getShortDescription();
                     Class<?> propertyType = descriptor.getPropertyType();
                     GraphQLScalarType scalarType = getScalarType(propertyType);
@@ -118,10 +128,12 @@ public class GraphQLBeanConverter {
                 Method writeMethod = descriptor.getWriteMethod();
                 if (writeMethod != null) {
                     Object arg = map.get(descriptor.getName());
-                    try {
-                        writeMethod.invoke(o, arg);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new IllegalStateException("Cannot set property " + descriptor.getName());
+                    if (arg != null) {
+                        try {
+                            writeMethod.invoke(o, arg);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            throw new IllegalStateException("Cannot set property " + descriptor.getName());
+                        }
                     }
                 }
             }

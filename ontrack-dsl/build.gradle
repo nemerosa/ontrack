@@ -8,12 +8,14 @@ tasks.withType(AbstractCompile) {
 }
 
 dependencies {
-    compile libraries.groovy
-    compile libraries.slf4j_api
-    compile libraries.http_client
-    compile libraries.http_mime
-    compile libraries.failsafe
-    compile libraries.jackson_databind
+    compile 'org.codehaus.groovy:groovy-all'
+    compile 'org.slf4j:slf4j-api'
+    compile 'org.apache.httpcomponents:httpclient'
+    compile 'org.apache.httpcomponents:httpcore'
+    compile 'org.apache.httpcomponents:httpmime'
+    compile 'commons-logging:commons-logging'
+    compile 'net.jodah:failsafe'
+    compile 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 if (documentationProfile) {

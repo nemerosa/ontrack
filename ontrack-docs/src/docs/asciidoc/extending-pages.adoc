@@ -32,7 +32,7 @@ public class MyProjectActionExtension extends AbstractExtension implements Proje
 
 The `@Component` notation registers the extension in Ontrack.
 
-An action extension, or any [extension](Extensions) is always associated with
+An action extension, or any <<extending,extension>> is always associated with
 an extension feature and this one is typically injected. Other services can be
 injected at the same time. For example, our sample extension needs to get a
 property on an entity so we inject the `PropertyService`:

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.security.ValidationStampCreate;
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -134,4 +135,15 @@ public class ValidationStampController extends AbstractResourceController {
         ));
     }
 
+    /**
+     * Bulk update of all validation stamps in other projects/branches and in predefined validation stamps,
+     * following the model designed by the validation stamp ID.
+     *
+     * @param validationStampId ID of the validation stamp model
+     * @return Result of the update
+     */
+    @PutMapping("validationStamps/{validationStampId}/bulk")
+    public Ack bulkUpdate(@PathVariable ID validationStampId) {
+        return structureService.bulkUpdateValidationStamps(validationStampId);
+    }
 }

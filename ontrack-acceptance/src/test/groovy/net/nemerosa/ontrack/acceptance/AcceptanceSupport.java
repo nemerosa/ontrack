@@ -2,10 +2,11 @@ package net.nemerosa.ontrack.acceptance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.acceptance.config.AcceptanceConfigRule;
 import net.nemerosa.ontrack.client.*;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
+import org.junit.Rule;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -25,6 +26,12 @@ public abstract class AcceptanceSupport {
     private static final ObjectMapper mapper = ObjectMapperFactory.create();
 
     /**
+     * Access to the configuration
+     */
+    @Rule
+    public AcceptanceConfigRule configRule = new AcceptanceConfigRule();
+
+    /**
      * Waits for the application to be ready by performing a call
      */
     @Before
@@ -39,30 +46,6 @@ public abstract class AcceptanceSupport {
                 .end();
     }
 
-    public static String env(String property, boolean required, String defaultValue, String name) {
-        String sys = System.getProperty(property);
-        if (StringUtils.isNotBlank(sys)) {
-            return sys;
-        } else {
-            String envName = property.toUpperCase().replace(".", "_");
-            String env = System.getenv(envName);
-            if (StringUtils.isNotBlank(env)) {
-                return env;
-            } else if (required) {
-                throw new IllegalStateException(
-                        String.format(
-                                "The %s system property or %s environment variable is required (%s)",
-                                property,
-                                envName,
-                                name
-                        )
-                );
-            } else {
-                return defaultValue;
-            }
-        }
-    }
-
     protected Client anonymous() {
         return client(() -> clientBuilder().build());
     }
@@ -73,7 +56,7 @@ public abstract class AcceptanceSupport {
     }
 
     protected String getAdminPassword() {
-        return env("ontrack.admin", false, "admin", "Acceptance admin password");
+        return configRule.getConfig().getAdmin();
     }
 
     private OTHttpClientBuilder clientBuilder() {
@@ -82,11 +65,11 @@ public abstract class AcceptanceSupport {
     }
 
     protected boolean isSslDisabled() {
-        return "true".equals(env("ontrack.disableSsl", false, "false", "Disabling SSL checks"));
+        return configRule.getConfig().isDisableSsl();
     }
 
     protected String getBaseURL() {
-        return env("ontrack.url", true, null, "Base URL for the application to test");
+        return configRule.getConfig().getUrl();
     }
 
     private Client client(Supplier<OTHttpClient> otHttpClientSupplier) {

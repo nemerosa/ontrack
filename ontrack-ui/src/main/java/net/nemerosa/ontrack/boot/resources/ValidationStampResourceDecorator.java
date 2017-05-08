@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
+import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.ValidationStampDelete;
 import net.nemerosa.ontrack.model.security.ValidationStampEdit;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -77,6 +78,12 @@ public class ValidationStampResourceDecorator extends AbstractLinkResourceDecora
                 link(
                         "_events",
                         validationStamp -> on(EventController.class).getEvents(validationStamp.getProjectEntityType(), validationStamp.getId(), 0, 10)
+                ),
+                // Bulk update
+                link(
+                        "_bulkUpdate",
+                        validationStamp -> on(ValidationStampController.class).bulkUpdate(validationStamp.getId()),
+                        withGlobalFn(GlobalSettings.class)
                 ),
                 // Page
                 page()

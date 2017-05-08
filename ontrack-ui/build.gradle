@@ -1,28 +1,20 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
-    }
-}
-
-apply plugin: 'spring-boot'
 apply plugin: 'groovy'
+apply plugin: 'org.springframework.boot'
 
 dependencies {
     compile project(':ontrack-ui-support')
     compile project(':ontrack-ui-graphql')
     compile project(':ontrack-extension-api')
     compile project(':ontrack-extension-support')
-    compile libraries.spring_boot_starter_web
-    compile libraries.spring_boot_starter_security
-    compile libraries.spring_boot_starter_actuator
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
 
     runtime project(':ontrack-service')
     runtime project(':ontrack-repository-impl')
-    runtime libraries.spring_boot_starter_aop
-    runtime libraries.spring_boot_starter_jdbc
+    compile 'org.springframework.boot:spring-boot-starter-aop'
+    compile 'org.springframework.boot:spring-boot-starter-jdbc'
+    runtime 'com.h2database:h2'
     runtime libraries.postgresql
     runtime libraries.flyway
 
@@ -31,8 +23,8 @@ dependencies {
     testCompile project(':ontrack-extension-api').sourceSets.test.output
     testCompile project(':ontrack-model').sourceSets.test.output
     testCompile project(':ontrack-ui-graphql').sourceSets.test.output
-    testCompile libraries.groovy
-    testCompile libraries.spring_boot_starter_test
+    testCompile 'org.codehaus.groovy:groovy-all'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 
     // List of extensions to include in core
     runtime project(':ontrack-extension-general')
@@ -56,19 +48,23 @@ dependencies {
  * Cleaning the Web resources
  */
 
-clean << {
-    project.delete 'src/main/resources/application.properties'
-    project.delete 'src/main/resources/static'
+clean {
+    doLast {
+        project.delete 'src/main/resources/application.properties'
+        project.delete 'src/main/resources/static'
+    }
 }
 
 /**
  * Copy of Web resources before packaging
  */
 
-task copyWebResources(dependsOn: ':ontrack-web:prod') << {
-    project.copy {
-        from project(':ontrack-web').tasks.prod.outputDir
-        into project.file('src/main/resources/static')
+task copyWebResources(dependsOn: ':ontrack-web:prod') {
+    doLast {
+        project.copy {
+            from project(':ontrack-web').tasks.prod.outputDir
+            into project.file('src/main/resources/static')
+        }
     }
 }
 
@@ -76,10 +72,11 @@ task copyWebResources(dependsOn: ':ontrack-web:prod') << {
  * Generates the version information in a file, useable from the code
  */
 
-task generateVersionInfo << {
-    // Amends the application.properties file with version information
-    File file = project.file('src/main/resources/application.properties')
-    file.text = """\
+task generateVersionInfo {
+    doLast {
+        // Amends the application.properties file with version information
+        File file = project.file('src/main/resources/application.properties')
+        file.text = """\
 # This file is generated at build time to contain version information
 # Do not edit it, do not commit it
 ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
@@ -101,6 +98,7 @@ info.build.commit = ${rootProject.versioning.info.commit}
 info.build.source = ${rootProject.versioning.info.branch}
 info.build.sourceType = ${rootProject.versioning.info.branchType}
 """
+    }
 }
 
 jar.dependsOn copyWebResources

@@ -3,6 +3,6 @@
 
 All <<model,entities>> can be associated with properties.
 
-include::property-message.adoc
+include::property-message.adoc[]
 
-include::property-meta.adoc
+include::property-meta.adoc[]

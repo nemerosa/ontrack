@@ -4,17 +4,22 @@ import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
 
 buildscript {
+    ext {
+        springBootVersion = '1.5.2.RELEASE'
+    }
     repositories {
         jcenter()
     }
     dependencies {
         classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
     }
 }
 
 plugins {
     id 'net.nemerosa.versioning' version '1.7.1'
     id 'nebula.os-package' version '2.2.6'
+    id 'org.sonarqube' version '2.3'
 }
 
 /**
@@ -35,10 +40,16 @@ allprojects {
 }
 
 /**
- * Dependency management
+ * Resolution
  */
 
-apply from: "$rootDir/gradle/dependencies.gradle"
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
 
 /**
  * Integration test environment
@@ -101,13 +112,33 @@ configure(javaProjects) {
 
     apply plugin: 'java'
     apply plugin: 'maven'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+        }
+        dependencies {
+            dependency 'commons-io:commons-io:2.5'
+            dependency 'org.apache.commons:commons-lang3:3.4'
+            dependency 'org.projectlombok:lombok:1.16.10'
+            dependency 'net.jodah:failsafe:0.9.2'
+            dependency 'commons-logging:commons-logging:1.2'
+            dependency 'org.apache.commons:commons-math3:3.6.1'
+            dependency 'com.google.guava:guava:19.0'
+            dependency 'net.sf.dbinit:dbinit:1.4.0'
+            dependency 'args4j:args4j:2.33'
+            dependency 'org.jgrapht:jgrapht-core:0.9.2'
+            dependency 'org.kohsuke:groovy-sandbox:1.10'
+        }
+    }
 
     dependencies {
-        // TODO Lombok not to be released
-        compile libraries.lombok
+        compileOnly 'org.projectlombok:lombok'
+        testCompile 'org.projectlombok:lombok'
         // Testing
-        testCompile libraries.junit
-        testCompile libraries.mockito
+        testCompile 'junit:junit'
+        testCompile 'org.mockito:mockito-core'
     }
 
     // Unit tests run with the `test` task

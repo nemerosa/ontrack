@@ -74,6 +74,17 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
                                 "_validationStampViews",
                                 branch -> on(ValidationStampController.class).getValidationStampViewListForBranch(branch.getId())
                         ),
+                        // List of validation stamp filters for this branch, all of them
+                        link(
+                                "_allValidationStampFilters",
+                                branch -> on(ValidationStampFilterController.class).getAllBranchValidationStampFilters(branch.getId())
+                        ),
+                        // Creation of a validation stamp filter for the branch
+                        link(
+                                "_validationStampFilterCreate",
+                                branch -> on(ValidationStampFilterController.class).getBranchValidationStampFilterForm(branch.getId()),
+                                withProjectFn(ProjectConfig.class)
+                        ),
                         // All branches for the same project
                         link(
                                 "_branches",

@@ -800,6 +800,26 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void bulkUpdateValidationStamps(ID validationStampId) {
+        // Description & name
+        ValidationStamp validationStamp = getValidationStamp(validationStampId);
+        String description = validationStamp.getDescription();
+        String name = validationStamp.getName();
+        // Image
+        Document image = getValidationStampImage(validationStampId);
+        // Bulk update
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE VALIDATION_STAMPS SET IMAGETYPE = :type, IMAGEBYTES = :content, DESCRIPTION = :description " +
+                        "WHERE ID <> :id AND NAME = :name",
+                params("id", validationStampId.getValue())
+                        .addValue("name", name)
+                        .addValue("description", description)
+                        .addValue("type", Document.isValid(image) ? image.getType() : null)
+                        .addValue("content", Document.isValid(image) ? image.getContent() : null)
+        );
+    }
+
+    @Override
     public void saveValidationStamp(ValidationStamp validationStamp) {
         // Update
         try {
