@@ -14,9 +14,8 @@ dependencies {
     runtime project(':ontrack-repository-impl')
     compile 'org.springframework.boot:spring-boot-starter-aop'
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
-    runtime 'com.h2database:h2'
-    runtime libraries.postgresql
-    runtime libraries.flyway
+    runtime 'org.postgresql:postgresql'
+    runtime 'org.flywaydb:flyway-core'
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')

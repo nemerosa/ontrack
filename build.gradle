@@ -130,6 +130,8 @@ configure(javaProjects) {
             dependency 'args4j:args4j:2.33'
             dependency 'org.jgrapht:jgrapht-core:0.9.2'
             dependency 'org.kohsuke:groovy-sandbox:1.10'
+            dependency 'org.postgresql:postgresql:9.4.1208'
+            dependency 'org.flywaydb:flyway-core:4.0'
         }
     }
 

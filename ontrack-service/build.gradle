@@ -17,7 +17,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'io.dropwizard.metrics:metrics-core'
     compile 'org.jgrapht:jgrapht-core'
-    compile libraries.flyway
+    compile 'org.flywaydb:flyway-core'
 
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output

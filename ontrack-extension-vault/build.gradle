@@ -5,10 +5,10 @@ apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-extension-support')
-    compile 'org.springframework.vault:spring-vault-core:1.0.0.M1'
+    compile 'org.springframework.vault:spring-vault-core:1.0.0.RELEASE'
 
     testCompile project(':ontrack-it-utils')
-    testCompile libraries.groovy
+    testCompile 'org.codehaus.groovy:groovy-all'
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
 }

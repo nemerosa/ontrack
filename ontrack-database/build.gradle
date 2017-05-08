@@ -1,6 +1,6 @@
 dependencies {
-    compile libraries.spring_context
-    compile libraries.spring_jdbc
-    compile libraries.flyway
+    compile 'org.springframework:spring-context'
+    compile 'org.springframework:spring-jdbc'
+    compile 'org.flywaydb:flyway-core'
     compile project(':ontrack-model')
 }
