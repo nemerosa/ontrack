@@ -33,14 +33,14 @@ services:
   links:
     - "postgresql:postgresql"
 
-# Postgresql database
-postgresql:
-  restart: always
-  environment:
-    POSTGRES_DB      : ontrack
-    POSTGRES_USER    : ontrack
-    POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD}
-  volumes:
-    - "/var/lib/postgresql/data:/var/lib/postgresql/data"
-  ports:
-    - "5432:5432"
+  # Postgresql database
+  postgresql:
+    restart: always
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD}
+    volumes:
+      - "/var/lib/postgresql/data:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
