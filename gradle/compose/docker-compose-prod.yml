@@ -30,8 +30,8 @@ services:
       - "/dev/urandom:/dev/random"
     ports:
       - "443:443"
-  links:
-    - "postgresql:postgresql"
+    links:
+      - "postgresql:postgresql"
 
   # Postgresql database
   postgresql:
