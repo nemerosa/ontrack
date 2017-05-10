@@ -212,16 +212,13 @@
         <td>
             <span ng-repeat="promotionRun in buildView.promotionRuns">
                 <span class="ot-promotion-run">
-                    <span class="ot-action" ng-click="displayPromotionRuns(buildView, promotionRun)">
-                        <ot-entity-image entity="promotionRun.promotionLevel">
-                            {{promotionRun.promotionLevel.name}}
-                        </ot-entity-image>
-                    </span>
-                    <span class="ot-promotion-run-signature">
-                        {{promotionRun.signature.time | date:'shortDate'}}
+                    <span class="ot-action"
+                          ng-click="displayPromotionRuns(buildView, promotionRun)">
+                        <ot-entity-image
+                                title="{{promotionRun.promotionLevel.name}} - {{promotionRun.signature.time | date:'shortDate'}}"
+                                entity="promotionRun.promotionLevel"></ot-entity-image>
                     </span>
                 </span>
-                <span ng-if="!$last" class="ot-promotion-run-separator"></span>
             </span>
         </td>
         <!-- Validation runs -->
