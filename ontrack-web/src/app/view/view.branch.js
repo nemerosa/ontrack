@@ -50,7 +50,39 @@ angular.module('ot.view.branch', [
         // Selected builds
         $scope.selectedBuild = {
             from: undefined,
-            to: undefined
+            to: undefined,
+            current: undefined
+        };
+
+        // Selection of a build
+        $scope.onBuildRowSelected = function (event, buildView) {
+            // Normal click
+            if (!event.shiftKey) {
+                // Reinitialise the selection to one element only
+                $scope.selectedBuild.from = buildView.build.id;
+                $scope.selectedBuild.to = buildView.build.id;
+                $scope.selectedBuild.current = buildView.build.id;
+            }
+            // Shift click to extend the selection
+            else {
+                // In the current selection...
+                if (buildView.build.id >= $scope.selectedBuild.to && buildView.build.id < $scope.selectedBuild.from) {
+                    // Extend from last single selection
+                    if ($scope.selectedBuild.current) {
+                        if (buildView.build.id > $scope.selectedBuild.current) {
+                            $scope.selectedBuild.from = buildView.build.id;
+                        }
+                        if (buildView.build.id < $scope.selectedBuild.current) {
+                            $scope.selectedBuild.to = buildView.build.id;
+                        }
+                    }
+                } else if (buildView.build.id < $scope.selectedBuild.to) {
+                    $scope.selectedBuild.to = buildView.build.id;
+                } else if (buildView.build.id > $scope.selectedBuild.from) {
+                    $scope.selectedBuild.from = buildView.build.id;
+                }
+                event.stopPropagation();
+            }
         };
 
         // Loading the build filters
