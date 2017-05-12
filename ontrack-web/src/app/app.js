@@ -169,6 +169,9 @@ var ontrack = angular.module('ontrack', [
                 otUserService.logout();
             };
 
+            // User menu filter
+            $scope.userMenuFilter = '';
+
             /**
              * Application info mgt
              */

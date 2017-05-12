@@ -10,7 +10,8 @@ angular.module('ot.directive.entity', [
             transclude: true,
             scope: {
                 entity: '=',
-                link: '@'
+                link: '@',
+                title: '@'
             }
         };
     })

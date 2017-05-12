@@ -128,6 +128,13 @@
   .alert-warning;
 }
 
+.ot-disable-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 /**
  * Time picker
  */
@@ -841,6 +848,14 @@ ul.ot-buildfilter-list {
   }
 }
 
+ul.ot-validationstampfilter-list {
+  li {
+    a {
+      cursor: pointer;
+    }
+  }
+}
+
 .ot-buildfilter-remote {
   font-weight: bold;
 }
@@ -875,4 +890,15 @@ dl.ot-search-result {
   .label;
   .label-info;
   margin-right: 0.5em;
+}
+
+/**
+  User menu
+ */
+
+.user-menu-filter {
+  div.input-group {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
 }

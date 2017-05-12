@@ -3,11 +3,23 @@
 
 When working with <<usage-git,Git>> or <<usage-subversion,Subversion>>, you
 have the opportunity to get a change log between two <<usage-builds,builds>> of
-the same project. In the <<usage-branches,branch view>>, two radio buttons
-columns are available in the build list, which allow you to select the
-change log boundaries:
+the same project.
+
+[[changelogs-selection]]
+==== Selection
+
+In the <<usage-branches,branch view>>, you can select the two boundaries
+of the change log by:
+
+* clicking on a build row
+* clicking while holding the `shift` key on another build row
+
+Two arrows indicate the current selection:
 
 image::images/changelog.selection.png[Change log selection,300]
+
+TIP: Note that by default the first and the last build of the current view
+are selected as boundaries.
 
 The _Change log_ button displays the change log page, which contains four
 sections:

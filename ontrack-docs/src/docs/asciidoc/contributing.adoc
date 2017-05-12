@@ -9,6 +9,21 @@ Contributions to _Ontrack_ are welcome!
 4. Your pull requests, once tested successfully, will be integrated into the
 `master` branch, waiting for the next release
 
+[[contributing-branches]]
+=== Branching strategy
+
+* development of features always goes to `feature/` branches
+* the branches are created from:
+** the `master` branch for version 2
+** the `v3` branch for version 3
+* new releases are created by branching from `develop` (V2)
+or `master` (V3), using `release/2.' or `release/3.` as a prefix
+* pull requests must be made from the `master` branch
+
+The versioning is automated using the
+https://github.com/nemerosa/versioning[Gradle Versioning plug-in]. No file
+needs to be updated to set the version.
+
 include::development.adoc[]
 
 include::architecture.adoc[]
