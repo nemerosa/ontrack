@@ -1,4 +1,5 @@
 String version = ''
+String branchName = ''
 
 pipeline {
 
@@ -14,15 +15,18 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '40'))
         // Timestamps
         timestamps()
+        // Ontrack branch name
+        branchName = ontrackBranchName(BRANCH_NAME)
     }
 
     stages {
 
         stage('Setup') {
             steps {
-                ontrackBranchSetup(project: 'ontrack', branch: BRANCH_NAME, script: """
+                echo "Ontrack branch name = ${branchName}"
+                ontrackBranchSetup(project: 'ontrack', branch: branchName, script: """
                     branch.config {
-                        gitBranch '${BRANCH_NAME}', [
+                        gitBranch '${branchName}', [
                             buildCommitLink: [
                                 id: 'git-commit-property'
                             ]
@@ -107,10 +111,11 @@ git clean -xfd
                 always {
                     archive 'build/distributions/*-delivery.zip'
                 }
+                success {
+                    ontrackBuild(project: 'ontrack', branch: branchName, build: version)
+                }
             }
         }
-
-        // TODO Ontrack build
 
         stage('Local acceptance tests') {
            steps {
