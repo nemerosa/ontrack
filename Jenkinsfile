@@ -15,14 +15,13 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '40'))
         // Timestamps
         timestamps()
-        // Ontrack branch name
-        branchName = ontrackBranchName(BRANCH_NAME)
     }
 
     stages {
 
         stage('Setup') {
             steps {
+                branchName = ontrackBranchName(BRANCH_NAME)
                 echo "Ontrack branch name = ${branchName}"
                 ontrackBranchSetup(project: 'ontrack', branch: branchName, script: """
                     branch.config {
