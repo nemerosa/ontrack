@@ -20,9 +20,9 @@ pipeline {
 
         stage('Setup') {
             steps {
-                ontrackBranchSetup(project: 'ontrack', branch: branch, script: """
+                ontrackBranchSetup(project: 'ontrack', branch: BRANCH_NAME, script: """
                     branch.config {
-                        gitBranch '${branch}', [
+                        gitBranch '${BRANCH_NAME}', [
                             buildCommitLink: [
                                 id: 'git-commit-property'
                             ]
