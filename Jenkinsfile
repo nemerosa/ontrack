@@ -21,8 +21,10 @@ pipeline {
 
         stage('Setup') {
             steps {
-                branchName = ontrackBranchName(BRANCH_NAME)
-                echo "Ontrack branch name = ${branchName}"
+                script {
+                    branchName = ontrackBranchName(BRANCH_NAME)
+                    echo "Ontrack branch name = ${branchName}"
+                }
                 ontrackBranchSetup(project: 'ontrack', branch: branchName, script: """
                     branch.config {
                         gitBranch '${branchName}', [
