@@ -152,10 +152,35 @@ docker-compose down --volumes
                  archive 'delivery/ontrack-acceptance/build/acceptance/**'
                  junit 'delivery/ontrack-acceptance/build/acceptance/*.xml'
              }
+             success {
+                 ontrackValidate(
+                         project: 'ontrack',
+                         branch: branchName,
+                         build: version,
+                         validationStamp: 'ACCEPTANCE',
+                         validationStatus: 'PASSED',
+                 )
+             }
+             unstable {
+                 ontrackValidate(
+                         project: 'ontrack',
+                         branch: branchName,
+                         build: version,
+                         validationStamp: 'ACCEPTANCE',
+                         validationStatus: 'WARNING',
+                 )
+             }
+             failure {
+                 ontrackValidate(
+                         project: 'ontrack',
+                         branch: branchName,
+                         build: version,
+                         validationStamp: 'ACCEPTANCE',
+                         validationStatus: 'FAILED',
+                 )
+             }
           }
         }
-
-        // TODO Ontrack validation --> ACCEPTANCE
 
         // Docker push
         stage('Docker publication') {
@@ -169,9 +194,37 @@ docker-compose down --volumes
                     }
                 }
             }
+            post {
+                success {
+                    ontrackValidate(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'DOCKER',
+                            validationStatus: 'PASSED',
+                    )
+                }
+                unstable {
+                    ontrackValidate(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'DOCKER',
+                            validationStatus: 'WARNING',
+                    )
+                }
+                failure {
+                    ontrackValidate(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'DOCKER',
+                            validationStatus: 'FAILED',
+                    )
+                }
+            }
         }
 
-        // TODO Ontrack validation --> DOCKER
         // TODO OS tests + DO tests in parallel
         // TODO Ontrack validation --> ACCEPTANCE.DEBIAN
         // TODO Ontrack validation --> ACCEPTANCE.CENTOS.6
