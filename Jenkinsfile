@@ -1,4 +1,5 @@
 String version = ''
+String gitCommit = ''
 String branchName = ''
 
 pipeline {
@@ -62,6 +63,7 @@ git clean -xfd
                     // Reads version information
                     def props = readProperties file: 'build/version.properties'
                     version = props.VERSION_DISPLAY
+                    gitCommit = props.VERSION_COMMIT
                 }
             }
         }
@@ -113,7 +115,7 @@ git clean -xfd
                     archive 'build/distributions/*-delivery.zip'
                 }
                 success {
-                    ontrackBuild(project: 'ontrack', branch: branchName, build: version)
+                    ontrackBuild(project: 'ontrack', branch: branchName, build: version, gitCommit: gitCommit)
                 }
             }
         }
