@@ -151,32 +151,12 @@ docker-compose down --volumes
 """
                  archive 'delivery/ontrack-acceptance/build/acceptance/**'
                  junit 'delivery/ontrack-acceptance/build/acceptance/*.xml'
-             }
-             success {
                  ontrackValidate(
                          project: 'ontrack',
                          branch: branchName,
                          build: version,
                          validationStamp: 'ACCEPTANCE',
-                         validationStatus: 'PASSED',
-                 )
-             }
-             unstable {
-                 ontrackValidate(
-                         project: 'ontrack',
-                         branch: branchName,
-                         build: version,
-                         validationStamp: 'ACCEPTANCE',
-                         validationStatus: 'WARNING',
-                 )
-             }
-             failure {
-                 ontrackValidate(
-                         project: 'ontrack',
-                         branch: branchName,
-                         build: version,
-                         validationStamp: 'ACCEPTANCE',
-                         validationStatus: 'FAILED',
+                         buildResult: currentBuild.result,
                  )
              }
           }
@@ -193,35 +173,13 @@ docker-compose down --volumes
                         // TODO If 2.x, pushes `latest` as well
                     }
                 }
-            }
-            post {
-                success {
-                    ontrackValidate(
-                            project: 'ontrack',
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'DOCKER',
-                            validationStatus: 'PASSED',
-                    )
-                }
-                unstable {
-                    ontrackValidate(
-                            project: 'ontrack',
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'DOCKER',
-                            validationStatus: 'WARNING',
-                    )
-                }
-                failure {
-                    ontrackValidate(
-                            project: 'ontrack',
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'DOCKER',
-                            validationStatus: 'FAILED',
-                    )
-                }
+                ontrackValidate(
+                        project: 'ontrack',
+                        branch: branchName,
+                        build: version,
+                        validationStamp: 'DOCKER',
+                        buildResult: currentBuild.result,
+                )
             }
         }
 
