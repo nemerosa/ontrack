@@ -183,20 +183,21 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="buildView in branchBuildView.buildViews">
+    <tr ng-repeat="buildView in branchBuildView.buildViews"
+        ng-click="onBuildRowSelected($event, buildView)"
+        class="ot-disable-select"
+    >
         <td>
-            <span ng-if="branchBuildView.buildDiffActions">
-                <input type="radio" id="build-from-{{buildView.build.id}}" name="selectedBuildFrom"
-                       ng-model="selectedBuild.from" ng-value="buildView.build.id"/>
-                <input type="radio" id="build-to-{{buildView.build.id}}" name="selectedBuildTo"
-                       ng-model="selectedBuild.to" ng-value="buildView.build.id"/>
-            </span>
-            <span ng-if="!branchBuildView.buildDiffActions">&nbsp;</span>
+            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.from == buildView.build.id" class="fa fa-chevron-down"></span>
+            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.to == buildView.build.id" class="fa fa-chevron-up"></span>
+            <span ng-if="selectedBuild.from == selectedBuild.to && selectedBuild.to == buildView.build.id" class="fa fa-chevron-right"></span>
+            <span ng-if="selectedBuild.to != buildView.build.id && selectedBuild.from != buildView.build.id">&nbsp;</span>
         </td>
         <td>
             <!-- Build name and link -->
             <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">
                 {{buildView.build.name}}
+                <code>[{{buildView.build.id}}]</code>
             </a>
             <!-- Build decorations -->
             <span class="ot-decoration-list">
@@ -212,16 +213,13 @@
         <td>
             <span ng-repeat="promotionRun in buildView.promotionRuns">
                 <span class="ot-promotion-run">
-                    <span class="ot-action" ng-click="displayPromotionRuns(buildView, promotionRun)">
-                        <ot-entity-image entity="promotionRun.promotionLevel">
-                            {{promotionRun.promotionLevel.name}}
-                        </ot-entity-image>
-                    </span>
-                    <span class="ot-promotion-run-signature">
-                        {{promotionRun.signature.time | date:'shortDate'}}
+                    <span class="ot-action"
+                          ng-click="displayPromotionRuns(buildView, promotionRun)">
+                        <ot-entity-image
+                                title="{{promotionRun.promotionLevel.name}} - {{promotionRun.signature.time | date:'shortDate'}}"
+                                entity="promotionRun.promotionLevel"></ot-entity-image>
                     </span>
                 </span>
-                <span ng-if="!$last" class="ot-promotion-run-separator"></span>
             </span>
         </td>
         <!-- Validation runs -->
