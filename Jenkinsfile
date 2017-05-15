@@ -237,14 +237,18 @@ docker-compose down --volumes
 
         stage('Release') {
             steps {
+                echo "Releasing..."
                 // TODO Release
-                ontrackPromote(
-                        project: 'ontrack',
-                        branch: branchName,
-                        build: version,
-                        promotionLevel: 'RELEASE',
-                        buildResult: currentBuild.result,
-                )
+            }
+            post {
+                success {
+                    ontrackPromote(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            promotionLevel: 'RELEASE',
+                    )
+                }
             }
         }
 
