@@ -176,6 +176,10 @@ configure(javaProjects) {
         }
     }
 
+    afterEvaluate {
+        tasks.assemble.dependsOn 'generatePomFileForMavenCustomPublication'
+    }
+
     // Archives for Javadoc and Sources
 
     artifacts {
@@ -185,8 +189,6 @@ configure(javaProjects) {
         }
         // FIXME archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: pomFile
     }
-
-    // FIXME assemble.dependsOn 'pomFile'
 
 }
 
