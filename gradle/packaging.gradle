@@ -49,7 +49,8 @@ task publicationPackage(type: Zip) {
                     if (tasks.findByName('sourceJar')) from sourceJar
                 }
                 if (tasks.findByName('testJar')) from testJar
-                if (tasks.findByName('generatePomFileForMavenCustomPublication')) from generatePomFileForMavenCustomPublication.output
+                // POM file
+                from "${project.buildDir}/poms/${project.name}-${project.version}.pom"
             }
         }
     }
