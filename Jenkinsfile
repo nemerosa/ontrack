@@ -93,6 +93,13 @@ git clean -xfd
     --profile \\
     --console plain
 '''
+                ontrackValidate(
+                        project: 'ontrack',
+                        branch: branchName,
+                        build: version,
+                        validationStamp: 'DOCKER.IMAGE',
+                        buildResult: currentBuild.result,
+                )
             }
         }
 
