@@ -198,7 +198,7 @@ docker-compose down --volumes
 
         // OS tests + DO tests in parallel
 
-        stage {
+        stage('Platforms') {
             steps {
                 parallel(
                         // TODO CentOS7
