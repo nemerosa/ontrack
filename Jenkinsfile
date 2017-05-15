@@ -66,6 +66,11 @@ git clean -xfd
                     gitCommit = props.VERSION_COMMIT
                 }
             }
+            post {
+                success {
+                    ontrackBuild(project: 'ontrack', branch: branchName, build: version, gitCommit: gitCommit)
+                }
+            }
         }
 
         stage('Integration tests') {
@@ -120,9 +125,6 @@ git clean -xfd
             post {
                 always {
                     archive 'build/distributions/*-delivery.zip'
-                }
-                success {
-                    ontrackBuild(project: 'ontrack', branch: branchName, build: version, gitCommit: gitCommit)
                 }
             }
         }
