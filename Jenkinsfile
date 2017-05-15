@@ -196,13 +196,58 @@ docker-compose down --volumes
             }
         }
 
-        // TODO OS tests + DO tests in parallel
-        // TODO Ontrack validation --> ACCEPTANCE.DEBIAN
-        // TODO Ontrack validation --> ACCEPTANCE.CENTOS.6
-        // TODO Ontrack validation --> ACCEPTANCE.CENTOS.7
-        // TODO Ontrack validation --> ACCEPTANCE.DO
-        // TODO Release
-        // TODO Ontrack promotion --> RELEASE
+        // OS tests + DO tests in parallel
+
+        stage {
+            steps {
+                parallel(
+                        // TODO CentOS7
+                        "CentOS7": {
+                            ontrackValidate(
+                                    project: 'ontrack',
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                    buildResult: currentBuild.result,
+                            )
+                        },
+                        // TODO Debian
+                        "Debian": {
+                            ontrackValidate(
+                                    project: 'ontrack',
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE.DEBIAN',
+                                    buildResult: currentBuild.result,
+                            )
+                        },
+                        // TODO Digital Ocean
+                        "Digital Ocean": {
+                            ontrackValidate(
+                                    project: 'ontrack',
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE.DO',
+                                    buildResult: currentBuild.result,
+                            )
+                        },
+                )
+            }
+        }
+
+        stage('Release') {
+            steps {
+                // TODO Release
+                ontrackPromote(
+                        project: 'ontrack',
+                        branch: branchName,
+                        build: version,
+                        promotionLevel: 'RELEASE',
+                        buildResult: currentBuild.result,
+                )
+            }
+        }
+
         // TODO Site
         // TODO Ontrack validation --> SITE
         // TODO Production
