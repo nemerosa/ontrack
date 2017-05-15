@@ -187,7 +187,6 @@ configure(javaProjects) {
             archives javadocJar
             archives sourceJar
         }
-        // FIXME archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: pomFile
     }
 
 }
