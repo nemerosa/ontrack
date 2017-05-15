@@ -182,13 +182,17 @@ docker-compose down --volumes
                         // TODO If 2.x, pushes `latest` as well
                     }
                 }
-                ontrackValidate(
-                        project: 'ontrack',
-                        branch: branchName,
-                        build: version,
-                        validationStamp: 'DOCKER',
-                        buildResult: currentBuild.result,
-                )
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'DOCKER',
+                            buildResult: currentBuild.result,
+                    )
+                }
             }
         }
 
