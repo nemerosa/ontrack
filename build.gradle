@@ -146,7 +146,8 @@ configure(javaProjects) {
                 from components.java
                 pom.withXml {
                     def root = asNode()
-                    root.appendNode('description', project.description)
+                    root.appendNode('name', project.name)
+                    root.appendNode('description', project.description ?: project.name)
                     root.appendNode('url', 'http://nemerosa.github.io/ontrack')
 
                     def licenses = root.appendNode('licenses')
