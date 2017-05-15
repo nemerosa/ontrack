@@ -66,7 +66,7 @@ configure(javaProjects) {
      */
 
     apply plugin: 'java'
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
 
     dependencyManagement {
@@ -140,47 +140,39 @@ configure(javaProjects) {
 
     // POM file
 
-    task pomFile {
-        ext.output = "${buildDir}/poms/${project.name}-${version}.pom"
-        doLast {
-            pom {
-                project {
-                    version versioning.info.display
-                    name project.name
-                    description project.description
-                    url 'http://nemerosa.github.io/ontrack'
-                    licenses {
-                        license {
-                            name 'The MIT License (MIT)'
-                            url 'http://opensource.org/licenses/MIT'
-                            distribution 'repo'
-                        }
-                    }
-                    scm {
-                        url 'https://github.com/nemerosa/ontrack'
-                        connection 'scm:git://github.com/nemerosa/ontrack'
-                        developerConnection 'scm:git:git://github.com/nemerosa/ontrack'
-                    }
-                    developers {
-                        developer {
-                            id 'dcoraboeuf'
-                            name 'Damien Coraboeuf'
-                            email 'damien.coraboeuf@gmail.com'
-                        }
-                    }
-                    dependencyManagement {
-                        dependencies {
-                            dependency {
-                                groupId "org.springframework.boot"
-                                artifactId "spring-boot-dependencies"
-                                version springBootVersion
-                                type "pom"
-                                scope "import"
-                            }
-                        }
-                    }
+    publishing {
+        publications {
+            mavenCustom(MavenPublication) {
+                from components.java
+                pom.withXml {
+                    def root = asNode()
+                    root.appendNode('description', project.description)
+                    root.appendNode('url', 'http://nemerosa.github.io/ontrack')
+
+                    def licenses = root.appendNode('licenses')
+                    def license = licenses.appendNode('license')
+                    license.appendNode('name', 'The MIT License (MIT)')
+                    license.appendNode('url', 'http://opensource.org/licenses/MIT')
+                    license.appendNode('distribution', 'repo')
+
+                    def scm = root.appendNode('scm')
+                    scm.appendNode('url', 'https://github.com/nemerosa/ontrack')
+                    scm.appendNode('connection', 'scm:git://github.com/nemerosa/ontrack')
+                    scm.appendNode('developerConnection', 'scm:git://github.com/nemerosa/ontrack')
+
+                    def developers = root.appendNode('developers')
+                    def developer = developers.appendNode('developer')
+                    developer.appendNode('id', 'dcoraboeuf')
+                    developer.appendNode('name', 'Damien Coraboeuf')
+                    developer.appendNode('email', 'damien.coraboeuf@gmail.com')
                 }
-            }.writeTo(output)
+            }
+        }
+    }
+
+    model {
+        tasks.generatePomFileForMavenCustomPublication {
+            destination = file("${buildDir}/poms/${project.name}-${version}.pom")
         }
     }
 
@@ -191,10 +183,10 @@ configure(javaProjects) {
             archives javadocJar
             archives sourceJar
         }
-        archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: pomFile
+        // FIXME archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: pomFile
     }
 
-    assemble.dependsOn 'pomFile'
+    // FIXME assemble.dependsOn 'pomFile'
 
 }
 
