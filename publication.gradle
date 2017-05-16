@@ -48,6 +48,8 @@ artifacts {
         archives file: file("publication/${module}-${ontrackVersion}-sources.jar"), name: module, classifier: 'sources'
         archives file: file("publication/${module}-${ontrackVersion}-javadoc.jar"), name: module, classifier: 'javadoc'
     }
+    // Specific modules
+    archives file: file("publication/ontrack-dsl-shell-${ontrackVersion}-executable.jar"), name: 'ontrack-dsl-shell', classifier: 'executable'
 }
 
 signing {
