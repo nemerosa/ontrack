@@ -9,6 +9,8 @@ import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
+import static graphql.Scalars.GraphQLInt
+import static graphql.Scalars.GraphQLLong
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 class SVNConfigurationGQLIT extends AbstractQLITSupport {
@@ -18,6 +20,9 @@ class SVNConfigurationGQLIT extends AbstractQLITSupport {
 
     @Autowired
     private OntrackConfigProperties configProperties
+
+    @Autowired
+    private SVNConfigurationGQLType svnConfigurationGQLType
 
     @Before
     void cleaning() throws Exception {
@@ -76,6 +81,34 @@ class SVNConfigurationGQLIT extends AbstractQLITSupport {
             assert data.svnConfigurations[0].name == n1
             assert data.svnConfigurations[0].url == "http://n1"
         }
+    }
+
+    @Test
+    void graphql_schema() {
+        def type = svnConfigurationGQLType.type
+        assert type.name == 'SVNConfiguration'
+        assert type.fieldDefinitions*.name as Set == [
+                'name',
+                'url',
+                'user',
+                'tagFilterPattern',
+                'browserForPath',
+                'browserForRevision',
+                'browserForChange',
+                'indexationInterval',
+                'indexationStart',
+                'issueServiceConfigurationIdentifier',
+        ] as Set
+        // Checks the type of the 'indexationInterval'
+        def definition = type.getFieldDefinition('indexationInterval')
+        assert definition
+        assert definition.name == 'indexationInterval'
+        assert definition.type == GraphQLInt
+        // Checks the type of the 'indexationStart'
+        definition = type.getFieldDefinition('indexationStart')
+        assert definition
+        assert definition.name == 'indexationStart'
+        assert definition.type == GraphQLLong
     }
 
 }

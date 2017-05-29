@@ -12,6 +12,6 @@ public class SVNConfigurationGQLType implements GQLType {
 
     @Override
     public GraphQLObjectType getType() {
-        return GraphQLBeanConverter.asObjectType(SVNConfiguration.class, ImmutableSet.of("password"));
+        return GraphQLBeanConverter.asObjectType(SVNConfiguration.class, ImmutableSet.of("password", "descriptor", "credentials"));
     }
 }
