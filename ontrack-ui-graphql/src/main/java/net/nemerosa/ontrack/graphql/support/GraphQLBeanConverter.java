@@ -105,6 +105,12 @@ public class GraphQLBeanConverter {
     public static GraphQLScalarType getScalarType(Class<?> type) {
         if (Integer.class.isAssignableFrom(type) || int.class.isAssignableFrom(type)) {
             return GraphQLInt;
+        } else if (Long.class.isAssignableFrom(type) || long.class.isAssignableFrom(type)) {
+            return GraphQLLong;
+        } else if (Double.class.isAssignableFrom(type) || double.class.isAssignableFrom(type)) {
+            return GraphQLFloat;
+        } else if (Float.class.isAssignableFrom(type) || float.class.isAssignableFrom(type)) {
+            return GraphQLFloat;
         } else if (Boolean.class.isAssignableFrom(type) || boolean.class.isAssignableFrom(type)) {
             return GraphQLBoolean;
         } else if (String.class.isAssignableFrom(type)) {
