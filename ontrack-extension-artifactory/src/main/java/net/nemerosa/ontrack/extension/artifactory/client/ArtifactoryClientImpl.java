@@ -21,6 +21,11 @@ public class ArtifactoryClientImpl implements ArtifactoryClient {
     }
 
     @Override
+    public JsonClient getJsonClient() {
+        return jsonClient;
+    }
+
+    @Override
     public List<String> getBuildNames() {
         JsonNode node = jsonClient.get("/api/build");
         List<String> names = new ArrayList<>();
