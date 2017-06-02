@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 
@@ -35,8 +36,7 @@ public class JsonClientImpl implements JsonClient {
     @Override
     public JsonNode post(Object data, String path, Object... parameters) {
         try {
-            return httpClient.post(
-                    this::toJson,
+            return post(
                     new StringEntity(
                             objectMapper.writeValueAsString(data),
                             ContentType.create("application/json", "UTF-8")
@@ -47,6 +47,16 @@ public class JsonClientImpl implements JsonClient {
         } catch (JsonProcessingException e) {
             throw new JsonClientMappingException(e);
         }
+    }
+
+    @Override
+    public JsonNode post(HttpEntity data, String path, Object... parameters) {
+        return httpClient.post(
+                this::toJson,
+                data,
+                path,
+                parameters
+        );
     }
 
     @Override
