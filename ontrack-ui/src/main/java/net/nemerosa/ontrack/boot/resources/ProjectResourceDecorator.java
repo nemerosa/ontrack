@@ -51,6 +51,11 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
                         link("_buildDiffActions", project -> on(BuildController.class).buildDiffActions(project.getId())),
                         // Actual properties for this project
                         link("_properties", project -> on(PropertyController.class).getProperties(ProjectEntityType.PROJECT, project.getId())),
+                        // Extra information
+                        link(
+                                "_extra",
+                                project -> on(ProjectEntityExtensionController.class).getInformation(ProjectEntityType.PROJECT, project.getId())
+                        ),
                         // Actions
                         link("_actions", project -> on(ProjectEntityExtensionController.class).getActions(ProjectEntityType.PROJECT, project.getId())),
                         // Updating the project
