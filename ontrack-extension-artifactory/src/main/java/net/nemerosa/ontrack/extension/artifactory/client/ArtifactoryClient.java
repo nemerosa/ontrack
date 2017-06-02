@@ -20,4 +20,9 @@ public interface ArtifactoryClient {
      * Access to the underlying JSON client
      */
     JsonClient getJsonClient();
+
+    /**
+     * AQL query
+     */
+    JsonNode aql(String query);
 }

@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.client.ClientNotFoundException;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +25,17 @@ public class ArtifactoryClientImpl implements ArtifactoryClient {
     @Override
     public JsonClient getJsonClient() {
         return jsonClient;
+    }
+
+    @Override
+    public JsonNode aql(String query) {
+        return jsonClient.post(
+                new StringEntity(
+                        query,
+                        ContentType.create("text/plain", "UTF-8")
+                ),
+                "/api/search/aql"
+        );
     }
 
     @Override
