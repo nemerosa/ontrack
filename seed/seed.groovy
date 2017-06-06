@@ -680,6 +680,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
     steps {
         ontrackDsl {
             log()
+            sandbox()
             script """\
 ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', 'Pipeline for ${BRANCH}', true).config {
     gitBranch '${BRANCH}', [
