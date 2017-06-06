@@ -383,3 +383,5 @@ include::extending-pages.adoc[]
 include::extending-event-types.adoc[]
 
 include::extending-graphql.adoc[]
+
+include::extending-metrics.adoc[]
