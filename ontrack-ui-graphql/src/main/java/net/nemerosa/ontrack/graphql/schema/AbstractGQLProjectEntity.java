@@ -100,19 +100,19 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
                 @SuppressWarnings("unchecked")
                 T entity = (T) source;
                 return getSignature(entity)
-                        .map(this::getMapFromSignature).orElse(null);
+                        .map(AbstractGQLProjectEntity::getMapFromSignature).orElse(null);
             } else {
                 return null;
             }
         };
     }
 
-    private Map<String, String> getMapFromSignature(Signature signature) {
+    public static Map<String, String> getMapFromSignature(Signature signature) {
         Map<String, String> map = new LinkedHashMap<>();
         if (signature != null) {
             User user = signature.getUser();
             if (user != null && user.getName() != null) {
-                map.put("name", user.getName());
+                map.put("user", user.getName());
             }
             if (signature.getTime() != null) {
                 map.put("time", Time.forStorage(signature.getTime()));
