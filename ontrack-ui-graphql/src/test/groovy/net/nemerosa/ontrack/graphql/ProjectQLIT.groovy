@@ -536,7 +536,13 @@ class ProjectQLIT extends AbstractQLITSupport {
 
     @Test
     void 'No signature for the branch'() {
-        def b = doCreateBranch()
+        def p = doCreateProject()
+        def b = structureRepository.newBranch(
+                Branch.of(
+                        p,
+                        nameDescription()
+                ).withSignature(Signature.of(null, null))
+        )
         // Gets the creation time for this project
         def data = run("""{
             projects(id: ${b.project.id}) {
