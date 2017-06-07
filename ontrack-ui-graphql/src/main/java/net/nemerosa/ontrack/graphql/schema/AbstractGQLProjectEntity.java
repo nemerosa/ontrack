@@ -1,15 +1,15 @@
 package net.nemerosa.ontrack.graphql.schema;
 
-import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.TypeResolverProxy;
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.Signature;
+import net.nemerosa.ontrack.model.structure.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -100,16 +100,25 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
                 @SuppressWarnings("unchecked")
                 T entity = (T) source;
                 return getSignature(entity)
-                        .map(signature ->
-                                ImmutableMap.of(
-                                        "user", signature.getUser().getName(),
-                                        "time", Time.forStorage(signature.getTime())
-                                )
-                        ).orElse(null);
+                        .map(this::getMapFromSignature).orElse(null);
             } else {
                 return null;
             }
         };
+    }
+
+    private Map<String, String> getMapFromSignature(Signature signature) {
+        Map<String, String> map = new LinkedHashMap<>();
+        if (signature != null) {
+            User user = signature.getUser();
+            if (user != null && user.getName() != null) {
+                map.put("name", user.getName());
+            }
+            if (signature.getTime() != null) {
+                map.put("time", Time.forStorage(signature.getTime()));
+            }
+        }
+        return map;
     }
 
     protected abstract Optional<Signature> getSignature(T entity);
