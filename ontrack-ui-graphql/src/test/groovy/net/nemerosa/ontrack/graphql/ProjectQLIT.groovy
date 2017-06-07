@@ -7,9 +7,14 @@ import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.repository.StructureRepository
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 
 class ProjectQLIT extends AbstractQLITSupport {
+
+    @Autowired
+    private StructureRepository structureRepository
 
     @Test
     void 'All projects'() {
@@ -458,7 +463,7 @@ class ProjectQLIT extends AbstractQLITSupport {
     void 'Projects filtered by property type and value'() {
         // Projects
         def p1 = doCreateProject()
-        /*def p2 = */doCreateProject()
+        /*def p2 = */ doCreateProject()
         def p3 = doCreateProject()
         def p4 = doCreateProject()
         // Properties
@@ -508,6 +513,45 @@ class ProjectQLIT extends AbstractQLITSupport {
         def branch = data.projects.first().branches.first()
         assert branch.name == b.name
         assert branch.creation.time.length() > 0
+    }
+
+    @Test
+    void 'No signature for the project'() {
+        def p = structureRepository.newProject(
+                Project.of(nameDescription())
+                        .withSignature(Signature.of(null, null))
+        )
+        // Gets the creation time for this project
+        def data = run("""{
+            projects(id: ${p.id}) {
+                name
+                creation {
+                    time
+                }
+            }
+        }""")
+        assert data.projects.first().name == p.name
+        assert data.projects.first().creation.time == null
+    }
+
+    @Test
+    void 'No signature for the branch'() {
+        def b = doCreateBranch()
+        // Gets the creation time for this project
+        def data = run("""{
+            projects(id: ${b.project.id}) {
+                name
+                branches {
+                    name
+                    creation {
+                        time
+                    }
+                }
+            }
+        }""")
+        def branch = data.projects.first().branches.first()
+        assert branch.name == b.name
+        assert branch.creation.time == null
     }
 
 }
