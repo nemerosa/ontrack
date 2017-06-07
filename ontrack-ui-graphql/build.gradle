@@ -13,6 +13,7 @@ dependencies {
     testCompile 'org.codehaus.groovy:groovy-all'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
+    testCompile project(':ontrack-repository-impl')
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
 
