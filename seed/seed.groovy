@@ -235,6 +235,7 @@ build
             log()
             environment 'VERSION_DISPLAY'
             environment 'GIT_COMMIT'
+            sandbox()
             script """\
 def build = ontrack.branch('${SEED_PROJECT}', '${SEED_BRANCH}').build(VERSION_DISPLAY, '', true)
 build.config.gitCommit GIT_COMMIT
@@ -556,6 +557,7 @@ docker logout
         ontrackDsl {
             environment 'VERSION'
             log()
+            sandbox()
             script """\
 ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION).config {
     label VERSION
