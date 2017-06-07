@@ -418,7 +418,7 @@ class ProjectQLIT extends AbstractQLITSupport {
     void 'Projects filtered by property type'() {
         // Projects
         def p1 = doCreateProject()
-        /*def p2 = */doCreateProject()
+        /*def p2 = */ doCreateProject()
         def p3 = doCreateProject()
         def p4 = doCreateProject()
         // Properties
@@ -438,7 +438,7 @@ class ProjectQLIT extends AbstractQLITSupport {
     void 'Projects filtered by property type and value pattern'() {
         // Projects
         def p1 = doCreateProject()
-        /*def p2 = */doCreateProject()
+        /*def p2 = */ doCreateProject()
         def p3 = doCreateProject()
         def p4 = doCreateProject()
         // Properties
@@ -472,6 +472,42 @@ class ProjectQLIT extends AbstractQLITSupport {
             }
         }""")
         assert data.projects*.name as Set == [p1.name] as Set
+    }
+
+    @Test
+    void 'Project creation time'() {
+        def p = doCreateProject()
+        // Gets the creation time for this project
+        def data = run("""{
+            projects(id: ${p.id}) {
+                name
+                creation {
+                    time
+                }
+            }
+        }""")
+        assert data.projects.first().name == p.name
+        assert data.projects.first().creation.time.length() > 0
+    }
+
+    @Test
+    void 'Branch creation time'() {
+        def b = doCreateBranch()
+        // Gets the creation time for this project
+        def data = run("""{
+            projects(id: ${b.project.id}) {
+                name
+                branches {
+                    name
+                    creation {
+                        time
+                    }
+                }
+            }
+        }""")
+        def branch = data.projects.first().branches.first()
+        assert branch.name == b.name
+        assert branch.creation.time.length() > 0
     }
 
 }
