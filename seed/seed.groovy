@@ -242,6 +242,7 @@ build
             log()
             environment 'VERSION_DISPLAY'
             environment 'GIT_COMMIT'
+            sandbox()
             script """\
 def build = ontrack.branch('${SEED_PROJECT}', '${SEED_BRANCH}').build(VERSION_DISPLAY, '', true)
 build.config.gitCommit GIT_COMMIT
@@ -559,16 +560,6 @@ docker logout
     publishers {
         // Use display version
         ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'RELEASE'
-        // Use display version
-        ontrackDsl {
-            environment 'VERSION'
-            log()
-            script """\
-ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION).config {
-    label VERSION
-}
-"""
-        }
     }
 }
 
@@ -712,6 +703,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
     steps {
         ontrackDsl {
             log()
+            sandbox()
             script """\
 ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', 'Pipeline for ${BRANCH}', true).config {
     gitBranch '${BRANCH}', [
