@@ -553,17 +553,6 @@ docker logout
     publishers {
         // Use display version
         ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'RELEASE'
-        // Use display version
-        ontrackDsl {
-            environment 'VERSION'
-            log()
-            sandbox()
-            script """\
-ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION).config {
-    label VERSION
-}
-"""
-        }
     }
 }
 
