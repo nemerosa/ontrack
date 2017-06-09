@@ -17,7 +17,7 @@ buildscript {
 }
 
 plugins {
-    id 'net.nemerosa.versioning' version '1.7.1'
+    id 'net.nemerosa.versioning' version '2.6.0'
     id 'nebula.os-package' version '2.2.6'
     id 'org.sonarqube' version '2.3'
 }
