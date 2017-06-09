@@ -90,7 +90,7 @@ key will depend on the job parameters and context. For example:
 [source,java]
 ----
 JobCategory CATEGORY = JobCategory.of("category").withName("My category");
-JobType TYPE = CATEGORT.getType("type").withName("My type");
+JobType TYPE = CATEGORY.getType("type").withName("My type");
 public JobKey getKey() {
    return TYPE.getKey("my-id")
 }
