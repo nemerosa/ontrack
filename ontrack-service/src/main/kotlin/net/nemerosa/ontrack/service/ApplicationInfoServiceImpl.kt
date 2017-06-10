@@ -17,9 +17,7 @@ class ApplicationInfoServiceImpl
         providers.forEach { provider -> logger.info("[info] Info provided: {}", provider.javaClass.name) }
     }
 
-    override fun getApplicationInfoList(): List<ApplicationInfo> {
-        return providers
-                .flatMap { provider -> provider.applicationInfoList }
-                .filter { it != null }
-    }
+    override fun getApplicationInfoList(): List<ApplicationInfo> = providers
+            .flatMap { provider -> provider.applicationInfoList }
+            .filter { it != null }
 }
