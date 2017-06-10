@@ -1,6 +1,8 @@
 apply plugin: 'groovy'
+apply plugin: 'kotlin'
 
 dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
     compile project(':ontrack-model')
     compile project(':ontrack-repository')
     compile project(':ontrack-extension-api')
