@@ -1,7 +1,4 @@
 buildscript {
-    ext {
-        ontrackVersion = '2.30.8'
-    }
     repositories {
         mavenCentral()
         jcenter()
