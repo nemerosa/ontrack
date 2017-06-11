@@ -229,6 +229,15 @@ build
                     sameNode()
                 }
             }
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
+                condition('SUCCESS')
+                parameters {
+                    // Link based on full version
+                    predefinedProp 'VERSION', '${VERSION_DISPLAY}'
+                    // Git
+                    predefinedProp 'COMMIT', '${VERSION_COMMIT}'
+                }
+            }
         }
         // Use display version & Git commit
         ontrackDsl {
@@ -242,6 +251,37 @@ build.config.gitCommit GIT_COMMIT
 """
 
         }
+    }
+}
+
+// Extension test
+
+job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Commit', 'Extension acceptance')
+    preparePipelineJob delegate, false
+    steps {
+        gradle {
+            rootBuildScriptDir 'publication/ontrack-extension-test'
+            tasks '''\
+-PontrackVersion=${VERSION}
+clean
+build
+-Dorg.gradle.jvmargs=-Xmx1536m
+--info
+--stacktrace
+--profile
+--console plain
+'''
+        }
+    }
+    publishers {
+        buildDescription '', '${VERSION}', '', ''
+        // Use display version
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'EXTENSIONS'
     }
 }
 
