@@ -1,0 +1,22 @@
+buildscript {
+    ext {
+        ontrackVersion = '2.30.8'
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'ontrack'
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.16.10'
+}
