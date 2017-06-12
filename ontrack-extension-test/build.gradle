@@ -33,6 +33,7 @@ dependencies {
 
 apply plugin: 'com.bmuschko.docker-remote-api'
 
+import com.bmuschko.gradle.docker.tasks.container.*
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 task prepareDockerImage(type: Copy) {
@@ -52,3 +53,32 @@ task buildDockerImage(type: DockerBuildImage) {
 }
 
 assemble.dependsOn buildDockerImage
+
+task createAppContainer(type: DockerCreateContainer) {
+    dependsOn buildDockerImage
+    targetImageId { buildDockerImage.getImageId() }
+    portBindings = ['8080']
+}
+
+
+task startAppContainer(type: DockerStartContainer) {
+    dependsOn createAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+}
+
+task stopAppContainer(type: DockerStopContainer) {
+    dependsOn createAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+}
+
+task removeAppContainer(type: DockerRemoveContainer) {
+    dependsOn stopAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+}
+
+task extensionTest(type: Test) {
+    dependsOn startAppContainer
+    finalizedBy removeAppContainer
+}
+
+build.dependsOn extensionTest
