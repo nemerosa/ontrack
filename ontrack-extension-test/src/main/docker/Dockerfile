@@ -1,5 +1,6 @@
 # Base Ontrack image
-FROM nemerosa/ontrack:${ontrackVersion}
+# TODO Version as a parameter
+FROM nemerosa/ontrack:2.30.8
 
 # Specific extension folder
 ENV EXTENSIONS_DIR /var/ontrack/test

@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.7'
     }
 }
 
@@ -29,3 +30,25 @@ apply plugin: 'ontrack'
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.10'
 }
+
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
+task prepareDockerImage(type: Copy) {
+    dependsOn bootRepackage
+    from 'build/libs'
+    include '*.jar'
+    exclude '*-javadoc.jar'
+    exclude '*-sources.jar'
+    into project.file('src/main/docker')
+    rename '.*', 'ontrack-extension-test.jar'
+}
+
+task buildDockerImage(type: DockerBuildImage) {
+    dependsOn prepareDockerImage
+    inputDir project.file('src/main/docker')
+    tag "nemerosa/ontrack-extension-test:${version}"
+}
+
+assemble.dependsOn buildDockerImage
