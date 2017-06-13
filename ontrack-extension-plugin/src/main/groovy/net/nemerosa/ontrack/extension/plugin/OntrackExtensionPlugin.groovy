@@ -21,9 +21,8 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         Properties properties = new Properties()
         getClass().getResourceAsStream('/META-INF/gradle-plugins/ontrack.properties').withStream { properties.load(it) }
         String ontrackVersion = properties.getProperty('implementation-version')
-        String kotlinVersion = properties.getProperty('kotlin-version')
+        String theKotlinVersion = properties.getProperty('kotlin-version')
         project.ext.ontrackVersion = ontrackVersion
-        project.ext.kotlinVersion = kotlinVersion
 
         println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.name}"
 
@@ -66,6 +65,18 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         project.afterEvaluate {
             if (project.extensions.ontrack.kotlin) {
                 println "[ontrack] Applying Kotlin v${kotlinVersion} to ${project.name} plugin"
+                project.buildscript {
+                    ext {
+                        kotlinVersion = theKotlinVersion
+                    }
+                    repositories {
+                        jcenter()
+                        mavenCentral()
+                    }
+                    dependencies {
+                        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+                    }
+                }
                 project.apply plugin: 'kotlin'
                 project.dependencies {
                     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
@@ -98,7 +109,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             doFirst {
                 println "[ontrack] Configure the NPM cache in ${project.npmCacheDir}"
             }
-            args = [ 'config', 'set', 'cache', project.npmCacheDir ]
+            args = ['config', 'set', 'cache', project.npmCacheDir]
             outputs.dir project.file(project.npmCacheDir)
         }
 
@@ -134,7 +145,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             doFirst { println "[ontrack] Install Node.js packages in ${nodeModulesDir}" }
 
             workingDir = new File(project.ontrackCacheDir as String)
-            args = [ 'install' ]
+            args = ['install']
         }
 
         /**
