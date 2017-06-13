@@ -74,12 +74,12 @@ class OntrackExtensionPlugin implements Plugin<Project> {
                         mavenCentral()
                     }
                     dependencies {
-                        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+                        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${theKotlinVersion}"
                     }
                 }
                 project.apply plugin: 'kotlin'
                 project.dependencies {
-                    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+                    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${theKotlinVersion}"
                 }
             }
         }
