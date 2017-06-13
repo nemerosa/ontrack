@@ -28,11 +28,6 @@ class OntrackExtension {
     String id
 
     /**
-     * Applies Kotlin dependencies?
-     */
-    boolean kotlin = false
-
-    /**
      * DSL access
      */
     void id(String value) {
@@ -43,7 +38,11 @@ class OntrackExtension {
      * Applies Kotlin dependencies
      */
     void kotlin() {
-        this.kotlin = true
+        println "[ontrack] Applying Kotlin v${project.ext.kotlinVersion} to ${project.name} plugin"
+        project.apply plugin: 'kotlin'
+        project.dependencies {
+            compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${project.ext.kotlinVersion}"
+        }
     }
 
     /**

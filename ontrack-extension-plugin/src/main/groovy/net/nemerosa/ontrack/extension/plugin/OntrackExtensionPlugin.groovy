@@ -27,19 +27,10 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.name}"
 
         /**
-         * Kotlin plugin dependencies (even if not applicable)
+         * Kotlin version
          */
 
         project.ext.kotlinVersion = theKotlinVersion
-        project.buildscript {
-            repositories {
-                jcenter()
-                mavenCentral()
-            }
-            dependencies {
-                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${theKotlinVersion}"
-            }
-        }
 
         /**
          * Java project
@@ -72,20 +63,6 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          */
 
         project.extensions.create('ontrack', OntrackExtension, project)
-
-        /**
-         * Kotlin dependencies
-         */
-
-        project.afterEvaluate {
-            if (project.extensions.ontrack.kotlin) {
-                println "[ontrack] Applying Kotlin v${theKotlinVersion} to ${project.name} plugin"
-                project.apply plugin: 'kotlin'
-                project.dependencies {
-                    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${theKotlinVersion}"
-                }
-            }
-        }
 
         /**
          * NPM setup
