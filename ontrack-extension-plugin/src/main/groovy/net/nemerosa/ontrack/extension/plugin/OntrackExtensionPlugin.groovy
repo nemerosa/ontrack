@@ -65,10 +65,8 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         project.afterEvaluate {
             if (project.extensions.ontrack.kotlin) {
                 println "[ontrack] Applying Kotlin v${theKotlinVersion} to ${project.name} plugin"
+                project.ext.kotlinVersion = theKotlinVersion
                 project.buildscript {
-                    ext {
-                        kotlinVersion = theKotlinVersion
-                    }
                     repositories {
                         jcenter()
                         mavenCentral()
