@@ -42,7 +42,7 @@ class OntrackExtension {
         println "[ontrack] Applying Kotlin v${kotlinVersion} to ${project.name} plugin"
         project.apply plugin: 'kotlin'
         project.dependencies {
-            compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+            compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
         }
     }
 
