@@ -22,5 +22,8 @@ if (documentationProfile) {
 }
 
 processResources {
-    filter(ReplaceTokens, tokens: [version: project.versioning.info.display])
+    filter(ReplaceTokens, tokens: [
+            version      : project.versioning.info.display,
+            kotlinVersion: kotlinVersion,
+    ])
 }

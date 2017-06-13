@@ -28,10 +28,22 @@ class OntrackExtension {
     String id
 
     /**
+     * Applies Kotlin dependencies?
+     */
+    boolean kotlin = false
+
+    /**
      * DSL access
      */
     void id(String value) {
         this.id = value
+    }
+
+    /**
+     * Applies Kotlin dependencies
+     */
+    void kotlin() {
+        this.kotlin = true
     }
 
     /**

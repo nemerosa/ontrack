@@ -21,7 +21,9 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         Properties properties = new Properties()
         getClass().getResourceAsStream('/META-INF/gradle-plugins/ontrack.properties').withStream { properties.load(it) }
         String ontrackVersion = properties.getProperty('implementation-version')
+        String kotlinVersion = properties.getProperty('kotlin-version')
         project.ext.ontrackVersion = ontrackVersion
+        project.ext.kotlinVersion = kotlinVersion
 
         println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.name}"
 
@@ -56,6 +58,17 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          */
 
         project.extensions.create('ontrack', OntrackExtension, project)
+
+        /**
+         * Kotlin dependencies
+         */
+
+        if (project.extensions.ontrack.kotlin) {
+            project.apply plugin: 'kotlin'
+            project.dependencies {
+                compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+            }
+        }
 
         /**
          * NPM setup
