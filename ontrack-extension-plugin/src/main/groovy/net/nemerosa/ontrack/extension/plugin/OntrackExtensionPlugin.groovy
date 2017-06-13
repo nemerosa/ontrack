@@ -63,10 +63,13 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          * Kotlin dependencies
          */
 
-        if (project.extensions.ontrack.kotlin) {
-            project.apply plugin: 'kotlin'
-            project.dependencies {
-                compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+        project.afterEvaluate {
+            if (project.extensions.ontrack.kotlin) {
+                println "[ontrack] Applying Kotlin v${kotlinVersion} to ${project.name} plugin"
+                project.apply plugin: 'kotlin'
+                project.dependencies {
+                    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+                }
             }
         }
 
