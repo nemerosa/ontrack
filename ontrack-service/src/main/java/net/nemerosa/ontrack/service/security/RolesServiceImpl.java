@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class RolesServiceImpl implements RolesService, StartupService {
 
+    public static final String GLOBAL_READ_ONLY = "READ_ONLY";
     /**
      * Index of global roles
      */
@@ -81,13 +82,13 @@ public class RolesServiceImpl implements RolesService, StartupService {
     private void initProjectRoles() {
 
         // Owner
-        register("OWNER", "Project owner",
+        register(Roles.PROJECT_OWNER, "Project owner",
                 "The project owner is allowed to all functions in a project, but for its deletion.",
                 getProjectFunctions().stream().filter(t -> !ProjectDelete.class.isAssignableFrom(t)).collect(Collectors.toList())
         );
 
         // Participant
-        register("PARTICIPANT", "Participant",
+        register(Roles.PROJECT_PARTICIPANT, "Participant",
                 "A participant in a project is allowed to change statuses in validation runs.",
                 Arrays.asList(
                         ProjectView.class,
@@ -103,7 +104,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 ValidationRunCreate.class,
                 ValidationRunStatusChange.class
         );
-        register("VALIDATION_MANAGER", "Validation manager",
+        register(Roles.PROJECT_VALIDATION_MANAGER, "Validation manager",
                 "The validation manager can manage the validation stamps.",
                 validationManagerFunctions
         );
@@ -114,7 +115,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 PromotionRunDelete.class,
                 ValidationRunStatusChange.class
         );
-        register("PROMOTER", "Promoter",
+        register(Roles.PROJECT_PROMOTER, "Promoter",
                 "The promoter can promote existing builds.",
                 promoterFunctions
         );
@@ -124,14 +125,14 @@ public class RolesServiceImpl implements RolesService, StartupService {
         projectManagerFunctions.addAll(validationManagerFunctions);
         projectManagerFunctions.addAll(promoterFunctions);
         projectManagerFunctions.add(BranchFilterMgt.class);
-        register("PROJECT_MANAGER", "Project manager",
+        register(Roles.PROJECT_MANAGER, "Project manager",
                 "The project manager can promote existing builds, manage the validation stamps, " +
                         "manage the shared build filters and edit some properties.",
                 projectManagerFunctions
         );
 
         // Read only on a project
-        register("READ_ONLY", "Read Only",
+        register(Roles.PROJECT_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all components of the projects",
                 readOnlyProjectFunctions
         );
@@ -155,13 +156,13 @@ public class RolesServiceImpl implements RolesService, StartupService {
     private void initGlobalRoles() {
 
         // Administrator
-        register("ADMINISTRATOR", "Administrator",
+        register(Roles.GLOBAL_ADMINISTRATOR, "Administrator",
                 "An administrator is allowed to do everything in the application.",
                 getGlobalFunctions(),
                 getProjectFunctions());
 
         // Creator
-        register("CREATOR", "Creator",
+        register(Roles.GLOBAL_CREATOR, "Creator",
                 "A creator is allowed to create new projects and to configure it. Once done, its rights on the " +
                         "project are revoked immediately.",
                 Collections.singletonList(
@@ -178,7 +179,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
         );
 
         // Creator
-        register("AUTOMATION", "Automation",
+        register(Roles.GLOBAL_AUTOMATION, "Automation",
                 "This role can be assigned to users or groups which must automate Ontrack. It aggregates both the " +
                         "Creator and the Controller roles into one.",
                 Arrays.asList(
@@ -205,7 +206,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
         );
 
         // Controller
-        register("CONTROLLER", "Controller",
+        register(Roles.GLOBAL_CONTROLLER, "Controller",
                 "A controller, is allowed to create builds, promotion runs and validation runs. He can also " +
                         "synchronise templates. This role is typically granted to continuous integration tools.",
                 Collections.emptyList(),
@@ -220,7 +221,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
         );
 
         // Read only on all projects
-        register("READ_ONLY", "Read Only",
+        register(GLOBAL_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all projects",
                 readOnlyGlobalFunctions,
                 readOnlyProjectFunctions
