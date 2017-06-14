@@ -389,3 +389,5 @@ include::extending-metrics.adoc[]
 include::extending-kotlin.adoc[]
 
 include::extending-settings.adoc[]
+
+include::extending-security.adoc[]

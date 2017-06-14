@@ -159,3 +159,10 @@ projects, at least in read only mode.
 You can disable this anonymous access by goint go to the _Settings_ and click
 the _Edit_ button in the _General_ section. There you can set the
 _Grants project view to all_ option to _No_.
+
+[[security-extending]]
+==== Extending the security
+
+<<extending,Extensions>> can extend the security model beyond what
+if defined in the Ontrack core. See
+<<extending-security>> for more details.

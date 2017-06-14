@@ -1,0 +1,124 @@
+[[extending-security]]
+==== Extending the security
+
+The <<security,security model>> of Ontrack can be extended to fit
+for specific needs in extensions.
+
+[[extending-security-functions]]
+===== Adding functions
+
+All authorizations in the code are granted through _functions_. We
+distinguish between:
+
+* _global_ functions about Ontrack in general
+* _project_ functions linked to a given project
+
+<<security,Global roles>> are then
+linked to a number of global functions and project functions.
+
+On the other hand, <<security,project roles>> can only be linked to
+project functions.
+
+[plantuml,"security-model",png]
+----
+include::security-model.puml[]
+----
+
+The association of _core_ functions and _core_ roles is fixed in the
+Ontrack core, but extensions can:
+
+* define new global and project functions
+* assign them to existing roles
+
+WARNING: For security reasons, extensions cannot associate _existing
+core_ functions to roles.
+
+In order to define a _global function_, just define an interface
+which extends `GlobalFunction`:
+
+[source,java]
+----
+public interface MyGlobalFunction extends GlobalFunction {}
+----
+
+Almost the same thing for a _project function_:
+
+[source,java]
+----
+public interface MyProjectFunction extends ProjectFunction {}
+----
+
+NOTE: No method is to be implemented.
+
+Now, you can link those functions to existing roles by providing
+a `RoleContributor` component. In our example, we want to grant
+the global function and the project function to the `AUTOMATION`
+global role and the project
+function to the `PROJECT_OWNER` project role.
+
+[source,java]
+----
+@Component
+public MyRoleContributor implements RoleContributor {
+    @Override
+    public List<Class<? extends GlobalFunction>> getGlobalFunctionContributionsForGlobalRole(String role) {
+        if (Roles.GLOBAL_AUTOMATION.equals(role)) {
+            return Collections.singletonList(
+                MyGlobalFunction.class
+            );
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    @Override
+    public List<Class<? extends ProjectFunction>> getProjectFunctionContributionsForGlobalRole(String role) {
+        if (Roles.GLOBAL_AUTOMATION.equals(role)) {
+            return Collections.singletonList(
+                MyProjectFunction.class
+            );
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    @Override
+    public List<Class<? extends ProjectFunction>> getProjectFunctionContributionsForProjectRole(String role) {
+        if (Roles.PROJECT_OWNER.equals(role)) {
+            return Collections.singletonList(
+                MyProjectFunction.class
+            );
+        } else {
+            return Collections.emptyList();
+        }
+    }
+}
+----
+
+TIP: All available roles are listed in the `Roles` interface.
+
+You can now check for those functions in your code by injecting
+the `SecurityService`:
+
+[source,java]
+----
+private final SecurityService securityService;
+...
+if (securityService.isGlobalFunctionGranted(MyGlobalFunction.class)) {
+   ...
+}
+if (securityService.isProjectFunctionGranted(project, MyProjectFunction.class)) {
+   ...
+}
+----
+
+or:
+
+[source,java]
+----
+private final SecurityService securityService;
+...
+securityService.checkGlobalFunction(MyGlobalFunction.class)) {
+securityService.checkProjectFunction(project, MyProjectFunction.class))
+----
+
+TIP: The project functions can be tested on a `Project` or any other
+<<model,entity>> which belongs to a project (branches, builds, etc.).
