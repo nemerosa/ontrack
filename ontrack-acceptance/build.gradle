@@ -70,6 +70,10 @@ test {
 
 // Disable normal JAR creation
 
+jar {
+    enabled = false
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
