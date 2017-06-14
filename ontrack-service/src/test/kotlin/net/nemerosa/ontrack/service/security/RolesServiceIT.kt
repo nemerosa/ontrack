@@ -14,6 +14,9 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
     @Autowired
     var rolesService: RolesService? = null
 
+    @Autowired
+    var securityService: SecurityService? = null
+
     interface TestGlobalFunction : GlobalFunction
     interface TestProject1Function : ProjectFunction
     interface TestProject2Function : ProjectFunction
@@ -92,6 +95,46 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
             fail("It should not have been possible to add an existing core function to a role.")
         } catch (e: IllegalStateException) {
             assertEquals("A core function cannot be added to an existing role.", e.message)
+        }
+    }
+
+    @Test
+    fun testing_a_global_role() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_CONTROLLER)).call {
+            assertTrue(securityService!!.isGlobalFunctionGranted(TestGlobalFunction::class.java))
+            assertFalse(securityService!!.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertFalse(securityService!!.isProjectFunctionGranted(project, TestProject2Function::class.java))
+        }
+    }
+
+    @Test
+    fun testing_a_global_role_with_project_function() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_CREATOR)).call {
+            assertFalse(securityService!!.isGlobalFunctionGranted(TestGlobalFunction::class.java))
+            assertTrue(securityService!!.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertFalse(securityService!!.isProjectFunctionGranted(project, TestProject2Function::class.java))
+        }
+    }
+
+    @Test
+    fun testing_a_project_role() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithProjectRole(project, Roles.PROJECT_OWNER)).call {
+            assertFalse(securityService!!.isGlobalFunctionGranted(TestGlobalFunction::class.java))
+            assertFalse(securityService!!.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertTrue(securityService!!.isProjectFunctionGranted(project, TestProject2Function::class.java))
+        }
+    }
+
+    @Test
+    fun testing_a_neutral_project_role() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithProjectRole(project, Roles.PROJECT_PARTICIPANT)).call {
+            assertFalse(securityService!!.isGlobalFunctionGranted(TestGlobalFunction::class.java))
+            assertFalse(securityService!!.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertFalse(securityService!!.isProjectFunctionGranted(project, TestProject2Function::class.java))
         }
     }
 
