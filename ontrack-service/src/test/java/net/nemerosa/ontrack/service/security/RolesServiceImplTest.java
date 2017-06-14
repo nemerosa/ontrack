@@ -17,7 +17,7 @@ public class RolesServiceImplTest {
 
     @Before
     public void init() {
-        rolesService = new RolesServiceImpl();
+        rolesService = new RolesServiceImpl(roleContributors);
         rolesService.start();
     }
 

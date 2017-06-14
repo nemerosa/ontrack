@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.StartupService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,16 @@ public class RolesServiceImpl implements RolesService, StartupService {
      * Index of project roles
      */
     private final Map<String, ProjectRole> projectRoles = new LinkedHashMap<>();
+
+    /**
+     * Role contributors
+     */
+    private final List<RoleContributor> roleContributors;
+
+    @Autowired
+    public RolesServiceImpl(List<RoleContributor> roleContributors) {
+        this.roleContributors = roleContributors;
+    }
 
     @Override
     public List<GlobalRole> getGlobalRoles() {
@@ -84,7 +95,9 @@ public class RolesServiceImpl implements RolesService, StartupService {
         // Owner
         register(Roles.PROJECT_OWNER, "Project owner",
                 "The project owner is allowed to all functions in a project, but for its deletion.",
-                getProjectFunctions().stream().filter(t -> !ProjectDelete.class.isAssignableFrom(t)).collect(Collectors.toList())
+                getProjectFunctions().stream()
+                        .filter(t -> !ProjectDelete.class.isAssignableFrom(t))
+                        .collect(Collectors.toList())
         );
 
         // Participant
@@ -140,12 +153,31 @@ public class RolesServiceImpl implements RolesService, StartupService {
     }
 
     private void register(String id, String name, String description, List<Class<? extends ProjectFunction>> projectFunctions) {
+        LinkedHashSet<Class<? extends ProjectFunction>> functions = new LinkedHashSet<>(projectFunctions);
+        // Contributions
+        roleContributors.forEach(roleContributor ->
+                roleContributor.getProjectFunctionContributionsForProjectRole(id).forEach(fn -> {
+                    // Checks the function as non core
+                    checkFunctionForContribution(fn);
+                    // OK
+                    functions.add(fn);
+                })
+        );
+        // OK
         register(new ProjectRole(
                 id,
                 name,
                 description,
-                new LinkedHashSet<>(projectFunctions)
+                functions
         ));
+    }
+
+    private void checkFunctionForContribution(Class<?> fn) {
+        CoreFunction coreFunction = fn.getDeclaredAnnotation(CoreFunction.class);
+        if (coreFunction != null) {
+            // Totally illegal - stopping everything
+            throw new IllegalStateException("A core function cannot be added to an existing role.");
+        }
     }
 
     private void register(ProjectRole projectRole) {
@@ -230,12 +262,29 @@ public class RolesServiceImpl implements RolesService, StartupService {
     }
 
     private void register(String id, String name, String description, List<Class<? extends GlobalFunction>> globalFunctions, List<Class<? extends ProjectFunction>> projectFunctions) {
+        // Global functions and contributions
+        LinkedHashSet<Class<? extends GlobalFunction>> gfns = new LinkedHashSet<>(globalFunctions);
+        roleContributors.forEach(roleContributor ->
+                roleContributor.getGlobalFunctionContributionsForGlobalRole(id).forEach(fn -> {
+                    checkFunctionForContribution(fn);
+                    gfns.add(fn);
+                })
+        );
+        // Project functions
+        LinkedHashSet<Class<? extends ProjectFunction>> pfns = new LinkedHashSet<>(projectFunctions);
+        roleContributors.forEach(roleContributor ->
+                roleContributor.getProjectFunctionContributionsForGlobalRole(id).forEach(fn -> {
+                    checkFunctionForContribution(fn);
+                    pfns.add(fn);
+                })
+        );
+        // OK
         register(new GlobalRole(
                 id,
                 name,
                 description,
-                new LinkedHashSet<>(globalFunctions),
-                new LinkedHashSet<>(projectFunctions)
+                gfns,
+                pfns
         ));
     }
 
