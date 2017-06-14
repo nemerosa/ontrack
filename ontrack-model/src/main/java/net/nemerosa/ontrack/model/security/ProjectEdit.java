@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security;
 
+@CoreFunction
 public interface ProjectEdit extends ProjectView, ProjectConfig,
         BranchCreate, BranchEdit, BranchDelete,
         BranchTemplateSync, BranchTemplateMgt,
