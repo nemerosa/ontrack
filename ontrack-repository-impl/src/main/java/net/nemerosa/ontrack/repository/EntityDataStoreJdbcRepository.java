@@ -183,7 +183,7 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
             params = params.addValue("beforeTime", dateTimeForDB(beforeTime));
         }
         // Ordering
-        sql += "ORDER BY CREATION DESC LIMIT 1";
+        sql += "ORDER BY CREATION DESC, ID DESC LIMIT 1";
         // Performs the query
         return getOptional(
                 sql,
@@ -214,13 +214,14 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
     }
 
     @Override
-    public List<EntityDataStoreRecord> findLastByCategory(ProjectEntity entity, String category) {
+    public List<EntityDataStoreRecord> findLastRecordsByNameInCategory(ProjectEntity entity, String category) {
         return getLastByName(
                 getNamedParameterJdbcTemplate().query(
                         String.format(
                                 "SELECT * FROM ENTITY_DATA_STORE " +
                                         "WHERE %s = :entityId " +
-                                        "AND CATEGORY = :category",
+                                        "AND CATEGORY = :category " +
+                                        "ORDER BY CREATION DESC, ID DESC",
                                 entity.getProjectEntityType().name()
                         ),
                         params("entityId", entity.id())
@@ -237,12 +238,13 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
                 .values().stream()
                 // Sorts each list from the newest to the oldest
                 .map(list -> list.stream()
-                        .sorted(Comparator.comparing((EntityDataStoreRecord e) -> e.getSignature().getTime()).reversed())
+                        .sorted(Comparator.naturalOrder())
                         .findFirst()
                 )
                 // Gets only the non empty lists
                 .filter(Optional::isPresent)
                 .map(Optional::get)
+                .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
     }
 
@@ -279,6 +281,20 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
                 signature,
                 groupName,
                 JsonUtils.format(data)
+        );
+    }
+
+    @Override
+    public Optional<EntityDataStoreRecord> getById(ProjectEntity entity, int id) {
+        return getOptional(
+                String.format(
+                        "SELECT * FROM ENTITY_DATA_STORE " +
+                                "WHERE %s = :entityId " +
+                                "AND ID = :id",
+                        entity.getProjectEntityType().name()
+                ),
+                params("id", id).addValue("entityId", entity.id()),
+                (rs, rowNum) -> toEntityDataStoreRecord(entity, rs)
         );
     }
 

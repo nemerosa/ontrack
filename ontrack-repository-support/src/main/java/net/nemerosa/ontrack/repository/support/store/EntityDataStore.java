@@ -99,7 +99,7 @@ public interface EntityDataStore {
      * @param category Data category
      * @return List of entries
      */
-    List<EntityDataStoreRecord> findLastByCategory(ProjectEntity entity, String category);
+    List<EntityDataStoreRecord> findLastRecordsByNameInCategory(ProjectEntity entity, String category);
 
     /**
      * Adds a new entry in the store
@@ -127,5 +127,11 @@ public interface EntityDataStore {
      */
     EntityDataStoreRecord replaceOrAddObject(ProjectEntity entity, String category, String name, Signature signature, String groupName, Object data);
 
-
+    /**
+     * Gets a record by ID
+     *
+     * @param id ID of the record
+     * @return Record or empty if not found
+     */
+    Optional<EntityDataStoreRecord> getById(ProjectEntity entity, int id);
 }
