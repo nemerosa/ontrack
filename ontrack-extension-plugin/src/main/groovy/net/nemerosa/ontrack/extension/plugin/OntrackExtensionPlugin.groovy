@@ -211,7 +211,7 @@ version = ${project.version}
          * Spring Boot packaging as a module
          */
 
-        project.apply plugin: 'spring-boot'
+        project.apply plugin: 'org.springframework.boot'
         project.springBoot {
             layout = 'MODULE'
             customConfiguration = 'moduleDependencies'
