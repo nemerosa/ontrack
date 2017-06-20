@@ -19,7 +19,7 @@ isolation between the "plugins".
 
 In order to create an extension, you have to create a Java project.
 
-TIP: The use of Groovy is also possible.
+TIP: The use of <<extending-kotlin,Kotlin>> is also possible.
 
 Note that Ontrack needs at least a JDK8u65 to run.
 
@@ -385,3 +385,9 @@ include::extending-event-types.adoc[]
 include::extending-graphql.adoc[]
 
 include::extending-metrics.adoc[]
+
+include::extending-kotlin.adoc[]
+
+include::extending-settings.adoc[]
+
+include::extending-security.adoc[]

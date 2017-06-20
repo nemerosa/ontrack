@@ -1,13 +1,16 @@
 buildscript {
     ext {
         springBootVersion = '1.5.2.RELEASE'
+        kotlinVersion = '1.1.1'
     }
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
     }
 }
 

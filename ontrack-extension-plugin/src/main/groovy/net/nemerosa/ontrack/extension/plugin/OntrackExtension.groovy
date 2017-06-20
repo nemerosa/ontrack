@@ -35,6 +35,18 @@ class OntrackExtension {
     }
 
     /**
+     * Applies Kotlin dependencies
+     */
+    void kotlin() {
+        def kotlinVersion = project.ext.kotlinVersion
+        println "[ontrack] Applying Kotlin v${kotlinVersion} to ${project.name} plugin"
+        project.apply plugin: 'kotlin'
+        project.dependencies {
+            compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+        }
+    }
+
+    /**
      * Dynamic computation of the ID if not specified
      */
     String id() {

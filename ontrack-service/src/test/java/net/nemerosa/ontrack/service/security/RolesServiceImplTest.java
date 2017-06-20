@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.security.ProjectRole;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
@@ -17,7 +18,7 @@ public class RolesServiceImplTest {
 
     @Before
     public void init() {
-        rolesService = new RolesServiceImpl();
+        rolesService = new RolesServiceImpl(Collections.emptyList());
         rolesService.start();
     }
 
