@@ -481,6 +481,12 @@ docker logout
                     }
                 }
             }
+        } else {
+            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-publish") {
+                parameters {
+                    currentBuild()
+                }
+            }
         }
         // Use display version
         ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'DOCKER'
