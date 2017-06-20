@@ -456,15 +456,15 @@ docker logout
 """
     }
     publishers {
-        downstreamParameterized {
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
-                condition('SUCCESS')
-                parameters {
-                    currentBuild() // VERSION
+        if (release) {
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
+                    condition('SUCCESS')
+                    parameters {
+                        currentBuild() // VERSION
+                    }
                 }
             }
-        }
-        if (release) {
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
                     condition 'SUCCESS'
@@ -608,11 +608,13 @@ docker logout
         }
     }
     publishers {
-        downstreamParameterized {
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-site") {
-                condition('SUCCESS')
-                parameters {
-                    currentBuild() // VERSION
+        if (release) {
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-site") {
+                    condition('SUCCESS')
+                    parameters {
+                        currentBuild() // VERSION
+                    }
                 }
             }
         }
@@ -625,20 +627,21 @@ docker logout
 
 // Site job
 
-job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
-    logRotator {
-        numToKeep(40)
-        artifactNumToKeep(5)
-    }
-    deliveryPipelineConfiguration('Release', 'Site')
-    preparePipelineJob delegate, false
-    wrappers {
-        credentialsBinding {
-            usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
+if (release) {
+    job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
+        logRotator {
+            numToKeep(40)
+            artifactNumToKeep(5)
         }
-    }
-    steps {
-        gradle """\
+        deliveryPipelineConfiguration('Release', 'Site')
+        preparePipelineJob delegate, false
+        wrappers {
+            credentialsBinding {
+                usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
+            }
+        }
+        steps {
+            gradle """\
 --build-file site.gradle
 --info
 --profile
@@ -650,10 +653,11 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
 -PontrackGitHubPassword=\${GITHUB_TOKEN}
 site
 """
-    }
-    publishers {
-        // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'SITE'
+        }
+        publishers {
+            // Use display version
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'SITE'
+        }
     }
 }
 
