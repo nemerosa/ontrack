@@ -87,7 +87,7 @@ fi
             propertiesFile 'ontrack.properties'
         }
         // Extracting the publication archive
-        shell 'unzip ontrack-publication.zip -d publication'
+        shell 'unzip ontrack-publication.zip -d publication -n'
         // Extraction of modules
         if (modules) {
             modules.each { module, classifier ->
