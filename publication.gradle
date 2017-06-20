@@ -72,6 +72,20 @@ uploadArchives {
     }
 }
 
+task installArchives(type: Upload) {
+    configuration = configurations.archives
+    repositories {
+        mavenInstaller {
+            modules.each { module ->
+                addFilter(module) { artifact, file ->
+                    artifact.name == module
+                }
+                pom(module).artifactId = module
+            }
+        }
+    }
+}
+
 nexusStaging {
     packageGroup = 'net.nemerosa'
     username = ossrhUser

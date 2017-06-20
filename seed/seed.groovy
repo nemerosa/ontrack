@@ -264,6 +264,22 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
     deliveryPipelineConfiguration('Commit', 'Extension acceptance')
     preparePipelineJob delegate, false
     steps {
+        // Local installation in Maven local repository
+        gradle """\
+--build-file publication.gradle
+--info
+--profile
+--console plain
+--stacktrace
+-PontrackVersion=\${VERSION}
+-PontrackVersionCommit=\${COMMIT}
+-PontrackReleaseBranch=${SEED_BRANCH}
+-Psigning.keyId=\${GPG_KEY_ID}
+-Psigning.password=\${GPG_KEY_PASSWORD}
+-Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
+installArchives
+"""
+        // Building the extension
         gradle {
             rootBuildScriptDir 'publication/ontrack-extension-test'
             tasks '''\
