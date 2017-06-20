@@ -56,9 +56,9 @@ boolean production = release && BRANCH.startsWith('release/3')
 
 /**
  * Extracting the delivery archive
- * @param modules List of modules to extract from the delivery / publication archuve
+ * @param modules List of modules to extract from the delivery / publication archive (module -> classifier)
  */
-def extractDeliveryArtifacts(Object dsl, String... modules) {
+def extractDeliveryArtifacts(Object dsl, Map<String, String> modules = [:]) {
     dsl.steps {
         // Cleaning the workspace
         shell 'rm -rf ${WORKSPACE}'
@@ -89,9 +89,14 @@ fi
         // Extracting the publication archive
         shell 'unzip ontrack-publication.zip -d publication'
         // Extraction of modules
-        if (modules && modules.length > 0) {
-            // Moves the artifacts
-            shell """${modules.collect{ "mv publication/${it}-\${VERSION}.jar ." }.join('\n')}"""
+        if (modules) {
+            modules.each { module, classifier ->
+                if (classifier) {
+                    shell "mv publication/${module}-\${VERSION}-${classifier}.jar ."
+                } else {
+                    shell "mv publication/${module}-\${VERSION}.jar ."
+                }
+            }
         }
     }
 }
@@ -122,7 +127,7 @@ exit 0
 """
 }
 
-def inDocker (def job) {
+def inDocker(def job) {
     job.wrappers {
         buildInDocker {
             dockerfile('seed/docker')
@@ -152,7 +157,7 @@ def preparePipelineJob(def job, boolean acceptance = true) {
         }
     }
     inDocker job
-    extractDeliveryArtifacts job, acceptance ? ['ontrack-acceptance'] as String[] : [] as String[]
+    extractDeliveryArtifacts job, acceptance ? ['ontrack-acceptance': 'app'] : [:]
 }
 
 // CentOS versions to tests
@@ -263,6 +268,12 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
     }
     deliveryPipelineConfiguration('Commit', 'Extension acceptance')
     preparePipelineJob delegate, false
+    wrappers {
+        credentialsBinding {
+            file 'GPG_KEY_FILE', 'GPGKeyRing'
+            usernamePassword 'GPG_KEY_ID', 'GPG_KEY_PASSWORD', 'GPG_KEY'
+        }
+    }
     steps {
         // Local installation in Maven local repository
         gradle """\
@@ -356,7 +367,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 // OS packages jobs
 // Only for releases
 
- if (release) {
+if (release) {
 
     // Debian package acceptance job
 
@@ -627,7 +638,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
         }
     }
     steps {
-            gradle """\
+        gradle """\
 --build-file site.gradle
 --info
 --profile
