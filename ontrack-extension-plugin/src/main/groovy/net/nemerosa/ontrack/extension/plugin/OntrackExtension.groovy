@@ -41,6 +41,7 @@ class OntrackExtension {
         def kotlinVersion = project.ext.kotlinVersion
         println "[ontrack] Applying Kotlin v${kotlinVersion} to ${project.name} plugin"
         project.apply plugin: 'kotlin'
+        project.apply plugin: 'kotlin-spring'
         project.dependencies {
             compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
         }

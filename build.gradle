@@ -1,7 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '1.5.2.RELEASE'
-        kotlinVersion = '1.1.1'
+        kotlinVersion = '1.1.2'
     }
     repositories {
         jcenter()
@@ -10,7 +10,8 @@ buildscript {
     dependencies {
         classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
     }
 }
 
@@ -69,6 +70,8 @@ configure(javaProjects) {
      */
 
     apply plugin: 'java'
+    apply plugin: 'kotlin'
+    apply plugin: 'kotlin-spring'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
 
@@ -92,11 +95,19 @@ configure(javaProjects) {
     }
 
     dependencies {
+        compile 'org.jetbrains.kotlin:kotlin-stdlib-jre8'
         compileOnly 'org.projectlombok:lombok'
         testCompile 'org.projectlombok:lombok'
         // Testing
         testCompile 'junit:junit'
         testCompile 'org.mockito:mockito-core'
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "1.8"
     }
 
     // Unit tests run with the `test` task
