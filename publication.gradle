@@ -50,6 +50,7 @@ artifacts {
     }
     // Specific modules
     archives file: file("publication/ontrack-dsl-shell-${ontrackVersion}-executable.jar"), name: 'ontrack-dsl-shell', classifier: 'executable'
+    archives file: file("publication/ontrack-acceptance-${ontrackVersion}-app.jar"), name: 'ontrack-acceptance', classifier: 'app'
 }
 
 signing {
