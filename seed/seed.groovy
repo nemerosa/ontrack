@@ -327,7 +327,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         withXvfb delegate, '''\
 ./gradlew \\
     ciAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}-app.jar \\
     -PciHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
@@ -383,7 +383,7 @@ if (release) {
             withXvfb delegate, """\
 ./gradlew \\
     debAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}-app.jar \\
     -PacceptanceDebianDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -415,7 +415,7 @@ if (release) {
                 withXvfb delegate, """\
 ./gradlew \\
     rpmAcceptanceTest${centOsVersion} \\
-    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}-app.jar \\
     -PacceptanceRpmDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -513,7 +513,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         withXvfb delegate, '''\
 ./gradlew \\
     doAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}-app.jar \\
     -PontrackVersion=${VERSION} \\
     -PdigitalOceanAccessToken=${DO_TOKEN} \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -722,7 +722,7 @@ productionUpgrade
 --stacktrace
 productionTest
 -Dorg.gradle.jvmargs=-Xmx1536m \\
--PacceptanceJar=ontrack-acceptance-${VERSION}.jar
+-PacceptanceJar=ontrack-acceptance-${VERSION}-app.jar
 '''
         }
         publishers {
