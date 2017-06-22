@@ -95,7 +95,7 @@ configure(javaProjects) {
     }
 
     dependencies {
-        compile 'org.jetbrains.kotlin:kotlin-stdlib-jre8'
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
         compileOnly 'org.projectlombok:lombok'
         testCompile 'org.projectlombok:lombok'
         // Testing
