@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
-        classpath 'com.bmuschko:gradle-docker-plugin:3.0.7'
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.8'
     }
 }
 
@@ -80,12 +80,17 @@ task removeAppContainer(type: DockerRemoveContainer) {
     targetContainerId { createAppContainer.getContainerId() }
 }
 
+test {
+    include '**/*Test.class'
+}
+
 task extensionTest(type: Test) {
     dependsOn startAppContainer
     finalizedBy removeAppContainer
-    include '**/AcceptanceTests*.class'
+    include '**/*Acceptance.class'
     ignoreFailures true
     outputs.upToDateWhen { false }  // Always run tests
+    systemProperty 'ontrack.url', "http://${ontrackTestDockerHost}:"
 }
 
 build.dependsOn extensionTest

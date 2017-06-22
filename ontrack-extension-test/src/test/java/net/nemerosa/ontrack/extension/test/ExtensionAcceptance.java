@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ExtensionAcceptanceTests {
+public class ExtensionAcceptance {
 
     private static String baseUrl;
 
