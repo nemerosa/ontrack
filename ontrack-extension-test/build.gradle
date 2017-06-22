@@ -30,6 +30,7 @@ apply plugin: 'ontrack'
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.10'
+    testCompile "net.nemerosa.ontrack:ontrack-acceptance:${ontrackVersion}"
 }
 
 apply plugin: 'com.bmuschko.docker-remote-api'

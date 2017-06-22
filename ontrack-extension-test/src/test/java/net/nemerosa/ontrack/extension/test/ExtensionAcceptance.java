@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.client.JsonClientImpl;
 import net.nemerosa.ontrack.client.OTHttpClient;
@@ -24,6 +25,10 @@ public class ExtensionAcceptance {
         );
         System.out.println("[extension][test] Starting running acceptance tests...");
         System.out.println("[extension][test] Base URL = " + baseUrl);
+        System.out.println("[extension][test] Waiting for Ontrack to be ready...");
+        AcceptanceConfig acceptanceConfig = new AcceptanceConfig();
+        acceptanceConfig.setUrl(baseUrl);
+        // FIXME acceptanceConfig.check();
     }
 
     private static String getEnvironment(String systemProperty, String environmentVariable, String defaultValue) {
