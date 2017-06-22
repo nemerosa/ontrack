@@ -22,6 +22,8 @@ public class ExtensionAcceptanceTests {
                 "ONTRACK_URL",
                 "http://localhost:8080"
         );
+        System.out.println("[extension][test] Starting running acceptance tests...");
+        System.out.println("[extension][test] Base URL = " + baseUrl);
     }
 
     private static String getEnvironment(String systemProperty, String environmentVariable, String defaultValue) {

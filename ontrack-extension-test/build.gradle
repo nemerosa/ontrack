@@ -34,7 +34,10 @@ dependencies {
 
 apply plugin: 'com.bmuschko.docker-remote-api'
 
-import com.bmuschko.gradle.docker.tasks.container.*
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 task prepareDockerImage(type: Copy) {
@@ -80,6 +83,9 @@ task removeAppContainer(type: DockerRemoveContainer) {
 task extensionTest(type: Test) {
     dependsOn startAppContainer
     finalizedBy removeAppContainer
+    include '**/AcceptanceTests*.class'
+    ignoreFailures true
+    outputs.upToDateWhen { false }  // Always run tests
 }
 
 build.dependsOn extensionTest
