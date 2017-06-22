@@ -61,7 +61,7 @@ assemble.dependsOn buildDockerImage
 task createAppContainer(type: DockerCreateContainer) {
     dependsOn buildDockerImage
     targetImageId { buildDockerImage.getImageId() }
-    portBindings = ['8080']
+    portBindings = ["${ontrackTestDockerPort}:8080"]
 }
 
 
@@ -90,7 +90,7 @@ task extensionTest(type: Test) {
     include '**/*Acceptance.class'
     ignoreFailures true
     outputs.upToDateWhen { false }  // Always run tests
-    systemProperty 'ontrack.url', "http://${ontrackTestDockerHost}:"
+    systemProperty 'ontrack.url', "http://${ontrackTestDockerHost}:${ontrackTestDockerPort}"
 }
 
 build.dependsOn extensionTest
