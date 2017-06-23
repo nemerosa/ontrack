@@ -10,6 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
 import static org.junit.Assert.assertTrue;
 
 public class ExtensionAcceptance {
@@ -17,7 +20,7 @@ public class ExtensionAcceptance {
     private static String baseUrl;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws InterruptedException, ExecutionException, TimeoutException {
         baseUrl = getEnvironment(
                 "ontrack.url",
                 "ONTRACK_URL",
@@ -28,7 +31,7 @@ public class ExtensionAcceptance {
         System.out.println("[extension][test] Waiting for Ontrack to be ready...");
         AcceptanceConfig acceptanceConfig = new AcceptanceConfig();
         acceptanceConfig.setUrl(baseUrl);
-        // FIXME acceptanceConfig.check();
+        acceptanceConfig.check();
     }
 
     private static String getEnvironment(String systemProperty, String environmentVariable, String defaultValue) {
