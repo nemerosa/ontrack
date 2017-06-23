@@ -307,6 +307,8 @@ build
     }
     publishers {
         buildDescription '', '${VERSION}', '', ''
+        // Acceptance tests
+        archiveJunit('ontrack-extension-test/build/test-results/extensionTest/**/*.xml')
         // Use display version
         ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'EXTENSIONS'
     }
