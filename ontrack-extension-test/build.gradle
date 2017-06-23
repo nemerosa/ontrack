@@ -92,6 +92,7 @@ task extensionTest(type: Test) {
     ignoreFailures true
     outputs.upToDateWhen { false }  // Always run tests
     systemProperty 'ontrack.url', "http://${ontrackTestDockerHost}:${ontrackTestDockerPort}"
+    systemProperty 'ontrack.version', ontrackVersion
 }
 
 build.dependsOn extensionTest

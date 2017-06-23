@@ -13,11 +13,13 @@ import org.junit.Test;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ExtensionAcceptance {
 
     private static String baseUrl;
+    private static String version;
 
     @BeforeClass
     public static void init() throws InterruptedException, ExecutionException, TimeoutException {
@@ -26,8 +28,14 @@ public class ExtensionAcceptance {
                 "ONTRACK_URL",
                 "http://localhost:8080"
         );
+        version = getEnvironment(
+                "ontrack.version",
+                "ONTRACK_VERSION",
+                "n/a"
+        );
         System.out.println("[extension][test] Starting running acceptance tests...");
         System.out.println("[extension][test] Base URL = " + baseUrl);
+        System.out.println("[extension][test] Version = " + version);
         System.out.println("[extension][test] Waiting for Ontrack to be ready...");
         AcceptanceConfig acceptanceConfig = new AcceptanceConfig();
         acceptanceConfig.setUrl(baseUrl);
@@ -48,13 +56,25 @@ public class ExtensionAcceptance {
 
     @Test
     public void information_is_accessible() {
-        OTHttpClient httpClient = OTHttpClientBuilder.create(baseUrl, true)
-                .withLogger(System.out::println)
-                .build();
-        JsonClient client = new JsonClientImpl(httpClient);
+        JsonClient client = getJsonClient();
         JsonNode info = client.get("info");
         String displayVersion = info.path("version").path("display").asText();
         assertTrue(StringUtils.isNotBlank(displayVersion));
+    }
+
+    @Test
+    public void version_check() {
+        JsonClient client = getJsonClient();
+        JsonNode info = client.get("info");
+        String displayVersion = info.path("version").path("display").asText();
+        assertEquals(version, displayVersion);
+    }
+
+    private JsonClient getJsonClient() {
+        OTHttpClient httpClient = OTHttpClientBuilder.create(baseUrl, true)
+                .withLogger(System.out::println)
+                .build();
+        return new JsonClientImpl(httpClient);
     }
 
 }
