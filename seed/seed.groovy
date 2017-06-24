@@ -298,6 +298,7 @@ installArchives
 cd publication/ontrack-extension-test
 ./gradlew \\
     -PontrackVersion=${VERSION} \\
+    -PontrackTestDockerHost=dockerhost \\
     clean \\
     build \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
