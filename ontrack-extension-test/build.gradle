@@ -40,20 +40,29 @@ import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import org.apache.tools.ant.filters.ReplaceTokens
 
 task prepareDockerImage(type: Copy) {
     dependsOn bootRepackage
-    from 'build/libs'
-    include '*.jar'
-    exclude '*-javadoc.jar'
-    exclude '*-sources.jar'
-    into project.file('src/main/docker')
-    rename '.*', 'ontrack-extension-test.jar'
+    from('build/libs') {
+        include '*.jar'
+        exclude '*-javadoc.jar'
+        exclude '*-sources.jar'
+        rename '.*', 'ontrack-extension-test.jar'
+    }
+    from('src/main/docker') {
+        include '*.yml'
+        include 'Dockerfile'
+        filter(ReplaceTokens, tokens: [
+                ontrackVersion: ontrackVersion,
+        ])
+    }
+    into project.file('build/docker')
 }
 
 task buildDockerImage(type: DockerBuildImage) {
     dependsOn prepareDockerImage
-    inputDir project.file('src/main/docker')
+    inputDir project.file('build/docker')
     tag "nemerosa/ontrack-extension-test:${version}"
 }
 
