@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +27,8 @@ public final class ObjectMapperFactory {
         AnnotationIntrospector pair = AnnotationIntrospector.pair(config.getAnnotationIntrospector(), new ConstructorPropertiesAnnotationIntrospector());
         // Support for JDK 8 times
         jdkTime(mapper);
+        // Support for Kotlin
+        mapper.registerModule(new KotlinModule());
         // OK
         return mapper.setAnnotationIntrospector(pair);
     }
