@@ -267,7 +267,15 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Commit', 'Extension acceptance')
-    preparePipelineJob delegate, false
+    parameters {
+        // Link based on full version
+        stringParam('VERSION', '', '')
+        // ... and Git commit
+        stringParam('COMMIT', '', '')
+    }
+    label 'docker'
+    inDocker delegate
+    extractDeliveryArtifacts delegate, [:]
     wrappers {
         credentialsBinding {
             file 'GPG_KEY_FILE', 'GPGKeyRing'
