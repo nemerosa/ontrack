@@ -38,6 +38,7 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerInspectContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -80,6 +81,23 @@ task startAppContainer(type: DockerStartContainer) {
     targetContainerId { createAppContainer.getContainerId() }
 }
 
+task portsOfAppContainer(type: DockerInspectContainer) {
+    dependsOn startAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+    onNext {
+        it.networkSettings.ports.getBindings().each { exposedPort, bindingArr ->
+            if (exposedPort.port == 8080) {
+                int portBinding = bindingArr.first().hostPortSpec as int
+                String ontrackUrl = "http://${ontrackTestDockerHost}:${portBinding}"
+                println "Setting Ontrack URL to ${ontrackUrl}"
+                tasks.extensionTest {
+                    systemProperty 'ontrack.url', ontrackUrl
+                }
+            }
+        }
+    }
+}
+
 task stopAppContainer(type: DockerStopContainer) {
     dependsOn createAppContainer
     targetContainerId { createAppContainer.getContainerId() }
@@ -95,12 +113,11 @@ test {
 }
 
 task extensionTest(type: Test) {
-    dependsOn startAppContainer
+    dependsOn portsOfAppContainer
     finalizedBy removeAppContainer
     include '**/*Acceptance.class'
     ignoreFailures true
     outputs.upToDateWhen { false }  // Always run tests
-    systemProperty 'ontrack.url', "http://${ontrackTestDockerHost}:${ontrackTestDockerPort}"
     systemProperty 'ontrack.version', ontrackVersion
 }
 
