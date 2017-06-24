@@ -291,19 +291,19 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
 installArchives
 """
         // Building the extension
-        gradle {
-            rootBuildScriptDir 'publication/ontrack-extension-test'
-            tasks '''\
--PontrackVersion=${VERSION}
-clean
-build
--Dorg.gradle.jvmargs=-Xmx1536m
---info
---stacktrace
---profile
---console plain
+        shell '''\
+#!/bin/bash
+cd publication/ontrack-extension-test
+./gradlew \\
+    -PontrackVersion=${VERSION} \\
+    clean \\
+    build \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --stacktrace \\
+    --profile \\
+    --console plain
 '''
-        }
     }
     publishers {
         buildDescription '', '${VERSION}', '', ''
