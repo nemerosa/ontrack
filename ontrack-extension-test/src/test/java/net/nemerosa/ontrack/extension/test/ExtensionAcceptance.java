@@ -70,6 +70,21 @@ public class ExtensionAcceptance {
         assertEquals(version, displayVersion);
     }
 
+    @Test
+    public void extension_loaded() {
+        JsonClient client = getJsonClient();
+        JsonNode extensionList = client.get("extensions");
+        boolean found = false;
+        for (JsonNode extensionFeatureDescription : extensionList.path("extensions")) {
+            if ("test".equals(extensionFeatureDescription.path("id").asText())) {
+                assertEquals("Test", extensionFeatureDescription.path("name").asText());
+                assertEquals("Test extension", extensionFeatureDescription.path("description").asText());
+                found = true;
+            }
+        }
+        assertTrue("Test extension must be present", found);
+    }
+
     private JsonClient getJsonClient() {
         OTHttpClient httpClient = OTHttpClientBuilder.create(baseUrl, true)
                 .withLogger(System.out::println)
