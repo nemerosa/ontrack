@@ -223,7 +223,7 @@ build
                 'FIXME', 'TODO', '@Deprecated', true
         )
         downstreamParameterized {
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
                 condition('SUCCESS')
                 parameters {
                     // Link based on full version
@@ -234,13 +234,15 @@ build
                     sameNode()
                 }
             }
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
                 condition('SUCCESS')
                 parameters {
                     // Link based on full version
                     predefinedProp 'VERSION', '${VERSION_DISPLAY}'
                     // Git
                     predefinedProp 'COMMIT', '${VERSION_COMMIT}'
+                    // Uses the same node in order to have local Docker image available
+                    sameNode()
                 }
             }
         }
