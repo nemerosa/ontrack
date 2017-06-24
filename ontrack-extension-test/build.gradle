@@ -10,16 +10,8 @@ buildscript {
     }
 }
 
-plugins {
-    id 'net.nemerosa.versioning' version '2.6.0'
-}
-
-versioning {
-    gitRepoRootDir = rootProject.file('..')
-}
-
 group = 'net.nemerosa.ontrack'
-version = versioning.info.display
+version = ontrackVersion
 
 repositories {
     mavenLocal() // Important: used for testing
