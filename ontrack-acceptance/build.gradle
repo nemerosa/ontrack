@@ -37,16 +37,21 @@ bootRepackage {
     mainClass = 'net.nemerosa.ontrack.acceptance.boot.Start'
     withJarTask = 'testJar'
     customConfiguration = 'testRuntime'
+    classifier = 'app'
 }
 
 task normaliseJar {
     doFirst {
         // Used for local testing only
-        ant.copy file: testJar.outputs.files.singleFile, tofile: "${buildDir}/libs/ontrack-acceptance.jar"
+        ant.copy file: bootRepackage.outputs.files.singleFile, tofile: "${buildDir}/libs/ontrack-acceptance.jar"
     }
 }
 normaliseJar.dependsOn bootRepackage
 assemble.dependsOn normaliseJar
+
+rootProject.tasks.publicationPackage {
+    from bootRepackage
+}
 
 /**
  * Local test definitions

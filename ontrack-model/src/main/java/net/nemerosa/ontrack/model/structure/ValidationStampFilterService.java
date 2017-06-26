@@ -27,7 +27,7 @@ public interface ValidationStampFilterService {
      * Gets the list of filters associated with a branch
      *
      * @param branch     Branch
-     * @param includeAll <code>true</code> if the project filters & global filters must be included as well
+     * @param includeAll <code>true</code> if the project filters and global filters must be included as well
      */
     List<ValidationStampFilter> getBranchValidationStampFilters(Branch branch, boolean includeAll);
 

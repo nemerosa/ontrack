@@ -165,6 +165,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
                 project.file("build/ontrack.properties").text = """\
 # Ontrack extension properties
 version = ${project.version}
+ontrack = ${ontrackVersion}
 """
             }
         }

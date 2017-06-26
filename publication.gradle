@@ -50,6 +50,7 @@ artifacts {
     }
     // Specific modules
     archives file: file("publication/ontrack-dsl-shell-${ontrackVersion}-executable.jar"), name: 'ontrack-dsl-shell', classifier: 'executable'
+    archives file: file("publication/ontrack-acceptance-${ontrackVersion}-app.jar"), name: 'ontrack-acceptance', classifier: 'app'
 }
 
 signing {
@@ -62,6 +63,20 @@ uploadArchives {
             repository(url: ossrhUrl) {
                 authentication(userName: ossrhUser, password: ossrhPassword)
             }
+            modules.each { module ->
+                addFilter(module) { artifact, file ->
+                    artifact.name == module
+                }
+                pom(module).artifactId = module
+            }
+        }
+    }
+}
+
+task installArchives(type: Upload) {
+    configuration = configurations.archives
+    repositories {
+        mavenInstaller {
             modules.each { module ->
                 addFilter(module) { artifact, file ->
                     artifact.name == module

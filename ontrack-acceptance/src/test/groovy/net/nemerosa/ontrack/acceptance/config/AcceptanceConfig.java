@@ -66,7 +66,7 @@ public class AcceptanceConfig {
     private String resultFileName = "ontrack-acceptance.xml";
 
     @PostConstruct
-    void check() throws InterruptedException, ExecutionException, TimeoutException {
+    public void check() throws InterruptedException, ExecutionException, TimeoutException {
         // Checks the URL is defined
         if (StringUtils.isBlank(url)) {
             throw new AcceptanceMissingURLException();
