@@ -38,9 +38,9 @@ public class KotlinTest {
     public void kotlin_to_json() throws JsonProcessingException {
         assertJsonWrite(
                 object()
-                        .with("doubleValue", 20)
                         .with("name", "Name")
                         .with("value", 10)
+                        .with("doubleValue", 20)
                         .end(),
                 new KotlinPOJO("Name", 10)
         );
