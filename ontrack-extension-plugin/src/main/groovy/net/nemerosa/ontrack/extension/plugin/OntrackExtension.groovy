@@ -50,6 +50,7 @@ class OntrackExtension {
         }
         project.dependencies {
             compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+            compileOnly "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
         }
     }
 
