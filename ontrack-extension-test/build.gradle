@@ -20,6 +20,10 @@ repositories {
 
 apply plugin: 'ontrack'
 
+ontrack {
+    kotlin()
+}
+
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.10'
     testCompile "net.nemerosa.ontrack:ontrack-acceptance:${ontrackVersion}"
