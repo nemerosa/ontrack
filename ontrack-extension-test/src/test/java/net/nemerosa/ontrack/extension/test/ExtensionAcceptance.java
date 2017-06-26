@@ -1,20 +1,24 @@
 package net.nemerosa.ontrack.extension.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.client.JsonClientImpl;
 import net.nemerosa.ontrack.client.OTHttpClient;
 import net.nemerosa.ontrack.client.OTHttpClientBuilder;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.OntrackConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static net.nemerosa.ontrack.test.TestUtils.uid;
+import static org.junit.Assert.*;
 
 public class ExtensionAcceptance {
 
@@ -83,6 +87,29 @@ public class ExtensionAcceptance {
             }
         }
         assertTrue("Test extension must be present", found);
+    }
+
+    @Test
+    public void set_test_property() {
+        Ontrack ontrack = OntrackConnection.create(baseUrl).authenticate("admin", "admin").build();
+        // Creates a project
+        String projectName = uid("P");
+        ontrack.project(projectName);
+        // Gets the test property
+        String propertyType = TestPropertyType.class.getName();
+        Object property = ontrack.project(projectName).getConfig().property(propertyType, false);
+        assertNull("Property is not set yet", property);
+        // Sets the property
+        String value = uid("V");
+        ontrack.project(projectName).getConfig().property(
+                propertyType,
+                ImmutableMap.of("value", value)
+        );
+        // Gets the property again
+        @SuppressWarnings("unchecked")
+        Map<String, String> map = (Map<String, String>) ontrack.project(projectName).getConfig().property(propertyType, false);
+        assertNotNull(map);
+        assertEquals(value, map.get("value"));
     }
 
     private JsonClient getJsonClient() {
