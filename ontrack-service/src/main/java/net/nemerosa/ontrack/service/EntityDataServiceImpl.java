@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.exceptions.JsonWritingException;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
+import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.EntityDataService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -96,7 +97,7 @@ public class EntityDataServiceImpl implements EntityDataService {
     }
 
     protected <T> Optional<T> retrieve(ProjectEntity entity, String key, Function<String, T> parser) {
-        securityService.checkProjectFunction(entity, ProjectConfig.class);
+        securityService.checkProjectFunction(entity, ProjectView.class);
         return repository.retrieve(entity, key).map(parser::apply);
     }
 

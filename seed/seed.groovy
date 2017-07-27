@@ -56,9 +56,9 @@ boolean production = release && BRANCH.startsWith('release/3')
 
 /**
  * Extracting the delivery archive
- * @param modules List of modules to extract from the delivery / publication archuve
+ * @param modules List of modules to extract from the delivery / publication archive (module -> classifier)
  */
-def extractDeliveryArtifacts(Object dsl, String... modules) {
+def extractDeliveryArtifacts(Object dsl, Map<String, String> modules = [:]) {
     dsl.steps {
         // Cleaning the workspace
         shell 'rm -rf ${WORKSPACE}'
@@ -87,11 +87,16 @@ fi
             propertiesFile 'ontrack.properties'
         }
         // Extracting the publication archive
-        shell 'unzip ontrack-publication.zip -d publication'
+        shell 'unzip -d publication -n ontrack-publication.zip'
         // Extraction of modules
-        if (modules && modules.length > 0) {
-            // Moves the artifacts
-            shell """${modules.collect{ "mv publication/${it}-\${VERSION}.jar ." }.join('\n')}"""
+        if (modules) {
+            modules.each { module, classifier ->
+                if (classifier) {
+                    shell "mv publication/${module}-\${VERSION}-${classifier}.jar ."
+                } else {
+                    shell "mv publication/${module}-\${VERSION}.jar ."
+                }
+            }
         }
     }
 }
@@ -122,7 +127,7 @@ exit 0
 """
 }
 
-def inDocker (def job) {
+def inDocker(def job) {
     job.wrappers {
         buildInDocker {
             dockerfile('seed/docker')
@@ -152,7 +157,7 @@ def preparePipelineJob(def job, boolean acceptance = true) {
         }
     }
     inDocker job
-    extractDeliveryArtifacts job, acceptance ? ['ontrack-acceptance'] as String[] : [] as String[]
+    extractDeliveryArtifacts job, acceptance ? ['ontrack-acceptance': 'app'] : [:]
 }
 
 // CentOS versions to tests
@@ -225,6 +230,17 @@ build
                 'FIXME', 'TODO', '@Deprecated', true
         )
         downstreamParameterized {
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
+                condition('SUCCESS')
+                parameters {
+                    // Link based on full version
+                    predefinedProp 'VERSION', '${VERSION_DISPLAY}'
+                    // Git
+                    predefinedProp 'COMMIT', '${VERSION_COMMIT}'
+                    // Uses the same node in order to have local Docker image available
+                    sameNode()
+                }
+            }
             trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
                 condition('SUCCESS')
                 parameters {
@@ -252,6 +268,62 @@ build.config.gitCommit GIT_COMMIT
     }
 }
 
+// Extension test
+
+job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-extension") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Commit', 'Extension acceptance')
+    preparePipelineJob delegate, false
+    wrappers {
+        credentialsBinding {
+            file 'GPG_KEY_FILE', 'GPGKeyRing'
+            usernamePassword 'GPG_KEY_ID', 'GPG_KEY_PASSWORD', 'GPG_KEY'
+        }
+    }
+    steps {
+        // Local installation in Maven local repository
+        gradle """\
+--build-file publication.gradle
+--info
+--profile
+--console plain
+--stacktrace
+-PontrackVersion=\${VERSION}
+-PontrackVersionCommit=\${COMMIT}
+-PontrackReleaseBranch=${SEED_BRANCH}
+-Psigning.keyId=\${GPG_KEY_ID}
+-Psigning.password=\${GPG_KEY_PASSWORD}
+-Psigning.secretKeyRingFile=\${GPG_KEY_FILE}
+installArchives
+"""
+        // Building the extension
+        shell '''\
+#!/bin/bash
+cd publication/ontrack-extension-test
+./gradlew \\
+    -PontrackVersion=${VERSION} \\
+    -PontrackTestDockerHost=dockerhost \\
+    clean \\
+    build \\
+    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    --info \\
+    --stacktrace \\
+    --profile \\
+    --console plain
+'''
+    }
+    publishers {
+        buildDescription '', '${VERSION}', '', ''
+        // Acceptance tests
+        archiveJunit('publication/ontrack-extension-test/build/test-results/extensionTest/**/*.xml')
+        // Use display version
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'EXTENSIONS'
+    }
+}
+
 // Local acceptance job
 
 job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
@@ -267,7 +339,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         withXvfb delegate, '''\
 ./gradlew \\
     ciAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}-app.jar \\
     -PciHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
@@ -307,7 +379,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 // OS packages jobs
 // Only for releases
 
- if (release) {
+if (release) {
 
     // Debian package acceptance job
 
@@ -323,7 +395,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             withXvfb delegate, """\
 ./gradlew \\
     debAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}-app.jar \\
     -PacceptanceDebianDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -355,7 +427,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
                 withXvfb delegate, """\
 ./gradlew \\
     rpmAcceptanceTest${centOsVersion} \\
-    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}-app.jar \\
     -PacceptanceRpmDistributionDir=. \\
     -PacceptanceHost=dockerhost \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -396,15 +468,15 @@ docker logout
 """
     }
     publishers {
-        downstreamParameterized {
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
-                condition('SUCCESS')
-                parameters {
-                    currentBuild() // VERSION
+        if (release) {
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
+                    condition('SUCCESS')
+                    parameters {
+                        currentBuild() // VERSION
+                    }
                 }
             }
-        }
-        if (release) {
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
                     condition 'SUCCESS'
@@ -419,6 +491,12 @@ docker logout
                             currentBuild()
                         }
                     }
+                }
+            }
+        } else {
+            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-publish") {
+                parameters {
+                    currentBuild()
                 }
             }
         }
@@ -447,7 +525,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         withXvfb delegate, '''\
 ./gradlew \\
     doAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}-app.jar \\
     -PontrackVersion=${VERSION} \\
     -PdigitalOceanAccessToken=${DO_TOKEN} \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -548,11 +626,13 @@ docker logout
         }
     }
     publishers {
-        downstreamParameterized {
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-site") {
-                condition('SUCCESS')
-                parameters {
-                    currentBuild() // VERSION
+        if (release) {
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-site") {
+                    condition('SUCCESS')
+                    parameters {
+                        currentBuild() // VERSION
+                    }
                 }
             }
         }
@@ -565,19 +645,20 @@ docker logout
 
 // Site job
 
-job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
-    logRotator {
-        numToKeep(40)
-        artifactNumToKeep(5)
-    }
-    deliveryPipelineConfiguration('Release', 'Site')
-    preparePipelineJob delegate, false
-    wrappers {
-        credentialsBinding {
-            usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
+if (release) {
+    job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
+        logRotator {
+            numToKeep(40)
+            artifactNumToKeep(5)
         }
-    }
-    steps {
+        deliveryPipelineConfiguration('Release', 'Site')
+        preparePipelineJob delegate, false
+        wrappers {
+            credentialsBinding {
+                usernamePassword 'GITHUB_USER', 'GITHUB_TOKEN', 'GITHUB'
+            }
+        }
+        steps {
             gradle """\
 --build-file site.gradle
 --info
@@ -591,10 +672,11 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
 -PontrackGitHubPassword=\${GITHUB_TOKEN}
 site
 """
-    }
-    publishers {
-        // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'SITE'
+        }
+        publishers {
+            // Use display version
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'SITE'
+        }
     }
 }
 
@@ -662,7 +744,7 @@ docker-compose \\
 ./gradlew \\
     --build-file production.gradle \\
     productionTest \\
-    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}-app.jar \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
     --info \\
     --profile \\

@@ -21,9 +21,16 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         Properties properties = new Properties()
         getClass().getResourceAsStream('/META-INF/gradle-plugins/ontrack.properties').withStream { properties.load(it) }
         String ontrackVersion = properties.getProperty('implementation-version')
+        String theKotlinVersion = properties.getProperty('kotlin-version')
         project.ext.ontrackVersion = ontrackVersion
 
         println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.name}"
+
+        /**
+         * Kotlin version
+         */
+
+        project.ext.kotlinVersion = theKotlinVersion
 
         /**
          * Java project
@@ -82,7 +89,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             doFirst {
                 println "[ontrack] Configure the NPM cache in ${project.npmCacheDir}"
             }
-            args = [ 'config', 'set', 'cache', project.npmCacheDir ]
+            args = ['config', 'set', 'cache', project.npmCacheDir]
             outputs.dir project.file(project.npmCacheDir)
         }
 
@@ -118,7 +125,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             doFirst { println "[ontrack] Install Node.js packages in ${nodeModulesDir}" }
 
             workingDir = new File(project.ontrackCacheDir as String)
-            args = [ 'install' ]
+            args = ['install']
         }
 
         /**
@@ -158,6 +165,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
                 project.file("build/ontrack.properties").text = """\
 # Ontrack extension properties
 version = ${project.version}
+ontrack = ${ontrackVersion}
 """
             }
         }
@@ -204,7 +212,7 @@ version = ${project.version}
          * Spring Boot packaging as a module
          */
 
-        project.apply plugin: 'spring-boot'
+        project.apply plugin: 'org.springframework.boot'
         project.springBoot {
             layout = 'MODULE'
             customConfiguration = 'moduleDependencies'

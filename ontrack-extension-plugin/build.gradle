@@ -12,6 +12,8 @@ dependencies {
     compile gradleApi()
     compile 'com.moowork.gradle:gradle-node-plugin:0.11'
     compile "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    compile "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+    compile "org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}"
 }
 
 if (documentationProfile) {
@@ -22,5 +24,8 @@ if (documentationProfile) {
 }
 
 processResources {
-    filter(ReplaceTokens, tokens: [version: project.versioning.info.display])
+    filter(ReplaceTokens, tokens: [
+            version      : project.versioning.info.display,
+            kotlinVersion: kotlinVersion,
+    ])
 }

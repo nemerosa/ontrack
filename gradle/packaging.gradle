@@ -54,6 +54,10 @@ task publicationPackage(type: Zip) {
             }
         }
     }
+    // Extension test
+    from("${rootProject.file('ontrack-extension-test')}") {
+        into 'ontrack-extension-test'
+    }
 }
 
 if (documentationProfile) {
