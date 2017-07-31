@@ -71,13 +71,14 @@ interface ValidationDataType<C, T> {
      * @param node JSON returned by the form edition
      * @return Data
      */
-    fun fromForm(node: JsonNode): T
+    fun fromForm(node: JsonNode): T?
 
     /**
      * Computes the status from some data
      *
+     * @param config Configuration to use
      * @param data Data associated with a run
      * @return Status or `null` if no status can be determined
      */
-    fun computeStatus(data: T): ValidationRunStatusID?
+    fun computeStatus(config: C?, data: T): ValidationRunStatusID?
 }
