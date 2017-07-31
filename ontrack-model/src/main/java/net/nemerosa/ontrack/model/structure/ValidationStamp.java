@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.model.form.Form;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,6 +38,7 @@ public class ValidationStamp implements ProjectEntity {
     /**
      * Data used for the link to an optional {@link ValidationDataType} and its configuration
      */
+    @Wither
     private final ServiceConfiguration dataType;
 
     @Override
@@ -62,17 +62,6 @@ public class ValidationStamp implements ProjectEntity {
 
     public ValidationStamp withImage(boolean image) {
         return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType);
-    }
-
-    public static Form form() {
-        // TODO User selection
-        return Form.nameAndDescription();
-    }
-
-    public Form asForm() {
-        return form()
-                .fill("name", name)
-                .fill("description", description);
     }
 
     public ValidationStamp update(NameDescription nameDescription) {

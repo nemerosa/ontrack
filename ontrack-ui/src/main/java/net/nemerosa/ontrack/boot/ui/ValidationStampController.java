@@ -3,13 +3,14 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.ServiceConfigurator;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.security.ValidationStampCreate;
-import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.boot.ui.UIUtils.setupDefaultImageCache;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -30,12 +33,14 @@ public class ValidationStampController extends AbstractResourceController {
     private final StructureService structureService;
     private final SecurityService securityService;
     private final DecorationService decorationService;
+    private final ValidationDataTypeService validationDataTypeService;
 
     @Autowired
-    public ValidationStampController(StructureService structureService, SecurityService securityService, DecorationService decorationService) {
+    public ValidationStampController(StructureService structureService, SecurityService securityService, DecorationService decorationService, ValidationDataTypeService validationDataTypeService) {
         this.structureService = structureService;
         this.securityService = securityService;
         this.decorationService = decorationService;
+        this.validationDataTypeService = validationDataTypeService;
     }
 
     // Validation stamps
@@ -79,17 +84,54 @@ public class ValidationStampController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.GET)
     public Form newValidationStampForm(@PathVariable ID branchId) {
         structureService.getBranch(branchId);
-        return ValidationStamp.form();
+        return Form.nameAndDescription()
+                .with(
+                        ServiceConfigurator.of("dataType")
+                                .label("Data type")
+                                .help("Type of the data to associate with a validation run.")
+                                .optional()
+                                .sources(
+                                        validationDataTypeService.getAllTypes().stream()
+                                                .map(
+                                                        dataType -> new ServiceConfigurationSource(
+                                                                dataType.getClass().getName(),
+                                                                dataType.getDisplayName(),
+                                                                dataType.getConfigForm(null),
+                                                                Collections.emptyMap()
+                                                        )
+                                                )
+                                                .collect(Collectors.toList())
+                                )
+                );
     }
 
     @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.POST)
-    public ValidationStamp newValidationStamp(@PathVariable ID branchId, @RequestBody @Valid NameDescription nameDescription) {
+    public ValidationStamp newValidationStamp(@PathVariable ID branchId, @RequestBody @Valid ValidationStampInput input) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
-        // Creates a new promotion level
-        ValidationStamp validationStamp = ValidationStamp.of(branch, nameDescription);
+        // Validation
+        ServiceConfiguration dataTypeServiceConfig = validateValidationDataType(input);
+        // Creates a new validation stamp
+        ValidationStamp validationStamp = ValidationStamp.of(
+                branch,
+                input.asNameDescription()
+        ).withDataType(dataTypeServiceConfig);
         // Saves it into the repository
         return structureService.newValidationStamp(validationStamp);
+    }
+
+    @Nullable
+    private ServiceConfiguration validateValidationDataType(@RequestBody @Valid ValidationStampInput input) {
+        // Validating the data type configuration if needed
+        ServiceConfiguration dataTypeServiceConfig = input.getDataType();
+        if (dataTypeServiceConfig != null) {
+            ValidationDataType<?, ?> dataType = validationDataTypeService.getValidationDataType(dataTypeServiceConfig.getId());
+            if (dataType != null) {
+                // Parsing without exception
+                dataType.fromForm(dataTypeServiceConfig.getData());
+            }
+        }
+        return dataTypeServiceConfig;
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.GET)
@@ -99,15 +141,22 @@ public class ValidationStampController extends AbstractResourceController {
 
     @RequestMapping(value = "validationStamps/{validationStampId}/update", method = RequestMethod.GET)
     public Form updateValidationStampForm(@PathVariable ID validationStampId) {
-        return structureService.getValidationStamp(validationStampId).asForm();
+        ValidationStamp validationStamp = structureService.getValidationStamp(validationStampId);
+        return newValidationStampForm(validationStamp.getBranch().getId())
+                .fill("name", validationStamp.getName())
+                .fill("description", validationStamp.getDescription())
+                .fill("dataType", validationStamp.getDataType())
+                ;
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}/update", method = RequestMethod.PUT)
-    public ValidationStamp updateValidationStamp(@PathVariable ID validationStampId, @RequestBody @Valid NameDescription nameDescription) {
+    public ValidationStamp updateValidationStamp(@PathVariable ID validationStampId, @RequestBody @Valid ValidationStampInput input) {
         // Gets from the repository
         ValidationStamp validationStamp = structureService.getValidationStamp(validationStampId);
+        // Validation
+        ServiceConfiguration dataTypeServiceConfig = validateValidationDataType(input);
         // Updates
-        validationStamp = validationStamp.update(nameDescription);
+        validationStamp = validationStamp.update(input.asNameDescription()).withDataType(dataTypeServiceConfig);
         // Saves in repository
         structureService.saveValidationStamp(validationStamp);
         // As resource

@@ -12,5 +12,10 @@ constructor(
         private val types: List<ValidationDataType<*, *>>
 ) : ValidationDataTypeService {
 
+    override fun <C, T> getValidationDataType(id: String): ValidationDataType<C, T>? {
+        @Suppress("UNCHECKED_CAST")
+        return types.find { it::class.java.name == id } as? ValidationDataType<C, T>?
+    }
+
     override fun getAllTypes(): List<ValidationDataType<*, *>> = types
 }
