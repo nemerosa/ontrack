@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +22,6 @@ public class ValidationStamp implements ProjectEntity {
                 null,
                 false,
                 Signature.none(),
-                null,
                 null
         );
     }
@@ -41,11 +39,7 @@ public class ValidationStamp implements ProjectEntity {
     /**
      * Data used for the link to an optional {@link ValidationDataType} and its configuration
      */
-    private final String dataType;
-    /**
-     * Data configuration linked to the type defined by {@link #dataType}.
-     */
-    private final JsonNode dataConfig;
+    private final ServiceConfiguration dataType;
 
     @Override
     public Project getProject() {
@@ -63,11 +57,11 @@ public class ValidationStamp implements ProjectEntity {
     }
 
     public ValidationStamp withId(ID id) {
-        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType, dataConfig);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType);
     }
 
     public ValidationStamp withImage(boolean image) {
-        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType, dataConfig);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType);
     }
 
     public static Form form() {
@@ -90,8 +84,7 @@ public class ValidationStamp implements ProjectEntity {
                 owner,
                 image,
                 signature,
-                dataType,
-                dataConfig
+                dataType
         );
     }
 }
