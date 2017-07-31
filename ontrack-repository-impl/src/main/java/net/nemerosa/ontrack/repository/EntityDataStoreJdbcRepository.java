@@ -118,7 +118,7 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
                 params("recordId", id),
                 (rs, rowNum) -> new EntityDataStoreRecordAudit(
                         EntityDataStoreRecordAuditType.valueOf(rs.getString("AUDIT_TYPE")),
-                        readSignature(rs, "TIMESTAMP", "USER")
+                        readSignature(rs, "TIMESTAMP", "CREATOR")
                 )
         );
     }
@@ -300,7 +300,7 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
 
     private void audit(EntityDataStoreRecordAuditType type, int recordId, Signature signature) {
         getNamedParameterJdbcTemplate().update(
-                "INSERT INTO ENTITY_DATA_STORE_AUDIT(RECORD_ID, AUDIT_TYPE, TIMESTAMP, USER) " +
+                "INSERT INTO ENTITY_DATA_STORE_AUDIT(RECORD_ID, AUDIT_TYPE, TIMESTAMP, CREATOR) " +
                         "VALUES (:recordId, :auditType, :timestamp, :user)",
                 params("recordId", recordId)
                         .addValue("auditType", type.name())
