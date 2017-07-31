@@ -138,9 +138,12 @@ public class RolesServiceImpl implements RolesService, StartupService {
         projectManagerFunctions.addAll(validationManagerFunctions);
         projectManagerFunctions.addAll(promoterFunctions);
         projectManagerFunctions.add(BranchFilterMgt.class);
+        projectManagerFunctions.add(BranchCreate.class);
+        projectManagerFunctions.add(BranchEdit.class);
+        projectManagerFunctions.add(BranchDelete.class);
         register(Roles.PROJECT_MANAGER, "Project manager",
                 "The project manager can promote existing builds, manage the validation stamps, " +
-                        "manage the shared build filters and edit some properties.",
+                        "manage the shared build filters, manage the branches and edit some properties.",
                 projectManagerFunctions
         );
 

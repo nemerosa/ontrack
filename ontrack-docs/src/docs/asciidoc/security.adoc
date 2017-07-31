@@ -82,7 +82,7 @@ A project **PROMOTER** can create and delete promotion runs, can change the
 validation runs statuses.
 
 A project **PROJECT_MANAGER** cumulates the functions of a PROMOTER and of a
-VALIDATION\_MANAGER. He can additional manage the common
+VALIDATION_MANAGER. He can additional manage branches (creation / edition / deletion) and the common
 build filters.
 
 A project **READ_ONLY** user can view this project, but cannot perform any action on it.
