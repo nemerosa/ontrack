@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +15,17 @@ public class ValidationStamp implements ProjectEntity {
     public static ValidationStamp of(Branch branch, NameDescription nameDescription) {
         Entity.isEntityDefined(branch, "Branch must be defined");
         Entity.isEntityDefined(branch.getProject(), "Project must be defined");
-        return new ValidationStamp(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), branch, null, false,
-                Signature.none());
+        return new ValidationStamp(
+                ID.NONE,
+                nameDescription.getName(),
+                nameDescription.getDescription(),
+                branch,
+                null,
+                false,
+                Signature.none(),
+                null,
+                null
+        );
     }
 
     private final ID id;
@@ -28,6 +38,14 @@ public class ValidationStamp implements ProjectEntity {
     private final Boolean image;
     @Wither
     private final Signature signature;
+    /**
+     * Data used for the link to an optional {@link ValidationDataType} and its configuration
+     */
+    private final String dataType;
+    /**
+     * Data configuration linked to the type defined by {@link #dataType}.
+     */
+    private final JsonNode dataConfig;
 
     @Override
     public Project getProject() {
@@ -45,11 +63,11 @@ public class ValidationStamp implements ProjectEntity {
     }
 
     public ValidationStamp withId(ID id) {
-        return new ValidationStamp(id, name, description, branch, owner, image, signature);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType, dataConfig);
     }
 
     public ValidationStamp withImage(boolean image) {
-        return new ValidationStamp(id, name, description, branch, owner, image, signature);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType, dataConfig);
     }
 
     public static Form form() {
@@ -71,7 +89,9 @@ public class ValidationStamp implements ProjectEntity {
                 branch,
                 owner,
                 image,
-                signature
+                signature,
+                dataType,
+                dataConfig
         );
     }
 }
