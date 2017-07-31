@@ -1,0 +1,72 @@
+package net.nemerosa.ontrack.model.structure
+
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.form.Form
+import org.springframework.stereotype.Component
+
+data class FractionValidationDataTypeConfig(val threshold: Int?, val okIfGreater: Boolean = false)
+data class FractionValidationData(val numerator: Int, val denominator: Int)
+
+@Component
+class FractionValidationDataType : AbstractValidationDataType<FractionValidationDataTypeConfig, FractionValidationData>() {
+    override fun configFromJson(node: JsonNode): FractionValidationDataTypeConfig =
+            JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
+
+    override fun configToJson(config: FractionValidationDataTypeConfig): JsonNode =
+            JsonUtils.format(config)
+
+    override fun getConfigForm(config: FractionValidationDataTypeConfig?): Form = Form.create()
+            .with(net.nemerosa.ontrack.model.form.Int
+                    .of("threshold")
+                    .label("Threshold (%)")
+                    .value(config?.threshold)
+                    .min(0).max(100)
+                    .optional()
+            )
+            .with(net.nemerosa.ontrack.model.form.YesNo
+                    .of("okIfGreater")
+                    .label("Valid if greater?")
+                    .value(config?.okIfGreater)
+            )
+
+    override fun fromConfigForm(node: JsonNode): FractionValidationDataTypeConfig =
+            JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
+
+    override fun toJson(data: FractionValidationData): JsonNode =
+            JsonUtils.format(data)
+
+    override fun fromJson(node: JsonNode): FractionValidationData? =
+            JsonUtils.parse(node, FractionValidationData::class.java)
+
+    override fun getForm(data: FractionValidationData?): Form = Form.create()
+            .with(net.nemerosa.ontrack.model.form.Int
+                    .of("numerator")
+                    .label("Numerator")
+                    .value(data?.numerator)
+                    .min(0)
+            )
+            .with(net.nemerosa.ontrack.model.form.Int
+                    .of("denominator")
+                    .label("Denominator")
+                    .value(data?.denominator)
+                    .min(1)
+            )
+
+    override fun fromForm(node: JsonNode): FractionValidationData? =
+            JsonUtils.parse(node, FractionValidationData::class.java)
+
+    override fun computeStatus(config: FractionValidationDataTypeConfig?, data: FractionValidationData): ValidationRunStatusID? {
+        if (config?.threshold != null) {
+            return if ((data.numerator * 100 / data.denominator) >= config.threshold && config.okIfGreater) {
+                ValidationRunStatusID.STATUS_PASSED
+            } else {
+                ValidationRunStatusID.STATUS_FAILED
+            }
+        } else {
+            return null
+        }
+    }
+
+    override val displayName = "Fraction with threshold"
+}
