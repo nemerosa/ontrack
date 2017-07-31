@@ -1,6 +1,8 @@
 @startuml
 
-class ValidationStamp <<entity>>
+class ValidationStamp <<entity>> {
+    dataType: String?
+}
 class ValidationRun <<entity>> {
     dataType: String?
     data: JSON?
