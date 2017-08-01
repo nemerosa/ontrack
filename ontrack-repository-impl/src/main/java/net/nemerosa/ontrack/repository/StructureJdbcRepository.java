@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.*;
@@ -738,13 +739,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
             // Insertion
             int id = dbCreate(
-                    "INSERT INTO VALIDATION_STAMPS(BRANCHID, NAME, DESCRIPTION, ORDERNB, CREATION, CREATOR) VALUES (:branchId, :name, :description, :orderNb, :creation, :creator)",
+                    "INSERT INTO VALIDATION_STAMPS(BRANCHID, NAME, DESCRIPTION, ORDERNB, CREATION, CREATOR, DATA_TYPE_ID, DATA_TYPE_CONFIG) VALUES (:branchId, :name, :description, :orderNb, :creation, :creator, :dataTypeId, :dataTypeConfig)",
                     params("name", validationStamp.getName())
                             .addValue("description", validationStamp.getDescription())
                             .addValue("branchId", validationStamp.getBranch().id())
                             .addValue("orderNb", orderNb)
                             .addValue("creation", dateTimeForDB(validationStamp.getSignature().getTime()))
                             .addValue("creator", validationStamp.getSignature().getUser().getName())
+                            .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
+                            .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getData()) : null)
             );
             return validationStamp.withId(id(id));
         } catch (DuplicateKeyException ex) {
@@ -809,13 +812,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         Document image = getValidationStampImage(validationStampId);
         // Bulk update
         getNamedParameterJdbcTemplate().update(
-                "UPDATE VALIDATION_STAMPS SET IMAGETYPE = :type, IMAGEBYTES = :content, DESCRIPTION = :description " +
+                "UPDATE VALIDATION_STAMPS SET IMAGETYPE = :type, IMAGEBYTES = :content, DESCRIPTION = :description, " +
+                        "DATA_TYPE_ID = :dataTypeId, DATA_TYPE_CONFIG = :dataTypeConfig " +
                         "WHERE ID <> :id AND NAME = :name",
                 params("id", validationStampId.getValue())
                         .addValue("name", name)
                         .addValue("description", description)
                         .addValue("type", Document.isValid(image) ? image.getType() : null)
                         .addValue("content", Document.isValid(image) ? image.getContent() : null)
+                        .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
+                        .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getData()) : null)
         );
     }
 
@@ -824,10 +830,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Update
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE VALIDATION_STAMPS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    "UPDATE VALIDATION_STAMPS SET NAME = :name, DESCRIPTION = :description, DATA_TYPE_ID = :dataTypeId, DATA_TYPE_CONFIG = :dataTypeConfig WHERE ID = :id",
                     params("name", validationStamp.getName())
                             .addValue("description", validationStamp.getDescription())
                             .addValue("id", validationStamp.id())
+                            .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
+                            .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getData()) : null)
             );
         } catch (DuplicateKeyException ex) {
             throw new ValidationStampNameAlreadyDefinedException(validationStamp.getName());
@@ -1005,7 +1013,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 )
         ).withId(id(rs))
                 .withSignature(readSignature(rs))
+                .withDataType(readServiceConfiguration(rs, "DATA_TYPE_ID", "DATA_TYPE_CONFIG"))
                 .withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
+    }
+
+    private ServiceConfiguration readServiceConfiguration(ResultSet rs, String idColumn, String dataColumn) throws SQLException {
+        String id = rs.getString(idColumn);
+        JsonNode json = readJson(rs, dataColumn);
+        if (StringUtils.isBlank(id) || json == null) {
+            return null;
+        } else {
+            return new ServiceConfiguration(id, json);
+        }
     }
 
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
