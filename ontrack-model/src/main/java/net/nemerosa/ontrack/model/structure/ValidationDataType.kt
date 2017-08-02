@@ -33,9 +33,9 @@ interface ValidationDataType<C, T> {
      * Gets a form to edit / create the configuration.
      *
      * @param config Data to edit - `null` if the form is for a creation
-     * @return A prefilled form or `null` if not editable (no config)
+     * @return A prefilled form or [Form.create] if not editable (no config)
      */
-    fun getConfigForm(config: C?): Form?
+    fun getConfigForm(config: C?): Form
 
     /**
      * Creates the config object from the JSON returned by a form edition

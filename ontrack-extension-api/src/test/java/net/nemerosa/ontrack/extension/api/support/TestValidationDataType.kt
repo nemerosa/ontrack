@@ -31,7 +31,7 @@ class TestValidationDataType : ValidationDataType<Unit, TestValidationData> {
 
     override fun configFromJson(node: JsonNode): Unit? = null
 
-    override fun getConfigForm(config: Unit?): Form? = null
+    override fun getConfigForm(config: Unit?): Form = Form.create()
 
     override fun fromConfigForm(node: JsonNode) {}
 
