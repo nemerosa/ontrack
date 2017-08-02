@@ -33,7 +33,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
             )
         }
         // Loads the validation stamp
-        var loadedVs = structureService.getValidationStamp(vs.id)
+        var loadedVs = asUserWithView(branch).call { structureService.getValidationStamp(vs.id) }
         // Checks the data type is still there
         var dataType = loadedVs.dataType
         assertNotNull("Data type is loaded", dataType)
@@ -46,7 +46,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
                 dataType.data
         )
         // Loads using the list
-        val vsList = structureService.getValidationStampListForBranch(branch.id)
+        val vsList = asUserWithView(branch).call { structureService.getValidationStampListForBranch(branch.id) }
         assertEquals(1, vsList.size)
         assertEquals(loadedVs, vsList.first())
         // Updates it (with a threshold)
@@ -63,7 +63,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
             )
         }
         // Reloads it and check
-        loadedVs = structureService.getValidationStamp(vs.id)
+        loadedVs = asUserWithView(branch).call { structureService.getValidationStamp(vs.id) }
         // Checks the data type is still there
         dataType = loadedVs.dataType
         assertNotNull("Data type is loaded", dataType)
