@@ -13,6 +13,8 @@ import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,18 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         asUser().with(GlobalSettings.class).call(() ->
                 configurationService.newConfiguration(configuration)
         );
+    }
+
+    /**
+     * Regression test for #531
+     */
+    @Test
+    public void test_ok_on_new_configuration_with_blank_password() throws Exception {
+        TestConfiguration configuration = new TestConfiguration(uid("T"), "", "");
+        ConnectionResult result = asUser().with(GlobalSettings.class).call(() ->
+                configurationService.test(configuration)
+        );
+        assertEquals(ConnectionResult.ConnectionResultType.OK, result.getType());
     }
 
     @Test

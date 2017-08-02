@@ -73,8 +73,12 @@ public class JIRAServiceTest {
     @Test
     public void update_new_password() {
         when(encryptionService.encrypt("pwd")).thenReturn("xxxxx");
+        when(configurationRepository.find(JIRAConfiguration.class, "test")).thenReturn(
+                Optional.of(
+                        new JIRAConfiguration("test", "http://host", "user", "xxxxx")
+                )
+        );
         jiraService.updateConfiguration("test", new JIRAConfiguration("test", "http://host", "user", "pwd"));
-        verify(configurationRepository, times(0)).find(JIRAConfiguration.class, "test");
         verify(configurationRepository, times(1)).save(new JIRAConfiguration("test", "http://host", "user", "xxxxx"));
     }
 
