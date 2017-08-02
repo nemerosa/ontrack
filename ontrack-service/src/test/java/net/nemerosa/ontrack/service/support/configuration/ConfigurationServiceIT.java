@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
