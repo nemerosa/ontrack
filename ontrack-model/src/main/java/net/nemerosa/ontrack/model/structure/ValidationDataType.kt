@@ -81,4 +81,12 @@ interface ValidationDataType<C, T> {
      * @return Status or `null` if no status can be determined
      */
     fun computeStatus(config: C?, data: T): ValidationRunStatusID?
+
+    /**
+     * Validates some data according to its type and configuration.
+     *
+     * @param config Configuration associated to the type
+     * @param data Data to validate
+     */
+    fun validateData(config: C?, data: T)
 }

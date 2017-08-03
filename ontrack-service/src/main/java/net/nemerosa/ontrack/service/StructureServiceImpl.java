@@ -47,6 +47,7 @@ public class StructureServiceImpl implements StructureService {
     private final EventPostService eventPostService;
     private final EventFactory eventFactory;
     private final ValidationRunStatusService validationRunStatusService;
+    private final ValidationDataTypeService validationDataTypeService;
     private final StructureRepository structureRepository;
     private final ExtensionManager extensionManager;
     private final PropertyService propertyService;
@@ -56,11 +57,12 @@ public class StructureServiceImpl implements StructureService {
     private final ProjectFavouriteService projectFavouriteService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService, DecorationService decorationService, ProjectFavouriteService projectFavouriteService) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, ValidationDataTypeService validationDataTypeService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService, DecorationService decorationService, ProjectFavouriteService projectFavouriteService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
         this.validationRunStatusService = validationRunStatusService;
+        this.validationDataTypeService = validationDataTypeService;
         this.structureRepository = structureRepository;
         this.extensionManager = extensionManager;
         this.propertyService = propertyService;
@@ -1067,6 +1069,40 @@ public class StructureServiceImpl implements StructureService {
         return validationStamp;
     }
 
+    private void checkValidationRunDataType(ValidationRun validationRun) {
+        ServiceConfiguration data = validationRun.getData();
+        ServiceConfiguration dataType = validationRun.getValidationStamp().getDataType();
+        if (data != null) {
+            if (dataType != null) {
+                if (StringUtils.equals(data.getId(), dataType.getId())) {
+                    // Same type - validation is needed
+                    validationDataTypeService.validateData(data, dataType.getData());
+                } else {
+                    // Different type of data
+                    throw new ValidationRunDataInputException(
+                            "Data associated with the validation run as different type " +
+                                    "than the one associated with the validation stamp. `%s` is expected and `%s` was given.",
+                            dataType.getId(),
+                            data.getId()
+                    );
+                }
+            } else {
+                // Data when no data type is defined
+                throw new ValidationRunDataInputException(
+                        "Some data is associated with the validation run when the validation stamp has no data type."
+                );
+            }
+        } else if (dataType != null) {
+            // No data when data type is defined
+            throw new ValidationRunDataInputException(
+                    "No data is associated with the validation run but " +
+                            "the validation stamp expects this data type to be provided: ``%s.",
+                    dataType.getId()
+            );
+        }
+        // No data, no data type - OK
+    }
+
     @Override
     public ValidationRun newValidationRun(ValidationRun validationRun) {
         // Validation
@@ -1077,6 +1113,8 @@ public class StructureServiceImpl implements StructureService {
                 "Validation run for a validation stamp can be done only on the same branch than the build.");
         // Checks the authorization
         securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunCreate.class);
+        // Checks the data
+        checkValidationRunDataType(validationRun);
         // Actual creation
         ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun, validationRunStatusService::getValidationRunStatus);
         // Event

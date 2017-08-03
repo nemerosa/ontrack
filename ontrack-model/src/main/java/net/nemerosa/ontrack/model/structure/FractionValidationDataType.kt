@@ -68,5 +68,11 @@ class FractionValidationDataType : AbstractValidationDataType<FractionValidation
         }
     }
 
+    override fun validateData(config: FractionValidationDataTypeConfig?, data: FractionValidationData) {
+        validate(data.numerator >= 0, "Numerator must be >= 0")
+        validate(data.denominator > 0, "Denominator must be >= 0")
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override val displayName = "Fraction with threshold"
 }

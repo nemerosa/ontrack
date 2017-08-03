@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,12 @@ public class ValidationRun implements ProjectEntity {
     private final int runOrder;
 
     /**
+     * Data used for the link to an optional {@link ValidationDataType} and its data
+     */
+    @Wither
+    private final ServiceConfiguration data;
+
+    /**
      * Must always contain at least one validation run status at creation time.
      */
     @JsonView({ValidationRun.class, BranchBuildView.class, Build.class, ValidationStampRunView.class})
@@ -37,6 +44,7 @@ public class ValidationRun implements ProjectEntity {
                 build,
                 validationStamp,
                 runOrder,
+                data,
                 Collections.unmodifiableList(statuses)
         );
     }
@@ -85,6 +93,7 @@ public class ValidationRun implements ProjectEntity {
                 build,
                 validationStamp,
                 runOrder,
+                null,
                 statuses
         );
     }
@@ -95,6 +104,7 @@ public class ValidationRun implements ProjectEntity {
                 build,
                 validationStamp,
                 runOrder,
+                data,
                 validationRunStatuses
         );
     }

@@ -868,9 +868,11 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
         // Validation run itself (parent)
         int id = dbCreate(
-                "INSERT INTO VALIDATION_RUNS(BUILDID, VALIDATIONSTAMPID) VALUES (:buildId, :validationStampId)",
+                "INSERT INTO VALIDATION_RUNS(BUILDID, VALIDATIONSTAMPID, DATA_TYPE_ID, DATA) VALUES (:buildId, :validationStampId, :dataTypeId, :data)",
                 params("buildId", validationRun.getBuild().id())
                         .addValue("validationStampId", validationRun.getValidationStamp().id())
+                        .addValue("dataTypeId", validationRun.getData() != null ? validationRun.getData().getId() : null)
+                        .addValue("data", validationRun.getData() != null ? writeJson(validationRun.getData().getData()) : null)
         );
 
         // Statuses
@@ -989,7 +991,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 validationStampSupplier.apply(validationStampId),
                 runOrder,
                 statuses
-        ).withId(ID.of(id));
+        )
+                .withId(ID.of(id))
+                .withData(readServiceConfiguration(rs, "DATA_TYPE_ID", "DATA"))
+                ;
     }
 
     protected PromotionLevel toPromotionLevel(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {

@@ -33,5 +33,8 @@ class TextValidationDataType : AbstractValidationDataType<Unit, String>() {
 
     override fun computeStatus(config: Unit?, data: String): ValidationRunStatusID? = null
 
+    override fun validateData(config: Unit?, data: String) {
+    }
+
     override val displayName = "Free text"
 }

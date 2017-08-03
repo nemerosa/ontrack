@@ -27,6 +27,9 @@ data class TestValidationData(
  */
 @Component
 class TestValidationDataType : ValidationDataType<Unit, TestValidationData> {
+
+    override fun validateData(config: Unit?, data: TestValidationData) {}
+
     override fun configToJson(config: Unit): JsonNode = NullNode.instance
 
     override fun configFromJson(node: JsonNode): Unit? = null

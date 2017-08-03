@@ -69,5 +69,8 @@ class ThresholdNumberValidationDataType : AbstractValidationDataType<Int?, Int>(
         }
     }
 
+    override fun validateData(config: Int?, data: Int) {
+    }
+
     override val displayName = "Number with threshold"
 }

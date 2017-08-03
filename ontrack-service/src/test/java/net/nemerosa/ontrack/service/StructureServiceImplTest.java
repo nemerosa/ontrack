@@ -38,11 +38,13 @@ public class StructureServiceImplTest {
         PredefinedValidationStampService predefinedValidationStampService = mock(PredefinedValidationStampService.class);
         DecorationService decorationService = mock(DecorationService.class);
         ProjectFavouriteService projectFavouriteService = mock(ProjectFavouriteService.class);
+        ValidationDataTypeService validationDataTypeService = mock(ValidationDataTypeService.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
                 eventFactory,
                 validationRunStatusService,
+                validationDataTypeService,
                 structureRepository,
                 extensionManager,
                 propertyService,

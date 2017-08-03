@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.form.Form
 import org.springframework.stereotype.Component
 
@@ -36,8 +37,15 @@ class ThresholdPercentageValidationDataType : AbstractValidationDataType<Thresho
     override fun toJson(data: Int): JsonNode =
             IntNode(data)
 
-    override fun fromJson(node: JsonNode): Int? =
-            node.asInt()
+    override fun fromJson(node: JsonNode): Int? {
+        if (node is IntNode) {
+            return node.asInt()
+        } else {
+            throw ValidationRunDataInputException(
+                    "Data is expected to be an integer."
+            )
+        }
+    }
 
     override fun getForm(data: Int?): Form = Form.create()
             .with(net.nemerosa.ontrack.model.form.Int
@@ -66,6 +74,10 @@ class ThresholdPercentageValidationDataType : AbstractValidationDataType<Thresho
         } else {
             return null
         }
+    }
+
+    override fun validateData(config: ThresholdPercentageValidationDataTypeConfig?, data: Int) {
+        validate(data >= 0, "Percentage must be >= 0")
     }
 
     override val displayName = "Percentage with threshold"
