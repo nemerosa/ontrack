@@ -6,21 +6,27 @@ import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
+import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
 class ValidationRunIT : AbstractServiceTestSupport() {
 
-    @Test
-    fun validationRunWithDataType() {
+    private lateinit var branch: Branch
+    private lateinit var build: Build
+    private lateinit var vs: ValidationStamp
+
+    @Before
+    fun init() {
         // Build & Branch
-        val build = doCreateBuild()
-        val branch = build.branch
+        build = doCreateBuild()
+        branch = build.branch
         // Creates a validation stamp with an associated percentage data type w/ threshold
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
+        vs = asUser().with(branch, ValidationStampCreate::class.java).call {
             structureService.newValidationStamp(
                     ValidationStamp.of(
                             branch,
@@ -35,24 +41,12 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                     )
             )
         }
+    }
+
+    @Test
+    fun validationRunWithData() {
         // Creates a validation run
-        val run = asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            ValidationRunStatusID.STATUS_PASSED,
-                            ""
-                    ).withData(
-                            ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    IntNode(80)
-                            )
-                    )
-            )
-        }
+        val run = createValidationRunWithData()
 
         // Loads the validation run
         val loadedRun = asUserWithView(branch).call { structureService.getValidationRun(run.id) }
@@ -70,6 +64,55 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         val status = loadedRun.lastStatus
         assertNotNull(status)
         assertEquals(ValidationRunStatusID.STATUS_PASSED, status.statusID)
+    }
+
+    @Test
+    fun validationRunWithDataAndStatusUpdate() {
+        // Creates a validation run with data
+        val run = createValidationRunWithData(ValidationRunStatusID.STATUS_FAILED)
+        // Checks the initial status
+        val status = run.lastStatus
+        assertNotNull(status)
+        assertEquals(ValidationRunStatusID.STATUS_FAILED.id, status.statusID.id)
+        // Updates the status
+        asUser().with(branch, ValidationRunStatusChange::class.java).execute {
+            structureService.newValidationRunStatus(
+                    run,
+                    ValidationRunStatus.of(
+                            Signature.of("test"),
+                            ValidationRunStatusID.STATUS_DEFECTIVE,
+                            "This is a defect"
+                    )
+            )
+        }
+        // Reloads
+        val newRun = asUser().withView(branch).call {
+            structureService.getValidationRun(run.id)
+        }
+        // Checks the new status
+        val newStatus = newRun.lastStatus
+        assertNotNull(newStatus)
+        assertEquals(ValidationRunStatusID.STATUS_DEFECTIVE.id, newStatus.statusID.id)
+    }
+
+    private fun createValidationRunWithData(statusId: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED): ValidationRun {
+        return asUser().with(branch, ValidationRunCreate::class.java).call {
+            structureService.newValidationRun(
+                    ValidationRun.of(
+                            build,
+                            vs,
+                            1,
+                            Signature.of("test"),
+                            statusId,
+                            ""
+                    ).withData(
+                            ServiceConfiguration(
+                                    ThresholdPercentageValidationDataType::class.java.name,
+                                    IntNode(80)
+                            )
+                    )
+            )
+        }
     }
 
     @Test
@@ -115,25 +158,6 @@ class ValidationRunIT : AbstractServiceTestSupport() {
 
     @Test(expected = ValidationRunDataInputException::class)
     fun validationRunWithInvalidData() {
-        // Build & Branch
-        val build = doCreateBuild()
-        val branch = build.branch
-        // Creates a validation stamp with an associated percentage data type w/ threshold
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VSPercent", "")
-                    ).withDataType(
-                            ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(60)
-                                    )
-                            )
-                    )
-            )
-        }
         // Creates a validation run
         asUser().with(branch, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
@@ -156,25 +180,6 @@ class ValidationRunIT : AbstractServiceTestSupport() {
 
     @Test(expected = ValidationRunDataInputException::class)
     fun validationRunWithInvalidDataFormat() {
-        // Build & Branch
-        val build = doCreateBuild()
-        val branch = build.branch
-        // Creates a validation stamp with an associated percentage data type w/ threshold
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VSPercent", "")
-                    ).withDataType(
-                            ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(60)
-                                    )
-                            )
-                    )
-            )
-        }
         // Creates a validation run
         asUser().with(branch, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
@@ -197,25 +202,6 @@ class ValidationRunIT : AbstractServiceTestSupport() {
 
     @Test(expected = ValidationRunDataInputException::class)
     fun validationRunWithInvalidDataType() {
-        // Build & Branch
-        val build = doCreateBuild()
-        val branch = build.branch
-        // Creates a validation stamp with an associated percentage data type w/ threshold
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VSPercent", "")
-                    ).withDataType(
-                            ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(60)
-                                    )
-                            )
-                    )
-            )
-        }
         // Creates a validation run
         asUser().with(branch, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
@@ -273,25 +259,6 @@ class ValidationRunIT : AbstractServiceTestSupport() {
 
     @Test(expected = ValidationRunDataInputException::class)
     fun validationRunWithMissingData() {
-        // Build & Branch
-        val build = doCreateBuild()
-        val branch = build.branch
-        // Creates a validation stamp with an associated percentage data type w/ threshold
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VSPercent", "")
-                    ).withDataType(
-                            ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(60)
-                                    )
-                            )
-                    )
-            )
-        }
         // Creates a validation run with no data
         asUser().with(branch, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
