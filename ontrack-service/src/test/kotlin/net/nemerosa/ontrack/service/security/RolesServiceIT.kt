@@ -203,4 +203,14 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
         }
     }
 
+    @Test
+    fun `Global role contribution`() {
+        assertNotNull(rolesService.globalRoles.find { it.id == newGlobalRole })
+    }
+
+    @Test
+    fun `Project role contribution`() {
+        assertNotNull(rolesService.projectRoles.find { it.id == newProjectRole })
+    }
+
 }
