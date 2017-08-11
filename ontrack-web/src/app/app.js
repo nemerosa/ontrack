@@ -20,6 +20,7 @@ var ontrack = angular.module('ontrack', [
         'ot.service.task',
         'ot.service.form',
         'ot.service.configuration',
+        'ot.service.graphql',
         // Views
         'ot.view.api',
         'ot.view.api-doc',
