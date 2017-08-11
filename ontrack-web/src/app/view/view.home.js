@@ -49,51 +49,49 @@ angular.module('ot.view.home', [
                 "  }\n" +
                 "}\n").then(function (data) {
                 $scope.projectsData = data;
+                // Commands
+                $rootScope.view.commands = [
+                    {
+                    //     id: 'createProject',
+                    //     name: 'Create project',
+                    //     cls: 'ot-command-project-new',
+                    //     condition: function () {
+                    //         return projectResources._create;
+                    //     },
+                    //     action: $scope.createProject
+                    // }, {
+                        id: 'showDisabled',
+                        name: "Show all hidden items",
+                        cls: 'ot-command-show-disabled',
+                        condition: function () {
+                            return !$scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = true;
+                        }
+                    }, {
+                        id: 'hideDisabled',
+                        name: "Hide disabled items",
+                        cls: 'ot-command-hide-disabled',
+                        condition: function () {
+                            return $scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = false;
+                        }
+                    }, {
+                        name: "API",
+                        cls: 'ot-command-api',
+                        link: '/api-doc'
+                    }, {
+                        name: "GraphiQL",
+                        cls: 'ot-command-api',
+                        absoluteLink: "graphiql.html"
+                    }
+                ];
             });
-            // ot.pageCall($http.get('structure/projects')).then(function (projectResources) {
-            //     $scope.projectResources = projectResources;
-            //     // Commands
-            //     $rootScope.view.commands = [
-            //         {
-            //             id: 'createProject',
-            //             name: 'Create project',
-            //             cls: 'ot-command-project-new',
-            //             condition: function () {
-            //                 return projectResources._create;
-            //             },
-            //             action: $scope.createProject
-            //         }, {
-            //             id: 'showDisabled',
-            //             name: "Show all hidden items",
-            //             cls: 'ot-command-show-disabled',
-            //             condition: function () {
-            //                 return !$scope.showDisabled;
-            //             },
-            //             action: function () {
-            //                 $scope.showDisabled = true;
-            //             }
-            //         }, {
-            //             id: 'hideDisabled',
-            //             name: "Hide disabled items",
-            //             cls: 'ot-command-hide-disabled',
-            //             condition: function () {
-            //                 return $scope.showDisabled;
-            //             },
-            //             action: function () {
-            //                 $scope.showDisabled = false;
-            //             }
-            //         }, {
-            //             name: "API",
-            //             cls: 'ot-command-api',
-            //             link: '/api-doc'
-            //         }, {
-            //             name: "GraphiQL",
-            //             cls: 'ot-command-api',
-            //             absoluteLink: "graphiql.html"
-            //         }
-            //     ];
-            // });
-            // Detailed views
+
+            // TODO GRAPHQL Detailed views
             ot.pageCall($http.get('structure/projects/favourites')).then(function (projectStatusViewResources) {
                 $scope.projectStatusViewResources = projectStatusViewResources;
                 $scope.projectStatusViews = projectStatusViewResources.resources;
