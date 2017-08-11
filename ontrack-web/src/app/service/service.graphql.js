@@ -40,7 +40,7 @@ angular.module('ot.service.graphql', [
             self.rawGraphQLCall(query, variables).then(function (json) {
                 // Errors?
                 var errors = json.errors;
-                if (errors) {
+                if (errors && errors.length > 0) {
                     // List of messages
                     d.reject(errors.map(function (error) {
                         return error.message;
@@ -68,7 +68,7 @@ angular.module('ot.service.graphql', [
             if (variables) {
                 params.variables = JSON.stringify(variables);
             }
-            return ot.pageCall($http.get('/graphql', {params: variables}));
+            return ot.pageCall($http.get('/graphql', {params: params}));
         };
 
         return self;

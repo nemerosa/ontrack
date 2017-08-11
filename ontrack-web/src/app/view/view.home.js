@@ -2,7 +2,8 @@ angular.module('ot.view.home', [
         'ui.router',
         'ot.service.structure',
         'ot.service.core',
-        'ot.service.user'
+        'ot.service.user',
+        'ot.service.graphql'
     ])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
@@ -11,7 +12,7 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otStructureService, otNotificationService, otUserService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService) {
         var search = $location.search();
         var code = search.code;
         var url = search.url;
@@ -28,49 +29,62 @@ angular.module('ot.view.home', [
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
-            ot.pageCall($http.get('structure/projects')).then(function (projectResources) {
-                $scope.projectResources = projectResources;
-                // Commands
-                $rootScope.view.commands = [
-                    {
-                        id: 'createProject',
-                        name: 'Create project',
-                        cls: 'ot-command-project-new',
-                        condition: function () {
-                            return projectResources._create;
-                        },
-                        action: $scope.createProject
-                    }, {
-                        id: 'showDisabled',
-                        name: "Show all hidden items",
-                        cls: 'ot-command-show-disabled',
-                        condition: function () {
-                            return !$scope.showDisabled;
-                        },
-                        action: function () {
-                            $scope.showDisabled = true;
-                        }
-                    }, {
-                        id: 'hideDisabled',
-                        name: "Hide disabled items",
-                        cls: 'ot-command-hide-disabled',
-                        condition: function () {
-                            return $scope.showDisabled;
-                        },
-                        action: function () {
-                            $scope.showDisabled = false;
-                        }
-                    }, {
-                        name: "API",
-                        cls: 'ot-command-api',
-                        link: '/api-doc'
-                    }, {
-                        name: "GraphiQL",
-                        cls: 'ot-command-api',
-                        absoluteLink: "graphiql.html"
-                    }
-                ];
+            otGraphqlService.pageGraphQLCall("{\n" +
+                "  projects {\n" +
+                "    id\n" +
+                "    name\n" +
+                "    disabled\n" +
+                "    links {\n" +
+                "      _favourite\n" +
+                "      _unfavourite\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n").then(function (data) {
+                $scope.projectsData = data;
             });
+            // ot.pageCall($http.get('structure/projects')).then(function (projectResources) {
+            //     $scope.projectResources = projectResources;
+            //     // Commands
+            //     $rootScope.view.commands = [
+            //         {
+            //             id: 'createProject',
+            //             name: 'Create project',
+            //             cls: 'ot-command-project-new',
+            //             condition: function () {
+            //                 return projectResources._create;
+            //             },
+            //             action: $scope.createProject
+            //         }, {
+            //             id: 'showDisabled',
+            //             name: "Show all hidden items",
+            //             cls: 'ot-command-show-disabled',
+            //             condition: function () {
+            //                 return !$scope.showDisabled;
+            //             },
+            //             action: function () {
+            //                 $scope.showDisabled = true;
+            //             }
+            //         }, {
+            //             id: 'hideDisabled',
+            //             name: "Hide disabled items",
+            //             cls: 'ot-command-hide-disabled',
+            //             condition: function () {
+            //                 return $scope.showDisabled;
+            //             },
+            //             action: function () {
+            //                 $scope.showDisabled = false;
+            //             }
+            //         }, {
+            //             name: "API",
+            //             cls: 'ot-command-api',
+            //             link: '/api-doc'
+            //         }, {
+            //             name: "GraphiQL",
+            //             cls: 'ot-command-api',
+            //             absoluteLink: "graphiql.html"
+            //         }
+            //     ];
+            // });
             // Detailed views
             ot.pageCall($http.get('structure/projects/favourites')).then(function (projectStatusViewResources) {
                 $scope.projectStatusViewResources = projectStatusViewResources;
