@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.graphql.support.GQLScalarJSON;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.structure.Decoration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static graphql.Scalars.GraphQLString;
@@ -18,6 +19,13 @@ import static graphql.schema.GraphQLObjectType.newObject;
 public class GQLTypeDecoration implements GQLType {
 
     public static final String DECORATION = "Decoration";
+
+    private final GQLTypeExtensionFeatureDescription extensionFeatureDescription;
+
+    @Autowired
+    public GQLTypeDecoration(GQLTypeExtensionFeatureDescription extensionFeatureDescription) {
+        this.extensionFeatureDescription = extensionFeatureDescription;
+    }
 
     @Override
     public GraphQLObjectType getType() {
@@ -47,6 +55,11 @@ public class GQLTypeDecoration implements GQLType {
                                 .description("Any error message associated with the decoration")
                                 .type(GraphQLString)
                                 .build()
+                )
+                // Feature
+                .field(f -> f.name("feature")
+                        .description("Extension feature")
+                        .type(extensionFeatureDescription.getType())
                 )
                 // OK
                 .build();

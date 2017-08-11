@@ -38,6 +38,14 @@ angular.module('ot.view.home', [
                 "      _favourite\n" +
                 "      _unfavourite\n" +
                 "    }\n" +
+                "    decorations {\n" +
+                "      decorationType\n" +
+                "      error\n" +
+                "      data\n" +
+                "      feature {\n" +
+                "        id\n" +
+                "      }\n" +
+                "    }\n" +
                 "  }\n" +
                 "}\n").then(function (data) {
                 $scope.projectsData = data;
