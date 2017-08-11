@@ -30,6 +30,9 @@ angular.module('ot.view.home', [
         function loadProjects() {
             $scope.loadingProjects = true;
             otGraphqlService.pageGraphQLCall("{\n" +
+                "  userRootActions {\n" +
+                "    projectCreate\n" +
+                "  }\n" +
                 "  projects {\n" +
                 "    id\n" +
                 "    name\n" +
@@ -52,14 +55,14 @@ angular.module('ot.view.home', [
                 // Commands
                 $rootScope.view.commands = [
                     {
-                    //     id: 'createProject',
-                    //     name: 'Create project',
-                    //     cls: 'ot-command-project-new',
-                    //     condition: function () {
-                    //         return projectResources._create;
-                    //     },
-                    //     action: $scope.createProject
-                    // }, {
+                        id: 'createProject',
+                        name: 'Create project',
+                        cls: 'ot-command-project-new',
+                        condition: function () {
+                            return data.userRootActions.projectCreate;
+                        },
+                        action: $scope.createProject
+                    }, {
                         id: 'showDisabled',
                         name: "Show all hidden items",
                         cls: 'ot-command-show-disabled',
@@ -109,7 +112,7 @@ angular.module('ot.view.home', [
 
         // Creating a project
         $scope.createProject = function () {
-            otStructureService.createProject($scope.projectResources._create).then(loadProjects);
+            otStructureService.createProject($scope.projectsData.userRootActions.projectCreate).then(loadProjects);
         };
 
         // Sets a project as favourite
