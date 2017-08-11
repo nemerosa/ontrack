@@ -21,7 +21,10 @@ account and to the groups.
 NOTE: As of now, only roles can be assigned to groups and accounts, and the
 list of roles and their associated functions is defined by Ontrack itself.
 
-Ontrack distinguishes between _global roles_ and _project roles.
+Ontrack distinguishes between _global roles_ and _project_ roles.
+
+<<extending,Extensions>> can contribute to built-in roles
+and functions - see <<extending-security>> for details.
 
 [[security-roles-global]]
 ===== Global roles
