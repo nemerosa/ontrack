@@ -14,6 +14,7 @@ var debug = require('gulp-debug');
 var minimist = require('minimist');
 var del = require('del');
 var babel = require("gulp-babel");
+var sourcemaps = require('gulp-sourcemaps');
 
 // Arguments
 
@@ -127,8 +128,10 @@ gulp.task('js:angular', ['lint', 'templates'], function () {
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
+        .pipe(sourcemaps.init())
         .pipe(babel())
         .pipe(concat('ci-angular.js'))
+        .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(buildAngular))
         .pipe(debug({title: 'js:angular:output'}));
 });
