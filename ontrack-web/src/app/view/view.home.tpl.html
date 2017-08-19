@@ -29,7 +29,7 @@
             </div>
         </div>
     </div>
-    <div class="row" ng-if="projectStatusViews">
+    <div class="row" ng-if="projectFavourites">
         <div class="col-md-12">
             <h4>
                 <span class="fa fa-star"></span>
@@ -37,29 +37,29 @@
             </h4>
             <table class="ot-home-projects">
                 <tbody>
-                <tr ng-repeat="projectStatusView in projectStatusViews"
-                    ng-show="showDisabled || (!projectStatusView.project.disabled && !projectStatusView.allBranchesDisabled)">
-                    <td ng-class="{'ot-entity-disabled': projectStatusView.project.disabled}">
+                <tr ng-repeat="projectFavourite in projectFavourites"
+                    ng-show="showDisabled || (!projectFavourite.disabled && !projectFavourite.allBranchesDisabled)">
+                    <td ng-class="{'ot-entity-disabled': projectFavourite.disabled}">
                         <span
                                 class="fa fa-star ot-command"
                                 title="Unsets as favourite"
-                                ng-if="projectStatusView.project._unfavourite"
-                                ng-click="projectUnfavourite(projectStatusView.project)"
+                                ng-if="projectFavourite.links._unfavourite"
+                                ng-click="projectUnfavourite(projectFavourite)"
                         ></span>
-                        <a href="#/project/{{projectStatusView.project.id}}">
-                            {{projectStatusView.project.name}}
+                        <a href="#/project/{{projectFavourite.id}}">
+                            {{projectFavourite.name}}
                         </a>
-                        <ot-entity-embedded-decorations decorations="projectStatusView.decorations"></ot-entity-embedded-decorations>
+                        <ot-entity-embedded-decorations decorations="projectFavourite.decorations"></ot-entity-embedded-decorations>
                     </td>
                     <td>
-                        <div class="ot-home-branch" ng-if="projectStatusView.branchStatusViews.length == 0">
+                        <div class="ot-home-branch" ng-if="projectFavourite.branchStatusViews.length == 0">
                             <span class="ot-description">
                                 <span class="fa fa-ban" title="No branch on this project"></span>
                                 No branch
                             </span>
                         </div>
                         <div class="ot-home-branch"
-                             ng-repeat="branchStatusView in projectStatusView.branchStatusViews"
+                             ng-repeat="branchStatusView in projectFavourite.branchStatusViews"
                              ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
                             <span class="ot-home-branch-name ot-decoration-list"
                                   ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
@@ -107,7 +107,7 @@
     <!-- List of projects -->
     <div class="row" ng-if="projectsData.projects.length > 0">
         <div class="col-md-12">
-            <div class="row" ng-show="projectStatusViews.length">
+            <div class="row" ng-show="projectFavourites.length">
                 <div class="col-md-12">
                     <h4>
                         <span class="fa fa-book"></span>

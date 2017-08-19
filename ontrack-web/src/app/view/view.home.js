@@ -1,10 +1,10 @@
 angular.module('ot.view.home', [
-        'ui.router',
-        'ot.service.structure',
-        'ot.service.core',
-        'ot.service.user',
-        'ot.service.graphql'
-    ])
+    'ui.router',
+    'ot.service.structure',
+    'ot.service.core',
+    'ot.service.user',
+    'ot.service.graphql'
+])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
             url: '/home',
@@ -26,6 +26,7 @@ angular.module('ot.view.home', [
         $scope.projectFilter = {
             name: ''
         };
+
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
@@ -50,8 +51,32 @@ angular.module('ot.view.home', [
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
+                "  projectFavourites: projects(favourites: true) {\n" +
+                "    id\n" +
+                "    name\n" +
+                "    disabled\n" +
+                "    links {\n" +
+                "      _unfavourite\n" +
+                "    }\n" +
+                "    branches {\n" +
+                "      name\n" +
+                "      type\n" +
+                "      disabled\n" +
+                "    }\n" +
+                "  }\n" +
                 "}\n").then(function (data) {
+
                 $scope.projectsData = data;
+                $scope.projectFavourites = data.projectFavourites;
+
+                // All branches disabled status computation
+                $scope.projectFavourites.forEach(function (projectFavourite) {
+                    projectFavourite.allBranchesDisabled = projectFavourite.branches.length > 0 &&
+                        projectFavourite.branches.every(function (branch) {
+                            return branch.disabled || branch.type === 'TEMPLATE_DEFINITION';
+                        });
+                });
+
                 // Commands
                 $rootScope.view.commands = [
                     {
@@ -92,22 +117,10 @@ angular.module('ot.view.home', [
                         absoluteLink: "graphiql.html"
                     }
                 ];
-            });
-
-            // TODO GRAPHQL Detailed views
-            ot.pageCall($http.get('structure/projects/favourites')).then(function (projectStatusViewResources) {
-                $scope.projectStatusViewResources = projectStatusViewResources;
-                $scope.projectStatusViews = projectStatusViewResources.resources;
-                // All branches disabled status computation
-                $scope.projectStatusViews.forEach(function (projectStatusView) {
-                    projectStatusView.allBranchesDisabled = projectStatusView.branchStatusViews.length > 0 &&
-                        projectStatusView.branchStatusViews.every(function (branchStatusView) {
-                            return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
-                        });
-                });
             }).finally(function () {
                 $scope.loadingProjects = false;
             });
+
         }
 
         // Creating a project
