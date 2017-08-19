@@ -31,6 +31,7 @@
     "stream-series": "^0.1.1",
     "babel-core": "^6.26.0",
     "gulp-babel": "^7.0.0",
-    "gulp-sourcemaps": "^2.6.1"
+    "gulp-sourcemaps": "^2.6.1",
+    "babel-preset-env": "^1.6.0"
   }
 }
