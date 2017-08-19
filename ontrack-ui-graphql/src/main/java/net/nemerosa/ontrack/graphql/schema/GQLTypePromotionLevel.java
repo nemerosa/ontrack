@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema;
 
+import graphql.Scalars;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
@@ -42,6 +43,11 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
+                // Image flag
+                .field(f -> f.name("image")
+                        .description("Flag to indicate if an image is associated")
+                        .type(Scalars.GraphQLBoolean)
+                )
                 // Ref to branch
                 .field(
                         newFieldDefinition()
