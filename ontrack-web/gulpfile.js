@@ -13,6 +13,7 @@ var ngFilesort = require('gulp-angular-filesort');
 var debug = require('gulp-debug');
 var minimist = require('minimist');
 var del = require('del');
+var babel = require("gulp-babel");
 
 // Arguments
 
@@ -126,6 +127,7 @@ gulp.task('js:angular', ['lint', 'templates'], function () {
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
+        .pipe(babel())
         .pipe(concat('ci-angular.js'))
         .pipe(gulp.dest(buildAngular))
         .pipe(debug({title: 'js:angular:output'}));
