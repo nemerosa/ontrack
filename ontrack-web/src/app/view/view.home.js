@@ -37,32 +37,56 @@ angular.module('ot.view.home', [
                 "  projects {\n" +
                 "    id\n" +
                 "    name\n" +
-                "    disabled\n" +
                 "    links {\n" +
                 "      _favourite\n" +
                 "      _unfavourite\n" +
                 "    }\n" +
                 "    decorations {\n" +
-                "      decorationType\n" +
-                "      error\n" +
-                "      data\n" +
-                "      feature {\n" +
-                "        id\n" +
-                "      }\n" +
+                "      ...decorationContent\n" +
                 "    }\n" +
                 "  }\n" +
                 "  projectFavourites: projects(favourites: true) {\n" +
                 "    id\n" +
                 "    name\n" +
                 "    disabled\n" +
+                "    decorations {\n" +
+                "      ...decorationContent\n" +
+                "    }\n" +
                 "    links {\n" +
                 "      _unfavourite\n" +
                 "    }\n" +
                 "    branches {\n" +
+                "      id\n" +
                 "      name\n" +
                 "      type\n" +
                 "      disabled\n" +
+                "      decorations {\n" +
+                "        ...decorationContent\n" +
+                "      }\n" +
+                "      latestPromotions: builds(lastPromotions: true) {\n" +
+                "        id\n" +
+                "        name\n" +
+                "        promotionRuns {\n" +
+                "          promotionLevel {\n" +
+                "            id\n" +
+                "            name\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "      latestBuild: builds(count: 1) {\n" +
+                "        id\n" +
+                "        name\n" +
+                "      }\n" +
                 "    }\n" +
+                "  }\n" +
+                "}\n" +
+                "\n" +
+                "fragment decorationContent on Decoration {\n" +
+                "  decorationType\n" +
+                "  error\n" +
+                "  data\n" +
+                "  feature {\n" +
+                "    id\n" +
                 "  }\n" +
                 "}\n").then(function (data) {
 

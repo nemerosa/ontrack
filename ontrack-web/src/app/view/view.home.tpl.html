@@ -52,34 +52,34 @@
                         <ot-entity-embedded-decorations decorations="projectFavourite.decorations"></ot-entity-embedded-decorations>
                     </td>
                     <td>
-                        <div class="ot-home-branch" ng-if="projectFavourite.branchStatusViews.length == 0">
+                        <div class="ot-home-branch" ng-if="projectFavourite.branches.length == 0">
                             <span class="ot-description">
                                 <span class="fa fa-ban" title="No branch on this project"></span>
                                 No branch
                             </span>
                         </div>
                         <div class="ot-home-branch"
-                             ng-repeat="branchStatusView in projectFavourite.branchStatusViews"
-                             ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
+                             ng-repeat="branch in projectFavourite.branches"
+                             ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
                             <span class="ot-home-branch-name ot-decoration-list"
-                                  ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
-                                <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
-                                <ot-entity-embedded-decorations decorations="branchStatusView.decorations"></ot-entity-embedded-decorations>
+                                  ng-class="{'ot-entity-disabled': branch.disabled}">
+                                <a href="#/branch/{{branch.id}}">{{branch.name}}</a>
+                                <ot-entity-embedded-decorations decorations="branch.decorations"></ot-entity-embedded-decorations>
                             </span>
-                            <span ng-if="branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
-                                <a href="#/promotionLevel/{{branchStatusView.lastPromotionView.promotionLevel.id}}">
-                                    <ot-entity-image entity="branchStatusView.lastPromotionView.promotionLevel"></ot-entity-image>
-                                    {{branchStatusView.lastPromotionView.promotionLevel.name}}
+                            <span ng-if="branch.latestPromotions.length > 0" class="ot-home-branch-promotion">
+                                <a href="#/promotionLevel/{{branch.latestPromotions[0].promotionRuns[0].promotionLevel.id}}">
+                                    <ot-entity-image entity="branch.latestPromotions[0].promotionRuns[0].promotionLevel"></ot-entity-image>
+                                    {{branch.latestPromotions[0].promotionRuns[0].promotionLevel.name}}
                                 </a>
                                 <span class="fa fa-arrow-right"></span>
-                                <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
+                                <a href="#/build/{{branch.latestPromotions[0].id}}">{{branch.latestPromotions[0].name}}</a>
                             </span>
-                            <span ng-if="!branchStatusView.lastPromotionView && branchStatusView.latestBuild" class="ot-home-branch-promotion">
+                            <span ng-if="branch.latestPromotions.length == 0 && branch.latestBuild.length > 0" class="ot-home-branch-promotion">
                                 <span class="ot-description">Latest</span>
                                 <span class="fa fa-arrow-right"></span>
-                                <a href="#/build/{{branchStatusView.latestBuild.id}}">{{branchStatusView.latestBuild.name}}</a>
+                                <a href="#/build/{{branch.latestBuild[0].id}}">{{branch.latestBuild[0].name}}</a>
                             </span>
-                            <span ng-if="!branchStatusView.lastPromotionView && !branchStatusView.latestBuild" class="ot-home-branch-promotion">
+                            <span ng-if="branch.latestPromotions.length == 0 && branch.latestBuild.length == 0" class="ot-home-branch-promotion">
                                 <span class="fa fa-ban"></span>
                                 <span class="ot-description">
                                     No build yet
