@@ -70,6 +70,8 @@ angular.module('ot.view.home', [
                 "          promotionLevel {\n" +
                 "            id\n" +
                 "            name\n" +
+                "            image\n" +
+                "            _image\n" +
                 "          }\n" +
                 "        }\n" +
                 "      }\n" +
