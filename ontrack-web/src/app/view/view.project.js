@@ -40,6 +40,7 @@ angular.module('ot.view.project', [
                 "      _clone\n" +
                 "      _enable\n" +
                 "      _disable\n" +
+                "      _properties\n" +
                 "    }\n" +
                 "    branches {\n" +
                 "      id\n" +
