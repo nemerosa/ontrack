@@ -72,19 +72,19 @@
                                     </span>
                                 </div>
                                 <div class="ot-project-branch-promotion"
-                                     ng-repeat="promotionView in branchStatusView.promotions">
-                                    <span ng-if="promotionView.promotionRun">
-                                        <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                     ng-repeat="promotionLevel in branch.promotionLevels">
+                                    <span ng-if="promotionLevel.promotionRuns.edges.length > 0">
+                                        <a href="#/promotionLevel/{{promotionLevel.id}}">
                                             <ot-entity-image
-                                                    entity="promotionView.promotionLevel"></ot-entity-image>
-                                            {{promotionView.promotionLevel.name}}
+                                                    entity="promotionLevel"></ot-entity-image>
+                                            {{promotionLevel.name}}
                                         </a>
                                         <span class="ot-project-branch-promotion-build">
                                             <span class="fa fa-arrow-right"></span>
-                                            <a href="#/build/{{promotionView.promotionRun.build.id}}">{{promotionView.promotionRun.build.name}}</a>
+                                            <a href="#/build/{{promotionLevel.promotionRuns.edges[0].node.build.id}}">{{promotionLevel.promotionRuns.edges[0].node.build.name}}</a>
                                         </span>
                                     </span>
-                                    <span ng-if="!promotionView.promotionRun">
+                                    <span ng-if="promotionLevel.promotionRuns.edges.length == 0">
                                         <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
                                             <ot-entity-image
                                                     entity="promotionView.promotionLevel"></ot-entity-image>

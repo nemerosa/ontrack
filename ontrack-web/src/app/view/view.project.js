@@ -56,6 +56,22 @@ angular.module('ot.view.project', [
                 "        id\n" +
                 "        name\n" +
                 "      }\n" +
+                "      promotionLevels {\n" +
+                "        id\n" +
+                "        name\n" +
+                "        image\n" +
+                "        _image\n" +
+                "        promotionRuns(last: 1) {\n" +
+                "          edges {\n" +
+                "            node {\n" +
+                "              build {\n" +
+                "                id\n" +
+                "                name\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
                 "    }\n" +
                 "  }\n" +
                 "}\n" +
