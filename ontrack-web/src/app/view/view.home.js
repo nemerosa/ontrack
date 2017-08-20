@@ -30,67 +30,68 @@ angular.module('ot.view.home', [
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
-            otGraphqlService.pageGraphQLCall("{\n" +
-                "  userRootActions {\n" +
-                "    projectCreate\n" +
-                "  }\n" +
-                "  projects {\n" +
-                "    id\n" +
-                "    name\n" +
-                "    links {\n" +
-                "      _favourite\n" +
-                "      _unfavourite\n" +
-                "    }\n" +
-                "    decorations {\n" +
-                "      ...decorationContent\n" +
-                "    }\n" +
-                "  }\n" +
-                "  projectFavourites: projects(favourites: true) {\n" +
-                "    id\n" +
-                "    name\n" +
-                "    disabled\n" +
-                "    decorations {\n" +
-                "      ...decorationContent\n" +
-                "    }\n" +
-                "    links {\n" +
-                "      _unfavourite\n" +
-                "    }\n" +
-                "    branches {\n" +
-                "      id\n" +
-                "      name\n" +
-                "      type\n" +
-                "      disabled\n" +
-                "      decorations {\n" +
-                "        ...decorationContent\n" +
-                "      }\n" +
-                "      latestPromotions: builds(lastPromotions: true) {\n" +
-                "        id\n" +
-                "        name\n" +
-                "        promotionRuns {\n" +
-                "          promotionLevel {\n" +
-                "            id\n" +
-                "            name\n" +
-                "            image\n" +
-                "            _image\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "      latestBuild: builds(count: 1) {\n" +
-                "        id\n" +
-                "        name\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}\n" +
-                "\n" +
-                "fragment decorationContent on Decoration {\n" +
-                "  decorationType\n" +
-                "  error\n" +
-                "  data\n" +
-                "  feature {\n" +
-                "    id\n" +
-                "  }\n" +
-                "}\n").then(function (data) {
+            otGraphqlService.pageGraphQLCall(`{
+              userRootActions {
+                projectCreate
+              }
+              projects {
+                id
+                name
+                links {
+                  _favourite
+                  _unfavourite
+                }
+                decorations {
+                  ...decorationContent
+                }
+              }
+              projectFavourites: projects(favourites: true) {
+                id
+                name
+                disabled
+                decorations {
+                  ...decorationContent
+                }
+                links {
+                  _unfavourite
+                }
+                branches {
+                  id
+                  name
+                  type
+                  disabled
+                  decorations {
+                    ...decorationContent
+                  }
+                  latestPromotions: builds(lastPromotions: true, count: 1) {
+                    id
+                    name
+                    promotionRuns {
+                      promotionLevel {
+                        id
+                        name
+                        image
+                        _image
+                      }
+                    }
+                  }
+                  latestBuild: builds(count: 1) {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+            
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }
+`).then(function (data) {
 
                 $scope.projectsData = data;
                 $scope.projectFavourites = data.projectFavourites;
