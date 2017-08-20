@@ -44,6 +44,7 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
         log.info("[dev] Compiled dev web resources from: " + dev);
         registry.addResourceHandler("/css/**").addResourceLocations(dev + "/css/");
         registry.addResourceHandler("/templates/**").addResourceLocations(dev + "/templates/");
+        registry.addResourceHandler("/converted/**").addResourceLocations(dev + "/converted/");
         registry.addResourceHandler("index.html").addResourceLocations(dev + "/");
         registry.addResourceHandler("graphiql.html").addResourceLocations(dev + "/");
 

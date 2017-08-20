@@ -137,7 +137,7 @@ gulp.task('js:conversion', ['lint'], function () {
  * Sorted and annotated Angular files
  */
 gulp.task('js:angular', ['lint', 'js:conversion', 'templates'], function () {
-    return gulp.src([buildTemplates + '/*.js', buildConvertedJs])
+    return gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js'])
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
@@ -219,11 +219,11 @@ gulp.task('extensionAssets', function () {
 
 // Injection in index.html
 
-gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
+gulp.task('index:dev', ['less', 'fonts', 'js:conversion', 'templates'], function () {
     var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
     var vendorJsSources = gulp.src(vendorJsResources, {read: false});
     var vendorCssSources = gulp.src(vendorCssResources, {read: false});
-    var appSources = gulp.src([buildTemplates + '/*.js', buildConvertedJs]).pipe(ngFilesort());
+    var appSources = gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js']).pipe(ngFilesort());
 
     return gulp.src(indexResource)
         .pipe(debug({title: 'index:dev:input'}))
