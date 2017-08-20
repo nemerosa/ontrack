@@ -16,43 +16,42 @@
     <div class="row" ng-hide="loadingBranches">
         <div class="col-md-12">
             <ot-section-title>Branches</ot-section-title>
-            <ot-noentry list="branchStatusViews">
+            <div class="ot-noentry" ng-if="project.branches.length == 0">
                 No branch has been created yet.
-            </ot-noentry>
-            <div class="row" ng-if="branchStatusViews">
+            </div>
+            <div class="row" ng-if="project.branches.length > 0">
                 <div class="col-md-12">
                     <div class="ot-project-branch-filter input-group col-md-4"
-                         ng-show="branchStatusViews.length > 5">
+                         ng-show="project.branches.length > 5">
                         <input class="form-control"
-                               type="text"
                                ng-model="branchNameFilter"
                                placeholder="Filter on branch names"/>
                         <span class="input-group-addon"><span class="fa fa-search"></span></span>
                     </div>
                     <table class="ot-project-branches">
                         <tbody>
-                        <tr ng-repeat="branchStatusView in branchStatusViews | filter:{branch: {name: branchNameFilter}}"
-                            ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
+                        <tr ng-repeat="branch in project.branches | filter:{name: branchNameFilter}"
+                            ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
                             <td class="ot-project-branch-name ot-decoration-list"
-                                ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
-                                <a href="#/branch/{{branchStatusView.branch.id}}">
-                                    {{branchStatusView.branch.name}}
+                                ng-class="{'ot-entity-disabled': branch.disabled}">
+                                <a href="#/branch/{{branch.id}}">
+                                    {{branch.name}}
                                 </a>
-                                <ot-entity-embedded-decorations decorations="branchStatusView.decorations"></ot-entity-embedded-decorations>
+                                <ot-entity-embedded-decorations decorations="branch.decorations"></ot-entity-embedded-decorations>
                                 <span
-                                        ng-show="showDisabled && branchStatusView.branch._enable"
-                                        title="Enable the {{branchStatusView.branch.name}} branch"
-                                        ng-click="enableBranch(branchStatusView.branch)"
+                                        ng-show="showDisabled && branch._enable"
+                                        title="Enable the {{branch.name}} branch"
+                                        ng-click="enableBranch(branch)"
                                         class="ot-command ot-command-enable"></span>
                                 <span
-                                        ng-show="showDisabled && branchStatusView.branch._disable"
-                                        title="Disable the {{branchStatusView.branch.name}} branch"
-                                        ng-click="disableBranch(branchStatusView.branch)"
+                                        ng-show="showDisabled && branch._disable"
+                                        title="Disable the {{branch.name}} branch"
+                                        ng-click="disableBranch(branch)"
                                         class="ot-command ot-command-disable"></span>
                                 <span
-                                        ng-show="showDisabled && branchStatusView.branch._delete"
-                                        title="Delete the {{branchStatusView.branch.name}} branch"
-                                        ng-click="deleteBranch(branchStatusView.branch)"
+                                        ng-show="showDisabled && branch._delete"
+                                        title="Delete the {{branch.name}} branch"
+                                        ng-click="deleteBranch(branch)"
                                         class="ot-command ot-command-delete"></span>
                             </td>
                             <td>
