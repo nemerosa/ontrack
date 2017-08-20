@@ -46,7 +46,7 @@ public final class GraphqlUtils {
         return newFieldDefinition()
                 .name(NAME)
                 .description(description)
-                .type(new GraphQLNonNull(GraphQLString))
+                .type(GraphQLString)
                 .build();
     }
 
