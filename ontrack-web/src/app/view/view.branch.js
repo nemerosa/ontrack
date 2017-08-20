@@ -8,7 +8,8 @@ angular.module('ot.view.branch', [
     'ot.service.copy',
     'ot.service.template',
     'ot.dialog.validationStampRunView',
-    'ot.dialog.promotionRuns'
+    'ot.dialog.promotionRuns',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('branch', {
@@ -19,7 +20,7 @@ angular.module('ot.view.branch', [
     })
     .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location,
                                         ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService,
-                                        otBuildFilterService) {
+                                        otBuildFilterService, otGraphqlService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
