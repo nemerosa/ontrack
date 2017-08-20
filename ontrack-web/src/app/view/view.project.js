@@ -41,6 +41,7 @@ angular.module('ot.view.project', [
                 "      _enable\n" +
                 "      _disable\n" +
                 "      _properties\n" +
+                "      _extra\n" +
                 "    }\n" +
                 "    branches {\n" +
                 "      id\n" +
