@@ -222,21 +222,27 @@ angular.module('ot.view.project', [
 
         // Enabling a branch
         $scope.enableBranch = function (branch) {
-            if (branch._enable) {
-                ot.pageCall($http.put(branch._enable)).then(loadProject);
+            if (branch.links._enable) {
+                ot.pageCall($http.put(branch.links._enable)).then(loadProject);
             }
         };
 
         // Disabling a branch
         $scope.disableBranch = function (branch) {
-            if (branch._disable) {
-                ot.pageCall($http.put(branch._disable)).then(loadProject);
+            if (branch.links._disable) {
+                ot.pageCall($http.put(branch.links._disable)).then(loadProject);
             }
         };
 
         // Deleting a branch
         $scope.deleteBranch = function (branch) {
-            otStructureService.deleteBranch(branch).then(loadProject);
+            return otAlertService.confirm({
+                title: "Deleting a branch",
+                message: "Do you really want to delete the branch " + branch.name +
+                " and all its associated data?"
+            }).then(function () {
+                return ot.call($http.delete(branch.links._delete));
+            }).then(loadProject);
         };
     })
 ;

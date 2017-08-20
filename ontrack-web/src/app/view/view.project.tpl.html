@@ -49,17 +49,17 @@
                                 </a>
                                 <ot-entity-embedded-decorations decorations="branch.decorations"></ot-entity-embedded-decorations>
                                 <span
-                                        ng-show="showDisabled && branch._enable"
+                                        ng-show="showDisabled && branch.links._enable"
                                         title="Enable the {{branch.name}} branch"
                                         ng-click="enableBranch(branch)"
                                         class="ot-command ot-command-enable"></span>
                                 <span
-                                        ng-show="showDisabled && branch._disable"
+                                        ng-show="showDisabled && branch.links._disable"
                                         title="Disable the {{branch.name}} branch"
                                         ng-click="disableBranch(branch)"
                                         class="ot-command ot-command-disable"></span>
                                 <span
-                                        ng-show="showDisabled && branch._delete"
+                                        ng-show="showDisabled && branch.links._delete"
                                         title="Delete the {{branch.name}} branch"
                                         ng-click="deleteBranch(branch)"
                                         class="ot-command ot-command-delete"></span>
