@@ -43,6 +43,7 @@ angular.module('ot.view.project', [
                 "      _properties\n" +
                 "      _extra\n" +
                 "      _events\n" +
+                "      _actions\n" +
                 "    }\n" +
                 "    branches {\n" +
                 "      id\n" +
@@ -208,7 +209,7 @@ angular.module('ot.view.project', [
                         }
                     },
                     ot.viewApiCommand($scope.project.links._self),
-                    // FIXME ot.viewActionsCommand($scope.project._actions),
+                    ot.viewActionsCommand($scope.project.links._actions),
                     ot.viewCloseCommand('/home')
                 ];
             }).finally(function () {
