@@ -85,11 +85,6 @@ angular.module('ot.view.project', [
                 "  }\n" +
                 "}\n", {projectId: projectId}).then(function (data) {
                 $scope.project = data.projects[0];
-                // View settings
-                view.title = $scope.project.name;
-                view.description = $scope.project.description;
-                view.decorationsEntity = $scope.project;
-                view.api = $scope.project._self;
                 // View commands
                 view.commands = [
                     {

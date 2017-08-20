@@ -1,17 +1,27 @@
 <ot-view>
 
-    <ot-entity-disabled entity="project" callback="reloadProject()">
-        The project is disabled.
-    </ot-entity-disabled>
-
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-info" ng-show="loadingBranches">
                 <span class="ot-loading-indicator"></span>
-                Loading the project branches...
+                Loading the project...
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12 ot-view-title">
+            {{project.name}}
+            <ot-entity-embedded-decorations decorations="project.decorations"></ot-entity-embedded-decorations>
+            <div ng-if="project.description" class="ot-description">
+                {{project.description}}
+            </div>
+        </div>
+    </div>
+
+    <ot-entity-disabled entity="project" callback="reloadProject()">
+        The project is disabled.
+    </ot-entity-disabled>
 
     <div class="row" ng-hide="loadingBranches">
         <div class="col-md-12">
