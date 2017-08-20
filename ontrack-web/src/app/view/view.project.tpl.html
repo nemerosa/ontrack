@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="ot-project-branch-promotion"
                                      ng-repeat="promotionLevel in branch.promotionLevels">
-                                    <span ng-if="promotionLevel.promotionRuns.edges.length > 0">
+                                    <span ng-if="promotionLevel.promotionRuns.length > 0">
                                         <a href="#/promotionLevel/{{promotionLevel.id}}">
                                             <ot-entity-image
                                                     entity="promotionLevel"></ot-entity-image>
@@ -81,14 +81,14 @@
                                         </a>
                                         <span class="ot-project-branch-promotion-build">
                                             <span class="fa fa-arrow-right"></span>
-                                            <a href="#/build/{{promotionLevel.promotionRuns.edges[0].node.build.id}}">{{promotionLevel.promotionRuns.edges[0].node.build.name}}</a>
+                                            <a href="#/build/{{promotionLevel.promotionRuns[0].build.id}}">{{promotionLevel.promotionRuns[0].build.name}}</a>
                                         </span>
                                     </span>
-                                    <span ng-if="promotionLevel.promotionRuns.edges.length == 0">
-                                        <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                    <span ng-if="promotionLevel.promotionRuns.length == 0">
+                                        <a href="#/promotionLevel/{{promotionLevel.id}}">
                                             <ot-entity-image
-                                                    entity="promotionView.promotionLevel"></ot-entity-image>
-                                            {{promotionView.promotionLevel.name}}
+                                                    entity="promotionLevel"></ot-entity-image>
+                                            {{promotionLevel.name}}
                                         </a>
                                         <span class="fa fa-arrow-right"></span>
                                         <span class="fa fa-ban"></span>
