@@ -41,8 +41,8 @@ angular.module('ot.view.project', [
                 "    branches {\n" +
                 "      id\n" +
                 "      name\n" +
-                "      type\n" +
                 "      disabled\n" +
+                "      type\n" +
                 "      decorations {\n" +
                 "        ...decorationContent\n" +
                 "      }\n" +
@@ -51,6 +51,10 @@ angular.module('ot.view.project', [
                 "        _enable\n" +
                 "        _disable\n" +
                 "        _delete\n" +
+                "      }\n" +
+                "      latestBuild: builds(count: 1) {\n" +
+                "        id\n" +
+                "        name\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
