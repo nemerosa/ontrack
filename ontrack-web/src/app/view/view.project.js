@@ -22,8 +22,8 @@ angular.module('ot.view.project', [
         // Loading the branches
         function loadBranches() {
             $scope.loadingBranches = true;
-            otGraphqlService.pageGraphQLCall("{\n" +
-                "  projects(id: 1) {\n" +
+            otGraphqlService.pageGraphQLCall("query ProjectView($projectId: Int) {\n" +
+                "  projects(id: $projectId) {\n" +
                 "    id\n" +
                 "    name\n" +
                 "    disabled\n" +
@@ -81,7 +81,7 @@ angular.module('ot.view.project', [
                 "  feature {\n" +
                 "    id\n" +
                 "  }\n" +
-                "}\n").then(function (data) {
+                "}\n", {projectId: projectId}).then(function (data) {
                 $scope.project = data.projects[0];
                 // View commands
                 view.commands = [
