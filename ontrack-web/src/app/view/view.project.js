@@ -19,13 +19,14 @@ angular.module('ot.view.project', [
         // Initial name filter
         $scope.branchNameFilter = '';
 
-        // Loading the branches
-        function loadBranches() {
+        // Loading the project and its whole information
+        function loadProject() {
             $scope.loadingBranches = true;
             otGraphqlService.pageGraphQLCall("query ProjectView($projectId: Int) {\n" +
                 "  projects(id: $projectId) {\n" +
                 "    id\n" +
                 "    name\n" +
+                "    description\n" +
                 "    disabled\n" +
                 "    decorations {\n" +
                 "      ...decorationContent\n" +
@@ -83,6 +84,11 @@ angular.module('ot.view.project', [
                 "  }\n" +
                 "}\n", {projectId: projectId}).then(function (data) {
                 $scope.project = data.projects[0];
+                // View settings
+                view.title = $scope.project.name;
+                view.description = $scope.project.description;
+                view.decorationsEntity = $scope.project;
+                view.api = $scope.project._self;
                 // View commands
                 view.commands = [
                     {
@@ -93,7 +99,7 @@ angular.module('ot.view.project', [
                         name: "Create branch",
                         cls: 'ot-command-branch-new',
                         action: function () {
-                            otStructureService.create($scope.project.links._createBranch, "New branch").then(loadBranches);
+                            otStructureService.create($scope.project.links._createBranch, "New branch").then(loadProject);
                         }
                     },
                     {
@@ -209,20 +215,6 @@ angular.module('ot.view.project', [
                 ];
             }).finally(function () {
                 $scope.loadingBranches = false;
-            });
-        }
-
-        // Loading the project
-        function loadProject() {
-            otStructureService.getProject(projectId).then(function (projectResource) {
-                $scope.project = projectResource;
-                // View settings
-                view.title = projectResource.name;
-                view.description = projectResource.description;
-                view.decorationsEntity = projectResource;
-                view.api = projectResource._self;
-                // Loads the branches
-                loadBranches();
             });
         }
 
