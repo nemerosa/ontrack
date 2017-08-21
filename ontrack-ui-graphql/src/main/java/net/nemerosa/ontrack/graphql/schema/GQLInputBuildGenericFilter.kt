@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
-import graphql.schema.GraphQLNonNull
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -22,12 +22,12 @@ constructor(private val buildFilterService: BuildFilterService) : GQLInputType<B
         return GraphQLInputObjectType.newInputObject()
                 .name("GenericBuildFilter")
                 .field {
-                    it.name("type")
-                            .description("FQCN of the filter type")
-                            .type(GraphQLNonNull(Scalars.GraphQLString))
+                    it.name(FIELD_TYPE)
+                            .description("FQCN of the filter type, null if no filter is to be applied")
+                            .type(Scalars.GraphQLString)
                 }
                 .field {
-                    it.name("data")
+                    it.name(FIELD_DATA)
                             .description("Filter data as JSON")
                             .type(Scalars.GraphQLString)
                 }
@@ -38,15 +38,26 @@ constructor(private val buildFilterService: BuildFilterService) : GQLInputType<B
         if (argument == null) {
             return buildFilterService.standardFilterProviderData(10).build()
         } else if (argument is Map<*, *>) {
-            val type = argument["type"] as String
-            val data = argument["data"] as String?
+            val type = argument[FIELD_TYPE] as String?
+            val data = argument[FIELD_DATA] as String?
             // Parses the data
-            val dataNode = if (data != null) JsonUtils.parseAsNode(data) else null
+            val dataNode = if (data != null && StringUtils.isNotBlank(data)) JsonUtils.parseAsNode(data) else null
+            // If no type is defined, use the default filter
+            if (type == null) {
+                return buildFilterService.standardFilterProviderData(10).build()
+            }
             // Gets the build filter
-            return buildFilterService.getBuildFilterProviderData<Any>(type, dataNode)
+            else {
+                return buildFilterService.getBuildFilterProviderData<Any>(type, dataNode)
+            }
         } else {
             throw IllegalStateException("Unexpected generic filter format")
         }
+    }
+
+    companion object {
+        val FIELD_TYPE = "type"
+        val FIELD_DATA = "data"
     }
 
 }
