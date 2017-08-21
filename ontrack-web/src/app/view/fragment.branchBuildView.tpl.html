@@ -183,20 +183,20 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="buildView in branchBuildView.buildViews"
-        ng-click="onBuildRowSelected($event, buildView)"
+    <tr ng-repeat="build in builds"
+        ng-click="onBuildRowSelected($event, build)"
         class="ot-disable-select"
     >
         <td>
-            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.from == buildView.build.id" class="fa fa-chevron-down"></span>
-            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.to == buildView.build.id" class="fa fa-chevron-up"></span>
-            <span ng-if="selectedBuild.from == selectedBuild.to && selectedBuild.to == buildView.build.id" class="fa fa-chevron-right"></span>
-            <span ng-if="selectedBuild.to != buildView.build.id && selectedBuild.from != buildView.build.id">&nbsp;</span>
+            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.from == build.id" class="fa fa-chevron-down"></span>
+            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.to == build.id" class="fa fa-chevron-up"></span>
+            <span ng-if="selectedBuild.from == selectedBuild.to && selectedBuild.to == build.id" class="fa fa-chevron-right"></span>
+            <span ng-if="selectedBuild.to != build.id && selectedBuild.from != build.id">&nbsp;</span>
         </td>
         <td>
             <!-- Build name and link -->
-            <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">
-                {{buildView.build.name}}
+            <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
+                {{build.name}}
             </a>
             <!-- Build decorations -->
             <span class="ot-decoration-list">

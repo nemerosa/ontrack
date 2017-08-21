@@ -21,13 +21,13 @@
         The branch is disabled.
     </ot-entity-disabled>
 
-    <div class="row" ng-if="branch.type != 'TEMPLATE_DEFINITION'" ng-show="branchBuildView.buildViews">
+    <div class="row" ng-if="branch.type != 'TEMPLATE_DEFINITION'" ng-show="builds.length > 0">
         <div class="col-md-12">
             <ng-include src="'app/view/fragment.branchBuildView.tpl.html'"></ng-include>
         </div>
     </div>
 
-    <div class="row" ng-show="branch.type != 'TEMPLATE_DEFINITION' && branchBuildView && branchBuildView.buildViews.length == 0">
+    <div class="row" ng-show="branch.type != 'TEMPLATE_DEFINITION' && builds && builds.length == 0">
         <div class="col-md-12">
             <div class="alert alert-warning">
                 No build has been created for this branch or the filter is too restrictive.
@@ -38,11 +38,11 @@
         </div>
     </div>
 
-    <div class="row" ng-show="(!branch || branch.type != 'TEMPLATE_DEFINITION') && !branchBuildView && loadingBuildView">
+    <div class="row" ng-show="(!branch || branch.type != 'TEMPLATE_DEFINITION') && loadingBuildView">
         <div class="col-md-12">
             <div class="alert alert-warning">
                 <span class="fa fa-spinner fa-spin"></span>
-                Loading the branch view...
+                Loading the builds...
             </div>
         </div>
     </div>
