@@ -210,12 +210,12 @@
         </td>
         <!-- Promotion runs -->
         <td>
-            <span ng-repeat="promotionRun in buildView.promotionRuns">
+            <span ng-repeat="promotionRun in build.promotionRuns">
                 <span class="ot-promotion-run">
                     <span class="ot-action"
-                          ng-click="displayPromotionRuns(buildView, promotionRun)">
+                          ng-click="displayPromotionRuns(build, promotionRun)">
                         <ot-entity-image
-                                title="{{promotionRun.promotionLevel.name}} - {{promotionRun.signature.time | date:'shortDate'}}"
+                                title="{{promotionRun.promotionLevel.name}} - {{promotionRun.creation.time | date:'shortDate'}}"
                                 entity="promotionRun.promotionLevel"></ot-entity-image>
                     </span>
                 </span>

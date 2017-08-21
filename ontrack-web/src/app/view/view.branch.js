@@ -138,8 +138,21 @@ angular.module('ot.view.branch', [
                 "        }\n" +
                 "      }\n" +
                 "      creation {\n" +
-                "        user\n" +
                 "        time\n" +
+                "      }\n" +
+                "      promotionRuns {\n" +
+                "        creation {\n" +
+                "          time\n" +
+                "        }\n" +
+                "        promotionLevel {\n" +
+                "          id\n" +
+                "          name\n" +
+                "          image\n" +
+                "          _image\n" +
+                "        }\n" +
+                "        links {\n" +
+                "          _all\n" +
+                "        }\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
@@ -485,16 +498,16 @@ angular.module('ot.view.branch', [
         /**
          * Displaying the promotion runs
          */
-        $scope.displayPromotionRuns = function (buildView, promotionRun) {
+        $scope.displayPromotionRuns = function (build, promotionRun) {
             $modal.open({
                 templateUrl: 'app/dialog/dialog.promotionRuns.tpl.html',
                 controller: 'otDialogPromotionRuns',
                 resolve: {
                     config: function () {
                         return {
-                            build: buildView.build,
+                            build: build,
                             promotionLevel: promotionRun.promotionLevel,
-                            uri: promotionRun._all
+                            uri: promotionRun.links._all
                         };
                     }
                 }
