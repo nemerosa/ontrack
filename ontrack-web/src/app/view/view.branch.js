@@ -129,6 +129,14 @@ angular.module('ot.view.branch', [
                 "    builds(generic: {type: $filterType, data: $filterData}) {\n" +
                 "      id\n" +
                 "      name\n" +
+                "      decorations {\n" +
+                "        decorationType\n" +
+                "        error\n" +
+                "        data\n" +
+                "        feature {\n" +
+                "          id\n" +
+                "        }\n" +
+                "      }\n" +
                 "    }\n" +
                 "  }\n" +
                 "}\n",
