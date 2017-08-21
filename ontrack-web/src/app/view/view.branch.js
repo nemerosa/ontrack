@@ -116,6 +116,25 @@ angular.module('ot.view.branch', [
             }
             // Call
             $scope.loadingBuildView = true;
+            otGraphqlService.pageGraphQLCall("query BranchView($branchId: Int!, $filterType: String, $filterData: String) {\n" +
+                "  branches(id: $branchId) {\n" +
+                "    id\n" +
+                "    name\n" +
+                "    builds(generic: {type: $filterType, data: $filterData}) {\n" +
+                "      id\n" +
+                "      name\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n",
+                {
+                    branchId: $scope.branch.id,
+                    filterType: currentBuildFilterResource.type,
+                    filterData: JSON.stringify(currentBuildFilterResource.data)
+                }).then(function (data) {
+
+            }).finally(function () {
+                $scope.loadingBuildView = false;
+            });
             ot.call($http.get(uri, config)).then(
                 function success(branchBuildView) {
                     $scope.loadingBuildView = false;
