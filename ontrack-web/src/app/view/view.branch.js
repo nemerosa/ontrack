@@ -137,6 +137,10 @@ angular.module('ot.view.branch', [
                 "          id\n" +
                 "        }\n" +
                 "      }\n" +
+                "      creation {\n" +
+                "        user\n" +
+                "        time\n" +
+                "      }\n" +
                 "    }\n" +
                 "  }\n" +
                 "}\n",
