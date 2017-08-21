@@ -105,9 +105,15 @@ angular.module('ot.view.branch', [
             // Parameters for the call
             var uri = $scope.branch._view;
             var config = {};
+            var filterType = null;
+            var filterData = null;
             // Adds the filter parameters
             var currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
             if (currentBuildFilterResource) {
+                filterType = currentBuildFilterResource.type;
+                if (currentBuildFilterResource.data) {
+                    filterData = JSON.stringify(currentBuildFilterResource.data);
+                }
                 $scope.currentBuildFilterResource = currentBuildFilterResource;
                 config.params = currentBuildFilterResource.data;
                 uri += '/' + currentBuildFilterResource.type;
@@ -128,27 +134,19 @@ angular.module('ot.view.branch', [
                 "}\n",
                 {
                     branchId: $scope.branch.id,
-                    filterType: currentBuildFilterResource.type,
-                    filterData: JSON.stringify(currentBuildFilterResource.data)
-                }).then(function (data) {
-
+                    filterType: filterType,
+                    filterData: filterData
+                }
+            ).then(function (data) {
+                $scope.builds = data.branches[0].builds;
+                // Selection of build boundaries
+                if ($scope.builds.length > 0) {
+                    $scope.selectedBuild.from = $scope.builds[0].id;
+                    $scope.selectedBuild.to = $scope.builds[$scope.builds.length - 1].id;
+                }
             }).finally(function () {
                 $scope.loadingBuildView = false;
             });
-            ot.call($http.get(uri, config)).then(
-                function success(branchBuildView) {
-                    $scope.loadingBuildView = false;
-                    $scope.branchBuildView = branchBuildView;
-                    // Selection of build boundaries
-                    var buildViews = branchBuildView.buildViews;
-                    if (buildViews && buildViews.length > 0) {
-                        $scope.selectedBuild.from = buildViews[0].build.id;
-                        $scope.selectedBuild.to = buildViews[buildViews.length - 1].build.id;
-                    }
-                }, function error() {
-                    $scope.loadingBuildView = false;
-                }
-            );
         }
 
         // Loading the promotion levels
