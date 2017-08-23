@@ -154,6 +154,23 @@ angular.module('ot.view.branch', [
                 "          _all\n" +
                 "        }\n" +
                 "      }\n" +
+                "      validations {\n" +
+                "        validationStamp {\n" +
+                "          id\n" +
+                "          name\n" +
+                "        }\n" +
+                "        validationRuns(count: 1) {\n" +
+                "          validationRunStatuses {\n" +
+                "            statusID {\n" +
+                "              id\n" +
+                "              name\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "      links {\n" +
+                "        _validate\n" +
+                "      }\n" +
                 "    }\n" +
                 "  }\n" +
                 "}\n",
@@ -483,13 +500,13 @@ angular.module('ot.view.branch', [
         /**
          * Creating a validation run
          */
-        $scope.createValidationRun = function (buildView, validationStampRunView) {
+        $scope.createValidationRun = function (build, validationStamp) {
             otStructureService.create(
-                buildView.build._validate,
+                build.links._validate,
                 'Validation for the build',
                 {
                     postForm: function (form) {
-                        return otFormService.updateFieldValue(form, 'validationStampId', validationStampRunView.validationStamp.id);
+                        return otFormService.updateFieldValue(form, 'validationStampId', validationStamp.id);
                     }
                 }
             ).then(loadBuildView);
@@ -701,8 +718,8 @@ angular.module('ot.view.branch', [
             return !$scope.validationStampFilter || $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0;
         };
 
-        $scope.validationStampRunViewFilter = function (validationStampRunView) {
-            return $scope.validationStampFilterFn({validationStamp: validationStampRunView.validationStamp});
+        $scope.validationStampRunViewFilter = function (validation) {
+            return $scope.validationStampFilterFn({validationStamp: validation.validationStamp});
         };
 
         $scope.validationStampFilterCount = function (plus) {

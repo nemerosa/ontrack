@@ -222,21 +222,21 @@
             </span>
         </td>
         <!-- Validation runs -->
-        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews | filter:validationStampRunViewFilter"
+        <td ng-repeat="validation in build.validations | filter:validationStampRunViewFilter"
             class="ot-branch-build-view-validation">
             <!-- Not run and validation enabled -->
-            <span ng-if="!validationStampRunView.run && buildView.build._validate" class="ot-command"
-                  ng-click="createValidationRun(buildView, validationStampRunView)">
+            <span ng-if="validation.validationRuns.length == 0 && build.links._validate" class="ot-command"
+                  ng-click="createValidationRun(build, validation.validationStamp)">
                 <ot-validation-run-status-none></ot-validation-run-status-none>
             </span>
             <!-- Not run and validation not enabled -->
-            <span ng-if="!validationStampRunView.run && !buildView.build._validate">
+            <span ng-if="validation.validationRuns.length == 0 && !build.links._validate">
                 <ot-validation-run-status-none></ot-validation-run-status-none>
             </span>
             <!-- Last status -->
-            <span ng-if="validationStampRunView.run">
-                <span class="ot-action" ng-click="displayValidationRuns(buildView, validationStampRunView)">
-                    <ot-validation-run-status status="validationStampRunView.lastStatus"></ot-validation-run-status>
+            <span ng-if="validation.validationRuns.length > 0">
+                <span class="ot-action" ng-click="displayValidationRuns(build, validation.validationStamp)">
+                    <ot-validation-run-status status="validation.validationRuns[0].validationRunStatuses[0]"></ot-validation-run-status>
                 </span>
             </span>
         </td>
