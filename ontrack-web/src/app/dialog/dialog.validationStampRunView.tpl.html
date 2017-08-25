@@ -1,23 +1,30 @@
 <div class="modal-header">
     <h3 ng-click="cancel()">
         Runs for
-        <ot-entity-image entity="config.validationStampRunView.validationStamp" link="#/validationStamp/{{config.validationStampRunView.validationStamp.id}}">
-            {{config.validationStampRunView.validationStamp.name}}
+        <ot-entity-image entity="validation.validationStamp" link="#/validationStamp/{{validation.validationStamp.id}}">
+            {{validation.validationStamp.name}}
         </ot-entity-image>
         in build
-        <a href="#/build/{{config.buildView.build.id}}">
-            {{config.buildView.build.name}}
+        <a href="#/build/{{build.id}}">
+            {{build.name}}
         </a>
     </h3>
 </div>
 <div class="modal-body">
+    <div class="panel panel-default" ng-show="loadingValidationRuns">
+        <div class="alert alert-info">
+            <span class="ot-loading-indicator"></span>
+            Loading the validation runs...
+        </div>
+    </div>
     <div class="panel panel-default"
-         ng-repeat="validationRun in config.validationStampRunView.validationRun | orderBy:'id':true">
+         ng-hide="loadingValidationRuns"
+         ng-repeat="validationRun in validation.validationRuns | orderBy:'id':true">
         <div class="panel-heading">
             <a href="#/validationRun/{{validationRun.id}}" ng-click="cancel()">
             Run #{{validationRun.runOrder}}
             </a>
-            <p class="ot-command pull-right" ng-if="validationRun._validationRunStatusChange" title="Change status"
+            <p class="ot-command pull-right" ng-if="validationRun.links._validationRunStatusChange" title="Change status"
                     ng-click="changeStatus(validationRun)">
                 <span class="fa fa-comment-o"></span>
             </p>
@@ -26,7 +33,13 @@
             <li class="list-group-item" ng-repeat="validationRunStatus in validationRun.validationRunStatuses">
                 <ot-validation-run-status status="validationRunStatus"></ot-validation-run-status>
                 {{validationRunStatus.statusID.name}}
-                <p class="pull-right"><ot-signature value="validationRunStatus.signature" user="true" time="true"></ot-signature></p>
+                <p class="pull-right">
+                    <span class="ot-signature">
+                        <span>{{validationRunStatus.creation.user}} @ </span>
+                        {{validationRunStatus.creation.time | date:'mediumDate' }}
+                        <span>{{validationRunStatus.creation.time | date:'shortTime' }}</span>
+                    </span>
+                </p>
                 <p ng-if="validationRunStatus.description" class="ot-description">{{validationRunStatus.description}}</p>
             </li>
         </ul>

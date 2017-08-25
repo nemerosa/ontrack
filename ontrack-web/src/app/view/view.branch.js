@@ -534,15 +534,15 @@ angular.module('ot.view.branch', [
         /**
          * Displaying the validation runs
          */
-        $scope.displayValidationRuns = function (buildView, validationStampRunView) {
+        $scope.displayValidationRuns = function (build, validationStamp) {
             $modal.open({
                 templateUrl: 'app/dialog/dialog.validationStampRunView.tpl.html',
                 controller: 'otDialogValidationStampRunView',
                 resolve: {
                     config: function () {
                         return {
-                            buildView: buildView,
-                            validationStampRunView: validationStampRunView,
+                            build: build,
+                            validationStamp: validationStamp,
                             callbackOnStatusChange: function () {
                                 loadBranch();
                             }
