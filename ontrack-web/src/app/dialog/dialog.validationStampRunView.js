@@ -58,7 +58,7 @@ angular.module('ot.dialog.validationStampRunView', [
             $scope.cancel();
             // Calling the service
             otStructureService.create(
-                validationRun._validationRunStatusChange,
+                validationRun.links._validationRunStatusChange,
                 'Status'
             ).then(function () {
                 if (config.callbackOnStatusChange) {
