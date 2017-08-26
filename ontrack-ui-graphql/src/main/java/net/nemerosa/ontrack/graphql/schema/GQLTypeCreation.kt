@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
+import graphql.schema.DataFetcher
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.structure.Signature
@@ -42,6 +43,17 @@ class GQLTypeCreation : GQLType {
             }
             return result
         }
+
+        @JvmStatic
+        inline fun <reified T> dataFetcher(noinline signatureGetter: (T) -> Signature?) =
+                DataFetcher { environment ->
+                    val source = environment.source
+                    if (source is T) {
+                        signatureGetter(source)?.let { getCreationFromSignature(it) }
+                    } else {
+                        throw IllegalStateException("Fetcher source not an ${T::class.qualifiedName}")
+                    }
+                }
     }
 
     data class Creation(
