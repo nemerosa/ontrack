@@ -26,11 +26,12 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
 
     @Autowired
     public GQLTypePromotionLevel(StructureService structureService,
+                                 GQLTypeCreation creation,
                                  GQLTypePromotionRun promotionRun,
                                  List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
         super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL,
-                projectEntityFieldContributors
-        );
+                projectEntityFieldContributors,
+                creation);
         this.structureService = structureService;
         this.promotionRun = promotionRun;
     }

@@ -1,22 +1,15 @@
 package net.nemerosa.ontrack.graphql.schema;
 
-import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.TypeResolverProxy;
-import net.nemerosa.ontrack.common.Time;
+import graphql.schema.*;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.model.structure.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
-import static graphql.schema.GraphQLObjectType.newObject;
 
 public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implements GQLType {
 
@@ -25,14 +18,18 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
     private final Class<T> projectEntityClass;
     private final ProjectEntityType projectEntityType;
     private final List<GQLProjectEntityFieldContributor> projectEntityFieldContributors;
+    private final GQLTypeCreation creation;
 
     public AbstractGQLProjectEntity(
             Class<T> projectEntityClass,
             ProjectEntityType projectEntityType,
-            List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+            List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+            GQLTypeCreation creation
+    ) {
         this.projectEntityClass = projectEntityClass;
         this.projectEntityType = projectEntityType;
         this.projectEntityFieldContributors = projectEntityFieldContributors;
+        this.creation = creation;
     }
 
     protected GraphQLInterfaceType projectEntityInterface() {
@@ -68,25 +65,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
                         GraphqlUtils.descriptionField(),
                         newFieldDefinition()
                                 .name("creation")
-                                .type(
-                                        newObject()
-                                                .name("Signature")
-                                                .field(
-                                                        newFieldDefinition()
-                                                                .name("user")
-                                                                .description("User name")
-                                                                .type(GraphQLString)
-                                                                .build()
-                                                )
-                                                .field(
-                                                        newFieldDefinition()
-                                                                .name("time")
-                                                                .description("ISO timestamp")
-                                                                .type(GraphQLString)
-                                                                .build()
-                                                )
-                                                .build()
-                                )
+                                .type(creation.getType())
                                 .dataFetcher(creationFetcher())
                                 .build()
                 )
@@ -94,31 +73,12 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
     }
 
     protected DataFetcher creationFetcher() {
-        return environment -> {
-            Object source = environment.getSource();
-            if (projectEntityClass.isInstance(source)) {
-                @SuppressWarnings("unchecked")
-                T entity = (T) source;
-                return getSignature(entity)
-                        .map(AbstractGQLProjectEntity::getMapFromSignature).orElse(null);
-            } else {
-                return null;
-            }
-        };
-    }
-
-    public static Map<String, String> getMapFromSignature(Signature signature) {
-        Map<String, String> map = new LinkedHashMap<>();
-        if (signature != null) {
-            User user = signature.getUser();
-            if (user != null && user.getName() != null) {
-                map.put("user", user.getName());
-            }
-            if (signature.getTime() != null) {
-                map.put("time", Time.forStorage(signature.getTime()));
-            }
-        }
-        return map;
+        return GraphqlUtils.fetcher(
+                projectEntityClass,
+                entity -> getSignature(entity)
+                        .map(GQLTypeCreation::getCreationFromSignature)
+                        .orElse(null)
+        );
     }
 
     protected abstract Optional<Signature> getSignature(T entity);

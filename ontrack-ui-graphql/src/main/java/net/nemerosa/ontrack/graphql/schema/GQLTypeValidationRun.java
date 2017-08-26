@@ -25,9 +25,10 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
     private final GQLTypeValidationRunStatus validationRunStatus;
 
     @Autowired
-    public GQLTypeValidationRun(GQLTypeValidationRunStatus validationRunStatus,
+    public GQLTypeValidationRun(GQLTypeCreation creation,
+                                GQLTypeValidationRunStatus validationRunStatus,
                                 List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(ValidationRun.class, ProjectEntityType.VALIDATION_RUN, projectEntityFieldContributors);
+        super(ValidationRun.class, ProjectEntityType.VALIDATION_RUN, projectEntityFieldContributors, creation);
         this.validationRunStatus = validationRunStatus;
     }
 

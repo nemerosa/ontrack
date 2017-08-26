@@ -25,8 +25,9 @@ class GQLTypeBuild
 constructor(
         private val structureService: StructureService,
         private val validation: GQLTypeValidation,
+        private val creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
-) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors) {
+) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
 
     override fun getType(): GraphQLObjectType {
         return newObject()

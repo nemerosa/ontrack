@@ -28,9 +28,10 @@ public class GQLTypeValidationStamp extends AbstractGQLProjectEntity<ValidationS
 
     @Autowired
     public GQLTypeValidationStamp(StructureService structureService,
+                                  GQLTypeCreation creation,
                                   GQLTypeValidationRun validationRun,
                                   List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(ValidationStamp.class, ProjectEntityType.VALIDATION_STAMP, projectEntityFieldContributors);
+        super(ValidationStamp.class, ProjectEntityType.VALIDATION_STAMP, projectEntityFieldContributors, creation);
         this.structureService = structureService;
         this.validationRun = validationRun;
     }

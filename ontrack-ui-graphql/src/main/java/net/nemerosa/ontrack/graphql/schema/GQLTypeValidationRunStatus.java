@@ -14,10 +14,12 @@ public class GQLTypeValidationRunStatus implements GQLType {
     public static final String VALIDATION_RUN_STATUS = "ValidationRunStatus";
 
     private final GQLTypeValidationRunStatusID validationRunStatusID;
+    private final GQLTypeCreation creation;
 
     @Autowired
-    public GQLTypeValidationRunStatus(GQLTypeValidationRunStatusID validationRunStatusID) {
+    public GQLTypeValidationRunStatus(GQLTypeValidationRunStatusID validationRunStatusID, GQLTypeCreation creation) {
         this.validationRunStatusID = validationRunStatusID;
+        this.creation = creation;
     }
 
     @Override
