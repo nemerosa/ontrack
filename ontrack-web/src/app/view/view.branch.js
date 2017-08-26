@@ -138,6 +138,23 @@ angular.module('ot.view.branch', [
                 "      type\n" +
                 "      uri\n" +
                 "    }\n" +
+                "    links {\n" +
+                "      _reorderValidationStamps\n" +
+                "    }\n" +
+                "    validationStamps {\n" +
+                "      id\n" +
+                "      name\n" +
+                "      image\n" +
+                "      _image\n" +
+                "      decorations {\n" +
+                "        decorationType\n" +
+                "        error\n" +
+                "        data\n" +
+                "        feature {\n" +
+                "          id\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
                 "    builds(generic: {type: $filterType, data: $filterData}) {\n" +
                 "      id\n" +
                 "      name\n" +
@@ -194,6 +211,20 @@ angular.module('ot.view.branch', [
             ).then(function (data) {
                 $scope.branchView = data.branches[0];
                 $scope.builds = data.branches[0].builds;
+                // Management of validation stamps
+                $scope.validationStamps = data.branches[0].validationStamps;
+                $scope.validationStampSortOptions = {
+                    disabled: !$scope.branchView.links._reorderValidationStamps,
+                    stop: function (event, ui) {
+                        var ids = $scope.validationStamps.map(function (vs) {
+                            return vs.id;
+                        });
+                        ot.call($http.put(
+                            $scope.branchView.links._reorderValidationStamps,
+                            {ids: ids}
+                        ));
+                    }
+                };
                 // Other branches
                 view.commands.push({
                     id: 'switch-branch',
@@ -234,29 +265,6 @@ angular.module('ot.view.branch', [
                         });
                         ot.call($http.put(
                             $scope.branch._reorderPromotionLevels,
-                            {ids: ids}
-                        ));
-                    }
-                };
-            });
-        }
-
-        // Loading the validation stamps
-        function loadValidationStamps() {
-            ot.call($http.get($scope.branch._validationStampViews)).then(function (resourcesForViews) {
-                $scope.validationStampViewResources = resourcesForViews;
-                $scope.validationStampViews = resourcesForViews.resources;
-                $scope.validationStamps = resourcesForViews.resources.map(function (view) {
-                    return view.validationStamp;
-                });
-                $scope.validationStampSortOptions = {
-                    disabled: !$scope.branch._reorderValidationStamps,
-                    stop: function (event, ui) {
-                        var ids = $scope.validationStamps.map(function (vs) {
-                            return vs.id;
-                        });
-                        ot.call($http.put(
-                            $scope.branch._reorderValidationStamps,
                             {ids: ids}
                         ));
                     }
@@ -426,8 +434,6 @@ angular.module('ot.view.branch', [
                 loadBuildFilters();
                 // Loads the promotion levels
                 loadPromotionLevels();
-                // Loads the validation stamps
-                loadValidationStamps();
                 // Loads the validation stamp filters
                 loadBranchValidationStampFilters();
             });
@@ -717,17 +723,17 @@ angular.module('ot.view.branch', [
             }
         };
 
-        $scope.validationStampFilterFn = function (validationStampView) {
-            return !$scope.validationStampFilter || $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0;
+        $scope.validationStampFilterFn = function (validationStamp) {
+            return !$scope.validationStampFilter || $scope.validationStampFilterEdition || $scope.validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0;
         };
 
         $scope.validationStampRunViewFilter = function (validation) {
-            return $scope.validationStampFilterFn({validationStamp: validation.validationStamp});
+            return $scope.validationStampFilterFn(validation.validationStamp);
         };
 
         $scope.validationStampFilterCount = function (plus) {
-            if ($scope.validationStampViews) {
-                return plus + $scope.validationStampViews.filter($scope.validationStampFilterFn).length;
+            if ($scope.validationStamps) {
+                return plus + $scope.validationStamps.filter($scope.validationStampFilterFn).length;
             } else {
                 return plus;
             }
@@ -806,8 +812,8 @@ angular.module('ot.view.branch', [
             if (validationStampFilter._update) {
                 ot.pageCall($http.put(validationStampFilter._update, {
                     name: validationStampFilter.name,
-                    vsNames: $scope.validationStampViews.map(function (vsv) {
-                        return vsv.validationStamp.name;
+                    vsNames: $scope.validationStamps.map(function (vs) {
+                        return vs.name;
                     })
                 })).then(function (vsf) {
                     loadBranchValidationStampFilters();
