@@ -41,6 +41,7 @@ angular.module('ot.directive.entity', [
                 entity: '='
             },
             link: function (scope) {
+                scope.eventsLoaded = false;
                 scope.renderEvent = otEventService.renderEvent;
                 scope.renderSince = function (eventTime) {
                     return moment(eventTime).fromNow();
@@ -48,11 +49,13 @@ angular.module('ot.directive.entity', [
                 scope.$watch('entity', function () {
                     if (scope.entity && scope.entity._events) {
                         scope.events = [];
-                        loadEvents(scope.entity._events);
+                        // loadEvents(scope.entity._events);
                     }
                 });
                 scope.moreEvents = function () {
-                    if (scope.eventsResource.pagination.next) {
+                    if (!scope.eventsLoaded) {
+                        loadEvents(scope.entity._events);
+                    } else if (scope.eventsResource.pagination.next) {
                         otTaskService.stop('events');
                         loadEvents(scope.eventsResource.pagination.next);
                     }
@@ -67,10 +70,14 @@ angular.module('ot.directive.entity', [
 
                 function loadEvents(uri) {
                     $log.debug("[events] From URI = " + uri);
+                    scope.loadingEvents = true;
                     ot.call($http.get(uri)).then(function (events) {
                         scope.eventsResource = events;
                         scope.events = scope.events.concat(events.resources);
                         scope.more = (events.resources.length > 0);
+                        scope.eventsLoaded = true;
+                    }).finally(function () {
+                        scope.loadingEvents = false;
                     });
                 }
             }
