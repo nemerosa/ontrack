@@ -22,11 +22,11 @@ angular.module('ot.dialog.validationStampRunView', [
             "        id\n" +
             "        runOrder\n" +
             "        description\n" +
-            "        creation {\n" +
-            "          user\n" +
-            "          time\n" +
-            "        }\n" +
             "        validationRunStatuses {\n" +
+            "          creation {\n" +
+            "            user\n" +
+            "            time\n" +
+            "          }\n" +
             "          description\n" +
             "          statusID {\n" +
             "            id\n" +
