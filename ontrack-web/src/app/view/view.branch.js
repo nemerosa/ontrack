@@ -125,7 +125,13 @@ angular.module('ot.view.branch', [
             otGraphqlService.pageGraphQLCall("query BranchView($branchId: Int!, $filterType: String, $filterData: String) {\n" +
                 "  branches(id: $branchId) {\n" +
                 "    id\n" +
-                "    name\n" +
+                "    name\n\n" +
+                "    buildDiffActions {\n" +
+                "      id\n" +
+                "      name\n" +
+                "      type\n" +
+                "      uri\n" +
+                "    }" +
                 "    builds(generic: {type: $filterType, data: $filterData}) {\n" +
                 "      id\n" +
                 "      name\n" +
@@ -180,6 +186,7 @@ angular.module('ot.view.branch', [
                     filterData: filterData
                 }
             ).then(function (data) {
+                $scope.branchView = data.branches[0];
                 $scope.builds = data.branches[0].builds;
                 // Selection of build boundaries
                 if ($scope.builds.length > 0) {

@@ -37,7 +37,7 @@
             <!-- Filter command -->
             <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
             <!-- Build diff extension commands -->
-            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
+            <button ng-repeat="action in branchView.buildDiffActions" class="btn btn-default"
                     id="{{action.id}}-top"
                     ng-click="buildDiff(action)">
                 {{action.name}}
@@ -248,7 +248,7 @@
             <!-- Filter command -->
             <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
             <!-- Build diff extension commands -->
-            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
+            <button ng-repeat="action in branchView.buildDiffActions" class="btn btn-default"
                     id="{{action.id}}"
                     ng-click="buildDiff(action)">
                 {{action.name}}
