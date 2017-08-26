@@ -125,13 +125,19 @@ angular.module('ot.view.branch', [
             otGraphqlService.pageGraphQLCall("query BranchView($branchId: Int!, $filterType: String, $filterData: String) {\n" +
                 "  branches(id: $branchId) {\n" +
                 "    id\n" +
-                "    name\n\n" +
+                "    name\n" +
+                "    otherBranches {\n" +
+                "      id\n" +
+                "      name\n" +
+                "      disabled\n" +
+                "      type\n" +
+                "    }\n" +
                 "    buildDiffActions {\n" +
                 "      id\n" +
                 "      name\n" +
                 "      type\n" +
                 "      uri\n" +
-                "    }" +
+                "    }\n" +
                 "    builds(generic: {type: $filterType, data: $filterData}) {\n" +
                 "      id\n" +
                 "      name\n" +
@@ -188,6 +194,24 @@ angular.module('ot.view.branch', [
             ).then(function (data) {
                 $scope.branchView = data.branches[0];
                 $scope.builds = data.branches[0].builds;
+                // Other branches
+                view.commands.push({
+                    id: 'switch-branch',
+                    name: "Switch",
+                    cls: 'ot-command-switch',
+                    group: true,
+                    actions: data.branches[0].otherBranches
+                        .filter(function (theBranch) {
+                            return (!theBranch.disabled) && (theBranch.type != 'TEMPLATE_DEFINITION');
+                        })
+                        .map(function (theBranch) {
+                            return {
+                                id: 'switch-' + theBranch.id,
+                                name: theBranch.name,
+                                uri: 'branch/' + theBranch.id
+                            };
+                        })
+                });
                 // Selection of build boundaries
                 if ($scope.builds.length > 0) {
                     $scope.selectedBuild.from = $scope.builds[0].id;
@@ -237,32 +261,6 @@ angular.module('ot.view.branch', [
                         ));
                     }
                 };
-            });
-        }
-
-        // Loading of the other branches
-        function loadOtherBranches() {
-            ot.call($http.get($scope.branch._branches)).then(function (branchCollection) {
-                view.commands.push({
-                    id: 'switch-branch',
-                    name: "Switch",
-                    cls: 'ot-command-switch',
-                    group: true,
-                    actions: branchCollection.resources
-                        .filter(function (theBranch) {
-                            return theBranch.id != branchId;
-                        })
-                        .filter(function (theBranch) {
-                            return (!theBranch.disabled) && (theBranch.type != 'TEMPLATE_DEFINITION');
-                        })
-                        .map(function (theBranch) {
-                            return {
-                                id: 'switch-' + theBranch.id,
-                                name: theBranch.name,
-                                uri: 'branch/' + theBranch.id
-                            };
-                        })
-                });
             });
         }
 
@@ -430,8 +428,6 @@ angular.module('ot.view.branch', [
                 loadPromotionLevels();
                 // Loads the validation stamps
                 loadValidationStamps();
-                // Loads the other branches
-                loadOtherBranches();
                 // Loads the validation stamp filters
                 loadBranchValidationStampFilters();
             });
