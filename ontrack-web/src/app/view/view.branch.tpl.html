@@ -56,14 +56,14 @@
     <div class="row">
         <div class="col-md-4">
             <ot-section-title>Promotion levels</ot-section-title>
-            <ot-noentry list="promotionLevelCollection.resources">
+            <ot-noentry list="promotionLevels">
                 No promotion level has been created yet.
             </ot-noentry>
-            <div ng-if="promotionLevelCollection.resources" class="ot-entity-sortable-list"
-                    ui-sortable="promotionLevelSortOptions" ng-model="promotionLevelCollection.resources">
-                <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-entity-sortable-list-item ot-decoration-list">
+            <div ng-if="promotionLevels" class="ot-entity-sortable-list"
+                    ui-sortable="promotionLevelSortOptions" ng-model="promotionLevels">
+                <div ng-repeat="promotionLevel in promotionLevels" class="ot-entity-sortable-list-item ot-decoration-list">
                     <span class="ot-entity-sortable-list-handle"
-                          ng-if="branch._reorderPromotionLevels"
+                          ng-if="branchView.links._reorderPromotionLevels"
                           title="Move this to reorder the promotion levels">&nbsp;</span>
                     <span class="ot-entity-sortable-list-image">
                         <ot-entity-image entity="promotionLevel" link="#/promotionLevel/{{promotionLevel.id}}"></ot-entity-image>
@@ -71,7 +71,7 @@
                     <a href="#/promotionLevel/{{promotionLevel.id}}" class="ot-entity-sortable-list-link">
                         {{promotionLevel.name}}
                     </a>
-                    <ot-entity-decorations entity="promotionLevel"></ot-entity-decorations>
+                    <ot-entity-embedded-decorations decorations="promotionLevel.decorations"></ot-entity-embedded-decorations>
                 </div>
             </div>
             <button ng-if="branch._createPromotionLevel" type="button" class="btn btn-default"

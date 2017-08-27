@@ -140,6 +140,16 @@ angular.module('ot.view.branch', [
                 "    }\n" +
                 "    links {\n" +
                 "      _reorderValidationStamps\n" +
+                "      _reorderPromotionLevels\n" +
+                "    }\n" +
+                "    promotionLevels {\n" +
+                "      id\n" +
+                "      name\n" +
+                "      image\n" +
+                "      _image\n" +
+                "      decorations {\n" +
+                "        ...decorationContent\n" +
+                "      }\n" +
                 "    }\n" +
                 "    validationStamps {\n" +
                 "      id\n" +
@@ -147,24 +157,14 @@ angular.module('ot.view.branch', [
                 "      image\n" +
                 "      _image\n" +
                 "      decorations {\n" +
-                "        decorationType\n" +
-                "        error\n" +
-                "        data\n" +
-                "        feature {\n" +
-                "          id\n" +
-                "        }\n" +
+                "        ...decorationContent\n" +
                 "      }\n" +
                 "    }\n" +
                 "    builds(generic: {type: $filterType, data: $filterData}) {\n" +
                 "      id\n" +
                 "      name\n" +
                 "      decorations {\n" +
-                "        decorationType\n" +
-                "        error\n" +
-                "        data\n" +
-                "        feature {\n" +
-                "          id\n" +
-                "        }\n" +
+                "        ...decorationContent\n" +
                 "      }\n" +
                 "      creation {\n" +
                 "        time\n" +
@@ -202,6 +202,15 @@ angular.module('ot.view.branch', [
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
+                "}\n" +
+                "\n" +
+                "fragment decorationContent on Decoration {\n" +
+                "  decorationType\n" +
+                "  error\n" +
+                "  data\n" +
+                "  feature {\n" +
+                "    id\n" +
+                "  }\n" +
                 "}\n",
                 {
                     branchId: $scope.branch.id,
@@ -211,6 +220,20 @@ angular.module('ot.view.branch', [
             ).then(function (data) {
                 $scope.branchView = data.branches[0];
                 $scope.builds = data.branches[0].builds;
+                // Management of promotion levels
+                $scope.promotionLevels = data.branches[0].promotionLevels;
+                $scope.promotionLevelSortOptions = {
+                    disabled: !$scope.branchView.links._reorderPromotionLevels,
+                    stop: function (event, ui) {
+                        var ids = $scope.promotionLevels.map(function (pl) {
+                            return pl.id;
+                        });
+                        ot.call($http.put(
+                            $scope.branchView.links._reorderPromotionLevels,
+                            {ids: ids}
+                        ));
+                    }
+                };
                 // Management of validation stamps
                 $scope.validationStamps = data.branches[0].validationStamps;
                 $scope.validationStampSortOptions = {
@@ -250,25 +273,6 @@ angular.module('ot.view.branch', [
                 }
             }).finally(function () {
                 $scope.loadingBuildView = false;
-            });
-        }
-
-        // Loading the promotion levels
-        function loadPromotionLevels() {
-            ot.call($http.get($scope.branch._promotionLevels)).then(function (collection) {
-                $scope.promotionLevelCollection = collection;
-                $scope.promotionLevelSortOptions = {
-                    disabled: !$scope.branch._reorderPromotionLevels,
-                    stop: function (event, ui) {
-                        var ids = $scope.promotionLevelCollection.resources.map(function (pl) {
-                            return pl.id;
-                        });
-                        ot.call($http.put(
-                            $scope.branch._reorderPromotionLevels,
-                            {ids: ids}
-                        ));
-                    }
-                };
             });
         }
 
@@ -432,8 +436,6 @@ angular.module('ot.view.branch', [
                 ];
                 // Loads the build filters
                 loadBuildFilters();
-                // Loads the promotion levels
-                loadPromotionLevels();
                 // Loads the validation stamp filters
                 loadBranchValidationStampFilters();
             });
