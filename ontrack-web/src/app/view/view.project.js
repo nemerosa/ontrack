@@ -13,80 +13,80 @@ angular.module('ot.view.project', [
         });
     })
     .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService) {
-        var view = ot.view();
+        const view = ot.view();
         // Project's id
-        var projectId = $stateParams.projectId;
+        const projectId = $stateParams.projectId;
         // Initial name filter
         $scope.branchNameFilter = '';
 
         // Loading the project and its whole information
         function loadProject() {
             $scope.loadingBranches = true;
-            otGraphqlService.pageGraphQLCall("query ProjectView($projectId: Int) {\n" +
-                "  projects(id: $projectId) {\n" +
-                "    id\n" +
-                "    name\n" +
-                "    description\n" +
-                "    disabled\n" +
-                "    decorations {\n" +
-                "      ...decorationContent\n" +
-                "    }\n" +
-                "    links {\n" +
-                "      _self\n" +
-                "      _createBranch\n" +
-                "      _update\n" +
-                "      _delete\n" +
-                "      _permissions\n" +
-                "      _clone\n" +
-                "      _enable\n" +
-                "      _disable\n" +
-                "      _properties\n" +
-                "      _extra\n" +
-                "      _events\n" +
-                "      _actions\n" +
-                "    }\n" +
-                "    branches {\n" +
-                "      id\n" +
-                "      name\n" +
-                "      disabled\n" +
-                "      type\n" +
-                "      decorations {\n" +
-                "        ...decorationContent\n" +
-                "      }\n" +
-                "      links {\n" +
-                "        _page\n" +
-                "        _enable\n" +
-                "        _disable\n" +
-                "        _delete\n" +
-                "      }\n" +
-                "      latestBuild: builds(count: 1) {\n" +
-                "        id\n" +
-                "        name\n" +
-                "      }\n" +
-                "      promotionLevels {\n" +
-                "        id\n" +
-                "        name\n" +
-                "        image\n" +
-                "        _image\n" +
-                "        promotionRuns(last: 1) {\n" +
-                "          build {\n" +
-                "            id\n" +
-                "            name\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}\n" +
-                "\n" +
-                "fragment decorationContent on Decoration {\n" +
-                "  decorationType\n" +
-                "  error\n" +
-                "  data\n" +
-                "  feature {\n" +
-                "    id\n" +
-                "  }\n" +
-                "}\n", {projectId: projectId}).then(function (data) {
+            otGraphqlService.pageGraphQLCall(`query ProjectView($projectId: Int) {
+              projects(id: $projectId) {
+                id
+                name
+                description
+                disabled
+                decorations {
+                  ...decorationContent
+                }
+                links {
+                  _self
+                  _createBranch
+                  _update
+                  _delete
+                  _permissions
+                  _clone
+                  _enable
+                  _disable
+                  _properties
+                  _extra
+                  _events
+                  _actions
+                }
+                branches {
+                  id
+                  name
+                  disabled
+                  type
+                  decorations {
+                    ...decorationContent
+                  }
+                  links {
+                    _page
+                    _enable
+                    _disable
+                    _delete
+                  }
+                  latestBuild: builds(count: 1) {
+                    id
+                    name
+                  }
+                  promotionLevels {
+                    id
+                    name
+                    image
+                    _image
+                    promotionRuns(last: 1) {
+                      build {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }`, {projectId: projectId}).then(function (data) {
                 $scope.project = data.projects[0];
                 // View commands
                 view.commands = [
