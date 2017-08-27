@@ -21,9 +21,9 @@ angular.module('ot.view.branch', [
     .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location,
                                         ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService,
                                         otBuildFilterService, otGraphqlService) {
-        var view = ot.view();
+        const view = ot.view();
         // Branch's id
-        var branchId = $stateParams.branchId;
+        const branchId = $stateParams.branchId;
 
         // Initial loading taking place... now
         $scope.loadingBuildView = true;
@@ -33,7 +33,7 @@ angular.module('ot.view.branch', [
             loadBuildView();
         }
 
-        var refreshTaskName = 'Branch build view refresh';
+        const refreshTaskName = 'Branch build view refresh';
         $scope.$watch('autoRefresh', function () {
             if ($scope.autoRefresh) {
                 // 1 minute interval
@@ -103,12 +103,11 @@ angular.module('ot.view.branch', [
         // Loading the build view
         function loadBuildView() {
             // Parameters for the call
-            var uri = $scope.branch._view;
-            var config = {};
-            var filterType = null;
-            var filterData = null;
+            let config = {};
+            let filterType = null;
+            let filterData = null;
             // Adds the filter parameters
-            var currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
+            let currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
             if (currentBuildFilterResource) {
                 filterType = currentBuildFilterResource.type;
                 if (currentBuildFilterResource.data) {
@@ -116,103 +115,101 @@ angular.module('ot.view.branch', [
                 }
                 $scope.currentBuildFilterResource = currentBuildFilterResource;
                 config.params = currentBuildFilterResource.data;
-                uri += '/' + currentBuildFilterResource.type;
             } else {
                 $scope.currentBuildFilterResource = undefined;
             }
             // Call
             $scope.loadingBuildView = true;
-            otGraphqlService.pageGraphQLCall("query BranchView($branchId: Int!, $filterType: String, $filterData: String) {\n" +
-                "  branches(id: $branchId) {\n" +
-                "    id\n" +
-                "    name\n" +
-                "    otherBranches {\n" +
-                "      id\n" +
-                "      name\n" +
-                "      disabled\n" +
-                "      type\n" +
-                "    }\n" +
-                "    buildDiffActions {\n" +
-                "      id\n" +
-                "      name\n" +
-                "      type\n" +
-                "      uri\n" +
-                "    }\n" +
-                "    links {\n" +
-                "      _reorderValidationStamps\n" +
-                "      _reorderPromotionLevels\n" +
-                "    }\n" +
-                "    promotionLevels {\n" +
-                "      id\n" +
-                "      name\n" +
-                "      image\n" +
-                "      _image\n" +
-                "      decorations {\n" +
-                "        ...decorationContent\n" +
-                "      }\n" +
-                "    }\n" +
-                "    validationStamps {\n" +
-                "      id\n" +
-                "      name\n" +
-                "      image\n" +
-                "      _image\n" +
-                "      decorations {\n" +
-                "        ...decorationContent\n" +
-                "      }\n" +
-                "    }\n" +
-                "    builds(generic: {type: $filterType, data: $filterData}) {\n" +
-                "      id\n" +
-                "      name\n" +
-                "      decorations {\n" +
-                "        ...decorationContent\n" +
-                "      }\n" +
-                "      creation {\n" +
-                "        time\n" +
-                "      }\n" +
-                "      promotionRuns {\n" +
-                "        creation {\n" +
-                "          time\n" +
-                "        }\n" +
-                "        promotionLevel {\n" +
-                "          id\n" +
-                "          name\n" +
-                "          image\n" +
-                "          _image\n" +
-                "        }\n" +
-                "        links {\n" +
-                "          _all\n" +
-                "        }\n" +
-                "      }\n" +
-                "      validations {\n" +
-                "        validationStamp {\n" +
-                "          id\n" +
-                "          name\n" +
-                "        }\n" +
-                "        validationRuns(count: 1) {\n" +
-                "          validationRunStatuses {\n" +
-                "            statusID {\n" +
-                "              id\n" +
-                "              name\n" +
-                "            }\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "      links {\n" +
-                "        _validate\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}\n" +
-                "\n" +
-                "fragment decorationContent on Decoration {\n" +
-                "  decorationType\n" +
-                "  error\n" +
-                "  data\n" +
-                "  feature {\n" +
-                "    id\n" +
-                "  }\n" +
-                "}\n",
-                {
+            otGraphqlService.pageGraphQLCall(`query BranchView($branchId: Int!, $filterType: String, $filterData: String) {
+              branches(id: $branchId) {
+                id
+                name
+                otherBranches {
+                  id
+                  name
+                  disabled
+                  type
+                }
+                buildDiffActions {
+                  id
+                  name
+                  type
+                  uri
+                }
+                links {
+                  _reorderValidationStamps
+                  _reorderPromotionLevels
+                }
+                promotionLevels {
+                  id
+                  name
+                  image
+                  _image
+                  decorations {
+                    ...decorationContent
+                  }
+                }
+                validationStamps {
+                  id
+                  name
+                  image
+                  _image
+                  decorations {
+                    ...decorationContent
+                  }
+                }
+                builds(generic: {type: $filterType, data: $filterData}) {
+                  id
+                  name
+                  decorations {
+                    ...decorationContent
+                  }
+                  creation {
+                    time
+                  }
+                  promotionRuns {
+                    creation {
+                      time
+                    }
+                    promotionLevel {
+                      id
+                      name
+                      image
+                      _image
+                    }
+                    links {
+                      _all
+                    }
+                  }
+                  validations {
+                    validationStamp {
+                      id
+                      name
+                    }
+                    validationRuns(count: 1) {
+                      validationRunStatuses {
+                        statusID {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                  links {
+                    _validate
+                  }
+                }
+              }
+            }
+            
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }`, {
                     branchId: $scope.branch.id,
                     filterType: filterType,
                     filterData: filterData
@@ -224,8 +221,8 @@ angular.module('ot.view.branch', [
                 $scope.promotionLevels = data.branches[0].promotionLevels;
                 $scope.promotionLevelSortOptions = {
                     disabled: !$scope.branchView.links._reorderPromotionLevels,
-                    stop: function (event, ui) {
-                        var ids = $scope.promotionLevels.map(function (pl) {
+                    stop: function () {
+                        const ids = $scope.promotionLevels.map(function (pl) {
                             return pl.id;
                         });
                         ot.call($http.put(
@@ -238,8 +235,8 @@ angular.module('ot.view.branch', [
                 $scope.validationStamps = data.branches[0].validationStamps;
                 $scope.validationStampSortOptions = {
                     disabled: !$scope.branchView.links._reorderValidationStamps,
-                    stop: function (event, ui) {
-                        var ids = $scope.validationStamps.map(function (vs) {
+                    stop: function () {
+                        const ids = $scope.validationStamps.map(function (vs) {
                             return vs.id;
                         });
                         ot.call($http.put(
@@ -256,7 +253,7 @@ angular.module('ot.view.branch', [
                     group: true,
                     actions: data.branches[0].otherBranches
                         .filter(function (theBranch) {
-                            return (!theBranch.disabled) && (theBranch.type != 'TEMPLATE_DEFINITION');
+                            return (!theBranch.disabled) && (theBranch.type !== 'TEMPLATE_DEFINITION');
                         })
                         .map(function (theBranch) {
                             return {
@@ -450,7 +447,7 @@ angular.module('ot.view.branch', [
 
         // Gets the list of tools for a branch
         function getTools(branch) {
-            var tools = [];
+            const tools = [];
             // Clone into branch
             if (branch._clone) {
                 tools.push({
@@ -567,8 +564,8 @@ angular.module('ot.view.branch', [
          * Build diff action
          */
         $scope.buildDiff = function (action) {
-            var selectedBuild = $scope.selectedBuild;
-            if (selectedBuild.from && selectedBuild.to && selectedBuild.from != selectedBuild.to) {
+            const selectedBuild = $scope.selectedBuild;
+            if (selectedBuild.from && selectedBuild.to && selectedBuild.from !== selectedBuild.to) {
                 $state.go(action.id, {
                     branch: branchId,
                     from: selectedBuild.from,
@@ -648,9 +645,9 @@ angular.module('ot.view.branch', [
          * Permalink to the current filter
          */
         $scope.buildFilterLink = function () {
-            var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
+            const currentFilter = otBuildFilterService.getCurrentFilter(branchId);
             if (currentFilter) {
-                var jsonFilter = JSON.stringify(currentFilter);
+                const jsonFilter = JSON.stringify(currentFilter);
                 $location.hash(jsonFilter);
             }
         };
@@ -659,11 +656,11 @@ angular.module('ot.view.branch', [
          * Loading the permalink at startup
          */
         function loadPermalink() {
-            var jsonFilter = $location.hash();
+            const jsonFilter = $location.hash();
             if (jsonFilter) {
                 // Parsing the JSON
                 try {
-                    var json = JSON.parse(jsonFilter);
+                    const json = JSON.parse(jsonFilter);
                     // Applies the filter
                     otBuildFilterService.storeCurrent(branchId, json);
                     // Removes the hash after use
@@ -682,10 +679,10 @@ angular.module('ot.view.branch', [
             ot.pageCall($http.get($scope.branch._allValidationStampFilters)).then(function (resources) {
                 $scope.branchValidationStampFilterResources = resources;
                 // Gets the validation stamp filter in the URL
-                var search = $location.search();
+                const search = $location.search();
                 if (search.vsFilter) {
                     // Gets the filter with same name
-                    var existingFilter = $scope.branchValidationStampFilterResources.resources.find(function (vsf) {
+                    const existingFilter = $scope.branchValidationStampFilterResources.resources.find(function (vsf) {
                         //noinspection EqualityComparisonWithCoercionJS
                         return vsf.name == search.vsFilter;
                     });
@@ -699,7 +696,7 @@ angular.module('ot.view.branch', [
         $scope.selectBranchValidationStampFilter = function (validationStampFilter) {
             $scope.validationStampFilter = validationStampFilter;
             // Permalink
-            var search = $location.search();
+            const search = $location.search();
             if (validationStampFilter) {
                 search.vsFilter = validationStampFilter.name;
             } else {
@@ -826,7 +823,7 @@ angular.module('ot.view.branch', [
 
         $scope.toggleValidationStampFromFilter = function (validationStampName) {
             if ($scope.validationStampFilter && $scope.validationStampFilter._update) {
-                var index = $scope.validationStampFilter.vsNames.indexOf(validationStampName);
+                const index = $scope.validationStampFilter.vsNames.indexOf(validationStampName);
                 if (index >= 0) {
                     $scope.removeValidationStampFromFilter($scope.validationStampFilter, validationStampName);
                 } else {
@@ -837,9 +834,9 @@ angular.module('ot.view.branch', [
 
         $scope.removeValidationStampFromFilter = function (validationStampFilter, validationStampName) {
             if (validationStampFilter._update) {
-                var index = validationStampFilter.vsNames.indexOf(validationStampName);
+                const index = validationStampFilter.vsNames.indexOf(validationStampName);
                 if (index >= 0) {
-                    var names = validationStampFilter.vsNames.slice(0); // Copy
+                    const names = validationStampFilter.vsNames.slice(0); // Copy
                     names.splice(index, 1);
                     ot.pageCall($http.put(validationStampFilter._update, {
                         name: validationStampFilter.name,
@@ -854,9 +851,9 @@ angular.module('ot.view.branch', [
 
         $scope.addValidationStampFromFilter = function (validationStampFilter, validationStampName) {
             if (validationStampFilter._update) {
-                var index = validationStampFilter.vsNames.indexOf(validationStampName);
+                const index = validationStampFilter.vsNames.indexOf(validationStampName);
                 if (index < 0) {
-                    var names = validationStampFilter.vsNames.slice(0); // Copy
+                    const names = validationStampFilter.vsNames.slice(0); // Copy
                     names.push(validationStampName);
                     ot.pageCall($http.put(validationStampFilter._update, {
                         name: validationStampFilter.name,
