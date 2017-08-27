@@ -13,9 +13,9 @@ angular.module('ot.view.home', [
         });
     })
     .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService) {
-        var search = $location.search();
-        var code = search.code;
-        var url = search.url;
+        const search = $location.search();
+        const code = search.code;
+        const url = search.url;
         $rootScope.view = {
             // Title
             title: 'Home',
@@ -91,7 +91,7 @@ angular.module('ot.view.home', [
                 id
               }
             }
-`).then(function (data) {
+            `).then(function (data) {
 
                 $scope.projectsData = data;
                 $scope.projectFavourites = data.projectFavourites;
@@ -171,7 +171,7 @@ angular.module('ot.view.home', [
 
         // Login procedure
         $scope.accessStatus = 'undefined';
-        if (code && code == 403) {
+        if (code && code === 403) {
             $log.debug('[403] received');
             if (otUserService.logged()) {
                 $scope.accessStatus = 'unauthorised';
