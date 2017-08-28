@@ -20,6 +20,7 @@ var ontrack = angular.module('ontrack', [
         'ot.service.task',
         'ot.service.form',
         'ot.service.configuration',
+        'ot.service.graphql',
         // Views
         'ot.view.api',
         'ot.view.api-doc',
@@ -36,7 +37,9 @@ var ontrack = angular.module('ontrack', [
         'ot.view.admin.accounts',
         'ot.view.admin.global-acl',
         'ot.view.admin.project-acl',
-        'ot.view.admin.console',
+        'ot.view.admin.health',
+        'ot.view.admin.extensions',
+        'ot.view.admin.jobs',
         'ot.view.admin.log-entries',
         'ot.view.admin.predefined-validation-stamps',
         'ot.view.admin.predefined-promotion-levels'

@@ -9,6 +9,20 @@ import java.util.List;
 public interface RoleContributor {
 
     /**
+     * Gets a list of global roles to add.
+     */
+    default List<RoleDefinition> getGlobalRoles() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Gets a list of project roles to add.
+     */
+    default List<RoleDefinition> getProjectRoles() {
+        return Collections.emptyList();
+    }
+
+    /**
      * Gets the list of functions to contribute to this global role.
      *
      * @param role Role to contribute to

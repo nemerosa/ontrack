@@ -33,7 +33,7 @@ angular.module('ot.directive.entity', [
             }
         };
     })
-    .directive('otEntityEvents', function ($http, ot, otEventService, otTaskService) {
+    .directive('otEntityEvents', function ($http, $log, ot, otEventService, otTaskService) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityEvents.tpl.html',
@@ -41,35 +41,43 @@ angular.module('ot.directive.entity', [
                 entity: '='
             },
             link: function (scope) {
+                scope.eventsLoaded = false;
                 scope.renderEvent = otEventService.renderEvent;
                 scope.renderSince = function (eventTime) {
                     return moment(eventTime).fromNow();
                 };
                 scope.$watch('entity', function () {
-                    if (scope.entity) {
+                    if (scope.entity && scope.entity._events) {
                         scope.events = [];
-                        loadEvents(scope.entity._events);
+                        // loadEvents(scope.entity._events);
                     }
                 });
                 scope.moreEvents = function () {
-                    if (scope.eventsResource.pagination.next) {
+                    if (!scope.eventsLoaded) {
+                        loadEvents(scope.entity._events);
+                    } else if (scope.eventsResource.pagination.next) {
                         otTaskService.stop('events');
                         loadEvents(scope.eventsResource.pagination.next);
                     }
                 };
 
                 otTaskService.register('events', function () {
-                    if (scope.entity) {
+                    if (scope.entity && scope.entity._events) {
                         scope.events = [];
                         loadEvents(scope.entity._events);
                     }
                 }, 60000);
 
                 function loadEvents(uri) {
+                    $log.debug("[events] From URI = " + uri);
+                    scope.loadingEvents = true;
                     ot.call($http.get(uri)).then(function (events) {
                         scope.eventsResource = events;
                         scope.events = scope.events.concat(events.resources);
                         scope.more = (events.resources.length > 0);
+                        scope.eventsLoaded = true;
+                    }).finally(function () {
+                        scope.loadingEvents = false;
                     });
                 }
             }
@@ -115,7 +123,7 @@ angular.module('ot.directive.entity', [
             },
             link: function (scope) {
                 scope.$watch('entity', function () {
-                    if (scope.entity) {
+                    if (scope.entity && scope.entity._extra) {
                         scope.infosLoading = true;
                         ot.call($http.get(scope.entity._extra)).then(function (infos) {
                             scope.infosLoading = false;

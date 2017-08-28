@@ -1,9 +1,10 @@
 angular.module('ot.view.home', [
-        'ui.router',
-        'ot.service.structure',
-        'ot.service.core',
-        'ot.service.user'
-    ])
+    'ui.router',
+    'ot.service.structure',
+    'ot.service.core',
+    'ot.service.user',
+    'ot.service.graphql'
+])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
             url: '/home',
@@ -11,10 +12,10 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otStructureService, otNotificationService, otUserService) {
-        var search = $location.search();
-        var code = search.code;
-        var url = search.url;
+    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService) {
+        const search = $location.search();
+        const code = search.code;
+        const url = search.url;
         $rootScope.view = {
             // Title
             title: 'Home',
@@ -25,11 +26,84 @@ angular.module('ot.view.home', [
         $scope.projectFilter = {
             name: ''
         };
+
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
-            ot.pageCall($http.get('structure/projects')).then(function (projectResources) {
-                $scope.projectResources = projectResources;
+            otGraphqlService.pageGraphQLCall(`{
+              userRootActions {
+                projectCreate
+              }
+              projects {
+                id
+                name
+                links {
+                  _favourite
+                  _unfavourite
+                }
+                decorations {
+                  ...decorationContent
+                }
+              }
+              projectFavourites: projects(favourites: true) {
+                id
+                name
+                disabled
+                decorations {
+                  ...decorationContent
+                }
+                links {
+                  _unfavourite
+                }
+                branches {
+                  id
+                  name
+                  type
+                  disabled
+                  decorations {
+                    ...decorationContent
+                  }
+                  latestPromotions: builds(lastPromotions: true, count: 1) {
+                    id
+                    name
+                    promotionRuns {
+                      promotionLevel {
+                        id
+                        name
+                        image
+                        _image
+                      }
+                    }
+                  }
+                  latestBuild: builds(count: 1) {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+            
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }
+            `).then(function (data) {
+
+                $scope.projectsData = data;
+                $scope.projectFavourites = data.projectFavourites;
+
+                // All branches disabled status computation
+                $scope.projectFavourites.forEach(function (projectFavourite) {
+                    projectFavourite.allBranchesDisabled = projectFavourite.branches.length > 0 &&
+                        projectFavourite.branches.every(function (branch) {
+                            return branch.disabled || branch.type === 'TEMPLATE_DEFINITION';
+                        });
+                });
+
                 // Commands
                 $rootScope.view.commands = [
                     {
@@ -37,7 +111,7 @@ angular.module('ot.view.home', [
                         name: 'Create project',
                         cls: 'ot-command-project-new',
                         condition: function () {
-                            return projectResources._create;
+                            return data.userRootActions.projectCreate;
                         },
                         action: $scope.createProject
                     }, {
@@ -70,45 +144,34 @@ angular.module('ot.view.home', [
                         absoluteLink: "graphiql.html"
                     }
                 ];
-            });
-            // Detailed views
-            ot.pageCall($http.get('structure/projects/favourites')).then(function (projectStatusViewResources) {
-                $scope.projectStatusViewResources = projectStatusViewResources;
-                $scope.projectStatusViews = projectStatusViewResources.resources;
-                // All branches disabled status computation
-                $scope.projectStatusViews.forEach(function (projectStatusView) {
-                    projectStatusView.allBranchesDisabled = projectStatusView.branchStatusViews.length > 0 &&
-                        projectStatusView.branchStatusViews.every(function (branchStatusView) {
-                            return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
-                        });
-                });
             }).finally(function () {
                 $scope.loadingProjects = false;
             });
+
         }
 
         // Creating a project
         $scope.createProject = function () {
-            otStructureService.createProject($scope.projectResources._create).then(loadProjects);
+            otStructureService.createProject($scope.projectsData.userRootActions.projectCreate).then(loadProjects);
         };
 
         // Sets a project as favourite
         $scope.projectFavourite = function (project) {
-            if (project._favourite) {
-                ot.pageCall($http.put(project._favourite)).then(loadProjects);
+            if (project.links._favourite) {
+                ot.pageCall($http.put(project.links._favourite)).then(loadProjects);
             }
         };
 
         // Unsets a project as favourite
         $scope.projectUnfavourite = function (project) {
-            if (project._unfavourite) {
-                ot.pageCall($http.put(project._unfavourite)).then(loadProjects);
+            if (project.links._unfavourite) {
+                ot.pageCall($http.put(project.links._unfavourite)).then(loadProjects);
             }
         };
 
         // Login procedure
         $scope.accessStatus = 'undefined';
-        if (code && code == 403) {
+        if (code && Number(code) === 403) {
             $log.debug('[403] received');
             if (otUserService.logged()) {
                 $scope.accessStatus = 'unauthorised';

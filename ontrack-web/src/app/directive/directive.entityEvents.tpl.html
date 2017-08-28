@@ -1,6 +1,13 @@
 <ot-section-title>Events</ot-section-title>
-<div class="alert alert-warning" ng-if="events.length == 0">
+<div class="alert alert-warning" ng-if="eventsLoaded && events.length == 0">
     No event.
+</div>
+<div class="alert alert-info" ng-if="!eventsLoaded" ng-hide="loadingEvents">
+    <a ng-click="moreEvents()" class="ot-action">Load the events</a>
+</div>
+<div class="alert alert-info" ng-show="loadingEvents">
+    <span class="ot-loading-indicator"></span>
+    Loading the events...
 </div>
 <div class="ot-event" ng-repeat="event in events">
     <span class="ot-event-category">

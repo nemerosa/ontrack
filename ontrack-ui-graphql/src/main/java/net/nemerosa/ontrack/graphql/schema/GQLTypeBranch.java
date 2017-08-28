@@ -31,22 +31,26 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     private final GQLTypePromotionLevel promotionLevel;
     private final GQLTypeValidationStamp validationStamp;
     private final GQLInputBuildStandardFilter inputBuildStandardFilter;
+    private final GQLInputBuildGenericFilter inputBuildGenericFilter;
 
     @Autowired
     public GQLTypeBranch(StructureService structureService,
                          BuildFilterService buildFilterService,
+                         GQLTypeCreation creation,
                          GQLTypeBuild build,
                          GQLTypePromotionLevel promotionLevel,
                          GQLTypeValidationStamp validationStamp,
                          GQLInputBuildStandardFilter inputBuildStandardFilter,
-                         List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors);
+                         List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+                         GQLInputBuildGenericFilter inputBuildGenericFilter) {
+        super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors, creation);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;
         this.promotionLevel = promotionLevel;
         this.validationStamp = validationStamp;
         this.inputBuildStandardFilter = inputBuildStandardFilter;
+        this.inputBuildGenericFilter = inputBuildGenericFilter;
     }
 
     @Override
@@ -119,6 +123,14 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                                 .type(inputBuildStandardFilter.getInputType())
                                                 .build()
                                 )
+                                // Generic filter
+                                .argument(
+                                        newArgument()
+                                                .name("generic")
+                                                .description("Generic filter based on a configured filter")
+                                                .type(inputBuildGenericFilter.getInputType())
+                                                .build()
+                                )
                                 // Query
                                 .dataFetcher(branchBuildsFetcher())
                                 .build()
@@ -136,6 +148,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 // Count
                 int count = GraphqlUtils.getIntArgument(environment, "count").orElse(10);
                 Object filter = environment.getArgument("filter");
+                Object genericFilter = environment.getArgument("generic");
                 boolean lastPromotions = GraphqlUtils.getBooleanArgument(environment, "lastPromotions", false);
                 // Filter to use
                 BuildFilterProviderData<?> buildFilter;
@@ -143,11 +156,17 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 if (lastPromotions) {
                     buildFilter = buildFilterService.lastPromotedBuildsFilterData();
                 }
-                // Default filter
-                else if (filter == null) {
-                    buildFilter = buildFilterService.standardFilterProviderData(count).build();
-                } else {
+                // Standard filter
+                else if (filter != null) {
                     buildFilter = inputBuildStandardFilter.convert(filter);
+                }
+                // Generic filter
+                else if (genericFilter != null) {
+                    buildFilter = inputBuildGenericFilter.convert(genericFilter);
+                }
+                // Default filter
+                else {
+                    buildFilter = buildFilterService.standardFilterProviderData(count).build();
                 }
                 // Result
                 return buildFilter.filterBranchBuilds(branch);

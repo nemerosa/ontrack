@@ -9,19 +9,23 @@
                             <form class="form-inline">
                                 <!-- Navigation -->
                                 <div class="form-group">
-                                    <button ng-click="previousPage()" class="btn btn-default" ng-disabled="!logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</button>
+                                    <button ng-click="previousPage()" class="btn btn-default" ng-disabled="loadingEntries || !logs.pagination.prev"><i class="fa fa-step-backward"></i>&nbsp;Previous</button>
                                 </div>
                                 <div class="form-group">
-                                    <button ng-click="nextPage()" class="btn btn-default" ng-disabled="!logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</button>
+                                    <button ng-click="nextPage()" class="btn btn-default" ng-disabled="loadingEntries || !logs.pagination.next"><i class="fa fa-step-forward"></i>&nbsp;Next</button>
                                 </div>
                                 <!-- Actions -->
                                 <div class="form-group">
-                                    <button ng-click="refreshList()" class="btn btn-info">
+                                    <button ng-click="refreshList()" class="btn btn-info" ng-disabled="loadingEntries">
                                         <i class="fa fa-refresh"></i>&nbsp;Refresh log
                                     </button>
-                                    <button ng-click="deleteAll()" class="btn btn-danger">
+                                    <button ng-click="deleteAll()" class="btn btn-danger" ng-disabled="loadingEntries">
                                         <i class="fa fa-trash"></i>&nbsp;Delete all entries
                                     </button>
+                                    <span ng-show="loadingEntries">
+                                        <span class="ot-loading-indicator"></span>
+                                        Loading log entries...
+                                    </span>
                                 </div>
                             </form>
                             <br/>
@@ -74,12 +78,12 @@
                                         </div>
                                         <!-- Commands -->
                                         <div class="form-group">
-                                            <button ng-click="filterLogs()" class="btn btn-info">
+                                            <button ng-click="filterLogs()" class="btn btn-info" ng-disabled="loadingEntries">
                                                 <i class="fa fa-filter"></i>&nbsp;Filter
                                             </button>
                                         </div>
                                         <div class="form-group">
-                                            <button ng-click="resetFilter()" class="btn btn-default">
+                                            <button ng-click="resetFilter()" class="btn btn-default" ng-disabled="loadingEntries">
                                                 <i class="fa fa-ban"></i>&nbsp;Reset filter
                                             </button>
                                         </div>
