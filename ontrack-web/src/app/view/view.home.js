@@ -171,7 +171,7 @@ angular.module('ot.view.home', [
 
         // Login procedure
         $scope.accessStatus = 'undefined';
-        if (code && code === 403) {
+        if (code && Number(code) === 403) {
             $log.debug('[403] received');
             if (otUserService.logged()) {
                 $scope.accessStatus = 'unauthorised';
