@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
+import net.nemerosa.ontrack.model.form.ServiceConfigurator
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
@@ -21,6 +22,7 @@ class ValidationRunController
 constructor(
         private val structureService: StructureService,
         private val validationRunStatusService: ValidationRunStatusService,
+        private val validationDataTypeService: ValidationDataTypeService,
         private val propertyService: PropertyService,
         private val securityService: SecurityService
 ) : AbstractResourceController() {
@@ -52,9 +54,22 @@ constructor(
         val build = structureService.getBuild(buildId)
         return Form.create()
                 .with(
-                        Selection.of("validationStampId")
+                        ServiceConfigurator.of("validationStampData")
                                 .label("Validation stamp")
-                                .items(structureService.getValidationStampListForBranch(build.branch.id))
+                                .sources(
+                                        structureService.getValidationStampListForBranch(build.branch.id)
+                                                .map {
+                                                    ServiceConfigurationSource(
+                                                            it.name,
+                                                            it.name,
+                                                            it.dataType?.let { dataType ->
+                                                                validationDataTypeService
+                                                                        .getValidationDataType<Any, Any>(dataType.id)
+                                                                        ?.getForm(null)
+                                                            } ?: Form.create()
+                                                    )
+                                                }
+                                )
                 )
                 .with(
                         Selection.of("validationRunStatusId")
@@ -105,7 +120,7 @@ constructor(
 
     @GetMapping("validationRuns/{validationRunId}")
     fun getValidationRun(@PathVariable validationRunId: ID): ValidationRun =
-        structureService.getValidationRun(validationRunId)
+            structureService.getValidationRun(validationRunId)
 
     // Validation run status
 
