@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Pagination;
@@ -81,7 +80,7 @@ public class ValidationRunController extends AbstractResourceController {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the validation stamp
-        ValidationStamp validationStamp = getValidationStamp(build.getBranch(), validationRunRequest.getValidationStampId(), validationRunRequest.getValidationStampName());
+        ValidationStamp validationStamp = getValidationStamp(build.getBranch(), validationRunRequest.getValidationStampId(), validationRunRequest.getActualValidationStampName());
         // Gets the validation run status
         ValidationRunStatusID validationRunStatusID = validationRunStatusService.getValidationRunStatus(validationRunRequest.getValidationRunStatusId());
         // Validation run to create

@@ -42,7 +42,7 @@ class ValidationRunControllerTest {
         predefinedValidationStampService = mock(PredefinedValidationStampService)
         controller = new ValidationRunController(
                 structureService,
-                validationRunStatusService,
+                validationRunStatusService, validationDataTypeService,
                 propertyService,
                 securityService
         )
