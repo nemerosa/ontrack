@@ -13,6 +13,8 @@ var ngFilesort = require('gulp-angular-filesort');
 var debug = require('gulp-debug');
 var minimist = require('minimist');
 var del = require('del');
+var babel = require("gulp-babel");
+var sourcemaps = require('gulp-sourcemaps');
 
 // Arguments
 
@@ -47,6 +49,7 @@ var build = 'build/web';
 
 var buildPath = build + '/dev';
 var buildTemplates = buildPath + '/templates';
+var buildConvertedJs = buildPath + '/converted';
 var buildAngular = buildPath + '/angular';
 var buildCss = buildPath + '/css';
 
@@ -104,7 +107,7 @@ gulp.task('clean', function () {
 gulp.task('lint', function () {
     return gulp.src(jsResources)
         .pipe(debug({title: 'lint:'}))
-        .pipe(jshint())
+        .pipe(jshint({esversion: 6}))
         .pipe(jshint.reporter('default'))
         .pipe(jshint.reporter('fail'))
         .pipe(liveReload());
@@ -119,14 +122,28 @@ gulp.task('templates', function () {
 });
 
 /**
+ * Converted files
+ */
+
+gulp.task('js:conversion', ['lint'], function () {
+    return gulp.src(jsResources)
+        .pipe(debug({title: 'js:conversion:input'}))
+        .pipe(babel())
+        .pipe(gulp.dest(buildConvertedJs))
+        .pipe(debug({title: 'js:conversion:output'}));
+});
+
+/**
  * Sorted and annotated Angular files
  */
-gulp.task('js:angular', ['lint', 'templates'], function () {
-    return gulp.src([buildTemplates + '/*.js', jsResources])
+gulp.task('js:angular', ['lint', 'js:conversion', 'templates'], function () {
+    return gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js'])
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
+        .pipe(sourcemaps.init())
         .pipe(concat('ci-angular.js'))
+        .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(buildAngular))
         .pipe(debug({title: 'js:angular:output'}));
 });
@@ -202,11 +219,11 @@ gulp.task('extensionAssets', function () {
 
 // Injection in index.html
 
-gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
+gulp.task('index:dev', ['less', 'fonts', 'js:conversion', 'templates'], function () {
     var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
     var vendorJsSources = gulp.src(vendorJsResources, {read: false});
     var vendorCssSources = gulp.src(vendorCssResources, {read: false});
-    var appSources = gulp.src([buildTemplates + '/*.js', jsResources]).pipe(ngFilesort());
+    var appSources = gulp.src([buildTemplates + '/*.js', buildConvertedJs + '/**/*.js']).pipe(ngFilesort());
 
     return gulp.src(indexResource)
         .pipe(debug({title: 'index:dev:input'}))

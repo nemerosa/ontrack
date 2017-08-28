@@ -1,33 +1,19 @@
-angular.module('ot.view.admin.console', [
+angular.module('ot.view.admin.jobs', [
         'ui.router',
         'ot.service.core',
         'ot.service.task'
     ])
     .config(function ($stateProvider) {
-        $stateProvider.state('admin-console', {
-            url: '/admin-console',
-            templateUrl: 'app/view/view.admin.console.tpl.html',
-            controller: 'AdminConsoleCtrl'
+        $stateProvider.state('admin-jobs', {
+            url: '/admin-jobs',
+            templateUrl: 'app/view/view.admin.jobs.tpl.html',
+            controller: 'AdminJobsCtrl'
         });
     })
-    .controller('AdminConsoleCtrl', function ($scope, $http, ot, otAlertService, otTaskService, otNotificationService) {
+    .controller('AdminJobsCtrl', function ($scope, $http, ot, otAlertService, otTaskService, otNotificationService) {
         var view = ot.view();
-        view.title = "Administration console";
-        view.description = "Tools for the general management of ontrack";
-
-        // Loads the statuses
-        function loadHealth() {
-            ot.call($http.get('admin/status')).then(function (health) {
-                $scope.health = health;
-            });
-        }
-
-        // Loads the extensions
-        function loadExtensions() {
-            ot.call($http.get('extensions')).then(function (extensions) {
-                $scope.extensions = extensions;
-            });
-        }
+        view.title = "System jobs";
+        view.description = "Tools for the management of system background jobs";
 
         // Selected category & types
         //noinspection UnnecessaryLocalVariableJS
@@ -81,8 +67,6 @@ angular.module('ot.view.admin.console', [
 
         // Initialisation
         loadJobs();
-        loadHealth();
-        loadExtensions();
 
         var interval = 10 * 1000; // 10 seconds
         otTaskService.register('Admin Console Load Jobs', loadJobs, interval);

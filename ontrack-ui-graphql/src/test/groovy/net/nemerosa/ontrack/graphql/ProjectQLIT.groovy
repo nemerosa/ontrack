@@ -136,19 +136,15 @@ class ProjectQLIT extends AbstractQLITSupport {
                     promotionLevels {
                         name
                         promotionRuns {
-                            edges {
-                                node {
-                                    build {
-                                        name
-                                    }
-                                }
+                            build {
+                                name
                             }
                         }
                     }
                 }
             }
         }""")
-        assert data.projects.branches.promotionLevels.promotionRuns.edges.node.build.name.flatten() == ['4', '2']
+        assert data.projects.branches.promotionLevels.promotionRuns.build.name.flatten() == ['4', '2']
     }
 
     @Test
@@ -364,19 +360,52 @@ class ProjectQLIT extends AbstractQLITSupport {
                     promotionLevels {
                         name
                         promotionRuns(first: 5) {
-                            edges {
-                                node {
-                                    build {
-                                        name
-                                    }
-                                }
+                            build {
+                                name
                             }
                         }
                     }
                 }
             }
         }""")
-        assert data.projects.branches.promotionLevels.promotionRuns.edges.node.build.name.flatten() == ['20', '18', '16', '14', '12']
+        assert data.projects.branches.promotionLevels.promotionRuns.build.name.flatten() == ['20', '18', '16', '14', '12']
+    }
+
+    @Test
+    void 'Last promotion runs for a promotion level'() {
+        def pl = doCreatePromotionLevel()
+        def branch = pl.branch
+        def project = branch.project
+        (1..20).each {
+            def build = doCreateBuild(branch, NameDescription.nd("${it}", "Build ${it}"))
+            if (it % 2 == 0) {
+                asUser().with(project, PromotionRunCreate).call {
+                    structureService.newPromotionRun(
+                            PromotionRun.of(
+                                    build,
+                                    pl,
+                                    Signature.of('test'),
+                                    "Promotion"
+                            )
+                    )
+                }
+            }
+        }
+        def data = run("""{
+            projects (id: ${project.id}) {
+                branches (name: "${branch.name}") {
+                    promotionLevels {
+                        name
+                        promotionRuns(last: 3) {
+                            build {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }""")
+        assert data.projects.branches.promotionLevels.promotionRuns.build.name.flatten() == ['6', '4', '2']
     }
 
     @Test

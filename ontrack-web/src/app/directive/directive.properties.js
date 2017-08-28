@@ -59,7 +59,7 @@ angular.module('ot.directive.properties', [
                 }
 
                 scope.$watch('entity', function () {
-                    if (scope.entity) {
+                    if (scope.entity && scope.entity._properties) {
                         loadProperties();
                     }
                 });
