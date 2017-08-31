@@ -100,6 +100,15 @@ constructor(
                 validationRunStatusID,
                 validationRunRequest.description
         )
+        // Validation run data
+        if (validationStamp.dataType != null) {
+            validationRun = validationRun.withData(
+                    ServiceConfiguration(
+                            validationStamp.dataType.id,
+                            validationRunRequest.validationStampData?.data
+                    )
+            )
+        }
         // Creation
         validationRun = structureService.newValidationRun(validationRun)
         // Saves the properties
