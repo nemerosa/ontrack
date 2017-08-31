@@ -40,7 +40,7 @@ constructor(
         // Parses the configuration
         val config = validationDataType.configFromJson(configJson)
         // Parses the data
-        val data = validationDataType.fromJson(dataJson) ?: throw ValidationRunDataInputException(
+        val data = validationDataType.fromForm(dataJson) ?: throw ValidationRunDataInputException(
                 "Data is required for this validation run."
         )
         // Validation
