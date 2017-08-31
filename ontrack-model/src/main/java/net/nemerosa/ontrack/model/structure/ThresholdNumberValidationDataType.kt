@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class ThresholdNumberValidationDataType : AbstractValidationDataType<Int?, Int>() {
-    override fun configFromJson(node: JsonNode): Int? =
+    override fun configFromJson(node: JsonNode?): Int? =
             when (node) {
                 is IntNode -> node.asInt()
                 else -> null

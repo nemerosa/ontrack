@@ -26,6 +26,7 @@ interface ValidationDataTypeService {
      *
      * @param data Data to validate (ID + JSON)
      * @param config Configuration associated to the type
+     * @return Validated JSON (might be different from the input)
      */
-    fun validateData(data: ServiceConfiguration, config: JsonNode)
+    fun validateData(data: ServiceConfiguration, config: JsonNode?): JsonNode?
 }

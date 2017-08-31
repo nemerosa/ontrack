@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class TextValidationDataType : AbstractValidationDataType<Unit, String>() {
-    override fun configFromJson(node: JsonNode) {}
+    override fun configFromJson(node: JsonNode?) {}
 
     override fun configToJson(config: Unit): JsonNode = NullNode.instance
 

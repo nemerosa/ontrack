@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
 import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.common.Document;
@@ -1069,14 +1070,21 @@ public class StructureServiceImpl implements StructureService {
         return validationStamp;
     }
 
-    private void checkValidationRunDataType(ValidationRun validationRun) {
+    private ValidationRun checkValidationRunDataType(ValidationRun validationRun) {
         ServiceConfiguration data = validationRun.getData();
         ServiceConfiguration dataType = validationRun.getValidationStamp().getDataType();
         if (data != null) {
             if (dataType != null) {
                 if (StringUtils.equals(data.getId(), dataType.getId())) {
                     // Same type - validation is needed
-                    validationDataTypeService.validateData(data, dataType.getData());
+                    JsonNode validatedData = validationDataTypeService.validateData(data, dataType.getData());
+                    // Returns the validated run
+                    return validationRun.withData(
+                            new ServiceConfiguration(
+                                    data.getId(),
+                                    validatedData
+                            )
+                    );
                 } else {
                     // Different type of data
                     throw new ValidationRunDataInputException(
@@ -1101,6 +1109,9 @@ public class StructureServiceImpl implements StructureService {
             );
         }
         // No data, no data type - OK
+        else {
+            return validationRun;
+        }
     }
 
     @Override
@@ -1114,7 +1125,7 @@ public class StructureServiceImpl implements StructureService {
         // Checks the authorization
         securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunCreate.class);
         // Checks the data
-        checkValidationRunDataType(validationRun);
+        ValidationRun validatedRun = checkValidationRunDataType(validationRun);
         // Actual creation
         ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun, validationRunStatusService::getValidationRunStatus);
         // Event

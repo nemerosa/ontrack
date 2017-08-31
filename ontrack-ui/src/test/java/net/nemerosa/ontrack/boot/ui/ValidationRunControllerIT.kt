@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.ui
 
-import com.fasterxml.jackson.databind.node.IntNode
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
@@ -87,7 +86,9 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         assertNotNull(data, "Validation run has some data")
         assertEquals(ThresholdPercentageValidationDataType::class.qualifiedName, data.id)
         TestUtils.assertJsonEquals(
-                IntNode(70),
+                JsonUtils.`object`()
+                        .with("value", 70)
+                        .end(),
                 data.data
         )
     }

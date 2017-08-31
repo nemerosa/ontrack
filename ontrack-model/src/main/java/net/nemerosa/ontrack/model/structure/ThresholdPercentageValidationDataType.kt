@@ -11,7 +11,7 @@ data class ThresholdPercentageValidationDataTypeConfig(val threshold: Int?, val 
 
 @Component
 class ThresholdPercentageValidationDataType : AbstractValidationDataType<ThresholdPercentageValidationDataTypeConfig, Int>() {
-    override fun configFromJson(node: JsonNode): ThresholdPercentageValidationDataTypeConfig =
+    override fun configFromJson(node: JsonNode?): ThresholdPercentageValidationDataTypeConfig =
             JsonUtils.parse(node, ThresholdPercentageValidationDataTypeConfig::class.java)
 
     override fun configToJson(config: ThresholdPercentageValidationDataTypeConfig): JsonNode =

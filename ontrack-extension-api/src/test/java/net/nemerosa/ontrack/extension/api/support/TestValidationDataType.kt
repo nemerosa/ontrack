@@ -32,7 +32,7 @@ class TestValidationDataType : ValidationDataType<Unit, TestValidationData> {
 
     override fun configToJson(config: Unit): JsonNode = NullNode.instance
 
-    override fun configFromJson(node: JsonNode): Unit? = null
+    override fun configFromJson(node: JsonNode?): Unit? = null
 
     override fun getConfigForm(config: Unit?): Form = Form.create()
 

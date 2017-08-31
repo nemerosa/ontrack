@@ -22,17 +22,17 @@ constructor(
 
     override fun getAllTypes(): List<ValidationDataType<*, *>> = types
 
-    override fun validateData(data: ServiceConfiguration, config: JsonNode) {
+    override fun validateData(data: ServiceConfiguration, config: JsonNode?): JsonNode? {
         // Gets the data type first
         val validationDataType = getValidationDataType<Any, Any>(data.id) ?: throw ValidationRunDataInputException(
                 "Cannot find any data type for ID `%s`",
                 data.id
         )
         // Validation
-        validateData(validationDataType, data.data, config)
+        return validateData(validationDataType, data.data, config)
     }
 
-    private fun <C, T> validateData(validationDataType: ValidationDataType<C, T>, dataJson: JsonNode?, configJson: JsonNode) {
+    private fun <C, T> validateData(validationDataType: ValidationDataType<C, T>, dataJson: JsonNode?, configJson: JsonNode?): JsonNode? {
         // Data is required
         if (dataJson == null) {
             throw ValidationRunDataInputException("Data is required for this validation run.")
@@ -45,5 +45,7 @@ constructor(
         )
         // Validation
         validationDataType.validateData(config, data)
+        // As JSON
+        return validationDataType.toJson(data)
     }
 }

@@ -10,7 +10,7 @@ data class FractionValidationData(val numerator: Int, val denominator: Int)
 
 @Component
 class FractionValidationDataType : AbstractValidationDataType<FractionValidationDataTypeConfig, FractionValidationData>() {
-    override fun configFromJson(node: JsonNode): FractionValidationDataTypeConfig =
+    override fun configFromJson(node: JsonNode?): FractionValidationDataTypeConfig =
             JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
 
     override fun configToJson(config: FractionValidationDataTypeConfig): JsonNode =

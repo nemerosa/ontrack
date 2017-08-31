@@ -27,7 +27,7 @@ interface ValidationDataType<C, T> {
      * @return The data or `null` if the JSON cannot be translated. The implementation can also choose
      * to throw an exception instead.
      */
-    fun configFromJson(node: JsonNode): C?
+    fun configFromJson(node: JsonNode?): C?
 
     /**
      * Gets a form to edit / create the configuration.
