@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
 class BuildLinkDecorationPromotion(
-        val promotionName: String,
-        val promotionImageLink: String
+        val name: String,
+        val imageLink: String
 )

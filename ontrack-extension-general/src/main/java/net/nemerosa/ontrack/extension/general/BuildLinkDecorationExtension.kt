@@ -35,8 +35,9 @@ constructor(
                 promotionRuns.map {
                     BuildLinkDecorationPromotion(
                             it.promotionLevel.name,
+                            // See PromotionLevelController
                             uriBuilder.url(
-                                    "promotionLevels/${it.promotionLevel.id}/image"
+                                    "/structure/promotionLevels/${it.promotionLevel.id}/image"
                             ).toString()
                     )
                 }
