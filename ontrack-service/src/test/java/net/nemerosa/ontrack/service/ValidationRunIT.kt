@@ -108,7 +108,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                     ).withData(
                             ServiceConfiguration(
                                     ThresholdPercentageValidationDataType::class.java.name,
-                                    IntNode(80)
+                                    JsonUtils.`object`().with("value", 80).end()
                             )
                     )
             )

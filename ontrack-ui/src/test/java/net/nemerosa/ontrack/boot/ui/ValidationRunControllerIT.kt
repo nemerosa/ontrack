@@ -86,9 +86,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         assertNotNull(data, "Validation run has some data")
         assertEquals(ThresholdPercentageValidationDataType::class.qualifiedName, data.id)
         TestUtils.assertJsonEquals(
-                JsonUtils.`object`()
-                        .with("value", 70)
-                        .end(),
+                JsonUtils.format(70),
                 data.data
         )
     }

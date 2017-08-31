@@ -1127,7 +1127,7 @@ public class StructureServiceImpl implements StructureService {
         // Checks the data
         ValidationRun validatedRun = checkValidationRunDataType(validationRun);
         // Actual creation
-        ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun, validationRunStatusService::getValidationRunStatus);
+        ValidationRun newValidationRun = structureRepository.newValidationRun(validatedRun, validationRunStatusService::getValidationRunStatus);
         // Event
         eventPostService.post(eventFactory.newValidationRun(newValidationRun));
         // OK
