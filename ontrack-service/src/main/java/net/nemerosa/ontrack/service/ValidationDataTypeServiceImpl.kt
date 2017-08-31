@@ -32,12 +32,16 @@ constructor(
         validateData(validationDataType, data.data, config)
     }
 
-    private fun <C, T> validateData(validationDataType: ValidationDataType<C, T>, dataJson: JsonNode, configJson: JsonNode) {
+    private fun <C, T> validateData(validationDataType: ValidationDataType<C, T>, dataJson: JsonNode?, configJson: JsonNode) {
+        // Data is required
+        if (dataJson == null) {
+            throw ValidationRunDataInputException("Data is required for this validation run.")
+        }
         // Parses the configuration
         val config = validationDataType.configFromJson(configJson)
         // Parses the data
         val data = validationDataType.fromJson(dataJson) ?: throw ValidationRunDataInputException(
-                "Data is required with validation run."
+                "Data is required for this validation run."
         )
         // Validation
         validationDataType.validateData(config, data)
