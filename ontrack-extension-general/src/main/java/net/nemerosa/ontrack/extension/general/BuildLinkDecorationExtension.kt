@@ -32,7 +32,14 @@ constructor(
                 build.project.name,
                 build.name,
                 uriBuilder.getEntityPage(build),
-                promotionRuns
+                promotionRuns.map {
+                    BuildLinkDecorationPromotion(
+                            it.promotionLevel.name,
+                            uriBuilder.url(
+                                    "promotionLevels/${it.promotionLevel.id}/image"
+                            ).toString()
+                    )
+                }
         ))
     }
 
