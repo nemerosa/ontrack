@@ -49,6 +49,8 @@ angular.module('ot.view.buildSearch', [
                         $scope.data = JSON.parse(jsonLink);
                         // Removes the hash after use
                         $location.hash('');
+                        // Launches the search automatically
+                        $scope.submitSearch();
                     } else {
                         // Locally saved criteria
                         var json = localStorage.getItem('build_search_' + projectId);

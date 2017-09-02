@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.graphql.schema;
 
+import graphql.Scalars;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
-import net.nemerosa.ontrack.graphql.support.ConnectionList;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.graphql.support.Relay;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,11 +26,12 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
 
     @Autowired
     public GQLTypePromotionLevel(StructureService structureService,
+                                 GQLTypeCreation creation,
                                  GQLTypePromotionRun promotionRun,
                                  List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
         super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL,
-                projectEntityFieldContributors
-        );
+                projectEntityFieldContributors,
+                creation);
         this.structureService = structureService;
         this.promotionRun = promotionRun;
     }
@@ -42,6 +42,11 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface())
                 .fields(projectEntityInterfaceFields())
+                // Image flag
+                .field(f -> f.name("image")
+                        .description("Flag to indicate if an image is associated")
+                        .type(Scalars.GraphQLBoolean)
+                )
                 // Ref to branch
                 .field(
                         newFieldDefinition()
@@ -55,8 +60,8 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                         newFieldDefinition()
                                 .name("promotionRuns")
                                 .description("List of runs for this promotion")
-                                .type(GraphqlUtils.connectionList(promotionRun.getType()))
-                                .argument(Relay.getConnectionFieldArguments())
+                                .type(GraphqlUtils.stdList(promotionRun.getType()))
+                                .argument(GraphqlUtils.stdListArguments())
                                 .dataFetcher(promotionLevelPromotionRunsFetcher())
                                 .build()
                 )
@@ -71,8 +76,8 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                 PromotionLevel promotionLevel = (PromotionLevel) source;
                 // Gets all the promotion runs
                 List<PromotionRun> promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.getId());
-                // As a connection list
-                return new ConnectionList(promotionRuns).get(environment);
+                // Filters according to the arguments
+                return GraphqlUtils.stdListArgumentsFilter(promotionRuns, environment);
             } else {
                 return Collections.emptyList();
             }

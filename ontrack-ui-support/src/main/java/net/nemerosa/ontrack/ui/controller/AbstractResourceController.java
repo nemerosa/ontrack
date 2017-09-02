@@ -25,11 +25,7 @@ public abstract class AbstractResourceController {
 
     protected Action resolveExtensionAction(Extension extension, Action action) {
         if (action != null) {
-            return action.withUri(
-                    String.format("extension/%s/%s",
-                            extension.getFeature().getId(),
-                            action.getUri())
-            );
+            return uriBuilder.resolveActionWithExtension(extension, action);
         } else {
             return null;
         }

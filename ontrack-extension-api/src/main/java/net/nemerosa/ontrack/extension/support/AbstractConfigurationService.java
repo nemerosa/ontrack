@@ -72,10 +72,14 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
 
     @Override
     public T getConfiguration(String name) {
+        return findConfiguration(name)
+                .orElseThrow(() -> new ConfigurationNotFoundException(name));
+    }
+
+    protected Optional<T> findConfiguration(String name) {
         return configurationRepository
                 .find(configurationClass, name)
-                .map(this::decrypt)
-                .orElseThrow(() -> new ConfigurationNotFoundException(name));
+                .map(this::decrypt);
     }
 
     @Override
@@ -86,7 +90,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public void deleteConfiguration(String name) {
         checkAccess();
-        T configuration = configurationRepository.find(configurationClass, name).get();
+        T configuration = getConfiguration(name);
         // Notifies of the deletion BEFORE the actual deletion, giving a change to the listeners to list access the configuration
         eventPostService.post(eventFactory.deleteConfiguration(configuration));
         // Listeners
@@ -113,10 +117,10 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
      * 3) the user name is the same
      */
     protected T injectCredentials(T configuration) {
+        T oldConfig = findConfiguration(configuration.getName()).orElse(null);
         T target;
         if (StringUtils.isBlank(configuration.getPassword())) {
-            T oldConfig = getConfiguration(configuration.getName());
-            if (StringUtils.equals(oldConfig.getUser(), configuration.getUser())) {
+            if (oldConfig != null && StringUtils.equals(oldConfig.getUser(), configuration.getUser())) {
                 target = configuration.withPassword(oldConfig.getPassword());
             } else {
                 target = configuration;

@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class RolesServiceImpl implements RolesService, StartupService {
 
-    public static final String GLOBAL_READ_ONLY = "READ_ONLY";
     /**
      * Index of global roles
      */
@@ -138,9 +137,12 @@ public class RolesServiceImpl implements RolesService, StartupService {
         projectManagerFunctions.addAll(validationManagerFunctions);
         projectManagerFunctions.addAll(promoterFunctions);
         projectManagerFunctions.add(BranchFilterMgt.class);
+        projectManagerFunctions.add(BranchCreate.class);
+        projectManagerFunctions.add(BranchEdit.class);
+        projectManagerFunctions.add(BranchDelete.class);
         register(Roles.PROJECT_MANAGER, "Project manager",
                 "The project manager can promote existing builds, manage the validation stamps, " +
-                        "manage the shared build filters and edit some properties.",
+                        "manage the shared build filters, manage the branches and edit some properties.",
                 projectManagerFunctions
         );
 
@@ -150,6 +152,24 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 readOnlyProjectFunctions
         );
 
+        // Project roles contributions
+        roleContributors.forEach(roleContributor ->
+                roleContributor.getProjectRoles().forEach(roleDefinition -> {
+                            if (Roles.PROJECT_ROLES.contains(roleDefinition.getId())) {
+                                // Totally illegal - stopping everything
+                                throw new IllegalStateException("An existing project role cannot be overridden: " + roleDefinition.getId());
+                            } else {
+                                register(
+                                        roleDefinition.getId(),
+                                        roleDefinition.getName(),
+                                        roleDefinition.getDescription(),
+                                        Collections.emptyList()
+                                );
+                            }
+                        }
+                )
+        );
+
     }
 
     private void register(String id, String name, String description, List<Class<? extends ProjectFunction>> projectFunctions) {
@@ -157,8 +177,11 @@ public class RolesServiceImpl implements RolesService, StartupService {
         // Contributions
         roleContributors.forEach(roleContributor ->
                 roleContributor.getProjectFunctionContributionsForProjectRole(id).forEach(fn -> {
-                    // Checks the function as non core
-                    checkFunctionForContribution(fn);
+                    // Checks if the role is predefined
+                    if (Roles.PROJECT_ROLES.contains(id)) {
+                        // Checks the function as non core
+                        checkFunctionForContribution(fn);
+                    }
                     // OK
                     functions.add(fn);
                 })
@@ -253,10 +276,29 @@ public class RolesServiceImpl implements RolesService, StartupService {
         );
 
         // Read only on all projects
-        register(GLOBAL_READ_ONLY, "Read Only",
+        register(Roles.GLOBAL_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all projects",
                 readOnlyGlobalFunctions,
                 readOnlyProjectFunctions
+        );
+
+        // Global roles contributions
+        roleContributors.forEach(roleContributor ->
+                roleContributor.getGlobalRoles().forEach(roleDefinition -> {
+                            if (Roles.GLOBAL_ROLES.contains(roleDefinition.getId())) {
+                                // Totally illegal - stopping everything
+                                throw new IllegalStateException("An existing global role cannot be overridden: " + roleDefinition.getId());
+                            } else {
+                                register(
+                                        roleDefinition.getId(),
+                                        roleDefinition.getName(),
+                                        roleDefinition.getDescription(),
+                                        Collections.emptyList(),
+                                        Collections.emptyList()
+                                );
+                            }
+                        }
+                )
         );
 
     }
@@ -266,7 +308,9 @@ public class RolesServiceImpl implements RolesService, StartupService {
         LinkedHashSet<Class<? extends GlobalFunction>> gfns = new LinkedHashSet<>(globalFunctions);
         roleContributors.forEach(roleContributor ->
                 roleContributor.getGlobalFunctionContributionsForGlobalRole(id).forEach(fn -> {
-                    checkFunctionForContribution(fn);
+                    if (Roles.GLOBAL_ROLES.contains(id)) {
+                        checkFunctionForContribution(fn);
+                    }
                     gfns.add(fn);
                 })
         );
@@ -274,7 +318,9 @@ public class RolesServiceImpl implements RolesService, StartupService {
         LinkedHashSet<Class<? extends ProjectFunction>> pfns = new LinkedHashSet<>(projectFunctions);
         roleContributors.forEach(roleContributor ->
                 roleContributor.getProjectFunctionContributionsForGlobalRole(id).forEach(fn -> {
-                    checkFunctionForContribution(fn);
+                    if (Roles.GLOBAL_ROLES.contains(id)) {
+                        checkFunctionForContribution(fn);
+                    }
                     pfns.add(fn);
                 })
         );

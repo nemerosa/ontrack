@@ -102,6 +102,7 @@ configure(javaProjects) {
         // Testing
         testCompile 'junit:junit'
         testCompile 'org.mockito:mockito-core'
+        testCompile "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
     }
 
     compileKotlin {

@@ -100,25 +100,27 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                     if (found) {
                         // ... loads the issue
                         Issue issue = c.getConfiguredIssueService().getIssue(token);
-                        // Saves the result for the project
-                        projectResults.put(
-                                projectId,
-                                new SearchResult(
-                                        issue.getDisplayKey(),
-                                        String.format("Issue %s found in project %s",
-                                                issue.getKey(),
-                                                c.getBranch().getProject().getName()
-                                        ),
-                                        uri(on(GitController.class).issueInfo(
-                                                c.getBranch().getId(),
-                                                issue.getKey()
-                                        )),
-                                        uriBuilder.page("extension/git/%d/issue/%s",
-                                                c.getBranch().id(),
-                                                issue.getKey()),
-                                        100
-                                )
-                        );
+                        // Saves the result for the project if an issue has been found
+                        if (issue != null) {
+                            projectResults.put(
+                                    projectId,
+                                    new SearchResult(
+                                            issue.getDisplayKey(),
+                                            String.format("Issue %s found in project %s",
+                                                    issue.getKey(),
+                                                    c.getBranch().getProject().getName()
+                                            ),
+                                            uri(on(GitController.class).issueInfo(
+                                                    c.getBranch().getId(),
+                                                    issue.getKey()
+                                            )),
+                                            uriBuilder.page("extension/git/%d/issue/%s",
+                                                    c.getBranch().id(),
+                                                    issue.getKey()),
+                                            100
+                                    )
+                            );
+                        }
                     }
                 }
             }

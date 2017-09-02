@@ -122,3 +122,44 @@ securityService.checkProjectFunction(project, MyProjectFunction.class))
 
 TIP: The project functions can be tested on a `Project` or any other
 <<model,entity>> which belongs to a project (branches, builds, etc.).
+
+[[extending-security-roles]]
+===== Adding roles
+
+Both _global_ and _project_ <<security,roles>> can be added
+using the same `RoleContributor` extension class, by
+overriding the following methods:
+
+[source,java]
+----
+@Component
+public MyRoleContributor implements RoleContributor {
+    @Override
+    public List<RoleDefinition> getGlobalRoles() {
+        return Collections.singletonList(
+            new RoleDefinition(
+                "MY_GLOBAL_ROLE",
+                "My Global Role",
+                "This is a new global role"
+            )
+        );
+    }
+    @Override
+    public List<RoleDefinition> getProjectRoles() {
+        return Collections.singletonList(
+            new RoleDefinition(
+                "MY_PROJECT_ROLE",
+                "My Project Role",
+                "This is a new project role"
+            )
+        );
+    }
+}
+----
+
+Those roles becomes eligible for selection when managing
+accounts and groups.
+
+Note that functions (built-in or contributed) can be
+associated to those new roles - see <<extending-security-functions>>.
+By default, no function is associated to a contributed role.

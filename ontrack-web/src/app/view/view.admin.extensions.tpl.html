@@ -1,0 +1,42 @@
+<ot-view>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info" ng-hide="extensions">
+                        <span class="ot-loading-indicator"></span>
+                        Loading the extension list...
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-bordered" ng-show="extensions">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Version</th>
+                    <th>GUI</th>
+                    <th>Dependencies</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="extension in extensions.extensions">
+                    <td><code>{{extension.id}}</code></td>
+                    <td>{{extension.name}}</td>
+                    <td>{{extension.description}}</td>
+                    <td>{{extension.version}}</td>
+                    <td>
+                        <span class="label label-info" ng-if="extension.options.gui">GUI</span>
+                    </td>
+                    <td>
+                        <span class="label label-success" ng-repeat="dependency in extension.options.dependencies">{{dependency}}</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</ot-view>

@@ -21,6 +21,8 @@ public final class GraphqlUtils {
     public static final String NAME = "name";
     public static final String DISABLED = "disabled";
     public static final String DESCRIPTION = "description";
+    public static final String STD_LIST_ARG_FIRST = "first";
+    public static final String STD_LIST_ARG_LAST = "last";
 
     public static GraphQLFieldDefinition idField() {
         return newFieldDefinition()
@@ -46,7 +48,7 @@ public final class GraphqlUtils {
         return newFieldDefinition()
                 .name(NAME)
                 .description(description)
-                .type(new GraphQLNonNull(GraphQLString))
+                .type(GraphQLString)
                 .build();
     }
 
@@ -202,6 +204,46 @@ public final class GraphqlUtils {
                                     ' '),
                             " ")
             );
+        }
+    }
+
+    public static List<GraphQLArgument> stdListArguments() {
+        return Arrays.asList(
+                GraphQLArgument.newArgument()
+                        .name(STD_LIST_ARG_FIRST)
+                        .description("Number of items to return from the beginning of the list")
+                        .type(GraphQLInt)
+                        .build(),
+                GraphQLArgument.newArgument()
+                        .name(STD_LIST_ARG_LAST)
+                        .description("Number of items to return from the end of the list")
+                        .type(GraphQLInt)
+                        .build()
+        );
+    }
+
+    public static <T> List<T> stdListArgumentsFilter(List<T> list, DataFetchingEnvironment environment) {
+        OptionalInt first = getIntArgument(environment, STD_LIST_ARG_FIRST);
+        OptionalInt last = getIntArgument(environment, STD_LIST_ARG_LAST);
+        if (first.isPresent()) {
+            if (last.isPresent()) {
+                throw new IllegalStateException(
+                        String.format(
+                                "Only one of `%s` or `%s` is expected as argument",
+                                STD_LIST_ARG_FIRST,
+                                STD_LIST_ARG_LAST
+                        )
+                );
+            } else {
+                // First items...
+                return list.subList(0, Math.min(list.size(), first.getAsInt()));
+            }
+        } else if (last.isPresent()) {
+            // Last items
+            return list.subList(Math.max(0, list.size() - last.getAsInt()), list.size());
+        } else {
+            // No range
+            return list;
         }
     }
 }

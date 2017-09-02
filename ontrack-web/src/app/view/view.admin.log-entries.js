@@ -78,10 +78,13 @@ angular.module('ot.view.admin.log-entries', [
             var params = angular.copy(filter);
             params.offset = $scope.offset;
             params.count = $scope.pageSize;
+            $scope.loadingEntries = true;
             ot.call($http.get('admin/logs', {
                 params: params
             })).then(function (logs) {
                 $scope.logs = logs;
+            }).finally(function () {
+                $scope.loadingEntries = false;
             });
         }
 

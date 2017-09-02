@@ -1,97 +1,104 @@
 <ot-view>
 
-    <ot-entity-disabled entity="project" callback="reloadProject()">
-        The project is disabled.
-    </ot-entity-disabled>
-
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-info" ng-show="loadingBranches">
                 <span class="ot-loading-indicator"></span>
-                Loading the project branches...
+                Loading the project...
             </div>
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-12 ot-view-title">
+            {{project.name}}
+            <ot-entity-embedded-decorations decorations="project.decorations"></ot-entity-embedded-decorations>
+            <div ng-if="project.description" class="ot-description">
+                {{project.description}}
+            </div>
+        </div>
+    </div>
+
+    <ot-entity-disabled entity="project" callback="reloadProject()">
+        The project is disabled.
+    </ot-entity-disabled>
+
     <div class="row" ng-hide="loadingBranches">
         <div class="col-md-12">
             <ot-section-title>Branches</ot-section-title>
-            <ot-noentry list="branchStatusViews">
+            <div class="ot-noentry" ng-if="project.branches.length == 0">
                 No branch has been created yet.
-            </ot-noentry>
-            <div class="row" ng-if="branchStatusViews">
+            </div>
+            <div class="row" ng-if="project.branches.length > 0">
                 <div class="col-md-12">
                     <div class="ot-project-branch-filter input-group col-md-4"
-                         ng-show="branchStatusViews.length > 5">
+                         ng-show="project.branches.length > 5">
                         <input class="form-control"
-                               type="text"
                                ng-model="branchNameFilter"
                                placeholder="Filter on branch names"/>
                         <span class="input-group-addon"><span class="fa fa-search"></span></span>
                     </div>
                     <table class="ot-project-branches">
                         <tbody>
-                        <tr ng-repeat="branchStatusView in branchStatusViews | filter:{branch: {name: branchNameFilter}}"
-                            ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
+                        <tr ng-repeat="branch in project.branches | filter:{name: branchNameFilter}"
+                            ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
                             <td class="ot-project-branch-name ot-decoration-list"
-                                ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
-                                <a href="#/branch/{{branchStatusView.branch.id}}">
-                                    {{branchStatusView.branch.name}}
+                                ng-class="{'ot-entity-disabled': branch.disabled}">
+                                <a href="#/branch/{{branch.id}}">
+                                    {{branch.name}}
                                 </a>
-                                <ot-entity-embedded-decorations decorations="branchStatusView.decorations"></ot-entity-embedded-decorations>
+                                <ot-entity-embedded-decorations decorations="branch.decorations"></ot-entity-embedded-decorations>
                                 <span
-                                        ng-show="showDisabled && branchStatusView.branch._enable"
-                                        title="Enable the {{branchStatusView.branch.name}} branch"
-                                        ng-click="enableBranch(branchStatusView.branch)"
+                                        ng-show="showDisabled && branch.links._enable"
+                                        title="Enable the {{branch.name}} branch"
+                                        ng-click="enableBranch(branch)"
                                         class="ot-command ot-command-enable"></span>
                                 <span
-                                        ng-show="showDisabled && branchStatusView.branch._disable"
-                                        title="Disable the {{branchStatusView.branch.name}} branch"
-                                        ng-click="disableBranch(branchStatusView.branch)"
+                                        ng-show="showDisabled && branch.links._disable"
+                                        title="Disable the {{branch.name}} branch"
+                                        ng-click="disableBranch(branch)"
                                         class="ot-command ot-command-disable"></span>
                                 <span
-                                        ng-show="showDisabled && branchStatusView.branch._delete"
-                                        title="Delete the {{branchStatusView.branch.name}} branch"
-                                        ng-click="deleteBranch(branchStatusView.branch)"
+                                        ng-show="showDisabled && branch.links._delete"
+                                        title="Delete the {{branch.name}} branch"
+                                        ng-click="deleteBranch(branch)"
                                         class="ot-command ot-command-delete"></span>
                             </td>
                             <td>
                                 <div class="ot-project-branch-promotion"
-                                     ng-if="branchStatusView.latestBuild">
+                                     ng-if="branch.latestBuild.length > 0">
                                     <span class="ot-description">Latest</span>
                                     <span class="fa fa-arrow-right"></span>
-                                    <a href="#/build/{{branchStatusView.latestBuild.id}}"
+                                    <a href="#/build/{{branch.latestBuild[0].id}}"
                                        title="Latest build on this branch">
-                                        {{branchStatusView.latestBuild.name}}
+                                        {{branch.latestBuild[0].name}}
                                     </a>
                                 </div>
                                 <div class="ot-project-branch-promotion"
-                                     ng-hide="branchStatusView.branch.loadingView"
-                                     ng-if="!branchStatusView.latestBuild">
+                                     ng-if="branch.latestBuild.length == 0">
                                     <span class="ot-description">
                                         <span class="fa fa-ban" title="No build on this branch"></span>
                                         No build
                                     </span>
                                 </div>
                                 <div class="ot-project-branch-promotion"
-                                     ng-hide="branchStatusView.branch.loadingView"
-                                     ng-repeat="promotionView in branchStatusView.promotions">
-                                    <span ng-if="promotionView.promotionRun">
-                                        <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                     ng-repeat="promotionLevel in branch.promotionLevels">
+                                    <span ng-if="promotionLevel.promotionRuns.length > 0">
+                                        <a href="#/promotionLevel/{{promotionLevel.id}}">
                                             <ot-entity-image
-                                                    entity="promotionView.promotionLevel"></ot-entity-image>
-                                            {{promotionView.promotionLevel.name}}
+                                                    entity="promotionLevel"></ot-entity-image>
+                                            {{promotionLevel.name}}
                                         </a>
                                         <span class="ot-project-branch-promotion-build">
                                             <span class="fa fa-arrow-right"></span>
-                                            <a href="#/build/{{promotionView.promotionRun.build.id}}">{{promotionView.promotionRun.build.name}}</a>
+                                            <a href="#/build/{{promotionLevel.promotionRuns[0].build.id}}">{{promotionLevel.promotionRuns[0].build.name}}</a>
                                         </span>
                                     </span>
-                                    <span ng-if="!promotionView.promotionRun">
-                                        <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                    <span ng-if="promotionLevel.promotionRuns.length == 0">
+                                        <a href="#/promotionLevel/{{promotionLevel.id}}">
                                             <ot-entity-image
-                                                    entity="promotionView.promotionLevel"></ot-entity-image>
-                                            {{promotionView.promotionLevel.name}}
+                                                    entity="promotionLevel"></ot-entity-image>
+                                            {{promotionLevel.name}}
                                         </a>
                                         <span class="fa fa-arrow-right"></span>
                                         <span class="fa fa-ban"></span>
@@ -110,20 +117,20 @@
             <ot-section-title>Properties</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
-                    <ot-entity-properties entity="project"></ot-entity-properties>
+                    <ot-entity-properties entity="{_properties: project.links._properties}"></ot-entity-properties>
                 </div>
             </div>
             <ot-section-title>Extra information</ot-section-title>
             <div class="row">
                 <div class="row">
                     <div class="col-md-12">
-                        <ot-entity-extra entity="project"></ot-entity-extra>
+                        <ot-entity-extra entity="{_extra: project.links._extra}"></ot-entity-extra>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-7">
-            <ot-entity-events entity="project"></ot-entity-events>
+            <ot-entity-events entity="{_events: project.links._events}"></ot-entity-events>
         </div>
     </div>
 

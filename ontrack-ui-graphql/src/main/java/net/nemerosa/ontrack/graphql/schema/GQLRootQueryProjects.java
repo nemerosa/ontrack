@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;
+import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
@@ -13,8 +14,7 @@ import java.util.Collections;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static graphql.Scalars.GraphQLInt;
-import static graphql.Scalars.GraphQLString;
+import static graphql.Scalars.*;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.checkArgList;
@@ -22,6 +22,10 @@ import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList;
 
 @Component
 public class GQLRootQueryProjects implements GQLRootQuery {
+
+    public static final String ARG_ID = "id";
+    public static final String ARG_NAME = "name";
+    public static final String ARG_FAVOURITES = "favourites";
 
     private final StructureService structureService;
     private final GQLTypeProject project;
@@ -41,17 +45,21 @@ public class GQLRootQueryProjects implements GQLRootQuery {
                 .type(stdList(project.getType()))
                 .argument(
                         newArgument()
-                                .name("id")
+                                .name(ARG_ID)
                                 .description("ID of the project to look for")
                                 .type(GraphQLInt)
                                 .build()
                 )
                 .argument(
                         newArgument()
-                                .name("name")
+                                .name(ARG_NAME)
                                 .description("Name of the project to look for")
                                 .type(GraphQLString)
                                 .build()
+                )
+                .argument(a -> a.name(ARG_FAVOURITES)
+                        .description("Favourite projects only")
+                        .type(GraphQLBoolean)
                 )
                 .argument(propertyFilter.asArgument())
                 .dataFetcher(projectFetcher())
@@ -60,12 +68,13 @@ public class GQLRootQueryProjects implements GQLRootQuery {
 
     private DataFetcher projectFetcher() {
         return environment -> {
-            Integer id = environment.getArgument("id");
-            String name = environment.getArgument("name");
+            Integer id = environment.getArgument(ARG_ID);
+            String name = environment.getArgument(ARG_NAME);
+            boolean favourites = GraphqlUtils.getBooleanArgument(environment, ARG_FAVOURITES, false);
             // Per ID
             if (id != null) {
                 // No other argument is expected
-                checkArgList(environment, "id");
+                checkArgList(environment, ARG_ID);
                 // Fetch by ID
                 Project project = structureService.getProject(ID.of(id));
                 // As list
@@ -74,10 +83,16 @@ public class GQLRootQueryProjects implements GQLRootQuery {
             // Name
             else if (name != null) {
                 // No other argument is expected
-                checkArgList(environment, "name");
+                checkArgList(environment, ARG_NAME);
                 return structureService.findProjectByName(name)
                         .map(Collections::singletonList)
                         .orElse(Collections.emptyList());
+            }
+            // Favourites
+            else if (favourites) {
+                // No other argument is expected
+                checkArgList(environment, ARG_FAVOURITES);
+                return structureService.getProjectFavourites();
             }
             // Other criterias
             else {
