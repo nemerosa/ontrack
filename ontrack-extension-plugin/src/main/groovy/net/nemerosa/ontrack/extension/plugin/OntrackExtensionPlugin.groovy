@@ -209,16 +209,6 @@ ontrack = ${ontrackVersion}
         }
 
         /**
-         * Spring Boot packaging as a module
-         */
-
-        project.apply plugin: 'org.springframework.boot'
-        project.springBoot {
-            layout = 'MODULE'
-            customConfiguration = 'moduleDependencies'
-        }
-
-        /**
          * Running the extension in Ontrack
          */
 
