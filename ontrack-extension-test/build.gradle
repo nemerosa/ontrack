@@ -44,13 +44,26 @@ import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.apache.tools.ant.filters.ReplaceTokens
 
+/**
+ * TODO Extract in Ontrack plugin
+ */
+
+task copyDependencies(type: Copy) {
+    from configurations.moduleDependencies
+    into 'build/dependencies'
+}
+
+
 task prepareDockerImage(type: Copy) {
-    dependsOn bootRepackage
+    dependsOn copyDependencies
     from('build/libs') {
         include '*.jar'
         exclude '*-javadoc.jar'
         exclude '*-sources.jar'
         rename '.*', 'ontrack-extension-test.jar'
+    }
+    from('build/dependencies') {
+        include '*.jar'
     }
     from('src/main/docker') {
         include '*.yml'
@@ -123,12 +136,3 @@ task extensionTest(type: Test) {
 }
 
 build.dependsOn extensionTest
-
-/**
- * TODO Extract in Ontrack plugin
- */
-
-task copyDependencies(type: Copy) {
-    from configurations.moduleDependencies
-    into 'build/dependencies'
-}
