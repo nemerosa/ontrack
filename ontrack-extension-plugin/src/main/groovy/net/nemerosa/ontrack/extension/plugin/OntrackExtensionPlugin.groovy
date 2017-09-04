@@ -214,7 +214,7 @@ ontrack = ${ontrackVersion}
          */
 
         project.tasks.create('ontrackCopyDependencies', Copy) {
-            from configurations.moduleDependencies
+            from project.configurations.moduleDependencies
             into 'build/dependencies'
         }
 
