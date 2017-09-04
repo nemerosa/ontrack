@@ -45,6 +45,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.apache.tools.ant.filters.ReplaceTokens
 
 task prepareDockerImage(type: Copy) {
+    dependsOn jar
     dependsOn ontrackCopyDependencies
     from('build/libs') {
         include '*.jar'
