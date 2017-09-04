@@ -209,6 +209,15 @@ ontrack = ${ontrackVersion}
         }
 
         /**
+         * Task to copy the dependencies
+         */
+
+        project.tasks.create('ontrackCopyDependencies', Copy) {
+            from configurations.moduleDependencies
+            into 'build/dependencies'
+        }
+
+        /**
          * Running the extension in Ontrack
          */
 
