@@ -215,8 +215,22 @@ ontrack = ${ontrackVersion}
 
         project.tasks.create('ontrackCopyDependencies', Copy) {
             from project.configurations.moduleDependencies
-            into 'build/dependencies'
+            into 'build/dist'
         }
+
+        /**
+         * Task to prepare dependencies & main JAR in dist folder
+         */
+        project.tasks.create('ontrackDist', Copy) {
+            dependsOn 'ontrackCopyDependencies'
+            from project.tasks.jar
+            into 'build/dist'
+        }
+
+        /**
+         * Building launches the `ontrackDist` task
+         */
+        project.tasks.build.dependsOn 'ontrackDist'
 
         /**
          * Running the extension in Ontrack
