@@ -81,8 +81,9 @@ jar {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact testJar
+        mavenCustom(MavenPublication) {
+            // Clears all previous artifacts defined in root `build.gradle`
+            artifacts = [testJar]
         }
     }
 }
