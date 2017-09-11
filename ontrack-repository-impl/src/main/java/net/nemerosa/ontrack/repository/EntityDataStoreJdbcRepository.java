@@ -298,6 +298,78 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
         );
     }
 
+    @Override
+    public List<EntityDataStoreRecord> getByCategoryAndName(ProjectEntity entity, String category, String name, int offset, int page) {
+        return getNamedParameterJdbcTemplate().query(
+                String.format(
+                        "SELECT * FROM ENTITY_DATA_STORE " +
+                                "WHERE %s = :entityId " +
+                                "AND CATEGORY = :category " +
+                                "AND NAME = :name " +
+                                "ORDER BY CREATION DESC, ID DESC " +
+                                "LIMIT :page OFFSET :offset",
+                        entity.getProjectEntityType().name()
+                ),
+                params("entityId", entity.id())
+                        .addValue("category", category)
+                        .addValue("name", name)
+                        .addValue("offset", offset)
+                        .addValue("page", page),
+                (rs, rowNum) -> toEntityDataStoreRecord(entity, rs)
+        );
+    }
+
+    @Override
+    public List<EntityDataStoreRecord> getByCategory(ProjectEntity entity, String category, int offset, int page) {
+        return getNamedParameterJdbcTemplate().query(
+                String.format(
+                        "SELECT * FROM ENTITY_DATA_STORE " +
+                                "WHERE %s = :entityId " +
+                                "AND CATEGORY = :category " +
+                                "ORDER BY CREATION DESC, ID DESC " +
+                                "LIMIT :page OFFSET :offset",
+                        entity.getProjectEntityType().name()
+                ),
+                params("entityId", entity.id())
+                        .addValue("category", category)
+                        .addValue("offset", offset)
+                        .addValue("page", page),
+                (rs, rowNum) -> toEntityDataStoreRecord(entity, rs)
+        );
+    }
+
+    @Override
+    public int getCountByCategoryAndName(ProjectEntity entity, String category, String name) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                String.format(
+                        "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
+                                "WHERE %s = :entityId " +
+                                "AND CATEGORY = :category " +
+                                "AND NAME = :name ",
+                        entity.getProjectEntityType().name()
+                ),
+                params("entityId", entity.id())
+                        .addValue("category", category)
+                        .addValue("name", name),
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getCountByCategory(ProjectEntity entity, String category) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                String.format(
+                        "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
+                                "WHERE %s = :entityId " +
+                                "AND CATEGORY = :category ",
+                        entity.getProjectEntityType().name()
+                ),
+                params("entityId", entity.id())
+                        .addValue("category", category),
+                Integer.class
+        );
+    }
+
     private void audit(EntityDataStoreRecordAuditType type, int recordId, Signature signature) {
         getNamedParameterJdbcTemplate().update(
                 "INSERT INTO ENTITY_DATA_STORE_AUDIT(RECORD_ID, AUDIT_TYPE, TIMESTAMP, USER) " +

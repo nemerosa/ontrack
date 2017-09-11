@@ -134,4 +134,24 @@ public interface EntityDataStore {
      * @return Record or empty if not found
      */
     Optional<EntityDataStoreRecord> getById(ProjectEntity entity, int id);
+
+    /**
+     * Gets a list of records for a category and a name
+     */
+    List<EntityDataStoreRecord> getByCategoryAndName(ProjectEntity entity, String category, String name, int offset, int page);
+
+    /**
+     * Gets a list of records for a category
+     */
+    List<EntityDataStoreRecord> getByCategory(ProjectEntity entity, String category, int offset, int page);
+
+    /**
+     * Gets the count of records for a category and a name
+     */
+    int getCountByCategoryAndName(ProjectEntity entity, String category, String name);
+
+    /**
+     * Gets the count of records for a category
+     */
+    int getCountByCategory(ProjectEntity entity, String category);
 }
