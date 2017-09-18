@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLInt
-import graphql.Scalars.GraphQLString
+import graphql.Scalars.*
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument.newArgument
@@ -25,7 +24,7 @@ class GQLTypeBuild
 constructor(
         private val structureService: StructureService,
         private val validation: GQLTypeValidation,
-        private val creation: GQLTypeCreation,
+        creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
 
@@ -52,6 +51,13 @@ constructor(
                                                 .name("promotion")
                                                 .description("Name of the promotion level")
                                                 .type(GraphQLString)
+                                                .build()
+                                )
+                                .argument(
+                                        newArgument()
+                                                .name("lastPerLevel")
+                                                .description("Returns the last promotion run per promotion level")
+                                                .type(GraphQLBoolean)
                                                 .build()
                                 )
                                 .type(stdList(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
@@ -202,6 +208,8 @@ constructor(
         return DataFetcher { environment ->
             val build = environment.source
             if (build is Build) {
+                // Last per promotion filter?
+                val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, "lastPerLevel", false)
                 // Promotion filter
                 val promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null)
                 if (promotion != null) {
@@ -218,10 +226,18 @@ constructor(
                         )
                     }
                     // Gets promotion runs for this promotion level
-                    return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+                    if (lastPerLevel) {
+                        return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
+                    } else {
+                        return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+                    }
                 } else {
                     // Gets all the promotion runs
-                    return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
+                    if (lastPerLevel) {
+                        return@DataFetcher structureService.getLastPromotionRunsForBuild(build.id)
+                    } else {
+                        return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
+                    }
                 }
             } else {
                 return@DataFetcher emptyList<Any>()
