@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
@@ -15,6 +14,7 @@ import java.util.List;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static net.nemerosa.ontrack.test.TestUtils.range;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class StandardBuildFilterIT extends AbstractBuildFilterIT {
 
@@ -67,14 +67,16 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     /**
      * Since a not found promotion level
      */
-    @Test(expected = PromotionLevelNotFoundException.class)
+    @Test
     public void since_promotion_level_not_found() throws Exception {
         // Filter
         BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
                 .withSincePromotionLevel("NOT_FOUND")
                 .build();
         // Filtering
-        filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // No build being returned
+        assertTrue("No build returned on promotion level not found", builds.isEmpty());
     }
 
     /**
