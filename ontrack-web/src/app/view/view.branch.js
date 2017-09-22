@@ -167,7 +167,7 @@ angular.module('ot.view.branch', [
                   creation {
                     time
                   }
-                  promotionRuns {
+                  promotionRuns(lastPerLevel: true) {
                     creation {
                       time
                     }

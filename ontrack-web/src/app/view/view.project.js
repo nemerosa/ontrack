@@ -68,7 +68,7 @@ angular.module('ot.view.project', [
                     name
                     image
                     _image
-                    promotionRuns(last: 1) {
+                    promotionRuns(first: 1) {
                       build {
                         id
                         name
