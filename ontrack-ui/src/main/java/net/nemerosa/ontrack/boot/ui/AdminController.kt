@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.job.JobStatus
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter
 import net.nemerosa.ontrack.model.support.ApplicationLogService
@@ -96,6 +97,36 @@ constructor(
     fun deleteLogEntries(): Ack {
         applicationLogService.deleteLogEntries()
         return Ack.OK
+    }
+
+    /**
+     * Gets the job filters
+     */
+    @GetMapping("jobs/filter")
+    fun getJobFilter(): JobFilterResources {
+        // All job types
+        val types = jobScheduler.allJobKeys
+                .map { it.type }
+                .distinctBy { it.key }
+        // All categories
+        val categories = types
+                .map { it.category }
+                .distinctBy { it.key }
+                .map {
+                    NameDescription(
+                            it.key,
+                            it.name
+                    )
+                }
+        // Indexation of types per category
+        val indexedTypes = types.groupBy { it.category.key }
+        // OK
+        return JobFilterResources(
+                categories,
+                indexedTypes.mapValues { (_, typeList) ->
+                    typeList.map { NameDescription(it.key, it.name) }
+                }
+        )
     }
 
     /**
