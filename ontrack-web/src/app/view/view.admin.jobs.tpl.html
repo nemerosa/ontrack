@@ -97,6 +97,18 @@
                                }"/>
                     </div>
 
+                    <!-- Search button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-disabled="loadingJobs"
+                                ng-click="loadJobs()"
+                                class="btn btn-primary">
+                            <span class="fa fa-search" ng-hide="loadingJobs"></span>
+                            <span class="ot-loading-indicator" ng-show="loadingJobs"></span>
+                            <span ng-show="loadingJobs">Loading jobs...</span>
+                        </button>
+                    </div>
+
                     <!-- Menu -->
                     <div class="form-group dropdown">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">

@@ -24,6 +24,12 @@ angular.module('ot.view.admin.jobs', [
             errorOnly: false
         };
 
+        // Current page
+        $scope.page = {
+            offset: 0,
+            count: 30
+        };
+
         // Category filter selection
         $scope.setJobFilterCategory = (category) => {
             if ($scope.jobFilter.category !== category) {
@@ -33,6 +39,7 @@ angular.module('ot.view.admin.jobs', [
         };
 
         // Loads the jobs
+        $scope.loadJobs = loadJobs;
         function loadJobs() {
             $scope.loadingJobs = true;
             ot.pageCall($http.get('admin/jobs/filter'))
