@@ -155,14 +155,18 @@
                         </ul>
                     </div>
 
-                    <!-- Scheduler status -->
-                    <div class="form-group" ng-show="jobs && jobs._resume">
+                </div>
+            </div>
+
+            <!-- Scheduler status -->
+            <div class="row" ng-show="jobs && jobs._resume" style="margin-top: 4px;">
+                <div class="col-md-12">
+                    <div class="alert alert-warning form-group">
                         <b class="form-control-static text-danger">
                             Execution of jobs has been stopped.
                             <a class="ot-action" ng-click="resumeJobs()">Resume their execution.</a>
                         </b>
                     </div>
-
                 </div>
             </div>
 
