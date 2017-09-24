@@ -166,7 +166,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="job in jobs.resources | filter:jobFilter"
+                <tr ng-repeat="job in jobs.resources"
                     class="ot-job ot-job-{{job.state.toLowerCase()}}">
                     <td>
                         {{job.id}}
