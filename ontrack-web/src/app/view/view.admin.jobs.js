@@ -45,8 +45,18 @@ angular.module('ot.view.admin.jobs', [
             ot.pageCall($http.get('admin/jobs/filter'))
                 .then(jobFilterResources => {
                     $scope.jobFilterResources = jobFilterResources;
-                    // TODO Current job filter and pagination
-                    return ot.pageCall($http.get('admin/jobs'));
+                    // Parameters
+                    const params = {};
+                    params.state = $scope.jobFilter.state ? $scope.jobFilter.state.name : undefined;
+                    params.category = $scope.jobFilter.category ? $scope.jobFilter.category.name : undefined;
+                    params.type = $scope.jobFilter.type ? $scope.jobFilter.type.name : undefined;
+                    params.description = $scope.jobFilter.description ? $scope.jobFilter.description : undefined;
+                    params.errorOnly = $scope.jobFilter.errorOnly ? $scope.jobFilter.errorOnly : undefined;
+                    console.log("Job params = ", params);
+                    // Call
+                    return ot.pageCall($http.get('admin/jobs', {
+                        params: params
+                    }));
                 })
                 .then(jobs => {
                     $scope.jobs = jobs;
