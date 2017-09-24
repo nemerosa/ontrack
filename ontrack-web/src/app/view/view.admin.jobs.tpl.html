@@ -32,14 +32,19 @@
                     <div class="form-group dropdown">
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                                 ng-class="{
-                                    'btn-info': selectedJobCategory.id != '',
-                                    'btn-default': selectedJobCategory.id == ''
+                                    'btn-info': jobFilter.category,
+                                    'btn-default': !jobFilter.category
                                     }">
-                            {{selectedJobCategory.name}}
+                            {{jobFilter.category ? jobFilter.category.description : "Any category"}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-repeat="jobCategory in jobCategories"><a class="ot-action" ng-click="setJobCategory(jobCategory)">{{jobCategory.name}}</a></li>
+                            <li>
+                                <a class="ot-action" ng-click="jobFilter.category = undefined;">Any state</a>
+                            </li>
+                            <li ng-repeat="category in jobFilterResources.categories">
+                                <a class="ot-action" ng-click="jobFilter.category = category;">{{category.description}}</a>
+                            </li>
                         </ul>
                     </div>
 

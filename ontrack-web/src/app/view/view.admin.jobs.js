@@ -1,8 +1,8 @@
 angular.module('ot.view.admin.jobs', [
-        'ui.router',
-        'ot.service.core',
-        'ot.service.task'
-    ])
+    'ui.router',
+    'ot.service.core',
+    'ot.service.task'
+])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-jobs', {
             url: '/admin-jobs',
@@ -17,7 +17,11 @@ angular.module('ot.view.admin.jobs', [
 
         // Current filter
         $scope.jobFilter = {
-            state: undefined
+            state: undefined,
+            category: undefined,
+            type: undefined,
+            description: '',
+            errorOnly: false
         };
 
         // Loads the jobs
@@ -67,14 +71,14 @@ angular.module('ot.view.admin.jobs', [
         };
 
         // Pausing all jobs
-        $scope.pauseJobs = function() {
+        $scope.pauseJobs = function () {
             if ($scope.jobs && $scope.jobs._pause) {
                 ot.pageCall($http.put($scope.jobs._pause)).then(loadJobs);
             }
         };
 
         // Resuming all jobs
-        $scope.resumeJobs = function() {
+        $scope.resumeJobs = function () {
             if ($scope.jobs && $scope.jobs._resume) {
                 ot.pageCall($http.put($scope.jobs._resume)).then(loadJobs);
             }
