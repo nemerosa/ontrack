@@ -57,7 +57,8 @@ data class Pagination(
             val offset = page.offset
             val limit = page.count
             val total = items.size
-            val actualCount = minOf(limit, total)
+            val paginatedList = items.subList(offset, minOf(offset + limit, total))
+            val actualCount = paginatedList.size
             var pagination = Pagination(offset, actualCount, total)
             // Previous page
             if (offset > 0) {
@@ -79,7 +80,7 @@ data class Pagination(
             }
             // OK
             return PaginatedList(
-                    items.subList(offset, minOf(offset + limit, total)),
+                    paginatedList,
                     pagination
             )
         }
