@@ -12,15 +12,18 @@
                     <div class="form-group dropdown">
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                                 ng-class="{
-                                    'btn-info': selectedJobStatus.id != '',
-                                    'btn-default': selectedJobStatus.id == ''
+                                    'btn-info': jobFilter.state,
+                                    'btn-default': !jobFilter.state
                                     }">
-                            {{selectedJobStatus.name}}
+                            {{jobFilter.state ? jobFilter.state.description : "Any state"}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-repeat="jobStatus in jobStatuses">
-                                <a class="ot-action" ng-click="setJobStatus(jobStatus)">{{jobStatus.name}}</a>
+                            <li>
+                                <a class="ot-action" ng-click="jobFilter.state = undefined;">Any state</a>
+                            </li>
+                            <li ng-repeat="state in jobFilterResources.states">
+                                <a class="ot-action" ng-click="jobFilter.state = state;">{{state.description}}</a>
                             </li>
                         </ul>
                     </div>
