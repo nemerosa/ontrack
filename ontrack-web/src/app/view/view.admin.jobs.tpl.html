@@ -74,14 +74,16 @@
                     <div class="form-group dropdown">
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                                 ng-class="{
-                                    'btn-info': selectedJobError.check,
-                                    'btn-default': !selectedJobError.check
+                                    'btn-info': jobFilter.errorOnly,
+                                    'btn-default': !jobFilter.errorOnly
                                     }">
-                            {{selectedJobError.name}}
+                            {{jobFilter.errorOnly ? "Jobs in error" : "Any error status"}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-repeat="error in jobErrors"><a class="ot-action" ng-click="setJobError(error)">{{error.name}}</a>
+                            <li>
+                                <a class="ot-action" ng-click="jobFilter.errorOnly = false;">Any error status</a>
+                                <a class="ot-action" ng-click="jobFilter.errorOnly = true;">Jobs in error</a>
                             </li>
                         </ul>
                     </div>
