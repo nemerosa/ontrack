@@ -4,12 +4,12 @@ import net.nemerosa.ontrack.job.JobState
 import net.nemerosa.ontrack.job.JobStatus
 import org.apache.commons.lang3.StringUtils
 
-data class JobFilter(
-        val state: JobState? = null,
-        val category: String? = null,
-        val type: String? = null,
-        val description: String? = null,
-        val errorOnly: Boolean = false
+class JobFilter(
+        var state: JobState? = null,
+        var category: String? = null,
+        var type: String? = null,
+        var description: String? = null,
+        var errorOnly: Boolean = false
 ) {
     fun filter(statuses: Collection<JobStatus>) =
             statuses.filter {

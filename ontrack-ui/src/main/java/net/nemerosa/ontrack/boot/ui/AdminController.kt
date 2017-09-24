@@ -134,6 +134,7 @@ constructor(
      */
     @GetMapping("jobs")
     fun getJobs(@Valid jobFilter: JobFilter, page: Page?): Resources<JobStatus> {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
         val jobs = jobFilter.filter(jobScheduler.jobStatuses)
         val pagination = Pagination.paginate(
                 jobs,
