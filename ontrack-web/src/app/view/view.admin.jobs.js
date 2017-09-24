@@ -24,6 +24,14 @@ angular.module('ot.view.admin.jobs', [
             errorOnly: false
         };
 
+        // Category filter selection
+        $scope.setJobFilterCategory = (category) => {
+            if ($scope.jobFilter.category !== category) {
+                $scope.jobFilter.category = category;
+                $scope.jobFilter.type = undefined;
+            }
+        };
+
         // Loads the jobs
         function loadJobs() {
             $scope.loadingJobs = true;
