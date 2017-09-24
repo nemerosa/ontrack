@@ -38,6 +38,17 @@ angular.module('ot.view.admin.jobs', [
             }
         };
 
+        // Clearing the filter
+        $scope.clearJobFilter = () => {
+            $scope.jobFilter = {
+                state: undefined,
+                category: undefined,
+                type: undefined,
+                description: '',
+                errorOnly: false
+            };
+        };
+
         // Loads the jobs
         $scope.loadJobs = loadJobs;
         function loadJobs() {
