@@ -109,6 +109,17 @@
                         </button>
                     </div>
 
+                    <!-- Clear button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-disabled="loadingJobs"
+                                ng-click="clearJobFilter()"
+                                title="Clears current filter and reloads the jobs"
+                                class="btn btn-default">
+                            <span class="fa fa-ban"></span>
+                        </button>
+                    </div>
+
                     <!-- Menu -->
                     <div class="form-group dropdown">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -116,11 +127,6 @@
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a class="ot-action" ng-click="clearJobFilter()">
-                                <span class="fa fa-ban"></span>
-                                Clear filter
-                            </a></li>
-
                             <li ng-show="jobs && jobs._pause">
                                 <a class="ot-action"
                                    title="Stops running new jobs - current executions are not stopped."

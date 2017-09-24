@@ -47,6 +47,7 @@ angular.module('ot.view.admin.jobs', [
                 description: '',
                 errorOnly: false
             };
+            loadJobs();
         };
 
         // Loads the jobs
@@ -63,7 +64,6 @@ angular.module('ot.view.admin.jobs', [
                     params.type = $scope.jobFilter.type ? $scope.jobFilter.type.name : undefined;
                     params.description = $scope.jobFilter.description ? $scope.jobFilter.description : undefined;
                     params.errorOnly = $scope.jobFilter.errorOnly ? $scope.jobFilter.errorOnly : undefined;
-                    console.log("Job params = ", params);
                     // Call
                     return ot.pageCall($http.get('admin/jobs', {
                         params: params
