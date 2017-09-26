@@ -3,7 +3,7 @@ apply plugin: 'groovy'
 dependencies {
 
     compile project(':ontrack-ui-support')
-    compile 'com.graphql-java:graphql-java:2.2.0'
+    compile 'com.graphql-java:graphql-java'
     compile 'org.springframework:spring-tx'
 
     testCompile project(':ontrack-test-utils')
@@ -13,6 +13,7 @@ dependencies {
     testCompile 'org.codehaus.groovy:groovy-all'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
+    testCompile project(':ontrack-repository-impl')
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
 

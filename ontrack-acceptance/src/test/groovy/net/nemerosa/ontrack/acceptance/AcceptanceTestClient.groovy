@@ -123,6 +123,12 @@ class AcceptanceTestClient extends AcceptanceSupport {
     }
 
     int doCreateAccountWithGlobalRole(String name, String password, String role) {
+        def accountId = doCreateAccount(name, password)
+        admin().put([role: role], "accounts/permissions/globals/ACCOUNT/${accountId}")
+        return accountId
+    }
+
+    int doCreateAccount(String name, String password) {
         def input = [
                 name    : name,
                 fullName: name,
@@ -130,9 +136,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
                 password: password,
         ]
         def account = admin().post(input, "accounts/create").get()
-        def accountId = account['id'].asText() as int
-        admin().put([role: role], "accounts/permissions/globals/ACCOUNT/${accountId}")
-        return accountId
+        return account['id'].asText() as int
     }
 
     def withProject(Closure closure) {

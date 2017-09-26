@@ -21,4 +21,11 @@ https://github.com/nemerosa/ontrack[source code]...
 | This service allows to store and retrieve arbitrary data with
   <<model,entities>>
 
+| `EntityDataStore`
+| This service allows to store audited and indexed data with
+  <<model,entities>>. See <<reference-service-entity-data-store>> for
+  more information.
+
 |===
+
+include::reference-service-entity-data-store.adoc[]

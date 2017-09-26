@@ -108,7 +108,7 @@ public Form getEditionForm(ProjectEntity entity, MyProperty value) {
                   Text.of("value")
                           .label("My value")
                           .length(20)
-                          .value(value !==== null ? value.getValue() : null)
+                          .value(value != null ? value.getValue() : null)
           );
 }
 ----
@@ -147,7 +147,9 @@ cloned for another entity, using a replacement function for the text values:
 ----
 @Override
 public MyProperty replaceValue(MyProperty value, Function<String, String> replacementFunction) {
-  return replacementFunction.apply(value);
+  return new MyProperty(
+      replacementFunction.apply(value.getValue())
+  );
 }
 ----
 

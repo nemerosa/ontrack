@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.nemerosa.ontrack.model.support.IDJsonDeserializer;
 import net.nemerosa.ontrack.model.support.IDJsonSerializer;
 import org.apache.commons.lang3.Validate;
 
@@ -14,6 +16,7 @@ import java.util.function.Function;
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonSerialize(using = IDJsonSerializer.class)
+@JsonDeserialize(using = IDJsonDeserializer.class)
 public final class ID implements Serializable {
 
     /**

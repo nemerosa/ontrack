@@ -2,7 +2,8 @@ angular.module('ot.view.project', [
     'ui.router',
     'ot.service.core',
     'ot.service.structure',
-    'ot.service.copy'
+    'ot.service.copy',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('project', {
@@ -11,41 +12,105 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otAlertService, otCopyService) {
-        var view = ot.view();
+    .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService) {
+        const view = ot.view();
         // Project's id
-        var projectId = $stateParams.projectId;
+        const projectId = $stateParams.projectId;
         // Initial name filter
         $scope.branchNameFilter = '';
-        // Loading the branches
-        function loadBranches() {
+
+        // Loading the project and its whole information
+        function loadProject() {
             $scope.loadingBranches = true;
-            ot.call($http.get($scope.project._branchStatusViews)).then(function (branchStatusViewsResources) {
-                $scope.branchStatusViewsResources = branchStatusViewsResources;
-                $scope.branchStatusViews = branchStatusViewsResources.resources;
+            otGraphqlService.pageGraphQLCall(`query ProjectView($projectId: Int) {
+              projects(id: $projectId) {
+                id
+                name
+                description
+                disabled
+                decorations {
+                  ...decorationContent
+                }
+                links {
+                  _self
+                  _createBranch
+                  _update
+                  _delete
+                  _permissions
+                  _clone
+                  _enable
+                  _disable
+                  _properties
+                  _extra
+                  _events
+                  _actions
+                }
+                branches {
+                  id
+                  name
+                  disabled
+                  type
+                  decorations {
+                    ...decorationContent
+                  }
+                  links {
+                    _page
+                    _enable
+                    _disable
+                    _delete
+                  }
+                  latestBuild: builds(count: 1) {
+                    id
+                    name
+                  }
+                  promotionLevels {
+                    id
+                    name
+                    image
+                    _image
+                    promotionRuns(first: 1) {
+                      build {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            
+            fragment decorationContent on Decoration {
+              decorationType
+              error
+              data
+              feature {
+                id
+              }
+            }`, {projectId: projectId}).then(function (data) {
+                $scope.project = data.projects[0];
                 // View commands
                 view.commands = [
                     {
                         condition: function () {
-                            return branchStatusViewsResources._create;
+                            return $scope.project.links._createBranch;
                         },
                         id: 'createBranch',
                         name: "Create branch",
                         cls: 'ot-command-branch-new',
                         action: function () {
-                            otStructureService.create(branchStatusViewsResources._create, "New branch").then(loadBranches);
+                            otStructureService.create($scope.project.links._createBranch, "New branch").then(loadProject);
                         }
                     },
                     {
                         condition: function () {
-                            return $scope.project._update;
+                            return $scope.project.links._update;
                         },
                         id: 'updateProject',
                         name: "Update project",
                         cls: 'ot-command-project-update',
                         action: function () {
                             otStructureService.update(
-                                $scope.project._update,
+                                $scope.project.links._update,
                                 "Update project"
                             ).then(loadProject);
                         }
@@ -58,24 +123,24 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
-                            return $scope.project._disable;
+                            return $scope.project.links._disable;
                         },
                         id: 'disableProject',
                         name: "Disable project",
                         cls: 'ot-command-project-disable',
                         action: function () {
-                            ot.pageCall($http.put($scope.project._disable)).then(loadProject);
+                            ot.pageCall($http.put($scope.project.links._disable)).then(loadProject);
                         }
                     },
                     {
                         condition: function () {
-                            return $scope.project._enable;
+                            return $scope.project.links._enable;
                         },
                         id: 'enableProject',
                         name: "Enable project",
                         cls: 'ot-command-project-enable',
                         action: function () {
-                            ot.pageCall($http.put($scope.project._enable)).then(loadProject);
+                            ot.pageCall($http.put($scope.project.links._enable)).then(loadProject);
                         }
                     }, {
                         id: 'showDisabled',
@@ -100,7 +165,7 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
-                            return $scope.project._permissions;
+                            return $scope.project.links._permissions;
                         },
                         id: 'permissionsProject',
                         name: "Permissions",
@@ -109,22 +174,24 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
-                            return $scope.project._clone;
+                            return $scope.project.links._clone;
                         },
                         id: 'cloneProject',
                         name: "Clone project",
                         cls: 'ot-command-project-clone',
                         action: function () {
-                            otCopyService.cloneProject($scope.project).then(function (newProject) {
-                                $state.go('project', {
-                                    projectId: newProject.id
+                            otStructureService.getProject($scope.project.id).then(function (project) {
+                                otCopyService.cloneProject(project).then(function (newProject) {
+                                    $state.go('project', {
+                                        projectId: newProject.id
+                                    });
                                 });
                             });
                         }
                     },
                     {
                         condition: function () {
-                            return $scope.project._delete;
+                            return $scope.project.links._delete;
                         },
                         id: 'deleteProject',
                         name: "Delete project",
@@ -133,34 +200,20 @@ angular.module('ot.view.project', [
                             otAlertService.confirm({
                                 title: "Deleting a project",
                                 message: "Do you really want to delete the project " + $scope.project.name +
-                                    " and all its associated data?"
+                                " and all its associated data?"
                             }).then(function () {
-                                return ot.call($http.delete($scope.project._delete));
+                                return ot.call($http.delete($scope.project.links._delete));
                             }).then(function () {
                                 $state.go('home');
                             });
                         }
                     },
-                    ot.viewApiCommand($scope.project._self),
-                    ot.viewActionsCommand($scope.project._actions),
+                    ot.viewApiCommand($scope.project.links._self),
+                    ot.viewActionsCommand($scope.project.links._actions),
                     ot.viewCloseCommand('/home')
                 ];
-            }).finally(function() {
+            }).finally(function () {
                 $scope.loadingBranches = false;
-            });
-        }
-
-        // Loading the project
-        function loadProject() {
-            otStructureService.getProject(projectId).then(function (projectResource) {
-                $scope.project = projectResource;
-                // View settings
-                view.title = projectResource.name;
-                view.description = projectResource.description;
-                view.decorationsEntity = projectResource;
-                view.api = projectResource._self;
-                // Loads the branches
-                loadBranches();
             });
         }
 
@@ -172,21 +225,27 @@ angular.module('ot.view.project', [
 
         // Enabling a branch
         $scope.enableBranch = function (branch) {
-            if (branch._enable) {
-                ot.pageCall($http.put(branch._enable)).then(loadProject);
+            if (branch.links._enable) {
+                ot.pageCall($http.put(branch.links._enable)).then(loadProject);
             }
         };
 
         // Disabling a branch
         $scope.disableBranch = function (branch) {
-            if (branch._disable) {
-                ot.pageCall($http.put(branch._disable)).then(loadProject);
+            if (branch.links._disable) {
+                ot.pageCall($http.put(branch.links._disable)).then(loadProject);
             }
         };
 
         // Deleting a branch
         $scope.deleteBranch = function (branch) {
-            otStructureService.deleteBranch(branch).then(loadProject);
+            return otAlertService.confirm({
+                title: "Deleting a branch",
+                message: "Do you really want to delete the branch " + branch.name +
+                " and all its associated data?"
+            }).then(function () {
+                return ot.call($http.delete(branch.links._delete));
+            }).then(loadProject);
         };
     })
 ;

@@ -54,13 +54,15 @@ angular.module('ot.service.user', [
                 uri: $rootScope.user.login,
                 title: "Sign in",
                 submit: function (data) {
+                    var credentials = data.name + ':' + data.password;
+                    var encodedCredentials = Unibabel.arrToBase64(Unibabel.strToUtf8Arr(credentials));
                     var d = $q.defer();
                     $http.post(
                         $rootScope.user.login + "?remember-me=" + (data.rememberMe === true),
                         {},
                         {
                             headers: {
-                                'Authorization': 'Basic ' + window.btoa(data.name + ':' + data.password)
+                                'Authorization': 'Basic ' + encodedCredentials
                             }
                         }
                     )

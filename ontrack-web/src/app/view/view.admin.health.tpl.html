@@ -1,0 +1,74 @@
+<ot-view>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="row" ng-hide="health">
+                <div class="col-md-12">
+                    <div class="alert alert-info" >
+                        Loading health indicators...
+                    </div>
+                </div>
+            </div>
+
+            <table class="table ot-admin-console-status" ng-show="health">
+                <!-- Overall status -->
+                <tr class="info">
+                    <td class="ot-health-status">
+                        <ot-health-status value="health"></ot-health-status>
+                    </td>
+                    <td colspan="4">
+                        Overall status
+                    </td>
+                </tr>
+                <!-- Per section -->
+                <tbody ng-repeat="(sectionName, section) in health"
+                       ng-if="sectionName != '_self' && sectionName != 'status'">
+                <!-- Section status -->
+                <tr class="active">
+                    <td class="ot-health-status-span">
+                        &nbsp;
+                    </td>
+                    <td>
+                        <ot-health-status value="section"></ot-health-status>
+                    </td>
+                    <td colspan="5">
+                        {{sectionName}} status
+                    </td>
+                </tr>
+                <!-- Section details -->
+                <tr ng-repeat="(configName, config) in section"
+                    ng-if="sectionName != 'dataSource' && sectionName != 'db' && configName != 'status'">
+                    <td class="ot-health-status-span">
+                        &nbsp;
+                    </td>
+                    <td class="ot-health-status-span">
+                        &nbsp;
+                    </td>
+                    <td class="ot-health-status">
+                        <ot-health-status value="config"></ot-health-status>
+                    </td>
+                    <td>
+                        <b>{{configName}}</b>
+                    </td>
+                    <td>
+                        <a ng-click="showDetails(config)" ng-if="!config.error" ng-hide="config.detailsShown"
+                           class="ot-action">Details</a>
+                        <a ng-click="showError(config)" ng-if="config.error" ng-hide="config.errorShown"
+                           class="ot-action">Error</a>
+                        <p ng-show="config.errorShown">
+                            {{config.error}}
+                        </p>
+                        <p ng-show="config.detailsShown" ng-repeat="(detailName, detail) in config"
+                           ng-if="detailName != 'status' && detailName != 'detailsShown'">
+                            <b>{{detailName}}</b>:
+                            {{detail}}
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</ot-view>

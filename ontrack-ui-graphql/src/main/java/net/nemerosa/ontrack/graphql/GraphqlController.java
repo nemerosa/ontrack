@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
+@Transactional
 @RestController
 @RequestMapping("/graphql")
 public class GraphqlController {
@@ -56,23 +58,25 @@ public class GraphqlController {
      */
     @RequestMapping(method = RequestMethod.GET)
     @Transactional
-    public ResponseEntity<JsonNode> get(
+    public Callable<ResponseEntity<JsonNode>> get(
             @RequestParam String query,
             @RequestParam(required = false) String variables,
             @RequestParam(required = false) String operationName
     ) throws IOException {
-        // Parses the arguments
-        Map<String, Object> arguments = decodeIntoMap(variables);
-        // Runs the query
-        return ResponseEntity.ok(
-                requestAsJson(
-                        new Request(
-                                query,
-                                arguments,
-                                operationName
-                        )
-                )
-        );
+        return () -> {
+            // Parses the arguments
+            Map<String, Object> arguments = decodeIntoMap(variables);
+            // Runs the query
+            return ResponseEntity.ok(
+                    requestAsJson(
+                            new Request(
+                                    query,
+                                    arguments,
+                                    operationName
+                            )
+                    )
+            );
+        };
     }
 
     /**
@@ -80,15 +84,17 @@ public class GraphqlController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    public ResponseEntity<JsonNode> post(@RequestBody String input) throws IOException {
-        // Gets the components
-        Request request = objectMapper.readValue(input, Request.class);
-        // Variables must not be null
-        request = request.withVariables();
-        // Runs the query
-        return ResponseEntity.ok(
-                requestAsJson(request)
-        );
+    public Callable<ResponseEntity<JsonNode>> post(@RequestBody String input) throws IOException {
+        return () -> {
+            // Gets the components
+            Request request = objectMapper.readValue(input, Request.class);
+            // Variables must not be null
+            request = request.withVariables();
+            // Runs the query
+            return ResponseEntity.ok(
+                    requestAsJson(request)
+            );
+        };
     }
 
     /**

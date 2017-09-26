@@ -19,7 +19,7 @@ isolation between the "plugins".
 
 In order to create an extension, you have to create a Java project.
 
-TIP: The use of Groovy is also possible.
+TIP: The use of <<extending-kotlin,Kotlin>> is also possible.
 
 Note that Ontrack needs at least a JDK8u65 to run.
 
@@ -56,7 +56,7 @@ The plug-in must declare the Maven Central as repository for the dependencies
 Finally, you can apply the `ontrack` plug-in. This one will:
 
 * apply the `java` plug-in. If you want to use Groovy, you'll have to apply
-this plug-in yourself.
+this plug-in yourself. <<extending-kotlin,Kotlin>> is very well supported.
 * add the `ontrack-extension-support` module to the `compile` configuration
 of your extension
 * define some tasks used for running, testing and packaging your extension
@@ -267,27 +267,6 @@ TIP: When running with Gradle in your IDE, if you edit some web resources and
 want your changes available in the browser, just rebuild your project
 (`Ctrl F9` in Intellij) and refresh your browser.
 
-[[extending-running-docker]]
-===== Using Docker
-
-In order to deploy your extension in an Ontrack Docker container, start by
-building:
-
-[source,bash]
-----
-./gradlew clean build
-----
-
-then run an Ontrack container, configured to fetch its extension directory from
-your extension build directory:
-
-      docker run --detach \
-         --volume `pwd`/build/libs:/var/ontrack/extensions \
-         --publish 8080:8080 \
-         nemerosa/ontrack:{{ontrack-version}}
-
-See the <<installation, documentation>> for the Docker options.
-
 [[extending-packaging]]
 ==== Packaging an extension
 
@@ -298,7 +277,20 @@ Just run:
 ./gradlew clean build
 ----
 
-The extension is available as a JAR in `build/libs`.
+The extension is available as a JAR (together with its transitive dependencies,
+see below) in `build/dist`.
+
+[[extending-dependencies]]
+==== Extension dependencies
+
+If your extension depends on dependencies which are not brought by Ontrack,
+you have to collect them explicitly and put them in the same directory
+which contain your main JAR file.
+
+The Ontrack plug-in provides an `ontrackPrepare` task which copies
+all dependencies (transitively) and the main JAR in the `build/dist` directory.
+
+This task is called by the main `build` task.
 
 [[extending-deploying]]
 ==== Deploying an extension
@@ -383,3 +375,11 @@ include::extending-pages.adoc[]
 include::extending-event-types.adoc[]
 
 include::extending-graphql.adoc[]
+
+include::extending-metrics.adoc[]
+
+include::extending-kotlin.adoc[]
+
+include::extending-settings.adoc[]
+
+include::extending-security.adoc[]

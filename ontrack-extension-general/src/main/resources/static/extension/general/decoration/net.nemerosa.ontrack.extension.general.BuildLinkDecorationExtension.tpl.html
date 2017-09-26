@@ -6,7 +6,8 @@
         <a href="{{decoration.data.uri}}">{{decoration.data.build}} @ {{decoration.data.project}}</a>
     </span>
     <!-- Promotions -->
-    <span ng-repeat="promotionRun in decoration.data.promotionRuns">
-        <ot-entity-image entity="promotionRun.promotionLevel"></ot-entity-image>
+    <span ng-repeat="promotion in decoration.data.promotions">
+        <img ng-if="!promotion.imageLink" src="assets/default_entity_image.png" class="ot-icon" title="{{promotion.name}}"/>
+        <img ng-if="promotion.imageLink" ng-src="{{promotion.imageLink}}" class="ot-icon" title="{{promotion.name}}"/>
     </span>
 </span>

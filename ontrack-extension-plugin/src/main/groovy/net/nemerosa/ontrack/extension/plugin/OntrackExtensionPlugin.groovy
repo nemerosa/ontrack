@@ -4,6 +4,7 @@ import com.moowork.gradle.node.task.NodeTask
 import com.moowork.gradle.node.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.JavaExec
 
 /**
@@ -21,9 +22,16 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         Properties properties = new Properties()
         getClass().getResourceAsStream('/META-INF/gradle-plugins/ontrack.properties').withStream { properties.load(it) }
         String ontrackVersion = properties.getProperty('implementation-version')
+        String theKotlinVersion = properties.getProperty('kotlin-version')
         project.ext.ontrackVersion = ontrackVersion
 
         println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.name}"
+
+        /**
+         * Kotlin version
+         */
+
+        project.ext.kotlinVersion = theKotlinVersion
 
         /**
          * Java project
@@ -82,7 +90,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             doFirst {
                 println "[ontrack] Configure the NPM cache in ${project.npmCacheDir}"
             }
-            args = [ 'config', 'set', 'cache', project.npmCacheDir ]
+            args = ['config', 'set', 'cache', project.npmCacheDir]
             outputs.dir project.file(project.npmCacheDir)
         }
 
@@ -118,7 +126,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             doFirst { println "[ontrack] Install Node.js packages in ${nodeModulesDir}" }
 
             workingDir = new File(project.ontrackCacheDir as String)
-            args = [ 'install' ]
+            args = ['install']
         }
 
         /**
@@ -158,6 +166,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
                 project.file("build/ontrack.properties").text = """\
 # Ontrack extension properties
 version = ${project.version}
+ontrack = ${ontrackVersion}
 """
             }
         }
@@ -201,14 +210,27 @@ version = ${project.version}
         }
 
         /**
-         * Spring Boot packaging as a module
+         * Task to copy the dependencies
          */
 
-        project.apply plugin: 'spring-boot'
-        project.springBoot {
-            layout = 'MODULE'
-            customConfiguration = 'moduleDependencies'
+        project.tasks.create('ontrackCopyDependencies', Copy) {
+            from project.configurations.moduleDependencies
+            into 'build/dist'
         }
+
+        /**
+         * Task to prepare dependencies & main JAR in dist folder
+         */
+        project.tasks.create('ontrackDist', Copy) {
+            dependsOn 'ontrackCopyDependencies'
+            from project.tasks.jar
+            into 'build/dist'
+        }
+
+        /**
+         * Building launches the `ontrackDist` task
+         */
+        project.tasks.build.dependsOn 'ontrackDist'
 
         /**
          * Running the extension in Ontrack

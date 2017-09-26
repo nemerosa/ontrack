@@ -1,0 +1,122 @@
+buildscript {
+    repositories {
+        mavenLocal() // Important: used for testing
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.8'
+    }
+}
+
+group = 'net.nemerosa.ontrack'
+version = ontrackVersion
+
+repositories {
+    mavenLocal() // Important: used for testing
+    mavenCentral()
+}
+
+apply plugin: 'ontrack'
+
+ontrack {
+    kotlin()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.16.18'
+
+    // Test for 3rd party dependencies not included in Ontrack core runtime
+    compile 'org.apache.commons:commons-math3:3.6.1'
+
+    testCompile "net.nemerosa.ontrack:ontrack-acceptance:${ontrackVersion}"
+    testCompile "net.nemerosa.ontrack:ontrack-dsl:${ontrackVersion}"
+}
+
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerInspectContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import org.apache.tools.ant.filters.ReplaceTokens
+
+task prepareDockerImage(type: Copy) {
+    dependsOn ontrackDist
+    from('build/dist') {
+        include '*.jar'
+    }
+    from('src/main/docker') {
+        include '*.yml'
+        include 'Dockerfile'
+        filter(ReplaceTokens, tokens: [
+                ontrackVersion: ontrackVersion,
+        ])
+    }
+    into project.file('build/docker')
+}
+
+task buildDockerImage(type: DockerBuildImage) {
+    dependsOn prepareDockerImage
+    inputDir project.file('build/docker')
+    tag "nemerosa/ontrack-extension-test:${version}"
+}
+
+assemble.dependsOn buildDockerImage
+
+task createAppContainer(type: DockerCreateContainer) {
+    dependsOn buildDockerImage
+    targetImageId { buildDockerImage.getImageId() }
+    portBindings = ["${ontrackTestDockerPort}:8080"]
+}
+
+
+task startAppContainer(type: DockerStartContainer) {
+    dependsOn createAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+}
+
+task portsOfAppContainer(type: DockerInspectContainer) {
+    dependsOn startAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+    onNext {
+        it.networkSettings.ports.getBindings().each { exposedPort, bindingArr ->
+            if (exposedPort.port == 8080) {
+                int portBinding = bindingArr.first().hostPortSpec as int
+                String ontrackUrl = "http://${ontrackTestDockerHost}:${portBinding}"
+                println "Setting Ontrack URL to ${ontrackUrl}"
+                tasks.extensionTest {
+                    systemProperty 'ontrack.url', ontrackUrl
+                }
+            }
+        }
+    }
+}
+
+task stopAppContainer(type: DockerStopContainer) {
+    dependsOn createAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+}
+
+task removeAppContainer(type: DockerRemoveContainer) {
+    dependsOn stopAppContainer
+    targetContainerId { createAppContainer.getContainerId() }
+}
+
+test {
+    include '**/*Test.class'
+}
+
+task extensionTest(type: Test) {
+    dependsOn portsOfAppContainer
+    finalizedBy removeAppContainer
+    include '**/*Acceptance.class'
+    ignoreFailures true
+    outputs.upToDateWhen { false }  // Always run tests
+    systemProperty 'ontrack.version', ontrackVersion
+}
+
+build.dependsOn extensionTest

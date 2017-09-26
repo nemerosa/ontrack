@@ -21,8 +21,8 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
     public static final String PROMOTION_RUN = "PromotionRun";
 
     @Autowired
-    public GQLTypePromotionRun(List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
-        super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, projectEntityFieldContributors);
+    public GQLTypePromotionRun(GQLTypeCreation creation, List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+        super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, projectEntityFieldContributors, creation);
     }
 
     @Override

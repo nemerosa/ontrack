@@ -73,8 +73,12 @@ public class JenkinsServiceTest {
     @Test
     public void update_new_password() {
         when(encryptionService.encrypt("pwd")).thenReturn("xxxxx");
+        when(configurationRepository.find(JenkinsConfiguration.class, "test")).thenReturn(
+                Optional.of(
+                        new JenkinsConfiguration("test", "http://host", "user", "xxxxx")
+                )
+        );
         jenkinsService.updateConfiguration("test", new JenkinsConfiguration("test", "http://host", "user", "pwd"));
-        verify(configurationRepository, times(0)).find(JenkinsConfiguration.class, "test");
         verify(configurationRepository, times(1)).save(new JenkinsConfiguration("test", "http://host", "user", "xxxxx"));
     }
 

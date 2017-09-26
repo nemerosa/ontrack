@@ -37,7 +37,7 @@
             <!-- Filter command -->
             <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
             <!-- Build diff extension commands -->
-            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
+            <button ng-repeat="action in branchView.buildDiffActions" class="btn btn-default"
                     id="{{action.id}}-top"
                     ng-click="buildDiff(action)">
                 {{action.name}}
@@ -136,7 +136,7 @@
             </button>
         </th>
         <!-- All validation stamps -->
-        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn"
+        <th ng-repeat="validationStamp in validationStamps | filter:validationStampFilterFn"
             class="ot-branch-build-view-validation"
             ng-class="{
                 'ot-validation-stamp-filter-edition': validationStampFilter && validationStampFilter._update && validationStampFilterEdition
@@ -145,99 +145,98 @@
             <span ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition">
                 <span class="ot-action"
                       ng-class="{
-                        'ot-validation-stamp-filter-edition-selected': validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0,
-                        'ot-validation-stamp-filter-edition-unselected': validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0
+                        'ot-validation-stamp-filter-edition-selected': validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0,
+                        'ot-validation-stamp-filter-edition-unselected': validationStampFilter.vsNames.indexOf(validationStamp.name) < 0
                         }"
-                      ng-click="toggleValidationStampFromFilter(validationStampView.validationStamp.name)"
+                      ng-click="toggleValidationStampFromFilter(validationStamp.name)"
                 >
-                    <ot-entity-image entity="validationStampView.validationStamp"></ot-entity-image>
+                    <ot-entity-image entity="validationStamp"></ot-entity-image>
                 </span>
                 <span
-                        ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) >= 0"
-                        ng-click="removeValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
-                        title="Removes the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
+                        ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStamp.name) >= 0"
+                        ng-click="removeValidationStampFromFilter(validationStampFilter, validationStamp.name)"
+                        title="Removes the {{validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
                         class="fa fa-minus-circle text-danger ot-action"
                         style="font-size: 50%; vertical-align: bottom;"></span>
                 <span
-                        ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStampView.validationStamp.name) < 0"
-                        ng-click="addValidationStampFromFilter(validationStampFilter, validationStampView.validationStamp.name)"
-                        title="Adds the {{validationStampView.validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
+                        ng-if="validationStampFilter && validationStampFilter._update && validationStampFilterEdition && validationStampFilter.vsNames.indexOf(validationStamp.name) < 0"
+                        ng-click="addValidationStampFromFilter(validationStampFilter, validationStamp.name)"
+                        title="Adds the {{validationStamp.name}} validation stamp from the {{validationStampFilter.name}} filter"
                         class="fa fa-plus-circle text-success ot-action"
                         style="font-size: 50%; vertical-align: bottom;"></span>
             </span>
             <!-- VS filter edition OFF -->
             <span ng-if="!validationStampFilter || !validationStampFilter._update || !validationStampFilterEdition">
-                <ot-entity-image entity="validationStampView.validationStamp"
-                                 link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
+                <ot-entity-image entity="validationStamp"
+                                 link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
             </span>
         </th>
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
         <!-- For each validation stamp -->
-        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilterFn"
+        <th ng-repeat="validationStamp in validationStamps | filter:validationStampFilterFn"
             class="ot-branch-build-view-validation">
             <ot-entity-embedded-decorations
-                    decorations="validationStampView.decorations"></ot-entity-embedded-decorations>
+                    decorations="validationStamp.decorations"></ot-entity-embedded-decorations>
         </th>
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="buildView in branchBuildView.buildViews"
-        ng-click="onBuildRowSelected($event, buildView)"
+    <tr ng-repeat="build in builds"
+        ng-click="onBuildRowSelected($event, build)"
         class="ot-disable-select"
     >
         <td>
-            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.from == buildView.build.id" class="fa fa-chevron-down"></span>
-            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.to == buildView.build.id" class="fa fa-chevron-up"></span>
-            <span ng-if="selectedBuild.from == selectedBuild.to && selectedBuild.to == buildView.build.id" class="fa fa-chevron-right"></span>
-            <span ng-if="selectedBuild.to != buildView.build.id && selectedBuild.from != buildView.build.id">&nbsp;</span>
+            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.from == build.id" class="fa fa-chevron-down"></span>
+            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.to == build.id" class="fa fa-chevron-up"></span>
+            <span ng-if="selectedBuild.from == selectedBuild.to && selectedBuild.to == build.id" class="fa fa-chevron-right"></span>
+            <span ng-if="selectedBuild.to != build.id && selectedBuild.from != build.id">&nbsp;</span>
         </td>
         <td>
             <!-- Build name and link -->
-            <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">
-                {{buildView.build.name}}
-                <code>[{{buildView.build.id}}]</code>
+            <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
+                {{build.name}}
             </a>
             <!-- Build decorations -->
             <span class="ot-decoration-list">
-                <ot-entity-embedded-decorations decorations="buildView.decorations"></ot-entity-embedded-decorations>
+                <ot-entity-embedded-decorations decorations="build.decorations"></ot-entity-embedded-decorations>
             </span>
             <!-- Signature, without the creator in the overview -->
             <div class="ot-branch-build-view-build-signature">
-                {{buildView.build.signature.time | date:'mediumDate'}}
-                {{buildView.build.signature.time | date:'shortTime'}}
+                {{build.creation.time | date:'mediumDate'}}
+                {{build.creation.time | date:'shortTime'}}
             </div>
         </td>
         <!-- Promotion runs -->
         <td>
-            <span ng-repeat="promotionRun in buildView.promotionRuns">
+            <span ng-repeat="promotionRun in build.promotionRuns">
                 <span class="ot-promotion-run">
                     <span class="ot-action"
-                          ng-click="displayPromotionRuns(buildView, promotionRun)">
+                          ng-click="displayPromotionRuns(build, promotionRun)">
                         <ot-entity-image
-                                title="{{promotionRun.promotionLevel.name}} - {{promotionRun.signature.time | date:'shortDate'}}"
+                                title="{{promotionRun.promotionLevel.name}} - {{promotionRun.creation.time | date:'shortDate'}}"
                                 entity="promotionRun.promotionLevel"></ot-entity-image>
                     </span>
                 </span>
             </span>
         </td>
         <!-- Validation runs -->
-        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews | filter:validationStampRunViewFilter"
+        <td ng-repeat="validation in build.validations | filter:validationStampRunViewFilter"
             class="ot-branch-build-view-validation">
             <!-- Not run and validation enabled -->
-            <span ng-if="!validationStampRunView.run && buildView.build._validate" class="ot-command"
-                  ng-click="createValidationRun(buildView, validationStampRunView)">
+            <span ng-if="validation.validationRuns.length == 0 && build.links._validate" class="ot-command"
+                  ng-click="createValidationRun(build, validation.validationStamp)">
                 <ot-validation-run-status-none></ot-validation-run-status-none>
             </span>
             <!-- Not run and validation not enabled -->
-            <span ng-if="!validationStampRunView.run && !buildView.build._validate">
+            <span ng-if="validation.validationRuns.length == 0 && !build.links._validate">
                 <ot-validation-run-status-none></ot-validation-run-status-none>
             </span>
             <!-- Last status -->
-            <span ng-if="validationStampRunView.run">
-                <span class="ot-action" ng-click="displayValidationRuns(buildView, validationStampRunView)">
-                    <ot-validation-run-status status="validationStampRunView.lastStatus"></ot-validation-run-status>
+            <span ng-if="validation.validationRuns.length > 0">
+                <span class="ot-action" ng-click="displayValidationRuns(build, validation.validationStamp)">
+                    <ot-validation-run-status status="validation.validationRuns[0].validationRunStatuses[0]"></ot-validation-run-status>
                 </span>
             </span>
         </td>
@@ -249,7 +248,7 @@
             <!-- Filter command -->
             <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
             <!-- Build diff extension commands -->
-            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
+            <button ng-repeat="action in branchView.buildDiffActions" class="btn btn-default"
                     id="{{action.id}}"
                     ng-click="buildDiff(action)">
                 {{action.name}}

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
+import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.login
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
@@ -29,6 +30,16 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     @AcceptanceTest(AcceptanceTestContext.SMOKE)
     void 'Admin login'() {
         browser { browser -> loginAsAdmin(browser) }
+    }
+
+    @Test
+    void 'Account with special characters in password'() {
+        def name = uid('A')
+        doCreateAccount(name, "test§")
+        // Login with this account
+        browser { browser ->
+            login(browser, name, "test§", name)
+        }
     }
 
     @Test

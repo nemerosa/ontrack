@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.Document;
+import org.apache.http.HttpEntity;
 
 public interface JsonClient {
 
@@ -12,6 +13,16 @@ public interface JsonClient {
     JsonNode delete(String path, Object... parameters);
 
     JsonNode post(Object data, String path, Object... parameters);
+
+    /**
+     * General POST method
+     *
+     * @param data       Entity to post
+     * @param path       Relative path
+     * @param parameters Parameter for the relative path parameters (if any)
+     * @return Result as JSON
+     */
+    JsonNode post(HttpEntity data, String path, Object... parameters);
 
     JsonNode put(Object data, String path, Object... parameters);
 

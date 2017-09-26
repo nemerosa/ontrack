@@ -21,7 +21,10 @@ account and to the groups.
 NOTE: As of now, only roles can be assigned to groups and accounts, and the
 list of roles and their associated functions is defined by Ontrack itself.
 
-Ontrack distinguishes between _global roles_ and _project roles.
+Ontrack distinguishes between _global roles_ and _project_ roles.
+
+<<extending,Extensions>> can contribute to built-in roles
+and functions - see <<extending-security>> for details.
 
 [[security-roles-global]]
 ===== Global roles
@@ -82,7 +85,7 @@ A project **PROMOTER** can create and delete promotion runs, can change the
 validation runs statuses.
 
 A project **PROJECT_MANAGER** cumulates the functions of a PROMOTER and of a
-VALIDATION\_MANAGER. He can additional manage the common
+VALIDATION_MANAGER. He can additional manage branches (creation / edition / deletion) and the common
 build filters.
 
 A project **READ_ONLY** user can view this project, but cannot perform any action on it.
@@ -159,3 +162,10 @@ projects, at least in read only mode.
 You can disable this anonymous access by goint go to the _Settings_ and click
 the _Edit_ button in the _General_ section. There you can set the
 _Grants project view to all_ option to _No_.
+
+[[security-extending]]
+==== Extending the security
+
+<<extending,Extensions>> can extend the security model beyond what
+if defined in the Ontrack core. See
+<<extending-security>> for more details.

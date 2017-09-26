@@ -54,6 +54,14 @@ public class DefaultURIBuilder implements URIBuilder {
     }
 
     @Override
+    public URI url(String relativeUri) {
+        return URI.create(
+                ServletUriComponentsBuilder.fromCurrentServletMapping().build().toUriString() +
+                        relativeUri
+        );
+    }
+
+    @Override
     public URI page(String path, Object... arguments) {
         String pagePath = format(
                 "/#/%s",
