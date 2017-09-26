@@ -9,12 +9,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.lang.IllegalStateException
 
-open class RolesServiceIT : AbstractServiceTestSupport() {
+const val newGlobalRole = "NEW_GLOBAL"
+const val newProjectRole = "NEW_PROJECT"
 
-    companion object {
-        val newGlobalRole = "NEW_GLOBAL"
-        val newProjectRole = "NEW_PROJECT"
-    }
+class RolesServiceIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var rolesService: RolesService
@@ -29,9 +27,9 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
     interface TestProjectCoreFunction : ProjectFunction
 
     @Configuration
-    open class RoleTestContributors {
+    class RoleTestContributors {
         @Bean
-        open fun roleContributor(): RoleContributor {
+        fun roleContributor(): RoleContributor {
             return object : RoleContributor {
                 override fun getGlobalRoles(): List<RoleDefinition> = listOf(
                         RoleDefinition(newGlobalRole, "New global role", "Test for a new global role")
@@ -41,26 +39,23 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
                         RoleDefinition(newProjectRole, "New project", "Test for a new project role")
                 )
 
-                override fun getGlobalFunctionContributionsForGlobalRole(role: String): List<Class<out GlobalFunction>> =
-                        when (role) {
-                            Roles.GLOBAL_CONTROLLER -> listOf(TestGlobalFunction::class.java)
-                            newGlobalRole -> listOf(ProjectCreation::class.java, TestGlobalFunction::class.java)
-                            else -> listOf()
-                        }
+                override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
+                        mapOf(
+                                Roles.GLOBAL_CONTROLLER to listOf(TestGlobalFunction::class.java),
+                                newGlobalRole to listOf(ProjectCreation::class.java, TestGlobalFunction::class.java)
+                        )
 
-                override fun getProjectFunctionContributionsForGlobalRole(role: String): List<Class<out ProjectFunction>> =
-                        when (role) {
-                            Roles.GLOBAL_CREATOR -> listOf(TestProject1Function::class.java)
-                            newGlobalRole -> listOf(TestProject2Function::class.java)
-                            else -> listOf()
-                        }
+                override fun getProjectFunctionContributionsForGlobalRoles(): Map<String, List<Class<out ProjectFunction>>> =
+                        mapOf(
+                                Roles.GLOBAL_CREATOR to listOf(TestProject1Function::class.java),
+                                newGlobalRole to listOf(TestProject2Function::class.java)
+                        )
 
-                override fun getProjectFunctionContributionsForProjectRole(role: String): List<Class<out ProjectFunction>> =
-                        when (role) {
-                            Roles.PROJECT_OWNER -> listOf(TestProject2Function::class.java)
-                            newProjectRole -> listOf(TestProject2Function::class.java)
-                            else -> listOf()
-                        }
+                override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
+                        mapOf(
+                                Roles.PROJECT_OWNER to listOf(TestProject2Function::class.java),
+                                newProjectRole to listOf(TestProject2Function::class.java)
+                        )
             }
         }
     }
@@ -83,11 +78,10 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun only_non_core_functions_are_allowed() {
         val service = RolesServiceImpl(listOf(object : RoleContributor {
-            override fun getProjectFunctionContributionsForProjectRole(role: String): List<Class<out ProjectFunction>> =
-                    when (role) {
-                        Roles.PROJECT_OWNER -> listOf(TestProjectCoreFunction::class.java)
-                        else -> listOf()
-                    }
+            override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
+                    mapOf(
+                            Roles.PROJECT_OWNER to listOf(TestProjectCoreFunction::class.java)
+                    )
         }))
         try {
             service.start()
@@ -100,11 +94,10 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun trying_to_add_an_existing_core_function() {
         val service = RolesServiceImpl(listOf(object : RoleContributor {
-            override fun getProjectFunctionContributionsForProjectRole(role: String): List<Class<out ProjectFunction>> =
-                    when (role) {
-                        Roles.PROJECT_PARTICIPANT -> listOf(ProjectConfig::class.java)
-                        else -> listOf()
-                    }
+            override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
+                    mapOf(
+                            Roles.PROJECT_PARTICIPANT to listOf(ProjectConfig::class.java)
+                    )
         }))
         try {
             service.start()
@@ -118,7 +111,7 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
     fun trying_to_override_a_global_role() {
         val service = RolesServiceImpl(listOf(object : RoleContributor {
             override fun getGlobalRoles(): List<RoleDefinition> =
-                listOf(RoleDefinition(Roles.GLOBAL_CREATOR, "Creator", "Overridden creator role"))
+                    listOf(RoleDefinition(Roles.GLOBAL_CREATOR, "Creator", "Overridden creator role"))
         }))
         try {
             service.start()
@@ -132,7 +125,7 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
     fun trying_to_override_a_project_role() {
         val service = RolesServiceImpl(listOf(object : RoleContributor {
             override fun getProjectRoles(): List<RoleDefinition> =
-                listOf(RoleDefinition(Roles.PROJECT_OWNER, "Owner", "Overridden owner role"))
+                    listOf(RoleDefinition(Roles.PROJECT_OWNER, "Owner", "Overridden owner role"))
         }))
         try {
             service.start()
@@ -211,6 +204,16 @@ open class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun `Project role contribution`() {
         assertNotNull(rolesService.projectRoles.find { it.id == newProjectRole })
+    }
+
+    @Test
+    fun `Contributed functions must be assigned by default to the administrator role`() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)).call {
+            assertTrue(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
+            assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
+        }
     }
 
 }
