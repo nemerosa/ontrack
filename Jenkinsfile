@@ -148,6 +148,7 @@ docker-compose run --rm \\
     -e ONTRACK_VERSION=${version} \\
     -e ONTRACK_ACCEPTANCE_OUTPUT=`pwd`/build/acceptance \\
     -e ONTRACK_ACCEPTANCE_IMPLICIT_WAIT=30 \\
+    -e ONTRACK_ACCEPTANCE_TIMEOUT=300 \\
     ontrack_acceptance
 """
                }
