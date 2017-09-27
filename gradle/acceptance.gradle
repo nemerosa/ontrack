@@ -30,6 +30,8 @@ task ciStop(type: ComposeStop) {
     projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
     projectName = 'ci'
     remove = true
+    logs = file("${project.buildDir}/ci-logs")
+    logService = 'ontrack'
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
