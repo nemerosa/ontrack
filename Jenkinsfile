@@ -203,33 +203,39 @@ docker-compose down --volumes
             parallel {
                 // TODO CentOS7
                 stage('CentOS7') {
-                    ontrackValidate(
-                            project: 'ontrack',
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ACCEPTANCE.CENTOS.7',
-                            buildResult: currentBuild.result,
-                    )
+                    steps {
+                        ontrackValidate(
+                                project: 'ontrack',
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                buildResult: currentBuild.result,
+                        )
+                    }
                 }
                 // TODO Debian
                 stage('Debian') {
-                    ontrackValidate(
-                            project: 'ontrack',
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ACCEPTANCE.DEBIAN',
-                            buildResult: currentBuild.result,
-                    )
+                    steps {
+                        ontrackValidate(
+                                project: 'ontrack',
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'ACCEPTANCE.DEBIAN',
+                                buildResult: currentBuild.result,
+                        )
+                    }
                 }
                 // TODO Digital Ocean
                 stage('Digital Ocean') {
-                    ontrackValidate(
-                            project: 'ontrack',
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ACCEPTANCE.DO',
-                            buildResult: currentBuild.result,
-                    )
+                    steps {
+                        ontrackValidate(
+                                project: 'ontrack',
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'ACCEPTANCE.DO',
+                                buildResult: currentBuild.result,
+                        )
+                    }
                 }
             }
         }
