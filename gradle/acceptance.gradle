@@ -35,6 +35,7 @@ task ciStop(type: ComposeStop) {
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
     acceptanceUrl = { "https://${ciStart.host}:${ciStart.getPublishedPort('ontrack', 443)}" }
     disableSsl = true
+    acceptanceTimeout = 300
     acceptanceImplicitWait = 30
     dependsOn ciStart
     finalizedBy ciStop
