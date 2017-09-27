@@ -199,40 +199,38 @@ docker-compose down --volumes
 
         // OS tests + DO tests in parallel
 
-        stage('Platforms') {
-            steps {
-                parallel(
-                        // TODO CentOS7
-                        "CentOS7": {
-                            ontrackValidate(
-                                    project: 'ontrack',
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.CENTOS.7',
-                                    buildResult: currentBuild.result,
-                            )
-                        },
-                        // TODO Debian
-                        "Debian": {
-                            ontrackValidate(
-                                    project: 'ontrack',
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DEBIAN',
-                                    buildResult: currentBuild.result,
-                            )
-                        },
-                        // TODO Digital Ocean
-                        "Digital Ocean": {
-                            ontrackValidate(
-                                    project: 'ontrack',
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DO',
-                                    buildResult: currentBuild.result,
-                            )
-                        },
-                )
+        stage('Platform tests') {
+            parallel {
+                // TODO CentOS7
+                stage('CentOS7') {
+                    ontrackValidate(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'ACCEPTANCE.CENTOS.7',
+                            buildResult: currentBuild.result,
+                    )
+                }
+                // TODO Debian
+                stage('Debian') {
+                    ontrackValidate(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'ACCEPTANCE.DEBIAN',
+                            buildResult: currentBuild.result,
+                    )
+                }
+                // TODO Digital Ocean
+                stage('Digital Ocean') {
+                    ontrackValidate(
+                            project: 'ontrack',
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'ACCEPTANCE.DO',
+                            buildResult: currentBuild.result,
+                    )
+                }
             }
         }
 
