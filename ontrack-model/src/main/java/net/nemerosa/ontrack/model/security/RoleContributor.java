@@ -11,6 +11,9 @@ public interface RoleContributor {
 
     /**
      * Gets a list of global roles to add.
+     *
+     * The parent role (if defined) functions are inherited by the new role. If the parent role is <code>null</code>,
+     * the role will not have any inherited function.
      */
     default List<RoleDefinition> getGlobalRoles() {
         return Collections.emptyList();
@@ -18,6 +21,9 @@ public interface RoleContributor {
 
     /**
      * Gets a list of project roles to add.
+     *
+     * The parent role (if defined) functions are inherited by the new role. If the parent role is <code>null</code>,
+     * the role will not have any inherited function.
      */
     default List<RoleDefinition> getProjectRoles() {
         return Collections.emptyList();

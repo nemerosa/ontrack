@@ -271,7 +271,7 @@ constructor(
 
         // Global roles contributions
         roleContributors.forEach { roleContributor ->
-            roleContributor.getGlobalRoles().forEach { roleDefinition ->
+            roleContributor.globalRoles.forEach { roleDefinition ->
                 if (Roles.GLOBAL_ROLES.contains(roleDefinition.id)) {
                     // Totally illegal - stopping everything
                     throw IllegalStateException("An existing global role cannot be overridden: " + roleDefinition.id)
@@ -280,13 +280,37 @@ constructor(
                             roleDefinition.id,
                             roleDefinition.name,
                             roleDefinition.description,
-                            emptyList(),
-                            emptyList()
+                            getGlobalFunctionsFromGlobalParent(roleDefinition.parent),
+                            getProjectFunctionsFromGlobalParent(roleDefinition.parent)
                     )
                 }
             }
         }
 
+    }
+
+    private fun getGlobalParentRole(parent: String?): GlobalRole? {
+        if (parent == null) {
+            return null
+        } else if (Roles.GLOBAL_ROLES.contains(parent)) {
+            val parentRole = globalRoles[parent]
+            if (parentRole != null) {
+                return parentRole
+            }
+        }
+        throw IllegalStateException("$parent role is not a built-in role or is not registered.")
+    }
+
+    private fun getGlobalFunctionsFromGlobalParent(parent: String?): List<Class<out GlobalFunction>> {
+        return getGlobalParentRole(parent)
+                ?.globalFunctions?.toList()
+                ?: listOf()
+    }
+
+    private fun getProjectFunctionsFromGlobalParent(parent: String?): List<Class<out ProjectFunction>> {
+        return getGlobalParentRole(parent)
+                ?.projectFunctions?.toList()
+                ?: listOf()
     }
 
     private fun register(id: String, name: String, description: String, globalFunctions: List<Class<out GlobalFunction>>, projectFunctions: List<Class<out ProjectFunction>>) {
