@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.security;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Components which contributes some functions to a role.
@@ -10,6 +11,9 @@ public interface RoleContributor {
 
     /**
      * Gets a list of global roles to add.
+     *
+     * The parent role (if defined) functions are inherited by the new role. If the parent role is <code>null</code>,
+     * the role will not have any inherited function.
      */
     default List<RoleDefinition> getGlobalRoles() {
         return Collections.emptyList();
@@ -17,42 +21,42 @@ public interface RoleContributor {
 
     /**
      * Gets a list of project roles to add.
+     *
+     * The parent role (if defined) functions are inherited by the new role. If the parent role is <code>null</code>,
+     * the role will not have any inherited function.
      */
     default List<RoleDefinition> getProjectRoles() {
         return Collections.emptyList();
     }
 
     /**
-     * Gets the list of functions to contribute to this global role.
+     * Gets the list of functions to contribute per global role.
      *
-     * @param role Role to contribute to
-     * @return List of {@link GlobalFunction} to add - none of them must be annotated with the
+     * @return List of {@link GlobalFunction} per role - none of them must be annotated with the
      * {@link CoreFunction} annotation.
      */
-    default List<Class<? extends GlobalFunction>> getGlobalFunctionContributionsForGlobalRole(String role) {
-        return Collections.emptyList();
+    default Map<String, List<Class<? extends GlobalFunction>>> getGlobalFunctionContributionsForGlobalRoles() {
+        return Collections.emptyMap();
     }
 
     /**
-     * Gets the list of project functions to contribute to this global role.
+     * Gets the list of project functions to contribute per global role.
      *
-     * @param role Role to contribute to
-     * @return List of {@link ProjectFunction} to add - none of them must be annotated with the
+     * @return List of {@link ProjectFunction} per role - none of them must be annotated with the
      * {@link CoreFunction} annotation.
      */
-    default List<Class<? extends ProjectFunction>> getProjectFunctionContributionsForGlobalRole(String role) {
-        return Collections.emptyList();
+    default Map<String, List<Class<? extends ProjectFunction>>> getProjectFunctionContributionsForGlobalRoles() {
+        return Collections.emptyMap();
     }
 
     /**
-     * Gets the list of functions to contribute to this project role.
+     * Gets the list of functions to contribute per project role.
      *
-     * @param role Role to contribute to
-     * @return List of {@link ProjectFunction} to add - none of them must be annotated with the
+     * @return List of {@link ProjectFunction} per role - none of them must be annotated with the
      * {@link CoreFunction} annotation.
      */
-    default List<Class<? extends ProjectFunction>> getProjectFunctionContributionsForProjectRole(String role) {
-        return Collections.emptyList();
+    default Map<String, List<Class<? extends ProjectFunction>>> getProjectFunctionContributionsForProjectRoles() {
+        return Collections.emptyMap();
     }
 
 }
