@@ -145,7 +145,7 @@ constructor(
                             roleDefinition.id,
                             roleDefinition.name,
                             roleDefinition.description,
-                            emptyList()
+                            getProjectFunctionsFromProjectParent(roleDefinition.parent)
                     )
                 }
             }
@@ -289,6 +289,18 @@ constructor(
 
     }
 
+    private fun getProjectParentRole(parent: String?): ProjectRole? {
+        if (parent == null) {
+            return null
+        } else if (Roles.PROJECT_ROLES.contains(parent)) {
+            val parentRole = projectRoles[parent]
+            if (parentRole != null) {
+                return parentRole
+            }
+        }
+        throw IllegalStateException("$parent role is not a built-in role or is not registered.")
+    }
+
     private fun getGlobalParentRole(parent: String?): GlobalRole? {
         if (parent == null) {
             return null
@@ -310,6 +322,12 @@ constructor(
     private fun getProjectFunctionsFromGlobalParent(parent: String?): List<Class<out ProjectFunction>> {
         return getGlobalParentRole(parent)
                 ?.projectFunctions?.toList()
+                ?: listOf()
+    }
+
+    private fun getProjectFunctionsFromProjectParent(parent: String?): List<Class<out ProjectFunction>> {
+        return getProjectParentRole(parent)
+                ?.functions?.toList()
                 ?: listOf()
     }
 

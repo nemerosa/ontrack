@@ -12,6 +12,7 @@ import java.lang.IllegalStateException
 const val newGlobalRole = "NEW_GLOBAL"
 const val extGlobalRole = "EXT_AUTOMATER"
 const val newProjectRole = "NEW_PROJECT"
+const val extProjectRole = "EXT_PARTICIPANT"
 
 class RolesServiceIT : AbstractServiceTestSupport() {
 
@@ -43,7 +44,13 @@ class RolesServiceIT : AbstractServiceTestSupport() {
                 )
 
                 override fun getProjectRoles(): List<RoleDefinition> = listOf(
-                        RoleDefinition(newProjectRole, "New project", "Test for a new project role")
+                        RoleDefinition(newProjectRole, "New project", "Test for a new project role"),
+                        RoleDefinition(
+                                extProjectRole,
+                                "Extended participant",
+                                "Participant with extra functions",
+                                Roles.PROJECT_PARTICIPANT
+                        )
                 )
 
                 override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
@@ -63,7 +70,8 @@ class RolesServiceIT : AbstractServiceTestSupport() {
                 override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
                         mapOf(
                                 Roles.PROJECT_OWNER to listOf(TestProject2Function::class.java),
-                                newProjectRole to listOf(TestProject2Function::class.java)
+                                newProjectRole to listOf(TestProject2Function::class.java),
+                                extProjectRole to listOf(TestProject1Function::class.java)
                         )
             }
         }
@@ -255,6 +263,24 @@ class RolesServiceIT : AbstractServiceTestSupport() {
                     PromotionRunCreate::class.java,
                     ValidationRunCreate::class.java,
                     BranchTemplateSync::class.java
+            ).forEach { fn ->
+                assertTrue(securityService.isProjectFunctionGranted(project, fn))
+            }
+        }
+    }
+
+    @Test
+    fun `Project role functions are inherited`() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithProjectRole(project, extProjectRole)).call {
+            // Specific functions
+            assertFalse(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
+            assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
+            // Inherited functions
+            listOf(
+                    ProjectView::class.java,
+                    ValidationRunStatusChange::class.java
             ).forEach { fn ->
                 assertTrue(securityService.isProjectFunctionGranted(project, fn))
             }
