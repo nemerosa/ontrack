@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Configuration
 import java.lang.IllegalStateException
 
 const val newGlobalRole = "NEW_GLOBAL"
+const val extGlobalRole = "EXT_AUTOMATER"
 const val newProjectRole = "NEW_PROJECT"
+const val extProjectRole = "EXT_PARTICIPANT"
 
 class RolesServiceIT : AbstractServiceTestSupport() {
 
@@ -32,29 +34,44 @@ class RolesServiceIT : AbstractServiceTestSupport() {
         fun roleContributor(): RoleContributor {
             return object : RoleContributor {
                 override fun getGlobalRoles(): List<RoleDefinition> = listOf(
-                        RoleDefinition(newGlobalRole, "New global role", "Test for a new global role")
+                        RoleDefinition(newGlobalRole, "New global role", "Test for a new global role"),
+                        RoleDefinition(
+                                extGlobalRole,
+                                "Extended automater",
+                                "Automater with extra functions",
+                                Roles.GLOBAL_AUTOMATION
+                        )
                 )
 
                 override fun getProjectRoles(): List<RoleDefinition> = listOf(
-                        RoleDefinition(newProjectRole, "New project", "Test for a new project role")
+                        RoleDefinition(newProjectRole, "New project", "Test for a new project role"),
+                        RoleDefinition(
+                                extProjectRole,
+                                "Extended participant",
+                                "Participant with extra functions",
+                                Roles.PROJECT_PARTICIPANT
+                        )
                 )
 
                 override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
                         mapOf(
                                 Roles.GLOBAL_CONTROLLER to listOf(TestGlobalFunction::class.java),
-                                newGlobalRole to listOf(ProjectCreation::class.java, TestGlobalFunction::class.java)
+                                newGlobalRole to listOf(ProjectCreation::class.java, TestGlobalFunction::class.java),
+                                extGlobalRole to listOf(TestGlobalFunction::class.java)
                         )
 
                 override fun getProjectFunctionContributionsForGlobalRoles(): Map<String, List<Class<out ProjectFunction>>> =
                         mapOf(
                                 Roles.GLOBAL_CREATOR to listOf(TestProject1Function::class.java),
-                                newGlobalRole to listOf(TestProject2Function::class.java)
+                                newGlobalRole to listOf(TestProject2Function::class.java),
+                                extGlobalRole to listOf(TestProject1Function::class.java)
                         )
 
                 override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
                         mapOf(
                                 Roles.PROJECT_OWNER to listOf(TestProject2Function::class.java),
-                                newProjectRole to listOf(TestProject2Function::class.java)
+                                newProjectRole to listOf(TestProject2Function::class.java),
+                                extProjectRole to listOf(TestProject1Function::class.java)
                         )
             }
         }
@@ -212,7 +229,61 @@ class RolesServiceIT : AbstractServiceTestSupport() {
         asAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)).call {
             assertTrue(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertTrue(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
+        }
+    }
+
+    @Test
+    fun `Global role functions are inherited`() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithGlobalRole(extGlobalRole)).call {
+            // Specific functions
+            assertTrue(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
+            // Inherited functions
+            listOf(
+                    ProjectCreation::class.java,
+                    AccountGroupManagement::class.java
+            ).forEach { fn ->
+                assertTrue(securityService.isGlobalFunctionGranted(fn))
+            }
+            listOf(
+                    ProjectConfig::class.java,
+                    ProjectAuthorisationMgt::class.java,
+                    BranchCreate::class.java,
+                    BranchTemplateMgt::class.java,
+                    PromotionLevelCreate::class.java,
+                    PromotionLevelEdit::class.java,
+                    ValidationStampCreate::class.java,
+                    ValidationStampEdit::class.java,
+                    ProjectView::class.java,
+                    BuildCreate::class.java,
+                    BuildConfig::class.java,
+                    PromotionRunCreate::class.java,
+                    ValidationRunCreate::class.java,
+                    BranchTemplateSync::class.java
+            ).forEach { fn ->
+                assertTrue(securityService.isProjectFunctionGranted(project, fn))
+            }
+        }
+    }
+
+    @Test
+    fun `Project role functions are inherited`() {
+        val project = doCreateProject()
+        asAccount(doCreateAccountWithProjectRole(project, extProjectRole)).call {
+            // Specific functions
+            assertFalse(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
+            assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
+            assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
+            // Inherited functions
+            listOf(
+                    ProjectView::class.java,
+                    ValidationRunStatusChange::class.java
+            ).forEach { fn ->
+                assertTrue(securityService.isProjectFunctionGranted(project, fn))
+            }
         }
     }
 
