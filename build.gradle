@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.gradle.DockerStop
 buildscript {
     ext {
         springBootVersion = '1.5.2.RELEASE'
-        kotlinVersion = '1.1.3'
+        kotlinVersion = '1.1.4-3'
     }
     repositories {
         jcenter()

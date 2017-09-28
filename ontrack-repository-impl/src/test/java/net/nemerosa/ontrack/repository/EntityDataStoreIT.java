@@ -286,4 +286,44 @@ public class EntityDataStoreIT extends AbstractRepositoryTestSupport {
         );
     }
 
+    @Test
+    public void getByCategoryAndName() {
+        // Entity
+        Branch branch = do_create_branch();
+        // Adds some data
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 1); // offset: 3
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 2); // offset: 2
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 3); // offset: 1
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 4); // offset: 0
+        store.addObject(branch, "C1", "N2", Signature.of(TEST_USER), null, 5);
+        store.addObject(branch, "C2", "N3", Signature.of(TEST_USER), null, 6);
+        // Query with pagination
+        List<EntityDataStoreRecord> records = store.getByCategoryAndName(branch, "C1", "N1", 2, 1);
+        // Checks the results
+        assertEquals(1, records.size());
+        assertEquals(2, records.get(0).getData().asInt());
+        // Count
+        assertEquals(4, store.getCountByCategoryAndName(branch, "C1", "N1"));
+    }
+
+    @Test
+    public void getByCategory() {
+        // Entity
+        Branch branch = do_create_branch();
+        // Adds some data
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 1); // offset: 4
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 2); // offset: 3
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 3); // offset: 2
+        store.addObject(branch, "C1", "N1", Signature.of(TEST_USER), null, 4); // offset: 1
+        store.addObject(branch, "C1", "N2", Signature.of(TEST_USER), null, 5); // offset: 0
+        store.addObject(branch, "C2", "N3", Signature.of(TEST_USER), null, 6);
+        // Query with pagination
+        List<EntityDataStoreRecord> records = store.getByCategory(branch, "C1", 2, 1);
+        // Checks the results
+        assertEquals(1, records.size());
+        assertEquals(3, records.get(0).getData().asInt());
+        // Count
+        assertEquals(5, store.getCountByCategory(branch, "C1"));
+    }
+
 }

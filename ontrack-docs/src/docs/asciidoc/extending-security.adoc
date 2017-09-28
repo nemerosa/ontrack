@@ -61,34 +61,31 @@ function to the `PROJECT_OWNER` project role.
 @Component
 public MyRoleContributor implements RoleContributor {
     @Override
-    public List<Class<? extends GlobalFunction>> getGlobalFunctionContributionsForGlobalRole(String role) {
-        if (Roles.GLOBAL_AUTOMATION.equals(role)) {
-            return Collections.singletonList(
+    public Map<String, List<Class<? extends GlobalFunction>>> getGlobalFunctionContributionsForGlobalRoles() {
+        return Collections.singletonMap(
+            Roles.GLOBAL_AUTOMATION,
+            Collections.singletonList(
                 MyGlobalFunction.class
-            );
-        } else {
-            return Collections.emptyList();
-        }
+            )
+        );
     }
     @Override
-    public List<Class<? extends ProjectFunction>> getProjectFunctionContributionsForGlobalRole(String role) {
-        if (Roles.GLOBAL_AUTOMATION.equals(role)) {
-            return Collections.singletonList(
+    public Map<String, List<Class<? extends ProjectFunction>>> getProjectFunctionContributionsForGlobalRoles() {
+        return Collections.singletonMap(
+            Roles.GLOBAL_AUTOMATION,
+            Collections.singletonList(
                 MyProjectFunction.class
-            );
-        } else {
-            return Collections.emptyList();
-        }
+            )
+        );
     }
     @Override
-    public List<Class<? extends ProjectFunction>> getProjectFunctionContributionsForProjectRole(String role) {
-        if (Roles.PROJECT_OWNER.equals(role)) {
-            return Collections.singletonList(
+    public Map<String, List<Class<? extends ProjectFunction>>> getProjectFunctionContributionsForProjectRoles() {
+        return Collections.singletonMap(
+            Roles.PROJECT_OWNER,
+            Collections.singletonList(
                 MyProjectFunction.class
-            );
-        } else {
-            return Collections.emptyList();
-        }
+            )
+        );
     }
 }
 ----
@@ -156,6 +153,31 @@ public MyRoleContributor implements RoleContributor {
     }
 }
 ----
+
+[NOTE]
+====
+A new role can inherit from a built-in role:
+
+[source,java]
+----
+    @Override
+    public List<RoleDefinition> getProjectRoles() {
+        return Collections.singletonList(
+            new RoleDefinition(
+                "MY_PROJECT_ROLE",
+                "My Project Role",
+                "This is a new project role",
+                Roles.PROJECT_PARTICIPANT
+            )
+        );
+    }
+----
+
+In the previous example, the `MY_PROJECT_ROLE` will inherit from
+all functions of the built-in `PARTICIPANT` role.
+
+Same principle applies for global roles.
+====
 
 Those roles becomes eligible for selection when managing
 accounts and groups.

@@ -283,6 +283,24 @@ class BuildQLIT extends AbstractQLITSupport {
         assert data.builds.get(0).id == build1.id()
     }
 
+    @Test
+    void 'Build filter with promotion since promotion when no promotion is available'() {
+        // Branch
+        def branch = doCreateBranch()
+        // A few builds without promotions
+        (1..4).each {
+            doCreateBuild(branch, nd(it.toString(), ""))
+        }
+        // Query
+        def data = run(""" {
+  builds(project: "${branch.project.name}", branch: "${branch.name}", buildBranchFilter: {count: 100, withPromotionLevel: "BRONZE", sincePromotionLevel: "SILVER"}) {
+    id
+  }
+}""")
+        // We should not have any build
+        assert data.builds.size() == 0
+    }
+
     @Test(expected = GraphQLException)
     void 'Branch filter requires a branch'() {
         // Builds
