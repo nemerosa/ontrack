@@ -30,11 +30,14 @@ task ciStop(type: ComposeStop) {
     projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
     projectName = 'ci'
     remove = true
+    logs = file("${project.buildDir}/ci-logs")
+    logService = 'ontrack'
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
     acceptanceUrl = { "https://${ciStart.host}:${ciStart.getPublishedPort('ontrack', 443)}" }
     disableSsl = true
+    acceptanceTimeout = 300
     acceptanceImplicitWait = 30
     dependsOn ciStart
     finalizedBy ciStop
