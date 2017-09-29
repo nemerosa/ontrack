@@ -19,7 +19,10 @@ import org.springframework.boot.actuate.endpoint.HealthEndpoint
 import org.springframework.boot.actuate.health.Health
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+import org.springframework.web.util.UriComponentsBuilder
+import java.net.URI
 import javax.validation.Valid
+import kotlin.reflect.full.memberProperties
 
 @RestController
 @RequestMapping("/admin")
@@ -133,14 +136,17 @@ constructor(
      * Gets the list of jobs and their status
      */
     @GetMapping("jobs")
-    fun getJobs(@Valid jobFilter: JobFilter, page: Page?): Resources<JobStatus> {
+    fun getJobs(
+            @Valid jobFilter: JobFilter?,
+            page: Page?
+    ): Resources<JobStatus> {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        val jobs = jobFilter.filter(jobScheduler.jobStatuses)
+        val jobs = (jobFilter ?: JobFilter()).filter(jobScheduler.jobStatuses)
         val pagination = Pagination.paginate(
                 jobs,
                 page ?: Page(),
                 { offset, limit ->
-                    uri(on(javaClass).getJobs(jobFilter, Page(offset, limit)))
+                    uri(on(javaClass).getJobs(null, null)).map(jobFilter, Page(offset, limit))
                 }
         )
         return Resources.of(
