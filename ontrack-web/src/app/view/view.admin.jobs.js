@@ -25,10 +25,7 @@ angular.module('ot.view.admin.jobs', [
         };
 
         // Current page
-        $scope.page = {
-            offset: 0,
-            count: 30
-        };
+        $scope.page = {};
 
         // Category filter selection
         $scope.setJobFilterCategory = (category) => {
@@ -50,8 +47,42 @@ angular.module('ot.view.admin.jobs', [
             loadJobs();
         };
 
+        // Navigation: previous page
+        $scope.previousPage = () => {
+            if ($scope.jobs.pagination.prev) {
+                $scope.loadingJobs = true;
+                ot.pageCall($http.get($scope.jobs.pagination.prev))
+                    .then(jobs => {
+                        $scope.jobs = jobs;
+                        $scope.page= jobs.pagination;
+                    })
+                    .finally(() => {
+                        $scope.loadingJobs = false;
+                    });
+            }
+        };
+
+        // Navigation: next page
+        $scope.nextPage = () => {
+            if ($scope.jobs.pagination.next) {
+                $scope.loadingJobs = true;
+                ot.pageCall($http.get($scope.jobs.pagination.next))
+                    .then(jobs => {
+                        $scope.jobs = jobs;
+                        $scope.page= jobs.pagination;
+                    })
+                    .finally(() => {
+                        $scope.loadingJobs = false;
+                    });
+            }
+        };
+
         // Loads the jobs
-        $scope.loadJobs = loadJobs;
+        $scope.loadJobs = () => {
+            $scope.page = {};
+            loadJobs();
+        };
+
         function loadJobs() {
             $scope.loadingJobs = true;
             ot.pageCall($http.get('admin/jobs/filter'))
@@ -64,6 +95,8 @@ angular.module('ot.view.admin.jobs', [
                     params.type = $scope.jobFilter.type ? $scope.jobFilter.type.name : undefined;
                     params.description = $scope.jobFilter.description ? $scope.jobFilter.description : undefined;
                     params.errorOnly = $scope.jobFilter.errorOnly ? $scope.jobFilter.errorOnly : undefined;
+                    params.offset = $scope.page.offset ? $scope.page.offset : 0;
+                    params.count = $scope.page.count ? $scope.page.count : 30;
                     // Call
                     return ot.pageCall($http.get('admin/jobs', {
                         params: params
@@ -71,6 +104,7 @@ angular.module('ot.view.admin.jobs', [
                 })
                 .then(jobs => {
                     $scope.jobs = jobs;
+                    $scope.page= jobs.pagination;
                     view.commands = [
                         ot.viewApiCommand(jobs._self),
                         ot.viewCloseCommand('/home')
