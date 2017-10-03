@@ -14,6 +14,7 @@ import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.util.EntityUtils
+import org.codehaus.groovy.runtime.InvokerInvocationException
 
 import java.util.concurrent.TimeUnit
 
@@ -33,11 +34,23 @@ class OTHttpClient {
                 httpClientSupplier,
                 httpContext,
                 clientLogger,
-                new RetryPolicy()
-                    .retryOn(ConnectException.class)
-                    .withDelay(retryDelaySeconds, TimeUnit.SECONDS)
-                    .withMaxRetries(maxTries)
+                createDefaultRetryPolicy()
+                        .withDelay(retryDelaySeconds, TimeUnit.SECONDS)
+                        .withMaxRetries(maxTries)
         )
+    }
+
+    static RetryPolicy createDefaultRetryPolicy() {
+        new RetryPolicy().retryOn({ th ->
+            if (th instanceof ConnectException) {
+                return true
+            } else if (th instanceof InvokerInvocationException) {
+                def cause = th.cause
+                return (cause instanceof ConnectException)
+            } else {
+                return false
+            }
+        })
     }
 
     OTHttpClient(URL url, HttpHost host, Closure<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, Closure clientLogger, RetryPolicy retryPolicy) {
@@ -133,7 +146,7 @@ class OTHttpClient {
     }
 
     protected Object baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
-                                               Closure entityParser) {
+                                        Closure entityParser) {
         int statusCode = response.statusLine.statusCode;
         clientLogger "[ontrack][response] ${request} CODE ${statusCode} ${response.statusLine.reasonPhrase}"
         if (statusCode == HttpStatus.SC_OK ||
