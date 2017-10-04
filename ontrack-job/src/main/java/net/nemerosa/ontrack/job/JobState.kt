@@ -1,33 +1,33 @@
-package net.nemerosa.ontrack.job;
+package net.nemerosa.ontrack.job
 
 /**
  * Global state of a job
  */
-public enum JobState {
+enum class JobState(val description: String) {
 
     /**
      * Job scheduled, but not running right now.
      */
-    IDLE,
+    IDLE("Idle"),
 
     /**
      * Job running
      */
-    RUNNING,
+    RUNNING("Running"),
 
     /**
      * Job paused
      */
-    PAUSED,
+    PAUSED("Paused"),
 
     /**
      * Job disabled
      */
-    DISABLED,
+    DISABLED("Disabled"),
 
     /**
      * Job scheduled for deletion
      */
-    INVALID
+    INVALID("Invalid")
 
 }

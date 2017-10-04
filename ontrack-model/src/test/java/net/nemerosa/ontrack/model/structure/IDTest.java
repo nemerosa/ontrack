@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.IntNode;
 import net.nemerosa.ontrack.json.JsonUtils;
 import org.junit.Test;
 
+import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 import static org.junit.Assert.*;
 
@@ -42,6 +44,15 @@ public class IDTest {
         assertJsonWrite(
                 JsonUtils.number(12),
                 ID.of(12)
+        );
+    }
+
+    @Test
+    public void read_from_json() throws JsonProcessingException {
+        assertJsonRead(
+                ID.of(9),
+                new IntNode(9),
+                ID.class
         );
     }
 
