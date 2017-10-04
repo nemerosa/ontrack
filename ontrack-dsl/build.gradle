@@ -7,15 +7,20 @@ tasks.withType(AbstractCompile) {
     targetCompatibility = 1.7
 }
 
+/**
+ * Dependencies of the DSL module must be carefully controlled
+ * outside of the core modules
+ */
+
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all'
-    compile 'org.slf4j:slf4j-api'
-    compile 'org.apache.httpcomponents:httpclient'
-    compile 'org.apache.httpcomponents:httpcore'
-    compile 'org.apache.httpcomponents:httpmime'
-    compile 'commons-logging:commons-logging'
-    compile 'net.jodah:failsafe'
-    compile 'com.fasterxml.jackson.core:jackson-databind'
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
+    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile 'org.apache.httpcomponents:httpclient:4.5.3'
+    compile 'org.apache.httpcomponents:httpcore:4.4.6'
+    compile 'org.apache.httpcomponents:httpmime:4.5.3'
+    compile 'commons-logging:commons-logging:1.2'
+    compile 'net.jodah:failsafe:0.9.2'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.9'
 }
 
 if (documentationProfile) {
