@@ -32,6 +32,21 @@ public class ProjectControllerIT extends AbstractWebTestSupport {
     }
 
     @Test
+    public void disablingEnablingProject() throws Exception {
+        Project project = doCreateProject();
+        // Disables it
+        Project disabled = asUser().with(project, ProjectEdit.class).call(
+                () -> controller.disableProject(project.getId())
+        );
+        assertTrue("Project is disabled", disabled.isDisabled());
+        // Enables it
+        Project enabled = asUser().with(project, ProjectEdit.class).call(
+                () -> controller.enableProject(project.getId())
+        );
+        assertFalse("Project is enabled", enabled.isDisabled());
+    }
+
+    @Test
     public void updateProject() throws Exception {
         // Creates the project
         NameDescriptionState initialNames = nameDescription().asState();

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.NameDescriptionState;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -29,6 +30,21 @@ public class BranchControllerIT extends AbstractWebTestSupport {
                 .call(() -> controller.newBranch(project.getId(), nameDescription));
         // Checks the branch
         checkBranchResource(branch, nameDescription);
+    }
+
+    @Test
+    public void disablingEnablingBranch() throws Exception {
+        Branch branch = doCreateBranch();
+        // Disables it
+        Branch disabled = asUser().with(branch, ProjectEdit.class).call(
+                () -> controller.disableBranch(branch.getId())
+        );
+        assertTrue("Branch is disabled", disabled.isDisabled());
+        // Enables it
+        Branch enabled = asUser().with(branch, ProjectEdit.class).call(
+                () -> controller.enableBranch(branch.getId())
+        );
+        assertFalse("Branch is enabled", enabled.isDisabled());
     }
 
     @Test(expected = AccessDeniedException.class)
