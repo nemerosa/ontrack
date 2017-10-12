@@ -131,6 +131,17 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
         );
     }
 
+    @Override
+    public Optional<Event> getLastEvent(ProjectEntityType entityType, ID entityId, EventType eventType,
+                                        BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                                        Function<String, EventType> eventTypeLoader) {
+        return getOptional(
+                format("SELECT * FROM EVENTS WHERE %s = :entityId AND EVENT_TYPE = :eventType ORDER BY ID DESC LIMIT 1", entityType.name()),
+                params("entityId", entityId.get()).addValue("eventType", eventType.getId()),
+                (ResultSet rs, int num) -> toEvent(rs, entityLoader, eventTypeLoader)
+        );
+    }
+
     private Event toEvent(ResultSet rs,
                           BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
                           Function<String, EventType> eventTypeLoader) throws SQLException {

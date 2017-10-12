@@ -46,4 +46,8 @@ public interface EventRepository {
     );
 
     Optional<Signature> getLastEventSignature(ProjectEntityType entityType, ID entityId, EventType eventType);
+
+    Optional<Event> getLastEvent(ProjectEntityType entityType, ID entityId, EventType eventType,
+                                 BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                                 Function<String, EventType> eventTypeLoader);
 }
