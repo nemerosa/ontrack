@@ -23,10 +23,14 @@ public class EventFactoryImpl implements EventFactory {
         types = new ConcurrentHashMap<>();
         register(NEW_PROJECT);
         register(UPDATE_PROJECT);
+        register(DISABLE_PROJECT);
+        register(ENABLE_PROJECT);
         register(DELETE_PROJECT);
 
         register(NEW_BRANCH);
         register(UPDATE_BRANCH);
+        register(DISABLE_BRANCH);
+        register(ENABLE_BRANCH);
         register(DELETE_BRANCH);
 
         register(NEW_BUILD);
@@ -86,6 +90,16 @@ public class EventFactoryImpl implements EventFactory {
     }
 
     @Override
+    public Event disableProject(Project project) {
+        return Event.of(DISABLE_PROJECT).withProject(project).get();
+    }
+
+    @Override
+    public Event enableProject(Project project) {
+        return Event.of(ENABLE_PROJECT).withProject(project).get();
+    }
+
+    @Override
     public Event deleteProject(Project project) {
         return Event.of(DELETE_PROJECT)
                 .with("project", project.getName())
@@ -101,6 +115,16 @@ public class EventFactoryImpl implements EventFactory {
     @Override
     public Event updateBranch(Branch branch) {
         return Event.of(UPDATE_BRANCH).withBranch(branch).get();
+    }
+
+    @Override
+    public Event disableBranch(Branch branch) {
+        return Event.of(DISABLE_BRANCH).withBranch(branch).get();
+    }
+
+    @Override
+    public Event enableBranch(Branch branch) {
+        return Event.of(ENABLE_BRANCH).withBranch(branch).get();
     }
 
     @Override

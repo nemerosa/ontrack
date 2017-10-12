@@ -26,6 +26,10 @@ public interface StructureService {
 
     void saveProject(Project project);
 
+    Project disableProject(Project project);
+
+    Project enableProject(Project project);
+
     Ack deleteProject(ID projectId);
 
     // Branches
@@ -41,6 +45,10 @@ public interface StructureService {
     BranchStatusView getBranchStatusView(Branch branch);
 
     void saveBranch(Branch branch);
+
+    Branch disableBranch(Branch branch);
+
+    Branch enableBranch(Branch branch);
 
     Ack deleteBranch(ID branchId);
 
