@@ -151,5 +151,5 @@ Entity metrics:
 
 Application errors metrics:
 
-* `counter.errors` - number of errors which have occurred in Ontrack - using a derivative of this value can help having an idea of the frequency of errors
-* `counter.errors.*` - number of errors for a given category, like `GitService` or `UIErrorHandler`)
+* `counter.error` - number of errors which have occurred in Ontrack - using a derivative of this value can help having an idea of the frequency of errors
+* `counter.error.*` - number of errors for a given category, like `GitService` or `UIErrorHandler`)
