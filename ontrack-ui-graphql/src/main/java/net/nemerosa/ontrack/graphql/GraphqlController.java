@@ -3,11 +3,11 @@ package net.nemerosa.ontrack.graphql;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
-import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import lombok.Data;
 import lombok.experimental.Wither;
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService;
+import net.nemerosa.ontrack.graphql.service.GraphQLService;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +26,14 @@ import java.util.concurrent.Callable;
 public class GraphqlController {
 
     private final GraphqlSchemaService schemaService;
+    private final GraphQLService graphQLService;
 
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     @Autowired
-    public GraphqlController(GraphqlSchemaService schemaService) {
+    public GraphqlController(GraphqlSchemaService schemaService, GraphQLService graphQLService) {
         this.schemaService = schemaService;
+        this.graphQLService = graphQLService;
     }
 
     /**
@@ -113,13 +115,14 @@ public class GraphqlController {
     public ExecutionResult request(Request request) {
         // Schema
         GraphQLSchema schema = schemaService.getSchema();
-        // TODO Execution strategy
-        return new GraphQL(schema).execute(
+        // Execution
+        return graphQLService.execute(
+                schema,
                 request.getQuery(),
+                request.getVariables(),
                 request.getOperationName(),
-                null, // No context
-                request.getVariables());
-
+                true
+        );
     }
 
     @SuppressWarnings("unchecked")

@@ -37,6 +37,8 @@
     <logger name="net.nemerosa.ontrack.job" level="INFO"/>
     <logger name="net.nemerosa.ontrack.service.security" level="INFO"/>
     <logger name="net.nemerosa.ontrack.extension.svn.client.SVNClient" level="WARN"/>
+    <!-- Ignoring the warnings during GraphQL execution -->
+    <logger name="graphql.execution.ExecutionStrategy" level="ERROR"/>
     <!--<logger name="net.nemerosa.ontrack.boot.metrics" level="TRACE"/>-->
 
 </configuration>
