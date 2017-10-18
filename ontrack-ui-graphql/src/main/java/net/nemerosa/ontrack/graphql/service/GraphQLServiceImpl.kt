@@ -2,12 +2,13 @@ package net.nemerosa.ontrack.graphql.service
 
 import graphql.ExecutionResult
 import graphql.GraphQL
-import graphql.execution.ExecutionContext
 import graphql.schema.GraphQLSchema
 import org.springframework.stereotype.Service
 
 @Service
-class GraphQLServiceImpl : GraphQLService {
+class GraphQLServiceImpl(
+        private val graphQLExceptionHandlers: List<GraphQLExceptionHandler>
+) : GraphQLService {
     override fun execute(
             schema: GraphQLSchema,
             query: String,
@@ -23,6 +24,11 @@ class GraphQLServiceImpl : GraphQLService {
         )
         if (result != null) {
             if (result.errors != null && !result.errors.isEmpty() && reportErrors) {
+                result.errors.forEach { error ->
+                    graphQLExceptionHandlers.forEach {
+                        it.handle(error)
+                    }
+                }
                 throw GraphQLServiceException(result.errors)
             } else {
                 return result

@@ -2,9 +2,27 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.junit.Test
+import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `Project by name when not authorized must throw an authentication exception`() {
+        // Creates a project
+        val project = doCreateProject()
+        // Looks for this project by name, with a not authorized user
+        assertFailsWith(AccessDeniedException::class, "Access denied") {
+            asUser().call {
+                run("""{
+                |  projects(name: "${project.name}") {
+                |    id
+                |  }
+                |}""".trimMargin())
+            }
+        }
+    }
 
     @Test
     fun `Last promoted build`() {
