@@ -7,9 +7,9 @@ class GraphQLServiceException(
         errors: List<GraphQLError>
 ) : RuntimeException(
         // Gets the first message
-        message = errors.first().message,
+        errors.first().message,
         // Gets the first exception
-        cause = errors
+        errors
                 .filterIsInstance(ExceptionWhileDataFetching::class.java)
                 .firstOrNull()
                 ?.exception
