@@ -47,7 +47,7 @@ class GQLTypeCreation : GQLType {
         @JvmStatic
         inline fun <reified T> dataFetcher(noinline signatureGetter: (T) -> Signature?) =
                 DataFetcher { environment ->
-                    val source = environment.source
+                    val source: Any = environment.getSource()
                     if (source is T) {
                         signatureGetter(source)?.let { getCreationFromSignature(it) }
                     } else {

@@ -51,7 +51,7 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
                         newFieldDefinition()
                                 .name("validationStamp")
                                 .description("Associated validation stamp")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeValidationStamp.VALIDATION_STAMP)))
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeValidationStamp.Companion.getVALIDATION_STAMP())))
                                 .build()
                 )
                 // Run order

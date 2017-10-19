@@ -115,7 +115,7 @@ constructor(
                 .build()
     }
 
-    private fun buildValidationsFetcher(): DataFetcher {
+    private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> {
         return fetcher(
                 Build::class.java
         ) { environment: DataFetchingEnvironment, build: Build ->
@@ -161,17 +161,16 @@ constructor(
         )
     }
 
-    private fun buildLinkedToFetcher(): DataFetcher {
+    private fun buildLinkedToFetcher(): DataFetcher<List<Build>> {
         return fetcher(
                 Build::class.java,
                 structureService::getBuildLinksFrom
         )
     }
 
-    private fun buildValidationRunsFetcher(): DataFetcher {
-        return DataFetcher { environment ->
-            val build = environment.source
-            if (build is Build) {
+    private fun buildValidationRunsFetcher() =
+            DataFetcher<List<ValidationRun>> { environment ->
+                val build: Build = environment.getSource()
                 // Filter
                 val count = GraphqlUtils.getIntArgument(environment, "count").orElse(50)
                 val validation = GraphqlUtils.getStringArgument(environment, "validation").orElse(null)
@@ -198,16 +197,11 @@ constructor(
                     return@DataFetcher structureService.getValidationRunsForBuild(build.id)
                             .take(count)
                 }
-            } else {
-                return@DataFetcher emptyList<Any>()
             }
-        }
-    }
 
-    private fun buildPromotionRunsFetcher(): DataFetcher {
-        return DataFetcher { environment ->
-            val build = environment.source
-            if (build is Build) {
+    private fun buildPromotionRunsFetcher() =
+            DataFetcher<List<PromotionRun>> { environment ->
+                val build: Build = environment.getSource()
                 // Last per promotion filter?
                 val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, "lastPerLevel", false)
                 // Promotion filter
@@ -228,6 +222,8 @@ constructor(
                     // Gets promotion runs for this promotion level
                     if (lastPerLevel) {
                         return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
+                                .map { listOf(it) }
+                                .orElse(listOf())
                     } else {
                         return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
                     }
@@ -239,11 +235,7 @@ constructor(
                         return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
                     }
                 }
-            } else {
-                return@DataFetcher emptyList<Any>()
             }
-        }
-    }
 
     override fun getSignature(entity: Build): Optional<Signature> {
         return Optional.ofNullable(entity.signature)
