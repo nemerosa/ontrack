@@ -14,12 +14,14 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         val project = doCreateProject()
         // Looks for this project by name, with a not authorized user
         assertFailsWith(AccessDeniedException::class, "Access denied") {
-            asUser().call {
-                run("""{
+            withNoGrantViewToAll {
+                asUser().call {
+                    run("""{
                 |  projects(name: "${project.name}") {
                 |    id
                 |  }
                 |}""".trimMargin())
+                }
             }
         }
     }

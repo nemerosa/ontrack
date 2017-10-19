@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputType;
-import lombok.Data;
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Property;
@@ -26,10 +25,25 @@ public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilt
         this.propertyService = propertyService;
     }
 
-    @Data
     public static class PropertyFilter {
         private String type;
         private String value;
+
+        public String getType() {
+            return this.type;
+        }
+
+        public String getValue() {
+            return this.value;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 
     @Override
