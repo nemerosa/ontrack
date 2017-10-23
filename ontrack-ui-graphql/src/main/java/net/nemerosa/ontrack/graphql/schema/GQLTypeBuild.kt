@@ -23,17 +23,18 @@ class GQLTypeBuild
 @Autowired
 constructor(
         private val structureService: StructureService,
+        private val projectEntityInterface: GQLProjectEntityInterface,
         private val validation: GQLTypeValidation,
         creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
 
-    override fun getTypeRef()= GraphQLTypeReference(BUILD)
+    override fun getTypeRef() = GraphQLTypeReference(BUILD)
 
     override fun createType(): GraphQLObjectType {
         return newObject()
                 .name(BUILD)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 // Ref to branch
                 .field(

@@ -11,9 +11,7 @@ import java.util.stream.Collectors;
 
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 
-public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implements GQLType, GQLInterface {
-
-    public static final String PROJECT_ENTITY = "ProjectEntity";
+public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implements GQLType {
 
     private final Class<T> projectEntityClass;
     private final ProjectEntityType projectEntityType;
@@ -30,22 +28,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
         this.projectEntityType = projectEntityType;
         this.projectEntityFieldContributors = projectEntityFieldContributors;
         this.creation = creation;
-    }
-
-    protected GraphQLTypeReference projectEntityInterface() {
-        return new GraphQLTypeReference(PROJECT_ENTITY);
-    }
-
-    @Override
-    public GraphQLInterfaceType createInterface() {
-        return GraphQLInterfaceType.newInterface()
-                .name(PROJECT_ENTITY)
-                // Common fields
-                .fields(baseProjectEntityInterfaceFields())
-                // TODO Type resolver not set, but it should
-                .typeResolver(new TypeResolverProxy())
-                // OK
-                .build();
     }
 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {

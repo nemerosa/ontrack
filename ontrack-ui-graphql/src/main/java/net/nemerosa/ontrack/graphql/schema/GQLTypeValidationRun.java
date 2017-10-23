@@ -23,13 +23,17 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
     public static final String VALIDATION_RUN = "ValidationRun";
 
     private final GQLTypeValidationRunStatus validationRunStatus;
+    private final GQLProjectEntityInterface projectEntityInterface;
 
     @Autowired
     public GQLTypeValidationRun(GQLTypeCreation creation,
                                 GQLTypeValidationRunStatus validationRunStatus,
-                                List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+                                List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+                                GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(ValidationRun.class, ProjectEntityType.VALIDATION_RUN, projectEntityFieldContributors, creation);
         this.validationRunStatus = validationRunStatus;
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
@@ -41,7 +45,7 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
     public GraphQLObjectType createType() {
         return newObject()
                 .name(VALIDATION_RUN)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 // Build
                 .field(

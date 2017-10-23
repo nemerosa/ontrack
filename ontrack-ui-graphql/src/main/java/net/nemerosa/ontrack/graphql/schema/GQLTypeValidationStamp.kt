@@ -16,6 +16,7 @@ import java.util.*
 class GQLTypeValidationStamp @Autowired
 constructor(private val structureService: StructureService,
             creation: GQLTypeCreation,
+            private val projectEntityInterface: GQLProjectEntityInterface,
             private val validationRun: GQLTypeValidationRun,
             projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<ValidationStamp>(
@@ -30,7 +31,7 @@ constructor(private val structureService: StructureService,
     override fun createType(): GraphQLObjectType {
         return newObject()
                 .name(VALIDATION_STAMP)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 // Image flag
                 .field { f ->

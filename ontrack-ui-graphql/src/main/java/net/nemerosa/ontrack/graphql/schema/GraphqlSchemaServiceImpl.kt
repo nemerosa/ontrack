@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 class GraphqlSchemaServiceImpl(
         private val types: List<GQLType>,
         private val inputTypes: List<GQLInputType<*>>,
+        private val interfaces: List<GQLInterface>,
         private val rootQueries: List<GQLRootQuery>
 ) : GraphqlSchemaService {
 
@@ -23,6 +24,7 @@ class GraphqlSchemaServiceImpl(
         // All types
         val dictionary =
                 types.map { it.createType() } +
+                        interfaces.map { it.createInterface() } +
                         inputTypes.map { it.createInputType() }
         return GraphQLSchema.newSchema()
                 .query(createQueryType())

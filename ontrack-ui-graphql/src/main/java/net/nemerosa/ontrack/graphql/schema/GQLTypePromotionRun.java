@@ -20,9 +20,16 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
 
     public static final String PROMOTION_RUN = "PromotionRun";
 
+    private final GQLProjectEntityInterface projectEntityInterface;
+
     @Autowired
-    public GQLTypePromotionRun(GQLTypeCreation creation, List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+    public GQLTypePromotionRun(
+            GQLTypeCreation creation,
+            List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+            GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, projectEntityFieldContributors, creation);
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
@@ -34,7 +41,7 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
     public GraphQLObjectType createType() {
         return newObject()
                 .name(PROMOTION_RUN)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 .field(
                         newFieldDefinition()

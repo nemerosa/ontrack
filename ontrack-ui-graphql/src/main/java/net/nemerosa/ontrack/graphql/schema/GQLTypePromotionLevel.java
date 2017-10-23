@@ -23,17 +23,21 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
 
     private final StructureService structureService;
     private final GQLTypePromotionRun promotionRun;
+    private final GQLProjectEntityInterface projectEntityInterface;
 
     @Autowired
     public GQLTypePromotionLevel(StructureService structureService,
                                  GQLTypeCreation creation,
                                  GQLTypePromotionRun promotionRun,
-                                 List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+                                 List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+                                 GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL,
                 projectEntityFieldContributors,
                 creation);
         this.structureService = structureService;
         this.promotionRun = promotionRun;
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
     public GraphQLObjectType createType() {
         return newObject()
                 .name(PROMOTION_LEVEL)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 // Image flag
                 .field(f -> f.name("image")

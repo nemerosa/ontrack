@@ -27,16 +27,20 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
     public static final String PROJECT = "Project";
 
     private final StructureService structureService;
+    private final GQLProjectEntityInterface projectEntityInterface;
     private final GQLTypeBranch branch;
 
     @Autowired
     public GQLTypeProject(StructureService structureService,
                           GQLTypeCreation creation,
                           GQLTypeBranch branch,
-                          List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+                          List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+                          GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(Project.class, ProjectEntityType.PROJECT, projectEntityFieldContributors, creation);
         this.structureService = structureService;
         this.branch = branch;
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
@@ -48,7 +52,7 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
     public GraphQLObjectType createType() {
         return newObject()
                 .name(PROJECT)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
                 // Branches

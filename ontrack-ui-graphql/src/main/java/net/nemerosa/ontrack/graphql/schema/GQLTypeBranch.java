@@ -32,6 +32,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     private final GQLTypeValidationStamp validationStamp;
     private final GQLInputBuildStandardFilter inputBuildStandardFilter;
     private final GQLInputBuildGenericFilter inputBuildGenericFilter;
+    private final GQLProjectEntityInterface projectEntityInterface;
 
     @Autowired
     public GQLTypeBranch(StructureService structureService,
@@ -42,7 +43,9 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                          GQLTypeValidationStamp validationStamp,
                          GQLInputBuildStandardFilter inputBuildStandardFilter,
                          List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
-                         GQLInputBuildGenericFilter inputBuildGenericFilter) {
+                         GQLInputBuildGenericFilter inputBuildGenericFilter,
+                         GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors, creation);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
@@ -51,6 +54,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
         this.validationStamp = validationStamp;
         this.inputBuildStandardFilter = inputBuildStandardFilter;
         this.inputBuildGenericFilter = inputBuildGenericFilter;
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     public GraphQLObjectType createType() {
         return newObject()
                 .name(BRANCH)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
                 .field(
