@@ -17,9 +17,17 @@ class GQLTypeValidationStamp @Autowired
 constructor(private val structureService: StructureService,
             creation: GQLTypeCreation,
             private val validationRun: GQLTypeValidationRun,
-            projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>) : AbstractGQLProjectEntity<ValidationStamp>(ValidationStamp::class.java, ProjectEntityType.VALIDATION_STAMP, projectEntityFieldContributors, creation) {
+            projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
+) : AbstractGQLProjectEntity<ValidationStamp>(
+        ValidationStamp::class.java,
+        ProjectEntityType.VALIDATION_STAMP,
+        projectEntityFieldContributors,
+        creation
+) {
 
-    override fun getType(): GraphQLObjectType {
+    override fun getTypeRef() = GraphQLTypeReference(VALIDATION_STAMP)
+
+    override fun createType(): GraphQLObjectType {
         return newObject()
                 .name(VALIDATION_STAMP)
                 .withInterface(projectEntityInterface())
@@ -43,7 +51,7 @@ constructor(private val structureService: StructureService,
                         newFieldDefinition()
                                 .name("validationRuns")
                                 .description("List of runs for this validation stamp")
-                                .type(GraphqlUtils.stdList(validationRun.type))
+                                .type(GraphqlUtils.stdList(validationRun.typeRef))
                                 .argument {
                                     it.name("count")
                                             .description("Maximum number of validation runs")

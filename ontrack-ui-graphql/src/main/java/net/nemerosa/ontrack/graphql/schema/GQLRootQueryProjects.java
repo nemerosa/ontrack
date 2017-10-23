@@ -42,7 +42,7 @@ public class GQLRootQueryProjects implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("projects")
-                .type(stdList(project.getType()))
+                .type(stdList(project.getTypeRef()))
                 .argument(
                         newArgument()
                                 .name(ARG_ID)

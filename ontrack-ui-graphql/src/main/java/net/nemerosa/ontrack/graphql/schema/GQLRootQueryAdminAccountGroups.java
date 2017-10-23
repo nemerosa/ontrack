@@ -46,7 +46,7 @@ public class GQLRootQueryAdminAccountGroups implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("accountGroups")
-                .type(stdList(accountGroup.getType()))
+                .type(stdList(accountGroup.getTypeRef()))
                 .argument(arg -> arg.name(ID_ARGUMENT)
                         .description("Searching by ID")
                         .type(GraphQLInt)

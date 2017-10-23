@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import org.springframework.stereotype.Component
 
 /**
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Component
  */
 @Component
 class GQLTypeAction : GQLType {
-    override fun getType(): GraphQLObjectType =
+    override fun getTypeRef() = GraphQLTypeReference("Action")
+
+    override fun createType(): GraphQLObjectType =
             GraphQLObjectType.newObject()
                     .name("Action")
                     .field { it.name("id").type(GraphQLString) }

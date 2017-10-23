@@ -302,7 +302,7 @@ class AdminQLIT extends AbstractQLITSupport {
             def mappings = g.mappings
             assert mappings.size() == 1
             assert mappings.first().id == mapping.id()
-            assert mappings.first().type == 'ldap'
+            assert mappings.first().getTypeRef == 'ldap'
             assert mappings.first().name == mappingName
         }
     }

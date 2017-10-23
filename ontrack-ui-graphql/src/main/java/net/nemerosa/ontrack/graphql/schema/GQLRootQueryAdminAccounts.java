@@ -40,7 +40,7 @@ public class GQLRootQueryAdminAccounts implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("accounts")
-                .type(stdList(account.getType()))
+                .type(stdList(account.getTypeRef()))
                 .argument(
                         newArgument()
                                 .name(ID_ARGUMENT)

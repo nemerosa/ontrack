@@ -37,7 +37,12 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(PROMOTION_LEVEL);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface())
@@ -60,7 +65,7 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                         newFieldDefinition()
                                 .name("promotionRuns")
                                 .description("List of runs for this promotion")
-                                .type(GraphqlUtils.stdList(promotionRun.getType()))
+                                .type(GraphqlUtils.stdList(promotionRun.getTypeRef()))
                                 .argument(GraphqlUtils.stdListArguments())
                                 .dataFetcher(promotionLevelPromotionRunsFetcher())
                                 .build()

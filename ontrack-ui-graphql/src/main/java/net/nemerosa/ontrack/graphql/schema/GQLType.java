@@ -1,9 +1,14 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 
 public interface GQLType {
 
-    GraphQLObjectType getType();
+    default GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(getClass().getSimpleName());
+    }
+
+    GraphQLObjectType createType();
 
 }

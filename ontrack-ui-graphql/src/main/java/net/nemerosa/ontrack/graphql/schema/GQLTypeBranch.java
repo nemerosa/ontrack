@@ -54,7 +54,12 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(BRANCH);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(BRANCH)
                 .withInterface(projectEntityInterface())
@@ -78,7 +83,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("promotionLevels")
-                                .type(stdList(promotionLevel.getType()))
+                                .type(stdList(promotionLevel.getTypeRef()))
                                 .dataFetcher(branchPromotionLevelsFetcher())
                                 .build()
                 )
@@ -86,7 +91,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("validationStamps")
-                                .type(stdList(validationStamp.getType()))
+                                .type(stdList(validationStamp.getTypeRef()))
                                 .argument(arg -> arg.name("name")
                                         .description("Filters on the validation stamp")
                                         .type(GraphQLString)
@@ -98,7 +103,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("builds")
-                                .type(GraphqlUtils.stdList(build.getType()))
+                                .type(GraphqlUtils.stdList(build.getTypeRef()))
                                 // Last builds
                                 .argument(
                                         newArgument()
@@ -120,7 +125,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                         newArgument()
                                                 .name("filter")
                                                 .description("Filter based on build promotions, validations, properties, ...")
-                                                .type(inputBuildStandardFilter.getInputType())
+                                                .type(inputBuildStandardFilter.getTypeRef())
                                                 .build()
                                 )
                                 // Generic filter
@@ -128,7 +133,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                         newArgument()
                                                 .name("generic")
                                                 .description("Generic filter based on a configured filter")
-                                                .type(inputBuildGenericFilter.getInputType())
+                                                .type(inputBuildGenericFilter.getTypeRef())
                                                 .build()
                                 )
                                 // Query

@@ -28,7 +28,9 @@ constructor(
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
 
-    override fun getType(): GraphQLObjectType {
+    override fun getTypeRef()= GraphQLTypeReference(BUILD)
+
+    override fun createType(): GraphQLObjectType {
         return newObject()
                 .name(BUILD)
                 .withInterface(projectEntityInterface())
@@ -99,7 +101,7 @@ constructor(
                                             .type(GraphQLString)
                                             .build()
                             )
-                            .type(stdList(validation.type))
+                            .type(stdList(validation.typeRef))
                             .dataFetcher(buildValidationsFetcher())
                 }
                 // Build links

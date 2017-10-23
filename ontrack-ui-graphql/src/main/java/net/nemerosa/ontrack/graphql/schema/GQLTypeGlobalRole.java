@@ -28,7 +28,12 @@ public class GQLTypeGlobalRole implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(GLOBAL_ROLE);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(GLOBAL_ROLE)
                 .field(GraphqlUtils.stringField("id", "ID of the role"))

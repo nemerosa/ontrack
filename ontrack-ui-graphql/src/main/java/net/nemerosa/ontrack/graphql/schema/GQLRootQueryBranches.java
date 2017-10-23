@@ -41,7 +41,7 @@ public class GQLRootQueryBranches implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("branches")
-                .type(stdList(branch.getType()))
+                .type(stdList(branch.getTypeRef()))
                 .argument(
                         newArgument()
                                 .name("id")

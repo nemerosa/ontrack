@@ -19,7 +19,12 @@ public class GQLTypeProjectAuthorization implements GQLType {
     public static final String PROJECT_AUTHORIZATION = "ProjectAuthorization";
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(PROJECT_AUTHORIZATION);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(PROJECT_AUTHORIZATION)
                 .field(GraphqlUtils.stringField("id", "ID of the role"))

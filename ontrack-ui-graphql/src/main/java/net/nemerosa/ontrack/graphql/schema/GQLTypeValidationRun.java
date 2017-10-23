@@ -33,7 +33,12 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(VALIDATION_RUN);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(VALIDATION_RUN)
                 .withInterface(projectEntityInterface())
@@ -67,7 +72,7 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
                         newFieldDefinition()
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
-                                .type(stdList(validationRunStatus.getType()))
+                                .type(stdList(validationRunStatus.getTypeRef()))
                                 .build()
                 )
                 // OK

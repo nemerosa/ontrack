@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLTypeReference;
 import lombok.Data;
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -33,7 +34,12 @@ public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilt
     }
 
     @Override
-    public GraphQLInputType getInputType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(PropertyFilter.class.getSimpleName());
+    }
+
+    @Override
+    public GraphQLInputType createInputType() {
         return GraphQLBeanConverter.asInputType(PropertyFilter.class);
     }
 
@@ -50,7 +56,7 @@ public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilt
         return GraphQLArgument.newArgument()
                 .name(ARGUMENT_NAME)
                 .description("Filter on property type and optional value pattern.")
-                .type(getInputType())
+                .type(new GraphQLTypeReference(PropertyFilter.class.getSimpleName()))
                 .build();
     }
 

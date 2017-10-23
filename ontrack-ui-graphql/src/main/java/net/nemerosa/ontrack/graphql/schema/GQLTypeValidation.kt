@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationStamp
@@ -20,13 +21,20 @@ constructor(
         private val validationRun: GQLTypeValidationRun
 ) : GQLType {
 
-    override fun getType(): GraphQLObjectType = GraphQLObjectType.newObject()
-            .name("Validation")
+    companion object {
+        @JvmField
+        val VALIDATION = "Validation"
+    }
+
+    override fun getTypeRef() = GraphQLTypeReference(VALIDATION)
+
+    override fun createType(): GraphQLObjectType = GraphQLObjectType.newObject()
+            .name(VALIDATION)
             // Validation stamp
             .field {
                 it.name("validationStamp")
                         .description("Associated validation stamp")
-                        .type(validationStamp.type)
+                        .type(validationStamp.typeRef)
             }
             // Validation runs
             .field {
@@ -38,7 +46,7 @@ constructor(
                                     .type(Scalars.GraphQLInt)
                                     .defaultValue(50)
                         }
-                        .type(GraphqlUtils.stdList(validationRun.type))
+                        .type(GraphqlUtils.stdList(validationRun.typeRef))
                         .dataFetcher(GraphqlUtils.fetcher(
                                 GQLTypeValidationData::class.java,
                                 { environment, data ->

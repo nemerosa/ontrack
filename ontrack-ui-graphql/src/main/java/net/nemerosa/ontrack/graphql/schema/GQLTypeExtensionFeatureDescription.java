@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 import org.springframework.stereotype.Component;
 
 import static graphql.Scalars.GraphQLString;
@@ -15,7 +16,12 @@ public class GQLTypeExtensionFeatureDescription implements GQLType {
     public static final String EXTENSION_FEATURE_DESCRIPTION = "ExtensionFeatureDescription";
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(EXTENSION_FEATURE_DESCRIPTION);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(EXTENSION_FEATURE_DESCRIPTION)
                 .field(f -> f.name("id")

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 import org.springframework.stereotype.Component;
 
 import static graphql.Scalars.GraphQLBoolean;
@@ -15,7 +16,12 @@ public class GQLTypeValidationRunStatusID implements GQLType {
     public static final String VALIDATION_RUN_STATUS_ID = "ValidationRunStatusID";
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(VALIDATION_RUN_STATUS_ID);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(VALIDATION_RUN_STATUS_ID)
                 // ID

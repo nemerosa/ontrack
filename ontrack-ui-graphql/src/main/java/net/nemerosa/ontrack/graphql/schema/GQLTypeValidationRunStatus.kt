@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,13 +17,15 @@ constructor(
         private val creation: GQLTypeCreation
 ) : GQLType {
 
-    override fun getType(): GraphQLObjectType {
+    override fun getTypeRef() = GraphQLTypeReference(VALIDATION_RUN_STATUS)
+
+    override fun createType(): GraphQLObjectType {
         return newObject()
                 .name(VALIDATION_RUN_STATUS)
                 // Creation
                 .field {
                     it.name("creation")
-                            .type(creation.type)
+                            .type(creation.typeRef)
                             .dataFetcher(GQLTypeCreation.dataFetcher<ValidationRunStatus> { it.signature })
                 }
                 // Status ID
@@ -30,7 +33,7 @@ constructor(
                         newFieldDefinition()
                                 .name("statusID")
                                 .description("Status ID")
-                                .type(validationRunStatusID.type)
+                                .type(validationRunStatusID.typeRef)
                                 .build()
                 )
                 // Description

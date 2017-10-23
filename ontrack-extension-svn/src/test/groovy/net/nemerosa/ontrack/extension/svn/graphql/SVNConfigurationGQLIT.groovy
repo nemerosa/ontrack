@@ -85,7 +85,7 @@ class SVNConfigurationGQLIT extends AbstractQLITSupport {
 
     @Test
     void graphql_schema() {
-        def type = svnConfigurationGQLType.type
+        def type = svnConfigurationGQLType.typeRef
         assert type.name == 'SVNConfiguration'
         assert type.fieldDefinitions*.name as Set == [
                 'name',

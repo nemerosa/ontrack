@@ -31,7 +31,7 @@ public class GQLRootQueryPromotionRuns implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("promotionRuns")
-                .type(stdList(promotionRun.getType()))
+                .type(stdList(promotionRun.getTypeRef()))
                 .argument(
                         newArgument()
                                 .name("id")

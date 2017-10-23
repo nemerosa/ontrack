@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class GitUICommitGQLType implements GQLType {
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLObjectType createType() {
         return GraphQLBeanConverter.asObjectType(GitUICommit.class);
     }
 

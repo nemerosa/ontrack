@@ -26,13 +26,13 @@ public class GitChangeLogGQLType implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLObjectType createType() {
         return GraphQLObjectType.newObject()
                 .name("GitChangeLog")
                 // Commits
                 .field(f -> f.name("commits")
                         .description("List of commits in the change log")
-                        .type(GraphqlUtils.stdList(gitUICommitGQLType.getType()))
+                        .type(GraphqlUtils.stdList(gitUICommitGQLType.getTypeRef()))
                         .dataFetcher(fetcher(
                                 GitChangeLog.class,
                                 changeLog -> gitService.getChangeLogCommits(changeLog).getCommits()

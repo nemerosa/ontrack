@@ -3,13 +3,16 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.structure.Signature
 import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeCreation : GQLType {
-    override fun getType(): GraphQLObjectType =
+    override fun getTypeRef() = GraphQLTypeReference(SIGNATURE)
+
+    override fun createType(): GraphQLObjectType =
             GraphQLObjectType.newObject()
                     .name(SIGNATURE)
                     .field {

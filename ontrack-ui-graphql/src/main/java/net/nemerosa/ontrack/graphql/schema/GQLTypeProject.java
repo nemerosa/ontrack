@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,12 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(PROJECT);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(PROJECT)
                 .withInterface(projectEntityInterface())
@@ -49,7 +55,7 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
                 .field(
                         newFieldDefinition()
                                 .name("branches")
-                                .type(stdList(branch.getType()))
+                                .type(stdList(branch.getTypeRef()))
                                 .argument(
                                         newArgument()
                                                 .name("name")

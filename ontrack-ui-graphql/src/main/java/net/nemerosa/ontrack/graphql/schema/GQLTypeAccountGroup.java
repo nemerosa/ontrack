@@ -47,7 +47,12 @@ public class GQLTypeAccountGroup implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(ACCOUNT_GROUP);
+    }
+
+    @Override
+    public GraphQLObjectType createType() {
         return newObject()
                 .name(ACCOUNT_GROUP)
                 .field(GraphqlUtils.idField())
@@ -62,7 +67,7 @@ public class GQLTypeAccountGroup implements GQLType {
                 // Global role
                 .field(field -> field.name("globalRole")
                         .description("Global role for the account group")
-                        .type(globalRole.getType())
+                        .type(globalRole.getTypeRef())
                         .dataFetcher(fetcher(
                                 AccountGroup.class,
                                 group -> accountService.getGlobalRoleForAccountGroup(group).orElse(null)
@@ -71,7 +76,7 @@ public class GQLTypeAccountGroup implements GQLType {
                 // Authorised projects
                 .field(field -> field.name("authorizedProjects")
                         .description("List of authorized projects")
-                        .type(stdList(authorizedProject.getType()))
+                        .type(stdList(authorizedProject.getTypeRef()))
                         .dataFetcher(fetcher(
                                 AccountGroup.class,
                                 accountService::getProjectPermissionsForAccountGroup
@@ -80,7 +85,7 @@ public class GQLTypeAccountGroup implements GQLType {
                 // Mappings
                 .field(field -> field.name("mappings")
                         .description("Mappings for this group")
-                        .type(stdList(accountGroupMapping.getType()))
+                        .type(stdList(accountGroupMapping.getTypeRef()))
                         .dataFetcher(fetcher(
                                 AccountGroup.class,
                                 accountGroupMappingService::getMappingsForGroup
