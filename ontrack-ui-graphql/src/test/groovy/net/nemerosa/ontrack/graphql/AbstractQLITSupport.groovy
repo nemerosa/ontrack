@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.graphql
 
+import graphql.ErrorType
+import graphql.ExceptionWhileDataFetching
+import graphql.ExecutionResult
 import graphql.GraphQL
 import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
@@ -13,8 +16,11 @@ abstract class AbstractQLITSupport extends AbstractServiceTestSupport {
     private GraphqlSchemaService schemaService
 
     def run(String query) {
-        def result = new GraphQL(schemaService.schema).execute(query)
-        if (result.errors && !result.errors.empty) {
+        def result = GraphQL.newGraphQL(schemaService.schema).build().execute(query)
+        def error = getException(result)
+        if (error != null) {
+            throw error
+        } else if (result.errors && !result.errors.empty) {
             fail result.errors*.message.join('\n')
         } else if (result.data) {
             return result.data
@@ -23,4 +29,15 @@ abstract class AbstractQLITSupport extends AbstractServiceTestSupport {
         }
     }
 
+    private static Throwable getException(ExecutionResult result) {
+        def fetchingError = result.errors.find { it.errorType == ErrorType.DataFetchingException }
+        if (fetchingError != null && fetchingError instanceof ExceptionWhileDataFetching) {
+            return fetchingError.exception
+        } else {
+            return null
+        }
+    }
+
+
 }
+

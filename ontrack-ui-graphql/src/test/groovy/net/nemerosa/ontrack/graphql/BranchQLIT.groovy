@@ -1,11 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
-import graphql.GraphQLException
-import net.nemerosa.ontrack.extension.api.support.TestDecorationData
-import net.nemerosa.ontrack.extension.api.support.TestDecorator
-import net.nemerosa.ontrack.extension.api.support.TestDecoratorPropertyType
-import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
-import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
+import net.nemerosa.ontrack.extension.api.support.*
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.junit.Test
 
@@ -19,7 +14,7 @@ class BranchQLIT extends AbstractQLITSupport {
         assert data.branches.name == [branch.name]
     }
 
-    @Test(expected = GraphQLException)
+    @Test(expected = IllegalStateException)
     void 'Branch by ID and project is not allowed'() {
         run("""{branches (id: 1, project: "test") { name } }""")
     }
@@ -194,7 +189,7 @@ class BranchQLIT extends AbstractQLITSupport {
     void 'Branches filtered by property type'() {
         // Branches
         def p1 = doCreateBranch()
-        /*def p2 = */doCreateBranch()
+        /*def p2 = */ doCreateBranch()
         def p3 = doCreateBranch()
         def p4 = doCreateBranch()
         // Properties
@@ -214,7 +209,7 @@ class BranchQLIT extends AbstractQLITSupport {
     void 'Branches filtered by property type and value pattern'() {
         // Branches
         def p1 = doCreateBranch()
-        /*def p2 = */doCreateBranch()
+        /*def p2 = */ doCreateBranch()
         def p3 = doCreateBranch()
         def p4 = doCreateBranch()
         // Properties
@@ -234,7 +229,7 @@ class BranchQLIT extends AbstractQLITSupport {
     void 'Branches filtered by property type and value'() {
         // Branches
         def p1 = doCreateBranch()
-        /*def p2 = */doCreateBranch()
+        /*def p2 = */ doCreateBranch()
         def p3 = doCreateBranch()
         def p4 = doCreateBranch()
         // Properties

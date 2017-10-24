@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql
 
-import graphql.GraphQLException
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
@@ -31,7 +30,7 @@ class ProjectQLIT extends AbstractQLITSupport {
         assert data.projects.first().name == p.name
     }
 
-    @Test(expected = GraphQLException)
+    @Test(expected = IllegalStateException)
     void 'Project by ID and name is not authorised'() {
         run("""{projects(id: 1, name: "test") { name }}""")
     }
@@ -175,19 +174,15 @@ class ProjectQLIT extends AbstractQLITSupport {
                     validationStamps {
                         name
                         validationRuns {
-                            edges {
-                                node {
-                                    build {
-                                        name
-                                    }
-                                }
+                            build {
+                                name
                             }
                         }
                     }
                 }
             }
         }""")
-        assert data.projects.branches.validationStamps.validationRuns.edges.node.build.name.flatten() == ['4', '2']
+        assert data.projects.branches.validationStamps.validationRuns.build.name.flatten() == ['4', '2']
     }
 
     @Test
@@ -232,22 +227,18 @@ class ProjectQLIT extends AbstractQLITSupport {
                     validationStamps {
                         name
                         validationRuns {
-                            edges {
-                                node {
-                                    validationRunStatuses {
-                                        statusID {
-                                            id
-                                        }
-                                        description
-                                    }
+                            validationRunStatuses {
+                                statusID {
+                                    id
                                 }
+                                description
                             }
                         }
                     }
                 }
             }
         }""")
-        def validationRunStatuses = data.projects.branches.validationStamps.validationRuns.edges.node.validationRunStatuses.flatten()
+        def validationRunStatuses = data.projects.branches.validationStamps.validationRuns.validationRunStatuses.flatten()
         assert validationRunStatuses.statusID.id as Set == ['EXPLAINED', 'INVESTIGATING', 'FAILED'] as Set
         assert validationRunStatuses.description as Set == ['Explained', 'Investigating', 'Validation failed'] as Set
     }
