@@ -131,24 +131,16 @@ public class ProjectController extends AbstractResourceController {
     public Project enableProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
-        // Updates
-        project = project.withDisabled(false);
         // Saves in repository
-        structureService.saveProject(project);
-        // As resource
-        return project;
+        return structureService.enableProject(project);
     }
 
     @RequestMapping(value = "{projectId}/disable", method = RequestMethod.PUT)
     public Project disableProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
-        // Updates
-        project = project.withDisabled(true);
         // Saves in repository
-        structureService.saveProject(project);
-        // As resource
-        return project;
+        return structureService.disableProject(project);
     }
 
     /**

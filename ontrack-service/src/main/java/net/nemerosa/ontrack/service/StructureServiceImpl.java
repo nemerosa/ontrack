@@ -141,6 +141,22 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Project disableProject(Project project) {
+        Project disabledProject = project.withDisabled(true);
+        saveProject(disabledProject);
+        eventPostService.post(eventFactory.disableProject(project));
+        return disabledProject;
+    }
+
+    @Override
+    public Project enableProject(Project project) {
+        Project enabledProject = project.withDisabled(false);
+        saveProject(enabledProject);
+        eventPostService.post(eventFactory.enableProject(project));
+        return enabledProject;
+    }
+
+    @Override
     public Ack deleteProject(ID projectId) {
         Validate.isTrue(projectId.isSet(), "Project ID must be set");
         securityService.checkProjectFunction(projectId.getValue(), ProjectDelete.class);
@@ -202,6 +218,22 @@ public class StructureServiceImpl implements StructureService {
         securityService.checkProjectFunction(branch.projectId(), BranchEdit.class);
         structureRepository.saveBranch(branch);
         eventPostService.post(eventFactory.updateBranch(branch));
+    }
+
+    @Override
+    public Branch disableBranch(Branch branch) {
+        Branch disabledBranch = branch.withDisabled(true);
+        saveBranch(disabledBranch);
+        eventPostService.post(eventFactory.disableBranch(branch));
+        return disabledBranch;
+    }
+
+    @Override
+    public Branch enableBranch(Branch branch) {
+        Branch disabledBranch = branch.withDisabled(false);
+        saveBranch(disabledBranch);
+        eventPostService.post(eventFactory.enableBranch(branch));
+        return disabledBranch;
     }
 
     @Override

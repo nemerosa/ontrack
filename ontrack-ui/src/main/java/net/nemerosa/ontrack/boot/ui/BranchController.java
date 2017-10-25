@@ -121,21 +121,17 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}/enable", method = RequestMethod.PUT)
     public Branch enableBranch(@PathVariable ID branchId) {
         // Loads and updates branch
-        Branch branch = structureService.getBranch(branchId).withDisabled(false);
+        Branch branch = structureService.getBranch(branchId);
         // Saves the branch
-        structureService.saveBranch(branch);
-        // OK
-        return branch;
+        return structureService.enableBranch(branch);
     }
 
     @RequestMapping(value = "branches/{branchId}/disable", method = RequestMethod.PUT)
     public Branch disableBranch(@PathVariable ID branchId) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId).withDisabled(true);
-        // Saves the branch
-        structureService.saveBranch(branch);
-        // OK
-        return branch;
+        // Disables the branch
+        return structureService.disableBranch(branch);
     }
 
     @RequestMapping(value = "branches/{branchId}/status", method = RequestMethod.GET)
