@@ -435,13 +435,10 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
                 String.format(
                         "DELETE FROM ENTITY_DATA_STORE " +
                                 "WHERE 1 = 1 " +
-                                "%s " +
-                                "LIMIT :page OFFSET :offset",
+                                "%s ",
                         critera
                 ),
                 params
-                        .addValue("offset", entityDataStoreFilter.getOffset())
-                        .addValue("page", entityDataStoreFilter.getCount())
         );
     }
 

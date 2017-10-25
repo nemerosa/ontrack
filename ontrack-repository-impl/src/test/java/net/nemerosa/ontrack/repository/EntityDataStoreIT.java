@@ -355,7 +355,7 @@ public class EntityDataStoreIT extends AbstractRepositoryTestSupport {
     }
 
     @Test
-    public void counttByFilter() {
+    public void countByFilter() {
         // Entities
         Branch branch1 = do_create_branch();
         Branch branch2 = do_create_branch();
@@ -397,6 +397,75 @@ public class EntityDataStoreIT extends AbstractRepositoryTestSupport {
         assertEquals(2, store.getCountByFilter(
                 new EntityDataStoreFilter()
                         .withName("N3")
+        ));
+    }
+
+    @Test
+    public void deleteAllByFilter() {
+        // Entities
+        Branch branch1 = do_create_branch();
+        Branch branch2 = do_create_branch();
+        // Adds some data
+        store.deleteAll();
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 1);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 2);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 3);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 4);
+        store.addObject(branch1, "C1", "N2", Signature.of(TEST_USER), null, 5);
+        store.addObject(branch1, "C2", "N3", Signature.of(TEST_USER), null, 6);
+        store.addObject(branch2, "C1", "N1", Signature.of(TEST_USER), null, 7);
+        store.addObject(branch2, "C1", "N2", Signature.of(TEST_USER), null, 8);
+        store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 9);
+        // Checks
+        assertEquals(9, store.deleteByFilter(
+                new EntityDataStoreFilter()
+        ));
+    }
+
+    @Test
+    public void deleteByBranchByFilter() {
+        // Entities
+        Branch branch1 = do_create_branch();
+        Branch branch2 = do_create_branch();
+        // Adds some data
+        store.deleteAll();
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 1);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 2);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 3);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 4);
+        store.addObject(branch1, "C1", "N2", Signature.of(TEST_USER), null, 5);
+        store.addObject(branch1, "C2", "N3", Signature.of(TEST_USER), null, 6);
+        store.addObject(branch2, "C1", "N1", Signature.of(TEST_USER), null, 7);
+        store.addObject(branch2, "C1", "N2", Signature.of(TEST_USER), null, 8);
+        store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 9);
+        // Checks
+        assertEquals(6, store.deleteByFilter(
+                new EntityDataStoreFilter()
+                        .withEntity(branch1)
+        ));
+    }
+
+    @Test
+    public void deleteByBranchAndCategoryByFilter() {
+        // Entities
+        Branch branch1 = do_create_branch();
+        Branch branch2 = do_create_branch();
+        // Adds some data
+        store.deleteAll();
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 1);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 2);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 3);
+        store.addObject(branch1, "C1", "N1", Signature.of(TEST_USER), null, 4);
+        store.addObject(branch1, "C1", "N2", Signature.of(TEST_USER), null, 5);
+        store.addObject(branch1, "C2", "N3", Signature.of(TEST_USER), null, 6);
+        store.addObject(branch2, "C1", "N1", Signature.of(TEST_USER), null, 7);
+        store.addObject(branch2, "C1", "N2", Signature.of(TEST_USER), null, 8);
+        store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 9);
+        // Checks
+        assertEquals(5, store.deleteByFilter(
+                new EntityDataStoreFilter()
+                        .withEntity(branch1)
+                        .withCategory("C1")
         ));
     }
 
