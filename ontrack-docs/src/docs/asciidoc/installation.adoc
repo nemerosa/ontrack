@@ -257,27 +257,9 @@ Ontrack can be downloaded as a JAR and started as a Spring Boot application.
 Download the JAR from the
 https://github.com/nemerosa/ontrack/releases[Ontrack release page]
 
-Start it using `java -jar ontrack.jar` with the following options:
+Start it using `java -jar ontrack.jar`.
 
-* `--spring.datasource.url=jdbc:h2:/var/ontrack/data/database/data`
-* or `--spring.datasource.url=jdbc:h2:./database/data`
-* and any other Java option, like memory settings: `-Xmx2048m`
-* or <<configuration,configuration parameter>> like `--server.port=9999`
-
-to specify the location of the H2 database files.
-
-<<configuration-properties,Options>> can also be specified in an `application.yml` file in
-the working directory.
-
-For example:
-
-[source,yaml]
-.application.yml
-----
-spring:
-   datasource:
-      url: "jdbc:h2:/var/ontrack/data/database/data"
-----
+<<configuration,Options>> can be passed on the command line.
 
 [[configuration]]
 === Configuration
