@@ -5,10 +5,8 @@ import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
-import net.nemerosa.ontrack.repository.support.store.EntityDataStore;
-import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecord;
-import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecordAudit;
-import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecordAuditType;
+import net.nemerosa.ontrack.repository.support.store.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -368,6 +366,111 @@ public class EntityDataStoreJdbcRepository extends AbstractJdbcRepository implem
                         .addValue("category", category),
                 Integer.class
         );
+    }
+
+    @Override
+    public void deleteAll() {
+        getJdbcTemplate().update(
+                "DELETE FROM ENTITY_DATA_STORE"
+        );
+    }
+
+    @Override
+    public List<EntityDataStoreRecord> getByFilter(EntityDataStoreFilter entityDataStoreFilter) {
+        // Checks the entity
+        if (entityDataStoreFilter.getEntity() == null) {
+            throw new IllegalArgumentException("The filter `entity` parameter is required.");
+        }
+        // SQL criterias
+        StringBuilder critera = new StringBuilder();
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        buildCriteria(entityDataStoreFilter, critera, params);
+        // Runs the query
+        return getNamedParameterJdbcTemplate().query(
+                String.format(
+                        "SELECT * FROM ENTITY_DATA_STORE " +
+                                "WHERE 1 = 1 " +
+                                " %s " +
+                                "ORDER BY CREATION DESC, ID DESC " +
+                                "LIMIT :page OFFSET :offset",
+                        critera
+                ),
+                params
+                        .addValue("offset", entityDataStoreFilter.getOffset())
+                        .addValue("page", entityDataStoreFilter.getCount()),
+                (rs, rowNum) -> toEntityDataStoreRecord(entityDataStoreFilter.getEntity(), rs)
+        );
+    }
+
+    @Override
+    public int getCountByFilter(EntityDataStoreFilter entityDataStoreFilter) {
+        // SQL criterias
+        StringBuilder critera = new StringBuilder();
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        buildCriteria(entityDataStoreFilter, critera, params);
+        // Runs the query
+        return getNamedParameterJdbcTemplate().queryForObject(
+                String.format(
+                        "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
+                                "WHERE 1 = 1 " +
+                                " %s " +
+                                "LIMIT :page OFFSET :offset",
+                        critera
+                ),
+                params
+                        .addValue("offset", entityDataStoreFilter.getOffset())
+                        .addValue("page", entityDataStoreFilter.getCount()),
+                Integer.class
+        );
+    }
+
+    @Override
+    public int deleteByFilter(EntityDataStoreFilter entityDataStoreFilter) {
+        // SQL criterias
+        StringBuilder critera = new StringBuilder();
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        buildCriteria(entityDataStoreFilter, critera, params);
+        // Runs the query
+        return getNamedParameterJdbcTemplate().update(
+                String.format(
+                        "DELETE FROM ENTITY_DATA_STORE " +
+                                "WHERE 1 = 1 " +
+                                "%s " +
+                                "LIMIT :page OFFSET :offset",
+                        critera
+                ),
+                params
+                        .addValue("offset", entityDataStoreFilter.getOffset())
+                        .addValue("page", entityDataStoreFilter.getCount())
+        );
+    }
+
+    private void buildCriteria(EntityDataStoreFilter filter, StringBuilder criteria, MapSqlParameterSource params) {
+        // Entity
+        if (filter.getEntity() != null) {
+            criteria.append(String.format(" AND %s = :entityId", filter.getEntity().getProjectEntityType().name()));
+            params.addValue("entityId", filter.getEntity().id());
+        }
+        // Category
+        if (StringUtils.isNotBlank(filter.getCategory())) {
+            criteria.append(" AND CATEGORY = :category");
+            params.addValue("category", filter.getCategory());
+        }
+        // Name
+        if (StringUtils.isNotBlank(filter.getName())) {
+            criteria.append(" AND NAME = :name");
+            params.addValue("name", filter.getName());
+        }
+        // Group
+        if (StringUtils.isNotBlank(filter.getGroup())) {
+            criteria.append(" AND GROUPID = :group");
+            params.addValue("group", filter.getGroup());
+        }
+        // Before time
+        if (filter.getBeforeTime() != null) {
+            criteria.append(" AND CREATION <= :beforeTime");
+            params.addValue("beforeTime", dateTimeForDB(filter.getBeforeTime()));
+        }
     }
 
     private void audit(EntityDataStoreRecordAuditType type, int recordId, Signature signature) {
