@@ -611,10 +611,10 @@ publicationMaven
         if (release) {
             shell """\
 docker pull nemerosa/ontrack:\${VERSION}
-docker tag nemerosa/ontrack:\${VERSION} nemerosa/ontrack:latest
+docker tag nemerosa/ontrack:\${VERSION} nemerosa/ontrack:3
 docker login --username="\${DOCKER_HUB_USERNAME}" --password="\${DOCKER_HUB_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION}
-docker push nemerosa/ontrack:latest
+docker push nemerosa/ontrack:3
 docker logout
 """
         }
