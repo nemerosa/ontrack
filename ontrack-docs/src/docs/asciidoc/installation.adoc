@@ -115,6 +115,8 @@ services:
         PROFILE: prod
     links:
       - "postgresql:postgresql"
+    ports:
+      - "8080:8080"
 
   # Postgresql database
   postgresql:
@@ -125,8 +127,16 @@ services:
       POSTGRES_PASSWORD: ontrack
     ports:
       - "5432"
-
 ----
+
+In the same directory, run:
+
+[source,bash]
+----
+docker-compose up -d
+----
+
+After some time, Ontrack becomes available at http://localhost:8080
 
 [[installation-rpm]]
 === RPM installation
