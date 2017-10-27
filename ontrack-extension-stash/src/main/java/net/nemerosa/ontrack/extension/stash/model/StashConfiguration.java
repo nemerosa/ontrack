@@ -50,7 +50,7 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
 
     @Override
     public StashConfiguration obfuscate() {
-        return this;
+        return withPassword("");
     }
 
     @Override
