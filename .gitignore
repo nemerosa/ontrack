@@ -18,3 +18,5 @@ build
 /LOG_FILE_IS_UNDEFINED*
 /publication
 /migration
+out/
+
