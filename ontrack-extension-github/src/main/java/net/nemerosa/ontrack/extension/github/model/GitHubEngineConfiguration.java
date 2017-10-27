@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
@@ -51,6 +52,7 @@ public class GitHubEngineConfiguration implements UserPasswordConfiguration<GitH
     /**
      * OAuth2 token
      */
+    @Wither
     private final String oauth2Token;
 
     @ConstructorProperties({"name", "url", "user", "password", "oauth2Token"})
@@ -73,7 +75,7 @@ public class GitHubEngineConfiguration implements UserPasswordConfiguration<GitH
 
     @Override
     public GitHubEngineConfiguration obfuscate() {
-        return this;
+        return withPassword("").withOauth2Token("");
     }
 
     @Override
