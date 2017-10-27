@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ConfigurationPropertyGraphQLIT : AbstractQLKTITSupport() {
 
@@ -27,6 +28,11 @@ class ConfigurationPropertyGraphQLIT : AbstractQLKTITSupport() {
             testConfigurationService.newConfiguration(
                     configuration
             )
+        }
+        // Checks the password is still accessible programmatically
+        asAdmin().execute {
+            val c = testConfigurationService.getConfiguration(configName)
+            assertEquals("secret", c.password, "Password must remain accessible programmatically")
         }
         // Creates a project
         val project = doCreateProject()
@@ -57,7 +63,7 @@ class ConfigurationPropertyGraphQLIT : AbstractQLKTITSupport() {
         assertEquals("Test", value["value"].asText())
         assertEquals(configName, value["configuration"]["name"].asText())
         assertEquals("user", value["configuration"]["user"].asText())
-        assertEquals("", value["configuration"]["password"].asText())
+        assertTrue(value["configuration"]["password"].isNull, "Password must have been obfuscated")
     }
 
 }
