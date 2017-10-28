@@ -5,9 +5,7 @@ import graphql.schema.GraphQLTypeReference;
 
 public interface GQLType {
 
-    default GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(getClass().getSimpleName());
-    }
+    GraphQLTypeReference getTypeRef();
 
     GraphQLObjectType createType();
 

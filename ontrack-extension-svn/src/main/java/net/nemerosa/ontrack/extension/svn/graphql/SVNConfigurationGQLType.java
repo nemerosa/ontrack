@@ -12,6 +12,11 @@ import org.springframework.stereotype.Component;
 public class SVNConfigurationGQLType implements GQLType {
 
     @Override
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(SVNConfiguration.class.getSimpleName());
+    }
+
+    @Override
     public GraphQLObjectType createType() {
         return GraphQLBeanConverter.asObjectType(SVNConfiguration.class, ImmutableSet.of("password", "descriptor", "credentials"));
     }
