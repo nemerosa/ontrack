@@ -12,15 +12,18 @@
                     <div class="form-group dropdown">
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                                 ng-class="{
-                                    'btn-info': selectedJobStatus.id != '',
-                                    'btn-default': selectedJobStatus.id == ''
+                                    'btn-info': jobFilter.state,
+                                    'btn-default': !jobFilter.state
                                     }">
-                            {{selectedJobStatus.name}}
+                            {{jobFilter.state ? jobFilter.state.description : "Any state"}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-repeat="jobStatus in jobStatuses">
-                                <a class="ot-action" ng-click="setJobStatus(jobStatus)">{{jobStatus.name}}</a>
+                            <li>
+                                <a class="ot-action" ng-click="jobFilter.state = undefined;">Any state</a>
+                            </li>
+                            <li ng-repeat="state in jobFilterResources.states">
+                                <a class="ot-action" ng-click="jobFilter.state = state;">{{state.description}}</a>
                             </li>
                         </ul>
                     </div>
@@ -29,14 +32,20 @@
                     <div class="form-group dropdown">
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                                 ng-class="{
-                                    'btn-info': selectedJobCategory.id != '',
-                                    'btn-default': selectedJobCategory.id == ''
+                                    'btn-info': jobFilter.category,
+                                    'btn-default': !jobFilter.category
                                     }">
-                            {{selectedJobCategory.name}}
+                            {{jobFilter.category ? jobFilter.category.description : "Any category"}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-repeat="jobCategory in jobCategories"><a class="ot-action" ng-click="setJobCategory(jobCategory)">{{jobCategory.name}}</a></li>
+                            <li>
+                                <a class="ot-action" ng-click="setJobFilterCategory(undefined)">Any state</a>
+                            </li>
+                            <li ng-repeat="category in jobFilterResources.categories">
+                                <a class="ot-action"
+                                   ng-click="setJobFilterCategory(category);">{{category.description}}</a>
+                            </li>
                         </ul>
                     </div>
 
@@ -44,15 +53,20 @@
                     <div class="form-group dropdown">
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                                 ng-class="{
-                                    'btn-info': selectedJobType.id != '',
-                                    'btn-default': selectedJobType.id == ''
+                                    'btn-info': jobFilter.type,
+                                    'btn-default': !jobFilter.type
                                     }">
-                            {{selectedJobType.name}}
+                            {{jobFilter.type ? jobFilter.type.description : "Any type"}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a class="ot-action" ng-click="setJobType(defaultJobType)">{{defaultJobType.name}}</a></li>
-                            <li ng-repeat="type in selectedJobCategory.types"><a class="ot-action" ng-click="setJobType(type)">{{type.name}}</a></li>
+                            <li>
+                                <a class="ot-action" ng-click="jobFilter.type = undefined;">Any type</a>
+                            </li>
+                            <li ng-repeat="type in jobFilterResources.types[jobFilter.category.name]">
+                                <a class="ot-action"
+                                   ng-click="jobFilter.type = type;">{{type.description}}</a>
+                            </li>
                         </ul>
                     </div>
 
@@ -60,23 +74,77 @@
                     <div class="form-group dropdown">
                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                                 ng-class="{
-                                    'btn-info': selectedJobError.check,
-                                    'btn-default': !selectedJobError.check
+                                    'btn-info': jobFilter.errorOnly,
+                                    'btn-default': !jobFilter.errorOnly
                                     }">
-                            {{selectedJobError.name}}
+                            {{jobFilter.errorOnly ? "Jobs in error" : "Any error status"}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-repeat="error in jobErrors"><a class="ot-action" ng-click="setJobError(error)">{{error.name}}</a></li>
+                            <li>
+                                <a class="ot-action" ng-click="jobFilter.errorOnly = false;">Any error status</a>
+                                <a class="ot-action" ng-click="jobFilter.errorOnly = true;">Jobs in error</a>
+                            </li>
                         </ul>
                     </div>
 
                     <!-- Description filter (text box) -->
                     <div class="form-group">
-                        <input class="form-control col-md-4" type="text" ng-model="jobDescription.value" placeholder="Description filter"
+                        <input class="form-control col-md-4" type="text" ng-model="jobFilter.description"
+                               placeholder="Description filter"
                                ng-class="{
-                                'bg-info': jobDescription.value
+                                'bg-info': jobFilter.description
                                }"/>
+                    </div>
+
+                    <!-- Search button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-disabled="loadingJobs"
+                                ng-click="loadJobs()"
+                                class="btn btn-primary">
+                            <span class="fa fa-search"></span>
+                        </button>
+                    </div>
+
+                    <!-- Clear button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-disabled="loadingJobs"
+                                ng-click="clearJobFilter()"
+                                title="Clears current filter and reloads the jobs"
+                                class="btn btn-default">
+                            <span class="fa fa-ban"></span>
+                        </button>
+                    </div>
+
+                    <!-- Previous button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-disabled="!jobs.pagination.prev || loadingJobs"
+                                ng-click="previousPage()"
+                                title="Previous page"
+                                class="btn btn-default">
+                            <span class="fa fa-backward"></span>
+                        </button>
+                    </div>
+
+                    <!-- Current page -->
+                    <div class="form-group">
+                        <span>
+                            {{page.offset}}-{{page.offset + page.limit}} / {{page.total}}
+                        </span>
+                    </div>
+
+                    <!-- Next button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-disabled="!jobs.pagination.next || loadingJobs"
+                                ng-click="nextPage()"
+                                title="Next page"
+                                class="btn btn-default">
+                            <span class="fa fa-forward"></span>
+                        </button>
                     </div>
 
                     <!-- Menu -->
@@ -86,14 +154,10 @@
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a class="ot-action" ng-click="clearJobFilter()">
-                                <span class="fa fa-ban"></span>
-                                Clear filter
-                            </a></li>
-
                             <li ng-show="jobs && jobs._pause">
-                                <a class="ot-action" title="Stops running new jobs - current executions are not stopped."
-                                    ng-click="pauseJobs()">
+                                <a class="ot-action"
+                                   title="Stops running new jobs - current executions are not stopped."
+                                   ng-click="pauseJobs()">
                                     <span class="fa fa-pause"></span>
                                     Stops running jobs
                                 </a>
@@ -118,14 +182,28 @@
                         </ul>
                     </div>
 
-                    <!-- Scheduler status -->
-                    <div class="form-group" ng-show="jobs && jobs._resume">
+                    <div class="form-group">
+                        <button type="button"
+                                ng-disabled="true"
+                                ng-show="loadingJobs"
+                                class="btn btn-default">
+                            <span class="ot-loading-indicator"></span>
+                            <span>Loading jobs...</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Scheduler status -->
+            <div class="row" ng-show="jobs && jobs._resume" style="margin-top: 4px;">
+                <div class="col-md-12">
+                    <div class="alert alert-warning form-group">
                         <b class="form-control-static text-danger">
                             Execution of jobs has been stopped.
                             <a class="ot-action" ng-click="resumeJobs()">Resume their execution.</a>
                         </b>
                     </div>
-
                 </div>
             </div>
 
@@ -147,7 +225,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="job in jobs.resources | filter:jobFilter"
+                <tr ng-repeat="job in jobs.resources"
                     class="ot-job ot-job-{{job.state.toLowerCase()}}">
                     <td>
                         {{job.id}}
@@ -163,10 +241,13 @@
                     </td>
                     <td>
                         <span ng-if="job.state == 'IDLE'" class="fa fa-cog fa-2x text-muted" title="Idle"></span>
-                        <span ng-if="job.state == 'RUNNING'" class="fa fa-cog fa-spin fa-2x text-success" title="Running"></span>
+                        <span ng-if="job.state == 'RUNNING'" class="fa fa-cog fa-spin fa-2x text-success"
+                              title="Running"></span>
                         <span ng-if="job.state == 'PAUSED'" class="fa fa-pause fa-2x text-info" title="Paused"></span>
-                        <span ng-if="job.state == 'DISABLED'" class="fa fa-ban fa-2x text-muted" title="Disabled"></span>
-                        <span ng-if="job.state == 'INVALID'" class="fa fa-trash fa-2x text-danger" title="Invalid - will be removed at next run"></span>
+                        <span ng-if="job.state == 'DISABLED'" class="fa fa-ban fa-2x text-muted"
+                              title="Disabled"></span>
+                        <span ng-if="job.state == 'INVALID'" class="fa fa-trash fa-2x text-danger"
+                              title="Invalid - will be removed at next run"></span>
                     </td>
                     <td>
                         <span

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLTypeReference;
 
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
@@ -11,7 +12,7 @@ import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
  */
 public interface GQLInputType<T> {
 
-    GraphQLInputType getInputType();
+    GraphQLInputType createInputType();
 
     T convert(Object argument);
 
@@ -27,4 +28,5 @@ public interface GQLInputType<T> {
                 .build();
     }
 
+    GraphQLTypeReference getTypeRef();
 }

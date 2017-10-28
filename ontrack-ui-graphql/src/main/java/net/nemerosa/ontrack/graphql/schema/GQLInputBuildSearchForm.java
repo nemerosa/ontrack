@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
 import net.nemerosa.ontrack.model.structure.BuildSearchForm;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,12 @@ import org.springframework.stereotype.Component;
 public class GQLInputBuildSearchForm implements GQLInputType<BuildSearchForm> {
 
     @Override
-    public GraphQLInputType getInputType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(BuildSearchForm.class.getSimpleName());
+    }
+
+    @Override
+    public GraphQLInputType createInputType() {
         return GraphQLBeanConverter.asInputType(BuildSearchForm.class);
     }
 

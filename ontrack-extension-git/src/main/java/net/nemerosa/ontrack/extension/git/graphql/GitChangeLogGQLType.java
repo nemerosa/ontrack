@@ -4,6 +4,7 @@ import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.graphql.schema.GQLType;
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,8 @@ import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher;
 @Component
 public class GitChangeLogGQLType implements GQLType {
 
+    public static final String GIT_CHANGE_LOG = "GitChangeLog";
+
     private final GitUICommitGQLType gitUICommitGQLType;
     private final GitService gitService;
 
@@ -26,13 +29,18 @@ public class GitChangeLogGQLType implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return GIT_CHANGE_LOG;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return GraphQLObjectType.newObject()
-                .name("GitChangeLog")
+                .name(GIT_CHANGE_LOG)
                 // Commits
                 .field(f -> f.name("commits")
                         .description("List of commits in the change log")
-                        .type(GraphqlUtils.stdList(gitUICommitGQLType.getType()))
+                        .type(GraphqlUtils.stdList(gitUICommitGQLType.getTypeRef()))
                         .dataFetcher(fetcher(
                                 GitChangeLog.class,
                                 changeLog -> gitService.getChangeLogCommits(changeLog).getCommits()

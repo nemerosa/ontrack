@@ -15,7 +15,12 @@ public class GQLTypeValidationRunStatusID implements GQLType {
     public static final String VALIDATION_RUN_STATUS_ID = "ValidationRunStatusID";
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return VALIDATION_RUN_STATUS_ID;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(VALIDATION_RUN_STATUS_ID)
                 // ID

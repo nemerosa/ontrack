@@ -26,31 +26,19 @@ class ValidationRunsPaginationQLIT extends AbstractQLITSupport {
     }
 
     @Test
-    void 'Getting all validation runs'() {
+    void 'Getting all validation runs is limited by default to 50'() {
         def data = run("""{
             branches (id: ${branch.id}) {
                 validationStamps(name: "VS") {
                     validationRuns {
-                        pageInfo {
-                            hasNextPage
-                            hasPreviousPage
-                            startCursor
-                            endCursor
-                        }
-                        edges {
-                            node {
-                                build {
-                                    name
-                                }
-                            }
+                        build {
+                            name
                         }
                     }
                 }
             }
         }""")
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasPreviousPage == false
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasNextPage == false
-        assert data.branches.first().validationStamps.first().validationRuns.edges.size() == 100
+        assert data.branches.first().validationStamps.first().validationRuns.size() == 50
     }
 
     @Test
@@ -58,85 +46,15 @@ class ValidationRunsPaginationQLIT extends AbstractQLITSupport {
         def data = run("""{
             branches (id: ${branch.id}) {
                 validationStamps(name: "VS") {
-                    validationRuns(first: 20) {
-                        pageInfo {
-                            hasNextPage
-                            hasPreviousPage
-                            startCursor
-                            endCursor
-                        }
-                        edges {
-                            node {
-                                build {
-                                    name
-                                }
-                            }
+                    validationRuns(count: 20) {
+                        build {
+                            name
                         }
                     }
                 }
             }
         }""")
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasPreviousPage == false
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasNextPage == true
-        assert data.branches.first().validationStamps.first().validationRuns.edges.size() == 20
-    }
-
-    @Test
-    void 'Getting 20 first runs and then the next page'() {
-        def data = run("""{
-            branches (id: ${branch.id}) {
-                validationStamps(name: "VS") {
-                    validationRuns(first: 20) {
-                        pageInfo {
-                            hasNextPage
-                            hasPreviousPage
-                            startCursor
-                            endCursor
-                        }
-                        edges {
-                            node {
-                                build {
-                                    name
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }""")
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasPreviousPage == false
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasNextPage == true
-        assert data.branches.first().validationStamps.first().validationRuns.edges.size() == 20
-        assert data.branches.first().validationStamps.first().validationRuns.edges.get(0).node.build.name == "100"
-        def endCursor = data.branches.first().validationStamps.first().validationRuns.pageInfo.endCursor
-
-        // Gets the next page
-        data = run("""{
-            branches (id: ${branch.id}) {
-                validationStamps(name: "VS") {
-                    validationRuns(first: 20, after: "${endCursor}") {
-                        pageInfo {
-                            hasNextPage
-                            hasPreviousPage
-                            startCursor
-                            endCursor
-                        }
-                        edges {
-                            node {
-                                build {
-                                    name
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }""")
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasPreviousPage == true
-        assert data.branches.first().validationStamps.first().validationRuns.pageInfo.hasNextPage == true
-        assert data.branches.first().validationStamps.first().validationRuns.edges.size() == 20
-        assert data.branches.first().validationStamps.first().validationRuns.edges.get(0).node.build.name == "80"
-
+        assert data.branches.first().validationStamps.first().validationRuns.size() == 20
     }
 
 }

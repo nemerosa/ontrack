@@ -31,14 +31,19 @@ public class GQLTypeAuthorizedProject implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return AUTHORIZED_PROJECT;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(AUTHORIZED_PROJECT)
                 .field(
                         newFieldDefinition()
                                 .name("role")
                                 .description("Role for the project")
-                                .type(new GraphQLNonNull(projectRole.getType()))
+                                .type(new GraphQLNonNull(projectRole.getTypeRef()))
                                 .dataFetcher(fetcher(ProjectRoleAssociation.class, ProjectRoleAssociation::getProjectRole))
                                 .build()
                 )

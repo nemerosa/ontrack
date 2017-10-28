@@ -50,7 +50,7 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("builds")
-                .type(stdList(build.getType()))
+                .type(stdList(build.getTypeRef()))
                 .argument(
                         newArgument()
                                 .name("id")
@@ -76,14 +76,14 @@ public class GQLRootQueryBuilds implements GQLRootQuery {
                         newArgument()
                                 .name(BUILD_BRANCH_FILTER_ARGUMENT)
                                 .description("Filter to apply for the builds on the branch - requires 'branch' to be filled.")
-                                .type(inputBuildStandardFilter.getInputType())
+                                .type(inputBuildStandardFilter.getTypeRef())
                                 .build()
                 )
                 .argument(
                         newArgument()
                                 .name(BUILD_PROJECT_FILTER_ARGUMENT)
                                 .description("Filter to apply for the builds on the project - requires 'project' to be filled.")
-                                .type(inputBuildSearchForm.getInputType())
+                                .type(inputBuildSearchForm.getTypeRef())
                                 .build()
                 )
                 .dataFetcher(buildFetcher())

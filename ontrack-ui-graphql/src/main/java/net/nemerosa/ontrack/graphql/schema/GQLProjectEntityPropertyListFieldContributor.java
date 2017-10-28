@@ -53,7 +53,7 @@ public class GQLProjectEntityPropertyListFieldContributor implements GQLProjectE
                                         .defaultValue(false)
                                         .build()
                         )
-                        .type(GraphqlUtils.stdList(property.getType()))
+                        .type(GraphqlUtils.stdList(property.getTypeRef()))
                         .dataFetcher(projectEntityPropertiesDataFetcher(projectEntityClass))
                         .build()
         );
