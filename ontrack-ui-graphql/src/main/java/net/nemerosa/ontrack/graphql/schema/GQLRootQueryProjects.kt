@@ -25,7 +25,7 @@ class GQLRootQueryProjects(
     override fun getFieldDefinition(): GraphQLFieldDefinition {
         return newFieldDefinition()
                 .name("projects")
-                .type(stdList(project.type))
+                .type(stdList(project.typeRef))
                 .argument(
                         newArgument()
                                 .name(ARG_ID)
@@ -50,7 +50,7 @@ class GQLRootQueryProjects(
                 .build()
     }
 
-    private fun projectFetcher(): DataFetcher {
+    private fun projectFetcher(): DataFetcher<List<Project>> {
         return DataFetcher { environment ->
             val id: Int? = environment.getArgument(ARG_ID)
             val name: String? = environment.getArgument(ARG_NAME)
@@ -82,12 +82,12 @@ class GQLRootQueryProjects(
                     // Filter to use
                     var filter: (Project) -> Boolean = { _ -> true }
                     // Property filter?
-                    val propertyFilterArg: String? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
+                    val propertyFilterArg: Map<String, *>? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
                     if (propertyFilterArg != null) {
                         val filterObject = propertyFilter.convert(propertyFilterArg)
                         if (filterObject != null && StringUtils.isNotBlank(filterObject.type)) {
                             val propertyPredicate = propertyFilter.getFilter(filterObject)
-                            filter = filter.and { propertyPredicate.test(it) }
+                            filter = filter and { propertyPredicate.test(it) }
                         }
                     }
                     // Whole list

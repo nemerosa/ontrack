@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.graphql.schema;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLTypeReference;
-import lombok.Data;
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Property;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.function.Predicate;
 
 @Component
-public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilter.PropertyFilter> {
+public class GQLInputPropertyFilter implements GQLInputType<PropertyFilter> {
 
     public static final String ARGUMENT_NAME = "withProperty";
 
@@ -25,12 +24,6 @@ public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilt
     @Autowired
     public GQLInputPropertyFilter(PropertyService propertyService) {
         this.propertyService = propertyService;
-    }
-
-    @Data
-    public static class PropertyFilter {
-        private String type;
-        private String value;
     }
 
     @Override
