@@ -16,8 +16,8 @@ public class GQLTypeAccountGroupMapping implements GQLType {
     public static final String ACCOUNT_GROUP_MAPPING = "AccountGroupMapping";
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(ACCOUNT_GROUP_MAPPING);
+    public String getTypeName() {
+        return ACCOUNT_GROUP_MAPPING;
     }
 
     @Override

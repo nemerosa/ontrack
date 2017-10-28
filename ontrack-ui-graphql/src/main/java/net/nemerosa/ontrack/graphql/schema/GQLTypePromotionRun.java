@@ -33,8 +33,8 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(PROMOTION_RUN);
+    public String getTypeName() {
+        return PROMOTION_RUN;
     }
 
     @Override

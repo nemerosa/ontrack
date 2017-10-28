@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git.graphql;
 
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.graphql.schema.GQLType;
@@ -30,8 +29,8 @@ public class GitChangeLogGQLType implements GQLType {
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(GIT_CHANGE_LOG);
+    public String getTypeName() {
+        return GIT_CHANGE_LOG;
     }
 
     @Override

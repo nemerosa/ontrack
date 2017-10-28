@@ -37,8 +37,8 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(VALIDATION_RUN);
+    public String getTypeName() {
+        return VALIDATION_RUN;
     }
 
     @Override

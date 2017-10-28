@@ -26,7 +26,7 @@ constructor(
         val VALIDATION = "Validation"
     }
 
-    override fun getTypeRef() = GraphQLTypeReference(VALIDATION)
+    override fun getTypeName() = VALIDATION
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
             .name(VALIDATION)

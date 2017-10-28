@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.json.JsonUtils;
@@ -29,8 +28,8 @@ public class GQLTypeProperty implements GQLType {
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(PROPERTY);
+    public String getTypeName() {
+        return PROPERTY;
     }
 
     @Override

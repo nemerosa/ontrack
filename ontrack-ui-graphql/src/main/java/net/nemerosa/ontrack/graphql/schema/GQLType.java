@@ -5,13 +5,11 @@ import graphql.schema.GraphQLTypeReference;
 
 public interface GQLType {
 
-    // FIXME Method to implement
-    default String getTypeName() {
-        return getTypeRef().getName();
-    }
+    String getTypeName();
 
-    // FIXME Method to set as default
-    GraphQLTypeReference getTypeRef();
+    default GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(getTypeName());
+    }
 
     GraphQLObjectType createType(GQLTypeCache cache);
 

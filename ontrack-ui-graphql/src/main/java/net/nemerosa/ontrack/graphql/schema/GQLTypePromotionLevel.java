@@ -41,8 +41,8 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(PROMOTION_LEVEL);
+    public String getTypeName() {
+        return PROMOTION_LEVEL;
     }
 
     @Override

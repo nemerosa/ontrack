@@ -19,8 +19,8 @@ public class GQLTypeProjectAuthorization implements GQLType {
     public static final String PROJECT_AUTHORIZATION = "ProjectAuthorization";
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(PROJECT_AUTHORIZATION);
+    public String getTypeName() {
+        return PROJECT_AUTHORIZATION;
     }
 
     @Override

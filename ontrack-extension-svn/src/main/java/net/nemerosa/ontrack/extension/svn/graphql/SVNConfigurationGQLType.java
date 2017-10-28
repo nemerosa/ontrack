@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.svn.graphql;
 
 import com.google.common.collect.ImmutableSet;
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.graphql.schema.GQLType;
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache;
@@ -13,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class SVNConfigurationGQLType implements GQLType {
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(SVNConfiguration.class.getSimpleName());
+    public String getTypeName() {
+        return SVNConfiguration.class.getSimpleName();
     }
 
     @Override

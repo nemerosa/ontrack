@@ -17,7 +17,7 @@ constructor(
         private val creation: GQLTypeCreation
 ) : GQLType {
 
-    override fun getTypeRef() = GraphQLTypeReference(VALIDATION_RUN_STATUS)
+    override fun getTypeName() = VALIDATION_RUN_STATUS
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()

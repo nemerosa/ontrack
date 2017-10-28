@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +15,8 @@ public class GQLTypePropertyType implements GQLType {
     public static final String PROPERTY_TYPE = "PropertyType";
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(PROPERTY_TYPE);
+    public String getTypeName() {
+        return PROPERTY_TYPE;
     }
 
     @Override

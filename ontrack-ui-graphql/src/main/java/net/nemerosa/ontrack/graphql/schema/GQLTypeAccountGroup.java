@@ -47,8 +47,8 @@ public class GQLTypeAccountGroup implements GQLType {
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(ACCOUNT_GROUP);
+    public String getTypeName() {
+        return ACCOUNT_GROUP;
     }
 
     @Override

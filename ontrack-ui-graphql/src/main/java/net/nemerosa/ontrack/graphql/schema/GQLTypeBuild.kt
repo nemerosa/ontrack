@@ -29,7 +29,7 @@ constructor(
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
 
-    override fun getTypeRef() = GraphQLTypeReference(BUILD)
+    override fun getTypeName() = BUILD
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()

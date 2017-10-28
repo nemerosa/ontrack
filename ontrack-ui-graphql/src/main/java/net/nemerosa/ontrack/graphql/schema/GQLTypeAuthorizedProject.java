@@ -31,8 +31,8 @@ public class GQLTypeAuthorizedProject implements GQLType {
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(AUTHORIZED_PROJECT);
+    public String getTypeName() {
+        return AUTHORIZED_PROJECT;
     }
 
     @Override

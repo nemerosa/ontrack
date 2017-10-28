@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeCreation : GQLType {
-    override fun getTypeRef() = GraphQLTypeReference(SIGNATURE)
+    override fun getTypeName() = SIGNATURE
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()

@@ -58,8 +58,8 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(BRANCH);
+    public String getTypeName() {
+        return BRANCH;
     }
 
     @Override

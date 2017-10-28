@@ -28,8 +28,8 @@ public class GQLTypeGlobalRole implements GQLType {
     }
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(GLOBAL_ROLE);
+    public String getTypeName() {
+        return GLOBAL_ROLE;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +15,8 @@ public class GQLTypeProjectRole implements GQLType {
     public static final String PROJECT_ROLE = "ProjectRole";
 
     @Override
-    public GraphQLTypeReference getTypeRef() {
-        return new GraphQLTypeReference(PROJECT_ROLE);
+    public String getTypeName() {
+        return PROJECT_ROLE;
     }
 
     @Override
