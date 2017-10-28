@@ -46,7 +46,7 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROMOTION_LEVEL)
                 .withInterface(projectEntityInterface.getTypeRef())

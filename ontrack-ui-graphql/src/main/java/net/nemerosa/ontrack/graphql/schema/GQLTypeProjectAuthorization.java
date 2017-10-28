@@ -24,7 +24,7 @@ public class GQLTypeProjectAuthorization implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROJECT_AUTHORIZATION)
                 .field(GraphqlUtils.stringField("id", "ID of the role"))

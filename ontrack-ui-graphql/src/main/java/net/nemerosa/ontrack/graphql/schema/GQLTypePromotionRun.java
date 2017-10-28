@@ -38,7 +38,7 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROMOTION_RUN)
                 .withInterface(projectEntityInterface.getTypeRef())

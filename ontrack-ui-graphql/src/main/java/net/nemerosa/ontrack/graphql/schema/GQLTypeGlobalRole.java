@@ -33,7 +33,7 @@ public class GQLTypeGlobalRole implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(GLOBAL_ROLE)
                 .field(GraphqlUtils.stringField("id", "ID of the role"))

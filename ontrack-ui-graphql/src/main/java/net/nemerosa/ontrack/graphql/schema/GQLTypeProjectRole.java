@@ -21,7 +21,7 @@ public class GQLTypeProjectRole implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROJECT_ROLE)
                 .field(GraphqlUtils.stringField("id", "ID of the role"))

@@ -5,6 +5,7 @@ import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.graphql.schema.GQLType;
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,7 @@ public class GitChangeLogGQLType implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return GraphQLObjectType.newObject()
                 .name(GIT_CHANGE_LOG)
                 // Commits

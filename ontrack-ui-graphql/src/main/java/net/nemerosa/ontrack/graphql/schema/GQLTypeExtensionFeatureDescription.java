@@ -21,7 +21,7 @@ public class GQLTypeExtensionFeatureDescription implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(EXTENSION_FEATURE_DESCRIPTION)
                 .field(f -> f.name("id")

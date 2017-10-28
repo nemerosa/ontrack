@@ -21,7 +21,7 @@ public class GQLTypeAccountGroupMapping implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(ACCOUNT_GROUP_MAPPING)
                 .field(GraphqlUtils.idField())

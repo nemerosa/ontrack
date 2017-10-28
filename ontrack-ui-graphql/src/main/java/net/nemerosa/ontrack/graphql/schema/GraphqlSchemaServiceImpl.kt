@@ -22,8 +22,9 @@ class GraphqlSchemaServiceImpl(
 
     private fun createSchema(): GraphQLSchema {
         // All types
+        val cache = GQLTypeCache()
         val dictionary =
-                types.map { it.createType() } +
+                types.map { it.createType(cache) } +
                         interfaces.map { it.createInterface() } +
                         inputTypes.map { it.createInputType() }
         return GraphQLSchema.newSchema()

@@ -63,7 +63,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(BRANCH)
                 .withInterface(projectEntityInterface.getTypeRef())

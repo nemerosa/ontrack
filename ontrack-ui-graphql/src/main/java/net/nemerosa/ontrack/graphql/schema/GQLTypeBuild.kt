@@ -31,7 +31,7 @@ constructor(
 
     override fun getTypeRef() = GraphQLTypeReference(BUILD)
 
-    override fun createType(): GraphQLObjectType {
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()
                 .name(BUILD)
                 .withInterface(projectEntityInterface.typeRef)

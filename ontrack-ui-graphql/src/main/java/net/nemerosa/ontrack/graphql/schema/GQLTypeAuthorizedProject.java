@@ -36,7 +36,7 @@ public class GQLTypeAuthorizedProject implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(AUTHORIZED_PROJECT)
                 .field(

@@ -49,7 +49,7 @@ public class GQLTypeProject extends AbstractGQLProjectEntity<Project> {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROJECT)
                 .withInterface(projectEntityInterface.getTypeRef())

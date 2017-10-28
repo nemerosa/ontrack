@@ -28,7 +28,7 @@ constructor(private val structureService: StructureService,
 
     override fun getTypeRef() = GraphQLTypeReference(VALIDATION_STAMP)
 
-    override fun createType(): GraphQLObjectType {
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()
                 .name(VALIDATION_STAMP)
                 .withInterface(projectEntityInterface.typeRef)

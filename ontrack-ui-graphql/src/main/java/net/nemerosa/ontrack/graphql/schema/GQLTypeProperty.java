@@ -34,7 +34,7 @@ public class GQLTypeProperty implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROPERTY)
                 // Type

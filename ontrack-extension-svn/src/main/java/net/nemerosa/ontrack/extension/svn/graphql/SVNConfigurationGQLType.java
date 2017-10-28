@@ -5,6 +5,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.graphql.schema.GQLType;
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache;
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class SVNConfigurationGQLType implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType createType() {
-        return GraphQLBeanConverter.asObjectType(SVNConfiguration.class, ImmutableSet.of("password", "descriptor", "credentials"));
+    public GraphQLObjectType createType(GQLTypeCache cache) {
+        return GraphQLBeanConverter.asObjectType(SVNConfiguration.class, cache, ImmutableSet.of("password", "descriptor", "credentials"));
     }
 }

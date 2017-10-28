@@ -42,7 +42,7 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
     }
 
     @Override
-    public GraphQLObjectType createType() {
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(VALIDATION_RUN)
                 .withInterface(projectEntityInterface.getTypeRef())
