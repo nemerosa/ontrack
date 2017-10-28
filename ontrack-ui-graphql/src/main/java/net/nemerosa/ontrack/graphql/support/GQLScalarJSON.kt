@@ -12,12 +12,10 @@ import java.io.IOException
 /**
  * JSON scalar type.
  */
-class GQLScalarJSON private constructor(
-
-) : GraphQLScalarType(
+class GQLScalarJSON private constructor() : GraphQLScalarType(
         "JSON",
         "Custom JSON value",
-        object : Coercing {
+        object : Coercing<Any, JsonNode> {
 
             private val mapper = ObjectMapperFactory.create()
 
@@ -34,11 +32,11 @@ class GQLScalarJSON private constructor(
                 return json.obfuscate()
             }
 
-            override fun parseValue(input: Any): Any {
+            override fun parseValue(input: Any): JsonNode {
                 return serialize(input)
             }
 
-            override fun parseLiteral(input: Any): Any? {
+            override fun parseLiteral(input: Any): JsonNode? {
                 return if (input is StringValue) {
                     serialize(input)
                 } else {
