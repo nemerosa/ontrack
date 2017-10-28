@@ -33,7 +33,7 @@ public class SVNConfigurationGQLRootQuery implements GQLRootQuery {
         return GraphQLFieldDefinition.newFieldDefinition()
                 .name("svnConfigurations")
                 .description("List of SVN configurations")
-                .type(GraphqlUtils.stdList(svnConfigurationGQLType.getType()))
+                .type(GraphqlUtils.stdList(svnConfigurationGQLType.getTypeRef()))
                 .argument(a -> a.name("name")
                         .description("Configuration name")
                         .type(GraphQLString)

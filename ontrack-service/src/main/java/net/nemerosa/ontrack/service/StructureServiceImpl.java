@@ -1171,6 +1171,26 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Project findProjectByNameIfAuthorized(String project) throws AccessDeniedException {
+        // Looks for the project as admin
+        Optional<Project> o = securityService.asAdmin(() -> findProjectByName(project));
+        // If it exists
+        if (o.isPresent()) {
+            Project p = o.get();
+            // If it is authorized
+            if (securityService.isProjectFunctionGranted(p, ProjectView.class)) {
+                return p;
+            } else {
+                throw new AccessDeniedException("Project access not granted.");
+            }
+        }
+        // If it does not exist
+        else {
+            return null;
+        }
+    }
+
+    @Override
     public Optional<Branch> findBranchByName(String project, String branch) {
         return structureRepository.getBranchByName(project, branch)
                 .filter(b -> securityService.isProjectFunctionGranted(b.projectId(), ProjectView.class));

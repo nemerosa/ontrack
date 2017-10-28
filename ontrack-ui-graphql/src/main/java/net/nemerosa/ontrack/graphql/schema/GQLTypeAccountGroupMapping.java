@@ -16,7 +16,12 @@ public class GQLTypeAccountGroupMapping implements GQLType {
     public static final String ACCOUNT_GROUP_MAPPING = "AccountGroupMapping";
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return ACCOUNT_GROUP_MAPPING;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(ACCOUNT_GROUP_MAPPING)
                 .field(GraphqlUtils.idField())

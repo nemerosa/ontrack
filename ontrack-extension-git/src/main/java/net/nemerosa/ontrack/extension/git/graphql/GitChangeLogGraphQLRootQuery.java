@@ -37,7 +37,7 @@ public class GitChangeLogGraphQLRootQuery implements GQLRootQuery {
                         .description("ID of the build to end the change log with")
                         .type(new GraphQLNonNull(GraphQLInt))
                 )
-                .type(gitChangeLogGQLType.getType())
+                .type(gitChangeLogGQLType.getTypeRef())
                 .dataFetcher(gitChangeLogFetcher())
                 .build();
     }

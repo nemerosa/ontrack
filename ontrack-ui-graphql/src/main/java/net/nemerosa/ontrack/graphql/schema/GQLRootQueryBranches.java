@@ -41,7 +41,7 @@ public class GQLRootQueryBranches implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("branches")
-                .type(stdList(branch.getType()))
+                .type(stdList(branch.getTypeRef()))
                 .argument(
                         newArgument()
                                 .name("id")
@@ -99,7 +99,7 @@ public class GQLRootQueryBranches implements GQLRootQuery {
 
                 // Property filter?
                 if (propertyFilterArg != null) {
-                    GQLInputPropertyFilter.PropertyFilter filterObject = propertyFilter.convert(propertyFilterArg);
+                    PropertyFilter filterObject = propertyFilter.convert(propertyFilterArg);
                     if (filterObject != null && StringUtils.isNotBlank(filterObject.getType())) {
                         branchFilter = branchFilter.and(propertyFilter.getFilter(filterObject));
                     }

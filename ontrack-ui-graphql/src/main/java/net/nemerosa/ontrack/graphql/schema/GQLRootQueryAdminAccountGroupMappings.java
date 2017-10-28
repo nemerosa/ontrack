@@ -40,7 +40,7 @@ public class GQLRootQueryAdminAccountGroupMappings implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("accountGroupMappings")
-                .type(stdList(accountGroupMapping.getType()))
+                .type(stdList(accountGroupMapping.getTypeRef()))
                 .argument(a -> a.name(MAPPING_TYPE_ARGUMENT)
                         .description("Mapping type")
                         .type(new GraphQLNonNull(GraphQLString)))

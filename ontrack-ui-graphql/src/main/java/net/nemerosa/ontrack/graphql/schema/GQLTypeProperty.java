@@ -28,7 +28,12 @@ public class GQLTypeProperty implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return PROPERTY;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROPERTY)
                 // Type
@@ -36,7 +41,7 @@ public class GQLTypeProperty implements GQLType {
                         newFieldDefinition()
                                 .name("type")
                                 .description("Property type")
-                                .type(propertyType.getType())
+                                .type(propertyType.getTypeRef())
                                 .dataFetcher(GraphqlUtils.fetcher(Property.class, Property::getTypeDescriptor))
                                 .build()
                 )

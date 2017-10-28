@@ -6,6 +6,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache;
 import org.springframework.beans.BeanUtils;
 
 import java.beans.PropertyDescriptor;
@@ -48,11 +49,11 @@ public class GraphQLBeanConverter {
         return builder.build();
     }
 
-    public static GraphQLObjectType asObjectType(Class<?> type) {
-        return asObjectType(type, null);
+    public static GraphQLObjectType asObjectType(Class<?> type, GQLTypeCache cache) {
+        return asObjectType(type, cache, null);
     }
 
-    public static GraphQLObjectType asObjectType(Class<?> type, Set<String> exclusions) {
+    public static GraphQLObjectType asObjectType(Class<?> type, GQLTypeCache cache, Set<String> exclusions) {
         GraphQLObjectType.Builder builder = GraphQLObjectType.newObject()
                 .name(type.getSimpleName());
         // Actual exclusions
@@ -88,7 +89,11 @@ public class GraphQLBeanConverter {
                     } else {
                         // Tries to convert to an object type
                         // Note: caching might be needed here...
-                        GraphQLObjectType propertyObjectType = asObjectType(propertyType);
+                        GraphQLObjectType propertyObjectType =
+                                cache.getOrCreate(
+                                        propertyType.getSimpleName(),
+                                        () -> asObjectType(propertyType, cache)
+                                );
                         builder = builder.field(field -> field
                                 .name(name)
                                 .description(description)
