@@ -38,12 +38,21 @@ public class StashProjectConfigurationProperty implements ConfigurationProperty<
      */
     @SuppressWarnings("unused")
     public String getRepositoryUrl() {
-        return String.format(
-                "%s/projects/%s/repos/%s",
-                configuration.getUrl(),
-                project,
-                repository
-        );
+        if (configuration.isCloud()) {
+            return String.format(
+                    "%s/%s/%s",
+                    configuration.getUrl(),
+                    project,
+                    repository
+            );
+        } else {
+            return String.format(
+                    "%s/projects/%s/repos/%s",
+                    configuration.getUrl(),
+                    project,
+                    repository
+            );
+        }
     }
 
 }
