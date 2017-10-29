@@ -344,6 +344,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     publishers {
         buildDescription '', '${VERSION}', '', ''
         archiveJunit('build/acceptance/*.xml')
+        archiveArtifacts {
+            pattern 'build/ci-logs/**'
+        }
         if (release) {
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {

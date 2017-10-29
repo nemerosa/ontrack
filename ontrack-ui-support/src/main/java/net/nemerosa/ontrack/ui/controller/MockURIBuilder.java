@@ -26,10 +26,20 @@ public class MockURIBuilder implements URIBuilder {
                         "urn:test:%s#%s:%s",
                         info.getControllerMethod().getDeclaringClass().getName(),
                         info.getControllerMethod().getName(),
-                        Arrays.asList(info.getArgumentValues()).stream()
+                        Arrays.stream(info.getArgumentValues())
                                 .map(o -> Objects.toString(o, ""))
                                 .map(this::encode)
                                 .collect(Collectors.joining(","))
+                )
+        );
+    }
+
+    @Override
+    public URI url(String relativeUri) {
+        return URI.create(
+                format(
+                        "urn:test:%s",
+                        relativeUri
                 )
         );
     }

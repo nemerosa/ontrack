@@ -1,8 +1,9 @@
 package net.nemerosa.ontrack.graphql
 
-import graphql.GraphQLException
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
+import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
+import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Signature
@@ -199,7 +200,7 @@ class BuildQLIT extends AbstractQLITSupport {
         assert link.branch.project.name == targetBuild.branch.project.name
     }
 
-    @Test(expected = GraphQLException)
+    @Test(expected = BranchNotFoundException)
     void 'By branch not found'() {
         def project = doCreateProject()
         def branchName = uid('B')
@@ -224,7 +225,7 @@ class BuildQLIT extends AbstractQLITSupport {
         assert data.builds.first().id == build.id()
     }
 
-    @Test(expected = GraphQLException)
+    @Test(expected = ProjectNotFoundException)
     void 'By project not found'() {
         def projectName = uid('P')
 
@@ -283,7 +284,25 @@ class BuildQLIT extends AbstractQLITSupport {
         assert data.builds.get(0).id == build1.id()
     }
 
-    @Test(expected = GraphQLException)
+    @Test
+    void 'Build filter with promotion since promotion when no promotion is available'() {
+        // Branch
+        def branch = doCreateBranch()
+        // A few builds without promotions
+        (1..4).each {
+            doCreateBuild(branch, nd(it.toString(), ""))
+        }
+        // Query
+        def data = run(""" {
+  builds(project: "${branch.project.name}", branch: "${branch.name}", buildBranchFilter: {count: 100, withPromotionLevel: "BRONZE", sincePromotionLevel: "SILVER"}) {
+    id
+  }
+}""")
+        // We should not have any build
+        assert data.builds.size() == 0
+    }
+
+    @Test(expected = IllegalStateException)
     void 'Branch filter requires a branch'() {
         // Builds
         def branch = doCreateBranch()
@@ -300,7 +319,7 @@ class BuildQLIT extends AbstractQLITSupport {
         }""")
     }
 
-    @Test(expected = GraphQLException)
+    @Test(expected = IllegalStateException)
     void 'Project filter requires a project'() {
         // Builds
         doCreateBuild()

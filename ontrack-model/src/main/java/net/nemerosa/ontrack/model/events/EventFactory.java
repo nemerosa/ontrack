@@ -10,10 +10,14 @@ public interface EventFactory {
 
     EventType NEW_PROJECT = SimpleEventType.of("new_project", "New project ${PROJECT}.");
     EventType UPDATE_PROJECT = SimpleEventType.of("update_project", "Project ${PROJECT} has been updated.");
+    EventType ENABLE_PROJECT = SimpleEventType.of("enable_project", "Project ${PROJECT} has been enabled.");
+    EventType DISABLE_PROJECT = SimpleEventType.of("disable_project", "Project ${PROJECT} has been disabled.");
     EventType DELETE_PROJECT = SimpleEventType.of("delete_project", "Project ${:project} has been deleted.");
 
     EventType NEW_BRANCH = SimpleEventType.of("new_branch", "New branch ${BRANCH} for project ${PROJECT}.");
     EventType UPDATE_BRANCH = SimpleEventType.of("update_branch", "Branch ${BRANCH} in ${PROJECT} has been updated.");
+    EventType ENABLE_BRANCH = SimpleEventType.of("enable_branch", "Branch ${BRANCH} in ${PROJECT} has been enabled.");
+    EventType DISABLE_BRANCH = SimpleEventType.of("disable_branch", "Branch ${BRANCH} in ${PROJECT} has been disabled.");
     EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${:branch} has been deleted from ${PROJECT}.");
 
     EventType NEW_BUILD = SimpleEventType.of("new_build", "New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.");
@@ -63,11 +67,19 @@ public interface EventFactory {
 
     Event updateProject(Project project);
 
+    Event disableProject(Project project);
+
+    Event enableProject(Project project);
+
     Event deleteProject(Project project);
 
     Event newBranch(Branch branch);
 
     Event updateBranch(Branch branch);
+
+    Event disableBranch(Branch branch);
+
+    Event enableBranch(Branch branch);
 
     Event deleteBranch(Branch branch);
 

@@ -23,24 +23,33 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
 
     private final StructureService structureService;
     private final GQLTypePromotionRun promotionRun;
+    private final GQLProjectEntityInterface projectEntityInterface;
 
     @Autowired
     public GQLTypePromotionLevel(StructureService structureService,
                                  GQLTypeCreation creation,
                                  GQLTypePromotionRun promotionRun,
-                                 List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+                                 List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+                                 GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL,
                 projectEntityFieldContributors,
                 creation);
         this.structureService = structureService;
         this.promotionRun = promotionRun;
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return PROMOTION_LEVEL;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROMOTION_LEVEL)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 // Image flag
                 .field(f -> f.name("image")
@@ -60,7 +69,7 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                         newFieldDefinition()
                                 .name("promotionRuns")
                                 .description("List of runs for this promotion")
-                                .type(GraphqlUtils.stdList(promotionRun.getType()))
+                                .type(GraphqlUtils.stdList(promotionRun.getTypeRef()))
                                 .argument(GraphqlUtils.stdListArguments())
                                 .dataFetcher(promotionLevelPromotionRunsFetcher())
                                 .build()

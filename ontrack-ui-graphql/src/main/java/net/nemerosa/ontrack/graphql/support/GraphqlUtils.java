@@ -96,20 +96,6 @@ public final class GraphqlUtils {
         );
     }
 
-    public static GraphQLOutputType connectionList(GraphQLObjectType type) {
-        return new GraphQLNonNull(
-                Relay.connectionType(
-                        type.getName() + "Connection",
-                        Relay.edgeType(
-                                type.getName() + "Edge",
-                                type,
-                                Collections.emptyList()
-                        ),
-                        Collections.emptyList()
-                )
-        );
-    }
-
     public static OptionalInt getIntArgument(DataFetchingEnvironment environment, @SuppressWarnings("SameParameterValue") String name) {
         Object value = environment.getArgument(name);
         if (value instanceof Integer) {
@@ -163,7 +149,7 @@ public final class GraphqlUtils {
                 ));
     }
 
-    public static <T, R> DataFetcher fetcher(Class<T> sourceType, Function<T, R> fn) {
+    public static <T, R> DataFetcher<R> fetcher(Class<T> sourceType, Function<T, R> fn) {
         return environment -> {
             Object o = environment.getSource();
             if (sourceType.isInstance(o)) {
@@ -175,7 +161,7 @@ public final class GraphqlUtils {
         };
     }
 
-    public static <T, R> DataFetcher fetcher(Class<T> sourceType, BiFunction<DataFetchingEnvironment, T, R> fn) {
+    public static <T, R> DataFetcher<R> fetcher(Class<T> sourceType, BiFunction<DataFetchingEnvironment, T, R> fn) {
         return environment -> {
             Object o = environment.getSource();
             if (sourceType.isInstance(o)) {

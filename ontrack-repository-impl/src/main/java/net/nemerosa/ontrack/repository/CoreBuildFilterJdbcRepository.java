@@ -69,11 +69,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
             int promotionLevelId = structureRepository
                     .getPromotionLevelByName(branch, sincePromotionLevel)
                     .map(Entity::id)
-                    .orElseThrow(() -> new PromotionLevelNotFoundException(
-                            branch.getProject().getName(),
-                            branch.getName(),
-                            sincePromotionLevel
-                    ));
+                    .orElse(-1);
             // Gets the last build having this promotion level
             Integer id = findLastBuildWithPromotionLevel(promotionLevelId);
             if (id != null) {

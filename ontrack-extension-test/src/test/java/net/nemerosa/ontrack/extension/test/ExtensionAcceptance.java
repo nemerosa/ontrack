@@ -112,6 +112,15 @@ public class ExtensionAcceptance {
         assertEquals(value, map.get("value"));
     }
 
+    @Test
+    public void third_party_library_test() {
+        // Just call a REST end point which relies on 3rd party dependency
+        JsonClient client = getJsonClient();
+        JsonNode json = client.get("extension/test/3rdparty?value=2&power=3");
+        int result = json.path("result").asInt();
+        assertEquals(8, result);
+    }
+
     private JsonClient getJsonClient() {
         OTHttpClient httpClient = OTHttpClientBuilder.create(baseUrl, true)
                 .withLogger(System.out::println)

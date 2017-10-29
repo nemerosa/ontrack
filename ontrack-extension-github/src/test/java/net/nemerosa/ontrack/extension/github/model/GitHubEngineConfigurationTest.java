@@ -11,6 +11,30 @@ import static org.junit.Assert.assertEquals;
 public class GitHubEngineConfigurationTest {
 
     @Test
+    public void obfuscation_of_password() {
+        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
+                "ontrack",
+                GitHubEngineConfiguration.GITHUB_COM,
+                "user",
+                "secret",
+                null
+        );
+        assertEquals("", configuration.obfuscate().getPassword());
+    }
+
+    @Test
+    public void obfuscation_of_token() {
+        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
+                "ontrack",
+                GitHubEngineConfiguration.GITHUB_COM,
+                null,
+                null,
+                "1234567890abcdef"
+        );
+        assertEquals("", configuration.obfuscate().getOauth2Token());
+    }
+
+    @Test
     public void toJson() throws JsonProcessingException {
         assertJsonWrite(
                 object()

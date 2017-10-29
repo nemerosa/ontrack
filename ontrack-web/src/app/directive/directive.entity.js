@@ -61,13 +61,6 @@ angular.module('ot.directive.entity', [
                     }
                 };
 
-                otTaskService.register('events', function () {
-                    if (scope.entity && scope.entity._events) {
-                        scope.events = [];
-                        loadEvents(scope.entity._events);
-                    }
-                }, 60000);
-
                 function loadEvents(uri) {
                     $log.debug("[events] From URI = " + uri);
                     scope.loadingEvents = true;

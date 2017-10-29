@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLInt
-import graphql.Scalars.GraphQLString
+import graphql.Scalars.*
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument.newArgument
@@ -24,15 +23,18 @@ class GQLTypeBuild
 @Autowired
 constructor(
         private val structureService: StructureService,
+        private val projectEntityInterface: GQLProjectEntityInterface,
         private val validation: GQLTypeValidation,
-        private val creation: GQLTypeCreation,
+        creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
 
-    override fun getType(): GraphQLObjectType {
+    override fun getTypeName() = BUILD
+
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()
                 .name(BUILD)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 // Ref to branch
                 .field(
@@ -52,6 +54,13 @@ constructor(
                                                 .name("promotion")
                                                 .description("Name of the promotion level")
                                                 .type(GraphQLString)
+                                                .build()
+                                )
+                                .argument(
+                                        newArgument()
+                                                .name("lastPerLevel")
+                                                .description("Returns the last promotion run per promotion level")
+                                                .type(GraphQLBoolean)
                                                 .build()
                                 )
                                 .type(stdList(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
@@ -93,7 +102,7 @@ constructor(
                                             .type(GraphQLString)
                                             .build()
                             )
-                            .type(stdList(validation.type))
+                            .type(stdList(validation.typeRef))
                             .dataFetcher(buildValidationsFetcher())
                 }
                 // Build links
@@ -109,7 +118,7 @@ constructor(
                 .build()
     }
 
-    private fun buildValidationsFetcher(): DataFetcher {
+    private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> {
         return fetcher(
                 Build::class.java
         ) { environment: DataFetchingEnvironment, build: Build ->
@@ -155,17 +164,16 @@ constructor(
         )
     }
 
-    private fun buildLinkedToFetcher(): DataFetcher {
+    private fun buildLinkedToFetcher(): DataFetcher<List<Build>> {
         return fetcher(
                 Build::class.java,
                 structureService::getBuildLinksFrom
         )
     }
 
-    private fun buildValidationRunsFetcher(): DataFetcher {
-        return DataFetcher { environment ->
-            val build = environment.source
-            if (build is Build) {
+    private fun buildValidationRunsFetcher() =
+            DataFetcher<List<ValidationRun>> { environment ->
+                val build: Build = environment.getSource()
                 // Filter
                 val count = GraphqlUtils.getIntArgument(environment, "count").orElse(50)
                 val validation = GraphqlUtils.getStringArgument(environment, "validation").orElse(null)
@@ -192,16 +200,13 @@ constructor(
                     return@DataFetcher structureService.getValidationRunsForBuild(build.id)
                             .take(count)
                 }
-            } else {
-                return@DataFetcher emptyList<Any>()
             }
-        }
-    }
 
-    private fun buildPromotionRunsFetcher(): DataFetcher {
-        return DataFetcher { environment ->
-            val build = environment.source
-            if (build is Build) {
+    private fun buildPromotionRunsFetcher() =
+            DataFetcher<List<PromotionRun>> { environment ->
+                val build: Build = environment.getSource()
+                // Last per promotion filter?
+                val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, "lastPerLevel", false)
                 // Promotion filter
                 val promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null)
                 if (promotion != null) {
@@ -218,16 +223,22 @@ constructor(
                         )
                     }
                     // Gets promotion runs for this promotion level
-                    return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+                    if (lastPerLevel) {
+                        return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
+                                .map { listOf(it) }
+                                .orElse(listOf())
+                    } else {
+                        return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+                    }
                 } else {
                     // Gets all the promotion runs
-                    return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
+                    if (lastPerLevel) {
+                        return@DataFetcher structureService.getLastPromotionRunsForBuild(build.id)
+                    } else {
+                        return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
+                    }
                 }
-            } else {
-                return@DataFetcher emptyList<Any>()
             }
-        }
-    }
 
     override fun getSignature(entity: Build): Optional<Signature> {
         return Optional.ofNullable(entity.signature)

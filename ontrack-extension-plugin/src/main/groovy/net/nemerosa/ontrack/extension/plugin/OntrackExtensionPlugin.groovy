@@ -4,6 +4,7 @@ import com.moowork.gradle.node.task.NodeTask
 import com.moowork.gradle.node.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.JavaExec
 
 /**
@@ -209,14 +210,27 @@ ontrack = ${ontrackVersion}
         }
 
         /**
-         * Spring Boot packaging as a module
+         * Task to copy the dependencies
          */
 
-        project.apply plugin: 'org.springframework.boot'
-        project.springBoot {
-            layout = 'MODULE'
-            customConfiguration = 'moduleDependencies'
+        project.tasks.create('ontrackCopyDependencies', Copy) {
+            from project.configurations.moduleDependencies
+            into 'build/dist'
         }
+
+        /**
+         * Task to prepare dependencies & main JAR in dist folder
+         */
+        project.tasks.create('ontrackDist', Copy) {
+            dependsOn 'ontrackCopyDependencies'
+            from project.tasks.jar
+            into 'build/dist'
+        }
+
+        /**
+         * Building launches the `ontrackDist` task
+         */
+        project.tasks.build.dependsOn 'ontrackDist'
 
         /**
          * Running the extension in Ontrack

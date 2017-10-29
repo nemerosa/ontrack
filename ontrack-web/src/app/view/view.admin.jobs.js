@@ -1,8 +1,8 @@
 angular.module('ot.view.admin.jobs', [
-        'ui.router',
-        'ot.service.core',
-        'ot.service.task'
-    ])
+    'ui.router',
+    'ot.service.core',
+    'ot.service.task'
+])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-jobs', {
             url: '/admin-jobs',
@@ -11,64 +11,114 @@ angular.module('ot.view.admin.jobs', [
         });
     })
     .controller('AdminJobsCtrl', function ($scope, $http, ot, otAlertService, otTaskService, otNotificationService) {
-        var view = ot.view();
+        const view = ot.view();
         view.title = "System jobs";
         view.description = "Tools for the management of system background jobs";
 
-        // Selected category & types
-        //noinspection UnnecessaryLocalVariableJS
-        var defaultJobCategory = {id: '', name: "Any category", types: []};
-        $scope.defaultJobType = {id: '', name: "Any type"};
-        $scope.selectedJobCategory = defaultJobCategory;
-        $scope.selectedJobType = $scope.defaultJobType;
+        // Current filter
+        $scope.jobFilter = {
+            state: undefined,
+            category: undefined,
+            type: undefined,
+            description: '',
+            errorOnly: false
+        };
+
+        // Current page
+        $scope.page = {};
+
+        // Category filter selection
+        $scope.setJobFilterCategory = (category) => {
+            if ($scope.jobFilter.category !== category) {
+                $scope.jobFilter.category = category;
+                $scope.jobFilter.type = undefined;
+            }
+        };
+
+        // Clearing the filter
+        $scope.clearJobFilter = () => {
+            $scope.jobFilter = {
+                state: undefined,
+                category: undefined,
+                type: undefined,
+                description: '',
+                errorOnly: false
+            };
+            loadJobs();
+        };
+
+        // Navigation: previous page
+        $scope.previousPage = () => {
+            if ($scope.jobs.pagination.prev) {
+                $scope.loadingJobs = true;
+                ot.pageCall($http.get($scope.jobs.pagination.prev))
+                    .then(jobs => {
+                        $scope.jobs = jobs;
+                        $scope.page= jobs.pagination;
+                    })
+                    .finally(() => {
+                        $scope.loadingJobs = false;
+                    });
+            }
+        };
+
+        // Navigation: next page
+        $scope.nextPage = () => {
+            if ($scope.jobs.pagination.next) {
+                $scope.loadingJobs = true;
+                ot.pageCall($http.get($scope.jobs.pagination.next))
+                    .then(jobs => {
+                        $scope.jobs = jobs;
+                        $scope.page= jobs.pagination;
+                    })
+                    .finally(() => {
+                        $scope.loadingJobs = false;
+                    });
+            }
+        };
 
         // Loads the jobs
+        $scope.loadJobs = () => {
+            $scope.page = {};
+            loadJobs();
+        };
+
         function loadJobs() {
-            ot.call($http.get('admin/jobs')).then(function (jobs) {
-                $scope.jobs = jobs;
-                view.commands = [
-                    ot.viewApiCommand(jobs._self),
-                    ot.viewCloseCommand('/home')
-                ];
-                // Computes the categories & types
-                var jobCategories = [defaultJobCategory];
-                $scope.jobs.resources.forEach(function (job) {
-                    var categoryId = job.key.type.category.key;
-                    var categoryName = job.key.type.category.name;
-                    var typeId = job.key.type.key;
-                    var typeName = job.key.type.name;
-                    // Existing category
-                    var category = jobCategories.find(function (cat) {
-                        return cat.id == categoryId;
-                    });
-                    if (!category) {
-                        category = {
-                            id: categoryId,
-                            name: categoryName,
-                            types: []
-                        };
-                        jobCategories.push(category);
-                    }
-                    // Existing type
-                    var type = category.types.find(function (type) {
-                        return type.id == typeId;
-                    });
-                    if (!type) {
-                        type = {
-                            id: typeId,
-                            name: typeName
-                        };
-                        category.types.push(type);
-                    }
+            $scope.loadingJobs = true;
+            ot.pageCall($http.get('admin/jobs/filter'))
+                .then(jobFilterResources => {
+                    $scope.jobFilterResources = jobFilterResources;
+                    // Parameters
+                    const params = {};
+                    params.state = $scope.jobFilter.state ? $scope.jobFilter.state.name : undefined;
+                    params.category = $scope.jobFilter.category ? $scope.jobFilter.category.name : undefined;
+                    params.type = $scope.jobFilter.type ? $scope.jobFilter.type.name : undefined;
+                    params.description = $scope.jobFilter.description ? $scope.jobFilter.description : undefined;
+                    params.errorOnly = $scope.jobFilter.errorOnly ? $scope.jobFilter.errorOnly : undefined;
+                    params.offset = $scope.page.offset ? $scope.page.offset : 0;
+                    params.count = $scope.page.count ? $scope.page.count : 30;
+                    // Call
+                    return ot.pageCall($http.get('admin/jobs', {
+                        params: params
+                    }));
+                })
+                .then(jobs => {
+                    $scope.jobs = jobs;
+                    $scope.page= jobs.pagination;
+                    view.commands = [
+                        ot.viewApiCommand(jobs._self),
+                        ot.viewCloseCommand('/home')
+                    ];
+                })
+                .finally(() => {
+                    $scope.loadingJobs = false;
                 });
-                $scope.jobCategories = jobCategories;
-            });
         }
 
         // Initialisation
         loadJobs();
 
-        var interval = 10 * 1000; // 10 seconds
+        const interval = 10 * 1000; // 10 seconds
         otTaskService.register('Admin Console Load Jobs', loadJobs, interval);
 
         // Duration formatting
@@ -91,14 +141,14 @@ angular.module('ot.view.admin.jobs', [
         };
 
         // Pausing all jobs
-        $scope.pauseJobs = function() {
+        $scope.pauseJobs = function () {
             if ($scope.jobs && $scope.jobs._pause) {
                 ot.pageCall($http.put($scope.jobs._pause)).then(loadJobs);
             }
         };
 
         // Resuming all jobs
-        $scope.resumeJobs = function() {
+        $scope.resumeJobs = function () {
             if ($scope.jobs && $scope.jobs._resume) {
                 ot.pageCall($http.put($scope.jobs._resume)).then(loadJobs);
             }
@@ -158,94 +208,6 @@ angular.module('ot.view.admin.jobs', [
                 // Reloads the jobs in any case
                 loadJobs();
             });
-        };
-
-        // Showing the error for a status message
-        $scope.showError = function (config) {
-            config.errorShown = true;
-        };
-
-        // Showing the details for a status message
-        $scope.showDetails = function (config) {
-            config.detailsShown = true;
-        };
-
-        // Job status filter
-        $scope.jobStatuses = [
-            {id: '', name: "Any status"},
-            {id: 'IDLE', name: "Idle jobs"},
-            {id: 'RUNNING', name: "Running jobs"},
-            {id: 'PAUSED', name: "Paused jobs"},
-            {id: 'DISABLED', name: "Disabled jobs"},
-            {id: 'INVALID', name: "Invalid jobs"}
-        ];
-
-        $scope.selectedJobStatus = $scope.jobStatuses[0];
-
-        $scope.setJobStatus = function (value) {
-            $scope.selectedJobStatus = value;
-        };
-
-        function jobStatusFilter(job) {
-            return $scope.selectedJobStatus.id === '' || $scope.selectedJobStatus.id === job.state;
-        }
-
-        // Job error filter
-        $scope.jobErrors = [
-            {check: false, name: "Any error status"},
-            {check: true, name: "Jobs in error"}
-        ];
-        $scope.selectedJobError = $scope.jobErrors[0];
-        $scope.setJobError = function (value) {
-            $scope.selectedJobError = value;
-        };
-
-        function jobErrorFilter(job) {
-            return !$scope.selectedJobError.check || job.lastErrorCount > 0;
-        }
-
-        // Job category filter
-        $scope.setJobCategory = function (value) {
-            $scope.selectedJobCategory = value;
-            $scope.selectedJobType = $scope.defaultJobType;
-        };
-
-        function jobCategoryFilter(job) {
-            return $scope.selectedJobCategory.id === '' || $scope.selectedJobCategory.id === job.key.type.category.key;
-        }
-
-        // Job type filter
-        $scope.setJobType = function (value) {
-            $scope.selectedJobType = value;
-        };
-
-        function jobTypeFilter(job) {
-            return $scope.selectedJobType.id === '' || $scope.selectedJobType.id === job.key.type.key;
-        }
-
-        // Job description filter
-        $scope.jobDescription = {value: ''};
-
-        function jobDescriptionFilter(job) {
-            return $scope.jobDescription.value === '' || job.description.toLowerCase().indexOf($scope.jobDescription.value.toLowerCase()) >= 0;
-        }
-
-        // Job filter
-
-        $scope.clearJobFilter = function () {
-            $scope.selectedJobStatus = $scope.jobStatuses[0];
-            $scope.selectedJobCategory = defaultJobCategory;
-            $scope.selectedJobType = $scope.defaultJobType;
-            $scope.selectedJobError = $scope.jobErrors[0];
-            $scope.jobDescription.value = '';
-        };
-
-        $scope.jobFilter = function (job) {
-            return jobStatusFilter(job) &&
-                jobCategoryFilter(job) &&
-                jobTypeFilter(job) &&
-                jobErrorFilter(job) &&
-                jobDescriptionFilter(job);
         };
 
         // Pause & resume all jobs

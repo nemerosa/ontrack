@@ -13,8 +13,6 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 
 public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implements GQLType {
 
-    public static final String PROJECT_ENTITY = "ProjectEntity";
-
     private final Class<T> projectEntityClass;
     private final ProjectEntityType projectEntityType;
     private final List<GQLProjectEntityFieldContributor> projectEntityFieldContributors;
@@ -30,17 +28,6 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
         this.projectEntityType = projectEntityType;
         this.projectEntityFieldContributors = projectEntityFieldContributors;
         this.creation = creation;
-    }
-
-    protected GraphQLInterfaceType projectEntityInterface() {
-        return GraphQLInterfaceType.newInterface()
-                .name(PROJECT_ENTITY)
-                // Common fields
-                .fields(baseProjectEntityInterfaceFields())
-                // TODO Type resolver not set, but it should
-                .typeResolver(new TypeResolverProxy())
-                // OK
-                .build();
     }
 
     protected List<GraphQLFieldDefinition> projectEntityInterfaceFields() {
@@ -65,7 +52,7 @@ public abstract class AbstractGQLProjectEntity<T extends ProjectEntity> implemen
                         GraphqlUtils.descriptionField(),
                         newFieldDefinition()
                                 .name("creation")
-                                .type(creation.getType())
+                                .type(creation.getTypeRef())
                                 .dataFetcher(creationFetcher())
                                 .build()
                 )

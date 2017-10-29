@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -201,6 +198,7 @@ public class DefaultJobScheduler implements JobScheduler {
     public Collection<JobStatus> getJobStatuses() {
         return services.values().stream()
                 .map(JobScheduledService::getJobStatus)
+                .sorted(Comparator.comparing(JobStatus::getId))
                 .collect(Collectors.toList());
     }
 

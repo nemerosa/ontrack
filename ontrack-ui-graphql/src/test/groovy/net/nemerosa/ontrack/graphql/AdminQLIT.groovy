@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
@@ -16,12 +17,12 @@ class AdminQLIT extends AbstractQLITSupport {
     @Autowired
     private AccountGroupMappingService mappingService
 
-    @Test(expected = GraphQLException)
+    @Test(expected = AccessDeniedException)
     void 'List of groups needs authorisation'() {
         run("""{ accountGroups { id } }""")
     }
 
-    @Test(expected = GraphQLException)
+    @Test(expected = AccessDeniedException)
     void 'List of accounts needs authorisation'() {
         run("""{ accounts { id } }""")
     }

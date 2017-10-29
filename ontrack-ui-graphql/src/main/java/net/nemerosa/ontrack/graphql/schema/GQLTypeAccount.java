@@ -31,7 +31,12 @@ public class GQLTypeAccount implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return ACCOUNT;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(ACCOUNT)
                 .field(GraphqlUtils.idField())
@@ -59,7 +64,7 @@ public class GQLTypeAccount implements GQLType {
                         newFieldDefinition()
                                 .name("globalRole")
                                 .description("Global role for the account")
-                                .type(globalRole.getType())
+                                .type(globalRole.getTypeRef())
                                 .dataFetcher(accountGlobalRoleFetcher())
                                 .build()
                 )
@@ -67,7 +72,7 @@ public class GQLTypeAccount implements GQLType {
                         newFieldDefinition()
                                 .name("authorizedProjects")
                                 .description("List of authorized projects")
-                                .type(GraphqlUtils.stdList(authorizedProject.getType()))
+                                .type(GraphqlUtils.stdList(authorizedProject.getTypeRef()))
                                 .dataFetcher(accountAuthorizedProjectsFetcher())
                                 .build()
                 )

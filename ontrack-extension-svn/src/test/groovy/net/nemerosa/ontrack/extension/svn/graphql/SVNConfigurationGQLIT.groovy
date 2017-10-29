@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.graphql
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
 import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService
 import net.nemerosa.ontrack.graphql.AbstractQLITSupport
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.After
 import org.junit.Before
@@ -85,7 +86,7 @@ class SVNConfigurationGQLIT extends AbstractQLITSupport {
 
     @Test
     void graphql_schema() {
-        def type = svnConfigurationGQLType.type
+        def type = svnConfigurationGQLType.createType(new GQLTypeCache())
         assert type.name == 'SVNConfiguration'
         assert type.fieldDefinitions*.name as Set == [
                 'name',

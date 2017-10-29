@@ -11,6 +11,14 @@ public interface URIBuilder {
     URI build(Object methodInvocation);
 
     /**
+     * Builds an absolute URL from a relative URI.
+     *
+     * @param relativeUri Relative URI
+     * @return Complete URL
+     */
+    URI url(String relativeUri);
+
+    /**
      * Builds the URI to a page.
      *
      * @param path      Path to the page, as a pattern

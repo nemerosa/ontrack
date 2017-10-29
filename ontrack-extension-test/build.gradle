@@ -25,7 +25,11 @@ ontrack {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.16.10'
+    compileOnly 'org.projectlombok:lombok:1.16.18'
+
+    // Test for 3rd party dependencies not included in Ontrack core runtime
+    compile 'org.apache.commons:commons-math3:3.6.1'
+
     testCompile "net.nemerosa.ontrack:ontrack-acceptance:${ontrackVersion}"
     testCompile "net.nemerosa.ontrack:ontrack-dsl:${ontrackVersion}"
 }
@@ -41,12 +45,9 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.apache.tools.ant.filters.ReplaceTokens
 
 task prepareDockerImage(type: Copy) {
-    dependsOn bootRepackage
-    from('build/libs') {
+    dependsOn ontrackDist
+    from('build/dist') {
         include '*.jar'
-        exclude '*-javadoc.jar'
-        exclude '*-sources.jar'
-        rename '.*', 'ontrack-extension-test.jar'
     }
     from('src/main/docker') {
         include '*.yml'
