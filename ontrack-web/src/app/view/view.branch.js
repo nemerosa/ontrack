@@ -520,7 +520,18 @@ angular.module('ot.view.branch', [
                 'Validation for the build',
                 {
                     postForm: function (form) {
-                        return otFormService.updateFieldValue(form, 'validationStampId', validationStamp.id);
+                        return otFormService.updateFieldValue(
+                            form,
+                            'validationStampData',
+                            // FIXME Get data from the validation stamp
+                            {
+                                id: validationStamp.name,
+                                data: {
+                                    threshold: 60,
+                                    okIfGreater: true
+                                }
+                            }
+                        );
                     }
                 }
             ).then(loadBuildView);
