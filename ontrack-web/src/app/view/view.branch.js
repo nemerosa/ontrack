@@ -188,6 +188,10 @@ angular.module('ot.view.branch', [
                     validationStamp {
                       id
                       name
+                      dataType {
+                        id
+                        data
+                      }
                     }
                     validationRuns(count: 1) {
                       validationRunStatuses {
@@ -523,13 +527,9 @@ angular.module('ot.view.branch', [
                         return otFormService.updateFieldValue(
                             form,
                             'validationStampData',
-                            // FIXME Get data from the validation stamp
                             {
                                 id: validationStamp.name,
-                                data: {
-                                    threshold: 60,
-                                    okIfGreater: true
-                                }
+                                data: validationStamp.dataType ? validationStamp.dataType.data : undefined
                             }
                         );
                     }
