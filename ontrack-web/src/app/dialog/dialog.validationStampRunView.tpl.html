@@ -29,6 +29,9 @@
                 <span class="fa fa-comment-o"></span>
             </p>
         </div>
+        <div class="panel-body" ng-if="validationRun.data">
+            <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
+        </div>
         <ul class="list-group">
             <li class="list-group-item" ng-repeat="validationRunStatus in validationRun.validationRunStatuses">
                 <ot-validation-run-status status="validationRunStatus"></ot-validation-run-status>
