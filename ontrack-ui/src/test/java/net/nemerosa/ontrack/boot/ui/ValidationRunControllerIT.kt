@@ -70,9 +70,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                             ServiceConfiguration(
                                     vs.name,
                                     JsonUtils.`object`()
-                                            .with("data", JsonUtils.`object`()
-                                                    .with("value", 70)
-                                                    .end())
+                                            .with("value", 70)
                                             .end()
                             ),
                             null,

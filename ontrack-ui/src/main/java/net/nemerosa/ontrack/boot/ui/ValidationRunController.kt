@@ -105,7 +105,7 @@ constructor(
             validationRun = validationRun.withData(
                     ServiceConfiguration(
                             validationStamp.dataType.id,
-                            validationRunRequest.validationStampData?.data?.get("data")
+                            validationRunRequest.validationStampData?.data
                     )
             )
         }
