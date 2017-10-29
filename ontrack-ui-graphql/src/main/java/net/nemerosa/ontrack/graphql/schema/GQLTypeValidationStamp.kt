@@ -18,6 +18,7 @@ constructor(private val structureService: StructureService,
             creation: GQLTypeCreation,
             private val projectEntityInterface: GQLProjectEntityInterface,
             private val validationRun: GQLTypeValidationRun,
+            private val serviceConfiguration: GQLTypeServiceConfiguration,
             projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<ValidationStamp>(
         ValidationStamp::class.java,
@@ -38,6 +39,12 @@ constructor(private val structureService: StructureService,
                     f.name("image")
                             .description("Flag to indicate if an image is associated")
                             .type(Scalars.GraphQLBoolean)
+                }
+                // Data type
+                .field {
+                    it.name("dataType")
+                            .description("Data definition associated with the validation stamp")
+                            .type(serviceConfiguration.typeRef)
                 }
                 // Ref to branch
                 .field(
