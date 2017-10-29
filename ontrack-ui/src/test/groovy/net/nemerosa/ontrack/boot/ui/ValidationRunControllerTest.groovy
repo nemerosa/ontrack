@@ -37,12 +37,14 @@ class ValidationRunControllerTest {
     void before() {
         structureService = mock(StructureService.class)
         ValidationRunStatusService validationRunStatusService = mock(ValidationRunStatusService.class)
+        ValidationDataTypeService validationDataTypeService = mock(ValidationDataTypeService)
         propertyService = mock(PropertyService.class)
         securityService = mock(SecurityService.class)
         predefinedValidationStampService = mock(PredefinedValidationStampService)
         controller = new ValidationRunController(
                 structureService,
-                validationRunStatusService, validationDataTypeService,
+                validationRunStatusService,
+                validationDataTypeService,
                 propertyService,
                 securityService
         )
