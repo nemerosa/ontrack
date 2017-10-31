@@ -1,9 +1,13 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration
+import net.nemerosa.ontrack.model.structure.ValidationRunRequest
+import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -50,10 +54,8 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                             NameDescription.nd("VS1", "")
                     ).withDataType(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(60)
-                                    )
+                                    TestNumberValidationDataType::class.java.name,
+                                    JsonUtils.format(60)
                             )
                     )
             )
@@ -69,9 +71,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                             null,
                             ServiceConfiguration(
                                     vs.name,
-                                    JsonUtils.`object`()
-                                            .with("value", 70)
-                                            .end()
+                                    JsonUtils.format(70)
                             ),
                             null,
                             "FAILED",
@@ -82,7 +82,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         // Checks the run has some data
         val data = run.data
         assertNotNull(data, "Validation run has some data")
-        assertEquals(ThresholdPercentageValidationDataType::class.qualifiedName, data.id)
+        assertEquals(TestNumberValidationDataType::class.qualifiedName, data.id)
         TestUtils.assertJsonEquals(
                 JsonUtils.format(70),
                 data.data

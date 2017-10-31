@@ -1,16 +1,23 @@
-package net.nemerosa.ontrack.model.structure
+package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
+import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 
 data class ThresholdPercentageValidationDataTypeConfig(val threshold: Int?, val okIfGreater: Boolean = false)
 
 @Component
-class ThresholdPercentageValidationDataType : AbstractValidationDataType<ThresholdPercentageValidationDataTypeConfig, Int>() {
+class ThresholdPercentageValidationDataType(
+        extensionFeature: GeneralExtensionFeature
+) : AbstractValidationDataType<ThresholdPercentageValidationDataTypeConfig, Int>(
+        extensionFeature
+) {
     override fun configFromJson(node: JsonNode?): ThresholdPercentageValidationDataTypeConfig =
             JsonUtils.parse(node, ThresholdPercentageValidationDataTypeConfig::class.java)
 

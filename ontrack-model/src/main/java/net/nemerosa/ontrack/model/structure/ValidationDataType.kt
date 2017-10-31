@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.extension.Extension
 import net.nemerosa.ontrack.model.form.Form
 
 /**
@@ -10,7 +11,7 @@ import net.nemerosa.ontrack.model.form.Form
  * @param C Configuration data associated with this type.
  * @param T Type of data associated with this type.
  */
-interface ValidationDataType<C, T> {
+interface ValidationDataType<C, T>: Extension {
 
     /**
      * Display name for this type

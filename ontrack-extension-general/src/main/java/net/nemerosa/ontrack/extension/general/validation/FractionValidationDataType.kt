@@ -1,15 +1,22 @@
-package net.nemerosa.ontrack.model.structure
+package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 
 data class FractionValidationDataTypeConfig(val threshold: Int?, val okIfGreater: Boolean = false)
 data class FractionValidationData(val numerator: Int, val denominator: Int)
 
 @Component
-class FractionValidationDataType : AbstractValidationDataType<FractionValidationDataTypeConfig, FractionValidationData>() {
+class FractionValidationDataType(
+        extensionFeature: GeneralExtensionFeature
+) : AbstractValidationDataType<FractionValidationDataTypeConfig, FractionValidationData>(
+        extensionFeature
+) {
     override fun configFromJson(node: JsonNode?): FractionValidationDataTypeConfig =
             JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
 

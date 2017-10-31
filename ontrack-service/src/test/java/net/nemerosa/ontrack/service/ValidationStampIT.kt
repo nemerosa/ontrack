@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.service
 
+import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.security.ValidationStampEdit
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration
+import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -24,10 +27,8 @@ class ValidationStampIT : AbstractServiceTestSupport() {
                             NameDescription.nd("VSPercent", "")
                     ).withDataType(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(null)
-                                    )
+                                    TestNumberValidationDataType::class.java.name,
+                                    JsonUtils.format(2)
                             )
                     )
             )
@@ -37,12 +38,9 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         // Checks the data type is still there
         var dataType = loadedVs.dataType
         assertNotNull("Data type is loaded", dataType)
-        assertEquals(ThresholdPercentageValidationDataType::class.java.name, dataType.id)
+        assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
         TestUtils.assertJsonEquals(
-                JsonUtils.`object`()
-                        .withNull("threshold")
-                        .with("okIfGreater", false)
-                        .end(),
+                JsonUtils.format(2),
                 dataType.data
         )
         // Loads using the list
@@ -54,10 +52,8 @@ class ValidationStampIT : AbstractServiceTestSupport() {
             structureService.saveValidationStamp(
                     loadedVs.withDataType(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(60)
-                                    )
+                                    TestNumberValidationDataType::class.java.name,
+                                    JsonUtils.format(60)
                             )
                     )
             )
@@ -67,12 +63,9 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         // Checks the data type is still there
         dataType = loadedVs.dataType
         assertNotNull("Data type is loaded", dataType)
-        assertEquals(ThresholdPercentageValidationDataType::class.java.name, dataType.id)
+        assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
         TestUtils.assertJsonEquals(
-                JsonUtils.`object`()
-                        .with("threshold", 60)
-                        .with("okIfGreater", false)
-                        .end(),
+                JsonUtils.format(60),
                 dataType.data
         )
     }

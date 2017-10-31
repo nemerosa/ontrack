@@ -1,13 +1,20 @@
-package net.nemerosa.ontrack.model.structure
+package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
+import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 
 @Component
-class ThresholdNumberValidationDataType : AbstractValidationDataType<Int?, Int>() {
+class ThresholdNumberValidationDataType(
+        extensionFeature: GeneralExtensionFeature
+) : AbstractValidationDataType<Int?, Int>(
+        extensionFeature
+) {
     override fun configFromJson(node: JsonNode?): Int? =
             when (node) {
                 is IntNode -> node.asInt()

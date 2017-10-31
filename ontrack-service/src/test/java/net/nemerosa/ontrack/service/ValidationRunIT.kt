@@ -2,7 +2,11 @@ package net.nemerosa.ontrack.service
 
 import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
+import net.nemerosa.ontrack.extension.api.support.TestValidationData
+import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
@@ -33,9 +37,13 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             NameDescription.nd("VSPercent", "")
                     ).withDataType(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
+                                    TestValidationDataType::class.java.name,
                                     JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(60)
+                                            TestValidationData(
+                                                    critical = 1,
+                                                    high = 0,
+                                                    medium = 0
+                                            )
                                     )
                             )
                     )
@@ -54,9 +62,13 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         // Checks the data is still there
         val data = loadedRun.data
         assertNotNull("Data type is loaded", data)
-        assertEquals(ThresholdPercentageValidationDataType::class.java.name, data.id)
+        assertEquals(TestValidationDataType::class.java.name, data.id)
         TestUtils.assertJsonEquals(
-                IntNode(80),
+                JsonUtils.`object`()
+                        .with("critical", 2)
+                        .with("high", 4)
+                        .with("medium", 8)
+                        .end(),
                 data.data
         )
 
@@ -107,8 +119,14 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ""
                     ).withData(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.`object`().with("value", 80).end()
+                                    TestValidationDataType::class.java.name,
+                                    JsonUtils.format(
+                                            TestValidationData(
+                                                    critical = 2,
+                                                    high = 4,
+                                                    medium = 8
+                                            )
+                                    )
                             )
                     )
             )
@@ -170,8 +188,8 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ""
                     ).withData(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    IntNode(-1)
+                                    TestValidationDataType::class.java.name,
+                                    JsonUtils.`object`().with("critical", -1).end()
                             )
                     )
             )
@@ -192,7 +210,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ""
                     ).withData(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
+                                    TestValidationDataType::class.java.name,
                                     TextNode("test")
                             )
                     )
@@ -215,7 +233,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                     ).withData(
                             ServiceConfiguration(
                                     // Wrong type
-                                    ThresholdNumberValidationDataType::class.java.name,
+                                    TestNumberValidationDataType::class.java.name,
                                     IntNode(80)
                             )
                     )
@@ -249,7 +267,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ""
                     ).withData(
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
+                                    TestNumberValidationDataType::class.java.name,
                                     IntNode(80)
                             )
                     )

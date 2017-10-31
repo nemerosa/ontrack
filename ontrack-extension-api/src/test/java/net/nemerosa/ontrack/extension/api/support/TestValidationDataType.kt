@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.structure.ValidationDataType
+import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 
@@ -26,9 +26,17 @@ data class TestValidationData(
  * Validation type
  */
 @Component
-class TestValidationDataType : ValidationDataType<Unit, TestValidationData> {
+class TestValidationDataType(
+        extensionFeature: TestExtensionFeature
+) : AbstractValidationDataType<Unit, TestValidationData>(
+        extensionFeature
+) {
 
-    override fun validateData(config: Unit?, data: TestValidationData) {}
+    override fun validateData(config: Unit?, data: TestValidationData) {
+        validate(data.critical >= 0, "Number of critical issues must be >= 0")
+        validate(data.high >= 0, "Number of high issues must be >= 0")
+        validate(data.medium >= 0, "Number of medium issues must be >= 0")
+    }
 
     override fun configToJson(config: Unit): JsonNode = NullNode.instance
 

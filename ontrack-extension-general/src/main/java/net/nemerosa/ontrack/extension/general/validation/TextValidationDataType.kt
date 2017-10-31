@@ -1,14 +1,21 @@
-package net.nemerosa.ontrack.model.structure
+package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
+import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 
 @Component
-class TextValidationDataType : AbstractValidationDataType<Unit, String>() {
+class TextValidationDataType(
+        extensionFeature: GeneralExtensionFeature
+) : AbstractValidationDataType<Unit, String>(
+        extensionFeature
+) {
     override fun configFromJson(node: JsonNode?) {}
 
     override fun configToJson(config: Unit): JsonNode = NullNode.instance

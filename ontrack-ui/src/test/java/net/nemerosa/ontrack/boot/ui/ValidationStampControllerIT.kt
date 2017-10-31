@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
-import net.nemerosa.ontrack.model.structure.ThresholdPercentageValidationDataType
-import net.nemerosa.ontrack.model.structure.ThresholdPercentageValidationDataTypeConfig
 import net.nemerosa.ontrack.model.structure.ValidationStampInput
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Assert.assertEquals
@@ -29,10 +28,8 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
                             "VSPercent",
                             "",
                             ServiceConfiguration(
-                                    ThresholdPercentageValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            ThresholdPercentageValidationDataTypeConfig(null)
-                                    )
+                                    TestNumberValidationDataType::class.java.name,
+                                    JsonUtils.format(60)
                             )
                     )
             )
@@ -42,12 +39,9 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
         // Checks the data type is still there
         val dataType = loadedVs.dataType
         assertNotNull("Data type is loaded", dataType)
-        assertEquals(ThresholdPercentageValidationDataType::class.java.name, dataType.id)
+        assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
         TestUtils.assertJsonEquals(
-                JsonUtils.`object`()
-                        .withNull("threshold")
-                        .with("okIfGreater", false)
-                        .end(),
+                JsonUtils.format(60),
                 dataType.data
         )
     }
