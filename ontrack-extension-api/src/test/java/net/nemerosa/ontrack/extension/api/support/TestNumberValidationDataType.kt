@@ -31,8 +31,8 @@ class TestNumberValidationDataType(
                     .optional()
             )
 
-    override fun fromConfigForm(node: JsonNode): Int? {
-        if (node.has("threshold")) {
+    override fun fromConfigForm(node: JsonNode?): Int? {
+        if (node != null && node.has("threshold")) {
             return node.get("threshold").asInt()
         } else {
             return null

@@ -32,8 +32,8 @@ class ThresholdNumberValidationDataType(
                     .optional()
             )
 
-    override fun fromConfigForm(node: JsonNode): Int? {
-        if (node.has("threshold")) {
+    override fun fromConfigForm(node: JsonNode?): Int? {
+        if (node != null && node.has("threshold")) {
             return node.get("threshold").asInt()
         } else {
             return null
@@ -56,8 +56,8 @@ class ThresholdNumberValidationDataType(
                     .optional()
             )
 
-    override fun fromForm(node: JsonNode): Int? {
-        if (node.has("value")) {
+    override fun fromForm(node: JsonNode?): Int? {
+        if (node != null && node.has("value")) {
             return node.get("value").asInt()
         } else {
             return null
@@ -76,8 +76,8 @@ class ThresholdNumberValidationDataType(
         }
     }
 
-    override fun validateData(config: Int?, data: Int) {
-    }
+    override fun validateData(config: Int?, data: Int?) =
+            validateNotNull(data)
 
     override val displayName = "Number with threshold"
 }

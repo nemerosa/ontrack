@@ -9,6 +9,14 @@ abstract class AbstractValidationDataType<C, T>(
 
     override fun getFeature() = extensionFeature
 
+    protected fun validateNotNull(data: T?): T {
+        if (data == null) {
+            throw ValidationRunDataInputException("Data must not be null")
+        } else {
+            return data
+        }
+    }
+
     protected fun validateNotNull(data: T?, validation: T.() -> Unit): T {
         if (data == null) {
             throw ValidationRunDataInputException("Data must not be null")

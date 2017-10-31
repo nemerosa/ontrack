@@ -110,28 +110,31 @@ public class ValidationStampController extends AbstractResourceController {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Validation
-        ServiceConfiguration dataTypeServiceConfig = validateValidationDataType(input);
+        ValidationDataTypeConfig<?> config = validateValidationDataTypeConfig(input);
         // Creates a new validation stamp
         ValidationStamp validationStamp = ValidationStamp.of(
                 branch,
                 input.asNameDescription()
-        ).withDataType(dataTypeServiceConfig);
+        ).withDataType(config);
         // Saves it into the repository
         return structureService.newValidationStamp(validationStamp);
     }
 
     @Nullable
-    private ServiceConfiguration validateValidationDataType(@RequestBody @Valid ValidationStampInput input) {
+    private <C> ValidationDataTypeConfig<C> validateValidationDataTypeConfig(@RequestBody @Valid ValidationStampInput input) {
         // Validating the data type configuration if needed
-        ServiceConfiguration dataTypeServiceConfig = input.getDataType();
-        if (dataTypeServiceConfig != null) {
-            ValidationDataType<?, ?> dataType = validationDataTypeService.getValidationDataType(dataTypeServiceConfig.getId());
+        ServiceConfiguration inputConfig = input.getDataType();
+        if (inputConfig != null) {
+            ValidationDataType<C, ?> dataType = validationDataTypeService.getValidationDataType(inputConfig.getId());
             if (dataType != null) {
                 // Parsing without exception
-                dataType.fromConfigForm(dataTypeServiceConfig.getData());
+                return new ValidationDataTypeConfig<>(
+                        inputConfig.getId(),
+                        dataType.fromConfigForm(inputConfig.getData())
+                );
             }
         }
-        return dataTypeServiceConfig;
+        return null;
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.GET)
@@ -154,7 +157,7 @@ public class ValidationStampController extends AbstractResourceController {
         // Gets from the repository
         ValidationStamp validationStamp = structureService.getValidationStamp(validationStampId);
         // Validation
-        ServiceConfiguration dataTypeServiceConfig = validateValidationDataType(input);
+        ValidationDataTypeConfig<?> dataTypeServiceConfig = validateValidationDataTypeConfig(input);
         // Updates
         validationStamp = validationStamp.update(input.asNameDescription()).withDataType(dataTypeServiceConfig);
         // Saves in repository

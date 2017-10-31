@@ -44,7 +44,7 @@ interface ValidationDataType<C, T> : Extension {
      * @param node JSON returned by the form edition
      * @return Configuration
      */
-    fun fromConfigForm(node: JsonNode): C
+    fun fromConfigForm(node: JsonNode?): C?
 
     /**
      * Translates the data into JSON

@@ -4,11 +4,7 @@ import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.ServiceConfiguration
-import net.nemerosa.ontrack.model.structure.ValidationRunRequest
-import net.nemerosa.ontrack.model.structure.ValidationStamp
-import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -53,10 +49,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                             branch,
                             NameDescription.nd("VS1", "")
                     ).withDataType(
-                            ServiceConfiguration(
-                                    TestNumberValidationDataType::class.java.name,
-                                    JsonUtils.format(60)
-                            )
+                            TestNumberValidationDataType::class.validationDataTypeConfig(60)
                     )
             )
         }
@@ -80,13 +73,11 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
             )
         }
         // Checks the run has some data
-        val data = run.data
+        @Suppress("UNCHECKED_CAST")
+        val data: ValidationRunData<Int> = run.data as ValidationRunData<Int>
         assertNotNull(data, "Validation run has some data")
         assertEquals(TestNumberValidationDataType::class.qualifiedName, data.id)
-        TestUtils.assertJsonEquals(
-                JsonUtils.format(70),
-                data.data
-        )
+        assertEquals(70, data.data)
     }
 
 }

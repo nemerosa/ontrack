@@ -13,16 +13,16 @@ import org.springframework.stereotype.Component
 @Component
 class TextValidationDataType(
         extensionFeature: GeneralExtensionFeature
-) : AbstractValidationDataType<Unit, String>(
+) : AbstractValidationDataType<Any?, String>(
         extensionFeature
 ) {
     override fun configFromJson(node: JsonNode?) {}
 
-    override fun configToJson(config: Unit): JsonNode = NullNode.instance
+    override fun configToJson(config: Any?): JsonNode = NullNode.instance
 
-    override fun getConfigForm(config: Unit?): Form = Form.create()
+    override fun getConfigForm(config: Any?): Form = Form.create()
 
-    override fun fromConfigForm(node: JsonNode) {}
+    override fun fromConfigForm(node: JsonNode?) {}
 
     override fun toJson(data: String): JsonNode = JsonUtils.format(data)
 
@@ -35,12 +35,13 @@ class TextValidationDataType(
                     .value(data)
             )
 
-    override fun fromForm(node: JsonNode): String? =
+    override fun fromForm(node: JsonNode?): String? =
             JsonUtils.get(node, "value")
 
-    override fun computeStatus(config: Unit?, data: String): ValidationRunStatusID? = null
+    override fun computeStatus(config: Any?, data: String): ValidationRunStatusID? = null
 
-    override fun validateData(config: Unit?, data: String) {
+    override fun validateData(config: Any?, data: String?): String {
+        return validateNotNull(data)
     }
 
     override val displayName = "Free text"

@@ -17,6 +17,7 @@ class FractionValidationDataType(
 ) : AbstractValidationDataType<FractionValidationDataTypeConfig, FractionValidationData>(
         extensionFeature
 ) {
+
     override fun configFromJson(node: JsonNode?): FractionValidationDataTypeConfig =
             JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
 
@@ -37,7 +38,7 @@ class FractionValidationDataType(
                     .value(config?.okIfGreater)
             )
 
-    override fun fromConfigForm(node: JsonNode): FractionValidationDataTypeConfig =
+    override fun fromConfigForm(node: JsonNode?): FractionValidationDataTypeConfig =
             JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
 
     override fun toJson(data: FractionValidationData): JsonNode =
@@ -60,7 +61,7 @@ class FractionValidationDataType(
                     .min(1)
             )
 
-    override fun fromForm(node: JsonNode): FractionValidationData? =
+    override fun fromForm(node: JsonNode?): FractionValidationData? =
             JsonUtils.parse(node, FractionValidationData::class.java)
 
     override fun computeStatus(config: FractionValidationDataTypeConfig?, data: FractionValidationData): ValidationRunStatusID? {
@@ -75,11 +76,12 @@ class FractionValidationDataType(
         }
     }
 
-    override fun validateData(config: FractionValidationDataTypeConfig?, data: FractionValidationData) {
-        validate(data.numerator >= 0, "Numerator must be >= 0")
-        validate(data.denominator > 0, "Denominator must be >= 0")
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+
+    override fun validateData(config: FractionValidationDataTypeConfig?, data: FractionValidationData?) =
+            validateNotNull(data) {
+                validate(numerator >= 0, "Numerator must be >= 0")
+                validate(denominator > 0, "Denominator must be >= 0")
+            }
 
     override val displayName = "Fraction with threshold"
 }

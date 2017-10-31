@@ -38,7 +38,7 @@ class ThresholdPercentageValidationDataType(
                     .value(config?.okIfGreater)
             )
 
-    override fun fromConfigForm(node: JsonNode): ThresholdPercentageValidationDataTypeConfig =
+    override fun fromConfigForm(node: JsonNode?): ThresholdPercentageValidationDataTypeConfig =
             JsonUtils.parse(node, ThresholdPercentageValidationDataTypeConfig::class.java)
 
     override fun toJson(data: Int): JsonNode =
@@ -63,8 +63,8 @@ class ThresholdPercentageValidationDataType(
                     .optional()
             )
 
-    override fun fromForm(node: JsonNode): Int? {
-        if (node.has("value")) {
+    override fun fromForm(node: JsonNode?): Int? {
+        if (node != null && node.has("value")) {
             return node.get("value").asInt()
         } else {
             return null
@@ -83,9 +83,10 @@ class ThresholdPercentageValidationDataType(
         }
     }
 
-    override fun validateData(config: ThresholdPercentageValidationDataTypeConfig?, data: Int) {
-        validate(data >= 0, "Percentage must be >= 0")
-    }
+    override fun validateData(config: ThresholdPercentageValidationDataTypeConfig?, data: Int?) =
+            validateNotNull(data) {
+                validate(this >= 0, "Percentage must be >= 0")
+            }
 
     override val displayName = "Percentage with threshold"
 }
