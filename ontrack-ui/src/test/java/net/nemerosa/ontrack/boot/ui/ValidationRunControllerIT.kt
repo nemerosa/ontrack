@@ -64,7 +64,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                             null,
                             ServiceConfiguration(
                                     vs.name,
-                                    JsonUtils.format(70)
+                                    JsonUtils.format(mapOf("value" to 70))
                             ),
                             null,
                             "FAILED",
