@@ -101,8 +101,16 @@ constructor(
                 validationRunRequest.description
         )
         // Validation run data
+        val runData: ServiceConfiguration? =
+                validationStamp.dataType?.let {
+                    ServiceConfiguration(
+                            validationStamp.dataType.id,
+                            validationRunRequest.validationStampData?.data
+                    )
+                }
+        // Validation of the run data
         val data: ValidationRunData<Any>? = validationDataTypeService.validateData(
-                validationRunRequest.validationStampData,
+                runData,
                 validationStamp.dataType
         )
         validationRun = validationRun.withData(data)
