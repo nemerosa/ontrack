@@ -44,7 +44,6 @@ public class StructureServiceImplTest {
                 eventService,
                 eventFactory,
                 validationRunStatusService,
-                validationDataTypeService,
                 structureRepository,
                 extensionManager,
                 propertyService,

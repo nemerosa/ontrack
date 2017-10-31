@@ -22,11 +22,10 @@ interface ValidationDataTypeService {
     fun <C, T> getValidationDataType(id: String): ValidationDataType<C, T>?
 
     /**
-     * Validates some data according to its type and configuration.
-     *
+     * Validates some run data according to its type and configuration.
      * @param data Data to validate (ID + JSON)
      * @param config Configuration associated to the type
-     * @return Validated JSON (might be different from the input)
+     * @return Validated data (if present and valid)
      */
-    fun validateData(data: ServiceConfiguration, config: JsonNode?): JsonNode?
+    fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>?): ValidationRunData<T>?
 }

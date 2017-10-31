@@ -28,7 +28,7 @@ public class ValidationRun implements ProjectEntity {
      * Data used for the link to an optional {@link ValidationDataType} and its data
      */
     @Wither
-    private final ServiceConfiguration data;
+    private final ValidationRunData<?> data;
 
     /**
      * Must always contain at least one validation run status at creation time.

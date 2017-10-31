@@ -55,11 +55,11 @@ class TestNumberValidationDataType(
                     .optional()
             )
 
-    override fun fromForm(node: JsonNode): Int? {
-        if (node.has("value")) {
-            return node.get("value").asInt()
+    override fun fromForm(node: JsonNode?): Int? {
+        return if (node?.has("value") == true) {
+            node.get("value")?.asInt()
         } else {
-            return null
+            null
         }
     }
 
@@ -75,8 +75,10 @@ class TestNumberValidationDataType(
         }
     }
 
-    override fun validateData(config: Int?, data: Int) {
-    }
+    override fun validateData(config: Int?, data: Int?) =
+            validateNotNull(data) {
+                validate(this >= 0, "Value must be >= 0")
+            }
 
     override val displayName = "Number with threshold"
 }

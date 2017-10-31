@@ -28,21 +28,22 @@ data class TestValidationData(
 @Component
 class TestValidationDataType(
         extensionFeature: TestExtensionFeature
-) : AbstractValidationDataType<Unit, TestValidationData>(
+) : AbstractValidationDataType<Any, TestValidationData>(
         extensionFeature
 ) {
 
-    override fun validateData(config: Unit?, data: TestValidationData) {
-        validate(data.critical >= 0, "Number of critical issues must be >= 0")
-        validate(data.high >= 0, "Number of high issues must be >= 0")
-        validate(data.medium >= 0, "Number of medium issues must be >= 0")
-    }
+    override fun validateData(config: Any?, data: TestValidationData?) =
+            validateNotNull(data) {
+                validate(critical >= 0, "Number of critical issues must be >= 0")
+                validate(high >= 0, "Number of high issues must be >= 0")
+                validate(medium >= 0, "Number of medium issues must be >= 0")
+            }
 
-    override fun configToJson(config: Unit): JsonNode = NullNode.instance
+    override fun configToJson(config: Any): JsonNode = NullNode.instance
 
-    override fun configFromJson(node: JsonNode?): Unit? = null
+    override fun configFromJson(node: JsonNode?): Any? = null
 
-    override fun getConfigForm(config: Unit?): Form = Form.create()
+    override fun getConfigForm(config: Any?): Form = Form.create()
 
     override fun fromConfigForm(node: JsonNode) {}
 
@@ -74,10 +75,10 @@ class TestValidationDataType(
                                     .value(data?.medium)
                     )
 
-    override fun fromForm(node: JsonNode): TestValidationData? =
+    override fun fromForm(node: JsonNode?): TestValidationData? =
             JsonUtils.parse(node, TestValidationData::class.java)
 
-    override fun computeStatus(config: Unit?, data: TestValidationData): ValidationRunStatusID? =
+    override fun computeStatus(config: Any?, data: TestValidationData): ValidationRunStatusID? =
             when {
                 data.critical > 0 -> ValidationRunStatusID.STATUS_FAILED
                 data.high > 0 -> ValidationRunStatusID.STATUS_WARNING

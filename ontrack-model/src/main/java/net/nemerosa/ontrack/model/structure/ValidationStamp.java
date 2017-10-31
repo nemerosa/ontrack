@@ -39,7 +39,7 @@ public class ValidationStamp implements ProjectEntity {
      * Data used for the link to an optional {@link ValidationDataType} and its configuration
      */
     @Wither
-    private final ServiceConfiguration dataType;
+    private final ValidationDataTypeConfig<?> dataType;
 
     @Override
     public Project getProject() {

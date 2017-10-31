@@ -2,13 +2,12 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.security.ValidationStampEdit
 import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.ServiceConfiguration
+import net.nemerosa.ontrack.model.structure.ValidationDataTypeConfig
 import net.nemerosa.ontrack.model.structure.ValidationStamp
-import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.model.structure.validationDataTypeConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -26,23 +25,18 @@ class ValidationStampIT : AbstractServiceTestSupport() {
                             branch,
                             NameDescription.nd("VSPercent", "")
                     ).withDataType(
-                            ServiceConfiguration(
-                                    TestNumberValidationDataType::class.java.name,
-                                    JsonUtils.format(2)
-                            )
+                            TestNumberValidationDataType::class.validationDataTypeConfig(2)
                     )
             )
         }
         // Loads the validation stamp
         var loadedVs = asUserWithView(branch).call { structureService.getValidationStamp(vs.id) }
         // Checks the data type is still there
-        var dataType = loadedVs.dataType
+        @Suppress("UNCHECKED_CAST")
+        var dataType: ValidationDataTypeConfig<Int?> = loadedVs.dataType as ValidationDataTypeConfig<Int?>
         assertNotNull("Data type is loaded", dataType)
         assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
-        TestUtils.assertJsonEquals(
-                JsonUtils.format(2),
-                dataType.data
-        )
+        assertEquals(2, dataType.config)
         // Loads using the list
         val vsList = asUserWithView(branch).call { structureService.getValidationStampListForBranch(branch.id) }
         assertEquals(1, vsList.size)
@@ -51,23 +45,18 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         asUser().with(branch, ValidationStampEdit::class.java).execute {
             structureService.saveValidationStamp(
                     loadedVs.withDataType(
-                            ServiceConfiguration(
-                                    TestNumberValidationDataType::class.java.name,
-                                    JsonUtils.format(60)
-                            )
+                            TestNumberValidationDataType::class.validationDataTypeConfig(60)
                     )
             )
         }
         // Reloads it and check
         loadedVs = asUserWithView(branch).call { structureService.getValidationStamp(vs.id) }
         // Checks the data type is still there
-        dataType = loadedVs.dataType
+        @Suppress("UNCHECKED_CAST")
+        dataType = loadedVs.dataType as ValidationDataTypeConfig<Int?>
         assertNotNull("Data type is loaded", dataType)
         assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
-        TestUtils.assertJsonEquals(
-                JsonUtils.format(60),
-                dataType.data
-        )
+        assertEquals(60, dataType.config)
     }
 
 }

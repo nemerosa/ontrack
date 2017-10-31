@@ -25,11 +25,13 @@ import java.util.stream.Collectors;
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
     private final BranchTemplateRepository branchTemplateRepository;
+    private final ValidationDataTypeService validationDataTypeService;
 
     @Autowired
-    public StructureJdbcRepository(DataSource dataSource, BranchTemplateRepository branchTemplateRepository) {
+    public StructureJdbcRepository(DataSource dataSource, BranchTemplateRepository branchTemplateRepository, ValidationDataTypeService validationDataTypeService) {
         super(dataSource);
         this.branchTemplateRepository = branchTemplateRepository;
+        this.validationDataTypeService = validationDataTypeService;
     }
 
     @Override
@@ -747,7 +749,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                             .addValue("creation", dateTimeForDB(validationStamp.getSignature().getTime()))
                             .addValue("creator", validationStamp.getSignature().getUser().getName())
                             .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
-                            .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getData()) : null)
+                            .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getConfig()) : null)
             );
             return validationStamp.withId(id(id));
         } catch (DuplicateKeyException ex) {
@@ -821,7 +823,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         .addValue("type", Document.isValid(image) ? image.getType() : null)
                         .addValue("content", Document.isValid(image) ? image.getContent() : null)
                         .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
-                        .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getData()) : null)
+                        .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getConfig()) : null)
         );
     }
 
@@ -835,7 +837,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                             .addValue("description", validationStamp.getDescription())
                             .addValue("id", validationStamp.id())
                             .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
-                            .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getData()) : null)
+                            .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getConfig()) : null)
             );
         } catch (DuplicateKeyException ex) {
             throw new ValidationStampNameAlreadyDefinedException(validationStamp.getName());
@@ -993,7 +995,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 statuses
         )
                 .withId(ID.of(id))
-                .withData(readServiceConfiguration(rs, "DATA_TYPE_ID", "DATA"))
+                .withData(readValidationRunData(rs))
                 ;
     }
 
@@ -1009,7 +1011,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 .withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
     }
 
-    protected ValidationStamp toValidationStamp(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
+    protected ValidationStamp toValidationStamp(
+            ResultSet rs,
+            Function<ID, Branch> branchSupplier
+    ) throws SQLException {
         return ValidationStamp.of(
                 branchSupplier.apply(id(rs, "branchId")),
                 new NameDescription(
@@ -1018,17 +1023,52 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 )
         ).withId(id(rs))
                 .withSignature(readSignature(rs))
-                .withDataType(readServiceConfiguration(rs, "DATA_TYPE_ID", "DATA_TYPE_CONFIG"))
+                .withDataType(readValidationDataTypeConfig(rs))
                 .withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
     }
 
-    private ServiceConfiguration readServiceConfiguration(ResultSet rs, String idColumn, String dataColumn) throws SQLException {
-        String id = rs.getString(idColumn);
-        JsonNode json = readJson(rs, dataColumn);
+    private <C> ValidationDataTypeConfig<C> readValidationDataTypeConfig(
+            ResultSet rs
+    ) throws SQLException {
+        String id = rs.getString("DATA_TYPE_ID");
+        JsonNode json = readJson(rs, "DATA_TYPE_CONFIG");
         if (StringUtils.isBlank(id) || json == null) {
             return null;
         } else {
-            return new ServiceConfiguration(id, json);
+            ValidationDataType<C, ?> validationDataType = validationDataTypeService.getValidationDataType(id);
+            if (validationDataType != null) {
+                // Parsing
+                C config = validationDataType.configFromJson(json);
+                // OK
+                return new ValidationDataTypeConfig<>(
+                        id,
+                        config
+                );
+            } else {
+                logger.warn("Cannot find validation data type for ID = " + id);
+                return null;
+            }
+        }
+    }
+
+    private <T> ValidationRunData<T> readValidationRunData(ResultSet rs) throws SQLException {
+        String id = rs.getString("DATA_TYPE_ID");
+        JsonNode json = readJson(rs, "DATA");
+        if (StringUtils.isBlank(id) || json == null) {
+            return null;
+        } else {
+            ValidationDataType<?, T> validationDataType = validationDataTypeService.getValidationDataType(id);
+            if (validationDataType != null) {
+                // Parsing
+                T data = validationDataType.fromJson(json);
+                return new ValidationRunData<>(
+                        id,
+                        data
+                );
+            } else {
+                logger.warn("Cannot find validation data type for ID = " + id);
+                return null;
+            }
         }
     }
 

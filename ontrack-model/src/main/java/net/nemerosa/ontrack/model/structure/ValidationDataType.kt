@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.model.form.Form
  * @param C Configuration data associated with this type.
  * @param T Type of data associated with this type.
  */
-interface ValidationDataType<C, T>: Extension {
+interface ValidationDataType<C, T> : Extension {
 
     /**
      * Display name for this type
@@ -72,7 +72,7 @@ interface ValidationDataType<C, T>: Extension {
      * @param node JSON returned by the form edition
      * @return Data
      */
-    fun fromForm(node: JsonNode): T?
+    fun fromForm(node: JsonNode?): T?
 
     /**
      * Computes the status from some data
@@ -88,6 +88,7 @@ interface ValidationDataType<C, T>: Extension {
      *
      * @param config Configuration associated to the type
      * @param data Data to validate
+     * @return Validated data
      */
-    fun validateData(config: C?, data: T)
+    fun validateData(config: C?, data: T?): T
 }

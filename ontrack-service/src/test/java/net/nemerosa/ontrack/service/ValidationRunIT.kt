@@ -1,19 +1,14 @@
 package net.nemerosa.ontrack.service
 
-import com.fasterxml.jackson.databind.node.IntNode
-import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.extension.api.support.TestValidationData
 import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.json.JsonParseException
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -35,18 +30,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                     ValidationStamp.of(
                             branch,
                             NameDescription.nd("VSPercent", "")
-                    ).withDataType(
-                            ServiceConfiguration(
-                                    TestValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            TestValidationData(
-                                                    critical = 1,
-                                                    high = 0,
-                                                    medium = 0
-                                            )
-                                    )
-                            )
-                    )
+                    ).withDataType(TestValidationDataType::class.validationDataTypeConfig(null))
             )
         }
     }
@@ -60,17 +44,13 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         val loadedRun = asUserWithView(branch).call { structureService.getValidationRun(run.id) }
 
         // Checks the data is still there
-        val data = loadedRun.data
+        @Suppress("UNCHECKED_CAST")
+        val data: ValidationRunData<TestValidationData> = loadedRun.data as ValidationRunData<TestValidationData>
         assertNotNull("Data type is loaded", data)
         assertEquals(TestValidationDataType::class.java.name, data.id)
-        TestUtils.assertJsonEquals(
-                JsonUtils.`object`()
-                        .with("critical", 2)
-                        .with("high", 4)
-                        .with("medium", 8)
-                        .end(),
-                data.data
-        )
+        assertEquals(2, data.data.critical)
+        assertEquals(4, data.data.high)
+        assertEquals(8, data.data.medium)
 
         // Checks the status
         val status = loadedRun.lastStatus
@@ -118,14 +98,11 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             statusId,
                             ""
                     ).withData(
-                            ServiceConfiguration(
-                                    TestValidationDataType::class.java.name,
-                                    JsonUtils.format(
-                                            TestValidationData(
-                                                    critical = 2,
-                                                    high = 4,
-                                                    medium = 8
-                                            )
+                            TestValidationDataType::class.validationRunData(
+                                    TestValidationData(
+                                            critical = 2,
+                                            high = 4,
+                                            medium = 8
                                     )
                             )
                     )
@@ -187,54 +164,8 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ValidationRunStatusID.STATUS_PASSED,
                             ""
                     ).withData(
-                            ServiceConfiguration(
-                                    TestValidationDataType::class.java.name,
-                                    JsonUtils.`object`().with("critical", -1).end()
-                            )
-                    )
-            )
-        }
-    }
-
-    @Test(expected = ValidationRunDataInputException::class)
-    fun validationRunWithInvalidDataFormat() {
-        // Creates a validation run
-        asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            ValidationRunStatusID.STATUS_PASSED,
-                            ""
-                    ).withData(
-                            ServiceConfiguration(
-                                    TestValidationDataType::class.java.name,
-                                    TextNode("test")
-                            )
-                    )
-            )
-        }
-    }
-
-    @Test(expected = ValidationRunDataInputException::class)
-    fun validationRunWithInvalidDataType() {
-        // Creates a validation run
-        asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            ValidationRunStatusID.STATUS_PASSED,
-                            ""
-                    ).withData(
-                            ServiceConfiguration(
-                                    // Wrong type
-                                    TestNumberValidationDataType::class.java.name,
-                                    IntNode(80)
+                            TestValidationDataType::class.validationRunData(
+                                    TestValidationData(-1, 0, 0)
                             )
                     )
             )
@@ -266,10 +197,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ValidationRunStatusID.STATUS_PASSED,
                             ""
                     ).withData(
-                            ServiceConfiguration(
-                                    TestNumberValidationDataType::class.java.name,
-                                    IntNode(80)
-                            )
+                            TestNumberValidationDataType::class.validationRunData(80)
                     )
             )
         }
