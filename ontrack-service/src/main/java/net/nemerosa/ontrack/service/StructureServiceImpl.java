@@ -47,6 +47,7 @@ public class StructureServiceImpl implements StructureService {
     private final EventPostService eventPostService;
     private final EventFactory eventFactory;
     private final ValidationRunStatusService validationRunStatusService;
+    private final ValidationDataTypeService validationDataTypeService;
     private final StructureRepository structureRepository;
     private final ExtensionManager extensionManager;
     private final PropertyService propertyService;
@@ -56,11 +57,12 @@ public class StructureServiceImpl implements StructureService {
     private final ProjectFavouriteService projectFavouriteService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService, DecorationService decorationService, ProjectFavouriteService projectFavouriteService) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, ValidationDataTypeService validationDataTypeService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService, DecorationService decorationService, ProjectFavouriteService projectFavouriteService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
         this.validationRunStatusService = validationRunStatusService;
+        this.validationDataTypeService = validationDataTypeService;
         this.structureRepository = structureRepository;
         this.extensionManager = extensionManager;
         this.propertyService = propertyService;
@@ -1109,12 +1111,21 @@ public class StructureServiceImpl implements StructureService {
                 "Validation run for a validation stamp can be done only on the same branch than the build.");
         // Checks the authorization
         securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunCreate.class);
+        // Data validation
+        validateRunData(validationRun);
         // Actual creation
         ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun, validationRunStatusService::getValidationRunStatus);
         // Event
         eventPostService.post(eventFactory.newValidationRun(newValidationRun));
         // OK
         return newValidationRun;
+    }
+
+    private void validateRunData(ValidationRun validationRun) {
+        validationDataTypeService.validateData(
+                validationRun.getData(),
+                validationRun.getValidationStamp().getDataType()
+        );
     }
 
     @Override

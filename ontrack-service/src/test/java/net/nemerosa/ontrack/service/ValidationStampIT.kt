@@ -40,7 +40,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         // Loads using the list
         val vsList = asUserWithView(branch).call { structureService.getValidationStampListForBranch(branch.id) }
         assertEquals(1, vsList.size)
-        assertEquals(loadedVs, vsList.first())
+        assertEquals(loadedVs.id, vsList.first().id)
         // Updates it (with a threshold)
         asUser().with(branch, ValidationStampEdit::class.java).execute {
             structureService.saveValidationStamp(

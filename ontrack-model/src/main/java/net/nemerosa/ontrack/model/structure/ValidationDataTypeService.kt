@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.model.structure
 
-import com.fasterxml.jackson.databind.JsonNode
-
 /**
  * Management of [ValidationDataType]s.
  */
@@ -28,4 +26,12 @@ interface ValidationDataTypeService {
      * @return Validated data (if present and valid)
      */
     fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>?): ValidationRunData<T>?
+
+    /**
+     * Validates some run data according to its type and configuration.
+     * @param data Data to validate (ID + type)
+     * @param config Configuration associated to the type
+     * @return Validated data (if present and valid)
+     */
+    fun <C, T> validateData(data: ValidationRunData<T>?, config: ValidationDataTypeConfig<C>?): ValidationRunData<T>?
 }
