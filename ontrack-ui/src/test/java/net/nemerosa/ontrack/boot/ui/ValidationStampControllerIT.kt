@@ -5,10 +5,10 @@ import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 import net.nemerosa.ontrack.model.structure.ValidationStampInput
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class ValidationStampControllerIT : AbstractWebTestSupport() {
 
@@ -28,7 +28,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
                             "",
                             ServiceConfiguration(
                                     TestNumberValidationDataType::class.java.name,
-                                    JsonUtils.format(60)
+                                    JsonUtils.format(mapOf("threshold" to 60))
                             )
                     )
             )
@@ -37,7 +37,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
         val loadedVs = validationStampController.getValidationStamp(vs.id)
         // Checks the data type is still there
         val dataType = loadedVs.dataType
-        assertNotNull("Data type is loaded", dataType)
+        assertNotNull(dataType, "Data type is loaded")
         assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
         assertEquals(60, dataType.config)
     }
