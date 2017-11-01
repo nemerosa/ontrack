@@ -91,14 +91,14 @@ interface ValidationDataType<C, T> : Extension {
      * @return Validated data
      */
     fun validateData(config: C?, data: T?): T
-}
 
-/**
- * Descriptor
- */
-val ValidationDataType<*, *>.descriptor
-    get() = ValidationDataTypeDescriptor(
-            feature.featureDescription,
-            this::class.qualifiedName!!,
-            displayName
-    )
+    /**
+     * Descriptor
+     */
+    val descriptor
+        get() = ValidationDataTypeDescriptor(
+                feature.featureDescription,
+                this::class.qualifiedName!!,
+                displayName
+        )
+}

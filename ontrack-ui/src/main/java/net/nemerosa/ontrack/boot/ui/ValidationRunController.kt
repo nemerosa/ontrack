@@ -64,7 +64,7 @@ constructor(
                                                             it.name,
                                                             it.dataType?.let { dataType ->
                                                                 validationDataTypeService
-                                                                        .getValidationDataType<Any, Any>(dataType.id)
+                                                                        .getValidationDataType<Any, Any>(dataType.descriptor.id)
                                                                         ?.getForm(null)
                                                             } ?: Form.create()
                                                     )
@@ -104,7 +104,7 @@ constructor(
         val runData: ServiceConfiguration? =
                 validationStamp.dataType?.let {
                     ServiceConfiguration(
-                            validationStamp.dataType.id,
+                            validationStamp.dataType.descriptor.id,
                             validationRunRequest.validationStampData?.data
                     )
                 }

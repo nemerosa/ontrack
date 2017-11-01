@@ -1,22 +1,20 @@
 package net.nemerosa.ontrack.model.structure
 
-import kotlin.reflect.KClass
-
 /**
  * Configuration data associated with a [ValidationStamp] and
  * a [ValidationDataType] by ID.
  *
  * @param C Type of configuration data
- * @param id Type ID
+ * @param descriptor Type descriptor
  * @param config Configuration data
  */
 class ValidationDataTypeConfig<out C>(
-        val id: String,
+        val descriptor: ValidationDataTypeDescriptor,
         val config: C?
 )
 
-fun <C, T> KClass<out ValidationDataType<C, T>>.validationDataTypeConfig(config: C?) =
+fun <C, T> ValidationDataType<C, T>.config(config: C?) =
         ValidationDataTypeConfig(
-                this.qualifiedName!!,
+                descriptor,
                 config
         )

@@ -12,12 +12,18 @@ import net.nemerosa.ontrack.model.structure.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 
 class ValidationRunIT : AbstractServiceTestSupport() {
 
     private lateinit var branch: Branch
     private lateinit var build: Build
     private lateinit var vs: ValidationStamp
+
+    @Autowired
+    private lateinit var testValidationDataType: TestValidationDataType
+    @Autowired
+    private lateinit var testNumberValidationDataType: TestNumberValidationDataType
 
     @Before
     fun init() {
@@ -30,7 +36,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                     ValidationStamp.of(
                             branch,
                             NameDescription.nd("VSPercent", "")
-                    ).withDataType(TestValidationDataType::class.validationDataTypeConfig(null))
+                    ).withDataType(testValidationDataType.config(null))
             )
         }
     }
@@ -47,7 +53,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         @Suppress("UNCHECKED_CAST")
         val data: ValidationRunData<TestValidationData> = loadedRun.data as ValidationRunData<TestValidationData>
         assertNotNull("Data type is loaded", data)
-        assertEquals(TestValidationDataType::class.java.name, data.id)
+        assertEquals(TestValidationDataType::class.java.name, data.descriptor.id)
         assertEquals(2, data.data.critical)
         assertEquals(4, data.data.high)
         assertEquals(8, data.data.medium)
@@ -98,7 +104,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             statusId,
                             ""
                     ).withData(
-                            TestValidationDataType::class.validationRunData(
+                            testValidationDataType.data(
                                     TestValidationData(
                                             critical = 2,
                                             high = 4,
@@ -164,7 +170,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ValidationRunStatusID.STATUS_PASSED,
                             ""
                     ).withData(
-                            TestValidationDataType::class.validationRunData(
+                            testValidationDataType.data(
                                     TestValidationData(-1, 0, 0)
                             )
                     )
@@ -197,7 +203,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ValidationRunStatusID.STATUS_PASSED,
                             ""
                     ).withData(
-                            TestNumberValidationDataType::class.validationRunData(80)
+                            testNumberValidationDataType.data(80)
                     )
             )
         }

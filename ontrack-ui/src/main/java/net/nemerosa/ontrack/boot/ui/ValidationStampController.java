@@ -129,7 +129,7 @@ public class ValidationStampController extends AbstractResourceController {
             if (dataType != null) {
                 // Parsing without exception
                 return new ValidationDataTypeConfig<>(
-                        inputConfig.getId(),
+                        dataType.getDescriptor(),
                         dataType.fromConfigForm(inputConfig.getData())
                 );
             }

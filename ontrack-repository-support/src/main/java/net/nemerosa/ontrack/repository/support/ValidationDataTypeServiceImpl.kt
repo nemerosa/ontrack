@@ -28,22 +28,22 @@ constructor(
             }
             // Data
             else {
-                if (data.id != config.id) {
+                if (data.descriptor.id != config.descriptor.id) {
                     // Different type of data
                     throw ValidationRunDataInputException(
                             "Data associated with the validation run as different " +
                                     "type than the one associated with the validation stamp. " +
-                                    "`${config.id}` is expected and `${data.id}` was given."
+                                    "`${config.descriptor.id}` is expected and `${data.descriptor.id}` was given."
                     )
                 } else {
                     // Gets the type
-                    val validationDataType = getValidationDataType<C, T>(data.id) ?:
-                            throw ValidationRunDataInputException("Cannot find any data type for ID `${data.id}`")
+                    val validationDataType = getValidationDataType<C, T>(data.descriptor.id) ?:
+                            throw ValidationRunDataInputException("Cannot find any data type for ID `${data.descriptor.id}`")
                     // Validation
                     val validatedData = validationDataType.validateData(config.config, data.data)
                     // OK
                     return ValidationRunData(
-                            data.id,
+                            data.descriptor,
                             validatedData
                     )
                 }
@@ -68,12 +68,12 @@ constructor(
             }
             // Data
             else {
-                if (data.id != config.id) {
+                if (data.id != config.descriptor.id) {
                     // Different type of data
                     throw ValidationRunDataInputException(
                             "Data associated with the validation run as different " +
                                     "type than the one associated with the validation stamp. " +
-                                    "`${config.id}` is expected and `${data.id}` was given."
+                                    "`${config.descriptor.id}` is expected and `${data.id}` was given."
                     )
                 } else {
                     // Gets the type
@@ -84,7 +84,7 @@ constructor(
                     val validatedData = validationDataType.validateData(config.config, parsedData)
                     // OK
                     return ValidationRunData(
-                            data.id,
+                            config.descriptor,
                             validatedData
                     )
                 }

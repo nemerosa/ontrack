@@ -16,6 +16,9 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
     @Autowired
     private lateinit var validationRunController: ValidationRunController
 
+    @Autowired
+    private lateinit var testNumberValidationDataType: TestNumberValidationDataType
+
     @Test
     fun `Validation with no required data`() {
         // Creates a validation stamp with no data type
@@ -49,7 +52,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                             branch,
                             NameDescription.nd("VS1", "")
                     ).withDataType(
-                            TestNumberValidationDataType::class.validationDataTypeConfig(60)
+                            testNumberValidationDataType.config(60)
                     )
             )
         }
@@ -76,7 +79,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         @Suppress("UNCHECKED_CAST")
         val data: ValidationRunData<Int> = run.data as ValidationRunData<Int>
         assertNotNull(data, "Validation run has some data")
-        assertEquals(TestNumberValidationDataType::class.qualifiedName, data.id)
+        assertEquals(TestNumberValidationDataType::class.qualifiedName, data.descriptor.id)
         assertEquals(70, data.data)
     }
 

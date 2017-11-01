@@ -748,7 +748,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                             .addValue("orderNb", orderNb)
                             .addValue("creation", dateTimeForDB(validationStamp.getSignature().getTime()))
                             .addValue("creator", validationStamp.getSignature().getUser().getName())
-                            .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
+                            .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getDescriptor().getId() : null)
                             .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getConfig()) : null)
             );
             return validationStamp.withId(id(id));
@@ -822,7 +822,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         .addValue("description", description)
                         .addValue("type", Document.isValid(image) ? image.getType() : null)
                         .addValue("content", Document.isValid(image) ? image.getContent() : null)
-                        .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
+                        .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getDescriptor().getId() : null)
                         .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getConfig()) : null)
         );
     }
@@ -836,7 +836,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                     params("name", validationStamp.getName())
                             .addValue("description", validationStamp.getDescription())
                             .addValue("id", validationStamp.id())
-                            .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getId() : null)
+                            .addValue("dataTypeId", validationStamp.getDataType() != null ? validationStamp.getDataType().getDescriptor().getId() : null)
                             .addValue("dataTypeConfig", validationStamp.getDataType() != null ? writeJson(validationStamp.getDataType().getConfig()) : null)
             );
         } catch (DuplicateKeyException ex) {
@@ -873,7 +873,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 "INSERT INTO VALIDATION_RUNS(BUILDID, VALIDATIONSTAMPID, DATA_TYPE_ID, DATA) VALUES (:buildId, :validationStampId, :dataTypeId, :data)",
                 params("buildId", validationRun.getBuild().id())
                         .addValue("validationStampId", validationRun.getValidationStamp().id())
-                        .addValue("dataTypeId", validationRun.getData() != null ? validationRun.getData().getId() : null)
+                        .addValue("dataTypeId", validationRun.getData() != null ? validationRun.getData().getDescriptor().getId() : null)
                         .addValue("data", validationRun.getData() != null ? writeJson(validationRun.getData().getData()) : null)
         );
 
@@ -1041,7 +1041,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 C config = validationDataType.configFromJson(json);
                 // OK
                 return new ValidationDataTypeConfig<>(
-                        id,
+                        validationDataType.getDescriptor(),
                         config
                 );
             } else {
@@ -1062,7 +1062,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 // Parsing
                 T data = validationDataType.fromJson(json);
                 return new ValidationRunData<>(
-                        id,
+                        validationDataType.getDescriptor(),
                         data
                 );
             } else {

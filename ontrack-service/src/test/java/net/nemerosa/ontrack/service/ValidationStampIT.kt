@@ -7,12 +7,16 @@ import net.nemerosa.ontrack.model.security.ValidationStampEdit
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationDataTypeConfig
 import net.nemerosa.ontrack.model.structure.ValidationStamp
-import net.nemerosa.ontrack.model.structure.validationDataTypeConfig
+import net.nemerosa.ontrack.model.structure.config
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 
 class ValidationStampIT : AbstractServiceTestSupport() {
+
+    @Autowired
+    private lateinit var testNumberValidationDataType: TestNumberValidationDataType
 
     @Test
     fun validationStampWithDataType() {
@@ -25,7 +29,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
                             branch,
                             NameDescription.nd("VSPercent", "")
                     ).withDataType(
-                            TestNumberValidationDataType::class.validationDataTypeConfig(2)
+                            testNumberValidationDataType.config(2)
                     )
             )
         }
@@ -35,7 +39,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         @Suppress("UNCHECKED_CAST")
         var dataType: ValidationDataTypeConfig<Int?> = loadedVs.dataType as ValidationDataTypeConfig<Int?>
         assertNotNull("Data type is loaded", dataType)
-        assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
+        assertEquals(TestNumberValidationDataType::class.java.name, dataType.descriptor.id)
         assertEquals(2, dataType.config)
         // Loads using the list
         val vsList = asUserWithView(branch).call { structureService.getValidationStampListForBranch(branch.id) }
@@ -45,7 +49,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         asUser().with(branch, ValidationStampEdit::class.java).execute {
             structureService.saveValidationStamp(
                     loadedVs.withDataType(
-                            TestNumberValidationDataType::class.validationDataTypeConfig(60)
+                            testNumberValidationDataType.config(60)
                     )
             )
         }
@@ -55,7 +59,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         @Suppress("UNCHECKED_CAST")
         dataType = loadedVs.dataType as ValidationDataTypeConfig<Int?>
         assertNotNull("Data type is loaded", dataType)
-        assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
+        assertEquals(TestNumberValidationDataType::class.java.name, dataType.descriptor.id)
         assertEquals(60, dataType.config)
     }
 

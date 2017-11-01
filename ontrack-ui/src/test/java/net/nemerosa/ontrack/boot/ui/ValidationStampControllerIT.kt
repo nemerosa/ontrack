@@ -38,7 +38,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
         // Checks the data type is still there
         val dataType = loadedVs.dataType
         assertNotNull(dataType, "Data type is loaded")
-        assertEquals(TestNumberValidationDataType::class.java.name, dataType.id)
+        assertEquals(TestNumberValidationDataType::class.java.name, dataType.descriptor.id)
         assertEquals(60, dataType.config)
     }
 
