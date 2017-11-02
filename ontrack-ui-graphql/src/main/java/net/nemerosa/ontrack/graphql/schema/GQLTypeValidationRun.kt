@@ -16,7 +16,7 @@ import java.util.*
 class GQLTypeValidationRun(
         creation: GQLTypeCreation,
         private val validationRunStatus: GQLTypeValidationRunStatus,
-        private val serviceConfiguration: GQLTypeServiceConfiguration,
+        private val validationRunData: GQLTypeValidationRunData,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val projectEntityInterface: GQLProjectEntityInterface
 ) : AbstractGQLProjectEntity<ValidationRun>(
@@ -69,7 +69,7 @@ class GQLTypeValidationRun(
                 .field {
                     it.name("data")
                             .description("Data associated with the validation run")
-                            .type(serviceConfiguration.typeRef)
+                            .type(validationRunData.typeRef)
                 }
                 // OK
                 .build()

@@ -8,18 +8,17 @@ import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.model.structure.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class GQLTypeValidationStamp @Autowired
-constructor(private val structureService: StructureService,
-            creation: GQLTypeCreation,
-            private val projectEntityInterface: GQLProjectEntityInterface,
-            private val validationRun: GQLTypeValidationRun,
-            private val serviceConfiguration: GQLTypeServiceConfiguration,
-            projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
+class GQLTypeValidationStamp(
+        private val structureService: StructureService,
+        creation: GQLTypeCreation,
+        private val projectEntityInterface: GQLProjectEntityInterface,
+        private val validationRun: GQLTypeValidationRun,
+        private val validationDataTypeConfig: GQLTypeValidationDataTypeConfig,
+        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<ValidationStamp>(
         ValidationStamp::class.java,
         ProjectEntityType.VALIDATION_STAMP,
@@ -44,7 +43,7 @@ constructor(private val structureService: StructureService,
                 .field {
                     it.name("dataType")
                             .description("Data definition associated with the validation stamp")
-                            .type(serviceConfiguration.typeRef)
+                            .type(validationDataTypeConfig.typeRef)
                 }
                 // Ref to branch
                 .field(
