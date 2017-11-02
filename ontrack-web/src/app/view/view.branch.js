@@ -189,8 +189,10 @@ angular.module('ot.view.branch', [
                       id
                       name
                       dataType {
-                        id
-                        data
+                        descriptor {
+                          id
+                        }
+                        config
                       }
                     }
                     validationRuns(count: 1) {
