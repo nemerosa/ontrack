@@ -34,4 +34,9 @@ interface ValidationDataTypeService {
      * @return Validated data (if present and valid)
      */
     fun <C, T> validateData(data: ValidationRunData<T>?, config: ValidationDataTypeConfig<C>?): ValidationRunData<T>?
+
+    /**
+     * Gets the [ServiceConfiguration] representation for a [ValidationDataTypeConfig].
+     */
+    fun <C> getServiceConfigurationForConfig(config: ValidationDataTypeConfig<C>?): ServiceConfiguration?
 }

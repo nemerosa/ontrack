@@ -22,6 +22,8 @@ class TextValidationDataType(
 
     override fun getConfigForm(config: Any?): Form = Form.create()
 
+    override fun configToFormJson(config: Any?) = null
+
     override fun fromConfigForm(node: JsonNode?) {}
 
     override fun toJson(data: String): JsonNode = JsonUtils.format(data)

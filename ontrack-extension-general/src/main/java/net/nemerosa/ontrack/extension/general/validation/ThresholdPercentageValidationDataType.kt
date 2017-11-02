@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
@@ -37,6 +38,15 @@ class ThresholdPercentageValidationDataType(
                     .label("Valid if greater?")
                     .value(config?.okIfGreater)
             )
+
+    override fun configToFormJson(config: ThresholdPercentageValidationDataTypeConfig?): JsonNode? {
+        return config?.let {
+            mapOf(
+                    "threshold" to it.threshold,
+                    "okIfGreater" to it.okIfGreater
+            ).toJson()
+        }
+    }
 
     override fun fromConfigForm(node: JsonNode?): ThresholdPercentageValidationDataTypeConfig =
             JsonUtils.parse(node, ThresholdPercentageValidationDataTypeConfig::class.java)

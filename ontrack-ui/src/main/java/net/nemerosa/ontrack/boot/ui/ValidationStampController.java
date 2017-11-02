@@ -148,7 +148,7 @@ public class ValidationStampController extends AbstractResourceController {
         return newValidationStampForm(validationStamp.getBranch().getId())
                 .fill("name", validationStamp.getName())
                 .fill("description", validationStamp.getDescription())
-                .fill("dataType", validationStamp.getDataType())
+                .fill("dataType", validationDataTypeService.getServiceConfigurationForConfig(validationStamp.getDataType()))
                 ;
     }
 

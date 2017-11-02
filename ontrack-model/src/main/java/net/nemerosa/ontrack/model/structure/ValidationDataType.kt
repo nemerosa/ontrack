@@ -39,6 +39,12 @@ interface ValidationDataType<C, T> : Extension {
     fun getConfigForm(config: C?): Form
 
     /**
+     * JSON for the client (must be mapped to the fields of the form
+     * defined by [getConfigForm].
+     */
+    fun configToFormJson(config: C?): JsonNode?
+
+    /**
      * Creates the config object from the JSON returned by a form edition
      *
      * @param node JSON returned by the form edition

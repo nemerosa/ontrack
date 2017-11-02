@@ -45,6 +45,8 @@ class TestValidationDataType(
 
     override fun getConfigForm(config: Any?): Form = Form.create()
 
+    override fun configToFormJson(config: Any?) = null
+
     override fun fromConfigForm(node: JsonNode?) {}
 
     override fun toJson(data: TestValidationData): JsonNode = JsonUtils.format(data)

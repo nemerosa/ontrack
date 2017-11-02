@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +19,23 @@ constructor(
     }
 
     override fun getAllTypes(): List<ValidationDataType<*, *>> = types
+
+    override fun <C> getServiceConfigurationForConfig(config: ValidationDataTypeConfig<C>?): ServiceConfiguration? {
+        if (config != null) {
+            // Gets the type
+            val validationDataType = getValidationDataType<C, Any>(config.descriptor.id) ?:
+                    throw ValidationRunDataInputException("Cannot find any data type for ID `${config.descriptor.id}`")
+            // Converts the typed data into JSON for the client
+            val json: JsonNode? = config.config?.let { validationDataType.configToFormJson(it) }
+            // OK
+            return ServiceConfiguration(
+                    config.descriptor.id,
+                    json
+            )
+        } else {
+            return null
+        }
+    }
 
     override fun <C, T> validateData(data: ValidationRunData<T>?, config: ValidationDataTypeConfig<C>?): ValidationRunData<T>? {
         // Config present

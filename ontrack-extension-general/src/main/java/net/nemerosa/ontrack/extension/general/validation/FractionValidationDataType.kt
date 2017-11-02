@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.general.validation
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -37,6 +38,15 @@ class FractionValidationDataType(
                     .label("Valid if greater?")
                     .value(config?.okIfGreater)
             )
+
+    override fun configToFormJson(config: FractionValidationDataTypeConfig?): JsonNode? {
+        return config?.let {
+            mapOf(
+                    "threshold" to it.threshold,
+                    "okIfGreater" to it.okIfGreater
+            ).toJson()
+        }
+    }
 
     override fun fromConfigForm(node: JsonNode?): FractionValidationDataTypeConfig =
             JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)

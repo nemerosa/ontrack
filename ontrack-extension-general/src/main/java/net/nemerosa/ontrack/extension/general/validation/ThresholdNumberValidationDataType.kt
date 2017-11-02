@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
+import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -31,6 +32,10 @@ class ThresholdNumberValidationDataType(
                     .value(config)
                     .optional()
             )
+
+    override fun configToFormJson(config: Int?): JsonNode? {
+        return config?.let { mapOf("threshold" to it).toJson() }
+    }
 
     override fun fromConfigForm(node: JsonNode?): Int? {
         if (node != null && node.has("threshold")) {
