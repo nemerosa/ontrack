@@ -531,7 +531,7 @@ angular.module('ot.view.branch', [
                             'validationStampData',
                             {
                                 id: validationStamp.name,
-                                data: validationStamp.dataType ? validationStamp.dataType.data : undefined
+                                data: validationStamp.dataType ? validationStamp.dataType.config : undefined
                             }
                         );
                     }
