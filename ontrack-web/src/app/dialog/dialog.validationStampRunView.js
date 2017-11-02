@@ -23,7 +23,12 @@ angular.module('ot.dialog.validationStampRunView', [
                 runOrder
                 description
                 data {
-                  id
+                  descriptor {
+                    id
+                    extension {
+                      id
+                    }
+                  }
                   data
                 }
                 validationRunStatuses {

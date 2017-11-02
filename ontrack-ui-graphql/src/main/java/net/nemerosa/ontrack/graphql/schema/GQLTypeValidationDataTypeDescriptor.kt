@@ -19,7 +19,7 @@ class GQLTypeValidationDataTypeDescriptor(
                     .name(typeName)
                     .description("Descriptor for a validation data type")
                     .field {
-                        it.name("descriptor")
+                        it.name("extension")
                                 .description("Associated extension feature")
                                 .type(extensionFeatureDescription.typeRef)
                     }
