@@ -30,6 +30,11 @@
                             </a>
                         </td>
                         <td>
+                            <span ng-if="validationRun.data">
+                                <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
+                            </span>
+                        </td>
+                        <td>
                             <a href="#/validationRun/{{validationRun.id}}">
                                 <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
                             </a>
@@ -44,7 +49,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="3" align="left">
+                    <td colspan="4" align="left">
                         <button class="btn btn-link" ng-show="validationRunResources.pagination.prev" ng-click="switchPage(validationRunResources.pagination.prev)">
                             <span class="fa fa-step-backward"></span>
                             Newer ones
