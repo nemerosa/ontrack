@@ -25,7 +25,7 @@ angular.module('ot.dialog.validationStampRunView', [
                 data {
                   descriptor {
                     id
-                    extension {
+                    feature {
                       id
                     }
                   }

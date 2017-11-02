@@ -10,7 +10,7 @@ angular.module('ot.directive.validationRunData', [
             },
             controller: function ($scope) {
                 $scope.getTemplatePath = (value) =>
-                    `extension/TODO/validationDataType/${value.id}-data.tpl.html`;
+                    `extension/${value.descriptor.feature.id}/validationDataType/${value.descriptor.id}-data.tpl.html`;
             }
         };
     })
