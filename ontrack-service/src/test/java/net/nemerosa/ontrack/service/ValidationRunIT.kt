@@ -247,7 +247,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         }
 
         // Gets the validation run back
-        val run = structureService.getValidationRun(runId)
+        val run = asUser().withView(vs).call { structureService.getValidationRun(runId) }
 
         // Checks it has still no data
         assertNull(run.data, "No data associated with validation run after migration")
@@ -274,7 +274,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         }
 
         // Gets the validation run back
-        val run = structureService.getValidationRun(runId)
+        val run = asUser().withView(vs).call { structureService.getValidationRun(runId) }
 
         // Checks it has still some data
         assertNotNull(run.data, "Data still associated with validation run after migration") {
@@ -306,7 +306,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         }
 
         // Gets the validation run back
-        val run = structureService.getValidationRun(runId)
+        val run = asUser().withView(vs).call { structureService.getValidationRun(runId) }
 
         // Checks it has still some data
         assertNotNull(run.data, "Data still associated with validation run after migration") {
