@@ -91,35 +91,46 @@ constructor(
                 build.branch,
                 validationRunRequest.validationStampId,
                 validationRunRequest.actualValidationStampName)
-        // Checks the status
-        if (validationStamp.dataType == null && validationRunRequest.validationRunStatusId.isNullOrBlank()) {
-            throw ValidationRunStatusRequiredException(validationStamp.name)
+        // Validation run data
+        val runData: ValidationRunData<Any>?
+        val runStatus: ValidationRunStatusID
+        when {
+            validationStamp.dataType != null -> {
+                val runDataJson = validationStamp.dataType?.let {
+                    ServiceConfiguration(
+                            validationStamp.dataType.descriptor.id,
+                            validationRunRequest.validationStampData?.data
+                    )
+                }
+                // Validation of the run data
+                val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
+                        runDataJson,
+                        validationStamp.dataType
+                )
+                // Assignment for the data
+                runData = status.runData
+                // Assignment for the status
+                if (!validationRunRequest.validationRunStatusId.isNullOrBlank()) {
+                    runStatus = validationRunStatusService.getValidationRunStatus(validationRunRequest.validationRunStatusId)
+                } else {
+                    runStatus = status.runStatusID
+                }
+            }
+            validationRunRequest.validationRunStatusId.isNullOrBlank() -> throw ValidationRunStatusRequiredException(validationStamp.name)
+            else -> {
+                runData = null
+                runStatus = validationRunStatusService.getValidationRunStatus(validationRunRequest.validationRunStatusId)
+            }
         }
-        // Gets the validation run status
-        val validationRunStatusID = validationRunStatusService.getValidationRunStatus(validationRunRequest.validationRunStatusId)
         // Validation run to create
         var validationRun = ValidationRun.of(
                 build,
                 validationStamp,
                 0,
                 securityService.currentSignature,
-                validationRunStatusID,
+                runStatus,
                 validationRunRequest.description
-        )
-        // Validation run data
-        val runData: ServiceConfiguration? =
-                validationStamp.dataType?.let {
-                    ServiceConfiguration(
-                            validationStamp.dataType.descriptor.id,
-                            validationRunRequest.validationStampData?.data
-                    )
-                }
-        // Validation of the run data
-        val data: ValidationRunData<Any>? = validationDataTypeService.validateData(
-                runData,
-                validationStamp.dataType
-        )
-        validationRun = validationRun.withData(data)
+        ).withData(runData)
         // Creation
         validationRun = structureService.newValidationRun(validationRun)
         // Saves the properties

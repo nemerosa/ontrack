@@ -72,9 +72,9 @@ class ThresholdNumberValidationDataType(
     override fun computeStatus(config: Int?, data: Int): ValidationRunStatusID? {
         if (config != null) {
             return if (data > config) {
-                ValidationRunStatusID.STATUS_FAILED
-            } else {
                 ValidationRunStatusID.STATUS_PASSED
+            } else {
+                ValidationRunStatusID.STATUS_FAILED
             }
         } else {
             return null

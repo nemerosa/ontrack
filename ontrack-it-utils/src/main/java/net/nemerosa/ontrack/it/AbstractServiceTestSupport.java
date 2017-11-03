@@ -199,13 +199,21 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return doCreateValidationStamp(doCreateBranch(), nameDescription());
     }
 
+    protected ValidationStamp doCreateValidationStamp(ValidationDataTypeConfig<?> config) throws Exception {
+        return doCreateValidationStamp(doCreateBranch(), nameDescription(), config);
+    }
+
     public ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription) throws Exception {
+        return doCreateValidationStamp(branch, nameDescription, null);
+    }
+
+    public ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription, ValidationDataTypeConfig<?> config) throws Exception {
         return asUser().with(branch.getProject().id(), ValidationStampCreate.class).call(() ->
                 structureService.newValidationStamp(
                         ValidationStamp.of(
                                 branch,
                                 nameDescription
-                        )
+                        ).withDataType(config)
                 )
         );
     }

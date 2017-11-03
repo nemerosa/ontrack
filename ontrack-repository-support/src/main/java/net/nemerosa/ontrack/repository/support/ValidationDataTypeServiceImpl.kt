@@ -77,44 +77,38 @@ constructor(
         }
     }
 
-    override fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>?): ValidationRunData<T>? {
-        // Config present
-        if (config != null) {
-            // No data
-            if (data == null) {
-                throw ValidationRunDataInputException("Data is required for this validation run.")
-            }
-            // Data
-            else {
-                if (data.id != config.descriptor.id) {
-                    // Different type of data
-                    throw ValidationRunDataInputException(
-                            "Data associated with the validation run as different " +
-                                    "type than the one associated with the validation stamp. " +
-                                    "`${config.descriptor.id}` is expected and `${data.id}` was given."
-                    )
-                } else {
-                    // Gets the type
-                    val validationDataType = getValidationDataType<C, T>(data.id) ?:
-                            throw ValidationRunDataInputException("Cannot find any data type for ID `${data.id}`")
-                    // Parsing & validation
-                    val parsedData = validationDataType.fromForm(data.data)
-                    val validatedData = validationDataType.validateData(config.config, parsedData)
-                    // OK
-                    return ValidationRunData(
-                            config.descriptor,
-                            validatedData
-                    )
-                }
-            }
+    override fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>): ValidationRunDataWithStatus<T> {
+        // No data
+        if (data == null) {
+            throw ValidationRunDataInputException("Data is required for this validation run.")
         }
-        // Data present (but no config)
-        else if (data != null) {
-            throw ValidationRunDataInputException("Data is not required for this validation run.")
-        }
-        // No config, no data --> OK
+        // Data
         else {
-            return null
+            if (data.id != config.descriptor.id) {
+                // Different type of data
+                throw ValidationRunDataInputException(
+                        "Data associated with the validation run as different " +
+                                "type than the one associated with the validation stamp. " +
+                                "`${config.descriptor.id}` is expected and `${data.id}` was given."
+                )
+            } else {
+                // Gets the type
+                val validationDataType = getValidationDataType<C, T>(data.id) ?:
+                        throw ValidationRunDataInputException("Cannot find any data type for ID `${data.id}`")
+                // Parsing & validation
+                val parsedData = validationDataType.fromForm(data.data)
+                val validatedData = validationDataType.validateData(config.config, parsedData)
+                // Computing the status
+                val statusID = validationDataType.computeStatus(config.config, validatedData)
+                // OK
+                return ValidationRunDataWithStatus(
+                        ValidationRunData(
+                                config.descriptor,
+                                validatedData
+                        ),
+                        statusID ?: ValidationRunStatusID.STATUS_PASSED
+                )
+            }
         }
     }
 
