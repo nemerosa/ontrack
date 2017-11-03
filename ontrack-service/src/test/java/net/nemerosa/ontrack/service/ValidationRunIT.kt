@@ -9,10 +9,12 @@ import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class ValidationRunIT : AbstractServiceTestSupport() {
 
@@ -52,7 +54,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         // Checks the data is still there
         @Suppress("UNCHECKED_CAST")
         val data: ValidationRunData<TestValidationData> = loadedRun.data as ValidationRunData<TestValidationData>
-        assertNotNull("Data type is loaded", data)
+        assertNotNull(data, "Data type is loaded")
         assertEquals(TestValidationDataType::class.java.name, data.descriptor.id)
         assertEquals(2, data.data.critical)
         assertEquals(4, data.data.high)
@@ -149,7 +151,7 @@ class ValidationRunIT : AbstractServiceTestSupport() {
 
         // Checks the data
         val data = loadedRun.data
-        assertNull("No data is loaded", data)
+        assertNull(data, "No data is loaded")
 
         // Checks the status
         val status = loadedRun.lastStatus
@@ -223,6 +225,93 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             ""
                     )
             )
+        }
+    }
+
+    @Test
+    fun `Introducing a data type on existing validation runs`() {
+        // Creates a basic stamp, with no data type
+        val vs = doCreateValidationStamp()
+        // Creates a build
+        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
+        // ... and validates it
+        val runId = doValidateBuild(build, vs, ValidationRunStatusID.STATUS_PASSED).id
+
+        // Now, changes the data type for the validation stamp
+        asAdmin().execute {
+            structureService.saveValidationStamp(
+                    vs.withDataType(
+                            testNumberValidationDataType.config(50)
+                    )
+            )
+        }
+
+        // Gets the validation run back
+        val run = structureService.getValidationRun(runId)
+
+        // Checks it has still no data
+        assertNull(run.data, "No data associated with validation run after migration")
+    }
+
+    @Test
+    fun `Removing a data type from existing validation runs`() {
+        // Creates a basic stamp, with some data type
+        val vs = doCreateValidationStamp(
+                testNumberValidationDataType.config(50)
+        )
+        // Creates a build
+        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
+        // ... and validates it with some data
+        val runId = doValidateBuild(build, vs, ValidationRunStatusID.STATUS_PASSED,
+                testNumberValidationDataType.data(40)
+        ).id
+
+        // Now, changes the data type for the validation stamp
+        asAdmin().execute {
+            structureService.saveValidationStamp(
+                    vs.withDataType(null)
+            )
+        }
+
+        // Gets the validation run back
+        val run = structureService.getValidationRun(runId)
+
+        // Checks it has still some data
+        assertNotNull(run.data, "Data still associated with validation run after migration") {
+            assertEquals(TestNumberValidationDataType::class.qualifiedName, it.descriptor.id)
+            assertEquals(40, it.data as Int)
+        }
+    }
+
+    @Test
+    fun `Changing a data type for existing validation runs`() {
+        // Creates a basic stamp, with some data type
+        val vs = doCreateValidationStamp(
+                testNumberValidationDataType.config(50)
+        )
+        // Creates a build
+        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
+        // ... and validates it with some data
+        val runId = doValidateBuild(build, vs, ValidationRunStatusID.STATUS_PASSED,
+                testNumberValidationDataType.data(40)
+        ).id
+
+        // Now, changes the data type for the validation stamp
+        asAdmin().execute {
+            structureService.saveValidationStamp(
+                    vs.withDataType(
+                            testValidationDataType.config(null)
+                    )
+            )
+        }
+
+        // Gets the validation run back
+        val run = structureService.getValidationRun(runId)
+
+        // Checks it has still some data
+        assertNotNull(run.data, "Data still associated with validation run after migration") {
+            assertEquals(TestNumberValidationDataType::class.qualifiedName, it.descriptor.id)
+            assertEquals(40, it.data as Int)
         }
     }
 

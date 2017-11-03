@@ -163,6 +163,17 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     }
 
     public ValidationRun doValidateBuild(Build build, ValidationStamp vs, ValidationRunStatusID statusId) throws Exception {
+        return doValidateBuild(
+                build, vs, statusId, null
+        );
+    }
+
+    public ValidationRun doValidateBuild(
+            Build build,
+            ValidationStamp vs,
+            ValidationRunStatusID statusId,
+            ValidationRunData<?> runData
+    ) throws Exception {
         return asUser().with(build, ValidationRunCreate.class).call(() ->
                 structureService.newValidationRun(
                         ValidationRun.of(
@@ -172,7 +183,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                                 Signature.of("test"),
                                 statusId,
                                 ""
-                        )
+                        ).withData(runData)
                 )
         );
     }
