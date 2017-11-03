@@ -60,6 +60,13 @@ public class Form {
         return this;
     }
 
+    public Form with(Iterable<Field> fields) {
+        fields.forEach(field ->
+                this.fields.put(field.getName(), field)
+        );
+        return this;
+    }
+
     public Field getField(String name) {
         return fields.get(name);
     }
