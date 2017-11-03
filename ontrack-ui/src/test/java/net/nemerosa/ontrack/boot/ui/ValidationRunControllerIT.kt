@@ -2,12 +2,14 @@ package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusRequiredException
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -81,6 +83,60 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         assertNotNull(data, "Validation run has some data")
         assertEquals(TestNumberValidationDataType::class.qualifiedName, data.descriptor.id)
         assertEquals(70, data.data)
+    }
+
+    @Test
+    fun `Validation with no data type and with status`() {
+        // Creates a validation stamp
+        val vs = doCreateValidationStamp()
+        // Creates a build
+        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
+        // Validates the build
+        val run = asUser().with(vs, ValidationRunCreate::class.java).call {
+            validationRunController.newValidationRun(
+                    build.id,
+                    ValidationRunRequest(
+                            null,
+                            ServiceConfiguration(
+                                    vs.name,
+                                    null
+                            ),
+                            null,
+                            "FAILED",
+                            "No description"
+                    )
+            )
+        }
+        // Checks the status
+        assertEquals("FAILED", run.lastStatus.statusID.id)
+    }
+
+    @Test
+    fun `Status is required when no data type is associated with the validation stamp`() {
+        // Creates a validation stamp
+        val vs = doCreateValidationStamp()
+        // Creates a build
+        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
+        // Validates the build
+        assertFailsWith<ValidationRunStatusRequiredException> {
+            asUser().with(vs, ValidationRunCreate::class.java).call {
+                validationRunController.newValidationRun(
+                        build.id,
+                        ValidationRunRequest(
+                                null,
+                                ServiceConfiguration(
+                                        vs.name,
+                                        null
+                                ),
+                                null,
+                                null,
+                                "No description"
+                        )
+                )
+            }
+        }.apply {
+            assertEquals("Status is required for validation stamp ${vs.name}.", message)
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusRequiredException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
@@ -74,6 +75,7 @@ constructor(
                 .with(
                         Selection.of("validationRunStatusId")
                                 .label("Status")
+                                .optional()
                                 .items(validationRunStatusService.validationRunStatusRoots)
                 )
                 .description()
@@ -89,6 +91,10 @@ constructor(
                 build.branch,
                 validationRunRequest.validationStampId,
                 validationRunRequest.actualValidationStampName)
+        // Checks the status
+        if (validationStamp.dataType == null && validationRunRequest.validationRunStatusId.isNullOrBlank()) {
+            throw ValidationRunStatusRequiredException(validationStamp.name)
+        }
         // Gets the validation run status
         val validationRunStatusID = validationRunStatusService.getValidationRunStatus(validationRunRequest.validationRunStatusId)
         // Validation run to create
