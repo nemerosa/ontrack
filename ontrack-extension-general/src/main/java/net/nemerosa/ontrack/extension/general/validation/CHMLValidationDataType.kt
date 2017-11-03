@@ -66,13 +66,13 @@ class CHMLValidationDataType(
     override fun fromConfigForm(node: JsonNode?) =
             node?.let {
                 CHMLValidationDataTypeConfig(
-                        CHMLLevel(
-                                node.getRequiredEnum("failedLevel"),
-                                node.getInt("failedValue") ?: 0
-                        ),
-                        CHMLLevel(
+                        warningLevel = CHMLLevel(
                                 node.getRequiredEnum("warningLevel"),
                                 node.getInt("warningValue") ?: 0
+                        ),
+                        failedLevel = CHMLLevel(
+                                node.getRequiredEnum("failedLevel"),
+                                node.getInt("failedValue") ?: 0
                         )
                 )
             }

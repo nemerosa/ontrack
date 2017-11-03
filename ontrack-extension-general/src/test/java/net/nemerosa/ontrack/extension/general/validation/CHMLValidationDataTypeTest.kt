@@ -65,6 +65,24 @@ class CHMLValidationDataTypeTest {
     }
 
     @Test
+    fun `Parsing config from client`() {
+        val config = dataType.fromConfigForm(
+                mapOf(
+                        "failedLevel" to "CRITICAL",
+                        "failedValue" to 1,
+                        "warningLevel" to "HIGH",
+                        "warningValue" to 2
+                ).toJson()
+        )
+        assertNotNull(config) {
+            assertEquals(CHML.CRITICAL, it.failedLevel.level)
+            assertEquals(1, it.failedLevel.value)
+            assertEquals(CHML.HIGH, it.warningLevel.level)
+            assertEquals(2, it.warningLevel.value)
+        }
+    }
+
+    @Test
     fun `Parsing data from client`() {
         val data = dataType.fromForm(mapOf(
                 "CRITICAL" to 1,
