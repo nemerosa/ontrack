@@ -3,6 +3,12 @@ package net.nemerosa.ontrack.json
 import com.fasterxml.jackson.databind.JsonNode
 
 /**
+ * Map as JSON
+ */
+fun jsonOf(vararg pairs: Pair<*, *>) =
+        mapOf(*pairs).toJson()!!
+
+/**
  * Converts any object into JSON, or null if not defined.
  */
 fun <T> T?.toJson(): JsonNode? =
