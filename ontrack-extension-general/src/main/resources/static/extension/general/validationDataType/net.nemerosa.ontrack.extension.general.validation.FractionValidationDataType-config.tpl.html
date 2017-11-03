@@ -1,0 +1,12 @@
+<span style="white-space: nowrap;" ng-if="value.config.failureThreshold">
+    • Failure if
+    <span ng-if="value.config.okIfGreater">&#8804;</span>
+    <span ng-if="!value.config.okIfGreater">&#8805;</span>
+    {{value.config.failureThreshold}}%
+</span>
+<span style="white-space: nowrap;" ng-if="value.config.warningThreshold">
+    • Warning if
+    <span ng-if="value.config.okIfGreater">&#8804;</span>
+    <span ng-if="!value.config.okIfGreater">&#8805;</span>
+    {{value.config.warningThreshold}}%
+</span>

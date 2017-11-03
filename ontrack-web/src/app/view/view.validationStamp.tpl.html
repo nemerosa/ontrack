@@ -12,6 +12,15 @@
     </div>
     <div class="row">
         <div class="col-md-8">
+
+            <div ng-if="validationStamp.dataType">
+                <ot-section-title>Data type</ot-section-title>
+                <p>
+                    {{validationStamp.dataType.descriptor.displayName}}
+                    <ot-validation-data-type-config value="validationStamp.dataType"></ot-validation-data-type-config>
+                </p>
+            </div>
+
             <ot-section-title>History</ot-section-title>
             <div class="alert alert-warning" ng-show="validationRunResources.resources.length == 0">
                 No validation run has been done yet.

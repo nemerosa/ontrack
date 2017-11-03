@@ -14,6 +14,7 @@ var ontrack = angular.module('ontrack', [
         'ot.directive.properties',
         'ot.directive.health',
         'ot.directive.validationRunData',
+        'ot.directive.validationDataTypeConfig',
         // Services
         'ot.service.core',
         'ot.service.user',
