@@ -17,6 +17,11 @@
             Loading the validation runs...
         </div>
     </div>
+    <div class="panel panel-default" ng-if="validation.validationStamp.dataType">
+        <div class="panel-body">
+            <ot-validation-data-type-config value="validation.validationStamp.dataType"></ot-validation-data-type-config>
+        </div>
+    </div>
     <div class="panel panel-default"
          ng-hide="loadingValidationRuns"
          ng-repeat="validationRun in validation.validationRuns | orderBy:'id':true">

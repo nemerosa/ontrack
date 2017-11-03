@@ -17,6 +17,15 @@ angular.module('ot.dialog.validationStampRunView', [
                 name
                 image
                 _image
+                dataType {
+                  descriptor {
+                    id
+                    feature {
+                      id
+                    }
+                  }
+                  config
+                }
               }
               validationRuns {
                 id
