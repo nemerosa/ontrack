@@ -2,60 +2,25 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
-import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
 
-data class FractionValidationDataTypeConfig(val threshold: Int?, val okIfGreater: Boolean = false)
 data class FractionValidationData(val numerator: Int, val denominator: Int)
 
 @Component
 class FractionValidationDataType(
         extensionFeature: GeneralExtensionFeature
-) : AbstractValidationDataType<FractionValidationDataTypeConfig, FractionValidationData>(
+) : AbstractThresholdConfigValidationDataType<FractionValidationData>(
         extensionFeature
 ) {
 
-    override fun configFromJson(node: JsonNode?): FractionValidationDataTypeConfig =
-            JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
-
-    override fun configToJson(config: FractionValidationDataTypeConfig): JsonNode =
-            JsonUtils.format(config)
-
-    override fun getConfigForm(config: FractionValidationDataTypeConfig?): Form = Form.create()
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("threshold")
-                    .label("Threshold (%)")
-                    .value(config?.threshold)
-                    .min(0).max(100)
-                    .optional()
-            )
-            .with(net.nemerosa.ontrack.model.form.YesNo
-                    .of("okIfGreater")
-                    .label("Valid if greater?")
-                    .value(config?.okIfGreater)
-            )
-
-    override fun configToFormJson(config: FractionValidationDataTypeConfig?): JsonNode? {
-        return config?.let {
-            mapOf(
-                    "threshold" to it.threshold,
-                    "okIfGreater" to it.okIfGreater
-            ).toJson()
-        }
-    }
-
-    override fun fromConfigForm(node: JsonNode?): FractionValidationDataTypeConfig =
-            JsonUtils.parse(node, FractionValidationDataTypeConfig::class.java)
-
     override fun toJson(data: FractionValidationData): JsonNode =
-            JsonUtils.format(data)
+            data.toJson()!!
 
     override fun fromJson(node: JsonNode): FractionValidationData? =
-            JsonUtils.parse(node, FractionValidationData::class.java)
+            node.parse()
 
     override fun getForm(data: FractionValidationData?): Form = Form.create()
             .with(net.nemerosa.ontrack.model.form.Int
@@ -72,26 +37,18 @@ class FractionValidationDataType(
             )
 
     override fun fromForm(node: JsonNode?): FractionValidationData? =
-            JsonUtils.parse(node, FractionValidationData::class.java)
+            node?.parse()
 
-    override fun computeStatus(config: FractionValidationDataTypeConfig?, data: FractionValidationData): ValidationRunStatusID? {
-        if (config?.threshold != null) {
-            return if ((data.numerator * 100 / data.denominator) >= config.threshold && config.okIfGreater) {
-                ValidationRunStatusID.STATUS_PASSED
-            } else {
-                ValidationRunStatusID.STATUS_FAILED
-            }
-        } else {
-            return null
-        }
+    override fun toIntValue(data: FractionValidationData): Int {
+        return (data.numerator * 100 / data.denominator)
     }
 
-
-    override fun validateData(config: FractionValidationDataTypeConfig?, data: FractionValidationData?) =
+    override fun validateData(config: ThresholdConfig?, data: FractionValidationData?) =
             validateNotNull(data) {
                 validate(numerator >= 0, "Numerator must be >= 0")
-                validate(denominator > 0, "Denominator must be >= 0")
+                validate(denominator > 0, "Denominator must be > 0")
+                validate(numerator <= denominator, "Numerator must <= denominator")
             }
 
-    override val displayName = "Fraction with threshold"
+    override val displayName = "Fraction"
 }
