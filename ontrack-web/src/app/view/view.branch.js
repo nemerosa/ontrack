@@ -160,6 +160,13 @@ angular.module('ot.view.branch', [
                   decorations {
                     ...decorationContent
                   }
+                  dataType {
+                    descriptor {
+                      id
+                      displayName
+                    }
+                    config
+                  }
                 }
                 builds(generic: {type: $filterType, data: $filterData}) {
                   id

@@ -95,6 +95,9 @@
                     <a href="#/validationStamp/{{validationStamp.id}}" class="ot-entity-sortable-list-link">
                         {{validationStamp.name}}
                     </a>
+                    <span ng-if="validationStamp.dataType">
+                        <ot-validation-data-type-decoration value="validationStamp.dataType"></ot-validation-data-type-decoration>
+                    </span>
                 </div>
             </div>
             <button ng-if="branch._createValidationStamp" type="button" class="btn btn-default"
