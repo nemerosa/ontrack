@@ -14,8 +14,9 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
     testCompile project(':ontrack-repository-impl')
+    testCompile project(':ontrack-extension-general')
+
     testRuntime project(':ontrack-service')
-    testRuntime project(':ontrack-repository-impl')
 
 }
 
