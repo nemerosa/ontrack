@@ -1036,9 +1036,11 @@ public class StructureServiceImpl implements StructureService {
             // Defining or replacing the predefined validation stamp
             Optional<PredefinedValidationStamp> o = predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.getName());
             if (o.isPresent()) {
-                // Updating the predefined validation stamp description
+                // Updating the predefined validation stamp description & data type
                 predefinedValidationStampService.savePredefinedValidationStamp(
-                        o.get().withDescription(validationStamp.getDescription())
+                        o.get()
+                                .withDescription(validationStamp.getDescription())
+                                .withDataType(validationStamp.getDataType())
                 );
                 // Sets its image
                 Document image = getValidationStampImage(validationStampId);
@@ -1054,14 +1056,16 @@ public class StructureServiceImpl implements StructureService {
                                         validationStamp.getName(),
                                         validationStamp.getDescription()
                                 )
-                        )
+                        ).withDataType(validationStamp.getDataType())
                 );
                 // Sets its image
                 Document image = getValidationStampImage(validationStampId);
-                predefinedValidationStampService.setPredefinedValidationStampImage(
-                        predefinedValidationStamp.getId(),
-                        image
-                );
+                if (!image.isEmpty()) {
+                    predefinedValidationStampService.setPredefinedValidationStampImage(
+                            predefinedValidationStamp.getId(),
+                            image
+                    );
+                }
             }
             // For all validation stamps
             structureRepository.bulkUpdateValidationStamps(validationStampId);
