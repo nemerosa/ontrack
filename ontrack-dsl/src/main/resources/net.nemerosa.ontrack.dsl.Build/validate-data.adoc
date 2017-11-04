@@ -1,0 +1,5 @@
+Validates the build using the given validation stamp and some data
+to associate with the run.
+
+The associated validation stamp data type will be used to validate
+the run data.

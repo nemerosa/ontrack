@@ -65,6 +65,22 @@ class Build extends AbstractProjectResource {
         run
     }
 
+    @DSLMethod(id = "validate-data", count = 2)
+    ValidationRun validate(String validationStamp, Object data) {
+        new ValidationRun(
+                ontrack,
+                ontrack.post(
+                        link("validate"),
+                        [
+                                validationStampData: [
+                                        id  : validationStamp,
+                                        data: data,
+                                ]
+                        ]
+                )
+        )
+    }
+
     @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {
