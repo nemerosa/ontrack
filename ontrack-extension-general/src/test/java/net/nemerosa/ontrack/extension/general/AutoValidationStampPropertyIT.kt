@@ -92,13 +92,14 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
         val pvs = asUser().with(GlobalSettings::class.java).call {
             predefinedValidationStampService.newPredefinedValidationStamp(
                     PredefinedValidationStamp.of(nd(name, ""))
-            ).withDataType(
-                    chmlValidationDataType.config(
-                            CHMLValidationDataTypeConfig(
-                                    CHMLLevel(CHML.HIGH, 10),
-                                    CHMLLevel(CHML.CRITICAL, 1)
+                            .withDataType(
+                                    chmlValidationDataType.config(
+                                            CHMLValidationDataTypeConfig(
+                                                    CHMLLevel(CHML.HIGH, 10),
+                                                    CHMLLevel(CHML.CRITICAL, 1)
+                                            )
+                                    )
                             )
-                    )
             )
         }
         val branch = doCreateBranch()
@@ -106,7 +107,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
             propertyService.editProperty(
                     branch.project,
                     AutoValidationStampPropertyType::class.java,
-                    AutoValidationStampProperty(true)CHMLValidationDataType
+                    AutoValidationStampProperty(true)
             )
         }
 

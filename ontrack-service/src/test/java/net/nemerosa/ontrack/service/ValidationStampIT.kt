@@ -4,19 +4,22 @@ import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.security.ValidationStampEdit
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.ValidationDataTypeConfig
-import net.nemerosa.ontrack.model.structure.ValidationStamp
-import net.nemerosa.ontrack.model.structure.config
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class ValidationStampIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var testNumberValidationDataType: TestNumberValidationDataType
+
+    @Autowired
+    private lateinit var predefinedValidationStampService: PredefinedValidationStampService
 
     @Test
     fun validationStampWithDataType() {
@@ -38,7 +41,7 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         // Checks the data type is still there
         @Suppress("UNCHECKED_CAST")
         var dataType: ValidationDataTypeConfig<Int?> = loadedVs.dataType as ValidationDataTypeConfig<Int?>
-        assertNotNull("Data type is loaded", dataType)
+        assertNotNull(dataType, "Data type is loaded")
         assertEquals(TestNumberValidationDataType::class.java.name, dataType.descriptor.id)
         assertEquals(2, dataType.config)
         // Loads using the list
@@ -58,9 +61,45 @@ class ValidationStampIT : AbstractServiceTestSupport() {
         // Checks the data type is still there
         @Suppress("UNCHECKED_CAST")
         dataType = loadedVs.dataType as ValidationDataTypeConfig<Int?>
-        assertNotNull("Data type is loaded", dataType)
+        assertNotNull(dataType, "Data type is loaded")
         assertEquals(TestNumberValidationDataType::class.java.name, dataType.descriptor.id)
         assertEquals(60, dataType.config)
+    }
+
+    @Test
+    fun `Creation from predefined with data type`() {
+        // Predefined validation stamp
+        val name = TestUtils.uid("PVS")
+        val pvs = asAdmin().call {
+            predefinedValidationStampService.newPredefinedValidationStamp(
+                    PredefinedValidationStamp.of(
+                            NameDescription.nd(name, "")
+                    ).withDataType(
+                            testNumberValidationDataType.config(50)
+                    )
+            )
+        }
+        // A branch...
+        val branch = doCreateBranch()
+        // Creation of validation stamp from predefined
+        asUser().with(branch, ValidationStampCreate::class.java).execute {
+            structureService.newValidationStampFromPredefined(
+                    branch,
+                    pvs
+            )
+        }
+        // Gets the validation stamp
+        val vs = asUser().withView(branch).call {
+            structureService.findValidationStampByName(branch.project.name, branch.name, name)
+        }
+        // Checks
+        assertPresent(vs) {
+            assertEquals(name, it.name)
+            assertNotNull(it.dataType) {
+                assertEquals(pvs.dataType?.descriptor?.id, it.descriptor.id)
+                assertEquals(50, it.config as Int)
+            }
+        }
     }
 
 }

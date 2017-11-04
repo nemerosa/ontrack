@@ -1092,7 +1092,7 @@ public class StructureServiceImpl implements StructureService {
                 ValidationStamp.of(
                         branch,
                         NameDescription.nd(predefinedValidationStamp.getName(), predefinedValidationStamp.getDescription())
-                )
+                ).withDataType(predefinedValidationStamp.getDataType())
         );
         // Image?
         if (predefinedValidationStamp.getImage() != null && predefinedValidationStamp.getImage()) {

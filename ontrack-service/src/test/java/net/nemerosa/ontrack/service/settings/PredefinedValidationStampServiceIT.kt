@@ -47,7 +47,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
     @Test
     fun `Predefined validation stamp creation with data type`() {
         val name = uid("PVS")
-        val predefinedValidationStamp = asUser().with(GlobalSettings::class.java).call {
+        asUser().with(GlobalSettings::class.java).call {
             service.newPredefinedValidationStamp(
                     PredefinedValidationStamp.of(
                             NameDescription.nd(
@@ -57,7 +57,10 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
                     ).withDataType(testNumberValidationDataType.config(50))
             )
         }
-        assertNotNull(predefinedValidationStamp) {
+
+        val predefinedValidationStamp = service.findPredefinedValidationStampByName(name)
+
+        assertPresent(predefinedValidationStamp) {
             assertTrue(it.id.isSet)
             assertNotNull(it.dataType) {
                 assertEquals(50, it.config as Int)
