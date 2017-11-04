@@ -26,12 +26,19 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     private final BranchTemplateRepository branchTemplateRepository;
     private final ValidationDataTypeService validationDataTypeService;
+    private final ValidationDataTypeConfigRepository validationDataTypeConfigRepository;
 
     @Autowired
-    public StructureJdbcRepository(DataSource dataSource, BranchTemplateRepository branchTemplateRepository, ValidationDataTypeService validationDataTypeService) {
+    public StructureJdbcRepository(
+            DataSource dataSource,
+            BranchTemplateRepository branchTemplateRepository,
+            ValidationDataTypeService validationDataTypeService,
+            ValidationDataTypeConfigRepository validationDataTypeConfigRepository
+    ) {
         super(dataSource);
         this.branchTemplateRepository = branchTemplateRepository;
         this.validationDataTypeService = validationDataTypeService;
+        this.validationDataTypeConfigRepository = validationDataTypeConfigRepository;
     }
 
     @Override
@@ -1023,32 +1030,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 )
         ).withId(id(rs))
                 .withSignature(readSignature(rs))
-                .withDataType(readValidationDataTypeConfig(rs))
+                .withDataType(validationDataTypeConfigRepository.readValidationDataTypeConfig(rs))
                 .withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
-    }
-
-    private <C> ValidationDataTypeConfig<C> readValidationDataTypeConfig(
-            ResultSet rs
-    ) throws SQLException {
-        String id = rs.getString("DATA_TYPE_ID");
-        JsonNode json = readJson(rs, "DATA_TYPE_CONFIG");
-        if (StringUtils.isBlank(id) || json == null) {
-            return null;
-        } else {
-            ValidationDataType<C, ?> validationDataType = validationDataTypeService.getValidationDataType(id);
-            if (validationDataType != null) {
-                // Parsing
-                C config = validationDataType.configFromJson(json);
-                // OK
-                return new ValidationDataTypeConfig<>(
-                        validationDataType.getDescriptor(),
-                        config
-                );
-            } else {
-                logger.warn("Cannot find validation data type for ID = " + id);
-                return null;
-            }
-        }
     }
 
     private <T> ValidationRunData<T> readValidationRunData(ResultSet rs) throws SQLException {
