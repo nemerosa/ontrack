@@ -2,12 +2,12 @@ package net.nemerosa.ontrack.graphql.support
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.*
+import graphql.language.NullValue
 import graphql.language.StringValue
 import graphql.schema.Coercing
+import graphql.schema.CoercingParseValueException
 import graphql.schema.GraphQLScalarType
-import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.ObjectMapperFactory
-import java.io.IOException
 
 /**
  * JSON scalar type.
@@ -15,34 +15,31 @@ import java.io.IOException
 class GQLScalarJSON private constructor() : GraphQLScalarType(
         "JSON",
         "Custom JSON value",
-        object : Coercing<Any, JsonNode> {
+        object : Coercing<JsonNode, JsonNode> {
 
             private val mapper = ObjectMapperFactory.create()
 
-            override fun serialize(input: Any): JsonNode {
-                val json: JsonNode = when (input) {
-                    is JsonNode -> input
-                    is String -> try {
-                        mapper.readTree(input)
-                    } catch (e: IOException) {
-                        throw JsonParseException(e)
-                    }
-                    else -> mapper.valueToTree<JsonNode>(input)
+            override fun serialize(dataFetcherResult: Any): JsonNode {
+                val json = when (dataFetcherResult) {
+                    is JsonNode -> dataFetcherResult
+                    else -> mapper.valueToTree<JsonNode>(dataFetcherResult)
                 }
                 return json.obfuscate()
             }
 
-            override fun parseValue(input: Any): JsonNode {
-                return serialize(input)
-            }
+            override fun parseValue(input: Any): JsonNode =
+                    when (input) {
+                        is String -> mapper.readTree(input)
+                        is JsonNode -> input
+                        else -> throw CoercingParseValueException("Cannot parse value for ${input::class}")
+                    }
 
-            override fun parseLiteral(input: Any): JsonNode? {
-                return if (input is StringValue) {
-                    serialize(input)
-                } else {
-                    null
-                }
-            }
+            override fun parseLiteral(input: Any): JsonNode? =
+                    when (input) {
+                        is NullValue -> NullNode.instance
+                        is StringValue -> mapper.readTree(input.value)
+                        else -> null // Meaning invalid
+                    }
 
             private fun JsonNode.obfuscate(): JsonNode {
                 val factory: JsonNodeFactory = mapper.nodeFactory

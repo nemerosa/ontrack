@@ -9,8 +9,8 @@ class GQLScalarJSONTest {
 
     @Test
     fun `JSON text`() {
-        // Data as JSON string --> <"Some text">
-        val data = """"Some text""""
+        // Data as string
+        val data = "Some text"
         // Serialization
         val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
         // Checks the data
