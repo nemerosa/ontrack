@@ -26,6 +26,7 @@
             </td>
             <td>
                 <div ng-if="predefinedValidationStamp.dataType">
+                    <p class="ot-description">{{predefinedValidationStamp.dataType.descriptor.displayName}}</p>
                     <ot-validation-data-type-config value="predefinedValidationStamp.dataType"></ot-validation-data-type-config>
                 </div>
                 <div ng-if="!predefinedValidationStamp.dataType">
