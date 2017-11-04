@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.extension.general.validation.CHML
+import net.nemerosa.ontrack.extension.general.validation.CHMLLevel
+import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType
+import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataTypeConfig
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -7,6 +11,7 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.NameDescription.nd
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp
+import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +23,9 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var predefinedValidationStampService: PredefinedValidationStampService
+
+    @Autowired
+    private lateinit var chmlValidationDataType: CHMLValidationDataType
 
     @Test
     fun `Get validation stamp by name - numeric`() {
@@ -75,6 +83,43 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
 
         assertNotNull(vs) {
             assertEquals(pvs.name, it.name)
+        }
+    }
+
+    @Test
+    fun `Get validation stamp by name - not found - predefined with data type`() {
+        val name = uid("PVS")
+        val pvs = asUser().with(GlobalSettings::class.java).call {
+            predefinedValidationStampService.newPredefinedValidationStamp(
+                    PredefinedValidationStamp.of(nd(name, ""))
+            ).withDataType(
+                    chmlValidationDataType.config(
+                            CHMLValidationDataTypeConfig(
+                                    CHMLLevel(CHML.HIGH, 10),
+                                    CHMLLevel(CHML.CRITICAL, 1)
+                            )
+                    )
+            )
+        }
+        val branch = doCreateBranch()
+        asUser().with(branch, ProjectEdit::class.java).call {
+            propertyService.editProperty(
+                    branch.project,
+                    AutoValidationStampPropertyType::class.java,
+                    AutoValidationStampProperty(true)CHMLValidationDataType
+            )
+        }
+
+        val vs = asUser().with(branch, ProjectEdit::class.java).call {
+            structureService.getOrCreateValidationStamp(branch, null, name)
+        }
+
+        assertNotNull(vs) {
+            assertEquals(pvs.name, it.name)
+            assertNotNull(it.dataType) {
+                assertEquals(pvs.dataType.descriptor.id, it.descriptor.id)
+                assertEquals(pvs.dataType.config, it.config)
+            }
         }
     }
 

@@ -135,7 +135,7 @@ data class CHMLValidationDataTypeData(
         val levels: Map<CHML, Int>
 )
 
-class CHMLValidationDataTypeConfig(
+data class CHMLValidationDataTypeConfig(
         val warningLevel: CHMLLevel,
         val failedLevel: CHMLLevel
 )
