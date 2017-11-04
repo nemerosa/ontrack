@@ -9,7 +9,14 @@
     <table class="table table-hover">
         <tr ng-if="validationRun.data">
             <td colspan="4" title="{{validationRun.data.descriptor.displayName}}">
-                <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
+                <p>
+                    Config:
+                    <ot-validation-data-type-config value="validationStamp.dataType"></ot-validation-data-type-config>
+                </p>
+                <p>
+                    Data:
+                    <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
+                </p>
             </td>
         </tr>
         <tr ng-repeat="validationRunStatus in validationRun.validationRunStatuses" ng-class="{info: $first}">
