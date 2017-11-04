@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.model.form.Form;
 
 /**
  * Validation stamp defined at global level, allowing some projects to create them automatically.
@@ -34,16 +33,6 @@ public class PredefinedValidationStamp implements Entity {
 
     public PredefinedValidationStamp withImage(boolean image) {
         return new PredefinedValidationStamp(id, name, description, image, dataType);
-    }
-
-    public static Form form() {
-        return Form.nameAndDescription();
-    }
-
-    public Form asForm() {
-        return form()
-                .fill("name", name)
-                .fill("description", description);
     }
 
     public PredefinedValidationStamp update(NameDescription nameDescription) {
