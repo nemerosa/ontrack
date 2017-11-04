@@ -12,6 +12,7 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Type</th>
                 <th>Description</th>
                 <th>&nbsp;</th>
             </tr>
@@ -22,6 +23,14 @@
                 <ot-entity-image entity="predefinedValidationStamp">
                     {{predefinedValidationStamp.name}}
                 </ot-entity-image>
+            </td>
+            <td>
+                <div ng-if="predefinedValidationStamp.dataType">
+                    <ot-validation-data-type-config value="predefinedValidationStamp.dataType"></ot-validation-data-type-config>
+                </div>
+                <div ng-if="!predefinedValidationStamp.dataType">
+                    <span class="ot-description">Normal</span>
+                </div>
             </td>
             <td>
                 {{predefinedValidationStamp.description}}
