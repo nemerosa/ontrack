@@ -99,7 +99,7 @@ public class BasicGitConfiguration implements UserPasswordConfiguration<BasicGit
 
     @Override
     public BasicGitConfiguration obfuscate() {
-        return this;
+        return withPassword("");
     }
 
     @Override

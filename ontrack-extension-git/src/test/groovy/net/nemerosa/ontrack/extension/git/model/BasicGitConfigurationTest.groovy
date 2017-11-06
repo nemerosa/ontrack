@@ -8,6 +8,13 @@ import static org.junit.Assert.*
 class BasicGitConfigurationTest {
 
     @Test
+    void obfuscation_of_password() {
+        BasicGitConfiguration configuration = BasicGitConfiguration.empty()
+                .withUser("test").withPassword("secret")
+        assertEquals("", configuration.obfuscate().getPassword())
+    }
+
+    @Test
     void user_password_none() {
         BasicGitConfiguration configuration = BasicGitConfiguration.empty();
         assertFalse(configuration.credentials.present);
