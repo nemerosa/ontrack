@@ -1128,7 +1128,8 @@ public class StructureServiceImpl implements StructureService {
     private void validateRunData(ValidationRun validationRun) {
         validationDataTypeService.validateData(
                 validationRun.getData(),
-                validationRun.getValidationStamp().getDataType()
+                validationRun.getValidationStamp().getDataType(),
+                validationRun.getLastStatus().getStatusID()
         );
     }
 
