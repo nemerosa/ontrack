@@ -11,7 +11,6 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -212,19 +211,17 @@ constructor(
                 val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, "lastPerLevel", false)
                 // Promotion filter
                 val promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null)
-                if (promotion != null) {
+                val promotionLevel: PromotionLevel? = if (promotion != null) {
                     // Gets the promotion level
-                    val promotionLevel = structureService.findPromotionLevelByName(
+                    structureService.findPromotionLevelByName(
                             build.project.name,
                             build.branch.name,
                             promotion
-                    ).orElseThrow {
-                        PromotionLevelNotFoundException(
-                                build.project.name,
-                                build.branch.name,
-                                promotion
-                        )
-                    }
+                    ).orElse(null)
+                } else {
+                    null
+                }
+                if (promotionLevel != null) {
                     // Gets promotion runs for this promotion level
                     if (lastPerLevel) {
                         return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
