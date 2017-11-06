@@ -34,4 +34,32 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         assertEquals(0, b["promotionRuns"].size())
     }
 
+    @Test
+    fun `Validations when validation stamp does not exist`() {
+        // Creates a build
+        val build = doCreateBuild()
+        // Looks for validations
+        val data = asUser().withView(build).call {
+            run("""
+                {
+                    builds(id: ${build.id}) {
+                        name
+                        validations(validationStamp: "VS") {
+                          validationRuns(count: 1) {
+                            creation {
+                              time
+                            }
+                          }
+                        }
+                    }
+                }
+            """.trimIndent())
+        }
+        // Checks the build
+        val b = data["builds"][0]
+        assertEquals(build.name, b["name"].asText())
+        // Checks that there is no validation run (but the query did not fail!)
+        assertEquals(0, b["validations"].size())
+    }
+
 }

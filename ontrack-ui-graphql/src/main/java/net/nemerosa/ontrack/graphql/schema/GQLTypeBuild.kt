@@ -121,26 +121,23 @@ constructor(
             // Filter on validation stamp
             val validationStampName = GraphqlUtils.getStringArgument(environment, "validationStamp")
             if (validationStampName.isPresent) {
-                // Loads the validation stamp by name
-                return@fetcher structureService.findValidationStampByName(
-                        build.project.name,
-                        build.branch.name,
-                        validationStampName.get()
-                ).map { vs ->
-                    listOf(
+                val validationStamp: ValidationStamp? =
+                        structureService.findValidationStampByName(
+                                build.project.name,
+                                build.branch.name,
+                                validationStampName.get()
+                        ).orElse(null)
+                if (validationStamp != null) {
+                    return@fetcher listOf(
                             buildValidation(
-                                    vs, build
+                                    validationStamp, build
                             )
                     )
-                }.orElseThrow {
-                    ValidationStampNotFoundException(
-                            build.project.name,
-                            build.branch.name,
-                            validationStampName.get()
-                    )
+                } else {
+                    return@fetcher listOf<GQLTypeValidation.GQLTypeValidationData>()
                 }
             } else {
-                // Gets the validation stamps for the branch
+                // Gets the validation runs for the build
                 return@fetcher structureService.getValidationStampListForBranch(build.branch.id)
                         .map { validationStamp -> buildValidation(validationStamp, build) }
             }
