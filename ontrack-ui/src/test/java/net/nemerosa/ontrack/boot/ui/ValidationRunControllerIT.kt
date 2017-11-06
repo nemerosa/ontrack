@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.boot.ui
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusRequiredException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
@@ -119,7 +119,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         // Creates a build
         val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
         // Validates the build
-        assertFailsWith<ValidationRunStatusRequiredException> {
+        assertFailsWith<ValidationRunDataStatusRequiredException> {
             asUser().with(vs, ValidationRunCreate::class.java).call {
                 validationRunController.newValidationRun(
                         build.id,
@@ -136,7 +136,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 )
             }
         }.apply {
-            assertEquals("Status is required for validation stamp ${vs.name}.", message)
+            assertEquals("Validation Run Status is required.", message)
         }
     }
 
@@ -169,7 +169,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
             assertEquals(80, it.data as Int, "... and the data is 80")
         }
         // Checks the status
-        assertEquals("WARNING", run.lastStatus.statusID.id)
+        assertEquals("PASSED", run.lastStatus.statusID.id)
     }
 
     @Test

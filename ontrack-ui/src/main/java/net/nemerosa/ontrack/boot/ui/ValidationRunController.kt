@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusRequiredException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
@@ -92,45 +91,28 @@ constructor(
                 validationRunRequest.validationStampId,
                 validationRunRequest.actualValidationStampName)
         // Validation run data
-        val runData: ValidationRunData<Any>?
-        val runStatus: ValidationRunStatusID
-        when {
-            validationStamp.dataType != null -> {
-                val runDataJson = validationStamp.dataType?.let {
-                    ServiceConfiguration(
-                            validationStamp.dataType.descriptor.id,
-                            validationRunRequest.validationStampData?.data
-                    )
-                }
-                // Validation of the run data
-                val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
-                        runDataJson,
-                        validationStamp.dataType
-                )
-                // Assignment for the data
-                runData = status.runData
-                // Assignment for the status
-                if (!validationRunRequest.validationRunStatusId.isNullOrBlank()) {
-                    runStatus = validationRunStatusService.getValidationRunStatus(validationRunRequest.validationRunStatusId)
-                } else {
-                    runStatus = status.runStatusID
-                }
-            }
-            validationRunRequest.validationRunStatusId.isNullOrBlank() -> throw ValidationRunStatusRequiredException(validationStamp.name)
-            else -> {
-                runData = null
-                runStatus = validationRunStatusService.getValidationRunStatus(validationRunRequest.validationRunStatusId)
-            }
+        val runDataJson = validationStamp.dataType?.let {
+            ServiceConfiguration(
+                    validationStamp.dataType.descriptor.id,
+                    validationRunRequest.validationStampData?.data
+            )
         }
+        // Validation of the run data
+        val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
+                runDataJson,
+                validationStamp.dataType,
+                validationRunRequest.validationRunStatusId,
+                validationRunStatusService::getValidationRunStatus
+        )
         // Validation run to create
         var validationRun = ValidationRun.of(
                 build,
                 validationStamp,
                 0,
                 securityService.currentSignature,
-                runStatus,
+                status.runStatusID,
                 validationRunRequest.description
-        ).withData(runData)
+        ).withData(status.runData)
         // Creation
         validationRun = structureService.newValidationRun(validationRun)
         // Saves the properties

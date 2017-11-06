@@ -211,8 +211,8 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         }
     }
 
-    @Test(expected = ValidationRunDataInputException::class)
-    fun validationRunWithMissingData() {
+    @Test
+    fun validationRunWithMissingDataOKWithStatus() {
         // Creates a validation run with no data
         asUser().with(branch, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
@@ -222,6 +222,23 @@ class ValidationRunIT : AbstractServiceTestSupport() {
                             1,
                             Signature.of("test"),
                             ValidationRunStatusID.STATUS_PASSED,
+                            ""
+                    )
+            )
+        }
+    }
+
+    @Test(expected = ValidationRunDataInputException::class)
+    fun validationRunWithMissingDataNotOKWithoutStatus() {
+        // Creates a validation run with no data
+        asUser().with(branch, ValidationRunCreate::class.java).call {
+            structureService.newValidationRun(
+                    ValidationRun.of(
+                            build,
+                            vs,
+                            1,
+                            Signature.of("test"),
+                            null,
                             ""
                     )
             )
