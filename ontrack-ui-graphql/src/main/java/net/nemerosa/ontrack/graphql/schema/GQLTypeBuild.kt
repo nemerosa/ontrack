@@ -11,7 +11,6 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -122,26 +121,23 @@ constructor(
             // Filter on validation stamp
             val validationStampName = GraphqlUtils.getStringArgument(environment, "validationStamp")
             if (validationStampName.isPresent) {
-                // Loads the validation stamp by name
-                return@fetcher structureService.findValidationStampByName(
-                        build.project.name,
-                        build.branch.name,
-                        validationStampName.get()
-                ).map { vs ->
-                    listOf(
+                val validationStamp: ValidationStamp? =
+                        structureService.findValidationStampByName(
+                                build.project.name,
+                                build.branch.name,
+                                validationStampName.get()
+                        ).orElse(null)
+                if (validationStamp != null) {
+                    return@fetcher listOf(
                             buildValidation(
-                                    vs, build
+                                    validationStamp, build
                             )
                     )
-                }.orElseThrow {
-                    ValidationStampNotFoundException(
-                            build.project.name,
-                            build.branch.name,
-                            validationStampName.get()
-                    )
+                } else {
+                    return@fetcher listOf<GQLTypeValidation.GQLTypeValidationData>()
                 }
             } else {
-                // Gets the validation stamps for the branch
+                // Gets the validation runs for the build
                 return@fetcher structureService.getValidationStampListForBranch(build.branch.id)
                         .map { validationStamp -> buildValidation(validationStamp, build) }
             }
@@ -212,19 +208,17 @@ constructor(
                 val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, "lastPerLevel", false)
                 // Promotion filter
                 val promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null)
-                if (promotion != null) {
+                val promotionLevel: PromotionLevel? = if (promotion != null) {
                     // Gets the promotion level
-                    val promotionLevel = structureService.findPromotionLevelByName(
+                    structureService.findPromotionLevelByName(
                             build.project.name,
                             build.branch.name,
                             promotion
-                    ).orElseThrow {
-                        PromotionLevelNotFoundException(
-                                build.project.name,
-                                build.branch.name,
-                                promotion
-                        )
-                    }
+                    ).orElse(null)
+                } else {
+                    null
+                }
+                if (promotionLevel != null) {
                     // Gets promotion runs for this promotion level
                     if (lastPerLevel) {
                         return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
