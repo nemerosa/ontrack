@@ -95,7 +95,7 @@ class Build extends AbstractProjectResource {
         Associates some critical / high / medium / low issue counts with the validation. The
         validation stamp must be configured to accept CHML as validation data.""")
     ValidationRun validateWithCHML(String validationStamp, int critical = 0, int high = 0, int medium = 0, int low = 0) {
-        return validateWithData("VS", [
+        return validateWithData(validationStamp, [
                 CRITICAL: critical,
                 HIGH    : high,
                 MEDIUM  : medium,
@@ -107,21 +107,21 @@ class Build extends AbstractProjectResource {
         Associates some number with the validation. The
         validation stamp must be configured to accept number as validation data.""")
     ValidationRun validateWithNumber(String validationStamp, int value) {
-        return validateWithData("VS", [value: value])
+        return validateWithData(validationStamp, [value: value])
     }
 
     @DSLMethod("""
         Associates some percentage with the validation. The
         validation stamp must be configured to accept percentage as validation data.""")
     ValidationRun validateWithPercentage(String validationStamp, int value) {
-        return validateWithData("VS", [value: value])
+        return validateWithData(validationStamp, [value: value])
     }
 
     @DSLMethod("""
         Associates some fraction with the validation. The
         validation stamp must be configured to accept fraction as validation data.""")
     ValidationRun validateWithFraction(String validationStamp, int numerator, int denominator) {
-        return validateWithData("VS", [
+        return validateWithData(validationStamp, [
                 numerator  : numerator,
                 denominator: denominator,
         ])

@@ -41,4 +41,31 @@ class PredefinedValidationStamp extends AbstractResource {
     Document getImage() {
         ontrack.download(link('image'))
     }
+
+    @DSLMethod("Sets a data type for the validation stamp")
+    def setDataType(String id, Object config) {
+        ontrack.put(
+                link("update"),
+                [
+                        name       : name,
+                        description: description,
+                        dataType   : [
+                                id  : id,
+                                data: config,
+                        ],
+                ]
+        )
+    }
+
+    @DSLMethod("Gets the data type for the validation stamp, map with `id` and `config`, or null if not defined.")
+    def getDataType() {
+        if (node.dataType) {
+            return [
+                    id    : node.dataType.descriptor.id,
+                    config: node.dataType.config
+            ]
+        } else {
+            return null
+        }
+    }
 }
