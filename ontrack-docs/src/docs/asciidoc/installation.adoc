@@ -16,8 +16,41 @@ Ontrack runs fine with 512 Mb of memory. However, think of upgrading to 2 Gb of
 memory if you intend to host a lot of projects. See the different installation
 modes (Docker, RPM, etc.) to know how to setup the memory settings.
 
-Ontrack stores its data in a local H2 database. This one can grow up to 500 Mb
-for big volumes (hundreds of projects).
+Ontrack stores its data in a Postgres database.
+
+[[installation-quick-start]]
+=== Quick start
+
+The fastest way to start Ontrack is to use <<installation-docker-compose,Docker Compose>>.
+
+[[installation-postgres]]
+=== Postgres database
+
+Unless you choose to deploy with <<installation-docker-compose,Docker Compose>>,
+you will need to have a Postgres database accessible by Ontrack.
+
+Version 9.5 of Postgres has been tested successfully with Ontrack, but
+any later 9.x version should be OK as well.
+
+No test with Postgres 10.x has been performed yet.
+
+Ontrack will by default try to connect to
+`jdbc:postgresql://postgresql/ontrack`, using `ontrack / ontrack`
+as credentials.
+
+Those parameters can be configured using normal Spring Boot JDBC <<configuration,configuration>>,
+for example using arguments at startup:
+
+[source]
+----
+--spring.datasource.url=jdbc:postgresql://localhost:5432/ontrack
+--spring.datasource.username=myuser
+--spring.datasource.password=password
+----
+
+See the https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-external-config[Spring Boot documentation]
+to see other and better ways to pass
+those <<configuration,configuration>> parameters.
 
 [[installation-docker]]
 === Installing using Docker
@@ -31,7 +64,7 @@ The Ontrack image exposes the ports `443` and `8080`.
 
 Two volumes are defined:
 
-* `/var/ontrack/data` - contains the data for Ontrack (files & database) but also the log files. This is typically provided through a data volume container.
+* `/var/ontrack/data` - contains some working files but also the log files.
 * `/var/ontrack/conf` - contains the <<configuration-properties,configuration files>> for Ontrack (see later).
 
 [[installation-docker-basic]]
@@ -63,6 +96,47 @@ docker run \
    --env "JAVA_OPTIONS=-Xmx2048m" \
    ...
 ----
+
+[[installation-docker-compose]]
+==== Docker Compose deployment
+
+Create the following file:
+
+[source,yaml]
+.docker-compose.yml
+----
+version: "2.1"
+
+services:
+  # Ontrack container
+  ontrack:
+    image: nemerosa/ontrack:3
+    environment:
+        PROFILE: prod
+    links:
+      - "postgresql:postgresql"
+    ports:
+      - "8080:8080"
+
+  # Postgresql database
+  postgresql:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+    ports:
+      - "5432"
+----
+
+In the same directory, run:
+
+[source,bash]
+----
+docker-compose up -d
+----
+
+After some time, Ontrack becomes available at http://localhost:8080
 
 [[installation-rpm]]
 === RPM installation
@@ -183,27 +257,9 @@ Ontrack can be downloaded as a JAR and started as a Spring Boot application.
 Download the JAR from the
 https://github.com/nemerosa/ontrack/releases[Ontrack release page]
 
-Start it using `java -jar ontrack.jar` with the following options:
+Start it using `java -jar ontrack.jar`.
 
-* `--spring.datasource.url=jdbc:h2:/var/ontrack/data/database/data`
-* or `--spring.datasource.url=jdbc:h2:./database/data`
-* and any other Java option, like memory settings: `-Xmx2048m`
-* or <<configuration,configuration parameter>> like `--server.port=9999`
-
-to specify the location of the H2 database files.
-
-<<configuration-properties,Options>> can also be specified in an `application.yml` file in
-the working directory.
-
-For example:
-
-[source,yaml]
-.application.yml
-----
-spring:
-   datasource:
-      url: "jdbc:h2:/var/ontrack/data/database/data"
-----
+<<configuration,Options>> can be passed on the command line.
 
 [[configuration]]
 === Configuration
