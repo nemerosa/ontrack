@@ -109,7 +109,7 @@ class ValidationStamp extends AbstractProjectResource {
         )
     }
 
-    @DSLMethod("Sets the data type for this validation stamp to 'Number'.")
+    @DSLMethod(value = "Sets the data type for this validation stamp to 'Number'.", count = 3)
     def setNumberDataType(
             Integer warningThreshold = null,
             Integer failureThreshold = null,
@@ -125,7 +125,7 @@ class ValidationStamp extends AbstractProjectResource {
         )
     }
 
-    @DSLMethod("Sets the data type for this validation stamp to 'Percentage'.")
+    @DSLMethod(value = "Sets the data type for this validation stamp to 'Percentage'.", count = 3)
     def setPercentageDataType(
             Integer warningThreshold = null,
             Integer failureThreshold = null,
@@ -141,7 +141,7 @@ class ValidationStamp extends AbstractProjectResource {
         )
     }
 
-    @DSLMethod("Sets the data type for this validation stamp to 'Fraction'.")
+    @DSLMethod(value = "Sets the data type for this validation stamp to 'Fraction'.", count = 3)
     def setFractionDataType(
             Integer warningThreshold = null,
             Integer failureThreshold = null,
