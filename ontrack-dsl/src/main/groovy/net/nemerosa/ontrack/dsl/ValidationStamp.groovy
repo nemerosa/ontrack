@@ -108,4 +108,20 @@ class ValidationStamp extends AbstractProjectResource {
                 ]
         )
     }
+
+    @DSLMethod("Sets the data type for this validation stamp to 'Number'.")
+    def setNumberDataType(
+            Integer warningThreshold = null,
+            Integer failureThreshold = null,
+            boolean okIfGreater = true
+    ) {
+        setDataType(
+                "net.nemerosa.ontrack.extension.general.validation.ThresholdNumberValidationDataType",
+                [
+                        warningThreshold: warningThreshold,
+                        failureThreshold: failureThreshold,
+                        okIfGreater     : okIfGreater,
+                ]
+        )
+    }
 }

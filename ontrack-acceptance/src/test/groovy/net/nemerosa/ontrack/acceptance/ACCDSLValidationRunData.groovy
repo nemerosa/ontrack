@@ -126,4 +126,27 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
         ]
     }
 
+    @Test
+    void 'Validation run with number threshold'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setNumberDataType(
+                    10,
+                    20,
+                    false
+            )
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithNumber("VS", 15)
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "WARNING"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.ThresholdNumberValidationDataType"
+        assert run.data.data == 15
+    }
+
 }

@@ -93,7 +93,7 @@ class Build extends AbstractProjectResource {
 
     @DSLMethod("""
         Associates some critical / high / medium / low issue counts with the validation. The 
-        validation stamp must be configured to accept text as validation data.""")
+        validation stamp must be configured to accept CHML as validation data.""")
     ValidationRun validateWithCHML(String validationStamp, int critical = 0, int high = 0, int medium = 0, int low = 0) {
         return validateWithData("VS", [
                 CRITICAL: critical,
@@ -101,6 +101,13 @@ class Build extends AbstractProjectResource {
                 MEDIUM  : medium,
                 LOW     : low,
         ])
+    }
+
+    @DSLMethod("""
+        Associates some number with the validation. The 
+        validation stamp must be configured to accept number as validation data.""")
+    ValidationRun validateWithNumber(String validationStamp, int value) {
+        return validateWithData("VS", [value: value])
     }
 
     @DSLMethod("Gets the list of promotion runs for this build")
