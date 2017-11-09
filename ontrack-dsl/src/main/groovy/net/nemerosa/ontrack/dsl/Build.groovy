@@ -91,6 +91,18 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod("""
+        Associates some critical / high / medium / low issue counts with the validation. The 
+        validation stamp must be configured to accept text as validation data.""")
+    ValidationRun validateWithCHML(String validationStamp, int critical = 0, int high = 0, int medium = 0, int low = 0) {
+        return validateWithData("VS", [
+                CRITICAL: critical,
+                HIGH    : high,
+                MEDIUM  : medium,
+                LOW     : low,
+        ])
+    }
+
     @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {

@@ -48,7 +48,7 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
     }
 
     @Test
-    void 'Validation run text data'() {
+    void 'Validation run with text'() {
         def projectName = uid("P")
         // Validation stamp data type
         ontrack.project(projectName).branch("master") {
@@ -63,6 +63,67 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
         assert run.data != null
         assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TextValidationDataType"
         assert run.data.data == "Some text"
+    }
+
+    @Test
+    void 'Validation run with CHML'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setCHMLDataType(
+                    "HIGH",
+                    10,
+                    "CRITICAL",
+                    2
+            )
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithCHML("VS", 1, 20, 4, 8)
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "WARNING"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType"
+        assert run.data.data == [
+                levels: [
+                        CRITICAL: 1,
+                        HIGH    : 20,
+                        MEDIUM  : 4,
+                        LOW     : 8,
+                ]
+        ]
+    }
+
+    @Test
+    void 'Validation run with partial CHML'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setCHMLDataType(
+                    "HIGH",
+                    10,
+                    "CRITICAL",
+                    1
+            )
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithCHML("VS", 1, 2)
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType"
+        assert run.data.data == [
+                levels: [
+                        CRITICAL: 1,
+                        HIGH    : 2,
+                        MEDIUM  : 0,
+                        LOW     : 0,
+                ]
+        ]
     }
 
 }
