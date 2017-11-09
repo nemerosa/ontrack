@@ -36,4 +36,16 @@ class ValidationRun extends AbstractProjectResource {
     def getValidationRunStatuses() {
         node.validationRunStatuses
     }
+
+    @DSLMethod("Gets the data for the validation run, map with `id` and `data`, or null if not defined.")
+    def getData() {
+        if (node.data) {
+            return [
+                    id  : node.data.descriptor.id,
+                    data: node.data.data
+            ]
+        } else {
+            return null
+        }
+    }
 }

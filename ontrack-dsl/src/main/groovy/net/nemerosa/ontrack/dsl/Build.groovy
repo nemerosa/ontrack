@@ -65,6 +65,68 @@ class Build extends AbstractProjectResource {
         run
     }
 
+    @DSLMethod(value = "Associates some data with the validation.", count = 3)
+    ValidationRun validateWithData(String validationStamp, Object data, String status = null) {
+        new ValidationRun(
+                ontrack,
+                ontrack.post(
+                        link("validate"),
+                        [
+                                validationStampData  : [
+                                        id  : validationStamp,
+                                        data: data,
+                                ],
+                                validationRunStatusId: status
+                        ]
+                )
+        )
+    }
+
+    @DSLMethod("Associates some text with the validation. The validation stamp must be configured to accept text as validation data.")
+    ValidationRun validateWithText(String validationStamp, String status, String text) {
+        return validateWithData(
+                validationStamp,
+                [value: text],
+                status
+        )
+    }
+
+    @DSLMethod(count = 5, value = """
+        Associates some critical / high / medium / low issue counts with the validation. The
+        validation stamp must be configured to accept CHML as validation data.""")
+    ValidationRun validateWithCHML(String validationStamp, int critical = 0, int high = 0, int medium = 0, int low = 0) {
+        return validateWithData("VS", [
+                CRITICAL: critical,
+                HIGH    : high,
+                MEDIUM  : medium,
+                LOW     : low,
+        ])
+    }
+
+    @DSLMethod("""
+        Associates some number with the validation. The
+        validation stamp must be configured to accept number as validation data.""")
+    ValidationRun validateWithNumber(String validationStamp, int value) {
+        return validateWithData("VS", [value: value])
+    }
+
+    @DSLMethod("""
+        Associates some percentage with the validation. The
+        validation stamp must be configured to accept percentage as validation data.""")
+    ValidationRun validateWithPercentage(String validationStamp, int value) {
+        return validateWithData("VS", [value: value])
+    }
+
+    @DSLMethod("""
+        Associates some fraction with the validation. The
+        validation stamp must be configured to accept fraction as validation data.""")
+    ValidationRun validateWithFraction(String validationStamp, int numerator, int denominator) {
+        return validateWithData("VS", [
+                numerator  : numerator,
+                denominator: denominator,
+        ])
+    }
+
     @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {
