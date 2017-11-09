@@ -82,4 +82,12 @@ class ValidationStamp extends AbstractProjectResource {
             return null
         }
     }
+
+    @DSLMethod("Sets the data type for this validation stamp to 'text'.")
+    def setTextDataType() {
+        setDataType(
+                "net.nemerosa.ontrack.extension.general.validation.TextValidationDataType",
+                [:]
+        )
+    }
 }

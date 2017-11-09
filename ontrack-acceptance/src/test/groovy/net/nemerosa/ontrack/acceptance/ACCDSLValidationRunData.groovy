@@ -25,7 +25,7 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
         }
         // Creates a build and validates it
         def build = ontrack.branch(projectName, "master").build("1")
-        build.validate("VS", [
+        build.validateWithData("VS", [
                 CRITICAL: 1,
                 HIGH    : 2,
                 MEDIUM  : 4,
@@ -45,6 +45,24 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
                 ]
         ]
 
+    }
+
+    @Test
+    void 'Validation run text data'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setTextDataType()
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithText("VS", "PASSED", "Some text")
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TextValidationDataType"
+        assert run.data.data == "Some text"
     }
 
 }

@@ -65,19 +65,29 @@ class Build extends AbstractProjectResource {
         run
     }
 
-    @DSLMethod(id = "validate-data", count = 2)
-    ValidationRun validate(String validationStamp, Object data) {
+    @DSLMethod("Associates some data with the validation.")
+    ValidationRun validateWithData(String validationStamp, Object data, String status = null) {
         new ValidationRun(
                 ontrack,
                 ontrack.post(
                         link("validate"),
                         [
-                                validationStampData: [
+                                validationStampData  : [
                                         id  : validationStamp,
                                         data: data,
-                                ]
+                                ],
+                                validationRunStatusId: status
                         ]
                 )
+        )
+    }
+
+    @DSLMethod("Associates some text with the validation. The validation stamp must be configured to accept text as validation data.")
+    ValidationRun validateWithText(String validationStamp, String status, String text) {
+        return validateWithData(
+                validationStamp,
+                [value: text],
+                status
         )
     }
 
