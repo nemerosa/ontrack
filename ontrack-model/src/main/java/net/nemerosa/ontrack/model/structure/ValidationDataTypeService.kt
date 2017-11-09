@@ -23,17 +23,20 @@ interface ValidationDataTypeService {
      * Validates some run data according to its type and configuration.
      * @param data Data to validate (ID + JSON)
      * @param config Configuration associated to the type
+     * @param status Passed status
+     * @param statusLoader Used to load the status when needed
      * @return Validated data
      */
-    fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>): ValidationRunDataWithStatus<T>
+    fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>?, status: String?, statusLoader: (String) -> ValidationRunStatusID): ValidationRunDataWithStatus<T>
 
     /**
      * Validates some run data according to its type and configuration.
      * @param data Data to validate (ID + type)
      * @param config Configuration associated to the type
+     * @param status Passed status
      * @return Validated data (if present and valid)
      */
-    fun <C, T> validateData(data: ValidationRunData<T>?, config: ValidationDataTypeConfig<C>?): ValidationRunData<T>?
+    fun <C, T> validateData(data: ValidationRunData<T>?, config: ValidationDataTypeConfig<C>?, status: ValidationRunStatusID?): ValidationRunData<T>?
 
     /**
      * Gets the [ServiceConfiguration] representation for a [ValidationDataTypeConfig].
