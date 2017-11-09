@@ -2,7 +2,9 @@
     <div class="col-md-12">
         <div class="row">
             <div class="col-md-12">
-                <select ng-model="sourceId"
+                <select
+                        id="{{field.name}}"
+                        ng-model="sourceId"
                         ng-options="source.id as source.name for source in field.sources"
                         class="form-control"
                         ng-required="field.required">
@@ -11,7 +13,7 @@
             </div>
         </div>
         <div class="row" ng-repeat="formEntry in formEntries" ng-if="formEntry.form.fields.length > 0">
-            <div class="col-md-11 ot-field-service-configurator-form">
+            <div class="col-md-11 ot-field-service-configurator-form" id="{{field.name}}-form">
                 <ot-field-service-configurator-form form="formEntry.form" data="formEntry.data" form-root="formRoot"></ot-field-service-configurator-form>
             </div>
         </div>
