@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.browser.dialogs.ValidationRunDialog
+import net.nemerosa.ontrack.acceptance.browser.pages.BranchPage
 import net.nemerosa.ontrack.acceptance.browser.pages.BuildPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.Build
+import net.nemerosa.ontrack.dsl.ValidationStamp
+import org.junit.Before
 import org.junit.Test
 import org.openqa.selenium.By
 
@@ -13,7 +16,11 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 @AcceptanceTestSuite
 class ACCBrowserValidationRunData extends AcceptanceTestClient {
 
-    private Build prepareBuild() {
+    private Build bld
+    private ValidationStamp vs
+
+    @Before
+    void prepare() {
         def projectName = uid('P')
         ontrack.project(projectName) {
             branch('B') {
@@ -21,20 +28,43 @@ class ACCBrowserValidationRunData extends AcceptanceTestClient {
                 build '1'
             }
         }
-        return ontrack.build(projectName, 'B', '1')
+        bld = ontrack.build(projectName, 'B', '1')
+        vs = ontrack.validationStamp(projectName, 'B', 'Coverage')
     }
 
     @Test
-    void 'Validating a build with data from the build page'() {
-        // Preparation
-        def build = prepareBuild()
+    void 'Validation a build with data from the branch overview'() {
+        // Gets the branch
+        def branch = ontrack.branch(bld.project, bld.branch)
 
         // GUI scenario
         browser { browser ->
             // Logs in
             loginAsAdmin(browser)
+            // Goes to the branch page
+            BranchPage branchPage = goTo(BranchPage, [id: branch.id])
+            // Click on the validation
+            ValidationRunDialog dialog = branchPage.validate(bld, vs)
+            // Selects the "Coverage" timestamp
+            dialog.validationStamp = 'Coverage'
+            // Enters a value
+            dialog.validationStampDataForm.findElement(By.name("value")).sendKeys("25")
+            // Validates
+            dialog.ok()
+        }
+
+        // Checks the validation run
+        checkValidationRun()
+    }
+
+    @Test
+    void 'Validating a build with data from the build page'() {
+        // GUI scenario
+        browser { browser ->
+            // Logs in
+            loginAsAdmin(browser)
             // Goes to the build page which must contains the link
-            BuildPage buildPage = goTo(BuildPage, [id: build.id])
+            BuildPage buildPage = goTo(BuildPage, [id: bld.id])
             // Validation link
             ValidationRunDialog dialog = buildPage.validate()
             // Selects the "Coverage" timestamp
@@ -46,7 +76,11 @@ class ACCBrowserValidationRunData extends AcceptanceTestClient {
         }
 
         // Checks the validation run
-        def run = build.validationRuns[0]
+        checkValidationRun()
+    }
+
+    protected void checkValidationRun() {
+        def run = bld.validationRuns[0]
         assert run.status == "WARNING"
         assert run.data != null
         assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType"
