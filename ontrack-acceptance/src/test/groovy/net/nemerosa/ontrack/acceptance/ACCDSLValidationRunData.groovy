@@ -172,4 +172,30 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
         assert run.data.data == 4
     }
 
+    @Test
+    void 'Validation run with fraction threshold'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setFractionDataType(
+                    50,
+                    25,
+                    true
+            )
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithFraction("VS", 30, 300)
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "FAILED"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType"
+        assert run.data.data == [
+                numerator  : 30,
+                denominator: 300,
+        ]
+    }
+
 }

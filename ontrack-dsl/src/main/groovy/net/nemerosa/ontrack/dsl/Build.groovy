@@ -117,6 +117,16 @@ class Build extends AbstractProjectResource {
         return validateWithData("VS", [value: value])
     }
 
+    @DSLMethod("""
+        Associates some fraction with the validation. The 
+        validation stamp must be configured to accept fraction as validation data.""")
+    ValidationRun validateWithFraction(String validationStamp, int numerator, int denominator) {
+        return validateWithData("VS", [
+                numerator: numerator,
+                denominator: denominator,
+        ])
+    }
+
     @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {

@@ -140,4 +140,20 @@ class ValidationStamp extends AbstractProjectResource {
                 ]
         )
     }
+
+    @DSLMethod("Sets the data type for this validation stamp to 'Fraction'.")
+    def setFractionDataType(
+            Integer warningThreshold = null,
+            Integer failureThreshold = null,
+            boolean okIfGreater = true
+    ) {
+        setDataType(
+                "net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType",
+                [
+                        warningThreshold: warningThreshold,
+                        failureThreshold: failureThreshold,
+                        okIfGreater     : okIfGreater,
+                ]
+        )
+    }
 }
