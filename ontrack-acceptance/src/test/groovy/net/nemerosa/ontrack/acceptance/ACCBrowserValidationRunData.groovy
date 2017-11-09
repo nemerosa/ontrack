@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import net.nemerosa.ontrack.acceptance.browser.dialogs.ValidationRunDialog
 import net.nemerosa.ontrack.acceptance.browser.pages.BuildPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.ValidationRun
+import net.nemerosa.ontrack.dsl.Build
 import org.junit.Test
 import org.openqa.selenium.By
 
@@ -13,9 +13,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 @AcceptanceTestSuite
 class ACCBrowserValidationRunData extends AcceptanceTestClient {
 
-    @Test
-    void 'Validating a build with data from the build page'() {
-        // Preparation
+    private Build prepareBuild() {
         def projectName = uid('P')
         ontrack.project(projectName) {
             branch('B') {
@@ -23,14 +21,20 @@ class ACCBrowserValidationRunData extends AcceptanceTestClient {
                 build '1'
             }
         }
-        def build1 = ontrack.build(projectName, 'B', '1')
+        return ontrack.build(projectName, 'B', '1')
+    }
+
+    @Test
+    void 'Validating a build with data from the build page'() {
+        // Preparation
+        def build = prepareBuild()
 
         // GUI scenario
         browser { browser ->
             // Logs in
             loginAsAdmin(browser)
             // Goes to the build page which must contains the link
-            BuildPage buildPage = goTo(BuildPage, [id: build1.id])
+            BuildPage buildPage = goTo(BuildPage, [id: build.id])
             // Validation link
             ValidationRunDialog dialog = buildPage.validate()
             // Selects the "Coverage" timestamp
@@ -42,7 +46,7 @@ class ACCBrowserValidationRunData extends AcceptanceTestClient {
         }
 
         // Checks the validation run
-        def run = build1.validationRuns[0]
+        def run = build.validationRuns[0]
         assert run.status == "WARNING"
         assert run.data != null
         assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType"
