@@ -149,4 +149,27 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
         assert run.data.data == 15
     }
 
+    @Test
+    void 'Validation run with percentage threshold'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setPercentageDataType(
+                    25,
+                    10,
+                    true
+            )
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithPercentage("VS", 4)
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "FAILED"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType"
+        assert run.data.data == 4
+    }
+
 }

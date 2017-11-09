@@ -110,6 +110,13 @@ class Build extends AbstractProjectResource {
         return validateWithData("VS", [value: value])
     }
 
+    @DSLMethod("""
+        Associates some percentage with the validation. The 
+        validation stamp must be configured to accept percentage as validation data.""")
+    ValidationRun validateWithPercentage(String validationStamp, int value) {
+        return validateWithData("VS", [value: value])
+    }
+
     @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {
