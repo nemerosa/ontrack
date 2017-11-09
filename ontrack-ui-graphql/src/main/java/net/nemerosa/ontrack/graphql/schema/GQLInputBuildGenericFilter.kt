@@ -3,24 +3,26 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 /**
  * Defines a generic build filter using a `type` and some arbitrary JSON data.
  */
 @Component
-class GQLInputBuildGenericFilter
-@Autowired
-constructor(private val buildFilterService: BuildFilterService) : GQLInputType<BuildFilterProviderData<*>> {
+class GQLInputBuildGenericFilter(
+        private val buildFilterService: BuildFilterService
+) : GQLInputType<BuildFilterProviderData<*>> {
 
-    override fun getInputType(): GraphQLInputType {
+    override fun getTypeRef() = GraphQLTypeReference(GENERIC_BUILD_FILTER)
+
+    override fun createInputType(): GraphQLInputType {
         return GraphQLInputObjectType.newInputObject()
-                .name("GenericBuildFilter")
+                .name(GENERIC_BUILD_FILTER)
                 .field {
                     it.name(FIELD_TYPE)
                             .description("FQCN of the filter type, null if no filter is to be applied")
@@ -58,6 +60,8 @@ constructor(private val buildFilterService: BuildFilterService) : GQLInputType<B
     companion object {
         val FIELD_TYPE = "type"
         val FIELD_DATA = "data"
+        @JvmField
+        val GENERIC_BUILD_FILTER = "GenericBuildFilter"
     }
 
 }

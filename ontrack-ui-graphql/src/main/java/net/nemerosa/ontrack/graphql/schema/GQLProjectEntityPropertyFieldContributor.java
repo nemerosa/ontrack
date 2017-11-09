@@ -36,7 +36,7 @@ public class GQLProjectEntityPropertyFieldContributor implements GQLProjectEntit
                 .map(propertyType -> newFieldDefinition()
                         .name(propertyFieldName(propertyType))
                         .description(propertyType.getDescription())
-                        .type(property.getType())
+                        .type(property.getTypeRef())
                         .dataFetcher(projectEntityPropertyDataFetcher(propertyType, projectEntityClass))
                         .build())
                 // OK

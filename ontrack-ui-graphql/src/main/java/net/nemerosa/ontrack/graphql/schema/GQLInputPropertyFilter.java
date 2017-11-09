@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputType;
-import lombok.Data;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Property;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.function.Predicate;
 
 @Component
-public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilter.PropertyFilter> {
+public class GQLInputPropertyFilter implements GQLInputType<PropertyFilter> {
 
     public static final String ARGUMENT_NAME = "withProperty";
 
@@ -26,14 +26,13 @@ public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilt
         this.propertyService = propertyService;
     }
 
-    @Data
-    public static class PropertyFilter {
-        private String type;
-        private String value;
+    @Override
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(PropertyFilter.class.getSimpleName());
     }
 
     @Override
-    public GraphQLInputType getInputType() {
+    public GraphQLInputType createInputType() {
         return GraphQLBeanConverter.asInputType(PropertyFilter.class);
     }
 
@@ -50,7 +49,7 @@ public class GQLInputPropertyFilter implements GQLInputType<GQLInputPropertyFilt
         return GraphQLArgument.newArgument()
                 .name(ARGUMENT_NAME)
                 .description("Filter on property type and optional value pattern.")
-                .type(getInputType())
+                .type(new GraphQLTypeReference(PropertyFilter.class.getSimpleName()))
                 .build();
     }
 

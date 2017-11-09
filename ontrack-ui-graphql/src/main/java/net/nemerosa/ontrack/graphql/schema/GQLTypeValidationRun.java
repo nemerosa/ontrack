@@ -23,20 +23,29 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
     public static final String VALIDATION_RUN = "ValidationRun";
 
     private final GQLTypeValidationRunStatus validationRunStatus;
+    private final GQLProjectEntityInterface projectEntityInterface;
 
     @Autowired
     public GQLTypeValidationRun(GQLTypeCreation creation,
                                 GQLTypeValidationRunStatus validationRunStatus,
-                                List<GQLProjectEntityFieldContributor> projectEntityFieldContributors) {
+                                List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
+                                GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(ValidationRun.class, ProjectEntityType.VALIDATION_RUN, projectEntityFieldContributors, creation);
         this.validationRunStatus = validationRunStatus;
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return VALIDATION_RUN;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(VALIDATION_RUN)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 // Build
                 .field(
@@ -51,7 +60,7 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
                         newFieldDefinition()
                                 .name("validationStamp")
                                 .description("Associated validation stamp")
-                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeValidationStamp.VALIDATION_STAMP)))
+                                .type(new GraphQLNonNull(new GraphQLTypeReference(GQLTypeValidationStamp.Companion.getVALIDATION_STAMP())))
                                 .build()
                 )
                 // Run order
@@ -67,7 +76,7 @@ public class GQLTypeValidationRun extends AbstractGQLProjectEntity<ValidationRun
                         newFieldDefinition()
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
-                                .type(stdList(validationRunStatus.getType()))
+                                .type(stdList(validationRunStatus.getTypeRef()))
                                 .build()
                 )
                 // OK

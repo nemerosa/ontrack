@@ -28,7 +28,12 @@ public class GQLTypeDecoration implements GQLType {
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return DECORATION;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(DECORATION)
                 // Type
@@ -59,7 +64,7 @@ public class GQLTypeDecoration implements GQLType {
                 // Feature
                 .field(f -> f.name("feature")
                         .description("Extension feature")
-                        .type(extensionFeatureDescription.getType())
+                        .type(extensionFeatureDescription.getTypeRef())
                 )
                 // OK
                 .build();

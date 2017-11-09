@@ -49,7 +49,7 @@ public class GQLProjectAuthorizationsFieldContributor implements GQLProjectEntit
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("projectRoles")
                             .description("Authorisations for the project")
-                            .type(stdList(projectAuthorization.getType()))
+                            .type(stdList(projectAuthorization.getTypeRef()))
                             .argument(a -> a.name("role")
                                     .description("Filter by role name")
                                     .type(GraphQLString)

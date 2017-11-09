@@ -5,13 +5,15 @@ import graphql.schema.GraphQLObjectType
 import org.springframework.stereotype.Component
 
 /**
- * GraphQL type for [Action].
+ * GraphQL type for [net.nemerosa.ontrack.model.support.Action].
  */
 @Component
 class GQLTypeAction : GQLType {
-    override fun getType(): GraphQLObjectType =
+    override fun getTypeName() = "Action"
+
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()
-                    .name("Action")
+                    .name(typeName)
                     .field { it.name("id").type(GraphQLString) }
                     .field { it.name("name").type(GraphQLString) }
                     .field { it.name("type").type(GraphQLString) }

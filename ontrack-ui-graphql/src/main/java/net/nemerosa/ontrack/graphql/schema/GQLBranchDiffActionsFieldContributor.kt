@@ -25,7 +25,7 @@ constructor(
                     GraphQLFieldDefinition.newFieldDefinition()
                             .name("buildDiffActions")
                             .description("Actions to get a diff on builds of the branch")
-                            .type(GraphqlUtils.stdList(gqlTypeAction.type))
+                            .type(GraphqlUtils.stdList(gqlTypeAction.typeRef))
                             .dataFetcher(GraphqlUtils.fetcher(
                                     Branch::class.java,
                                     { branch ->

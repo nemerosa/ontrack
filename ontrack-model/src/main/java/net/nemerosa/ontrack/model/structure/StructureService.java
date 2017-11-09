@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 import java.util.Optional;
@@ -222,6 +223,16 @@ public interface StructureService {
     // Entity searches by name
 
     Optional<Project> findProjectByName(String project);
+
+    /**
+     * Gets the project by its name if authorized to access it. If it does exist, but the user is
+     * not authorized to see it, throws an {@link AccessDeniedException}
+     *
+     * @param project Name of the project to look for
+     * @return Project if it exists and is authorized, or null if if does not exist
+     * @throws AccessDeniedException If the project does exist but the user has no access to it
+     */
+    Project findProjectByNameIfAuthorized(String project) throws AccessDeniedException;
 
     Optional<Branch> findBranchByName(String project, String branch);
 

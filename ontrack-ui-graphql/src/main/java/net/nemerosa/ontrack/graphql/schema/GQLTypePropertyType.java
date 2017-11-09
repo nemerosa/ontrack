@@ -15,7 +15,12 @@ public class GQLTypePropertyType implements GQLType {
     public static final String PROPERTY_TYPE = "PropertyType";
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return PROPERTY_TYPE;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(PROPERTY_TYPE)
                 .field(GraphqlUtils.stringField("typeName", "Qualified type name"))

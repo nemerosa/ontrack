@@ -32,6 +32,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
     private final GQLTypeValidationStamp validationStamp;
     private final GQLInputBuildStandardFilter inputBuildStandardFilter;
     private final GQLInputBuildGenericFilter inputBuildGenericFilter;
+    private final GQLProjectEntityInterface projectEntityInterface;
 
     @Autowired
     public GQLTypeBranch(StructureService structureService,
@@ -42,7 +43,9 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                          GQLTypeValidationStamp validationStamp,
                          GQLInputBuildStandardFilter inputBuildStandardFilter,
                          List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
-                         GQLInputBuildGenericFilter inputBuildGenericFilter) {
+                         GQLInputBuildGenericFilter inputBuildGenericFilter,
+                         GQLProjectEntityInterface projectEntityInterface
+    ) {
         super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors, creation);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
@@ -51,13 +54,19 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
         this.validationStamp = validationStamp;
         this.inputBuildStandardFilter = inputBuildStandardFilter;
         this.inputBuildGenericFilter = inputBuildGenericFilter;
+        this.projectEntityInterface = projectEntityInterface;
     }
 
     @Override
-    public GraphQLObjectType getType() {
+    public String getTypeName() {
+        return BRANCH;
+    }
+
+    @Override
+    public GraphQLObjectType createType(GQLTypeCache cache) {
         return newObject()
                 .name(BRANCH)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
                 .field(
@@ -78,7 +87,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("promotionLevels")
-                                .type(stdList(promotionLevel.getType()))
+                                .type(stdList(promotionLevel.getTypeRef()))
                                 .dataFetcher(branchPromotionLevelsFetcher())
                                 .build()
                 )
@@ -86,7 +95,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("validationStamps")
-                                .type(stdList(validationStamp.getType()))
+                                .type(stdList(validationStamp.getTypeRef()))
                                 .argument(arg -> arg.name("name")
                                         .description("Filters on the validation stamp")
                                         .type(GraphQLString)
@@ -98,7 +107,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("builds")
-                                .type(GraphqlUtils.stdList(build.getType()))
+                                .type(GraphqlUtils.stdList(build.getTypeRef()))
                                 // Last builds
                                 .argument(
                                         newArgument()
@@ -120,7 +129,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                         newArgument()
                                                 .name("filter")
                                                 .description("Filter based on build promotions, validations, properties, ...")
-                                                .type(inputBuildStandardFilter.getInputType())
+                                                .type(inputBuildStandardFilter.getTypeRef())
                                                 .build()
                                 )
                                 // Generic filter
@@ -128,7 +137,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                                         newArgument()
                                                 .name("generic")
                                                 .description("Generic filter based on a configured filter")
-                                                .type(inputBuildGenericFilter.getInputType())
+                                                .type(inputBuildGenericFilter.getTypeRef())
                                                 .build()
                                 )
                                 // Query

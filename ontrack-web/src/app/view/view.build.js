@@ -11,9 +11,9 @@ angular.module('ot.view.build', [
         });
     })
     .controller('BuildCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService) {
-        var view = ot.view();
+        const view = ot.view();
         // Build's id
-        var buildId = $stateParams.buildId;
+        const buildId = $stateParams.buildId;
 
         // Loads the build
         function loadBuild() {
@@ -91,6 +91,7 @@ angular.module('ot.view.build', [
                         }
                     },
                     ot.viewApiCommand(build._self),
+                    ot.viewActionsCommand(build._actions),
                     ot.viewCloseCommand('/branch/' + build.branch.id)
                 ];
                 // Gets a reference to the next build

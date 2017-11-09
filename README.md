@@ -3,7 +3,7 @@ ontrack
 
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/nemerosa/ontrack.svg)](http://isitmaintained.com/project/nemerosa/ontrack "Average time to resolve an issue")
 
-[Continuous delivery monitoring](https://nemerosa.github.io).
+[Continuous delivery monitoring](https://nemerosa.github.io/ontrack).
 
 Store all events which happen in your CI/CD environment: branches, builds,
 validations, promotions, labels, commits. Display this information in
