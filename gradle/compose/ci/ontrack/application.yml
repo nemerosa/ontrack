@@ -1,5 +1,9 @@
 # CI environment
 
+spring:
+  datasource:
+    url: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
+
 # SSL with self signed certificate
 server:
   port: 443
