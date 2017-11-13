@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.dsl.http
 import groovy.json.JsonSlurper
 import net.jodah.failsafe.Failsafe
 import net.jodah.failsafe.RetryPolicy
+import net.jodah.failsafe.function.Predicate
 import net.nemerosa.ontrack.dsl.Document
 import org.apache.http.HttpEntity
 import org.apache.http.HttpHost
@@ -41,14 +42,17 @@ class OTHttpClient {
     }
 
     static RetryPolicy createDefaultRetryPolicy() {
-        new RetryPolicy().retryOn({ th ->
-            if (th instanceof ConnectException) {
-                return true
-            } else if (th instanceof InvokerInvocationException) {
-                def cause = th.cause
-                return (cause instanceof ConnectException)
-            } else {
-                return false
+        new RetryPolicy().retryOn(new Predicate<Throwable>() {
+            @Override
+            boolean test(Throwable th) {
+                if (th instanceof ConnectException) {
+                    return true
+                } else if (th instanceof InvokerInvocationException) {
+                    def cause = th.cause
+                    return (cause instanceof ConnectException)
+                } else {
+                    return false
+                }
             }
         })
     }
