@@ -32,6 +32,9 @@ Just run:
 
 The application is then available at http://localhost:8080
 
+NOTE: The `dev` profile is activated by default and the working files
+and database file will be available under `ontrack-ui/work`.
+
 [[development-launch]]
 ==== Launching the application in the IDE
 
@@ -47,6 +50,13 @@ In order to launch the application, run the
 `--spring.profiles.active=dev` as argument.
 
 The application is then available at http://localhost:8080
+
+NOTE: By activating the `dev` profile, the working files
+and database file will be available under `work` in the root directory.
+
+WARNING: Not activating the `dev` profile without setting the database
+to connect to will result in Ontrack using a in-memory and therefore
+transient H2 database instance.
 
 [[development-web]]
 ==== Developing for the web
