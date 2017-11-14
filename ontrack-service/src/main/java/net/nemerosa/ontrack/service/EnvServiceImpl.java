@@ -77,5 +77,9 @@ public class EnvServiceImpl implements EnvService {
         logger.info("[version] Commit:            {}", version.getCommit());
         logger.info("[version] Source:            {}", version.getSource());
         logger.info("[version] Source type:       {}", version.getSourceType());
+        // Warnings
+        if (StringUtils.isBlank(jdbcUrl)) {
+            logger.warn("No JDBC datasource URL has been specified (spring.datasource.url is null or blank) and a in-memory transient H2 database will now be used.");
+        }
     }
 }
