@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
   # InfluxDB container
@@ -12,6 +12,13 @@ services:
     ports:
       - "3000:3000"
 
+  # H2 database
+  h2:
+    image: "nemerosa/h2:latest"
+    ports:
+      - "9082"
+      - "8082"
+
   # Ontrack container
   ontrack:
     image: nemerosa/ontrack:${ONTRACK_VERSION}
@@ -24,3 +31,5 @@ services:
       - "/dev/urandom:/dev/random"
     ports:
       - "443:443"
+    links:
+      - "h2:h2"
