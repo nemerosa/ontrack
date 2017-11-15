@@ -1,5 +1,5 @@
 # Base
-FROM java:openjdk-8u111-jdk
+FROM openjdk:8u151-jdk
 
 # Makes sure all tools for the build are installed
 RUN apt-get update && apt-get install -y \

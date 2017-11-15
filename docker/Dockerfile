@@ -1,5 +1,5 @@
 # Base
-FROM java:openjdk-8u111-jdk
+FROM openjdk:8u151-jdk
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
