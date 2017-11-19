@@ -1,6 +1,28 @@
 [[appendix-deprecations]]
 === Deprecations and migration notes
 
+[[appendix-deprecations-2.32]]
+==== Since 2.32
+
+Version 2.32 and before do use the H2 database in embedded mode
+only. Later versions still support this mode but also support
+a <<installation-docker-db-server,server mode>>.
+
+In production mode, to keep the embedded mode, the following
+option must be added to the Ontrack command line parameters:
+
+[source,bash]
+----
+spring.datasource.url=jdbc:h2:/var/ontrack/data/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE
+----
+
+The way to pass this option and the path to the database will vary
+according to the way you run Ontrack. See the <<installation>>
+chapter for more information.
+
+In <<development,development>> mode, as long as you use the
+`dev` profile, nothing will change.
+
 [[appendix-deprecations-2.28]]
 ==== Since 2.28
 
