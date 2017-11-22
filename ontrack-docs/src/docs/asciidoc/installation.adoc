@@ -183,17 +183,20 @@ sudo rpm --upgrade ontrack.rpm
 sudo service ontrack start
 ----
 
-The optional `/etc/default/ontrack` file can be used to define the
-`JAVA_OPTIONS`, for example:
+The optional `/etc/default/ontrack` file can be used to define
+environment variables like
+`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+For example:
 
 [source]
 ./etc/default/ontrack
 ----
 JAVA_OPTIONS=-Xmx2048m
+ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
 ----
 
-NOTE: See the <<installation-docker,Docker installation>> section for information
-on how to connect to the database.
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
 
 [[installation-debian]]
 === Debian installation
@@ -230,17 +233,20 @@ service ontrack status
 service ontrack stop
 ----
 
-The optional `/etc/default/ontrack` file can be used to define the
-`JAVA_OPTIONS`, for example:
+The optional `/etc/default/ontrack` file can be used to define
+environment variables like
+`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+For example:
 
 [source]
 ./etc/default/ontrack
 ----
 JAVA_OPTIONS=-Xmx2048m
+ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
 ----
 
-NOTE: See the <<installation-docker,Docker installation>> section for information
-on how to connect to the database.
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
 
 [[installation-sa]]
 === Standalone installation
