@@ -24,6 +24,7 @@ services:
     image: nemerosa/ontrack:${ONTRACK_VERSION}
     environment:
         PROFILE: acceptance
+        ONTRACK_DB_URL: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
     volumes:
       # The /var/ontrack/conf on the DO machine is filled in from gradle/compose/ci/ontrack in the doEnv task
       - "/var/ontrack/conf:/var/ontrack/conf"
