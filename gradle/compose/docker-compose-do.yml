@@ -33,8 +33,4 @@ services:
     ports:
       - "443:443"
     links:
-<<<<<<< HEAD
       - "postgresql:postgresql"
-=======
-      - "h2:h2"
->>>>>>> release/2.33
