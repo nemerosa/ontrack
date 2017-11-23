@@ -25,7 +25,6 @@ public interface EventRepository {
     );
 
     List<Event> query(
-            List<Integer> allowedProjects,
             ProjectEntityType entityType,
             ID entityId,
             int offset,
@@ -35,7 +34,6 @@ public interface EventRepository {
     );
 
     List<Event> query(
-            List<Integer> allowedProjects,
             EventType eventType,
             ProjectEntityType entityType,
             ID entityId,
