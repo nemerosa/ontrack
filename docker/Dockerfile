@@ -50,6 +50,9 @@ ENV PROFILE prod
 # Java options
 ENV JAVA_OPTIONS ''
 
+# Additional arguments to pass on the command lines
+ENV ONTRACK_ARGS ''
+
 # Copies the Ontrack JAR
 COPY ontrack.jar /opt/ontrack/
 

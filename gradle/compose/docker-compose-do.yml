@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
   # InfluxDB container
@@ -12,11 +12,19 @@ services:
     ports:
       - "3000:3000"
 
+  # H2 database
+  h2:
+    image: "nemerosa/h2:latest"
+    ports:
+      - "9082"
+      - "8082"
+
   # Ontrack container
   ontrack:
     image: nemerosa/ontrack:${ONTRACK_VERSION}
     environment:
         PROFILE: acceptance
+        ONTRACK_DB_URL: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
     volumes:
       # The /var/ontrack/conf on the DO machine is filled in from gradle/compose/ci/ontrack in the doEnv task
       - "/var/ontrack/conf:/var/ontrack/conf"
@@ -25,4 +33,8 @@ services:
     ports:
       - "443:443"
     links:
+<<<<<<< HEAD
       - "postgresql:postgresql"
+=======
+      - "h2:h2"
+>>>>>>> release/2.33

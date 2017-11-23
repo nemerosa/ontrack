@@ -205,6 +205,9 @@ The optional `/etc/default/ontrack` file can be used to define the
 JAVA_OPTIONS=-Xmx2048m
 ----
 
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
+
 [[installation-debian]]
 === Debian installation
 
@@ -248,6 +251,9 @@ The optional `/etc/default/ontrack` file can be used to define the
 ----
 JAVA_OPTIONS=-Xmx2048m
 ----
+
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
 
 [[installation-sa]]
 === Standalone installation

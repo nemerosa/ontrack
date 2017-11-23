@@ -108,6 +108,9 @@ processResources.mustRunAfter generateVersionInfo
 
 bootRun.dependsOn jar
 
+// Running with `dev` profile by default with `bootRun`
+bootRun.args("--spring.profiles.active=dev")
+
 /**
  * Spring boot packaging
  */

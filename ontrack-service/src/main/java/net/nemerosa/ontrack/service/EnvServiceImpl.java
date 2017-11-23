@@ -25,18 +25,19 @@ public class EnvServiceImpl implements EnvService {
     private final String defaultProfiles;
     private final String profiles;
     private final VersionInfo version;
+    private final String jdbcUrl;
     private final File home;
-    private final ApplicationContext ctx;
 
     @Autowired
     public EnvServiceImpl(VersionInfoConfig version,
                           OntrackConfigProperties configProperties,
                           ApplicationContext ctx) {
-        this.ctx = ctx;
         this.defaultProfiles = StringUtils.join(ctx.getEnvironment().getDefaultProfiles(), ",");
         this.profiles = StringUtils.join(ctx.getEnvironment().getActiveProfiles(), ",");
         // Version information from the configuration
         this.version = version.toInfo();
+        // JDBC URL
+        this.jdbcUrl = ctx.getEnvironment().getProperty("spring.datasource.url");
         // Home directory
         this.home = new File(configProperties.getApplicationWorkingDir());
     }
@@ -65,11 +66,10 @@ public class EnvServiceImpl implements EnvService {
 
     @PostConstruct
     public void init() throws FileNotFoundException {
-        String jdbcUrl = ctx.getEnvironment().getProperty("spring.datasource.url", "n/a");
         logger.info("[env] With JDK:              {}", System.getProperty("java.version"));
         logger.info("[env] With default profiles: {}", defaultProfiles);
         logger.info("[env] With active profiles:  {}", profiles);
-        logger.info("[setup] DB JDBC URL:         {}", jdbcUrl);
+        logger.info("[datasource] URL:            {}", jdbcUrl);
         logger.info("[version] Display:           {}", version.getDisplay());
         logger.info("[version] Full:              {}", version.getFull());
         logger.info("[version] Branch:            {}", version.getBranch());
