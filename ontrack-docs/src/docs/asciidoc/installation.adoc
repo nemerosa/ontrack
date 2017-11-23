@@ -36,7 +36,6 @@ Two volumes are defined:
 
 Several modes of database setup can be done:
 
-* <<installation-docker-db-transient,test mode / transient database>>
 * <<installation-docker-db-volume,database persisted in volume>>
 * <<installation-docker-db-server,using a H2 server database>>
 
@@ -73,38 +72,27 @@ docker run \
 Additional arguments to the Ontrack process, like
 <<configuration,configuration arguments>>
 passed on the command line, can use the `ONTRACK_ARGS` environment variable.
-For example, to specify a <<installation-docker-db-server,H2 server database>>:
 
 [source,bash]
 ----
 docker run \
    ...
-   --env "ONTRACK_ARGS=--spring.datasource.url=jdbc:h2:tcp://localhost:9082/ontrack;MODE=MYSQL"
+   --env "ONTRACK_ARGS=..."
    ...
 ----
-
-[[installation-docker-db-transient]]
-==== Test mode / transient database
-
-By running without further option, Ontrack will create a in-memory transient
-H2 database instance. When the container is stopped, the data is gone.
-
-While this is fine for test purpose, this is of course not suitable
-for development and even less for production purpose.
 
 [[installation-docker-db-volume]]
 ==== Database persisted in volume
 
-To set the database on the `/var/ontrack/data` volume, use the additional
-`ONTRACK_ARGS`:
+By default, the database JDBC URL is set to:
 
-[source,bash]
+[source]
 ----
-docker run \
-   ...
-   --env "ONTRACK_ARGS=--spring.datasource.url=jdbc:h2:/var/ontrack/data/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
-   ...
+jdbc:h2:/var/ontrack/data/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE
 ----
+
+TIP: In order to put the database file on the host or in a data
+volume, share the `/var/ontrack/data` volume.
 
 NOTE: In this mode, the H2 database is NOT accessible while the Ontrack
 process runs. One will prefer to use the
@@ -133,7 +121,7 @@ the example above:
 ----
 docker run \
    ...
-   --env "ONTRACK_ARGS=--spring.datasource.url=jdbc:h2:tcp://localhost:9082/ontrack;MODE=MYSQL"
+   --env "ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
    ...
 ----
 
@@ -195,17 +183,20 @@ sudo rpm --upgrade ontrack.rpm
 sudo service ontrack start
 ----
 
-The optional `/etc/default/ontrack` file can be used to define the
-`JAVA_OPTIONS`, for example:
+The optional `/etc/default/ontrack` file can be used to define
+environment variables like
+`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+For example:
 
 [source]
 ./etc/default/ontrack
 ----
 JAVA_OPTIONS=-Xmx2048m
+ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
 ----
 
-NOTE: See the <<installation-docker,Docker installation>> section for information
-on how to connect to the database.
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
 
 [[installation-debian]]
 === Debian installation
@@ -242,17 +233,20 @@ service ontrack status
 service ontrack stop
 ----
 
-The optional `/etc/default/ontrack` file can be used to define the
-`JAVA_OPTIONS`, for example:
+The optional `/etc/default/ontrack` file can be used to define
+environment variables like
+`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+For example:
 
 [source]
 ./etc/default/ontrack
 ----
 JAVA_OPTIONS=-Xmx2048m
+ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
 ----
 
-NOTE: See the <<installation-docker,Docker installation>> section for information
-on how to connect to the database.
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
 
 [[installation-sa]]
 === Standalone installation
