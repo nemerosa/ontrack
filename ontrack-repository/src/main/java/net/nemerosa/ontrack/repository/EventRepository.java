@@ -24,30 +24,7 @@ public interface EventRepository {
             Function<String, EventType> eventTypeLoader
     );
 
-    @Deprecated
     List<Event> query(
-            List<Integer> allowedProjects,
-            ProjectEntityType entityType,
-            ID entityId,
-            int offset,
-            int count,
-            BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
-            Function<String, EventType> eventTypeLoader
-    );
-
-    List<Event> query(
-            ProjectEntityType entityType,
-            ID entityId,
-            int offset,
-            int count,
-            BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
-            Function<String, EventType> eventTypeLoader
-    );
-
-    @Deprecated
-    List<Event> query(
-            List<Integer> allowedProjects,
-            EventType eventType,
             ProjectEntityType entityType,
             ID entityId,
             int offset,

@@ -78,27 +78,6 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
     }
 
     @Override
-    public List<Event> query(List<Integer> allowedProjects,
-                             ProjectEntityType entityType,
-                             ID entityId,
-                             int offset,
-                             int count,
-                             BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
-                             Function<String, EventType> eventTypeLoader) {
-        return getNamedParameterJdbcTemplate().query(
-                format("SELECT * FROM EVENTS WHERE %s = :entityId", entityType.name()) +
-                        " AND PROJECT IN (:projects)" +
-                        " ORDER BY ID DESC" +
-                        " LIMIT :count OFFSET :offset",
-                params("entityId", entityId.get())
-                        .addValue("projects", allowedProjects)
-                        .addValue("count", count)
-                        .addValue("offset", offset),
-                (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
-        );
-    }
-
-    @Override
     public List<Event> query(ProjectEntityType entityType,
                              ID entityId,
                              int offset,
@@ -110,30 +89,6 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                         " ORDER BY ID DESC" +
                         " LIMIT :count OFFSET :offset",
                 params("entityId", entityId.get())
-                        .addValue("count", count)
-                        .addValue("offset", offset),
-                (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
-        );
-    }
-
-    @Override
-    public List<Event> query(List<Integer> allowedProjects,
-                             EventType eventType,
-                             ProjectEntityType entityType,
-                             ID entityId,
-                             int offset,
-                             int count,
-                             BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
-                             Function<String, EventType> eventTypeLoader) {
-        return getNamedParameterJdbcTemplate().query(
-                format("SELECT * FROM EVENTS WHERE %s = :entityId", entityType.name()) +
-                        " AND EVENT_TYPE = :eventType" +
-                        " AND PROJECT IN (:projects)" +
-                        " ORDER BY ID DESC" +
-                        " LIMIT :count OFFSET :offset",
-                params("entityId", entityId.get())
-                        .addValue("eventType", eventType.getId())
-                        .addValue("projects", allowedProjects)
                         .addValue("count", count)
                         .addValue("offset", offset),
                 (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
