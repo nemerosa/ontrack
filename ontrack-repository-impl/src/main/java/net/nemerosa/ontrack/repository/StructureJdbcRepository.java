@@ -656,7 +656,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel) {
         return Optional.ofNullable(
                 getFirstItem(
-                        "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId AND PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC LIMIT 1",
+                        "SELECT * FROM PROMOTION_RUNS " +
+                                "WHERE BUILDID = :buildId " +
+                                "AND PROMOTIONLEVELID = :promotionLevelId " +
+                                "ORDER BY CREATION DESC, ID DESC LIMIT 1",
                         params("buildId", build.id()).addValue("promotionLevelId", promotionLevel.id()),
                         (rs, rowNum) -> toPromotionRun(rs,
                                 (id) -> build,
@@ -669,7 +672,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId AND PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC",
+                "SELECT * FROM PROMOTION_RUNS " +
+                        "WHERE BUILDID = :buildId " +
+                        "AND PROMOTIONLEVELID = :promotionLevelId " +
+                        "ORDER BY CREATION DESC, ID DESC",
                 params("buildId", build.id()).addValue("promotionLevelId", promotionLevel.id()),
                 (rs, rowNum) -> toPromotionRun(rs,
                         (id) -> build,
