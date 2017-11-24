@@ -100,6 +100,11 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
             }
             // Ordering
             query.append(" ORDER BY ID DESC");
+            // Limit and offset
+            query.append(" LIMIT :page OFFSET :offset");
+            params = params
+                    .addValue("page", page.getCount())
+                    .addValue("offset", page.getOffset());
             // Performing the query
             List<ApplicationLogEntry> entries = getNamedParameterJdbcTemplate().query(
                     query.toString(),
@@ -117,8 +122,8 @@ public class ApplicationLogEntriesJdbcRepository extends AbstractJdbcRepository
                             getDetailsFromJson(rs)
                     )
             );
-            // Pagination
-            return page.extract(entries);
+            // OK
+            return entries;
         }
     }
 
