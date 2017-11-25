@@ -33,14 +33,12 @@ services:
 
   # Ontrack container
   ontrack:
-    image: "nemerosa/ontrack:${ONTRACK_VERSION}"
+    image: "nemerosa/ontrack:latest"
     environment:
-        PROFILE: "acceptance"
+        PROFILE: "prod"
         ONTRACK_DB_URL: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
     volumes:
-      # The /var/ontrack/conf on the DO machine is filled in from gradle/compose/do/ontrack in the doEnv task
-      - "/var/ontrack/conf:/var/ontrack/conf"
-      # Better startup performances in CI and DO, do not use in Prod
+      - "./dev/ontrack:/var/ontrack/conf"
       - "/dev/urandom:/dev/random"
     ports:
       - "443:443"
