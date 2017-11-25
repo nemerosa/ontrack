@@ -173,6 +173,7 @@ configure(coreProjects) {
             dependency 'org.jgrapht:jgrapht-core:1.0.1'
             dependency 'org.kohsuke:groovy-sandbox:1.15'
             dependency 'com.graphql-java:graphql-java:5.0'
+            dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
         }
     }
 
@@ -184,7 +185,7 @@ configure(coreProjects) {
         // Testing
         testCompile 'junit:junit'
         testCompile 'org.mockito:mockito-core'
-        testCompile "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
+        testCompile "org.jetbrains.kotlin:kotlin-test"
     }
 
     compileKotlin {
