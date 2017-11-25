@@ -80,7 +80,7 @@ task doEnv {
         }
         project.exec {
             executable 'docker-machine'
-            args = ['scp', '-r', 'gradle/compose/ci/ontrack', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
+            args = ['scp', '-r', 'gradle/compose/do/ontrack', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
         }
     }
 }
