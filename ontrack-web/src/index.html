@@ -43,7 +43,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li>
-                                <a class="ot-application-info-none">No message to display</a>
+                                <a class="ot-application-info-none" ng-click="loadApplicationInfo()">No message to display - click to load</a>
                             </li>
                         </ul>
                     </li>
@@ -57,7 +57,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li>
-                                <a class="ot-application-info-none">Application messages:</a>
+                                <a class="ot-application-info-none" ng-click="loadApplicationInfo()">Application messages (click to reload):</a>
                                 <a ng-repeat="info in applicationInfo.resources"
                                    class="ot-application-info-{{info.type | lowercase}}">{{info.message}}</a>
                             </li>

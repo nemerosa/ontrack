@@ -179,6 +179,10 @@ var ontrack = angular.module('ontrack', [
              * Application info mgt
              */
 
+            $scope.loadApplicationInfo = function () {
+                otInfoService.loadApplicationInfo();
+            };
+
             $scope.displayVersionInfo = function (versionInfo) {
                 otInfoService.displayVersionInfo(versionInfo);
             };
