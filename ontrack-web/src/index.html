@@ -36,28 +36,14 @@
 
                     <!-- Application info messages -->
 
-                    <!-- No messages: -->
-                    <li class="dropdown" ng-if="!applicationInfo.resources.length">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Application messages: none">
-                            <span class="ot-application-info ot-application-info-none"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li>
-                                <a class="ot-application-info-none" ng-click="loadApplicationInfo()">No message to display - click to load</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- With messages: -->
-                    <li class="dropdown" ng-if="applicationInfo.resources.length"
-                        title="Application messages: {{applicationInfo.resources.length}}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <li class="dropdown"
+                        title="Application messages (double click to reload)">
+                        <a href="#" class="dropdown-toggle" id="applicationInfoToggle" data-toggle="dropdown" ng-click="loadApplicationInfo()">
                             <span class="ot-application-info"></span>
-                            <span class="ot-application-info-count">{{applicationInfo.resources.length}}</span>
+                            <span class="ot-application-info-count" ng-if="applicationInfo.resources.length">{{applicationInfo.resources.length}}</span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li>
-                                <a class="ot-application-info-none" ng-click="loadApplicationInfo()">Application messages (click to reload):</a>
                                 <a ng-repeat="info in applicationInfo.resources"
                                    class="ot-application-info-{{info.type | lowercase}}">{{info.message}}</a>
                             </li>
