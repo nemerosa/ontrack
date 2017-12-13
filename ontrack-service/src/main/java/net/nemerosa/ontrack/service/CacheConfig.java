@@ -8,6 +8,7 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -18,8 +19,9 @@ public class CacheConfig {
     public CacheManager cacheManager() throws Exception {
         SimpleCacheManager o = new SimpleCacheManager();
         o.setCaches(
-                Collections.singletonList(
-                        new GuavaCacheFactoryBean(Caches.SETTINGS, 1, 600).getObject()
+                Arrays.asList(
+                        new GuavaCacheFactoryBean(Caches.SETTINGS, 1, 600).getObject(),
+                        new GuavaCacheFactoryBean("properties", 10_000, 60 * 6).getObject()
                 )
         );
         return o;
