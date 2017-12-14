@@ -37,17 +37,10 @@
                     <!-- Application info messages -->
 
                     <li class="dropdown"
-                        title="Application messages (double click to reload)">
-                        <a href="#" class="dropdown-toggle" id="applicationInfoToggle" data-toggle="dropdown" ng-click="loadApplicationInfo()">
+                        title="Application messages">
+                        <a href="#" ng-click="loadApplicationInfo()">
                             <span class="ot-application-info"></span>
-                            <span class="ot-application-info-count" ng-if="applicationInfo.resources.length">{{applicationInfo.resources.length}}</span>
                         </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li>
-                                <a ng-repeat="info in applicationInfo.resources"
-                                   class="ot-application-info-{{info.type | lowercase}}">{{info.message}}</a>
-                            </li>
-                        </ul>
                     </li>
 
                     <!-- User menu: not logged -->

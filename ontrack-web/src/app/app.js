@@ -1,4 +1,4 @@
-var ontrack = angular.module('ontrack', [
+const ontrack = angular.module('ontrack', [
         'ui.bootstrap',
         'ui.router',
         'ui.sortable',
@@ -13,6 +13,8 @@ var ontrack = angular.module('ontrack', [
         'ot.directive.field',
         'ot.directive.properties',
         'ot.directive.health',
+        // Dialogs
+        'ot.dialog.applicationInfo',
         // Services
         'ot.service.core',
         'ot.service.user',
@@ -147,7 +149,7 @@ var ontrack = angular.module('ontrack', [
             otInfoService.init();
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
+        .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
 
             $log.debug('[app] Initialising the app controller...');
 
@@ -180,7 +182,10 @@ var ontrack = angular.module('ontrack', [
              */
 
             $scope.loadApplicationInfo = function () {
-                otInfoService.loadApplicationInfo();
+                $modal.open({
+                    templateUrl: 'app/dialog/dialog.applicationInfo.tpl.html',
+                    controller: 'otDialogApplicationInfo'
+                });
             };
 
             $scope.displayVersionInfo = function (versionInfo) {

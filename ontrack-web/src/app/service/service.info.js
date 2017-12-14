@@ -7,9 +7,7 @@ angular.module('ot.service.info', [
         var self = {};
 
         self.loadApplicationInfo = function () {
-            ot.call($http.get($rootScope.info._applicationInfo)).then(function (messages) {
-                $rootScope.applicationInfo = messages;
-            });
+            return ot.call($http.get($rootScope.info._applicationInfo));
         };
 
         self.loadInfo = function () {
