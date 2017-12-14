@@ -1,0 +1,44 @@
+<div class="modal-header">
+    <h3>
+        Application messages
+    </h3>
+</div>
+<div class="modal-body">
+    <div class="alert alert-info" ng-show="loadingMessages">
+        <span class="ot-loading-indicator"></span>
+        Loading messages...
+    </div>
+    <div class="alert alert-info" ng-show="messages.length == 0 && !loadingMessages">
+        No message available.
+    </div>
+    <table class="table" ng-show="messages.length > 0 && !loadingMessages">
+        <tbody>
+        <tr
+                ng-repeat="message in messages"
+                ng-class="{
+                    'success': message.type == 'SUCCESS',
+                    'info': message.type == 'INFO',
+                    'warning': message.type == 'WARNING',
+                    'danger': message.type == 'ERROR'
+                }"
+        >
+            <td>
+                <span class="fa fa-check text-success" ng-if="message.type == 'SUCCESS'"></span>
+                <span class="fa fa-info-circle text-info" ng-if="message.type == 'INFO'"></span>
+                <span class="fa fa-exclamation-triangle text-warning" ng-if="message.type == 'WARNING'"></span>
+                <span class="fa fa-times-circle text-danger" ng-if="message.type == 'ERROR'"></span>
+            </td>
+            <td>
+                {{message.message}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-info" type="button" ng-click="loadApplicationMessages()">
+        <span class="fa fa-refresh"></span>
+        Refresh
+    </button>
+    <button class="btn btn-primary" type="submit" ng-click="cancel()">Close</button>
+</div>
