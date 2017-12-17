@@ -32,7 +32,7 @@ class CacheConfig(
                         // Cache for properties
                         toCache(
                                 "properties",
-                                "maximumSize=1000,expireAfterWrite=1d"
+                                "maximumSize=1000,expireAfterWrite=1d,recordStats"
                         )
                 )
         )
