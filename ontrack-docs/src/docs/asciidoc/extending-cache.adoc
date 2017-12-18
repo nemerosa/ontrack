@@ -39,3 +39,16 @@ ontrack:
             specs:
                 myCache: "maximumSize=2000,expireAfterWrite=1d,recordStats"
 ----
+
+In order to use the cache in the code, you can just use the
+https://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsingle/#boot-features-caching[Spring cache annotations].
+For example:
+
+[source,kotlin]
+----
+@Service
+class MyServiceImpl: MyService {
+    @Cacheable(cacheNames = "myCache")
+    fun getValue(id: Int): MyObject = ...
+}
+----
