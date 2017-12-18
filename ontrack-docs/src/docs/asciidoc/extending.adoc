@@ -376,6 +376,8 @@ include::extending-event-types.adoc[]
 
 include::extending-graphql.adoc[]
 
+include::extending-cache.adoc[]
+
 include::extending-metrics.adoc[]
 
 include::extending-kotlin.adoc[]

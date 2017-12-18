@@ -17,7 +17,9 @@ class EventQueryServiceIT extends AbstractServiceTestSupport {
         // Creates a branch
         Branch branch = doCreateBranch()
         // Gets the branch creation signature
-        def o = eventQueryService.getLastEventSignature(branch.projectEntityType, branch.id, EventFactory.NEW_BRANCH)
+        def o = asUserWithView(branch).call {
+            eventQueryService.getLastEventSignature(branch.projectEntityType, branch.id, EventFactory.NEW_BRANCH)
+        }
         assert o != null
         assert o.present
         assert o.get().user.name == 'user'
