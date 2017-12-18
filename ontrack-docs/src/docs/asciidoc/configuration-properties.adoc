@@ -68,4 +68,10 @@ ontrack.config.jobs.scattering = false
 # scattering. For example, setting 0.5 would not add a dealy greater than half
 # the period of the job. Setting 0 would actually disable the scattering altogether.
 ontrack.config.jobs.scattering-ratio = 1.0
+
+# Cache configuration
+# Caffeine spec strings per cache type
+# See http://www.javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.6.0
+# For example, for the `properties` cache:
+ontrack.config.cache.specs.properties = maximumSize=1000,expireAfterWrite=1d,recordStats
 ----
