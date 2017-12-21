@@ -2,23 +2,20 @@ version: "2.1"
 
 services:
    ontrack:
-      image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+      image: nemerosa/ontrack:${ONTRACK_VERSION}
       environment:
          PROFILE: acceptance
-         ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
-         JAVA_OPTIONS: "-Xmx2048m"
    selenium:
-      image: "selenium/standalone-chrome:3.3.0"
-      environment:
-         JAVA_OPTS: "-Xmx2048m"
+      image: selenium/standalone-firefox
    ontrack_acceptance:
-      build: docker
+      image: nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
       depends_on:
-         - ontrack
-         - selenium
+         ontrack:
+            condition: service_healthy
+         selenium:
+            condition: service_started
       environment:
-         ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
-         ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
+         ONTRACK_ACCEPTANCE_SELENIUM_URL: http://selenium:4444
          ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
       volumes:
-        - "${ONTRACK_ACCEPTANCE_OUTPUT:-./build/acceptance}:/ontrack/acceptance/output"
+        - "${ONTRACK_ACCEPTANCE_RESULTS:-./target}:/ontrack/acceptance/results"

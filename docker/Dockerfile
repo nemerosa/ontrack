@@ -49,3 +49,7 @@ ADD start.sh /opt/ontrack/start.sh
 # Running the application
 WORKDIR /opt/ontrack
 ENTRYPOINT ["/opt/ontrack/start.sh"]
+
+# Healthcheck
+HEALTHCHECK --interval=1m --timeout=10s \
+  CMD curl -f http://localhost:8080/info || exit 1
