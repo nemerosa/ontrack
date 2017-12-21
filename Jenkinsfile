@@ -52,6 +52,7 @@ git clean -xfd
     test \\
     build \\
     integrationTest \\
+    dockerLatest \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -74,27 +75,6 @@ git clean -xfd
         }
 
         /*
-
-        stage('Docker image') {
-            steps {
-                sh '''\
-./gradlew \\
-    dockerLatest \\
-    -Dorg.gradle.jvmargs=-Xmx1536m \\
-    --info \\
-    --stacktrace \\
-    --profile \\
-    --console plain
-'''
-                ontrackValidate(
-                        project: 'ontrack',
-                        branch: branchName,
-                        build: version,
-                        validationStamp: 'DOCKER.IMAGE',
-                        buildResult: currentBuild.result,
-                )
-            }
-        }
 
         stage('OS packages') {
             steps {
