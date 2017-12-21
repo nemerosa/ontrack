@@ -13,8 +13,8 @@ plugins {
 }
 
 task siteOntrackLastReleases(type: OntrackLastReleases) {
-    releaseCount = 3
-    releasePattern = /2\..*/
+    releaseCount = 6
+    releasePattern = /[23]\..*/
 }
 
 task sitePagesDocJs {

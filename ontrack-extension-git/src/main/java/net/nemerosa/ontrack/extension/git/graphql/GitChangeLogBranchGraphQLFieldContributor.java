@@ -46,7 +46,7 @@ public class GitChangeLogBranchGraphQLFieldContributor implements GQLProjectEnti
                                 .description("Name of the build to end the change log with")
                                 .type(new GraphQLNonNull(GraphQLString))
                         )
-                        .type(gitChangeLogGQLType.getType())
+                        .type(gitChangeLogGQLType.getTypeRef())
                         .dataFetcher(gitChangeLogFetcher())
                         .build()
         );

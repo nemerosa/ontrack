@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
@@ -19,6 +20,7 @@ import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
 @Component
 public class GQLInputBuildStandardFilter implements GQLInputType<BuildFilterProviderData<?>> {
 
+    public static final String STANDARD_BUILD_FILTER = "StandardBuildFilter";
     private final BuildFilterService buildFilterService;
 
     @Autowired
@@ -27,9 +29,14 @@ public class GQLInputBuildStandardFilter implements GQLInputType<BuildFilterProv
     }
 
     @Override
-    public GraphQLInputType getInputType() {
+    public GraphQLTypeReference getTypeRef() {
+        return new GraphQLTypeReference(STANDARD_BUILD_FILTER);
+    }
+
+    @Override
+    public GraphQLInputType createInputType() {
         return GraphQLInputObjectType.newInputObject()
-                .name("StandardBuildFilter")
+                .name(STANDARD_BUILD_FILTER)
                 .field(
                         newInputObjectField()
                                 .name("count")

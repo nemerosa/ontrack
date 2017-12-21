@@ -30,7 +30,7 @@ public class GQLRootQueryAdminGlobalRoles implements GQLRootQuery {
         return newFieldDefinition()
                 .name("globalRoles")
                 .description("List of global security roles")
-                .type(stdList(globalRole.getType()))
+                .type(stdList(globalRole.getTypeRef()))
                 .argument(a -> a.name("role")
                         .description("Filter by role name")
                         .type(GraphQLString)

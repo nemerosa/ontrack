@@ -25,7 +25,6 @@ public interface EventRepository {
     );
 
     List<Event> query(
-            List<Integer> allowedProjects,
             ProjectEntityType entityType,
             ID entityId,
             int offset,
@@ -35,7 +34,6 @@ public interface EventRepository {
     );
 
     List<Event> query(
-            List<Integer> allowedProjects,
             EventType eventType,
             ProjectEntityType entityType,
             ID entityId,
@@ -46,4 +44,8 @@ public interface EventRepository {
     );
 
     Optional<Signature> getLastEventSignature(ProjectEntityType entityType, ID entityId, EventType eventType);
+
+    Optional<Event> getLastEvent(ProjectEntityType entityType, ID entityId, EventType eventType,
+                                 BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                                 Function<String, EventType> eventTypeLoader);
 }

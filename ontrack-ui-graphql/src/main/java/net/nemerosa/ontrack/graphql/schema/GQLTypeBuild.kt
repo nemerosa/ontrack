@@ -11,7 +11,6 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,15 +22,18 @@ class GQLTypeBuild
 @Autowired
 constructor(
         private val structureService: StructureService,
+        private val projectEntityInterface: GQLProjectEntityInterface,
         private val validation: GQLTypeValidation,
         creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
 
-    override fun getType(): GraphQLObjectType {
+    override fun getTypeName() = BUILD
+
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()
                 .name(BUILD)
-                .withInterface(projectEntityInterface())
+                .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 // Ref to branch
                 .field(
@@ -99,7 +101,7 @@ constructor(
                                             .type(GraphQLString)
                                             .build()
                             )
-                            .type(stdList(validation.type))
+                            .type(stdList(validation.typeRef))
                             .dataFetcher(buildValidationsFetcher())
                 }
                 // Build links
@@ -115,33 +117,30 @@ constructor(
                 .build()
     }
 
-    private fun buildValidationsFetcher(): DataFetcher {
+    private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> {
         return fetcher(
                 Build::class.java
         ) { environment: DataFetchingEnvironment, build: Build ->
             // Filter on validation stamp
             val validationStampName = GraphqlUtils.getStringArgument(environment, "validationStamp")
             if (validationStampName.isPresent) {
-                // Loads the validation stamp by name
-                return@fetcher structureService.findValidationStampByName(
-                        build.project.name,
-                        build.branch.name,
-                        validationStampName.get()
-                ).map { vs ->
-                    listOf(
+                val validationStamp: ValidationStamp? =
+                        structureService.findValidationStampByName(
+                                build.project.name,
+                                build.branch.name,
+                                validationStampName.get()
+                        ).orElse(null)
+                if (validationStamp != null) {
+                    return@fetcher listOf(
                             buildValidation(
-                                    vs, build
+                                    validationStamp, build
                             )
                     )
-                }.orElseThrow {
-                    ValidationStampNotFoundException(
-                            build.project.name,
-                            build.branch.name,
-                            validationStampName.get()
-                    )
+                } else {
+                    return@fetcher listOf<GQLTypeValidation.GQLTypeValidationData>()
                 }
             } else {
-                // Gets the validation stamps for the branch
+                // Gets the validation runs for the build
                 return@fetcher structureService.getValidationStampListForBranch(build.branch.id)
                         .map { validationStamp -> buildValidation(validationStamp, build) }
             }
@@ -161,17 +160,16 @@ constructor(
         )
     }
 
-    private fun buildLinkedToFetcher(): DataFetcher {
+    private fun buildLinkedToFetcher(): DataFetcher<List<Build>> {
         return fetcher(
                 Build::class.java,
                 structureService::getBuildLinksFrom
         )
     }
 
-    private fun buildValidationRunsFetcher(): DataFetcher {
-        return DataFetcher { environment ->
-            val build = environment.source
-            if (build is Build) {
+    private fun buildValidationRunsFetcher() =
+            DataFetcher<List<ValidationRun>> { environment ->
+                val build: Build = environment.getSource()
                 // Filter
                 val count = GraphqlUtils.getIntArgument(environment, "count").orElse(50)
                 val validation = GraphqlUtils.getStringArgument(environment, "validation").orElse(null)
@@ -198,36 +196,31 @@ constructor(
                     return@DataFetcher structureService.getValidationRunsForBuild(build.id)
                             .take(count)
                 }
-            } else {
-                return@DataFetcher emptyList<Any>()
             }
-        }
-    }
 
-    private fun buildPromotionRunsFetcher(): DataFetcher {
-        return DataFetcher { environment ->
-            val build = environment.source
-            if (build is Build) {
+    private fun buildPromotionRunsFetcher() =
+            DataFetcher<List<PromotionRun>> { environment ->
+                val build: Build = environment.getSource()
                 // Last per promotion filter?
                 val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, "lastPerLevel", false)
                 // Promotion filter
                 val promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null)
-                if (promotion != null) {
+                val promotionLevel: PromotionLevel? = if (promotion != null) {
                     // Gets the promotion level
-                    val promotionLevel = structureService.findPromotionLevelByName(
+                    structureService.findPromotionLevelByName(
                             build.project.name,
                             build.branch.name,
                             promotion
-                    ).orElseThrow {
-                        PromotionLevelNotFoundException(
-                                build.project.name,
-                                build.branch.name,
-                                promotion
-                        )
-                    }
+                    ).orElse(null)
+                } else {
+                    null
+                }
+                if (promotionLevel != null) {
                     // Gets promotion runs for this promotion level
                     if (lastPerLevel) {
                         return@DataFetcher structureService.getLastPromotionRunForBuildAndPromotionLevel(build, promotionLevel)
+                                .map { listOf(it) }
+                                .orElse(listOf())
                     } else {
                         return@DataFetcher structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
                     }
@@ -239,11 +232,7 @@ constructor(
                         return@DataFetcher structureService.getPromotionRunsForBuild(build.id)
                     }
                 }
-            } else {
-                return@DataFetcher emptyList<Any>()
             }
-        }
-    }
 
     override fun getSignature(entity: Build): Optional<Signature> {
         return Optional.ofNullable(entity.signature)

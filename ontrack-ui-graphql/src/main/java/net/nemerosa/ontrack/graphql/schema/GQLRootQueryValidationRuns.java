@@ -31,7 +31,7 @@ public class GQLRootQueryValidationRuns implements GQLRootQuery {
     public GraphQLFieldDefinition getFieldDefinition() {
         return newFieldDefinition()
                 .name("validationRuns")
-                .type(stdList(validationRun.getType()))
+                .type(stdList(validationRun.getTypeRef()))
                 .argument(
                         newArgument()
                                 .name("id")

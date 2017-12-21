@@ -100,6 +100,9 @@ angular.module('ot.view.branch', [
             });
         }
 
+        // Switch branches loaded?
+        let switchBranchesLoaded = false;
+
         // Loading the build view
         function loadBuildView() {
             // Parameters for the call
@@ -246,23 +249,26 @@ angular.module('ot.view.branch', [
                     }
                 };
                 // Other branches
-                view.commands.push({
-                    id: 'switch-branch',
-                    name: "Switch",
-                    cls: 'ot-command-switch',
-                    group: true,
-                    actions: data.branches[0].otherBranches
-                        .filter(function (theBranch) {
-                            return (!theBranch.disabled) && (theBranch.type !== 'TEMPLATE_DEFINITION');
-                        })
-                        .map(function (theBranch) {
-                            return {
-                                id: 'switch-' + theBranch.id,
-                                name: theBranch.name,
-                                uri: 'branch/' + theBranch.id
-                            };
-                        })
-                });
+                if (!switchBranchesLoaded) {
+                    switchBranchesLoaded = true;
+                    view.commands.push({
+                        id: 'switch-branch',
+                        name: "Switch",
+                        cls: 'ot-command-switch',
+                        group: true,
+                        actions: data.branches[0].otherBranches
+                            .filter(function (theBranch) {
+                                return (!theBranch.disabled) && (theBranch.type !== 'TEMPLATE_DEFINITION');
+                            })
+                            .map(function (theBranch) {
+                                return {
+                                    id: 'switch-' + theBranch.id,
+                                    name: theBranch.name,
+                                    uri: 'branch/' + theBranch.id
+                                };
+                            })
+                    });
+                }
                 // Selection of build boundaries
                 if ($scope.builds.length > 0) {
                     $scope.selectedBuild.from = $scope.builds[0].id;

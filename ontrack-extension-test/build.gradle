@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
-        classpath 'com.bmuschko:gradle-docker-plugin:3.0.8'
+        classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
     }
 }
 
@@ -83,13 +83,16 @@ task portsOfAppContainer(type: DockerInspectContainer) {
     dependsOn startAppContainer
     targetContainerId { createAppContainer.getContainerId() }
     onNext {
-        it.networkSettings.ports.getBindings().each { exposedPort, bindingArr ->
-            if (exposedPort.port == 8080) {
-                int portBinding = bindingArr.first().hostPortSpec as int
-                String ontrackUrl = "http://${ontrackTestDockerHost}:${portBinding}"
-                println "Setting Ontrack URL to ${ontrackUrl}"
-                tasks.extensionTest {
-                    systemProperty 'ontrack.url', ontrackUrl
+        // Workaround for https://github.com/bmuschko/gradle-docker-plugin/issues/490
+        if (it != null) {
+            it.networkSettings.ports.getBindings().each { exposedPort, bindingArr ->
+                if (exposedPort.port == 8080) {
+                    int portBinding = bindingArr.first().hostPortSpec as int
+                    String ontrackUrl = "http://${ontrackTestDockerHost}:${portBinding}"
+                    println "Setting Ontrack URL to ${ontrackUrl}"
+                    tasks.extensionTest {
+                        systemProperty 'ontrack.url', ontrackUrl
+                    }
                 }
             }
         }

@@ -21,6 +21,8 @@ server:
 # Management
 management:
   context-path: "/manage"
+  security:
+    roles: ADMIN
 
 # Security
 

@@ -44,7 +44,7 @@ public class GQLProjectEntityDecorationListFieldContributor implements GQLProjec
                                         .type(GraphQLString)
                                         .build()
                         )
-                        .type(GraphqlUtils.stdList(decoration.getType()))
+                        .type(GraphqlUtils.stdList(decoration.getTypeRef()))
                         .dataFetcher(projectEntityDecorationsDataFetcher(projectEntityClass))
                         .build()
         );

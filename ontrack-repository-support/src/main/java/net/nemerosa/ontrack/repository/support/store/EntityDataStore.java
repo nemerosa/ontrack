@@ -154,4 +154,26 @@ public interface EntityDataStore {
      * Gets the count of records for a category
      */
     int getCountByCategory(ProjectEntity entity, String category);
+
+    /**
+     * Deletes EVERYTHING in the store for this entity - us with care
+     */
+    void deleteAll();
+
+    /**
+     * Gets a list of records based on a filter
+     * <p>
+     * Note that the {@link EntityDataStoreFilter#entity} parameter is required.
+     */
+    List<EntityDataStoreRecord> getByFilter(EntityDataStoreFilter entityDataStoreFilter);
+
+    /**
+     * Gets a count of records based on a filter
+     */
+    int getCountByFilter(EntityDataStoreFilter entityDataStoreFilter);
+
+    /**
+     * Deletes a list of records based on a filter
+     */
+    int deleteByFilter(EntityDataStoreFilter entityDataStoreFilter);
 }

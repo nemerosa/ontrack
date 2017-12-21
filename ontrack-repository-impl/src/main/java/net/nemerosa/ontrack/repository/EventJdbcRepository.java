@@ -78,8 +78,7 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
     }
 
     @Override
-    public List<Event> query(List<Integer> allowedProjects,
-                             ProjectEntityType entityType,
+    public List<Event> query(ProjectEntityType entityType,
                              ID entityId,
                              int offset,
                              int count,
@@ -87,11 +86,9 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                              Function<String, EventType> eventTypeLoader) {
         return getNamedParameterJdbcTemplate().query(
                 format("SELECT * FROM EVENTS WHERE %s = :entityId", entityType.name()) +
-                        " AND PROJECT IN (:projects)" +
                         " ORDER BY ID DESC" +
                         " LIMIT :count OFFSET :offset",
                 params("entityId", entityId.get())
-                        .addValue("projects", allowedProjects)
                         .addValue("count", count)
                         .addValue("offset", offset),
                 (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
@@ -99,8 +96,7 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
     }
 
     @Override
-    public List<Event> query(List<Integer> allowedProjects,
-                             EventType eventType,
+    public List<Event> query(EventType eventType,
                              ProjectEntityType entityType,
                              ID entityId,
                              int offset,
@@ -110,12 +106,10 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
         return getNamedParameterJdbcTemplate().query(
                 format("SELECT * FROM EVENTS WHERE %s = :entityId", entityType.name()) +
                         " AND EVENT_TYPE = :eventType" +
-                        " AND PROJECT IN (:projects)" +
                         " ORDER BY ID DESC" +
                         " LIMIT :count OFFSET :offset",
                 params("entityId", entityId.get())
                         .addValue("eventType", eventType.getId())
-                        .addValue("projects", allowedProjects)
                         .addValue("count", count)
                         .addValue("offset", offset),
                 (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
@@ -128,6 +122,17 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                 format("SELECT * FROM EVENTS WHERE %s = :entityId AND EVENT_TYPE = :eventType ORDER BY ID DESC LIMIT 1", entityType.name()),
                 params("entityId", entityId.get()).addValue("eventType", eventType.getId()),
                 (ResultSet rs, int num) -> readSignature(rs, "event_time", "event_user")
+        );
+    }
+
+    @Override
+    public Optional<Event> getLastEvent(ProjectEntityType entityType, ID entityId, EventType eventType,
+                                        BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                                        Function<String, EventType> eventTypeLoader) {
+        return getOptional(
+                format("SELECT * FROM EVENTS WHERE %s = :entityId AND EVENT_TYPE = :eventType ORDER BY ID DESC LIMIT 1", entityType.name()),
+                params("entityId", entityId.get()).addValue("eventType", eventType.getId()),
+                (ResultSet rs, int num) -> toEvent(rs, entityLoader, eventTypeLoader)
         );
     }
 

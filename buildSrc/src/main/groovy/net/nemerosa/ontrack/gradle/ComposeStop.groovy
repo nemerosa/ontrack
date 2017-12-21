@@ -22,6 +22,16 @@ class ComposeStop extends AbstractCompose {
      */
     String service
 
+    /**
+     * Collection of all container logs
+     */
+    String logs
+
+    /**
+     * Service to logs (optional)
+     */
+    String logService
+
     @TaskAction
     def run() {
         // Arguments
@@ -39,6 +49,26 @@ class ComposeStop extends AbstractCompose {
         }
         // Running
         compose(args as Object[])
+
+        // Collection of logs
+        if (logs) {
+            File logDir = project.file(logs)
+            if (!logDir.exists()) {
+                project.mkdir(logDir)
+            }
+            List<String> logArgs = [
+                    'logs',
+                    '--no-color',
+                    '--timestamps',
+            ]
+            if (logService) {
+                logArgs << logService
+            }
+            String logAsText = compose(logArgs as Object[])
+            def logFile = new File(logDir, 'compose.log')
+            println "[${name}] Putting ${logService} log into ${logFile}"
+            logFile.text = logAsText
+        }
 
         // Removing?
         if (remove) {

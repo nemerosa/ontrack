@@ -39,6 +39,7 @@ dependencies {
     runtime project(':ontrack-extension-stale')
     runtime project(':ontrack-extension-metrics-graphite')
     runtime project(':ontrack-extension-metrics-influxdb')
+    runtime project(':ontrack-extension-vault')
 }
 
 /**
@@ -105,6 +106,9 @@ processResources.mustRunAfter copyWebResources
 processResources.mustRunAfter generateVersionInfo
 
 bootRun.dependsOn jar
+
+// Running with `dev` profile by default with `bootRun`
+bootRun.args("--spring.profiles.active=dev")
 
 /**
  * Spring boot packaging
