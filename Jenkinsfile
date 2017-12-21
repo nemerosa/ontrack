@@ -60,7 +60,7 @@ git clean -xfd
 '''
                 script {
                     // Reads version information
-                    def props = readProperties file: 'build/version.properties'
+                    def props = readProperties(file: 'build/version.properties')
                     version = props.VERSION_DISPLAY
                     gitCommit = props.VERSION_COMMIT
                 }
