@@ -51,6 +51,7 @@ git clean -xfd
     versionFile \\
     test \\
     build \\
+    integrationTest \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
@@ -73,20 +74,6 @@ git clean -xfd
         }
 
         /*
-
-        stage('Integration tests') {
-            steps {
-                sh '''\
-./gradlew \\
-    integrationTest \\
-    -Dorg.gradle.jvmargs=-Xmx1536m \\
-    --info \\
-    --stacktrace \\
-    --profile \\
-    --console plain
-'''
-            }
-        }
 
         stage('Docker image') {
             steps {
