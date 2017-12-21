@@ -52,7 +52,8 @@ git clean -xfd
     test \\
     build \\
     integrationTest \\
-    dockerLatest \\
+    dockerBuild \\
+    acceptanceDockerBuild \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx1536m \\
