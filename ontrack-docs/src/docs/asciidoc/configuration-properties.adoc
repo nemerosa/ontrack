@@ -69,6 +69,12 @@ ontrack.config.jobs.scattering = false
 # the period of the job. Setting 0 would actually disable the scattering altogether.
 ontrack.config.jobs.scattering-ratio = 1.0
 
+# Cache configuration
+# Caffeine spec strings per cache type
+# See http://static.javadoc.io/com.github.ben-manes.caffeine/caffeine/2.6.0/com/github/benmanes/caffeine/cache/CaffeineSpec.html
+# For example, for the `properties` cache:
+ontrack.config.cache.specs.properties = maximumSize=1000,expireAfterWrite=1d,recordStats
+
 # Confidential store for the encryption keys
 ontrack.config.key-store = file
 ----

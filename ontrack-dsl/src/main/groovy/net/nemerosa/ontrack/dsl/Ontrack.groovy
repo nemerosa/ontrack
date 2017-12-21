@@ -11,6 +11,7 @@ import groovy.json.JsonSlurper
 import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.http.OTHttpClient
+import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
 
@@ -79,12 +80,10 @@ class Ontrack {
      */
     @DSLMethod("Finds a project using its name. Returns null if not found.")
     Project findProject(String name) {
-        def projectNode = get("structure/projects").resources.find {
-            it.name == name
-        }
-        if (projectNode) {
-            return new Project(this, get(projectNode._self))
-        } else {
+        try {
+            def projectNode = get("structure/entity/project/${name}")
+            return new Project(this, projectNode)
+        } catch (OTNotFoundException ignored) {
             return null
         }
     }
