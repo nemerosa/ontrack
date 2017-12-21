@@ -38,8 +38,6 @@ pipeline {
             }
         }
 
-        /*
-
         stage('Build') {
             steps {
                 sh '''\
@@ -74,6 +72,8 @@ git clean -xfd
                 }
             }
         }
+
+        /*
 
         stage('Integration tests') {
             steps {
