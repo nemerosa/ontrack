@@ -38,6 +38,8 @@ pipeline {
             }
         }
 
+        /*
+
         stage('Build') {
             steps {
                 sh '''\
@@ -256,6 +258,8 @@ docker-compose down --volumes
                 }
             }
         }
+
+        */
 
         // TODO Site
         // TODO Ontrack validation --> SITE
