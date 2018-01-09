@@ -78,13 +78,22 @@ task acceptanceDockerPrepareEnv(type: Copy) {
 assemble.dependsOn normaliseJar
 assemble.dependsOn copyJarForDocker
 
-task acceptanceDockerBuild(type: Exec, dependsOn: acceptanceDockerPrepareEnv) {
+task dockerBuild(type: Exec, dependsOn: acceptanceDockerPrepareEnv) {
     executable 'docker'
     args = [
             'build',
             '--tag',
             "nemerosa/ontrack-acceptance:${versioning.info.display}",
             project.file('src/main/docker')
+    ]
+}
+
+task dockerLatest(type: Exec, dependsOn: dockerBuild) {
+    executable 'docker'
+    args = [
+            'tag',
+            "nemerosa/ontrack-acceptance:${versioning.info.display}",
+            "nemerosa/ontrack-acceptance:latest",
     ]
 }
 

@@ -12,7 +12,7 @@ services:
       environment:
          JAVA_OPTS: "-Xmx2048m"
    ontrack_acceptance:
-      image: nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
+      image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
          ontrack:
             condition: service_healthy
