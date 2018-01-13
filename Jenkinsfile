@@ -97,7 +97,7 @@ echo "Cleanup..."
 cd ontrack-acceptance/src/main/compose
 docker-compose down --volumes
 """
-                 // TODO archive 'delivery/ontrack-acceptance/build/acceptance/**'
+                 archive 'ontrack-acceptance/src/main/compose/build'
                  // TODO junit 'delivery/ontrack-acceptance/build/acceptance/*.xml'
                  ontrackValidate(
                          project: 'ontrack',

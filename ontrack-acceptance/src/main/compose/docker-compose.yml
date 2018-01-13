@@ -23,4 +23,4 @@ services:
          ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
          ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
       volumes:
-        - "${ONTRACK_ACCEPTANCE_OUTPUT:-./build}:/ontrack/acceptance/output"
+         - "./build:/ontrack/acceptance/output:rw"
