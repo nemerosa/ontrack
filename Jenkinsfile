@@ -86,7 +86,7 @@ docker-compose up -d ontrack selenium
                    sh """\
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose up -d ontrack_acceptance
+docker-compose up ontrack_acceptance
 """
                }
           }
