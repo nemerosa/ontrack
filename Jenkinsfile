@@ -74,61 +74,31 @@ git clean -xfd
             }
         }
 
-        /*
-
-        stage('OS packages') {
-            steps {
-                sh '''\
-./gradlew \\
-    osPackages \\
-    -Dorg.gradle.jvmargs=-Xmx1536m \\
-    --info \\
-    --stacktrace \\
-    --profile \\
-    --console plain
-'''
-               // Saving the delivery ZIP for later
-               stash includes: 'build/distributions/*-delivery.zip', name: 'delivery-zip'
-            }
-            post {
-                always {
-                    archive 'build/distributions/*-delivery.zip'
-                }
-            }
-        }
-
         stage('Local acceptance tests') {
            steps {
-             // Gets the delivery zip
-             dir('delivery') {
-                unstash 'delivery-zip'
-             }
-             // Unzips the delivery
-             sh '''\
-unzip delivery/build/distributions/*-delivery.zip -d delivery
-'''
              // Runs the acceptance tests
-               timeout(time: 15, unit: 'MINUTES') {
+               timeout(time: 25, unit: 'MINUTES') {
                    sh """\
-cd delivery/ontrack-acceptance
-docker-compose build
-docker-compose run --rm \\
-    -e ONTRACK_VERSION=${version} \\
-    -e ONTRACK_ACCEPTANCE_OUTPUT=`pwd`/build/acceptance \\
-    -e ONTRACK_ACCEPTANCE_IMPLICIT_WAIT=30 \\
-    -e ONTRACK_ACCEPTANCE_TIMEOUT=300 \\
-    ontrack_acceptance
+echo "Launching environment..."
+cd ontrack-acceptance/src/main/compose
+docker-compose up -d ontrack selenium
+"""
+                   sh """\
+echo "Launching tests..."
+cd ontrack-acceptance/src/main/compose
+docker-compose up -d ontrack_acceptance
 """
                }
           }
           post {
              always {
                 sh """\
-cd delivery/ontrack-acceptance
+echo "Cleanup..."
+cd ontrack-acceptance/src/main/compose
 docker-compose down --volumes
 """
-                 archive 'delivery/ontrack-acceptance/build/acceptance/**'
-                 junit 'delivery/ontrack-acceptance/build/acceptance/*.xml'
+                 // TODO archive 'delivery/ontrack-acceptance/build/acceptance/**'
+                 // TODO junit 'delivery/ontrack-acceptance/build/acceptance/*.xml'
                  ontrackValidate(
                          project: 'ontrack',
                          branch: branchName,
@@ -139,6 +109,8 @@ docker-compose down --volumes
              }
           }
         }
+
+        /*
 
         // Docker push
         stage('Docker publication') {
