@@ -110,8 +110,6 @@ docker-compose down --volumes
           }
         }
 
-        /*
-
         // Docker push
         stage('Docker publication') {
             steps {
@@ -136,6 +134,8 @@ docker-compose down --volumes
                 }
             }
         }
+
+        /*
 
         // OS tests + DO tests in parallel
 
