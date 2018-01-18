@@ -109,10 +109,10 @@ class Migration(
         // copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "JSON_VALUE::JSONB");
 
         // ENTITY_DATA_STORE
-        copy("ENTITY_DATA_STORE", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "CREATION", "CREATOR", "CATEGORY", "NAME", "GROUPID", "JSON::JSONB")
+        copyEntityDataStore()
 
-        // FIXME ENTITY_DATA_STORE
-        // copy("ENTITY_DATA_STORE_AUDIT", "ID", "RECORD_ID", "AUDIT_TYPE", "TIMESTAMP", "USER->CREATOR");
+        // ENTITY_DATA_STORE
+        copyEntityDataStoreAudit()
 
         // PROPERTIES
         copyProperties()
@@ -178,6 +178,45 @@ class Migration(
 
     }
 
+    private fun copyEntityDataStore() {
+        copyWithTmp(
+                "ENTITY_DATA_STORE",
+                """CREATE TABLE TMP_ENTITY_DATA_STORE (
+                  ID         INTEGER     PRIMARY KEY,
+                  PROJECT          INTEGER        NULL,
+                  BRANCH           INTEGER        NULL,
+                  PROMOTION_LEVEL  INTEGER        NULL,
+                  VALIDATION_STAMP INTEGER        NULL,
+                  BUILD            INTEGER        NULL,
+                  PROMOTION_RUN    INTEGER        NULL,
+                  VALIDATION_RUN   INTEGER        NULL,
+                  CREATION         VARCHAR(24)    NOT NULL,
+                  CREATOR          VARCHAR(40)    NOT NULL,
+                  CATEGORY         VARCHAR(150)   NOT NULL,
+                  NAME             VARCHAR(150)   NOT NULL,
+                  GROUPID          VARCHAR(150)   NULL,
+                  JSON             VARCHAR(10000) NOT NULL
+                );
+                """,
+                "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "CREATION", "CREATOR", "CATEGORY", "NAME", "GROUPID", "JSON"
+        )
+    }
+
+    private fun copyEntityDataStoreAudit() {
+        copyWithTmp(
+                "ENTITY_DATA_STORE_AUDIT",
+                """CREATE TABLE TMP_ENTITY_DATA_STORE_AUDIT (
+                  ID         INTEGER     PRIMARY KEY,
+                  RECORD_ID  INTEGER     NOT NULL,
+                  AUDIT_TYPE VARCHAR(10) NOT NULL,
+                  TIMESTAMP  VARCHAR(24) NOT NULL,
+                  CREATOR    VARCHAR(40) NOT NULL
+                );
+                """,
+                "ID", "RECORD_ID", "AUDIT_TYPE", "TIMESTAMP", "USER->CREATOR"
+        )
+    }
+
     private fun copyProperties() {
         copyWithTmp(
                 "PROPERTIES",
@@ -225,29 +264,25 @@ class Migration(
     private fun copyWithTmp(table: String, tmpCreation: String, vararg columns: String) {
         val h2Query = format("SELECT * FROM %s", table)
 
-        val insert = columns.joinToString(",") { it.substringBefore("::") }
+        val specs = columns.map { ColumnMigration.parse(it) }
+
+        val insert = specs.joinToString(",") { it.target }
         val postgresqlUpdate = format(
                 "INSERT INTO TMP_%s (%s) VALUES (%s)",
                 table,
                 insert,
-                columns.joinToString(",") { column ->
-                    "?" + if (column.contains("::")) {
-                        "::" + column.substringAfter("::")
-                    } else {
-                        ""
-                    }
-                }
+                specs.joinToString(",") { it.typedPlaceholder }
         )
 
-        tx({
+        tx {
             // Makes sure temp table is dropped
             postgresql.jdbcOperations.execute(format("DROP TABLE IF EXISTS TMP_%s", table))
             // Creates temporary table, without any contraint
             logger.info(format("Creating TMP_%s...", table))
             postgresql.jdbcOperations.execute(tmpCreation)
-        })
+        }
 
-        val count = intx<Int>({
+        val count = intx {
             logger.info("Migrating {} to TMP_{} (no check)...", table, table)
             val sources = h2.queryForList(h2Query, emptyMap<String, Any>())
             val size = sources.size
@@ -260,8 +295,8 @@ class Migration(
                         for (source in sources) {
                             index++
                             var i = 1
-                            for (column in columns) {
-                                ps.setObject(i++, source[StringUtils.substringBefore(column, "::")])
+                            for (spec in specs) {
+                                ps.setObject(i++, source[spec.source])
                             }
                             ps.addBatch()
                             tosend++
@@ -278,21 +313,28 @@ class Migration(
                             logger.info("Migrating {} to TMP_{} (no check) {}/{} [{}%]", table, table, index, size, percent)
                             ps.executeBatch()
                         }
-                        null
                     }
             )
             size
-        })
+        }
 
-        tx({
+        tx {
             // Copying the tmp
             logger.info("Copying TMP_{} into {}...", table, table)
-            postgresql.jdbcOperations.execute(format("INSERT INTO %s SELECT * FROM TMP_%s", table, table))
+            postgresql.jdbcOperations.execute(
+                    format(
+                            "INSERT INTO %s(%s) SELECT %s FROM TMP_%s",
+                            table,
+                            specs.joinToString(",") { it.target },
+                            specs.joinToString(",") { it.source },
+                            table
+                    )
+            )
 
             // Deletes tmp table
             logger.info("Deleting TMP_{}...", table)
             postgresql.jdbcOperations.execute(format("DROP TABLE TMP_%s;", table))
-        })
+        }
 
         // OK
         logger.info("{} count = {}...", table, count)
@@ -386,6 +428,32 @@ class Migration(
         }
 
         logger.info("{} count = {}...", name, count)
+    }
+
+    data class ColumnMigration(
+            val source: String,
+            val target: String,
+            val type: String?
+    ) {
+        companion object {
+            /**
+             * @param pattern Something like `[source->]target[::type]]`
+             */
+            fun parse(pattern: String): ColumnMigration {
+                val source = pattern.substringBefore("->", "")
+                val targetSpec = pattern.substringAfter("->")
+                val target = targetSpec.substringBefore("::")
+                val type = targetSpec.substringAfter("::", "")
+                return ColumnMigration(
+                        source = if (source.isBlank()) target else source,
+                        target = target,
+                        type = if (type.isBlank()) null else type
+                )
+            }
+        }
+
+        val typedPlaceholder: String
+            get() = if (type == null) "?" else "?::$type"
     }
 
 }
