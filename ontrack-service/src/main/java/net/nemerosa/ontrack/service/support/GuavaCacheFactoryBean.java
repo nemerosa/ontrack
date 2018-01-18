@@ -7,6 +7,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCache;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class GuavaCacheFactoryBean implements FactoryBean<ConcurrentMapCache> {
 
     private final ConcurrentMap<Object, Object> store;
