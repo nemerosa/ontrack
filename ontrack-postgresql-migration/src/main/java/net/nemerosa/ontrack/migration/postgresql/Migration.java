@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -15,6 +16,8 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
+import java.sql.BatchUpdateException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -69,21 +72,24 @@ public class Migration {
         // STORAGE
         copy("STORAGE", "STORE", "NAME", "DATA::JSONB");
 
+        // APPLICATION_LOG_ENTRIES
+        // No migration of the log entries
+
         /*
          * Entities
          */
 
         // PROJECTS
-        copy("PROJECTS", "ID", "NAME", "DESCRIPTION", "DISABLED");
+        copy("PROJECTS", "ID", "NAME", "DESCRIPTION", "DISABLED", "CREATION", "CREATOR");
 
         // BRANCHES
-        copy("BRANCHES", "ID", "PROJECTID", "NAME", "DESCRIPTION", "DISABLED");
+        copy("BRANCHES", "ID", "PROJECTID", "NAME", "DESCRIPTION", "DISABLED", "CREATION", "CREATOR");
 
         // PROMOTION_LEVELS
-        copy("PROMOTION_LEVELS", "ID", "BRANCHID", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
+        copy("PROMOTION_LEVELS", "ID", "BRANCHID", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES", "CREATION", "CREATOR");
 
         // VALIDATION_STAMPS
-        copy("VALIDATION_STAMPS", "ID", "BRANCHID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
+        copy("VALIDATION_STAMPS", "ID", "BRANCHID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES", "CREATION", "CREATOR");
 
         // BUILDS
         copy("BUILDS", "ID", "BRANCHID", "NAME", "DESCRIPTION", "CREATION", "CREATOR");
@@ -117,14 +123,23 @@ public class Migration {
          * Entity data
          */
 
-        // ENTITY_DATA
-        copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "VALUE::JSONB");
+        // FIXME ENTITY_DATA
+        // copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "JSON_VALUE::JSONB");
+
+        // ENTITY_DATA_STORE
+        copy("ENTITY_DATA_STORE", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "CREATION", "CREATOR", "CATEGORY", "NAME", "GROUPID", "JSON::JSONB");
+
+        // FIXME ENTITY_DATA_STORE
+        // copy("ENTITY_DATA_STORE_AUDIT", "ID", "RECORD_ID", "AUDIT_TYPE", "TIMESTAMP", "USER->CREATOR");
 
         // PROPERTIES
         copyProperties();
 
         // SHARED_BUILD_FILTERS
         copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA::JSONB");
+
+        // VALIDATION_STAMP_FILTERS
+        copy("VALIDATION_STAMP_FILTERS", "ID", "NAME", "PROJECT", "BRANCH", "VSNAMES");
 
         // BUILD_LINKS
         copy("BUILD_LINKS", "ID", "BUILDID", "TARGETBUILDID");
@@ -265,14 +280,16 @@ public class Migration {
                             ps.addBatch();
                             tosend++;
                             if (tosend % 1000 == 0) {
-                                logger.info("Migrating {} to TMP_{} (no check) {}/{}", table, table, index, size);
+                                long percent = index * 100 / size;
+                                logger.info("Migrating {} to TMP_{} (no check) {}/{} [{}%]", table, table, index, size, percent);
                                 ps.executeBatch();
                                 tosend = 0;
                             }
                         }
                         // Final statement
                         if (tosend > 0) {
-                            logger.info("Migrating {} to TMP_{} (no check) {}/{}", table, table, index, size);
+                            long percent = index * 100 / size;
+                            logger.info("Migrating {} to TMP_{} (no check) {}/{} [{}%]", table, table, index, size, percent);
                             ps.executeBatch();
                         }
                         return null;
@@ -305,6 +322,8 @@ public class Migration {
                 "BUILDS",
                 "CONFIGURATIONS",
                 "ENTITY_DATA",
+                "ENTITY_DATA_STORE",
+                "ENTITY_DATA_STORE_AUDIT",
                 "EVENTS",
                 "EXT_SVN_REPOSITORY",
                 "PREDEFINED_PROMOTION_LEVELS",
@@ -317,6 +336,7 @@ public class Migration {
                 "VALIDATION_RUN_STATUSES",
                 "VALIDATION_RUNS",
                 "VALIDATION_STAMPS",
+                "VALIDATION_STAMP_FILTERS"
         };
         tx(() -> Arrays.stream(tables).forEach(table -> {
             Integer max = postgresql.queryForObject(
@@ -346,6 +366,7 @@ public class Migration {
                 "EVENTS",
                 "SETTINGS",
                 "STORAGE",
+                "VALIDATION_STAMP_FILTERS",
         };
         tx(() -> {
             for (String table : tables) {
@@ -397,7 +418,17 @@ public class Migration {
         int count = sources.size();
         @SuppressWarnings("unchecked")
         Map<String, ?>[] array = sources.toArray(new Map[sources.size()]);
-        postgresql.batchUpdate(postgresqlUpdate, array);
+        try {
+            postgresql.batchUpdate(postgresqlUpdate, array);
+        } catch (DataAccessException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof BatchUpdateException) {
+                SQLException sqlException = ((BatchUpdateException) cause).getNextException();
+                throw new RuntimeException("SQL Error", sqlException);
+            } else {
+                throw ex;
+            }
+        }
         logger.info("{} count = {}...", name, count);
     }
 
