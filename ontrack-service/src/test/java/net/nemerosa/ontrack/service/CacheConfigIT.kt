@@ -8,7 +8,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertTrue
 
-class CacheConfigTest : AbstractServiceTestSupport() {
+class CacheConfigIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var propertyRepository: PropertyRepository
