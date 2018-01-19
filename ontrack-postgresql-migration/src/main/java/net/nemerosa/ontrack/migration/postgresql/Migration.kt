@@ -105,8 +105,8 @@ class Migration(
          * Entity data
          */
 
-        // FIXME ENTITY_DATA
-        // copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "JSON_VALUE::JSONB");
+        // ENTITY_DATA
+        copyEntityData()
 
         // ENTITY_DATA_STORE
         copyEntityDataStore()
@@ -176,6 +176,27 @@ class Migration(
         // Update of sequences
         updateSequences()
 
+    }
+
+    private fun copyEntityData() {
+        // copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "JSON_VALUE::JSONB");
+        copyWithTmp(
+                "ENTITY_DATA",
+                """CREATE TABLE TMP_ENTITY_DATA (
+                  ID               INTEGER     PRIMARY KEY,
+                  NAME             VARCHAR(150)       NOT NULL,
+                  PROJECT          INTEGER,
+                  BRANCH           INTEGER,
+                  PROMOTION_LEVEL  INTEGER,
+                  VALIDATION_STAMP INTEGER,
+                  BUILD            INTEGER,
+                  PROMOTION_RUN    INTEGER,
+                  VALIDATION_RUN   INTEGER,
+                  JSON_VALUE       JSONB NULL
+                );
+                """,
+                "ID", "NAME", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "VALUE->JSON_VALUE::JSONB"
+        )
     }
 
     private fun copyEntityDataStore() {
@@ -284,6 +305,7 @@ class Migration(
 
         val count = intx {
             logger.info("Migrating {} to TMP_{} (no check)...", table, table)
+            logger.info("Using: $postgresqlUpdate")
             val sources = h2.queryForList(h2Query, emptyMap<String, Any>())
             val size = sources.size
 
@@ -321,15 +343,10 @@ class Migration(
         tx {
             // Copying the tmp
             logger.info("Copying TMP_{} into {}...", table, table)
-            postgresql.jdbcOperations.execute(
-                    format(
-                            "INSERT INTO %s(%s) SELECT %s FROM TMP_%s",
-                            table,
-                            specs.joinToString(",") { it.target },
-                            specs.joinToString(",") { it.source },
-                            table
-                    )
-            )
+            val columnList = specs.joinToString(",") { it.target }
+            val tmpCopy = "INSERT INTO $table($columnList) SELECT $columnList FROM TMP_$table"
+            logger.info("  using $tmpCopy")
+            postgresql.jdbcOperations.execute(tmpCopy)
 
             // Deletes tmp table
             logger.info("Deleting TMP_{}...", table)

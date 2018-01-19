@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,31 +20,7 @@ public class EntityDataJdbcRepository extends AbstractJdbcRepository implements 
 
     @Override
     public void store(ProjectEntity entity, String key, String value) {
-        // Existing?
-        Optional<Integer> existingId = getOptional(
-                String.format(
-                        "SELECT ID FROM ENTITY_DATA WHERE %s = :entityId AND NAME = :name",
-                        entity.getProjectEntityType().name()
-                ),
-                params("entityId", entity.id()).addValue("name", key),
-                Integer.class
-        );
-        if (existingId.isPresent()) {
-            getNamedParameterJdbcTemplate().update(
-                    "UPDATE ENTITY_DATA SET VALUE = :value WHERE ID = :id",
-                    params("id", existingId.get()).addValue("value", value)
-            );
-        } else {
-            getNamedParameterJdbcTemplate().update(
-                    String.format(
-                            "INSERT INTO ENTITY_DATA(%s, NAME, VALUE) VALUES (:entityId, :name, :value)",
-                            entity.getProjectEntityType().name()
-                    ),
-                    params("entityId", entity.id())
-                            .addValue("name", key)
-                            .addValue("value", value)
-            );
-        }
+        storeJson(entity, key, new TextNode(value));
     }
 
     @Override
@@ -77,14 +54,7 @@ public class EntityDataJdbcRepository extends AbstractJdbcRepository implements 
 
     @Override
     public Optional<String> retrieve(ProjectEntity entity, String key) {
-        return getOptional(
-                String.format(
-                        "SELECT VALUE FROM ENTITY_DATA WHERE %s = :entityId AND NAME = :name",
-                        entity.getProjectEntityType().name()
-                ),
-                params("entityId", entity.id()).addValue("name", key),
-                String.class
-        );
+        return retrieveJson(entity, key).map(JsonNode::asText);
     }
 
     @Override
