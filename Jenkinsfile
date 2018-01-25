@@ -113,15 +113,20 @@ docker-compose down --volumes
         // Docker push
         stage('Docker publication') {
             steps {
+                environment {
+                    DOCKER_HUB = credentials("DOCKER_HUB")
+                    ONTRACK_VERSION = "${version}"
+                }
                 timeout(time: 1, unit: 'HOURS') {
                     input "Pushing version ${version} to the Docker Hub?"
                 }
                 script {
-                    docker.withRegistry('https://index.docker.io/v2', 'DOCKER_HUB') {
-                        def image = docker.image("nemerosa/ontrack:${version}")
-                        image.push()
-                        // TODO If 2.x, pushes `latest` as well
-                    }
+                    sh '''\
+#!/bin/bash
+set -e
+docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
+docker push nemerosa/ontrack:${ONTRACK_VERSION}
+'''
                 }
             }
             post {
