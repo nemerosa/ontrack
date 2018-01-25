@@ -112,11 +112,11 @@ docker-compose down --volumes
 
         // Docker push
         stage('Docker publication') {
+            environment {
+                DOCKER_HUB = credentials("DOCKER_HUB")
+                ONTRACK_VERSION = "${version}"
+            }
             steps {
-                environment {
-                    DOCKER_HUB = credentials("DOCKER_HUB")
-                    ONTRACK_VERSION = "${version}"
-                }
                 timeout(time: 1, unit: 'HOURS') {
                     input "Pushing version ${version} to the Docker Hub?"
                 }
