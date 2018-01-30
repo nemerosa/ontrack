@@ -1,6 +1,7 @@
 String version = ''
 String gitCommit = ''
 String branchName = ''
+String projectName = 'ontrack'
 
 pipeline {
 
@@ -26,7 +27,7 @@ pipeline {
                     branchName = ontrackBranchName(BRANCH_NAME)
                     echo "Ontrack branch name = ${branchName}"
                 }
-                ontrackBranchSetup(project: 'ontrack', branch: branchName, script: """
+                ontrackBranchSetup(project: projectName, branch: branchName, script: """
                     branch.config {
                         gitBranch '${branchName}', [
                             buildCommitLink: [
@@ -69,7 +70,7 @@ git clean -xfd
             }
             post {
                 success {
-                    ontrackBuild(project: 'ontrack', branch: branchName, build: version, gitCommit: gitCommit)
+                    ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
                 }
             }
         }
@@ -100,7 +101,7 @@ docker-compose down --volumes
                  archiveArtifacts 'ontrack-acceptance/src/main/compose/build/**'
                  junit 'ontrack-acceptance/src/main/compose/build/*.xml'
                  ontrackValidate(
-                         project: 'ontrack',
+                         project: projectName,
                          branch: branchName,
                          build: version,
                          validationStamp: 'ACCEPTANCE',
@@ -132,7 +133,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
             post {
                 always {
                     ontrackValidate(
-                            project: 'ontrack',
+                            project: projectName,
                             branch: branchName,
                             build: version,
                             validationStamp: 'DOCKER',
@@ -142,8 +143,6 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
             }
         }
 
-        /*
-
         // OS tests + DO tests in parallel
 
         stage('Platform tests') {
@@ -152,7 +151,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                 stage('CentOS7') {
                     steps {
                         ontrackValidate(
-                                project: 'ontrack',
+                                project: projectName,
                                 branch: branchName,
                                 build: version,
                                 validationStamp: 'ACCEPTANCE.CENTOS.7',
@@ -164,7 +163,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                 stage('Debian') {
                     steps {
                         ontrackValidate(
-                                project: 'ontrack',
+                                project: projectName,
                                 branch: branchName,
                                 build: version,
                                 validationStamp: 'ACCEPTANCE.DEBIAN',
@@ -176,7 +175,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                 stage('Digital Ocean') {
                     steps {
                         ontrackValidate(
-                                project: 'ontrack',
+                                project: projectName,
                                 branch: branchName,
                                 build: version,
                                 validationStamp: 'ACCEPTANCE.DO',
@@ -187,6 +186,8 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
             }
         }
 
+        /*
+
         stage('Release') {
             steps {
                 echo "Releasing..."
@@ -195,7 +196,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
             post {
                 success {
                     ontrackPromote(
-                            project: 'ontrack',
+                            project: projectName,
                             branch: branchName,
                             build: version,
                             promotionLevel: 'RELEASE',
