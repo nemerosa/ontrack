@@ -189,10 +189,13 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                             sh '''\
 #!/bin/bash
 
-echo "Removing any previous machine: ${DROPLET_NAME}..."
+echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME} > /dev/null
 
-echo "Creating ${DROPLET_NAME} droplet..."
+# Failing on first error from now on
+set -e
+
+echo "(*) Creating ${DROPLET_NAME} droplet..."
 docker-machine create \\
     --driver=digitalocean \\
     --digitalocean-access-token=${DO_TOKEN} \\
@@ -201,15 +204,42 @@ docker-machine create \\
     --digitalocean-size=1gb \\
     --digitalocean-backups=false \\
     ${DROPLET_NAME}
-if [ "$?" != "0" ]
-then
-    echo "Cannot create droplet ${DROPLET_NAME}."
-    exit 1
-fi
 
-echo "Gets ${DROPLET_NAME} droplet IP..."
+echo "(*) Gets ${DROPLET_NAME} droplet IP..."
 DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
 echo "Droplet IP = ${DROPLET_IP}"
+
+echo "(*) Target Ontrack application..."
+ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
+
+echo "(*) Gets the ${DROPLET_NAME} Docker environment..."
+DROPLET_DOCKER=`docker-machine env --shell bash ${DROPLET_NAME}`
+
+echo "(*) Uploading the Compose file to ${DROPLET_NAME}..."
+docker-machine ssh ${DROPLET_NAME} mkdir -p /var/ontrack/
+docker-machine scp ontrack-acceptance/src/main/compose/docker-compose-do-server.xml /var/ontrack/docker-compose.yml
+
+echo "(*) Launching the remote Ontrack ecosystem..."
+${DROPLET_DOCKER} docker-compose \\
+    --project-directory /var/ontrack \\
+    --file docker-compose.yml \\
+    --project-name ontrack \\
+    up -d
+
+echo "(*) Launching the test environment..."
+docker-compose \\
+    --project-directory ontrack-acceptance/src/main/compose \\
+    --file docker-compose-do-client.yml \\
+    --project-name acceptance \\
+    up -d selenium
+
+echo "(*) Running the tests..."
+docker-compose \\
+    --project-directory ontrack-acceptance/src/main/compose \\
+    --file docker-compose-do-client.yml \\
+    --project-name acceptance \\
+    up ontrack_acceptance
+"""
 '''
                         }
                     }
@@ -217,7 +247,15 @@ echo "Droplet IP = ${DROPLET_IP}"
                         always {
                             sh '''\
 #!/bin/bash
-echo "Removing any previous machine: ${DROPLET_NAME}..."
+
+echo "(*) Removing the test environment..."
+docker-compose \\
+    --project-directory ontrack-acceptance/src/main/compose \\
+    --file docker-compose-do-client.yml \\
+    --project-name acceptance \\
+    down
+
+echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
                             ontrackValidate(
