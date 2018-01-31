@@ -217,7 +217,7 @@ DROPLET_DOCKER=`docker-machine env --shell bash ${DROPLET_NAME}`
 
 echo "(*) Uploading the Compose file to ${DROPLET_NAME}..."
 docker-machine ssh ${DROPLET_NAME} mkdir -p /var/ontrack/
-docker-machine scp ontrack-acceptance/src/main/compose/docker-compose-do-server.xml /var/ontrack/docker-compose.yml
+docker-machine scp ontrack-acceptance/src/main/compose/docker-compose-do-server.yml /var/ontrack/docker-compose.yml
 
 echo "(*) Launching the remote Ontrack ecosystem..."
 ${DROPLET_DOCKER} docker-compose \\
