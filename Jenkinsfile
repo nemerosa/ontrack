@@ -149,6 +149,9 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
             parallel {
                 // TODO CentOS7
                 stage('CentOS7') {
+                    when {
+                        branch 'release/.*'
+                    }
                     steps {
                         ontrackValidate(
                                 project: projectName,
@@ -161,6 +164,9 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                 }
                 // TODO Debian
                 stage('Debian') {
+                    when {
+                        branch 'release/.*'
+                    }
                     steps {
                         ontrackValidate(
                                 project: projectName,
@@ -171,16 +177,57 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                         )
                     }
                 }
-                // TODO Digital Ocean
+                // Digital Ocean
                 stage('Digital Ocean') {
+                    environment {
+                        ONTRACK_VERSION = "${version}"
+                        DROPLET_NAME = "ontrack-acceptance-${version}"
+                        // TODO DO token
+                    }
                     steps {
-                        ontrackValidate(
-                                project: projectName,
-                                branch: branchName,
-                                build: version,
-                                validationStamp: 'ACCEPTANCE.DO',
-                                buildResult: currentBuild.result,
-                        )
+                        timeout(time: 25, unit: 'MINUTES') {
+                            sh '''\
+#!/bin/bash
+
+echo "Removing any previous machine: ${DROPLET_NAME}..."
+docker-machine rm --force ${DROPLET_NAME}
+
+echo "Creating ${DROPLET_NAME} droplet..."
+docker-machine create \\
+    --driver=digitalocean \\
+    --digitalocean-access-token=${DO_TOKEN} \\
+    --digitalocean-image=docker \\
+    --digitalocean-region=fra1 \\
+    --digitalocean-size=1gb \\
+    --digitalocean-backups=false \\
+    ${DROPLET_NAME}
+if [ "$?" != "0" ]
+then
+    echo "Cannot create droplet ${DROPLET_NAME}."
+    exit 1
+fi
+
+echo "Gets ${DROPLET_NAME} droplet IP..."
+DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
+echo "Droplet IP = ${DROPLET_IP}"
+'''
+                        }
+                    }
+                    post {
+                        always {
+                            sh '''\
+#!/bin/bash
+echo "Removing any previous machine: ${DROPLET_NAME}..."
+docker-machine rm --force ${DROPLET_NAME}
+'''
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE.DO',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
                     }
                 }
             }
