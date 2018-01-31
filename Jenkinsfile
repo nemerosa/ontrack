@@ -182,7 +182,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                     environment {
                         ONTRACK_VERSION = "${version}"
                         DROPLET_NAME = "ontrack-acceptance-${version}"
-                        // TODO DO token
+                        DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
                     }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
@@ -190,7 +190,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
 #!/bin/bash
 
 echo "Removing any previous machine: ${DROPLET_NAME}..."
-docker-machine rm --force ${DROPLET_NAME}
+docker-machine rm --force ${DROPLET_NAME} > /dev/null
 
 echo "Creating ${DROPLET_NAME} droplet..."
 docker-machine create \\
