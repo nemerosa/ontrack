@@ -118,9 +118,10 @@ docker-compose down --volumes
                 ONTRACK_VERSION = "${version}"
             }
             steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    input "Pushing version ${version} to the Docker Hub?"
-                }
+                // TODO Confirmation before going further (disabled for development)
+                // timeout(time: 1, unit: 'HOURS') {
+                //     input "Pushing version ${version} to the Docker Hub?"
+                // }
                 script {
                     sh '''\
 #!/bin/bash
