@@ -190,6 +190,9 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                             sh '''\
 #!/bin/bash
 
+echo "(*) Cleanup..."
+rm -rf ontrack-acceptance/src/main/compose/build
+
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME} > /dev/null
 
@@ -259,6 +262,8 @@ docker-compose \\
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
+                            archiveArtifacts 'ontrack-acceptance/src/main/compose/build/**'
+                            junit 'ontrack-acceptance/src/main/compose/build/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
