@@ -216,21 +216,20 @@ echo "Droplet IP = ${DROPLET_IP}"
 echo "(*) Target Ontrack application..."
 ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
 
-echo "(*) Gets the ${DROPLET_NAME} Docker environment..."
-DROPLET_DOCKER=`docker-machine env --shell bash ${DROPLET_NAME}`
-
 echo "(*) Uploading the Compose file to ${DROPLET_NAME}..."
 docker-machine ssh ${DROPLET_NAME} mkdir -p /var/ontrack/
 docker-machine scp ontrack-acceptance/src/main/compose/docker-compose-do-server.yml ${DROPLET_NAME}:/var/ontrack/docker-compose.yml
 
 echo "(*) Launching the remote Ontrack ecosystem..."
-${DROPLET_DOCKER} docker-compose \\
+eval $(docker-machine env --shell bash ${DROPLET_NAME})
+docker-compose \\
     --project-directory /var/ontrack \\
     --file docker-compose.yml \\
     --project-name ontrack \\
     up -d
 
-echo "(*) Launching the test environment..."
+echo "(*) Launching the test environment locally..."
+eval $(docker-machine env --unset)
 docker-compose \\
     --project-directory ontrack-acceptance/src/main/compose \\
     --file docker-compose-do-client.yml \\
