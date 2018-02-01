@@ -224,7 +224,7 @@ docker-compose \\
     up -d
 
 echo "(*) Launching the test environment locally..."
-eval $(docker-machine env --unset)
+eval $(docker-machine env --shell bash --unset)
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name acceptance \\
