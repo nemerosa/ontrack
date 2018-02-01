@@ -3,6 +3,9 @@ version: "2.1"
 services:
   # InfluxDB container
   influxdb:
+    image: influxdb:1.1-alpine
+    environment:
+      PRE_CREATE_DB: "ontrack"
     # Makes all ports accessible on the host for testing
     ports:
       - "8083"
