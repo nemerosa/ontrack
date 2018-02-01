@@ -226,18 +226,16 @@ docker-compose \\
 echo "(*) Launching the test environment locally..."
 eval $(docker-machine env --unset)
 docker-compose \\
-    --project-directory ontrack-acceptance/src/main/compose \\
-    --file docker-compose-do-client.yml \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name acceptance \\
     up -d selenium
 
 echo "(*) Running the tests..."
 docker-compose \\
-    --project-directory ontrack-acceptance/src/main/compose \\
-    --file docker-compose-do-client.yml \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name acceptance \\
     up ontrack_acceptance
-"""
+
 '''
                         }
                     }
