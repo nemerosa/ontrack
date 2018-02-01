@@ -56,7 +56,7 @@ git clean -xfd
     dockerLatest \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
-    -Dorg.gradle.jvmargs=-Xmx1536m \\
+    -Dorg.gradle.jvmargs=-Xmx2048m \\
     --stacktrace \\
     --profile \\
     --console plain
