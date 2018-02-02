@@ -186,7 +186,7 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                         DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
                     }
                     steps {
-                        timeout(time: 25, unit: 'MINUTES') {
+                        timeout(time: 60, unit: 'MINUTES') {
                             sh '''\
 #!/bin/bash
 
