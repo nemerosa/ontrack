@@ -246,8 +246,7 @@ docker-compose \\
 
 echo "(*) Removing the test environment..."
 docker-compose \\
-    --project-directory ontrack-acceptance/src/main/compose \\
-    --file docker-compose-do-client.yml \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name acceptance \\
     down
 
