@@ -214,7 +214,7 @@ DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
 echo "Droplet IP = ${DROPLET_IP}"
 
 echo "(*) Target Ontrack application..."
-ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
+export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
 
 echo "(*) Launching the remote Ontrack ecosystem..."
 eval $(docker-machine env --shell bash ${DROPLET_NAME})

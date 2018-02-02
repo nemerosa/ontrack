@@ -14,6 +14,6 @@ services:
          ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
          ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
          # Injected by the CI/CD environment
-         # ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_TARGET_URL: "${ONTRACK_ACCEPTANCE_TARGET_URL}"
       volumes:
          - "./build:/ontrack/acceptance/output:rw"
