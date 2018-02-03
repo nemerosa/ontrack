@@ -13,7 +13,7 @@ import kotlin.test.assertTrue
  * Tests for extensions.
  */
 @AcceptanceTestSuite
-@AcceptanceTest(value = *arrayOf(AcceptanceTestContext.SMOKE, AcceptanceTestContext.BROWSER_TEST))
+@AcceptanceTest(value = *arrayOf(AcceptanceTestContext.EXTENSIONS))
 class ACCExtension : AbstractACCDSL() {
 
     @Test
