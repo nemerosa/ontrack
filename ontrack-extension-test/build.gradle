@@ -61,8 +61,3 @@ task buildDockerImage(type: DockerBuildImage) {
 }
 
 assemble.dependsOn buildDockerImage
-
-
-test {
-    include '**/*Test.class'
-}
