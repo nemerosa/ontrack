@@ -28,7 +28,8 @@ class ACCExtension : AbstractACCDSL() {
     fun `Version check`() {
         anonymous().get("info").withNode { info ->
             val displayVersion = info.path("version").path("display").asText()
-            // FIXME assertEquals(version, displayVersion)
+            val expectedVersion = configRule.config.version
+            assertEquals(expectedVersion, displayVersion)
         }
     }
 
