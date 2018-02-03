@@ -25,15 +25,6 @@ class ACCExtension : AbstractACCDSL() {
     }
 
     @Test
-    fun `Version check`() {
-        anonymous().get("info").withNode { info ->
-            val displayVersion = info.path("version").path("display").asText()
-            val expectedVersion = configRule.config.version
-            assertEquals(expectedVersion, displayVersion)
-        }
-    }
-
-    @Test
     fun `Extension loaded`() {
         admin().get("extensions").withNode { extensionList ->
             val extensionFeatureDescription = extensionList.path("extensions").find {

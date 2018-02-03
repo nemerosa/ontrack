@@ -73,11 +73,6 @@ public class AcceptanceConfig {
      */
     private String resultFileName = "ontrack-acceptance.xml";
 
-    /**
-     * Actual version (dynamic)
-     */
-    private String version = "undefined";
-
     @PostConstruct
     public void check() throws InterruptedException, ExecutionException, TimeoutException {
         // Checks the URL is defined
@@ -90,18 +85,11 @@ public class AcceptanceConfig {
             logger.info(format("Waiting %d s for %s to be available...", timeout, url));
             AcceptanceTargetCheck check = new AcceptanceTargetCheck();
             Future<String> future = executor.submit(check);
-            version = future.get(timeout, TimeUnit.SECONDS);
+            String version = future.get(timeout, TimeUnit.SECONDS);
             logger.info(format("Getting version %s", version));
         } finally {
             executor.shutdownNow();
         }
-    }
-
-    /**
-     * Gets the computed version
-     */
-    public String getVersion() {
-        return version;
     }
 
     public boolean acceptTest(AcceptanceTest acceptanceTest) {
