@@ -128,6 +128,8 @@ docker-compose down --volumes
 set -e
 docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 docker push nemerosa/ontrack:${ONTRACK_VERSION}
+docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
+docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
 '''
                 }
             }
@@ -176,6 +178,47 @@ docker push nemerosa/ontrack:${ONTRACK_VERSION}
                                 validationStamp: 'ACCEPTANCE.DEBIAN',
                                 buildResult: currentBuild.result,
                         )
+                    }
+                }
+                // Extension tests
+                stage('Local extension tests') {
+                    steps {
+                        timeout(time: 25, unit: 'MINUTES') {
+                            // Cleanup
+                            sh """\
+rm -rf ontrack-acceptance/src/main/compose/build
+"""
+                            // Launches the extension environment
+                            sh """\
+echo "Launching environment..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name ext --file docker-compose-ext.yml up -d ontrack selenium
+"""
+                            // Launches the tests
+                            sh """\
+echo "Launching tests..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_acceptance
+"""
+                        }
+                    }
+                    post {
+                        always {
+                            sh """\
+echo "Cleanup..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
+"""
+                            archiveArtifacts 'ontrack-acceptance/src/main/compose/build/**'
+                            junit 'ontrack-acceptance/src/main/compose/build/*.xml'
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'EXTENSIONS',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
                     }
                 }
                 // Digital Ocean
