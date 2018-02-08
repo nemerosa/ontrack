@@ -1,7 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '1.5.8.RELEASE'
-        kotlinVersion = '1.1.60'
+        kotlinVersion = '1.2.21'
     }
     repositories {
         jcenter()
@@ -174,6 +174,8 @@ configure(coreProjects) {
             dependency 'org.kohsuke:groovy-sandbox:1.15'
             dependency 'com.graphql-java:graphql-java:5.0'
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
+            // Overrides from Spring Boot
+            dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4'
         }
     }
 
