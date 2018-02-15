@@ -101,8 +101,12 @@ mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
 docker-compose down --volumes
-ls -l build/acceptance
 """
+                    sh '''\
+#!/bin/bash
+set -e
+ls -l build/acceptance
+'''
                     archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
                     ontrackValidate(
