@@ -93,15 +93,21 @@ public class AcceptanceConfig {
     }
 
     public boolean acceptTest(AcceptanceTest acceptanceTest) {
+        // Explicit check
+        if (acceptanceTest != null && acceptanceTest.explicit()) {
+            // The current context must be defined
+            // and equal to one of the accepted contexts
+            return context != null && Arrays.asList(acceptanceTest.value()).contains(context);
+        }
         // No context, all tests are eligible
         // If there is a context, but no annotation, the test cannot be accepted
         // There is a context *and* an annotation, checks the context is part of the
         // accepted values in the annotation
-        return StringUtils.isBlank(context) || StringUtils.equals(CONTEXT_ALL, context) ||
-                (
-                        acceptanceTest != null &&
-                                Arrays.asList(acceptanceTest.value()).contains(context)
-                );
+        else {
+            return StringUtils.isBlank(this.context) ||
+                    StringUtils.equals(CONTEXT_ALL, this.context) ||
+                    acceptanceTest != null && Arrays.asList(acceptanceTest.value()).contains(context);
+        }
     }
 
     public void log(Consumer<String> logger) {
