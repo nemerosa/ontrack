@@ -76,39 +76,44 @@ git clean -xfd
         }
 
         stage('Local acceptance tests') {
-           steps {
-             // Runs the acceptance tests
-               timeout(time: 25, unit: 'MINUTES') {
-                   sh """\
+            steps {
+                // Runs the acceptance tests
+                timeout(time: 25, unit: 'MINUTES') {
+                    sh """\
 echo "Launching environment..."
 cd ontrack-acceptance/src/main/compose
 docker-compose up -d ontrack selenium
 """
-                   sh """\
+                    sh """\
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose up ontrack_acceptance
 """
-               }
-          }
-          post {
-             always {
-                sh """\
+                }
+            }
+            post {
+                always {
+                    sh """\
+#!/bin/bash
+set -e
 echo "Cleanup..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
 docker-compose down --volumes
+ls -l build/acceptance
 """
-                 archiveArtifacts 'ontrack-acceptance/src/main/compose/build/**'
-                 junit 'ontrack-acceptance/src/main/compose/build/*.xml'
-                 ontrackValidate(
-                         project: projectName,
-                         branch: branchName,
-                         build: version,
-                         validationStamp: 'ACCEPTANCE',
-                         buildResult: currentBuild.result,
-                 )
-             }
-          }
+                    archiveArtifacts 'build/acceptance/**'
+                    junit 'build/acceptance/*.xml'
+                    ontrackValidate(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'ACCEPTANCE',
+                            buildResult: currentBuild.result,
+                    )
+                }
+            }
         }
 
         // Docker push
@@ -206,11 +211,13 @@ docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_accep
                         always {
                             sh """\
 echo "Cleanup..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
 """
-                            archiveArtifacts 'ontrack-acceptance/src/main/compose/build/**'
-                            junit 'ontrack-acceptance/src/main/compose/build/*.xml'
+                            archiveArtifacts 'build/acceptance/**'
+                            junit 'build/acceptance/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -287,6 +294,10 @@ docker-compose \\
                             sh '''\
 #!/bin/bash
 
+echo "(*) Copying the test results..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+
 echo "(*) Removing the test environment..."
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
@@ -296,8 +307,8 @@ docker-compose \\
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
-                            archiveArtifacts 'ontrack-acceptance/src/main/compose/build/**'
-                            junit 'ontrack-acceptance/src/main/compose/build/*.xml'
+                            archiveArtifacts 'build/acceptance/**'
+                            junit 'build/acceptance/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
