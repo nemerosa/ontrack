@@ -102,11 +102,6 @@ cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
 docker-compose down --volumes
 """
-                    sh '''\
-#!/bin/bash
-set -e
-ls -l build/acceptance
-'''
                     archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
                     ontrackValidate(
@@ -138,7 +133,6 @@ set -e
 docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 docker push nemerosa/ontrack:${ONTRACK_VERSION}
 docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
-docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
 '''
                 }
             }
