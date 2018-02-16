@@ -53,6 +53,7 @@ git clean -xfd
     test \\
     build \\
     integrationTest \\
+    publishToMavenLocal \\
     dockerLatest \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
@@ -67,6 +68,19 @@ git clean -xfd
                     version = props.VERSION_DISPLAY
                     gitCommit = props.VERSION_COMMIT
                 }
+                sh """\
+echo "(*) Building the test extension..."
+cd ontrack-extension-test
+./gradlew \\
+    clean \\
+    build \\
+    -PontrackVersion=${version} \\
+    -PbowerOptions='--allow-root' \\
+    -Dorg.gradle.jvmargs=-Xmx2048m \\
+    --stacktrace \\
+    --profile \\
+    --console plain
+"""
             }
             post {
                 success {
@@ -133,6 +147,7 @@ set -e
 docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 docker push nemerosa/ontrack:${ONTRACK_VERSION}
 docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
+docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
 '''
                 }
             }
