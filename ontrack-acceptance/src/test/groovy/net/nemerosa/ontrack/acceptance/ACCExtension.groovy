@@ -11,7 +11,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Tests for extensions.
  */
 @AcceptanceTestSuite
-@AcceptanceTest(value = [AcceptanceTestContext.EXTENSIONS])
+@AcceptanceTest(value = [AcceptanceTestContext.EXTENSIONS], explicit = true)
 class ACCExtension extends AbstractACCDSL {
 
     @Test
