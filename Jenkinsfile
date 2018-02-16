@@ -152,6 +152,9 @@ docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
         // OS tests + DO tests in parallel
 
         stage('Platform tests') {
+            environment {
+                ONTRACK_VERSION = "${version}"
+            }
             parallel {
                 // TODO CentOS7
                 stage('CentOS7') {
