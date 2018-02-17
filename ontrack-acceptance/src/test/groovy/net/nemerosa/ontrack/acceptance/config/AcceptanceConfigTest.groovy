@@ -31,11 +31,23 @@ class AcceptanceConfigTest {
         assert !(config.acceptTest(AnyContext.class.getAnnotation(AcceptanceTest)))
     }
 
+    @Test
+    void 'Test method to be run if part of an explicit active context'() {
+        def config = new AcceptanceConfig()
+        config.context = "explicitContext"
+        assert(config.acceptTest(
+                ExplicitContext.class.getAnnotation(AcceptanceTest),
+                ExplicitContext.class.getMethod("dummy").getAnnotation(AcceptanceTest)
+        ))
+    }
 
     @AcceptanceTest("anyContext")
     static class AnyContext {}
 
     @AcceptanceTest(value = ["explicitContext"], explicit = true)
-    static class ExplicitContext {}
+    static class ExplicitContext {
+        @Test
+        void dummy() {}
+    }
 
 }
