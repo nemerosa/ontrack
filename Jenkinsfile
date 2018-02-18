@@ -362,6 +362,9 @@ docker-machine rm --force ${DROPLET_NAME}
                 branch 'experimental/pipeline-release'
                 // FIXME branch 'release/*'
             }
+            steps {
+                echo "TODO Release"
+            }
             post {
                 success {
                     ontrackPromote(
