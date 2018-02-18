@@ -338,12 +338,29 @@ docker-machine rm --force ${DROPLET_NAME}
             }
         }
 
-        /*
+        // Publication
+
+        stage('Publication') {
+            parallel {
+                stage('Docker push') {
+                    steps {
+                        echo "TODO Docker push"
+                    }
+                }
+                stage('Maven publication') {
+                    steps {
+                        echo "TODO Docker push"
+                    }
+                }
+            }
+        }
+
+        // Release
 
         stage('Release') {
-            steps {
-                echo "Releasing..."
-                // TODO Release
+            when {
+                branch 'experimental/pipeline-release'
+                // FIXME branch 'release/*'
             }
             post {
                 success {
@@ -356,8 +373,6 @@ docker-machine rm --force ${DROPLET_NAME}
                 }
             }
         }
-
-        */
 
         // TODO Site
         // TODO Ontrack validation --> SITE
