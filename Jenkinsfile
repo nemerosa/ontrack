@@ -343,11 +343,13 @@ docker-machine rm --force ${DROPLET_NAME}
 
         stage('Publication') {
             environment {
-                DOCKER_HUB = credentials("DOCKER_HUB")
                 ONTRACK_VERSION = "${version}"
             }
             parallel {
                 stage('Docker push') {
+                    environment {
+                        DOCKER_HUB = credentials("DOCKER_HUB")
+                    }
                     when {
                         branch 'release/*'
                     }
@@ -370,8 +372,35 @@ docker push nemerosa/ontrack:latest
                     }
                 }
                 stage('Maven publication') {
+                    environment {
+                        ONTRACK_COMMIT = "${gitCommit}"
+                        ONTRACK_BRANCH = "${branchName}"
+                        GPG_KEY = credentials("GPG_KEY")
+                        GPG_KEY_RING = credentials("GPG_KEY_RING")
+                        OSSRH = credentials("OSSRH")
+                    }
                     steps {
-                        echo "TODO Docker push"
+                        echo "Maven publication"
+                        sh '''\
+#!/bin/bash
+set -e
+
+./gradlew \\
+    --build-file publication.gradle \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace \\
+    -PontrackVersion=${ONTRACK_VERSION} \\
+    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
+    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
+    -Psigning.keyId=${GPG_KEY_USR} \\
+    -Psigning.password=${GPG_KEY_PSW} \\
+    -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
+    -PossrhUser=${OSSRH_USR} \\
+    -PossrhPassword=${OSSRH_PSW} \\
+    publicationMaven
+'''
                     }
                 }
             }
