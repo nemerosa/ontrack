@@ -85,6 +85,7 @@ cd ontrack-extension-test
             post {
                 success {
                     ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                    stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                 }
             }
         }
