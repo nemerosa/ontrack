@@ -342,10 +342,31 @@ docker-machine rm --force ${DROPLET_NAME}
         // Publication
 
         stage('Publication') {
+            environment {
+                DOCKER_HUB = credentials("DOCKER_HUB")
+                ONTRACK_VERSION = "${version}"
+            }
             parallel {
                 stage('Docker push') {
+                    when {
+                        branch 'release/*'
+                    }
                     steps {
-                        echo "TODO Docker push"
+                        echo "Docker push"
+                        sh '''\
+#!/bin/bash
+set -e
+
+docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
+
+docker pull nemerosa/ontrack:${ONTRACK_VERSION}
+
+docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
+docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
+
+docker push nemerosa/ontrack:2
+docker push nemerosa/ontrack:latest
+'''
                     }
                 }
                 stage('Maven publication') {
