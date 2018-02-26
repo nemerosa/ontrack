@@ -381,9 +381,20 @@ docker push nemerosa/ontrack:latest
                     }
                     steps {
                         echo "Maven publication"
+
+                        unstash name: "delivery"
                         sh '''\
 #!/bin/bash
 set -e
+unzip build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d delivery
+unzip delivery/ontrack-publication.zip -d PUBLICATION
+'''
+
+                        sh '''\
+#!/bin/bash
+set -e
+
+cd publication
 
 ./gradlew \\
     --build-file publication.gradle \\
