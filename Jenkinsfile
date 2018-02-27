@@ -394,8 +394,6 @@ unzip -n delivery/ontrack-publication.zip -d publication
 #!/bin/bash
 set -e
 
-cd publication
-
 ./gradlew \\
     --build-file publication.gradle \\
     --info \\
