@@ -419,12 +419,41 @@ set -e
         // Release
 
         stage('Release') {
+            environment {
+                ONTRACK_COMMIT = "${gitCommit}"
+                ONTRACK_BRANCH = "${branchName}"
+            }
             when {
-                branch 'experimental/pipeline-release'
+                branch 'experimental/pipeline'
                 // FIXME branch 'release/*'
             }
             steps {
-                echo "TODO Release"
+                echo "Release"
+
+                unstash name: "delivery"
+                sh '''\
+#!/bin/bash
+set -e
+unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
+unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
+'''
+
+                sh '''\
+#!/bin/bash
+set -e
+
+./gradlew \\
+    --build-file publication.gradle \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace \\
+    -PontrackVersion=${ONTRACK_VERSION} \\
+    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
+    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
+    publicationRelease
+'''
+
             }
             post {
                 success {

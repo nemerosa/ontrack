@@ -284,7 +284,7 @@ task publicationMaven {
 closeAndPromoteRepository.mustRunAfter uploadArchives
 
 task publicationRelease {
-    dependsOn publicationMaven
+    // dependsOn publicationMaven
     dependsOn publicationGitHubRelease
 }
 
