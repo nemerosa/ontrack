@@ -387,7 +387,7 @@ docker push nemerosa/ontrack:latest
 #!/bin/bash
 set -e
 unzip build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d delivery
-unzip delivery/ontrack-publication.zip -d PUBLICATION
+unzip -n delivery/ontrack-publication.zip -d publication
 '''
 
                         sh '''\
