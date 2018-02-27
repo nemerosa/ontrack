@@ -422,6 +422,7 @@ set -e
             environment {
                 ONTRACK_COMMIT = "${gitCommit}"
                 ONTRACK_BRANCH = "${branchName}"
+                GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
                 branch 'experimental/pipeline'
@@ -451,6 +452,8 @@ set -e
     -PontrackVersion=${ONTRACK_VERSION} \\
     -PontrackVersionCommit=${ONTRACK_COMMIT} \\
     -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
+    -PgitHubUser=${GITHUB_USR} \\
+    -PgitHubPassword=${GITHUB_PSW} \\
     publicationRelease
 '''
 
