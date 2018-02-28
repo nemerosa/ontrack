@@ -420,6 +420,7 @@ set -e
 
         stage('Release') {
             environment {
+                ONTRACK_VERSION = "${version}"
                 ONTRACK_COMMIT = "${gitCommit}"
                 ONTRACK_BRANCH = "${branchName}"
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
