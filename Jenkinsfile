@@ -477,7 +477,7 @@ set -e
             environment {
                 ONTRACK_VERSION = "${version}"
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
-                GITHUB_URI = scm.userRemoteConfigs.first().url
+                GITHUB_URI = "${scm.userRemoteConfigs.first().url}"
             }
             when {
                 branch 'experimental/pipeline'
