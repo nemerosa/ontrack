@@ -477,7 +477,6 @@ set -e
             environment {
                 ONTRACK_VERSION = "${version}"
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
-                GITHUB_URI = "${scm.userRemoteConfigs.first().url}"
             }
             when {
                 branch 'experimental/pipeline'
@@ -497,6 +496,8 @@ unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
                 sh '''\
 #!/bin/bash
 set -e
+
+GITHUB_URI=`git config remote.origin.url`
 
 ./gradlew \\
     --build-file site.gradle \\
