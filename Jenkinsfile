@@ -516,11 +516,12 @@ GITHUB_URI=`git config remote.origin.url`
             }
             post {
                 success {
-                    ontrackPromote(
+                    ontrackValidate(
                             project: projectName,
                             branch: branchName,
                             build: version,
-                            promotionLevel: 'SITE',
+                            validationStamp: 'SITE',
+                            buildResult: currentBuild.result,
                     )
                 }
             }
