@@ -5,12 +5,9 @@ String projectName = 'ontrack'
 
 pipeline {
 
-    agent {
-        dockerfile {
-            label "docker"
-            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-        }
-    }
+    // Stages must declare their agent explicitly
+    // This allows inputs to run without any executor
+    agent none
 
     options {
         // General Jenkins job properties
@@ -22,6 +19,12 @@ pipeline {
     stages {
 
         stage('Setup') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 script {
                     branchName = ontrackBranchName(BRANCH_NAME)
@@ -40,6 +43,12 @@ pipeline {
         }
 
         stage('Build') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -92,6 +101,12 @@ cd ontrack-extension-test
         }
 
         stage('Local acceptance tests') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
@@ -133,6 +148,12 @@ docker-compose down --volumes
 
         // Docker push
         stage('Docker publication') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
                 ONTRACK_VERSION = "${version}"
@@ -175,6 +196,12 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             parallel {
                 // TODO CentOS7
                 stage('CentOS7') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     when {
                         branch 'release/.*'
                     }
@@ -190,6 +217,12 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                 }
                 // TODO Debian
                 stage('Debian') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     when {
                         branch 'release/.*'
                     }
@@ -205,6 +238,12 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                 }
                 // Extension tests
                 stage('Local extension tests') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             // Cleanup
@@ -248,6 +287,12 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                 }
                 // Digital Ocean
                 stage('Digital Ocean') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_VERSION = "${version}"
                         DROPLET_NAME = "ontrack-acceptance-${version}"
@@ -348,6 +393,12 @@ docker-machine rm --force ${DROPLET_NAME}
             }
             parallel {
                 stage('Docker push') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         DOCKER_HUB = credentials("DOCKER_HUB")
                     }
@@ -373,6 +424,12 @@ docker push nemerosa/ontrack:latest
                     }
                 }
                 stage('Maven publication') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_COMMIT = "${gitCommit}"
                         ONTRACK_BRANCH = "${branchName}"
@@ -419,6 +476,12 @@ set -e
         // Release
 
         stage('Release') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 ONTRACK_COMMIT = "${gitCommit}"
@@ -473,6 +536,12 @@ set -e
         // Site
 
         stage('Site') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
