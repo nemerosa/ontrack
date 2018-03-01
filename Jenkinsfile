@@ -505,11 +505,11 @@ GITHUB_URI=`git config remote.origin.url`
     --profile \\
     --console plain \\
     --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION}
-    -PontrackGitHubUri=${GITHUB_URI}
-    -PontrackGitHubPages=gh-pages
-    -PontrackGitHubUser=${GITHUB_USR}
-    -PontrackGitHubPassword=${GITHUB_PSW}
+    -PontrackVersion=${ONTRACK_VERSION} \\
+    -PontrackGitHubUri=${GITHUB_URI} \\
+    -PontrackGitHubPages=gh-pages \\
+    -PontrackGitHubUser=${GITHUB_USR} \\
+    -PontrackGitHubPassword=${GITHUB_PSW} \\
     site
 '''
 
