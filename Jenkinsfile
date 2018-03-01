@@ -146,6 +146,8 @@ docker-compose down --volumes
             }
         }
 
+        // TODO We stop here for pull requests
+
         // Docker push
         stage('Docker publication') {
             agent {
@@ -388,6 +390,9 @@ docker-machine rm --force ${DROPLET_NAME}
         // Publication
 
         stage('Publication') {
+            when {
+                branch 'release/*'
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
             }
@@ -401,9 +406,6 @@ docker-machine rm --force ${DROPLET_NAME}
                     }
                     environment {
                         DOCKER_HUB = credentials("DOCKER_HUB")
-                    }
-                    when {
-                        branch 'release/*'
                     }
                     steps {
                         echo "Docker push"
