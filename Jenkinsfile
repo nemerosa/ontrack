@@ -426,8 +426,7 @@ set -e
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
-                branch 'experimental/pipeline'
-                // FIXME branch 'release/*'
+                branch 'release/*'
             }
             steps {
                 echo "Release"
@@ -479,8 +478,7 @@ set -e
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
-                branch 'experimental/pipeline'
-                // FIXME branch 'release/*'
+                branch 'release/*'
             }
             steps {
                 echo "Release"
