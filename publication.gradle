@@ -250,8 +250,8 @@ task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {
 task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleaseJarUpload
     dependsOn publicationGitHubReleaseJarShellUpload
-    // TODO dependsOn publicationGitHubReleaseDebianUpload
-    // TODO dependsOn publicationGitHubReleaseRpmUpload
+    dependsOn publicationGitHubReleaseDebianUpload
+    dependsOn publicationGitHubReleaseRpmUpload
     dependsOn publicationGitHubReleasePdfUpload
 }
 

@@ -54,6 +54,7 @@ git clean -xfd
     build \\
     integrationTest \\
     publishToMavenLocal \\
+    osPackages \\
     dockerLatest \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
