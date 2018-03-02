@@ -179,9 +179,9 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             parallel {
                 // CentOS7
                 stage('CentOS7') {
-                    when {
-                        branch 'release/.*'
-                    }
+                    // when {
+                        // FIXME branch 'release/.*'
+                    // }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
