@@ -19,4 +19,10 @@ RUN rpm -i /opt/ontrack/ontrack.rpm
 # Gets the application.yml for local configuration
 COPY application.yml /usr/lib/ontrack/
 
-# This image must be run with --tty and /bin/cat
+# Starting point
+ENTRYPOINT ["/opt/ontrack/bin/ontrack.sh"]
+CMD ["start"]
+
+# Healthcheck
+HEALTHCHECK --interval=1m --timeout=10s \
+  CMD curl -f http://localhost:8080/info || exit 1

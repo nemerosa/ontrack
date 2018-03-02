@@ -87,6 +87,7 @@ cd ontrack-extension-test
                 success {
                     ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
+                    stash name: "rpm", includes: "build/distributions/*.rpm"
                     archiveArtifacts "build/distributions/ontrack-*-delivery.zip"
                 }
             }
@@ -176,19 +177,52 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                 ONTRACK_VERSION = "${version}"
             }
             parallel {
-                // TODO CentOS7
+                // CentOS7
                 stage('CentOS7') {
                     when {
                         branch 'release/.*'
                     }
                     steps {
-                        ontrackValidate(
-                                project: projectName,
-                                branch: branchName,
-                                build: version,
-                                validationStamp: 'ACCEPTANCE.CENTOS.7',
-                                buildResult: currentBuild.result,
-                        )
+                        unstash name: "rpm"
+                        timeout(time: 25, unit: 'MINUTES') {
+                            sh """\
+echo "Preparing environment..."
+DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+rm -f \${DOCKER_DIR}/*.rpm
+cp build/distributions/*rpm \${DOCKER_DIR}
+
+echo "Launching environment..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-centos-7.yml up -d ontrack selenium
+"""
+                            sh """\
+echo "Launching tests..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
+"""
+                        }
+                    }
+                    post {
+                        always {
+                            sh """\
+#!/bin/bash
+set -e
+echo "Cleanup..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-centos-7.yml down --volumes
+"""
+                            archiveArtifacts 'build/acceptance/**'
+                            junit 'build/acceptance/*.xml'
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
                     }
                 }
                 // TODO Debian
