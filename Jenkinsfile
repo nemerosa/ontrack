@@ -3,6 +3,8 @@ String gitCommit = ''
 String branchName = ''
 String projectName = 'ontrack'
 
+boolean pr = false
+
 pipeline {
 
     agent {
@@ -26,16 +28,24 @@ pipeline {
                 script {
                     branchName = ontrackBranchName(BRANCH_NAME)
                     echo "Ontrack branch name = ${branchName}"
+                    pr = BRANCH_NAME ==~ 'PR-.*'
                 }
-                ontrackBranchSetup(project: projectName, branch: branchName, script: """
-                    branch.config {
-                        gitBranch '${branchName}', [
-                            buildCommitLink: [
-                                id: 'git-commit-property'
-                            ]
-                        ]
+                script {
+                    if (pr) {
+                        echo "No Ontrack setup for PR."
+                    } else {
+                        echo "Ontrack setup for ${branchName}"
+                        ontrackBranchSetup(project: projectName, branch: branchName, script: """
+                            branch.config {
+                                gitBranch '${branchName}', [
+                                    buildCommitLink: [
+                                        id: 'git-commit-property'
+                                    ]
+                                ]
+                            }
+                        """)
                     }
-                """)
+                }
             }
         }
 
@@ -85,7 +95,11 @@ cd ontrack-extension-test
             }
             post {
                 success {
-                    ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                    script {
+                        if (!pr) {
+                            ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                        }
+                    }
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                     stash name: "rpm", includes: "build/distributions/*.rpm"
                     stash name: "debian", includes: "build/distributions/*.deb"
@@ -134,10 +148,15 @@ docker-compose down --volumes
             }
         }
 
-        // TODO We stop here for pull requests
+        // We stop here for pull requests
 
         // Docker push
         stage('Docker publication') {
+            when {
+                not {
+                    branch 'PR-*'
+                }
+            }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
                 ONTRACK_VERSION = "${version}"
@@ -177,12 +196,12 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             environment {
                 ONTRACK_VERSION = "${version}"
             }
+            when {
+                branch 'release/.*'
+            }
             parallel {
                 // CentOS7
                 stage('CentOS7') {
-                    when {
-                        branch 'release/.*'
-                    }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
@@ -228,9 +247,6 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                 }
                 // Debian
                 stage('Debian') {
-                    when {
-                        branch 'release/.*'
-                    }
                     steps {
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
