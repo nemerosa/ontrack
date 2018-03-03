@@ -106,6 +106,11 @@ task deliveryPackage(type: Zip) {
         exclude '**/.gradle/**'
         exclude '**/build/**'
     }
+    // Acceptance
+    dependsOn ':ontrack-acceptance:normaliseJar'
+    from(project(':ontrack-acceptance').file('src/main/compose')) {
+      into 'ontrack-acceptance'
+    }
     // All artifacts
     dependsOn publicationPackage
     from publicationPackage

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.acceptance.browser
 
 import com.google.common.base.Function
-import com.google.common.base.Predicate
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
@@ -32,22 +31,20 @@ class Configuration {
 
     private final AtomicLong screenshotIndex = new AtomicLong()
 
-    protected Configuration(AcceptanceConfig config) {
-        try {
-            acceptanceConfig = config
-            // Configuration
-            baseUrl = config.url
-            implicitWait = config.implicitWait
-            screenshotDir = new File(config.outputDir, "screenshots").getAbsoluteFile()
-            FileUtils.forceMkdir(screenshotDir)
-            // Web driver class
-            driver = initDriver(config)
-            driver.manage().deleteAllCookies()
-            driver.manage().window().setSize(new Dimension(1024, 768))
-            driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS)
-        } catch (IOException ex) {
-            throw new ConfigurationException("Cannot initialise browser configuration", ex)
-        }
+    Configuration(AcceptanceConfig config) {
+        acceptanceConfig = config
+        // Configuration
+        baseUrl = config.seleniumTargetUrl ?: config.url
+        implicitWait = config.implicitWait
+        screenshotDir = new File(config.outputDir, "screenshots").getAbsoluteFile()
+        FileUtils.forceMkdir(screenshotDir)
+        // Logging
+        logger.info("Browser base URL: ${}", baseUrl)
+        // Web driver class
+        driver = initDriver(config)
+        driver.manage().deleteAllCookies()
+        driver.manage().window().setSize(new Dimension(1024, 768))
+        driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS)
     }
 
     AcceptanceConfig getAcceptanceConfig() {
@@ -63,6 +60,7 @@ class Configuration {
     }
 
     void closeConfiguration() {
+        logger.info("[driver] Quitting driver")
         driver.quit()
     }
 
@@ -72,8 +70,12 @@ class Configuration {
     }
 
     WebElement findElement(By by) {
+        return findElement(by, implicitWait)
+    }
+
+    WebElement findElement(By by, int waitingTime) {
         new FluentWait<WebDriver>(driver)
-                .withTimeout(implicitWait, TimeUnit.SECONDS)
+                .withTimeout(waitingTime, TimeUnit.SECONDS)
                 .pollingEvery(1, TimeUnit.SECONDS)
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
@@ -111,10 +113,10 @@ class Configuration {
 
     void waitUntil(String message, int seconds, Closure<Boolean> closure) {
         try {
-            new WebDriverWait(driver, seconds).until(new Predicate<WebDriver>() {
+            new WebDriverWait(driver, seconds).until(new Function<WebDriver, Boolean>() {
                 @Override
-                boolean apply(WebDriver input) {
-                    closure()
+                Boolean apply(WebDriver input) {
+                    return closure()
                 }
             })
         } catch (TimeoutException ex) {
@@ -163,11 +165,13 @@ class Configuration {
         FileUtils.forceMkdir(loggingDir)
         logger.info("[gui] Browser logging directory at {}", loggingDir)
 
-        if (config.seleniumUrl) {
+        if (config.seleniumGridUrl) {
+            logger.info("[driver] Remote driver = {}", config.seleniumGridUrl)
+            logger.info("[driver] Browser = {}", config.seleniumBrowserName)
             DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
-            desiredCapabilities.setBrowserName("firefox")
+            desiredCapabilities.setBrowserName(config.seleniumBrowserName)
             return new RemoteWebDriver(
-                    new URL(config.seleniumUrl),
+                    new URL(config.seleniumGridUrl),
                     desiredCapabilities
             )
         } else {

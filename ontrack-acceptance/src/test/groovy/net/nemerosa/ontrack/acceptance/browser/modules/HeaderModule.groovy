@@ -36,10 +36,6 @@ public class HeaderModule extends AbstractModule {
 
         browser.screenshot("login-filled-in");
 
-        // Logging
-        trace("Login.name = %s", tName.getAttribute("value"));
-        trace("Login.password (size) = %d", tPassword.getAttribute("value").length());
-
         // Sign in OK
         WebElement okButton = $(".btn-primary");
         browser.waitUntil { okButton.enabled }

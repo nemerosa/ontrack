@@ -14,4 +14,9 @@ public @interface AcceptanceTest {
      */
     String[] value();
 
+    /**
+     * Only when the context is explicitly set?
+     */
+    boolean explicit() default false;
+
 }

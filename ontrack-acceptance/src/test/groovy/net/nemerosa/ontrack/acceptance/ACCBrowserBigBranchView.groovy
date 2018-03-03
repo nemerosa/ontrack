@@ -75,7 +75,8 @@ class ACCBrowserBigBranchView extends AcceptanceTestClient {
             // Screenshot before loading
             browser.screenshot 'big-branch-loading'
             // Sync with display of one validation run (img.ot-validation-run-status)
-            browser.findElement(By.cssSelector('img.ot-validation-run-status'))
+            // Waiting twice the normal waiting time
+            browser.findElement(By.cssSelector('img.ot-validation-run-status'), browser.configuration.acceptanceConfig.implicitWait * 2)
             // Timing of the load
             long end = System.currentTimeMillis()
             long duration = (end - start)
