@@ -180,9 +180,9 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             parallel {
                 // CentOS7
                 stage('CentOS7') {
-                    // when {
-                        // FIXME branch 'release/.*'
-                    // }
+                    when {
+                        branch 'release/.*'
+                    }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
@@ -228,9 +228,9 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                 }
                 // Debian
                 stage('Debian') {
-                    // when {
-                    // FIXME branch 'release/.*'
-                    // }
+                    when {
+                        branch 'release/.*'
+                    }
                     steps {
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
