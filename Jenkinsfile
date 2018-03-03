@@ -189,7 +189,7 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
 rm -f \${DOCKER_DIR}/*.rpm
-cp build/distributions/*rpm \${DOCKER_DIR}
+cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 
 echo "Launching environment..."
 cd ontrack-acceptance/src/main/compose
