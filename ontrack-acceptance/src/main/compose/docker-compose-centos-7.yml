@@ -3,7 +3,7 @@ version: "2.1"
 services:
    ontrack:
       build:
-        context: "./centos/7/docker"
+        context: "./os/centos/7/docker"
    selenium:
       image: "selenium/standalone-chrome:3.8.1"
       environment:
