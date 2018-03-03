@@ -139,13 +139,17 @@ docker-compose down --volumes
 """
                     archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ACCEPTANCE',
-                            buildResult: currentBuild.result,
-                    )
+                    script {
+                        if (!pr) {
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
+                    }
                 }
             }
         }
