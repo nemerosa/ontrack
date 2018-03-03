@@ -19,6 +19,8 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '40'))
         // Timestamps
         timestamps()
+        // No durability
+        durabilityHint('PERFORMANCE_OPTIMIZED')
     }
 
     stages {
