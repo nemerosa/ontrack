@@ -88,6 +88,7 @@ cd ontrack-extension-test
                     ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                     stash name: "rpm", includes: "build/distributions/*.rpm"
+                    stash name: "debian", includes: "build/distributions/*.deb"
                     archiveArtifacts "build/distributions/ontrack-*-delivery.zip"
                 }
             }
@@ -225,19 +226,52 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                         }
                     }
                 }
-                // TODO Debian
+                // Debian
                 stage('Debian') {
-                    when {
-                        branch 'release/.*'
-                    }
+                    // when {
+                    // FIXME branch 'release/.*'
+                    // }
                     steps {
-                        ontrackValidate(
-                                project: projectName,
-                                branch: branchName,
-                                build: version,
-                                validationStamp: 'ACCEPTANCE.DEBIAN',
-                                buildResult: currentBuild.result,
-                        )
+                        unstash name: "debian"
+                        timeout(time: 25, unit: 'MINUTES') {
+                            sh """\
+echo "Preparing environment..."
+DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
+rm -f \${DOCKER_DIR}/*.deb
+cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
+
+echo "Launching environment..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-debian.yml up -d ontrack selenium
+"""
+                            sh """\
+echo "Launching tests..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-debian.yml up ontrack_acceptance
+"""
+                        }
+                    }
+                    post {
+                        always {
+                            sh """\
+#!/bin/bash
+set -e
+echo "Cleanup..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-debian.yml down --volumes
+"""
+                            archiveArtifacts 'build/acceptance/**'
+                            junit 'build/acceptance/*.xml'
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE.DEBIAN',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
                     }
                 }
                 // Extension tests
