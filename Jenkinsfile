@@ -81,6 +81,7 @@ git clean -xfd
                     version = props.VERSION_DISPLAY
                     gitCommit = props.VERSION_COMMIT
                 }
+                echo "Version = ${version}"
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
