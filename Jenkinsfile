@@ -526,6 +526,8 @@ set -e
                 echo "Release"
 
                 unstash name: "delivery"
+                unstash name: "rpm"
+                unstash name: "debian"
                 sh '''\
 #!/bin/bash
 set -e
