@@ -6,8 +6,6 @@ RUN apt-get update && apt-get install -y \
     git \
     subversion \
     zip \
-    xvfb \
-    iceweasel \
     graphviz \
     && rm -rf /var/lib/apt/lists/*
 
