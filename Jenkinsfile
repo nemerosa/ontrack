@@ -203,7 +203,7 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                 ONTRACK_VERSION = "${version}"
             }
             when {
-                branch 'release/.*'
+                branch 'release/*'
             }
             parallel {
                 // CentOS7
