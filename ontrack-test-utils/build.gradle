@@ -2,4 +2,5 @@ dependencies {
     compile 'junit:junit'
     compile 'commons-io:commons-io'
     compile project(':ontrack-json')
+    compile "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
 }

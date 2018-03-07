@@ -10,6 +10,10 @@ import net.nemerosa.ontrack.job.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class TestJob implements Job {
 
+    public static JobKey key(String name) {
+        return Fixtures.TEST_CATEGORY.getType("test").getKey(name);
+    }
+
     public static TestJob of() {
         return of("test");
     }

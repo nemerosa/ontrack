@@ -35,7 +35,7 @@ class JobOrchestrator(
         // Jobs to add
         val toAdd = HashSet(keys)
         toAdd.removeAll(cache)
-        registrations.stream()
+        registrations
                 .filter { jobRegistration -> toAdd.contains(jobRegistration.job.key) }
                 .forEach { jobRegistration -> schedule(jobRegistration, runListener) }
         // Resets the cache
