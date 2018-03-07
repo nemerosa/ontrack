@@ -27,57 +27,119 @@ class JobOrchestratorIntegrationTest {
         scheduledExecutorService.shutdownNow()
     }
 
-    private fun createJobScheduler(): JobScheduler {
-        return DefaultJobScheduler(
-                NOPJobDecorator.INSTANCE,
-                scheduledExecutorService,
-                OutputJobListener({ println(it) }),
-                false,
-                false,
-                1.0
-        )
+    @Test
+    fun `Removed job`() {
+        withOrchestrator {
+            // Two jobs
+            supplier += "1"
+            supplier += "2"
+            // Fires the orchestration and checks jobs
+            orchestration {
+                job("1") {
+                    assertFalse(isDisabled)
+                }
+                job("2") {
+                    assertFalse(isDisabled)
+                }
+            }
+            // Removing a job from the supplier
+            supplier -= "2"
+            // Fires the orchestration and checks jobs
+            orchestration {
+                job("1") {
+                    assertFalse(isDisabled)
+                }
+                noJob("2")
+            }
+        }
     }
 
     @Test
-    fun `Removed job`() {
-        // Job scheduler
-        val scheduler = createJobScheduler()
+    fun `Added job`() {
+        withOrchestrator {
+            // Two jobs
+            supplier += "1"
+            supplier += "2"
+            // Fires the orchestration and checks jobs
+            orchestration {
+                job("1") {
+                    assertFalse(isDisabled)
+                }
+                job("2") {
+                    assertFalse(isDisabled)
+                }
+            }
+            // Adding a job to the supplier
+            supplier += "3"
+            // Fires the orchestration and checks jobs
+            orchestration {
+                job("1") {
+                    assertFalse(isDisabled)
+                }
+                job("2") {
+                    assertFalse(isDisabled)
+                }
+                job("3") {
+                    assertFalse(isDisabled)
+                }
+            }
+        }
+    }
+
+    private fun withOrchestrator(code: OrchestratorContext.() -> Unit) {
         // Supplier
         val supplier = TestJobOrchestratorSupplier()
-        // Two jobs
-        supplier += "1"
-        supplier += "2"
-        // Orchestrator
-        val orchestrator = JobOrchestrator(
-                scheduler,
-                "Test",
-                listOf(supplier)
-        )
-        val orchestratorKey = orchestrator.key
-        // Registration of the orchestrator
-        scheduler.schedule(orchestrator, Schedule.NONE)
-        // Fires the orchestration
-        scheduler.fireImmediately(orchestratorKey).orElseThrow { RuntimeException("Not scheduled") }.get()
-        // Checks that both jobs are registered and enabled
-        val o1 = scheduler.getJobStatus(TestJobOrchestratorSupplier.key("1"))
-        assertPresent(o1) {
-            assertFalse(it.isDisabled)
+        // OK
+        OrchestratorContext(scheduledExecutorService, supplier).code()
+    }
+
+    class OrchestratorContext(
+            scheduledExecutorService: ScheduledExecutorService,
+            val supplier: TestJobOrchestratorSupplier
+    ) {
+        private val scheduler: JobScheduler
+        private val orchestrator: JobOrchestrator
+
+        init {
+            scheduler = DefaultJobScheduler(
+                    NOPJobDecorator.INSTANCE,
+                    scheduledExecutorService,
+                    OutputJobListener({ println(it) }),
+                    false,
+                    false,
+                    1.0
+            )
+            orchestrator = JobOrchestrator(
+                    scheduler,
+                    "Test",
+                    listOf(supplier)
+            )
         }
-        val o2 = scheduler.getJobStatus(TestJobOrchestratorSupplier.key("2"))
-        assertPresent(o2) {
-            assertFalse(it.isDisabled)
+
+        fun orchestration(code: OrchestrationContext.() -> Unit) {
+            // Registration of the orchestrator
+            scheduler.schedule(orchestrator, Schedule.NONE)
+            // Fires the orchestration
+            scheduler.fireImmediately(orchestrator.key).orElseThrow { RuntimeException("Not scheduled") }.get()
+            // Code
+            OrchestrationContext(scheduler).code()
         }
-        // Removing a job from the supplier
-        supplier -= "2"
-        // Registration of the orchestrator
-        scheduler.schedule(orchestrator, Schedule.NONE)
-        // Fires the orchestration
-        scheduler.fireImmediately(orchestratorKey).orElseThrow { RuntimeException("Not scheduled") }.get()
-        // Checks the jobs
-        assertPresent(scheduler.getJobStatus(TestJobOrchestratorSupplier.key("1"))) {
-            assertFalse(it.isDisabled)
+    }
+
+    class OrchestrationContext(
+            private val jobScheduler: JobScheduler
+    ) {
+        fun job(name: String, code: JobStatus.() -> Unit) {
+            val status = jobScheduler.getJobStatus(TestJobOrchestratorSupplier.key(name))
+            assertPresent(status, "Job with key $name must be present.") {
+                it.code()
+            }
         }
-        assertNotPresent(scheduler.getJobStatus(TestJobOrchestratorSupplier.key("2")))
+
+        fun noJob(name: String) {
+            val status = jobScheduler.getJobStatus(TestJobOrchestratorSupplier.key(name))
+            assertNotPresent(status, "Job with key $name must not be present.")
+        }
     }
 
     class TestJobOrchestratorSupplier : JobOrchestratorSupplier {
