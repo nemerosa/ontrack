@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.job.support
 
-import net.nemerosa.ontrack.job.Fixtures
-import net.nemerosa.ontrack.job.JobCategory
-import net.nemerosa.ontrack.job.JobScheduler
-import net.nemerosa.ontrack.job.Schedule
+import net.nemerosa.ontrack.job.*
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.test.assertNotPresent
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
@@ -408,6 +407,48 @@ class JobSchedulingTest : AbstractJobTest() {
             assertEquals(0, job.count)
             // ... and it's now gone
             assertNotPresent(scheduler.getJobStatus(job.key))
+        }
+    }
+
+    @Test
+    fun scheduler_paused_at_startup_with_orchestration() {
+        scheduler(initiallyPaused = true) {
+            val job = ConfigurableJob()
+            // Job orchestration
+            val jobOrchestrator = JobOrchestrator(
+                    scheduler,
+                    "Orchestrator",
+                    listOf(
+                            JobOrchestratorSupplier {
+                                listOf(
+                                        JobRegistration.of(job).withSchedule(Schedule.EVERY_SECOND)
+                                ).stream()
+                            }
+
+                    )
+            )
+            // Registers the orchestrator
+            schedule(jobOrchestrator, Schedule.EVERY_SECOND)
+            // Waits some time...
+            tick_seconds(3)
+            // ... and the job should not have run
+            assertEquals(0, job.count)
+            // ... and the orchestrator must not have run
+            status(jobOrchestrator.key) {
+                assertEquals(0, runCount)
+                assertFalse(isRunning)
+            }
+            // Resumes the job scheduler
+            scheduler.resume()
+            // Resumes all jobs
+            schedulerPool.runUntilIdle()
+            // Waits for one second for the orchestrator to kick off
+            tick_seconds(1)
+            // Forces the registration of pending jobs
+            schedulerPool.runUntilIdle()
+            jobPool.runUntilIdle()
+            // The job managed by the orchestrator must have run
+            assertEquals(1, job.count)
         }
     }
 
