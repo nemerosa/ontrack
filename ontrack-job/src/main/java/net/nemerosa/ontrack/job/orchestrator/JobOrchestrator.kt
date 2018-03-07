@@ -25,18 +25,18 @@ class JobOrchestrator(
         // Complete list of registrations
         val registrations = jobOrchestratorSuppliers
                 .flatMap { it.collectJobRegistrations().toList() }
-        // List of keys
+        // List of registration keys
         val keys = registrations
                 .map { registration -> registration.job.key }
         // Jobs to unschedule
         val toRemove = HashSet(cache)
         toRemove.removeAll(keys)
         toRemove.forEach { jobScheduler.unschedule(it) }
-        // Jobs to add
-        val toAdd = HashSet(keys)
-        toAdd.removeAll(cache)
+        // Jobs to add / update
+        val toRegister = HashSet(keys)
+        toRegister.removeAll(toRemove)
         registrations
-                .filter { jobRegistration -> toAdd.contains(jobRegistration.job.key) }
+                .filter { jobRegistration -> toRegister.contains(jobRegistration.job.key) }
                 .forEach { jobRegistration -> schedule(jobRegistration, runListener) }
         // Resets the cache
         cache.clear()

@@ -102,8 +102,8 @@ class JobOrchestratorIntegrationTest {
                     assertFalse(isDisabled)
                 }
             }
-            // Changing the status of a job
-            supplier += "2" to false
+            // Disables the job
+            supplier += "2" to true
             // Fires the orchestration and checks jobs
             orchestration {
                 job("1") {
@@ -113,8 +113,8 @@ class JobOrchestratorIntegrationTest {
                     assertTrue(isDisabled, "The job should be marked as disabled.")
                 }
             }
-            // Changing the status of a job
-            supplier += "2" to true
+            // Enables the job
+            supplier += "2" to false
             // Fires the orchestration and checks jobs
             orchestration {
                 job("1") {
