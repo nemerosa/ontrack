@@ -23,7 +23,7 @@ data class JobCategory(
         /**
          * Core category, used internally
          */
-        @JvmStatic
+        @JvmField
         val CORE = JobCategory.of("core").withName("Core")
 
         @JvmStatic
