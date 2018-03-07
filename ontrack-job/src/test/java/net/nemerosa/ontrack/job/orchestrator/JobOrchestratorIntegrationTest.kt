@@ -1,32 +1,16 @@
 package net.nemerosa.ontrack.job.orchestrator
 
 import net.nemerosa.ontrack.job.*
-import net.nemerosa.ontrack.job.support.DefaultJobScheduler
-import net.nemerosa.ontrack.job.support.TestJob
+import net.nemerosa.ontrack.job.support.AbstractJobTest
+import net.nemerosa.ontrack.job.support.ConfigurableJob
 import net.nemerosa.ontrack.test.assertNotPresent
 import net.nemerosa.ontrack.test.assertPresent
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
 import java.util.stream.Stream
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class JobOrchestratorIntegrationTest {
-
-    private lateinit var scheduledExecutorService: ScheduledExecutorService
-
-    @Before
-    fun before() {
-        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-    }
-
-    @After
-    fun after() {
-        scheduledExecutorService.shutdownNow()
-    }
+class JobOrchestratorIntegrationTest : AbstractJobTest() {
 
     @Test
     fun `Removed job`() {
@@ -131,37 +115,27 @@ class JobOrchestratorIntegrationTest {
         // Supplier
         val supplier = TestJobOrchestratorSupplier()
         // OK
-        OrchestratorContext(scheduledExecutorService, supplier).code()
+        scheduler {
+            OrchestratorContext(scheduler, supplier).code()
+        }
     }
 
-    class OrchestratorContext(
-            scheduledExecutorService: ScheduledExecutorService,
+    inner class OrchestratorContext(
+            private val scheduler: JobScheduler,
             val supplier: TestJobOrchestratorSupplier
     ) {
-        private val scheduler: JobScheduler
-        private val orchestrator: JobOrchestrator
-
-        init {
-            scheduler = DefaultJobScheduler(
-                    NOPJobDecorator.INSTANCE,
-                    scheduledExecutorService,
-                    OutputJobListener({ println(it) }),
-                    false,
-                    false,
-                    1.0
-            )
-            orchestrator = JobOrchestrator(
-                    scheduler,
-                    "Test",
-                    listOf(supplier)
-            )
-        }
+        private val orchestrator: JobOrchestrator = JobOrchestrator(
+                scheduler,
+                "Test",
+                listOf(supplier)
+        )
 
         fun orchestration(code: OrchestrationContext.() -> Unit) {
             // Registration of the orchestrator
             scheduler.schedule(orchestrator, Schedule.NONE)
             // Fires the orchestration
-            scheduler.fireImmediately(orchestrator.key).orElseThrow { RuntimeException("Not scheduled") }.get()
+            scheduler.fireImmediately(orchestrator.key).orElseThrow { RuntimeException("Not scheduled") }
+            jobPool.runUntilIdle()
             // Code
             OrchestrationContext(scheduler).code()
         }
@@ -192,11 +166,11 @@ class JobOrchestratorIntegrationTest {
         }
 
         operator fun plusAssign(name: String) {
-            jobs[name] = TestJob.of(name)
+            jobs[name] = ConfigurableJob(name)
         }
 
         operator fun plusAssign(state: Pair<String, Boolean>) {
-            jobs[state.first] = TestJob.of(state.first).apply { isDisabled = state.second }
+            jobs[state.first] = ConfigurableJob(state.first, disabled = state.second)
         }
 
         operator fun minusAssign(name: String) {
@@ -204,7 +178,7 @@ class JobOrchestratorIntegrationTest {
         }
 
         companion object {
-            fun key(name: String): JobKey = TestJob.key(name)
+            fun key(name: String): JobKey = ConfigurableJob(name).key
         }
 
     }
