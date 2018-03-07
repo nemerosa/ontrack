@@ -12,6 +12,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.stream.Stream
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class JobOrchestratorIntegrationTest {
 
@@ -86,6 +87,46 @@ class JobOrchestratorIntegrationTest {
         }
     }
 
+    @Test
+    fun `Job status changed`() {
+        withOrchestrator {
+            // Two jobs
+            supplier += "1"
+            supplier += "2"
+            // Fires the orchestration and checks jobs
+            orchestration {
+                job("1") {
+                    assertFalse(isDisabled)
+                }
+                job("2") {
+                    assertFalse(isDisabled)
+                }
+            }
+            // Changing the status of a job
+            supplier += "2" to false
+            // Fires the orchestration and checks jobs
+            orchestration {
+                job("1") {
+                    assertFalse(isDisabled)
+                }
+                job("2") {
+                    assertTrue(isDisabled, "The job should be marked as disabled.")
+                }
+            }
+            // Changing the status of a job
+            supplier += "2" to true
+            // Fires the orchestration and checks jobs
+            orchestration {
+                job("1") {
+                    assertFalse(isDisabled)
+                }
+                job("2") {
+                    assertFalse(isDisabled, "The job should be marked as enabled again.")
+                }
+            }
+        }
+    }
+
     private fun withOrchestrator(code: OrchestratorContext.() -> Unit) {
         // Supplier
         val supplier = TestJobOrchestratorSupplier()
@@ -152,6 +193,10 @@ class JobOrchestratorIntegrationTest {
 
         operator fun plusAssign(name: String) {
             jobs[name] = TestJob.of(name)
+        }
+
+        operator fun plusAssign(state: Pair<String, Boolean>) {
+            jobs[state.first] = TestJob.of(state.first).apply { isDisabled = state.second }
         }
 
         operator fun minusAssign(name: String) {
