@@ -185,7 +185,7 @@ class DefaultJobScheduler(
             pausedAtStartup: Boolean
     ) : Runnable {
 
-        val id: Long = idGenerator.incrementAndGet()
+        val id: Long
         private val actualSchedule: Schedule
         private val scheduledFuture: ScheduledFuture<*>?
 
@@ -275,11 +275,14 @@ class DefaultJobScheduler(
             }
             // Copies stats from old service
             if (old != null) {
+                id = old.id
                 runCount.set(old.runCount.get())
                 lastRunDate.set(old.lastRunDate.get())
                 lastRunDurationMs.set(old.lastRunDurationMs.get())
                 lastErrorCount.set(old.lastErrorCount.get())
                 lastError.set(old.lastError.get())
+            } else {
+                id = idGenerator.incrementAndGet()
             }
             // Converting all units to milliseconds
             var initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.initialPeriod, schedule.unit)
