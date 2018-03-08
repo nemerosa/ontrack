@@ -154,13 +154,13 @@ docker-compose down --volumes
             }
         }
 
-        // We stop here for pull requests
+        // We stop here for pull requests and feature branches
 
         // Docker push
         stage('Docker publication') {
             when {
-                not {
-                    branch 'PR-*'
+                when {
+                    branch 'release/.*'
                 }
             }
             environment {
