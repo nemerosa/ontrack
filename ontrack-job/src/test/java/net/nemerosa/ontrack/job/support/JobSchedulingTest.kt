@@ -452,6 +452,64 @@ class JobSchedulingTest : AbstractJobTest() {
         }
     }
 
+    @Test
+    fun `Updating the schedule of a job`() {
+        scheduler {
+            job {
+                // Checks it has run
+                tick_seconds(2)
+                val currentCount = count
+                assertEquals(3, currentCount)
+                // Then every minute
+                schedule(this, Schedule(1, 1, TimeUnit.MINUTES))
+                // Checks after three more seconds than the count has not moved
+                tick_seconds(3)
+                assertEquals(currentCount, count)
+                // Checks the new schedule
+                status(key) {
+                    assertEquals(1, schedule.initialPeriod)
+                    assertEquals(1, schedule.period)
+                    assertEquals(TimeUnit.MINUTES, schedule.unit)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Updating the description of a job`() {
+        scheduler {
+            val job = schedule(
+                    ConfigurableJob(theDescription = "Description 1")
+            )
+            // Checks the description status
+            status(job.key) {
+                assertEquals("Description 1", description)
+            }
+            // Schedules with a new description
+            schedule(ConfigurableJob(theDescription = "Description 2"))
+            // Checks the description status
+            status(job.key) {
+                assertEquals("Description 2", description)
+            }
+        }
+    }
+
+    @Test
+    fun `Updating the task of a job`() {
+        scheduler {
+            job {
+                // Checks it has run
+                tick_seconds(2)
+                assertEquals(3, count)
+                // Then with an increment of 10, and the same schedule
+                val newJob = schedule(ConfigurableJob(increment = 10))
+                // Checks after three more seconds has moved way more
+                tick_seconds(3)
+                assertEquals(30, newJob.count)
+            }
+        }
+    }
+
     private fun test_with_pause(
             pause: (JobScheduler, ConfigurableJob) -> Unit,
             resume: (JobScheduler, ConfigurableJob) -> Unit

@@ -5,12 +5,14 @@ import net.nemerosa.ontrack.job.*
 class ConfigurableJob(
         val name: String = "test",
         var count: Int = 0,
+        var increment: Int = 1,
         val category: JobCategory = Fixtures.TEST_CATEGORY,
         val type: String = "test",
         var fail: Boolean = false,
         var wait: Long = 0,
         var valid: Boolean = true,
-        var disabled: Boolean = false
+        var disabled: Boolean = false,
+        var theDescription: String = "Test job"
 ) : Job {
 
     var running: Boolean = false
@@ -41,7 +43,7 @@ class ConfigurableJob(
                 if (fail) {
                     throw RuntimeException("Task failure")
                 }
-                count++
+                count += increment
                 listener.message("TEST JOB %s Count = %d", name, count)
             } finally {
                 running = false
@@ -62,7 +64,7 @@ class ConfigurableJob(
     }
 
     override fun getDescription(): String {
-        return "Test job"
+        return theDescription
     }
 
 }
