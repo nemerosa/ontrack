@@ -55,23 +55,27 @@ class DefaultJobScheduler(
     override fun schedule(job: Job, schedule: Schedule) {
         logger.info("[scheduler][job]{} Scheduling with {}", job.key, schedule)
         // Manages existing schedule
-        val existingService = services.remove(job.key)
+        val existingService = services[job.key]
         if (existingService != null) {
-            logger.info("[scheduler][job]{} Stopping existing schedule", job.key)
-            existingService.cancel(false)
+            logger.info("[scheduler][job]{} Modifying existing schedule", job.key)
+            existingService.update(
+                    job,
+                    schedule
+            )
         }
         // Creates and starts the scheduled service
-        logger.info("[scheduler][job]{} Starting scheduled service", job.key)
-        // Copy stats from old schedule
-        val jobScheduledService = JobScheduledService(
-                job,
-                schedule,
-                schedulerPool,
-                existingService,
-                jobListener.isPausedAtStartup(job.key)
-        )
-        // Registration
-        services[job.key] = jobScheduledService
+        else {
+            logger.info("[scheduler][job]{} Starting scheduled service", job.key)
+            // Copy stats from old schedule
+            val jobScheduledService = JobScheduledService(
+                    job,
+                    schedule,
+                    schedulerPool,
+                    jobListener.isPausedAtStartup(job.key)
+            )
+            // Registration
+            services[job.key] = jobScheduledService
+        }
     }
 
     override fun unschedule(key: JobKey): Boolean {
@@ -178,16 +182,18 @@ class DefaultJobScheduler(
     }
 
     private inner class JobScheduledService(
-            private val job: Job,
-            private val schedule: Schedule,
-            scheduledExecutorService: ScheduledExecutorService,
-            old: JobScheduledService?,
+            initialJob: Job,
+            initialSchedule: Schedule,
+            private val scheduledExecutorService: ScheduledExecutorService,
             pausedAtStartup: Boolean
     ) : Runnable {
 
-        val id: Long
-        private val actualSchedule: Schedule
-        private val scheduledFuture: ScheduledFuture<*>?
+        private var job = initialJob
+        private var schedule = initialSchedule
+
+        val id: Long = idGenerator.incrementAndGet()
+        private var actualSchedule: Schedule = Schedule.NONE
+        private var scheduledFuture: ScheduledFuture<*>? = null
 
         private val paused: AtomicBoolean = AtomicBoolean(pausedAtStartup)
 
@@ -199,8 +205,80 @@ class DefaultJobScheduler(
         private val lastErrorCount = AtomicLong()
         private val lastError = AtomicReference<String>(null)
 
-        val jobKey: JobKey
-            get() = job.key
+        init {
+            // Paused at startup
+            if (pausedAtStartup) {
+                logger.debug("[job]{} Job paused at startup", job.key)
+            }
+            // Initial schedule
+            createSchedule()
+        }
+
+        private fun createSchedule() {
+            // Converting all units to milliseconds
+            var initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.initialPeriod, schedule.unit)
+            val period = TimeUnit.MILLISECONDS.convert(schedule.period, schedule.unit)
+            // Scattering
+            if (scattering) {
+                // Computes the hash for the job key
+                val hash = Math.abs(job.key.toString().hashCode()) % 10000
+                // Period to consider
+                val scatteringMax = (period * scatteringRatio).toLong()
+                if (scatteringMax > 0) {
+                    // Modulo on the period
+                    val delay = hash * scatteringMax / 10000
+                    logger.debug("[job]{} Scattering enabled - additional delay: {} ms", job.key, delay)
+                    // Adding to the initial delay
+                    initialPeriod += delay
+                }
+            }
+            // Actual schedule
+            actualSchedule = Schedule(
+                    initialPeriod,
+                    period,
+                    TimeUnit.MILLISECONDS
+            )
+            // Scheduling now
+            scheduledFuture = if (schedule.period > 0) {
+                scheduledExecutorService.scheduleWithFixedDelay(
+                        this,
+                        initialPeriod,
+                        period,
+                        TimeUnit.MILLISECONDS
+                )
+            } else {
+                logger.debug("[job]{} Job not scheduled since period = 0", job.key)
+                null
+            }
+        }
+
+        /**
+         * Updates (if needed) the service to use the new job.
+         */
+        fun update(
+                newJob: Job,
+                newSchedule: Schedule
+        ) {
+            // Checks the key of the job
+            if (job.key != newJob.key) {
+                throw IllegalStateException("The job assigned to a job service " +
+                        "cannot have a different key. " +
+                        "Expected=${job.key}, Actual=${newJob.key}")
+            }
+            // Adapting the schedule if needed
+            if (newSchedule != schedule) {
+                // Cancels current execution service (NOT any currently running job!)
+                cancel(false)
+                // Changes the schedule
+                schedule = newSchedule
+                // Reschedules
+                createSchedule()
+            }
+            // Replacing the job itself
+            job = newJob
+        }
+
+        val jobKey: JobKey = job.key
 
         private val run: Runnable
             get() {
@@ -268,59 +346,6 @@ class DefaultJobScheduler(
                 )
             }
 
-        init {
-            // Paused at startup
-            if (pausedAtStartup) {
-                logger.debug("[job]{} Job paused at startup", job.key)
-            }
-            // Copies stats from old service
-            if (old != null) {
-                id = old.id
-                runCount.set(old.runCount.get())
-                lastRunDate.set(old.lastRunDate.get())
-                lastRunDurationMs.set(old.lastRunDurationMs.get())
-                lastErrorCount.set(old.lastErrorCount.get())
-                lastError.set(old.lastError.get())
-            } else {
-                id = idGenerator.incrementAndGet()
-            }
-            // Converting all units to milliseconds
-            var initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.initialPeriod, schedule.unit)
-            val period = TimeUnit.MILLISECONDS.convert(schedule.period, schedule.unit)
-            // Scattering
-            if (scattering) {
-                // Computes the hash for the job key
-                val hash = Math.abs(job.key.toString().hashCode()) % 10000
-                // Period to consider
-                val scatteringMax = (period * scatteringRatio).toLong()
-                if (scatteringMax > 0) {
-                    // Modulo on the period
-                    val delay = hash * scatteringMax / 10000
-                    logger.debug("[job]{} Scattering enabled - additional delay: {} ms", job.key, delay)
-                    // Adding to the initial delay
-                    initialPeriod += delay
-                }
-            }
-            // Actual schedule
-            actualSchedule = Schedule(
-                    initialPeriod,
-                    period,
-                    TimeUnit.MILLISECONDS
-            )
-            // Scheduling now
-            scheduledFuture = if (schedule.period > 0) {
-                scheduledExecutorService.scheduleWithFixedDelay(
-                        this,
-                        initialPeriod,
-                        period,
-                        TimeUnit.MILLISECONDS
-                )
-            } else {
-                logger.debug("[job]{} Job not scheduled since period = 0", job.key)
-                null
-            }
-        }
-
         override fun run() {
             if (!schedulerPaused.get()) {
                 doRun(false)
@@ -370,15 +395,14 @@ class DefaultJobScheduler(
             if (forceStop) {
                 stop()
             }
-            return scheduledFuture != null && scheduledFuture.cancel(forceStop)
+            return scheduledFuture?.cancel(forceStop) ?: false
         }
 
         private fun getNextRunDate(valid: Boolean): LocalDateTime? {
-            return if (valid && scheduledFuture != null) {
-                Time.now().plus(
-                        scheduledFuture.getDelay(TimeUnit.SECONDS),
-                        ChronoUnit.SECONDS
-                )
+            return if (valid) {
+                scheduledFuture
+                        ?.getDelay(TimeUnit.SECONDS)
+                        ?.let { Time.now().plus(it, ChronoUnit.SECONDS) }
             } else {
                 null
             }
