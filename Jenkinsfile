@@ -160,9 +160,7 @@ docker-compose down --volumes
         // Docker push
         stage('Docker publication') {
             when {
-                when {
-                    branch 'release/.*'
-                }
+                branch 'release/.*'
             }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
