@@ -27,8 +27,9 @@ public class AcceptanceTestRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        AcceptanceTest acceptanceTest = method.getAnnotation(AcceptanceTest.class);
-        if (!config.acceptTest(acceptanceTest)) {
+        AcceptanceTest root = method.getDeclaringClass().getAnnotation(AcceptanceTest.class);
+        AcceptanceTest item = method.getAnnotation(AcceptanceTest.class);
+        if (!config.acceptTest(root, item)) {
             notifier.fireTestIgnored(describeChild(method));
             return;
         }

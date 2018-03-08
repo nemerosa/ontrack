@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.JobStatus
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.ApplicationManagement
+import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
@@ -17,6 +18,8 @@ import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.actuate.endpoint.HealthEndpoint
 import org.springframework.boot.actuate.health.Health
+import org.springframework.http.HttpEntity
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import org.springframework.web.util.UriComponentsBuilder
@@ -32,7 +35,8 @@ constructor(
         private val jobScheduler: JobScheduler,
         private val applicationLogService: ApplicationLogService,
         private val healthEndpoint: HealthEndpoint,
-        private val securityService: SecurityService
+        private val securityService: SecurityService,
+        private val encryptionService: EncryptionService
 ) : AbstractResourceController() {
 
     /**
@@ -240,6 +244,23 @@ constructor(
         return jobScheduler.getJobKey(id)
                 .map { key -> Ack.validate(jobScheduler.stop(key)) }
                 .orElse(Ack.NOK)
+    }
+
+    /**
+     * Exporting the encryption key
+     */
+    @GetMapping("/encryption")
+    fun exportEncryptionKey(): HttpEntity<String> {
+        return ResponseEntity.ok(encryptionService.exportKey())
+    }
+
+    /**
+     * Importing the encryption key
+     */
+    @PutMapping("/encryption")
+    fun importEncryptionKey(@RequestBody payload: String): HttpEntity<String> {
+        encryptionService.importKey(payload)
+        return ResponseEntity.accepted().body(payload)
     }
 
 }

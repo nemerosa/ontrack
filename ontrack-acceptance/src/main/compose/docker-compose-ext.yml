@@ -1,0 +1,27 @@
+version: "2.1"
+
+services:
+   ontrack:
+      image: "nemerosa/ontrack-extension-test:${ONTRACK_VERSION}"
+      environment:
+         PROFILE: acceptance
+         ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
+         JAVA_OPTIONS: "-Xmx2048m"
+   selenium:
+      image: "selenium/standalone-chrome:3.8.1"
+      environment:
+         JAVA_OPTS: "-Xmx2048m"
+   ontrack_acceptance:
+      image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      depends_on:
+         ontrack:
+            condition: service_healthy
+         selenium:
+            condition: service_started
+      environment:
+         ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
+         ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
+         ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_CONTEXT: "extensions"
+      volumes:
+         - "./build:/ontrack/acceptance/output:rw"

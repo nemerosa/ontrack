@@ -73,6 +73,9 @@ Just run:
 
 The application is then available at http://localhost:8080
 
+NOTE: The `dev` profile is activated by default and the working files
+and database file will be available under `ontrack-ui/work`.
+
 [[development-launch]]
 ==== Launching the application in the IDE
 
@@ -88,6 +91,51 @@ In order to launch the application, run the
 `--spring.profiles.active=dev` as argument.
 
 The application is then available at http://localhost:8080
+
+NOTE: By activating the `dev` profile, the working files
+and database file will be available under `work` in the root directory.
+
+WARNING: Not activating the `dev` profile without setting the database
+to connect to will result in Ontrack using a in-memory and therefore
+transient H2 database instance.
+
+[[development-h2-server]]
+==== Developing with H2 server database
+
+Ontrack uses by default a local embedded H2 database but one can configure
+it to use a H2 database deployed in server mode.
+
+The fastest way to deploy a H2 database is to use Docker, for example:
+
+[source,bash]
+----
+docker container run -d --publish 9082:9082 --name h2 nemerosa/h2:latest
+----
+
+This will create a local `h2` container running H2 and exposes its `9082`
+port.
+
+Then, you either run Ontrack with the following argument:
+
+[source]
+----
+--spring.datasource.url=jdbc:h2:tcp://localhost:9082/ontrack;MODE=MYSQL
+----
+
+NOTE: `localhost` is your Docker host
+
+You can also create a local `application.properties` file and place it
+in `ontrack-ui/src/main/resources`:
+
+[source]
+.ontrack-ui/src/main/resources/application.properties
+----
+spring.datasource.url = jdbc:h2:tcp://localhost:9082/ontrack;MODE=MYSQL
+----
+
+TIP: Credentials to access the H2 database are controlled by the
+`spring.datasource.username` and `spring.datasource.password` Spring Boot
+properties and both default to `ontrack`.
 
 [[development-web]]
 ==== Developing for the web

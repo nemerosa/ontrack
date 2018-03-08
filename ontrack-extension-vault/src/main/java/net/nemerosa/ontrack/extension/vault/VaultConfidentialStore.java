@@ -26,7 +26,8 @@ public class VaultConfidentialStore extends AbstractConfidentialStore {
         this.vaultOperations = vaultOperations;
         this.configProperties = configProperties;
         LoggerFactory.getLogger(VaultConfidentialStore.class).info(
-                "[key-store] Using Vault store"
+                "[key-store] Using Vault store at {}",
+                configProperties.getUri()
         );
     }
 

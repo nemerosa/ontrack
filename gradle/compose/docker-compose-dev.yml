@@ -1,0 +1,47 @@
+version: "2.1"
+
+services:
+  # InfluxDB container
+  influxdb:
+    # Makes all ports accessible on the host for testing
+    ports:
+      - "8083:8083"
+
+  # Grafana container
+  grafana:
+    ports:
+      - "3000:3000"
+
+  # H2 database
+  h2:
+    image: "nemerosa/h2:latest"
+    ports:
+      - "9082"
+      - "8082"
+
+  # Vault
+  # Non production setup
+  # See https://hub.docker.com/_/vault/
+  vault:
+    image: "vault:0.9.0"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "test"
+    cap_add:
+      - "IPC_LOCK"
+    ports:
+      - "8200"
+
+  # Ontrack container
+  ontrack:
+    image: "nemerosa/ontrack:latest"
+    environment:
+        PROFILE: "prod"
+        ONTRACK_DB_URL: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
+    volumes:
+      - "./dev/ontrack:/var/ontrack/conf"
+      - "/dev/urandom:/dev/random"
+    ports:
+      - "443:443"
+    links:
+      - "h2:h2"
+      - "vault:vault"

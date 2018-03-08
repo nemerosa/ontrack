@@ -25,6 +25,7 @@ public class EnvServiceImpl implements EnvService {
     private final String defaultProfiles;
     private final String profiles;
     private final VersionInfo version;
+    private final String jdbcUrl;
     private final File home;
     private final ApplicationContext ctx;
 
@@ -37,6 +38,8 @@ public class EnvServiceImpl implements EnvService {
         this.profiles = StringUtils.join(ctx.getEnvironment().getActiveProfiles(), ",");
         // Version information from the configuration
         this.version = version.toInfo();
+        // JDBC URL
+        this.jdbcUrl = ctx.getEnvironment().getProperty("spring.datasource.url");
         // Home directory
         this.home = new File(configProperties.getApplicationWorkingDir());
     }
@@ -69,7 +72,7 @@ public class EnvServiceImpl implements EnvService {
         logger.info("[env] With JDK:              {}", System.getProperty("java.version"));
         logger.info("[env] With default profiles: {}", defaultProfiles);
         logger.info("[env] With active profiles:  {}", profiles);
-        logger.info("[setup] DB JDBC URL:         {}", jdbcUrl);
+        logger.info("[datasource] URL:            {}", jdbcUrl);
         logger.info("[version] Display:           {}", version.getDisplay());
         logger.info("[version] Full:              {}", version.getFull());
         logger.info("[version] Branch:            {}", version.getBranch());
@@ -77,5 +80,9 @@ public class EnvServiceImpl implements EnvService {
         logger.info("[version] Commit:            {}", version.getCommit());
         logger.info("[version] Source:            {}", version.getSource());
         logger.info("[version] Source type:       {}", version.getSourceType());
+        // Warnings
+        if (StringUtils.isBlank(jdbcUrl)) {
+            logger.warn("No JDBC datasource URL has been specified (spring.datasource.url is null or blank) and a in-memory transient H2 database will now be used.");
+        }
     }
 }
