@@ -1,5 +1,5 @@
 # Base
-FROM ubuntu:vivid
+FROM ubuntu:xenial
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
