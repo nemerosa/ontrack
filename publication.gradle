@@ -230,14 +230,14 @@ task publicationGitHubReleaseDebianUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.deb'
     fileType = 'application/x-debian-package'
-    file = project.file("ontrack_${ontrackVersion}-1_all.deb")
+    file = project.file("build/distributions/ontrack_${ontrackVersion}-1_all.deb")
 }
 
 task publicationGitHubReleaseRpmUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.rpm'
     fileType = 'application/x-rpm'
-    file = project.file("ontrack-${ontrackVersion}-1.noarch.rpm")
+    file = project.file("build/distributions/ontrack-${ontrackVersion}-1.noarch.rpm")
 }
 
 task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {

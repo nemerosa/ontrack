@@ -81,6 +81,7 @@ git clean -xfd
                     version = props.VERSION_DISPLAY
                     gitCommit = props.VERSION_COMMIT
                 }
+                echo "Version = ${version}"
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
@@ -203,7 +204,7 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                 ONTRACK_VERSION = "${version}"
             }
             when {
-                branch 'release/.*'
+                branch 'release/*'
             }
             parallel {
                 // CentOS7
@@ -525,6 +526,8 @@ set -e
                 echo "Release"
 
                 unstash name: "delivery"
+                unstash name: "rpm"
+                unstash name: "debian"
                 sh '''\
 #!/bin/bash
 set -e
