@@ -27,13 +27,11 @@ public class EnvServiceImpl implements EnvService {
     private final VersionInfo version;
     private final String jdbcUrl;
     private final File home;
-    private final ApplicationContext ctx;
 
     @Autowired
     public EnvServiceImpl(VersionInfoConfig version,
                           OntrackConfigProperties configProperties,
                           ApplicationContext ctx) {
-        this.ctx = ctx;
         this.defaultProfiles = StringUtils.join(ctx.getEnvironment().getDefaultProfiles(), ",");
         this.profiles = StringUtils.join(ctx.getEnvironment().getActiveProfiles(), ",");
         // Version information from the configuration
@@ -68,7 +66,6 @@ public class EnvServiceImpl implements EnvService {
 
     @PostConstruct
     public void init() throws FileNotFoundException {
-        String jdbcUrl = ctx.getEnvironment().getProperty("spring.datasource.url", "n/a");
         logger.info("[env] With JDK:              {}", System.getProperty("java.version"));
         logger.info("[env] With default profiles: {}", defaultProfiles);
         logger.info("[env] With active profiles:  {}", profiles);
@@ -80,9 +77,5 @@ public class EnvServiceImpl implements EnvService {
         logger.info("[version] Commit:            {}", version.getCommit());
         logger.info("[version] Source:            {}", version.getSource());
         logger.info("[version] Source type:       {}", version.getSourceType());
-        // Warnings
-        if (StringUtils.isBlank(jdbcUrl)) {
-            logger.warn("No JDBC datasource URL has been specified (spring.datasource.url is null or blank) and a in-memory transient H2 database will now be used.");
-        }
     }
 }

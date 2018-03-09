@@ -53,9 +53,6 @@ ENV JAVA_OPTIONS ''
 # Additional arguments to pass on the command lines
 ENV ONTRACK_ARGS ''
 
-# Database URL
-ENV ONTRACK_DB_URL "jdbc:h2:/var/ontrack/data/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
-
 # Copies the Ontrack JAR
 COPY ontrack.jar /opt/ontrack/
 

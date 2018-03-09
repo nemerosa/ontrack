@@ -9,7 +9,6 @@ rm -rf /opt/ontrack/config \
 # Traces
 echo "[START] EXTENSIONS_DIR = ${EXTENSIONS_DIR}"
 echo "[START] JAVA_OPTIONS   = ${JAVA_OPTIONS}"
-echo "[START] ONTRACK_DB_URL = ${ONTRACK_DB_URL}"
 echo "[START] ONTRACK_ARGS   = ${ONTRACK_ARGS}"
 
 # Launching the application
