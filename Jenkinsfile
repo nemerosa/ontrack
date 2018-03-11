@@ -68,7 +68,7 @@ git clean -xfd
     publishToMavenLocal \\
     osPackages \\
     dockerLatest \\
-    -PitJdbcHost=db \\
+    -PitJdbcHost=${DOCKER_HOST} \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx2048m \\
