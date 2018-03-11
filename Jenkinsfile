@@ -458,10 +458,9 @@ docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 
 docker pull nemerosa/ontrack:${ONTRACK_VERSION}
 
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
+docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:3
 
-docker push nemerosa/ontrack:2
+docker push nemerosa/ontrack:3
 docker push nemerosa/ontrack:latest
 '''
                     }
@@ -620,9 +619,117 @@ GITHUB_URI=`git config remote.origin.url`
                 }
             }
         }
-        // TODO Production
-        // TODO Ontrack promotion --> ONTRACK
-        // TODO Production tests
+
+        // Production
+
+        stage('Production') {
+            when {
+                branch 'release/3*'
+            }
+            environment {
+                ONTRACK_VERSION = "${version}"
+                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
+            }
+            steps {
+                timeout(time: 15, unit: 'MINUTES') {
+                    script {
+                        sshagent(credentials: ['ONTRACK_SSH_KEY']) {
+                            sh '''\
+#!/bin/bash
+
+set -e
+
+SSH_OPTIONS=StrictHostKeyChecking=no
+
+SSH_HOST=ontrack.nemerosa.net
+
+scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
+ssh -o ${SSH_OPTIONS} ONTRACK_VERSION=${ONTRACK_VERSION} ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR} ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW} root@${SSH_HOST} docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
+
+'''
+                        }
+                    }
+                }
+            }
+            post {
+                success {
+                    ontrackPromote(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            promotionLevel: 'ONTRACK',
+                    )
+                }
+            }
+        }
+
+        // Production tests
+
+        stage('Production tests') {
+            when {
+                branch 'release/3*'
+            }
+            environment {
+                ONTRACK_VERSION = "${version}"
+            }
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh '''\
+#!/bin/bash
+set -e
+
+echo "(*) Target Ontrack application..."
+export ONTRACK_ACCEPTANCE_TARGET_URL="https://ontrack.nemerosa.net"
+
+echo "(*) Launching the test environment locally..."
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+    --project-name production \\
+    up -d selenium
+
+echo "(*) Running the tests..."
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+    --project-name production \\
+    up ontrack_acceptance
+'''
+                }
+            }
+            post {
+                always {
+                    sh '''\
+#!/bin/bash
+
+echo "(*) Copying the test results..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+
+echo "(*) Removing the test environment..."
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+    --project-name production \\
+    down
+
+'''
+                    archiveArtifacts 'build/acceptance/**'
+                    junit 'build/acceptance/*.xml'
+                    ontrackValidate(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'ACCEPTANCE.DO',
+                            buildResult: currentBuild.result,
+                    )
+                    ontrackValidate(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'ONTRACK.SMOKE',
+                            buildResult: currentBuild.result,
+                    )
+                }
+            }
+        }
         // TODO Ontrack validation --> ACCEPTANCE.PRODUCTION
 
     }
