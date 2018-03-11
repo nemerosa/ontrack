@@ -631,8 +631,6 @@ GITHUB_URI=`git config remote.origin.url`
                 ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
             }
             steps {
-                // FIXME Remove the check
-                input "Going on with production?"
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
                         sshagent(credentials: ['ONTRACK_SSH_KEY']) {
