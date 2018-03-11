@@ -10,7 +10,7 @@ pipeline {
     agent {
         dockerfile {
             label "docker"
-            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+            args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
         }
     }
 
@@ -68,7 +68,6 @@ git clean -xfd
     publishToMavenLocal \\
     osPackages \\
     dockerLatest \\
-    -PitJdbcHost=${DOCKER_HOST} \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx2048m \\
