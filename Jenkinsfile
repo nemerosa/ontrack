@@ -631,6 +631,8 @@ GITHUB_URI=`git config remote.origin.url`
                 ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
             }
             steps {
+                // FIXME Remove the check
+                input "Going on with production?"
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
                         sshagent(credentials: ['ONTRACK_SSH_KEY']) {
@@ -649,16 +651,6 @@ ssh -o ${SSH_OPTIONS} ONTRACK_VERSION=${ONTRACK_VERSION} ONTRACK_POSTGRES_USER=$
 '''
                         }
                     }
-                }
-            }
-            post {
-                success {
-                    ontrackPromote(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            promotionLevel: 'ONTRACK',
-                    )
                 }
             }
         }
@@ -717,20 +709,20 @@ docker-compose \\
                             project: projectName,
                             branch: branchName,
                             build: version,
-                            validationStamp: 'ACCEPTANCE.DO',
-                            buildResult: currentBuild.result,
-                    )
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
                             validationStamp: 'ONTRACK.SMOKE',
                             buildResult: currentBuild.result,
                     )
                 }
+                success {
+                    ontrackPromote(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            promotionLevel: 'ONTRACK',
+                    )
+                }
             }
         }
-        // TODO Ontrack validation --> ACCEPTANCE.PRODUCTION
 
     }
 
