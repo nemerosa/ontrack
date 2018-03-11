@@ -118,7 +118,7 @@ cd ontrack-extension-test
                     sh """\
 echo "Launching environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose up -d ontrack selenium
+docker-compose up -d postgresql ontrack selenium
 """
                     sh """\
 echo "Launching tests..."
@@ -220,7 +220,7 @@ cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 
 echo "Launching environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up -d ontrack selenium
+docker-compose --file docker-compose-centos-7.yml up -d postgresql ontrack selenium
 """
                             sh """\
 echo "Launching tests..."
@@ -265,7 +265,7 @@ cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
 
 echo "Launching environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up -d ontrack selenium
+docker-compose --file docker-compose-debian.yml up -d postgresql ontrack selenium
 """
                             sh """\
 echo "Launching tests..."
@@ -309,7 +309,7 @@ rm -rf ontrack-acceptance/src/main/compose/build
                             sh """\
 echo "Launching environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up -d ontrack selenium
+docker-compose --project-name ext --file docker-compose-ext.yml up -d postgresql ontrack selenium
 """
                             // Launches the tests
                             sh """\

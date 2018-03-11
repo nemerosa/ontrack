@@ -1,8 +1,17 @@
 version: "2.1"
 
 services:
+   postgresql:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
    ontrack:
       image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+      depends_on:
+         postgresql:
+            condition: service_started
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"

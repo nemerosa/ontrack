@@ -10,12 +10,12 @@ services:
     ports:
       - "8083"
 
-  # H2 database
-  h2:
-    image: "nemerosa/h2:latest"
-    ports:
-      - "9082"
-      - "8082"
+  postgresql:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
 
   # Vault
   # Non production setup
@@ -35,7 +35,6 @@ services:
     environment:
        PROFILE: acceptance
        ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
-       ONTRACK_DB_URL: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
        # Using Vault for storing the encryption keys
        ONTRACK_CONFIG_KEY_STORE: "vault"
        ONTRACK_CONFIG_VAULT_URI: "http://vault:8200"
@@ -52,5 +51,5 @@ services:
     depends_on:
       vault:
         condition: service_started
-      h2:
+      postgresql:
         condition: service_started
