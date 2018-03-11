@@ -3,6 +3,9 @@ version: "2.1"
 services:
   # InfluxDB container
   influxdb:
+    image: influxdb:1.1-alpine
+    environment:
+      PRE_CREATE_DB: "ontrack"
     restart: always
     volumes:
       # Keeping data on the host
@@ -10,6 +13,7 @@ services:
 
   # Grafana container
   grafana:
+    image: grafana/grafana:4.1.1
     restart: always
     ports:
       - "3000:3000"
@@ -19,10 +23,16 @@ services:
 
   # Ontrack container
   ontrack:
-    restart: always
     image: nemerosa/ontrack:${ONTRACK_VERSION}
+    restart: always
     environment:
         PROFILE: prod
+        JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
+    depends_on:
+      influxdb:
+        condition: service_started
+      postgresql:
+        condition: service_started
     volumes:
       - "/var/ontrack/conf:/var/ontrack/conf"
       - "/var/ontrack/data:/var/ontrack/data"
@@ -30,11 +40,10 @@ services:
       - "/dev/urandom:/dev/random"
     ports:
       - "443:443"
-    links:
-      - "postgresql:postgresql"
 
   # Postgresql database
   postgresql:
+    image: postgres:9.5.2
     restart: always
     environment:
       POSTGRES_DB      : ontrack
