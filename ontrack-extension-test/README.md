@@ -11,9 +11,13 @@ also important to be able to test this extension locally.
 
 #### From the IDE
 
-To launch the extension:
+Make sure you have a Postgres database running. You can use, for example:
 
-**TODO** Check the Postgres database container.
+```bash
+./gradlew devInit
+```
+
+To launch the extension:
 
 ```bash
 cd ontrack-extension-test
