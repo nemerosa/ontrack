@@ -55,7 +55,14 @@ To launch the tests:
 
 ```bash
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-ext.yml up -d ontrack-acceptance
+docker-compose --file docker-compose-ext.yml up ontrack_acceptance
 ```
 
 The test results will be available in `ontrack-acceptance/src/main/compose/build`.
+
+When done, all services can be stopped and destroyed using:
+
+```bash
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-ext.yml down
+```
