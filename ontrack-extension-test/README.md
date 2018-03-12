@@ -17,7 +17,7 @@ to be used by your local extension test module.
 To build it locally (without running the tests for example):
 
 ```bash
-./gradlew publishToMavenLocal -x test
+./gradlew clean publishToMavenLocal -x test
 ```
 
 To get the version which has been published, you can run:
