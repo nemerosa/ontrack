@@ -17,7 +17,7 @@ In order to reproduce what happens in the Ontrack pipeline, follow this procedur
 
 ```bash
 # Version to test
-export ONTRACK_VERSION=3.33.1
+export ONTRACK_VERSION=3.34.3
 # Building and testing the extension locally
 cd ontrack-extension-test
 ./gradlew \
