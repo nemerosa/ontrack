@@ -15,7 +15,7 @@
 #        password: ontrack
 
 # Base
-FROM java:openjdk-8u111-jdk
+FROM openjdk:8u151-jdk
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
@@ -62,3 +62,7 @@ ADD start.sh /opt/ontrack/start.sh
 # Running the application
 WORKDIR /opt/ontrack
 ENTRYPOINT ["/opt/ontrack/start.sh"]
+
+# Healthcheck
+HEALTHCHECK --interval=1m --timeout=10s \
+  CMD curl -f http://localhost:8080/info || exit 1

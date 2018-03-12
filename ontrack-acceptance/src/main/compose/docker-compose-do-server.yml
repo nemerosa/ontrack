@@ -1,0 +1,55 @@
+version: "2.1"
+
+services:
+  # InfluxDB container
+  influxdb:
+    image: influxdb:1.1-alpine
+    environment:
+      PRE_CREATE_DB: "ontrack"
+    # Makes all ports accessible on the host for testing
+    ports:
+      - "8083"
+
+  postgresql:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+
+  # Vault
+  # Non production setup
+  # See https://hub.docker.com/_/vault/
+  vault:
+    image: "vault:0.9.0"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "test"
+    cap_add:
+      - "IPC_LOCK"
+    ports:
+      - "8200"
+
+  # Ontrack container
+  ontrack:
+    image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+    environment:
+       PROFILE: acceptance
+       ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
+       # Using Vault for storing the encryption keys
+       ONTRACK_CONFIG_KEY_STORE: "vault"
+       ONTRACK_CONFIG_VAULT_URI: "http://vault:8200"
+       ONTRACK_CONFIG_VAULT_TOKEN: "test"
+       # Sending metrics to InfluxDB
+       ONTRACK_METRICS_INFLUXDB_HOST: "influxdb"
+       ONTRACK_METRICS_INFLUXDB_PERIOD: 5
+       ONTRACK_CONFIG_METRICS_PERIOD: 5
+    volumes:
+      # Better startup performances in CI and DO, do not use in Prod
+      - "/dev/urandom:/dev/random"
+    ports:
+      - "8080:8080"
+    depends_on:
+      vault:
+        condition: service_started
+      postgresql:
+        condition: service_started

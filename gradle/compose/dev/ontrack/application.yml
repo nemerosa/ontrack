@@ -1,0 +1,37 @@
+# CI environment
+
+# SSL with self signed certificate
+server:
+  port: 443
+  ssl:
+    enabled: true
+    key-alias: ontrack
+    key-store: "config/keystore.p12"
+    key-store-type: PKCS12
+    key-store-password: ontrack
+    key-password: ontrack
+
+# Remote shutdown enabled
+endpoints:
+  shutdown:
+    enabled: true
+
+# Ontrack configuration
+ontrack:
+  config:
+    # Disabling the test of the external configurations
+    configuration-test: false
+    # Integration with InfluxDB for the metrics
+    metrics-period: 5
+    # Using Vault for encryption key
+    key-store: vault
+    vault:
+      uri: "http://vault:8200"
+      token: test
+  metrics:
+    influxdb:
+      # The host is defined by the Docker link ontrack -> influxdb
+      # Using the default internal port because of the link
+      host: influxdb
+      # Increases the refresh period for test
+      period: 5

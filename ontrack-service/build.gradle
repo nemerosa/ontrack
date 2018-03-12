@@ -18,8 +18,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-cache'
     compile 'io.dropwizard.metrics:metrics-core'
     compile 'org.jgrapht:jgrapht-core'
-    compile 'org.flywaydb:flyway-core'
     compile 'com.github.ben-manes.caffeine:caffeine'
+    compile 'org.flywaydb:flyway-core'
 
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output

@@ -6,9 +6,17 @@ import lombok.Data;
 import lombok.experimental.Wither;
 import net.nemerosa.ontrack.job.*;
 
+/**
+ * @deprecated Use {@link ConfigurableJob} from Kotlin test classes
+ */
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Deprecated
 public class TestJob implements Job {
+
+    public static JobKey key(String name) {
+        return Fixtures.TEST_CATEGORY.getType("test").getKey(name);
+    }
 
     public static TestJob of() {
         return of("test");

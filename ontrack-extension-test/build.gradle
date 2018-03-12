@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
-        classpath 'com.bmuschko:gradle-docker-plugin:3.0.8'
+        classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
     }
 }
 
@@ -36,11 +36,6 @@ dependencies {
 
 apply plugin: 'com.bmuschko.docker-remote-api'
 
-import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerInspectContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.apache.tools.ant.filters.ReplaceTokens
 
@@ -66,14 +61,3 @@ task buildDockerImage(type: DockerBuildImage) {
 }
 
 assemble.dependsOn buildDockerImage
-
-test {
-    include '**/*Test.class'
-}
-
-task extensionTest(type: Test) {
-    include '**/*Acceptance.class'
-    ignoreFailures true
-    outputs.upToDateWhen { false }  // Always run tests
-    systemProperty 'ontrack.version', ontrackVersion
-}

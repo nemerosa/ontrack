@@ -1,0 +1,33 @@
+version: "2.1"
+
+services:
+   postgresql:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+   ontrack:
+      build:
+        context: "./os/centos/7/docker"
+      depends_on:
+         postgresql:
+            condition: service_started
+   selenium:
+      image: "selenium/standalone-chrome:3.8.1"
+      environment:
+         JAVA_OPTS: "-Xmx2048m"
+   ontrack_acceptance:
+      image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      depends_on:
+         ontrack:
+            condition: service_started
+         selenium:
+            condition: service_started
+      environment:
+         ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
+         ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
+         ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_CONTEXT: smoke
+      volumes:
+         - "./build:/ontrack/acceptance/output:rw"
