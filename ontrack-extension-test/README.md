@@ -11,9 +11,22 @@ also important to be able to test this extension locally.
 
 #### From the IDE
 
-#### Integration tests
+To launch the extension:
+
+**TODO** Check the Postgres database container.
+
+```bash
+cd ontrack-extension-test
+./gradlew ontrackRun
+```
+
+#### Integration tests from the IDE
+
+#### Integration tests on command line
 
 In order to reproduce what happens in the Ontrack pipeline, follow this procedure.
+
+Start by building the extension:
 
 ```bash
 # Version to test
@@ -25,3 +38,24 @@ cd ontrack-extension-test
     clean \
     build
 ```
+
+This will build a Docker image with name: `nemerosa/ontrack-extension-test:${ONTRACK_VERSION}`.
+
+Then, launch the test environment, which comprises:
+
+* the Ontrack application itself
+* a Postgres database as backend
+
+```bash
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-ext.yml up -d ontrack postgresql selenium
+```
+
+To launch the tests:
+
+```bash
+cd ontrack-acceptance/src/main/compose
+docker-compose --file docker-compose-ext.yml up -d ontrack-acceptance
+```
+
+The test results will be available in `ontrack-acceptance/src/main/compose/build`.
