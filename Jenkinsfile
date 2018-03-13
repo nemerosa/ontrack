@@ -665,6 +665,8 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
                 ONTRACK_VERSION = "${version}"
             }
             steps {
+                // FIXME Pause
+                input "Pause before production..."
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''\
 #!/bin/bash
