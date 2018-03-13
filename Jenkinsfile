@@ -209,6 +209,9 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             parallel {
                 // CentOS7
                 stage('CentOS7') {
+                    options {
+                        retry(3)
+                    }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
@@ -254,6 +257,9 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                 }
                 // Debian
                 stage('Debian') {
+                    options {
+                        retry(3)
+                    }
                     steps {
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
