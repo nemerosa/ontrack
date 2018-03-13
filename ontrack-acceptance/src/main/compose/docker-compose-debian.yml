@@ -1,7 +1,7 @@
 version: "2.1"
 
 services:
-   postgresql:
+   postgres:
     image: postgres:9.5.2
     environment:
       POSTGRES_DB      : ontrack
@@ -10,8 +10,10 @@ services:
    ontrack:
       build:
         context: "./os/debian/docker"
+      environment:
+         SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
       depends_on:
-         postgresql:
+         postgres:
             condition: service_started
    selenium:
       image: "selenium/standalone-chrome:3.8.1"

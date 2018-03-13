@@ -10,7 +10,7 @@ services:
     ports:
       - "8083"
 
-  postgresql:
+  postgres:
     image: postgres:9.5.2
     environment:
       POSTGRES_DB      : ontrack
@@ -35,6 +35,8 @@ services:
     environment:
        PROFILE: acceptance
        ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
+       # Database connection
+       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
        # Using Vault for storing the encryption keys
        ONTRACK_CONFIG_KEY_STORE: "vault"
        ONTRACK_CONFIG_VAULT_URI: "http://vault:8200"
@@ -51,5 +53,5 @@ services:
     depends_on:
       vault:
         condition: service_started
-      postgresql:
+      postgres:
         condition: service_started

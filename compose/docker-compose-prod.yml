@@ -28,10 +28,11 @@ services:
     environment:
         PROFILE: prod
         JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
+        SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
     depends_on:
       influxdb:
         condition: service_started
-      postgresql:
+      postgres:
         condition: service_started
     volumes:
       - "/var/ontrack/conf:/var/ontrack/conf"
@@ -42,7 +43,7 @@ services:
       - "443:443"
 
   # Postgresql database
-  postgresql:
+  postgres:
     image: postgres:9.5.2
     restart: always
     environment:
