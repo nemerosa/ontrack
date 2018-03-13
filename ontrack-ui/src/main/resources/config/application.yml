@@ -9,7 +9,7 @@ flyway:
 spring:
   # Default database connection
   datasource:
-    url: "jdbc:postgresql://postgresql/ontrack"
+    url: "jdbc:postgresql://localhost/ontrack"
     username: ontrack
     password: ontrack
   # Default profile

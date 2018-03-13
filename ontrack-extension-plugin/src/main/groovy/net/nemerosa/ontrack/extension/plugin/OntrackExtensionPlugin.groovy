@@ -243,8 +243,6 @@ ontrack = ${ontrackVersion}
             systemProperties = [
                     'loader.main': 'net.nemerosa.ontrack.boot.Application'
             ]
-            // Development profile by default
-            args '--spring.profiles.active=dev'
         }
 
     }
