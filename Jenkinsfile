@@ -633,6 +633,8 @@ GITHUB_URI=`git config remote.origin.url`
                 ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
             }
             steps {
+                // FIXME Pause
+                input "Pause before production..."
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
                         sshagent(credentials: ['ONTRACK_SSH_KEY']) {
@@ -665,8 +667,6 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
                 ONTRACK_VERSION = "${version}"
             }
             steps {
-                // FIXME Pause
-                input "Pause before production..."
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''\
 #!/bin/bash
