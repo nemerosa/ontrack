@@ -663,15 +663,13 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
             }
             environment {
                 ONTRACK_VERSION = "${version}"
+                ONTRACK_ACCEPTANCE_ADMIN = credentials("ONTRACK_ACCEPTANCE_ADMIN")
             }
             steps {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''\
 #!/bin/bash
 set -e
-
-echo "(*) Target Ontrack application..."
-export ONTRACK_ACCEPTANCE_TARGET_URL="https://ontrack.nemerosa.net"
 
 echo "(*) Launching the test environment locally..."
 docker-compose \\
