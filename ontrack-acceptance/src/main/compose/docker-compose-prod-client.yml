@@ -19,5 +19,7 @@ services:
          ONTRACK_ACCEPTANCE_TARGET_URL: "https://ontrack.nemerosa.net"
          # Admin password injected by CI/CD
          ONTRACK_ACCEPTANCE_ADMIN: "${ONTRACK_ACCEPTANCE_ADMIN}"
+         # Misc. settings
+         ONTRACK_ACCEPTANCE_TIMEOUT: 300
       volumes:
          - "./build:/ontrack/acceptance/output:rw"
