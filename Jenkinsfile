@@ -97,6 +97,9 @@ cd ontrack-extension-test
 """
             }
             post {
+                always {
+                    junit '**/build/test-results/**/*.xml'
+                }
                 success {
                     script {
                         if (!pr) {
@@ -235,12 +238,12 @@ docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
 set -e
 echo "Cleanup..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
 docker-compose --file docker-compose-centos-7.yml down --volumes
 """
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/centos/**'
+                            junit 'build/centos/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -283,12 +286,12 @@ docker-compose --file docker-compose-debian.yml up ontrack_acceptance
 set -e
 echo "Cleanup..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/debian
 cd ontrack-acceptance/src/main/compose
 docker-compose --file docker-compose-debian.yml down --volumes
 """
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/debian/**'
+                            junit 'build/debian/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -326,12 +329,12 @@ docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_accep
                             sh """\
 echo "Cleanup..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
 """
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/extension/**'
+                            junit 'build/extension/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -410,7 +413,7 @@ docker-compose \\
 
 echo "(*) Copying the test results..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/do
 
 echo "(*) Removing the test environment..."
 docker-compose \\
@@ -421,8 +424,8 @@ docker-compose \\
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/do/**'
+                            junit 'build/do/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -692,7 +695,7 @@ docker-compose \\
 
 echo "(*) Copying the test results..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/production
 
 echo "(*) Removing the test environment..."
 docker-compose \\
@@ -701,8 +704,8 @@ docker-compose \\
     down
 
 '''
-                    archiveArtifacts 'build/acceptance/**'
-                    junit 'build/acceptance/*.xml'
+                    archiveArtifacts 'build/production/**'
+                    junit 'build/production/*.xml'
                     ontrackValidate(
                             project: projectName,
                             branch: branchName,
@@ -722,12 +725,6 @@ docker-compose \\
             }
         }
 
-    }
-
-    post {
-        always {
-            junit '**/build/test-results/**/*.xml'
-        }
     }
 
 }
