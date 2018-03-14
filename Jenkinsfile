@@ -162,18 +162,14 @@ docker-compose down --volumes
 
         // Docker push
         stage('Docker publication') {
-            when {
+            // when {
                 // FIXME branch 'release/*'
-            }
+            // }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
                 ONTRACK_VERSION = "${version}"
             }
             steps {
-                // TODO Confirmation before going further (disabled for development)
-                // timeout(time: 1, unit: 'HOURS') {
-                //     input "Pushing version ${version} to the Docker Hub?"
-                // }
                 script {
                     sh '''\
 #!/bin/bash
@@ -204,9 +200,9 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             environment {
                 ONTRACK_VERSION = "${version}"
             }
-            when {
+            // when {
                 // FIXME branch 'release/*'
-            }
+            // }
             parallel {
                 // CentOS7
                 stage('CentOS7') {
