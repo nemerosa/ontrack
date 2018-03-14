@@ -94,7 +94,7 @@ public class AcceptanceConfig {
 
     public boolean acceptTest(AcceptanceTest root, AcceptanceTest member) {
         if (acceptTest(root)) {
-            if (root.explicit()) {
+            if (root != null && root.explicit()) {
                 // If no context is required on the member, it is accepted
                 // Else checks the member
                 return member == null || acceptTest(member);
