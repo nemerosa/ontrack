@@ -11,6 +11,11 @@ import static org.junit.Assert.*;
 public class AccountTest {
 
     @Test
+    public void failure() {
+        fail("For test");
+    }
+
+    @Test
     public void projectEdit() {
         Account account = account(ProjectEdit.class).lock();
         assertTrue(account.isGranted(1, ProjectEdit.class));
