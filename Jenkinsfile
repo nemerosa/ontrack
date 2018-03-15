@@ -125,6 +125,8 @@ cd ontrack-acceptance/src/main/compose
 docker-compose up -d ontrack selenium
 """
                     sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose up ontrack_acceptance
@@ -221,6 +223,8 @@ cd ontrack-acceptance/src/main/compose
 docker-compose --file docker-compose-centos-7.yml up -d ontrack selenium
 """
                             sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
@@ -266,6 +270,8 @@ cd ontrack-acceptance/src/main/compose
 docker-compose --file docker-compose-debian.yml up -d ontrack selenium
 """
                             sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose --file docker-compose-debian.yml up ontrack_acceptance
@@ -311,6 +317,8 @@ docker-compose --project-name ext --file docker-compose-ext.yml up -d ontrack se
 """
                             // Launches the tests
                             sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_acceptance
