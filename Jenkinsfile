@@ -120,16 +120,11 @@ cd ontrack-extension-test
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
                     sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose up -d ontrack selenium
-"""
-                    sh """\
 #!/bin/bash
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose up ontrack_acceptance
+docker-compose --exit-code-from ontrack_acceptance up
 """
                 }
             }
