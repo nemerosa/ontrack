@@ -124,7 +124,7 @@ cd ontrack-extension-test
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --exit-code-from ontrack_acceptance up
+docker-compose up --exit-code-from ontrack_acceptance
 """
                 }
             }
