@@ -99,6 +99,7 @@ cd ontrack-extension-test
             post {
                 always {
                     junit '**/build/test-results/**/*.xml'
+                    archiveArtifacts '**/build/test-results/**/*.xml'
                 }
                 success {
                     script {
