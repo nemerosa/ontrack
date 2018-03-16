@@ -23,6 +23,6 @@ services:
          ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
          ONTRACK_ACCEPTANCE_SELENIUM_TARGET_URL: http://ontrack:8080
          ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 30
-         ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_URL: http://ontrack:8080
       volumes:
          - "./build:/ontrack/acceptance/output:rw"
