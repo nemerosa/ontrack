@@ -203,6 +203,12 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             parallel {
                 // CentOS7
                 stage('CentOS7') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
@@ -246,6 +252,12 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                 }
                 // Debian
                 stage('Debian') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
@@ -289,6 +301,12 @@ docker-compose --file docker-compose-debian.yml down --volumes
                 }
                 // Extension tests
                 stage('Local extension tests') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             // Cleanup
@@ -328,6 +346,12 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                 }
                 // Digital Ocean
                 stage('Digital Ocean') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_VERSION = "${version}"
                         DROPLET_NAME = "ontrack-acceptance-${version}"
