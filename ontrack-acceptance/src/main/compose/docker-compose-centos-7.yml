@@ -4,6 +4,8 @@ services:
    ontrack:
       build:
         context: "./os/centos/7/docker"
+      tty: true
+      command: "start-and-wait"
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
       environment:
