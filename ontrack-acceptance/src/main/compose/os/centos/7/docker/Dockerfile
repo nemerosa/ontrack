@@ -10,6 +10,9 @@ RUN yum install -y java-1.8.0-openjdk-devel.x86_64
 # Exposing the ports
 EXPOSE 8080
 
+# Log volume
+VOLUME /var/log/ontrack
+
 # Gets the RPM file in this image
 COPY ontrack.rpm /opt/ontrack/
 

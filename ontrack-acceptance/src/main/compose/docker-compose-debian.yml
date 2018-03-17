@@ -6,6 +6,8 @@ services:
         context: "./os/debian/docker"
       tty: true
       command: "start-and-wait"
+      volumes:
+        - "./build/logs/ontrack:/var/log/ontrack"
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
       environment:
