@@ -211,17 +211,13 @@ echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
 rm -f \${DOCKER_DIR}/*.rpm
 cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
-
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up -d ontrack selenium
 """
                             sh """\
 #!/bin/bash
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
+docker-compose --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -258,17 +254,13 @@ echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
 rm -f \${DOCKER_DIR}/*.deb
 cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
-
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up -d ontrack selenium
 """
                             sh """\
 #!/bin/bash
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up ontrack_acceptance
+docker-compose --file docker-compose-debian.yml up --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -303,19 +295,13 @@ docker-compose --file docker-compose-debian.yml down --volumes
                             sh """\
 rm -rf ontrack-acceptance/src/main/compose/build
 """
-                            // Launches the extension environment
-                            sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up -d ontrack selenium
-"""
                             // Launches the tests
                             sh """\
 #!/bin/bash
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_acceptance
+docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -385,18 +371,12 @@ docker-compose \\
     --project-name ontrack \\
     up -d
 
-echo "(*) Launching the test environment locally..."
+echo "(*) Running the tests..."
 eval $(docker-machine env --shell bash --unset)
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name acceptance \\
-    up -d selenium
-
-echo "(*) Running the tests..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    up ontrack_acceptance
+    up --exit-code-from ontrack_acceptance
 
 '''
                         }
