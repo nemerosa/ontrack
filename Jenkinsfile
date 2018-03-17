@@ -123,7 +123,7 @@ cd ontrack-extension-test
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose up --exit-code-from ontrack_acceptance
+docker-compose --project-name local up --exit-code-from ontrack_acceptance
 """
                 }
             }
@@ -136,7 +136,7 @@ echo "Cleanup..."
 mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
-docker-compose down --volumes
+docker-compose --project-name local down --volumes
 """
                     archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
@@ -223,7 +223,7 @@ cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -236,7 +236,7 @@ echo "Cleanup..."
 mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml down --volumes
+docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
 """
                             archiveArtifacts 'build/centos/**'
                             junit 'build/centos/*.xml'
@@ -272,7 +272,7 @@ cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up --exit-code-from ontrack_acceptance
+docker-compose --project-name debian --file docker-compose-debian.yml up --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -285,7 +285,7 @@ echo "Cleanup..."
 mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/debian
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml down --volumes
+docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
                             archiveArtifacts 'build/debian/**'
                             junit 'build/debian/*.xml'
@@ -399,7 +399,7 @@ echo "(*) Running the tests..."
 eval $(docker-machine env --shell bash --unset)
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
+    --project-name do \\
     up --exit-code-from ontrack_acceptance
 
 '''
@@ -417,7 +417,7 @@ cp -r ontrack-acceptance/src/main/compose/build build/do
 echo "(*) Removing the test environment..."
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
+    --project-name do \\
     down
 
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
