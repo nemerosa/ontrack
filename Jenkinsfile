@@ -245,7 +245,7 @@ cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --build --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -297,7 +297,7 @@ cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
 set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name debian --file docker-compose-debian.yml up --exit-code-from ontrack_acceptance
+docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance
 """
                         }
                     }
