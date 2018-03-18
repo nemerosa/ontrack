@@ -301,8 +301,8 @@ docker-compose --project-name debian --file docker-compose-debian.yml up --exit-
 #!/bin/bash
 set -e
 echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/debian
+mkdir -p build/debian
+cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
