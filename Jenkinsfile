@@ -7,12 +7,7 @@ boolean pr = false
 
 pipeline {
 
-    agent {
-        dockerfile {
-            label "docker"
-            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-        }
-    }
+    agent none
 
     options {
         // General Jenkins job properties
@@ -26,6 +21,12 @@ pipeline {
     stages {
 
         stage('Setup') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 script {
                     branchName = ontrackBranchName(BRANCH_NAME)
@@ -52,6 +53,12 @@ pipeline {
         }
 
         stage('Build') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -115,6 +122,12 @@ cd ontrack-extension-test
         }
 
         stage('Local acceptance tests') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
@@ -159,6 +172,12 @@ docker-compose --project-name local down --volumes
 
         // Docker push
         stage('Docker publication') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             // when {
                 // FIXME branch 'release/*'
             // }
