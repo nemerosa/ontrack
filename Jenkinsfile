@@ -228,6 +228,9 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
+                    options {
+                        retry(3)
+                    }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
@@ -276,6 +279,9 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                             label "docker"
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
+                    }
+                    options {
+                        retry(3)
                     }
                     steps {
                         unstash name: "debian"
