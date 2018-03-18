@@ -242,7 +242,7 @@ cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 
 echo "Launching test environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack selenium
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
 
 echo "Launching Ontrack in CentOS environment..."
 CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
