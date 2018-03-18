@@ -232,17 +232,25 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
+#!/bin/bash
+set -e
+
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
 rm -f \${DOCKER_DIR}/*.rpm
 cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
-"""
-                            sh """\
-#!/bin/bash
-set -e
-echo "Launching tests..."
+
+echo "Launching test environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name centos --file docker-compose-centos-7.yml up --build --exit-code-from ontrack_acceptance
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack selenium
+
+echo "Launching Ontrack in CentOS environment..."
+CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
+echo "Launching tests..."
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
                     }
