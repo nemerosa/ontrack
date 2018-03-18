@@ -76,11 +76,6 @@ start() {
 
 }
 
-startAndWait() {
-    start
-    /bin/cat
-}
-
 stop() {
     echo -n "Stopping $PROJECT_NAME: "
 
@@ -112,9 +107,6 @@ status() {
 case "$1" in
     start)
         start
-        ;;
-    start-and-wait)
-        startAndWait
         ;;
     stop)
         stop
