@@ -94,6 +94,7 @@ class XMLRunListener extends RunListener {
 
     void render(File file) {
         // Output
+        file.parentFile.mkdirs()
         def writer = new FileWriter(file)
         def xml = new MarkupBuilder(writer)
         xml.testsuite(

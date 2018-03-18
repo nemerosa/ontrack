@@ -29,8 +29,8 @@ class ACCExtension extends AbstractACCDSL {
                 "test" == it.path("id").asText()
             }
             assert (extensionFeatureDescription != null)
-            assert "Test" == it.path("name").asText()
-            assert "Test extension" == it.path("description").asText()
+            assert "Test" == extensionFeatureDescription.path("name").asText()
+            assert "Test extension" == extensionFeatureDescription.path("description").asText()
         }
     }
 
