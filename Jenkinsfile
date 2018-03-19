@@ -476,12 +476,6 @@ docker-machine rm --force ${DROPLET_NAME}
         // Publication
 
         stage('Publication') {
-            agent {
-                dockerfile {
-                    label "docker"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
             when {
                 branch 'release/*'
             }
@@ -490,6 +484,12 @@ docker-machine rm --force ${DROPLET_NAME}
             }
             parallel {
                 stage('Docker push') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         DOCKER_HUB = credentials("DOCKER_HUB")
                     }
@@ -512,6 +512,12 @@ docker push nemerosa/ontrack:latest
                     }
                 }
                 stage('Maven publication') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_COMMIT = "${gitCommit}"
                         ONTRACK_BRANCH = "${branchName}"
