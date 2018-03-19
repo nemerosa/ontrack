@@ -476,6 +476,12 @@ docker-machine rm --force ${DROPLET_NAME}
         // Publication
 
         stage('Publication') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             when {
                 branch 'release/*'
             }
@@ -552,6 +558,12 @@ set -e
         // Release
 
         stage('Release') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 ONTRACK_COMMIT = "${gitCommit}"
@@ -608,6 +620,12 @@ set -e
         // Site
 
         stage('Site') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
