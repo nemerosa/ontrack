@@ -307,7 +307,6 @@ echo "... for container \${CONTAINER}"
 docker container exec \${CONTAINER} /etc/init.d/ontrack start
 
 echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
 docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
