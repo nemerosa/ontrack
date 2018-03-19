@@ -289,17 +289,26 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
+#!/bin/bash
+set -e
+
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
 rm -f \${DOCKER_DIR}/*.deb
 cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
-"""
-                            sh """\
-#!/bin/bash
-set -e
+
+echo "Launching test environment..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+
+echo "Launching Ontrack in Debian environment..."
+CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance
+docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
                     }
