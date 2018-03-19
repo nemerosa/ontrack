@@ -54,27 +54,27 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''\
-git checkout -B ${BRANCH_NAME}
-git clean -xfd
-'''
+                git checkout -B ${BRANCH_NAME}
+                git clean -xfd
+                '''.stripIndent()                
                 sh '''\
-./gradlew \\
-    clean \\
-    versionDisplay \\
-    versionFile \\
-    test \\
-    build \\
-    integrationTest \\
-    publishToMavenLocal \\
-    osPackages \\
-    dockerLatest \\
-    -Pdocumentation \\
-    -PbowerOptions='--allow-root' \\
-    -Dorg.gradle.jvmargs=-Xmx2048m \\
-    --stacktrace \\
-    --profile \\
-    --console plain
-'''
+                ./gradlew \\
+                    clean \\
+                    versionDisplay \\
+                    versionFile \\
+                    test \\
+                    build \\
+                    integrationTest \\
+                    publishToMavenLocal \\
+                    osPackages \\
+                    dockerLatest \\
+                    -Pdocumentation \\
+                    -PbowerOptions='--allow-root' \\
+                    -Dorg.gradle.jvmargs=-Xmx2048m \\
+                    --stacktrace \\
+                    --profile \\
+                    --console plain
+                '''.stripIndent()
                 script {
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
@@ -83,18 +83,18 @@ git clean -xfd
                 }
                 echo "Version = ${version}"
                 sh """\
-echo "(*) Building the test extension..."
-cd ontrack-extension-test
-./gradlew \\
-    clean \\
-    build \\
-    -PontrackVersion=${version} \\
-    -PbowerOptions='--allow-root' \\
-    -Dorg.gradle.jvmargs=-Xmx2048m \\
-    --stacktrace \\
-    --profile \\
-    --console plain
-"""
+                echo "(*) Building the test extension..."
+                cd ontrack-extension-test
+                ./gradlew \\
+                    clean \\
+                    build \\
+                    -PontrackVersion=${version} \\
+                    -PbowerOptions='--allow-root' \\
+                    -Dorg.gradle.jvmargs=-Xmx2048m \\
+                    --stacktrace \\
+                    --profile \\
+                    --console plain
+                """.stripIndent()
             }
             post {
                 success {
@@ -116,28 +116,28 @@ cd ontrack-extension-test
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
                     sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose up -d ontrack selenium
-"""
+                    echo "Launching environment..."
+                    cd ontrack-acceptance/src/main/compose
+                    docker-compose up -d ontrack selenium
+                    """.stripIndent()
                     sh """\
-echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose up ontrack_acceptance
-"""
+                    echo "Launching tests..."
+                    cd ontrack-acceptance/src/main/compose
+                    docker-compose up ontrack_acceptance
+                    """.stripIndent()
                 }
             }
             post {
                 always {
                     sh """\
-#!/bin/bash
-set -e
-echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-cd ontrack-acceptance/src/main/compose
-docker-compose down --volumes
-"""
+                    #!/bin/bash
+                    set -e
+                    echo "Cleanup..."
+                    mkdir -p build
+                    cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                    cd ontrack-acceptance/src/main/compose
+                    docker-compose down --volumes
+                    """.stripIndent()
                     archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
                     script {
@@ -173,13 +173,13 @@ docker-compose down --volumes
                 // }
                 script {
                     sh '''\
-#!/bin/bash
-set -e
-docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
-docker push nemerosa/ontrack:${ONTRACK_VERSION}
-docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
-docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
-'''
+                    #!/bin/bash
+                    set -e
+                    docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
+                    docker push nemerosa/ontrack:${ONTRACK_VERSION}
+                    docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
+                    docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
+                    '''.stripIndent()
                 }
             }
             post {
@@ -211,33 +211,33 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
-echo "Preparing environment..."
-DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-rm -f \${DOCKER_DIR}/*.rpm
-cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
+                            echo "Preparing environment..."
+                            DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+                            rm -f \${DOCKER_DIR}/*.rpm
+                            cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up -d ontrack selenium
-"""
+                            echo "Launching environment..."
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --file docker-compose-centos-7.yml up -d ontrack selenium
+                            """.stripIndent()
                             sh """\
-echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
-"""
+                            echo "Launching tests..."
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
+                            """.stripIndent()
                         }
                     }
                     post {
                         always {
                             sh """\
-#!/bin/bash
-set -e
-echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml down --volumes
-"""
+                            #!/bin/bash
+                            set -e
+                            echo "Cleanup..."
+                            mkdir -p build
+                            cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --file docker-compose-centos-7.yml down --volumes
+                            """.stripIndent()
                             archiveArtifacts 'build/acceptance/**'
                             junit 'build/acceptance/*.xml'
                             ontrackValidate(
@@ -256,33 +256,33 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
-echo "Preparing environment..."
-DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-rm -f \${DOCKER_DIR}/*.deb
-cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
+                            echo "Preparing environment..."
+                            DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
+                            rm -f \${DOCKER_DIR}/*.deb
+                            cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
 
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up -d ontrack selenium
-"""
-                            sh """\
-echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up ontrack_acceptance
-"""
+                            echo "Launching environment..."
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --file docker-compose-debian.yml up -d ontrack selenium
+                            """
+                                                        sh """\
+                            echo "Launching tests..."
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --file docker-compose-debian.yml up ontrack_acceptance
+                            """.stripIndent()
                         }
                     }
                     post {
                         always {
                             sh """\
-#!/bin/bash
-set -e
-echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml down --volumes
-"""
+                            #!/bin/bash
+                            set -e
+                            echo "Cleanup..."
+                            mkdir -p build
+                            cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --file docker-compose-debian.yml down --volumes
+                            """.stripIndent()
                             archiveArtifacts 'build/acceptance/**'
                             junit 'build/acceptance/*.xml'
                             ontrackValidate(
@@ -301,31 +301,31 @@ docker-compose --file docker-compose-debian.yml down --volumes
                         timeout(time: 25, unit: 'MINUTES') {
                             // Cleanup
                             sh """\
-rm -rf ontrack-acceptance/src/main/compose/build
-"""
+                            rm -rf ontrack-acceptance/src/main/compose/build
+                            """.stripIndent()
                             // Launches the extension environment
                             sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up -d ontrack selenium
-"""
+                            echo "Launching environment..."
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --project-name ext --file docker-compose-ext.yml up -d ontrack selenium
+                            """.stripIndent()
                             // Launches the tests
                             sh """\
-echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_acceptance
-"""
+                            echo "Launching tests..."
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_acceptance
+                            """.stripIndent()
                         }
                     }
                     post {
                         always {
                             sh """\
-echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
-"""
+                            echo "Cleanup..."
+                            mkdir -p build
+                            cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
+                            """.stripIndent()
                             archiveArtifacts 'build/acceptance/**'
                             junit 'build/acceptance/*.xml'
                             ontrackValidate(
@@ -348,75 +348,75 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                     steps {
                         timeout(time: 60, unit: 'MINUTES') {
                             sh '''\
-#!/bin/bash
+                            #!/bin/bash
 
-echo "(*) Cleanup..."
-rm -rf ontrack-acceptance/src/main/compose/build
+                            echo "(*) Cleanup..."
+                            rm -rf ontrack-acceptance/src/main/compose/build
 
-echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-docker-machine rm --force ${DROPLET_NAME} > /dev/null
+                            echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
+                            docker-machine rm --force ${DROPLET_NAME} > /dev/null
 
-# Failing on first error from now on
-set -e
+                            # Failing on first error from now on
+                            set -e
 
-echo "(*) Creating ${DROPLET_NAME} droplet..."
-docker-machine create \\
-    --driver=digitalocean \\
-    --digitalocean-access-token=${DO_TOKEN} \\
-    --digitalocean-image=docker \\
-    --digitalocean-region=fra1 \\
-    --digitalocean-size=1gb \\
-    --digitalocean-backups=false \\
-    ${DROPLET_NAME}
+                            echo "(*) Creating ${DROPLET_NAME} droplet..."
+                            docker-machine create \\
+                                --driver=digitalocean \\
+                                --digitalocean-access-token=${DO_TOKEN} \\
+                                --digitalocean-image=docker \\
+                                --digitalocean-region=fra1 \\
+                                --digitalocean-size=1gb \\
+                                --digitalocean-backups=false \\
+                                ${DROPLET_NAME}
 
-echo "(*) Gets ${DROPLET_NAME} droplet IP..."
-DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
-echo "Droplet IP = ${DROPLET_IP}"
+                            echo "(*) Gets ${DROPLET_NAME} droplet IP..."
+                            DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
+                            echo "Droplet IP = ${DROPLET_IP}"
 
-echo "(*) Target Ontrack application..."
-export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
+                            echo "(*) Target Ontrack application..."
+                            export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
 
-echo "(*) Launching the remote Ontrack ecosystem..."
-eval $(docker-machine env --shell bash ${DROPLET_NAME})
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
-    --project-name ontrack \\
-    up -d
+                            echo "(*) Launching the remote Ontrack ecosystem..."
+                            eval $(docker-machine env --shell bash ${DROPLET_NAME})
+                            docker-compose \\
+                                --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
+                                --project-name ontrack \\
+                                up -d
 
-echo "(*) Launching the test environment locally..."
-eval $(docker-machine env --shell bash --unset)
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    up -d selenium
+                            echo "(*) Launching the test environment locally..."
+                            eval $(docker-machine env --shell bash --unset)
+                            docker-compose \\
+                                --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
+                                --project-name acceptance \\
+                                up -d selenium
 
-echo "(*) Running the tests..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    up ontrack_acceptance
+                            echo "(*) Running the tests..."
+                            docker-compose \\
+                                --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
+                                --project-name acceptance \\
+                                up ontrack_acceptance
 
-'''
+                            '''.stripIndent()
                         }
                     }
                     post {
                         always {
                             sh '''\
-#!/bin/bash
+                            #!/bin/bash
 
-echo "(*) Copying the test results..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                            echo "(*) Copying the test results..."
+                            mkdir -p build
+                            cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 
-echo "(*) Removing the test environment..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    down
+                            echo "(*) Removing the test environment..."
+                            docker-compose \\
+                                --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
+                                --project-name acceptance \\
+                                down
 
-echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-docker-machine rm --force ${DROPLET_NAME}
-'''
+                            echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
+                            docker-machine rm --force ${DROPLET_NAME}
+                            '''.stripIndent()
                             archiveArtifacts 'build/acceptance/**'
                             junit 'build/acceptance/*.xml'
                             ontrackValidate(
@@ -449,19 +449,19 @@ docker-machine rm --force ${DROPLET_NAME}
                     steps {
                         echo "Docker push"
                         sh '''\
-#!/bin/bash
-set -e
+                        #!/bin/bash
+                        set -e
 
-docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
+                        docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 
-docker pull nemerosa/ontrack:${ONTRACK_VERSION}
+                        docker pull nemerosa/ontrack:${ONTRACK_VERSION}
 
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
+                        docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
+                        docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
 
-docker push nemerosa/ontrack:2
-docker push nemerosa/ontrack:latest
-'''
+                        docker push nemerosa/ontrack:2
+                        docker push nemerosa/ontrack:latest
+                        '''.stripIndent()
                     }
                 }
                 stage('Maven publication') {
@@ -477,32 +477,32 @@ docker push nemerosa/ontrack:latest
 
                         unstash name: "delivery"
                         sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
+                        #!/bin/bash
+                        set -e
+                        unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
+                        unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
+                        '''.stripIndent()
 
                         sh '''\
-#!/bin/bash
-set -e
+                        #!/bin/bash
+                        set -e
 
-./gradlew \\
-    --build-file publication.gradle \\
-    --info \\
-    --profile \\
-    --console plain \\
-    --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION} \\
-    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
-    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
-    -Psigning.keyId=${GPG_KEY_USR} \\
-    -Psigning.password=${GPG_KEY_PSW} \\
-    -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-    -PossrhUser=${OSSRH_USR} \\
-    -PossrhPassword=${OSSRH_PSW} \\
-    publicationMaven
-'''
+                        ./gradlew \\
+                            --build-file publication.gradle \\
+                            --info \\
+                            --profile \\
+                            --console plain \\
+                            --stacktrace \\
+                            -PontrackVersion=${ONTRACK_VERSION} \\
+                            -PontrackVersionCommit=${ONTRACK_COMMIT} \\
+                            -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
+                            -Psigning.keyId=${GPG_KEY_USR} \\
+                            -Psigning.password=${GPG_KEY_PSW} \\
+                            -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
+                            -PossrhUser=${OSSRH_USR} \\
+                            -PossrhPassword=${OSSRH_PSW} \\
+                            publicationMaven
+                        '''.stripIndent()
                     }
                 }
             }
@@ -527,29 +527,29 @@ set -e
                 unstash name: "rpm"
                 unstash name: "debian"
                 sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
+                #!/bin/bash
+                set -e
+                unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
+                unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
+                '''.stripIndent()
 
                 sh '''\
-#!/bin/bash
-set -e
+                #!/bin/bash
+                set -e
 
-./gradlew \\
-    --build-file publication.gradle \\
-    --info \\
-    --profile \\
-    --console plain \\
-    --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION} \\
-    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
-    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
-    -PgitHubUser=${GITHUB_USR} \\
-    -PgitHubPassword=${GITHUB_PSW} \\
-    publicationRelease
-'''
+                ./gradlew \\
+                    --build-file publication.gradle \\
+                    --info \\
+                    --profile \\
+                    --console plain \\
+                    --stacktrace \\
+                    -PontrackVersion=${ONTRACK_VERSION} \\
+                    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
+                    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
+                    -PgitHubUser=${GITHUB_USR} \\
+                    -PgitHubPassword=${GITHUB_PSW} \\
+                    publicationRelease
+                '''.stripIndent()
 
             }
             post {
@@ -579,31 +579,31 @@ set -e
 
                 unstash name: "delivery"
                 sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
+                #!/bin/bash
+                set -e
+                unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
+                unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
+                '''.stripIndent()
 
                 sh '''\
-#!/bin/bash
-set -e
+                #!/bin/bash
+                set -e
 
-GITHUB_URI=`git config remote.origin.url`
+                GITHUB_URI=`git config remote.origin.url`
 
-./gradlew \\
-    --build-file site.gradle \\
-    --info \\
-    --profile \\
-    --console plain \\
-    --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION} \\
-    -PontrackGitHubUri=${GITHUB_URI} \\
-    -PontrackGitHubPages=gh-pages \\
-    -PontrackGitHubUser=${GITHUB_USR} \\
-    -PontrackGitHubPassword=${GITHUB_PSW} \\
-    site
-'''
+                ./gradlew \\
+                    --build-file site.gradle \\
+                    --info \\
+                    --profile \\
+                    --console plain \\
+                    --stacktrace \\
+                    -PontrackVersion=${ONTRACK_VERSION} \\
+                    -PontrackGitHubUri=${GITHUB_URI} \\
+                    -PontrackGitHubPages=gh-pages \\
+                    -PontrackGitHubUser=${GITHUB_USR} \\
+                    -PontrackGitHubPassword=${GITHUB_PSW} \\
+                    site
+                '''.stripIndent()
 
             }
             post {
