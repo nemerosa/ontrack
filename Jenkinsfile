@@ -250,7 +250,7 @@ echo "... for container \${CONTAINER}"
 docker container exec \${CONTAINER} /etc/init.d/ontrack start
 
 echo "Launching tests..."
-docker-compose --project-name centos --file docker-compose-centos-7.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
                     }
