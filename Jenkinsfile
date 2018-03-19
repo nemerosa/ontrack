@@ -363,6 +363,7 @@ docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-f
                             sh """\
 echo "Cleanup..."
 mkdir -p build
+rm -rf build/extension
 cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
@@ -447,6 +448,7 @@ docker-compose \\
 
 echo "(*) Copying the test results..."
 mkdir -p build
+rm -rf build/do
 cp -r ontrack-acceptance/src/main/compose/build build/do
 
 echo "(*) Removing the test environment..."
