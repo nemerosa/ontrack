@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.acceptance.browser
 
 import com.google.common.base.Function
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig
+import net.nemerosa.ontrack.acceptance.support.AcceptanceRunContext
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
@@ -135,6 +136,11 @@ class Configuration {
                 screenshotIndex.incrementAndGet(),
                 name
         )
+        // Test context is available
+        AcceptanceRunContext context = AcceptanceRunContext.instance.get()
+        if (context != null) {
+            fullName = context.testDescription + "-" + fullName
+        }
         // Saves the screenshot in the target directory
         File targetFile = new File(screenshotDir, fullName)
         logger.info("[gui] Screenshot at {}", targetFile.getAbsolutePath())

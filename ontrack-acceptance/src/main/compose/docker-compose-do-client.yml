@@ -2,9 +2,9 @@ version: "2.1"
 
 services:
    selenium:
-      image: "selenium/standalone-chrome:3.8.1"
+      image: "selenium/standalone-chrome:3.11.0"
       environment:
-         JAVA_OPTS: "-Xmx2048m"
+         JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
       image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
@@ -17,5 +17,7 @@ services:
          ONTRACK_ACCEPTANCE_CONTEXT: "${ONTRACK_ACCEPTANCE_CONTEXT:-smoke}"
          # Injected by the CI/CD environment
          ONTRACK_ACCEPTANCE_TARGET_URL: "${ONTRACK_ACCEPTANCE_TARGET_URL}"
+         # Memory settings
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
       volumes:
          - "./build:/ontrack/acceptance/output:rw"

@@ -6,11 +6,11 @@ services:
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
-         JAVA_OPTIONS: "-Xmx2048m"
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
    selenium:
-      image: "selenium/standalone-chrome:3.8.1"
+      image: "selenium/standalone-chrome:3.11.0"
       environment:
-         JAVA_OPTS: "-Xmx2048m"
+         JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
       image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
@@ -21,6 +21,9 @@ services:
       environment:
          ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
          ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
+         ONTRACK_ACCEPTANCE_SELENIUM_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 30
          ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
       volumes:
          - "./build:/ontrack/acceptance/output:rw"

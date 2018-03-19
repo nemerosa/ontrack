@@ -63,12 +63,6 @@ task normaliseJar {
     }
 }
 
-task copyJarForDocker(type: Copy) {
-    dependsOn normaliseJar
-    from "${buildDir}/libs/ontrack-acceptance.jar"
-    into "${projectDir}/src/main/compose/docker"
-}
-
 task acceptanceDockerPrepareEnv(type: Copy) {
     dependsOn normaliseJar
     from "${buildDir}/libs/ontrack-acceptance.jar"
@@ -76,7 +70,6 @@ task acceptanceDockerPrepareEnv(type: Copy) {
 }
 
 assemble.dependsOn normaliseJar
-assemble.dependsOn copyJarForDocker
 
 task dockerBuild(type: Exec, dependsOn: acceptanceDockerPrepareEnv) {
     executable 'docker'

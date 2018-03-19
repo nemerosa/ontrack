@@ -7,12 +7,7 @@ boolean pr = false
 
 pipeline {
 
-    agent {
-        dockerfile {
-            label "docker"
-            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-        }
-    }
+    agent none
 
     options {
         // General Jenkins job properties
@@ -26,6 +21,12 @@ pipeline {
     stages {
 
         stage('Setup') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 script {
                     branchName = ontrackBranchName(BRANCH_NAME)
@@ -52,6 +53,12 @@ pipeline {
         }
 
         stage('Build') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -97,6 +104,9 @@ cd ontrack-extension-test
 """
             }
             post {
+                always {
+                    junit '**/build/test-results/**/*.xml'
+                }
                 success {
                     script {
                         if (!pr) {
@@ -112,18 +122,21 @@ cd ontrack-extension-test
         }
 
         stage('Local acceptance tests') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
                     sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose up -d ontrack selenium
-"""
-                    sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose up ontrack_acceptance
+docker-compose --project-name local up --exit-code-from ontrack_acceptance
 """
                 }
             }
@@ -136,7 +149,7 @@ echo "Cleanup..."
 mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
-docker-compose down --volumes
+docker-compose --project-name local down --volumes
 """
                     archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
@@ -159,18 +172,20 @@ docker-compose down --volumes
 
         // Docker push
         stage('Docker publication') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             when {
-                branch 'release/.*'
+                branch 'release/*'
             }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
                 ONTRACK_VERSION = "${version}"
             }
             steps {
-                // TODO Confirmation before going further (disabled for development)
-                // timeout(time: 1, unit: 'HOURS') {
-                //     input "Pushing version ${version} to the Docker Hub?"
-                // }
                 script {
                     sh '''\
 #!/bin/bash
@@ -207,23 +222,35 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             parallel {
                 // CentOS7
                 stage('CentOS7') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
+#!/bin/bash
+set -e
+
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
 rm -f \${DOCKER_DIR}/*.rpm
 cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 
-echo "Launching environment..."
+echo "Launching test environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up -d ontrack selenium
-"""
-                            sh """\
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+
+echo "Launching Ontrack in CentOS environment..."
+CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
 echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
                     }
@@ -234,12 +261,12 @@ docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
 set -e
 echo "Cleanup..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml down --volumes
+docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
 """
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/centos/**'
+                            junit 'build/centos/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -252,23 +279,35 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                 }
                 // Debian
                 stage('Debian') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
+#!/bin/bash
+set -e
+
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
 rm -f \${DOCKER_DIR}/*.deb
 cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
 
-echo "Launching environment..."
+echo "Launching test environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up -d ontrack selenium
-"""
-                            sh """\
+docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+
+echo "Launching Ontrack in Debian environment..."
+CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
 echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up ontrack_acceptance
+docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
                     }
@@ -278,13 +317,13 @@ docker-compose --file docker-compose-debian.yml up ontrack_acceptance
 #!/bin/bash
 set -e
 echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+mkdir -p build/debian
+cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml down --volumes
+docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/debian/**'
+                            junit 'build/debian/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -297,23 +336,25 @@ docker-compose --file docker-compose-debian.yml down --volumes
                 }
                 // Extension tests
                 stage('Local extension tests') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             // Cleanup
                             sh """\
 rm -rf ontrack-acceptance/src/main/compose/build
 """
-                            // Launches the extension environment
-                            sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up -d ontrack selenium
-"""
                             // Launches the tests
                             sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_acceptance
+docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -322,12 +363,12 @@ docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_accep
                             sh """\
 echo "Cleanup..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
 """
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/extension/**'
+                            junit 'build/extension/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -340,6 +381,12 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                 }
                 // Digital Ocean
                 stage('Digital Ocean') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_VERSION = "${version}"
                         DROPLET_NAME = "ontrack-acceptance-${version}"
@@ -383,18 +430,12 @@ docker-compose \\
     --project-name ontrack \\
     up -d
 
-echo "(*) Launching the test environment locally..."
+echo "(*) Running the tests..."
 eval $(docker-machine env --shell bash --unset)
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    up -d selenium
-
-echo "(*) Running the tests..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    up ontrack_acceptance
+    --project-name do \\
+    up --exit-code-from ontrack_acceptance
 
 '''
                         }
@@ -406,19 +447,19 @@ docker-compose \\
 
 echo "(*) Copying the test results..."
 mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+cp -r ontrack-acceptance/src/main/compose/build build/do
 
 echo "(*) Removing the test environment..."
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
+    --project-name do \\
     down
 
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
-                            archiveArtifacts 'build/acceptance/**'
-                            junit 'build/acceptance/*.xml'
+                            archiveArtifacts 'build/do/**'
+                            junit 'build/do/*.xml'
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
@@ -618,17 +659,7 @@ GITHUB_URI=`git config remote.origin.url`
                 }
             }
         }
-        // TODO Production
-        // TODO Ontrack promotion --> ONTRACK
-        // TODO Production tests
-        // TODO Ontrack validation --> ACCEPTANCE.PRODUCTION
 
-    }
-
-    post {
-        always {
-            junit '**/build/test-results/**/*.xml'
-        }
     }
 
 }
