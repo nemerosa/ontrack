@@ -178,9 +178,10 @@ docker-compose --project-name local down --volumes
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
-            when {
-                branch 'release/*'
-            }
+            // FIXME Restore release filtering
+//            when {
+//                branch 'release/*'
+//            }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
                 ONTRACK_VERSION = "${version}"
