@@ -7,12 +7,7 @@ boolean pr = false
 
 pipeline {
 
-    agent {
-        dockerfile {
-            label "docker"
-            args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
-        }
-    }
+    agent none
 
     options {
         // General Jenkins job properties
@@ -26,6 +21,12 @@ pipeline {
     stages {
 
         stage('Setup') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 script {
                     branchName = ontrackBranchName(BRANCH_NAME)
@@ -52,6 +53,12 @@ pipeline {
         }
 
         stage('Build') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -115,18 +122,21 @@ cd ontrack-extension-test
         }
 
         stage('Local acceptance tests') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
                     sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose up -d postgres ontrack selenium
-"""
-                    sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose up ontrack_acceptance
+docker-compose --project-name local up --exit-code-from ontrack_acceptance
 """
                 }
             }
@@ -139,7 +149,7 @@ echo "Cleanup..."
 mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
-docker-compose down --volumes
+docker-compose --project-name local down --volumes
 """
                     archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
@@ -162,10 +172,14 @@ docker-compose down --volumes
 
         // Docker push
         stage('Docker publication') {
-            when {
-                not {
-                    branch 'PR-*'
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
+            }
+            when {
+                branch 'release/*'
             }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
@@ -208,26 +222,35 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             parallel {
                 // CentOS7
                 stage('CentOS7') {
-                    options {
-                        retry(3)
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
                     }
                     steps {
                         unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
+#!/bin/bash
+set -e
+
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
 rm -f \${DOCKER_DIR}/*.rpm
 cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
 
-echo "Launching environment..."
+echo "Launching test environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up -d postgres ontrack selenium
-"""
-                            sh """\
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+
+echo "Launching Ontrack in CentOS environment..."
+CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
 echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml up ontrack_acceptance
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
                     }
@@ -240,7 +263,7 @@ echo "Cleanup..."
 mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-centos-7.yml down --volumes
+docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
 """
                             archiveArtifacts 'build/centos/**'
                             junit 'build/centos/*.xml'
@@ -256,26 +279,35 @@ docker-compose --file docker-compose-centos-7.yml down --volumes
                 }
                 // Debian
                 stage('Debian') {
-                    options {
-                        retry(3)
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
                     }
                     steps {
                         unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
+#!/bin/bash
+set -e
+
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
 rm -f \${DOCKER_DIR}/*.deb
 cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
 
-echo "Launching environment..."
+echo "Launching test environment..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up -d postgres ontrack selenium
-"""
-                            sh """\
+docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+
+echo "Launching Ontrack in Debian environment..."
+CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
 echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml up ontrack_acceptance
+docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
 """
                         }
                     }
@@ -285,10 +317,10 @@ docker-compose --file docker-compose-debian.yml up ontrack_acceptance
 #!/bin/bash
 set -e
 echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/debian
+mkdir -p build/debian
+cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
 cd ontrack-acceptance/src/main/compose
-docker-compose --file docker-compose-debian.yml down --volumes
+docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
                             archiveArtifacts 'build/debian/**'
                             junit 'build/debian/*.xml'
@@ -304,23 +336,25 @@ docker-compose --file docker-compose-debian.yml down --volumes
                 }
                 // Extension tests
                 stage('Local extension tests') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             // Cleanup
                             sh """\
 rm -rf ontrack-acceptance/src/main/compose/build
 """
-                            // Launches the extension environment
-                            sh """\
-echo "Launching environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up -d postgres ontrack selenium
-"""
                             // Launches the tests
                             sh """\
+#!/bin/bash
+set -e
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_acceptance
+docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
 """
                         }
                     }
@@ -329,6 +363,7 @@ docker-compose --project-name ext --file docker-compose-ext.yml up ontrack_accep
                             sh """\
 echo "Cleanup..."
 mkdir -p build
+rm -rf build/extension
 cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
@@ -347,6 +382,12 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                 }
                 // Digital Ocean
                 stage('Digital Ocean') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_VERSION = "${version}"
                         DROPLET_NAME = "ontrack-acceptance-${version}"
@@ -390,18 +431,12 @@ docker-compose \\
     --project-name ontrack \\
     up -d
 
-echo "(*) Launching the test environment locally..."
+echo "(*) Running the tests..."
 eval $(docker-machine env --shell bash --unset)
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    up -d selenium
-
-echo "(*) Running the tests..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
-    up ontrack_acceptance
+    --project-name do \\
+    up --exit-code-from ontrack_acceptance
 
 '''
                         }
@@ -413,12 +448,13 @@ docker-compose \\
 
 echo "(*) Copying the test results..."
 mkdir -p build
+rm -rf build/do
 cp -r ontrack-acceptance/src/main/compose/build build/do
 
 echo "(*) Removing the test environment..."
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name acceptance \\
+    --project-name do \\
     down
 
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
@@ -450,6 +486,12 @@ docker-machine rm --force ${DROPLET_NAME}
             }
             parallel {
                 stage('Docker push') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         DOCKER_HUB = credentials("DOCKER_HUB")
                     }
@@ -463,14 +505,21 @@ docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 
 docker pull nemerosa/ontrack:${ONTRACK_VERSION}
 
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:3
+docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
+docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
 
-docker push nemerosa/ontrack:3
+docker push nemerosa/ontrack:2
 docker push nemerosa/ontrack:latest
 '''
                     }
                 }
                 stage('Maven publication') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_COMMIT = "${gitCommit}"
                         ONTRACK_BRANCH = "${branchName}"
@@ -517,6 +566,12 @@ set -e
         // Release
 
         stage('Release') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 ONTRACK_COMMIT = "${gitCommit}"
@@ -573,6 +628,12 @@ set -e
         // Site
 
         stage('Site') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
@@ -620,106 +681,6 @@ GITHUB_URI=`git config remote.origin.url`
                             build: version,
                             validationStamp: 'SITE',
                             buildResult: currentBuild.result,
-                    )
-                }
-            }
-        }
-
-        // Production
-
-        stage('Production') {
-            when {
-                branch 'release/3*'
-            }
-            environment {
-                ONTRACK_VERSION = "${version}"
-                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
-            }
-            steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    script {
-                        sshagent(credentials: ['ONTRACK_SSH_KEY']) {
-                            sh '''\
-#!/bin/bash
-
-set -e
-
-SSH_OPTIONS=StrictHostKeyChecking=no
-
-SSH_HOST=ontrack.nemerosa.net
-
-scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
-ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
-
-'''
-                        }
-                    }
-                }
-            }
-        }
-
-        // Production tests
-
-        stage('Production tests') {
-            when {
-                branch 'release/3*'
-            }
-            environment {
-                ONTRACK_VERSION = "${version}"
-                ONTRACK_ACCEPTANCE_ADMIN = credentials("ONTRACK_ACCEPTANCE_ADMIN")
-            }
-            steps {
-                timeout(time: 30, unit: 'MINUTES') {
-                    sh '''\
-#!/bin/bash
-set -e
-
-echo "(*) Launching the test environment locally..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-    --project-name production \\
-    up -d selenium
-
-echo "(*) Running the tests..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-    --project-name production \\
-    up ontrack_acceptance
-'''
-                }
-            }
-            post {
-                always {
-                    sh '''\
-#!/bin/bash
-
-echo "(*) Copying the test results..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/production
-
-echo "(*) Removing the test environment..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-    --project-name production \\
-    down
-
-'''
-                    archiveArtifacts 'build/production/**'
-                    junit 'build/production/*.xml'
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ONTRACK.SMOKE',
-                            buildResult: currentBuild.result,
-                    )
-                }
-                success {
-                    ontrackPromote(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            promotionLevel: 'ONTRACK',
                     )
                 }
             }

@@ -10,8 +10,6 @@ import org.junit.runner.notification.RunListener
 class XMLRunListener extends RunListener {
 
     private final PrintStream stream
-    private long runStart;
-    private long runEnd;
 
     private Map<Description, TestRun> runs = [:]
 
@@ -50,12 +48,10 @@ class XMLRunListener extends RunListener {
     @Override
     void testRunStarted(Description description) throws Exception {
         trace "Starting tests in ${description.className}..."
-        runStart = System.currentTimeMillis()
     }
 
     @Override
     void testRunFinished(Result result) throws Exception {
-        runEnd = System.currentTimeMillis()
         if (result.wasSuccessful()) {
             trace ''
             trace "Tests OK (${result.runCount} test${result.runCount > 1 ? 's' : ''})"
@@ -98,6 +94,7 @@ class XMLRunListener extends RunListener {
 
     void render(File file) {
         // Output
+        file.parentFile.mkdirs()
         def writer = new FileWriter(file)
         def xml = new MarkupBuilder(writer)
         xml.testsuite(
@@ -105,7 +102,7 @@ class XMLRunListener extends RunListener {
                 skipped: runs.values().count { it.ignored },
                 failures: runs.values().count { it.failure },
                 errors: runs.values().count { it.error },
-                time: (runEnd - runStart) / 1000
+                time: (runs.values().sum { it.time }) / 1000
         ) {
             runs.values().each { run ->
                 testcase(

@@ -2,20 +2,23 @@ version: "2.1"
 
 services:
    selenium:
-      image: "selenium/standalone-chrome:3.8.1"
+      image: "selenium/standalone-chrome:3.11.0"
       environment:
-         JAVA_OPTS: "-Xmx2048m"
+         JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
       image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
          selenium:
             condition: service_started
       environment:
+         ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 30
          ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
          ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
          # By default in "smoke" mode, can be injected by the CI/CD environment
          ONTRACK_ACCEPTANCE_CONTEXT: "${ONTRACK_ACCEPTANCE_CONTEXT:-smoke}"
          # Injected by the CI/CD environment
          ONTRACK_ACCEPTANCE_TARGET_URL: "${ONTRACK_ACCEPTANCE_TARGET_URL}"
+         # Memory settings
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
       volumes:
          - "./build:/ontrack/acceptance/output:rw"
