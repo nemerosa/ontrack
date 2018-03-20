@@ -363,6 +363,7 @@ docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-f
                             sh """\
 echo "Cleanup..."
 mkdir -p build
+rm -rf build/extension
 cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
@@ -447,6 +448,7 @@ docker-compose \\
 
 echo "(*) Copying the test results..."
 mkdir -p build
+rm -rf build/do
 cp -r ontrack-acceptance/src/main/compose/build build/do
 
 echo "(*) Removing the test environment..."
@@ -484,6 +486,12 @@ docker-machine rm --force ${DROPLET_NAME}
             }
             parallel {
                 stage('Docker push') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         DOCKER_HUB = credentials("DOCKER_HUB")
                     }
@@ -506,6 +514,12 @@ docker push nemerosa/ontrack:latest
                     }
                 }
                 stage('Maven publication') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
                     environment {
                         ONTRACK_COMMIT = "${gitCommit}"
                         ONTRACK_BRANCH = "${branchName}"
@@ -552,6 +566,12 @@ set -e
         // Release
 
         stage('Release') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 ONTRACK_COMMIT = "${gitCommit}"
@@ -608,6 +628,12 @@ set -e
         // Site
 
         stage('Site') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
