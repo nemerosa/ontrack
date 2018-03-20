@@ -216,9 +216,10 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             environment {
                 ONTRACK_VERSION = "${version}"
             }
-            when {
-                branch 'release/*'
-            }
+            // FIXME Restore release filtering
+//            when {
+//                branch 'release/*'
+//            }
             parallel {
                 // CentOS7
                 stage('CentOS7') {
