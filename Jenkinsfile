@@ -178,10 +178,9 @@ docker-compose --project-name local down --volumes
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
-            // FIXME Restore release filtering
-//            when {
-//                branch 'release/*'
-//            }
+            when {
+                branch 'release/*'
+            }
             environment {
                 DOCKER_HUB = credentials("DOCKER_HUB")
                 ONTRACK_VERSION = "${version}"
@@ -217,10 +216,9 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
             environment {
                 ONTRACK_VERSION = "${version}"
             }
-            // FIXME Restore release filtering
-//            when {
-//                branch 'release/*'
-//            }
+            when {
+                branch 'release/*'
+            }
             parallel {
                 // CentOS7
                 stage('CentOS7') {
