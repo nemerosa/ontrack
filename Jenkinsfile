@@ -56,7 +56,7 @@ pipeline {
             agent {
                 dockerfile {
                     label "docker"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
                 }
             }
             steps {
