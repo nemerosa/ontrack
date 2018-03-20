@@ -689,6 +689,12 @@ GITHUB_URI=`git config remote.origin.url`
         // Production
 
         stage('Production') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             when {
                 branch 'release/3*'
             }
@@ -722,6 +728,12 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
         // Production tests
 
         stage('Production tests') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             when {
                 branch 'release/3*'
             }
