@@ -735,17 +735,11 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
 #!/bin/bash
 set -e
 
-echo "(*) Launching the test environment locally..."
+echo "(*) Launching the tests..."
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
     --project-name production \\
-    up -d selenium
-
-echo "(*) Running the tests..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-    --project-name production \\
-    up ontrack_acceptance
+    up --exit-code-from ontrack_acceptance
 '''
                 }
             }
