@@ -31,27 +31,9 @@ node {
 
 npmInstall {
     nodeModulesCacheDir = "${rootDir}/.gradle/node_modules_cache"
+    inputs.files file('package.json')
+    outputs.dir file('node_modules')
 }
-
-// Environment
-
-//ext {
-//    cacheDir = gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
-//}
-//
-//task npmCacheConfig(type: NpmTask) {
-//    description = "Configure the NPM cache"
-//    def npmCacheDir = "${cacheDir}/caches/npm"
-//    outputs.files file(npmCacheDir)
-//    args = [ 'config', 'set', 'cache', npmCacheDir ]
-//}
-//
-//task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
-//    description = "Install Node.js packages"
-//    args = [ 'install' ]
-//    inputs.files file('package.json')
-//    outputs.files file('node_modules')
-//}
 
 // Installing the Bower packages
 
@@ -66,7 +48,7 @@ task bowerInstall(type: ExecuteNodeScriptTask, dependsOn: npmInstall) {
     }
     args = bowerArgs
     inputs.files file('bower.json')
-    outputs.files file('vendor')
+    outputs.dir file('vendor')
 }
 
 //// Cleanup
