@@ -15,8 +15,8 @@ apply plugin: 'com.moowork.node'
 // Node environment
 
 node {
-    version = '4.2.2'
-    npmVersion = '4.2.2'
+    version = '8.10.0'
+    npmVersion = '5.7.1'
     download = true
 }
 
