@@ -56,11 +56,11 @@ task bowerInstall(type: ExecuteNodeScriptTask, dependsOn: npmInstall) {
 clean.delete << file('build/web')
 
 // Web packaging
-//
-//task dev(type: NodeTask, dependsOn: bowerInstall) {
-//    script = file('node_modules/gulp/bin/gulp')
-//    args = ['dev']
-//}
+
+task dev(type: ExecuteNodeScriptTask, dependsOn: bowerInstall) {
+    scriptFile = file('node_modules/gulp/bin/gulp')
+    args = ['dev']
+}
 
 task prod(type: ExecuteNodeScriptTask, dependsOn: bowerInstall) {
     scriptFile = file('node_modules/gulp/bin/gulp')
@@ -75,7 +75,7 @@ task prod(type: ExecuteNodeScriptTask, dependsOn: bowerInstall) {
 
 build.dependsOn prod
 
-//task watch(type: NodeTask, dependsOn: dev) {
-//    script = file('node_modules/gulp/bin/gulp')
-//    args = ['watch']
-//}
+task watch(type: ExecuteNodeScriptTask, dependsOn: dev) {
+    scriptFile = file('node_modules/gulp/bin/gulp')
+    args = ['watch']
+}
