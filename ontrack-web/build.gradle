@@ -51,30 +51,30 @@ task bowerInstall(type: ExecuteNodeScriptTask, dependsOn: npmInstall) {
     outputs.dir file('vendor')
 }
 
-//// Cleanup
-//
-//clean.delete << file('build/web')
-//
-//// Web packaging
+// Cleanup
+
+clean.delete << file('build/web')
+
+// Web packaging
 //
 //task dev(type: NodeTask, dependsOn: bowerInstall) {
 //    script = file('node_modules/gulp/bin/gulp')
 //    args = ['dev']
 //}
-//
-//task prod(type: NodeTask, dependsOn: bowerInstall) {
-//    script = file('node_modules/gulp/bin/gulp')
-//    args = ['default', '--version', versioning.info.display]
-//    inputs.dir file('src')
-//    inputs.file file('bower.json')
-//    inputs.file file('gulpfile.js')
-//    inputs.file file('package.json')
-//    ext.outputDir = file('build/web/prod')
-//    outputs.dir outputDir
-//}
-//
-//build.dependsOn prod
-//
+
+task prod(type: ExecuteNodeScriptTask, dependsOn: bowerInstall) {
+    scriptFile = file('node_modules/gulp/bin/gulp')
+    args = ['default', '--version', versioning.info.display]
+    inputs.dir file('src')
+    inputs.file file('bower.json')
+    inputs.file file('gulpfile.js')
+    inputs.file file('package.json')
+    ext.outputDir = file('build/web/prod')
+    outputs.dir outputDir
+}
+
+build.dependsOn prod
+
 //task watch(type: NodeTask, dependsOn: dev) {
 //    script = file('node_modules/gulp/bin/gulp')
 //    args = ['watch']
