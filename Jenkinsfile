@@ -77,7 +77,6 @@ git clean -xfd
     dockerLatest \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
-    -Pnode.gradle.cache=${WORKSPACE}/.gradle/node \\
     -Dorg.gradle.jvmargs=-Xmx2048m \\
     --stacktrace \\
     --profile \\
