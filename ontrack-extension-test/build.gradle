@@ -3,6 +3,9 @@ buildscript {
         mavenLocal() // Important: used for testing
         mavenCentral()
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
