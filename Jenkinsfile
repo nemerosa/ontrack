@@ -80,6 +80,7 @@ git clean -xfd
     -Dorg.gradle.jvmargs=-Xmx2048m \\
     --stacktrace \\
     --profile \\
+    --parallel \\
     --console plain
 '''
                 script {
