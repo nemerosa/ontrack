@@ -34,7 +34,11 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          */
 
         project.ext {
-            cacheDir = project.gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
+            if (project.hasProperty('node.gradle.cache')) {
+                cacheDir = project.properties['node.gradle.cache']
+            } else {
+                cacheDir = project.gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
+            }
             npmCacheDir = "${cacheDir}/caches/npm"
             ontrackCacheDir = "${cacheDir}/caches/ontrack/extension"
         }
