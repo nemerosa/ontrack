@@ -3,6 +3,9 @@ String gitCommit = ''
 String branchName = ''
 String projectName = 'ontrack'
 
+String dockerRegistry = "docker.nemerosa.net"
+String dockerRegistryCredentials = "docker.nemerosa.net"
+
 boolean pr = false
 
 pipeline {
@@ -59,6 +62,9 @@ pipeline {
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
+            environment {
+                DOCKER_REGISTRY_CREDENTIALS = credentials(dockerRegistryCredentials)
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -102,6 +108,18 @@ cd ontrack-extension-test
     --stacktrace \\
     --profile \\
     --console plain
+"""
+                echo "Pushing image to registry..."
+                sh """\
+docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+
+docker tag nemerosa/ontrack:${version} ${dockerRegistry}/nemerosa/ontrack:${version} 
+docker tag nemerosa/ontrack-acceptance:${version} ${dockerRegistry}/nemerosa/ontrack-acceptance:${version}
+docker tag nemerosa/ontrack-extension-test:${version} ${dockerRegistry}/nemerosa/ontrack-extension-test:${version}
+
+docker push ${dockerRegistry}/nemerosa/ontrack:${version} 
+docker push ${dockerRegistry}/nemerosa/ontrack-acceptance:${version}
+docker push ${dockerRegistry}/nemerosa/ontrack-extension-test:${version}
 """
             }
             post {
@@ -170,46 +188,6 @@ docker-compose --project-name local down --volumes
         }
 
         // We stop here for pull requests and feature branches
-
-        // Docker push
-        stage('Docker publication') {
-            agent {
-                dockerfile {
-                    label "docker"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
-            when {
-                branch 'release/*'
-            }
-            environment {
-                DOCKER_HUB = credentials("DOCKER_HUB")
-                ONTRACK_VERSION = "${version}"
-            }
-            steps {
-                script {
-                    sh '''\
-#!/bin/bash
-set -e
-docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
-docker push nemerosa/ontrack:${ONTRACK_VERSION}
-docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
-docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
-'''
-                }
-            }
-            post {
-                always {
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'DOCKER',
-                            buildResult: currentBuild.result,
-                    )
-                }
-            }
-        }
 
         // OS tests + DO tests in parallel
 

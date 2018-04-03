@@ -2,17 +2,17 @@ version: "2.1"
 
 services:
    ontrack:
-      image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+      image: "docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
          JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
    selenium:
-      image: "selenium/standalone-chrome:3.11.0"
+      image: "docker.nemerosa.net/selenium/standalone-chrome:3.11.0"
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
-      image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      image: "docker.nemerosa.net/nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
          ontrack:
             condition: service_healthy
