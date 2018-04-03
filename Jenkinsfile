@@ -3,9 +3,6 @@ String gitCommit = ''
 String branchName = ''
 String projectName = 'ontrack'
 
-String dockerRegistry = "docker.nemerosa.net"
-String dockerRegistryCredentials = "DOCKER_NEMEROSA"
-
 boolean pr = false
 
 pipeline {
@@ -63,7 +60,7 @@ pipeline {
                 }
             }
             environment {
-                DOCKER_REGISTRY_CREDENTIALS = credentials(dockerRegistryCredentials)
+                DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
             }
             steps {
                 sh '''\
@@ -113,13 +110,13 @@ cd ontrack-extension-test
                 sh """\
 docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
 
-docker tag nemerosa/ontrack:${version} ${dockerRegistry}/nemerosa/ontrack:${version} 
-docker tag nemerosa/ontrack-acceptance:${version} ${dockerRegistry}/nemerosa/ontrack-acceptance:${version}
-docker tag nemerosa/ontrack-extension-test:${version} ${dockerRegistry}/nemerosa/ontrack-extension-test:${version}
+docker tag nemerosa/ontrack:${version} docker.nemerosa.net/nemerosa/ontrack:${version} 
+docker tag nemerosa/ontrack-acceptance:${version} docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
+docker tag nemerosa/ontrack-extension-test:${version} docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
 
-docker push ${dockerRegistry}/nemerosa/ontrack:${version} 
-docker push ${dockerRegistry}/nemerosa/ontrack-acceptance:${version}
-docker push ${dockerRegistry}/nemerosa/ontrack-extension-test:${version}
+docker push docker.nemerosa.net/nemerosa/ontrack:${version} 
+docker push docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
+docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
 """
             }
             post {
