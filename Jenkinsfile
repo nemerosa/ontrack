@@ -4,7 +4,7 @@ String branchName = ''
 String projectName = 'ontrack'
 
 String dockerRegistry = "docker.nemerosa.net"
-String dockerRegistryCredentials = "docker.nemerosa.net"
+String dockerRegistryCredentials = "DOCKER_NEMEROSA"
 
 boolean pr = false
 
