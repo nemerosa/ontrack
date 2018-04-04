@@ -18,6 +18,10 @@ pipeline {
         durabilityHint('PERFORMANCE_OPTIMIZED')
     }
 
+    environment {
+        DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
+    }
+
     stages {
 
         stage('Setup') {
@@ -58,9 +62,6 @@ pipeline {
                     label "docker"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
-            }
-            environment {
-                DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
             }
             steps {
                 sh '''\
@@ -150,6 +151,9 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
                     sh """\
 #!/bin/bash
 set -e
+
+docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name local up --exit-code-from ontrack_acceptance
