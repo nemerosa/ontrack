@@ -145,6 +145,9 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
+            environment {
+                ONTRACK_VERSION = "${version}"
+            }
             steps {
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
