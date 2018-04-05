@@ -199,9 +199,9 @@ docker-compose --project-name local down --volumes
             environment {
                 ONTRACK_VERSION = "${version}"
             }
-            when {
-                branch 'release/*'
-            }
+            // FIXME when {
+            // FIXME     branch 'release/*'
+            // FIXME }
             parallel {
                 // CentOS7
                 stage('CentOS7') {
@@ -217,6 +217,8 @@ docker-compose --project-name local down --volumes
                             sh """\
 #!/bin/bash
 set -e
+
+docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
 
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
@@ -274,6 +276,8 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                             sh """\
 #!/bin/bash
 set -e
+
+docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
 
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
@@ -335,6 +339,9 @@ rm -rf ontrack-acceptance/src/main/compose/build
                             sh """\
 #!/bin/bash
 set -e
+
+docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
