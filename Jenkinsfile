@@ -379,7 +379,6 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                         }
                     }
                     environment {
-                        ONTRACK_VERSION = "${version}"
                         DROPLET_NAME = "ontrack-acceptance-${version}"
                         DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
                     }
