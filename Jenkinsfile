@@ -416,6 +416,7 @@ export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
 
 echo "(*) Launching the remote Ontrack ecosystem..."
 eval $(docker-machine env --shell bash ${DROPLET_NAME})
+docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password ${DOCKER_REGISTRY_CREDENTIALS_PSW}
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
     --project-name ontrack \\
@@ -423,6 +424,7 @@ docker-compose \\
 
 echo "(*) Running the tests..."
 eval $(docker-machine env --shell bash --unset)
+docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password ${DOCKER_REGISTRY_CREDENTIALS_PSW}
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name do \\
