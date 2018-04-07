@@ -109,7 +109,7 @@ cd ontrack-extension-test
 """
                 echo "Pushing image to registry..."
                 sh """\
-docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
 docker tag nemerosa/ontrack:${version} docker.nemerosa.net/nemerosa/ontrack:${version} 
 docker tag nemerosa/ontrack-acceptance:${version} docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
@@ -155,7 +155,7 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
 #!/bin/bash
 set -e
 
-docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
@@ -218,7 +218,7 @@ docker-compose --project-name local down --volumes
 #!/bin/bash
 set -e
 
-docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
@@ -277,7 +277,7 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
 #!/bin/bash
 set -e
 
-docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
@@ -340,7 +340,7 @@ rm -rf ontrack-acceptance/src/main/compose/build
 #!/bin/bash
 set -e
 
-docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password \${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
@@ -415,7 +415,7 @@ export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
 
 echo "(*) Launching the remote Ontrack ecosystem..."
 eval $(docker-machine env --shell bash ${DROPLET_NAME})
-docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password ${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
     --project-name ontrack \\
@@ -423,7 +423,7 @@ docker-compose \\
 
 echo "(*) Running the tests..."
 eval $(docker-machine env --shell bash --unset)
-docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password ${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name do \\
@@ -494,12 +494,12 @@ set -e
 
 echo "Making sure the images are available on this node..."
 
-docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password ${DOCKER_REGISTRY_CREDENTIALS_PSW}
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
 
 echo "Publishing in Docker Hub..."
 
-docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
+echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
 
 docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION}
 docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
