@@ -476,7 +476,7 @@ docker-machine rm --force ${DROPLET_NAME}
                 ONTRACK_VERSION = "${version}"
             }
             parallel {
-                stage('Docker push') {
+                stage('Docker Hub') {
                     agent {
                         dockerfile {
                             label "docker"
@@ -492,15 +492,22 @@ docker-machine rm --force ${DROPLET_NAME}
 #!/bin/bash
 set -e
 
+echo "Making sure the images are available on this node..."
+
+docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password ${DOCKER_REGISTRY_CREDENTIALS_PSW}
+docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
+
+echo "Publishing in Docker Hub..."
+
 docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 
-docker pull nemerosa/ontrack:${ONTRACK_VERSION}
+docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION}
+docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
+docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
 
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
-
-docker push nemerosa/ontrack:2
-docker push nemerosa/ontrack:latest
+docker image push nemerosa/ontrack:${ONTRACK_VERSION}
+docker image push nemerosa/ontrack:2
+docker image push nemerosa/ontrack:latest
 '''
                     }
                 }
