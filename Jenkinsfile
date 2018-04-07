@@ -505,11 +505,9 @@ docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
 
 docker pull nemerosa/ontrack:${ONTRACK_VERSION}
 
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
+docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:3
 
-docker push nemerosa/ontrack:2
-docker push nemerosa/ontrack:latest
+docker push nemerosa/ontrack:3
 '''
                     }
                 }
