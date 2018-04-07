@@ -11,7 +11,7 @@ services:
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
-      image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      image: "docker.nemerosa.net/nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
          ontrack:
             condition: service_started

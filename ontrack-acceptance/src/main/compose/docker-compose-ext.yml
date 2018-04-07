@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
    ontrack:
-      image: "nemerosa/ontrack-extension-test:${ONTRACK_VERSION}"
+      image: "docker.nemerosa.net/nemerosa/ontrack-extension-test:${ONTRACK_VERSION}"
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
@@ -12,7 +12,7 @@ services:
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
-      image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      image: "docker.nemerosa.net/nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
          ontrack:
             condition: service_healthy
