@@ -199,9 +199,9 @@ docker-compose --project-name local down --volumes
             environment {
                 ONTRACK_VERSION = "${version}"
             }
-            // FIXME when {
-            // FIXME     branch 'release/*'
-            // FIXME }
+            when {
+                branch 'release/*'
+            }
             parallel {
                 // CentOS7
                 stage('CentOS7') {
