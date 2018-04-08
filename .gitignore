@@ -20,3 +20,8 @@ build
 /migration
 out/
 /delivery
+
+# Extension web files
+ontrack-extension-*/package*.json
+ontrack-extension-*/gulpfile.js
+ontrack-extension-*/node_modules

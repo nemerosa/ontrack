@@ -1,57 +1,54 @@
 buildscript {
     repositories {
-        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
-        classpath 'com.moowork.gradle:gradle-node-plugin:0.11'
+        classpath 'gradle.plugin.com.liferay:gradle-plugins-node:4.3.0'
     }
 }
 
 // Plug-ins
 
 apply plugin: 'base'
-apply plugin: 'com.moowork.node'
+apply plugin: 'com.liferay.node'
+
+// Imports
+
+import com.liferay.gradle.plugins.node.tasks.ExecuteNodeScriptTask
 
 // Node environment
 
 node {
-    version = '4.2.2'
-    npmVersion = '4.2.2'
+    global = true
+    nodeVersion = '8.10.0'
+    npmVersion = '5.7.1'
     download = true
 }
 
-// Environment
+// NPM cache
 
-ext {
-    cacheDir = gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
-}
-
-task npmCacheConfig(type: NpmTask) {
-    description = "Configure the NPM cache"
-    def npmCacheDir = "${cacheDir}/caches/npm"
-    outputs.files file(npmCacheDir)
-    args = [ 'config', 'set', 'cache', npmCacheDir ]
-}
-
-task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
-    description = "Install Node.js packages"
-    args = [ 'install' ]
+npmInstall {
+    nodeModulesCacheDir = "${rootDir}/.gradle/node_modules_cache"
     inputs.files file('package.json')
-    outputs.files file('node_modules')
+    outputs.dir file('node_modules')
 }
 
-task bowerInstall(type: NodeTask, dependsOn: npmPackages) {
-    script = file('node_modules/bower/bin/bower')
-    def bowerArgs = ["--config.storage.cache=${cacheDir}/caches/bower/cache",
-                     "--config.storage.packages=${cacheDir}/caches/bower/packages",
-                     "--config.storage.registry=${cacheDir}/caches/bower/registry",
+// Installing the Bower packages
+
+task bowerInstall(type: ExecuteNodeScriptTask, dependsOn: npmInstall) {
+    scriptFile = file('node_modules/bower/bin/bower')
+    def bowerArgs = ["--config.storage.cache=${rootDir}/.gradle/bower/cache",
+                     "--config.storage.packages=${rootDir}/.gradle/bower/packages",
+                     "--config.storage.registry=${rootDir}/.gradle/bower/registry",
                      'install']
     if (project.properties.bowerOptions) {
         bowerArgs.add(project.properties.bowerOptions as String)
     }
     args = bowerArgs
     inputs.files file('bower.json')
-    outputs.files file('vendor')
+    outputs.dir file('vendor')
 }
 
 // Cleanup
@@ -60,13 +57,13 @@ clean.delete << file('build/web')
 
 // Web packaging
 
-task dev(type: NodeTask, dependsOn: bowerInstall) {
-    script = file('node_modules/gulp/bin/gulp')
+task dev(type: ExecuteNodeScriptTask, dependsOn: bowerInstall) {
+    scriptFile = file('node_modules/gulp/bin/gulp')
     args = ['dev']
 }
 
-task prod(type: NodeTask, dependsOn: bowerInstall) {
-    script = file('node_modules/gulp/bin/gulp')
+task prod(type: ExecuteNodeScriptTask, dependsOn: bowerInstall) {
+    scriptFile = file('node_modules/gulp/bin/gulp')
     args = ['default', '--version', versioning.info.display]
     inputs.dir file('src')
     inputs.file file('bower.json')
@@ -78,7 +75,7 @@ task prod(type: NodeTask, dependsOn: bowerInstall) {
 
 build.dependsOn prod
 
-task watch(type: NodeTask, dependsOn: dev) {
-    script = file('node_modules/gulp/bin/gulp')
+task watch(type: ExecuteNodeScriptTask, dependsOn: dev) {
+    scriptFile = file('node_modules/gulp/bin/gulp')
     args = ['watch']
 }
