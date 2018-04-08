@@ -7,7 +7,7 @@
  * from the Versioning plugin for the feature branches for example.
  */
 def packageVersion
-if (versioning.info.display ==~ /\d+\.\d\.\d+/) {
+if (versioning.info.display ==~ /\d+\.\d+\.\d+/) {
     packageVersion = versioning.info.display.replaceAll(/[^0-9\.-_]/, '')
 } else {
     packageVersion = '0.0.0'
