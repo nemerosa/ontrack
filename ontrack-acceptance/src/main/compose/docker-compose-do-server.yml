@@ -31,7 +31,7 @@ services:
 
   # Ontrack container
   ontrack:
-    image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+    image: "docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
     environment:
        PROFILE: acceptance
        ONTRACK_CONFIG_CONFIGURATION_TEST: "false"

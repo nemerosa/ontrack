@@ -18,6 +18,10 @@ pipeline {
         durabilityHint('PERFORMANCE_OPTIMIZED')
     }
 
+    environment {
+        DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
+    }
+
     stages {
 
         stage('Setup') {
@@ -80,6 +84,7 @@ git clean -xfd
     -Dorg.gradle.jvmargs=-Xmx2048m \\
     --stacktrace \\
     --profile \\
+    --parallel \\
     --console plain
 '''
                 script {
@@ -101,6 +106,18 @@ cd ontrack-extension-test
     --stacktrace \\
     --profile \\
     --console plain
+"""
+                echo "Pushing image to registry..."
+                sh """\
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
+docker tag nemerosa/ontrack:${version} docker.nemerosa.net/nemerosa/ontrack:${version} 
+docker tag nemerosa/ontrack-acceptance:${version} docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
+docker tag nemerosa/ontrack-extension-test:${version} docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
+
+docker push docker.nemerosa.net/nemerosa/ontrack:${version} 
+docker push docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
+docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
 """
             }
             post {
@@ -128,12 +145,18 @@ cd ontrack-extension-test
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
+            environment {
+                ONTRACK_VERSION = "${version}"
+            }
             steps {
                 // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
                     sh """\
 #!/bin/bash
 set -e
+
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name local up --exit-code-from ontrack_acceptance
@@ -168,47 +191,7 @@ docker-compose --project-name local down --volumes
             }
         }
 
-        // We stop here for pull requests
-
-        // Docker push
-        stage('Docker publication') {
-            agent {
-                dockerfile {
-                    label "docker"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
-            when {
-                branch 'release/*'
-            }
-            environment {
-                DOCKER_HUB = credentials("DOCKER_HUB")
-                ONTRACK_VERSION = "${version}"
-            }
-            steps {
-                script {
-                    sh '''\
-#!/bin/bash
-set -e
-docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
-docker push nemerosa/ontrack:${ONTRACK_VERSION}
-docker push nemerosa/ontrack-acceptance:${ONTRACK_VERSION}
-docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
-'''
-                }
-            }
-            post {
-                always {
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'DOCKER',
-                            buildResult: currentBuild.result,
-                    )
-                }
-            }
-        }
+        // We stop here for pull requests and feature branches
 
         // OS tests + DO tests in parallel
 
@@ -234,6 +217,8 @@ docker push nemerosa/ontrack-extension-test:${ONTRACK_VERSION}
                             sh """\
 #!/bin/bash
 set -e
+
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
@@ -291,6 +276,8 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                             sh """\
 #!/bin/bash
 set -e
+
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
 echo "Preparing environment..."
 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
@@ -352,6 +339,9 @@ rm -rf ontrack-acceptance/src/main/compose/build
                             sh """\
 #!/bin/bash
 set -e
+
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
@@ -389,7 +379,6 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                         }
                     }
                     environment {
-                        ONTRACK_VERSION = "${version}"
                         DROPLET_NAME = "ontrack-acceptance-${version}"
                         DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
                     }
@@ -426,6 +415,7 @@ export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
 
 echo "(*) Launching the remote Ontrack ecosystem..."
 eval $(docker-machine env --shell bash ${DROPLET_NAME})
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
     --project-name ontrack \\
@@ -433,6 +423,7 @@ docker-compose \\
 
 echo "(*) Running the tests..."
 eval $(docker-machine env --shell bash --unset)
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
     --project-name do \\
@@ -485,7 +476,7 @@ docker-machine rm --force ${DROPLET_NAME}
                 ONTRACK_VERSION = "${version}"
             }
             parallel {
-                stage('Docker push') {
+                stage('Docker Hub') {
                     agent {
                         dockerfile {
                             label "docker"
@@ -501,15 +492,22 @@ docker-machine rm --force ${DROPLET_NAME}
 #!/bin/bash
 set -e
 
-docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}
+echo "Making sure the images are available on this node..."
 
-docker pull nemerosa/ontrack:${ONTRACK_VERSION}
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
 
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
-docker tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
+echo "Publishing in Docker Hub..."
 
-docker push nemerosa/ontrack:2
-docker push nemerosa/ontrack:latest
+echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
+
+docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION}
+docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
+docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
+
+docker image push nemerosa/ontrack:${ONTRACK_VERSION}
+docker image push nemerosa/ontrack:2
+docker image push nemerosa/ontrack:latest
 '''
                     }
                 }
