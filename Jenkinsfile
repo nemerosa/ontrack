@@ -743,6 +743,8 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
 #!/bin/bash
 set -e
 
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
 echo "(*) Launching the tests..."
 docker-compose \\
     --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
