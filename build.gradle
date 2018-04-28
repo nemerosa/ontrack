@@ -173,7 +173,7 @@ configure(coreProjects) {
             dependency 'args4j:args4j:2.33'
             dependency 'org.jgrapht:jgrapht-core:1.1.0'
             dependency 'org.kohsuke:groovy-sandbox:1.19'
-            dependency 'com.graphql-java:graphql-java:5.0'
+            dependency 'com.graphql-java:graphql-java:8.0'
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
             // Overrides from Spring Boot
             dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
