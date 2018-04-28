@@ -161,8 +161,8 @@ configure(coreProjects) {
             mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
         }
         dependencies {
-            dependency 'commons-io:commons-io:2.5'
-            dependency 'org.apache.commons:commons-lang3:3.6'
+            dependency 'commons-io:commons-io:2.6'
+            dependency 'org.apache.commons:commons-lang3:3.7'
             dependency 'org.projectlombok:lombok:1.16.18'
             dependency 'net.jodah:failsafe:1.0.4'
             dependency 'commons-logging:commons-logging:1.2'
