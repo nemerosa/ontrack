@@ -45,11 +45,11 @@ public class FileConfidentialStore extends AbstractConfidentialStore {
     private final SecretKey masterKey;
 
     @Autowired
-    public FileConfidentialStore(EnvService envService) throws IOException, InterruptedException {
+    public FileConfidentialStore(EnvService envService) throws IOException {
         this(envService.getWorkingDir("security", "secrets"));
     }
 
-    public FileConfidentialStore(File rootDir) throws IOException, InterruptedException {
+    public FileConfidentialStore(File rootDir) throws IOException {
         this.rootDir = rootDir;
         LoggerFactory.getLogger(FileConfidentialStore.class).info(
                 "[key-store] Using file based key store at {}",
@@ -70,19 +70,18 @@ public class FileConfidentialStore extends AbstractConfidentialStore {
      */
     @Override
     public void store(String key, byte[] payload) throws IOException {
-        CipherOutputStream cos = null;
-        FileOutputStream fos = null;
         try {
             Cipher sym = Cipher.getInstance("AES");
             sym.init(Cipher.ENCRYPT_MODE, masterKey);
-            cos = new CipherOutputStream(fos = new FileOutputStream(getFileFor(key)), sym);
-            cos.write(payload);
-            cos.write(MAGIC);
+            try (
+                    FileOutputStream fos = new FileOutputStream(getFileFor(key));
+                    CipherOutputStream cos = new CipherOutputStream(fos, sym)
+            ) {
+                cos.write(payload);
+                cos.write(MAGIC);
+            }
         } catch (GeneralSecurityException e) {
             throw new IOException("Failed to persist the key: " + key, e);
-        } finally {
-            IOUtils.closeQuietly(cos);
-            IOUtils.closeQuietly(fos);
         }
     }
 
@@ -93,22 +92,21 @@ public class FileConfidentialStore extends AbstractConfidentialStore {
      */
     @Override
     public byte[] load(String key) throws IOException {
-        CipherInputStream cis = null;
-        FileInputStream fis = null;
         try {
             File f = getFileFor(key);
             if (!f.exists()) return null;
 
             Cipher sym = Cipher.getInstance("AES");
             sym.init(Cipher.DECRYPT_MODE, masterKey);
-            cis = new CipherInputStream(fis = new FileInputStream(f), sym);
-            byte[] bytes = IOUtils.toByteArray(cis);
-            return verifyMagic(bytes);
+            try (
+                    FileInputStream fis = new FileInputStream(f);
+                    CipherInputStream cis = new CipherInputStream(fis, sym)
+            ) {
+                byte[] bytes = IOUtils.toByteArray(cis);
+                return verifyMagic(bytes);
+            }
         } catch (GeneralSecurityException e) {
             throw new IOException("Failed to persist the key: " + key, e);
-        } finally {
-            IOUtils.closeQuietly(cis);
-            IOUtils.closeQuietly(fis);
         }
     }
 

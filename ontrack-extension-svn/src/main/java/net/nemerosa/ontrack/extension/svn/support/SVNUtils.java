@@ -7,7 +7,7 @@ public class SVNUtils {
 
     public static SVNURL toURL(String path) {
         try {
-            return SVNURL.parseURIDecoded(path);
+            return SVNURL.parseURIEncoded(path);
         } catch (SVNException e) {
             throw new IllegalArgumentException("Cannot get SVN URL for " + path, e);
         }

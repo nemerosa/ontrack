@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.extension;
 
 import lombok.Data;
-import lombok.experimental.Builder;
+import lombok.Builder;
 import lombok.experimental.Wither;
 
 import java.util.Collections;

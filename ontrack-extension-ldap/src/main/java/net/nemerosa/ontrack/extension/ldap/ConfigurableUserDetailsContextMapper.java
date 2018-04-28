@@ -2,12 +2,13 @@ package net.nemerosa.ontrack.extension.ldap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.ldap.core.DistinguishedName;
+import org.springframework.ldap.support.LdapUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 
+import javax.naming.ldap.LdapName;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,9 +53,9 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
         String[] groups = ctx.getStringAttributes(groupAttribute);
         Set<String> parsedGroups;
         if (groups != null && groups.length > 0) {
-            parsedGroups = Arrays.asList(groups).stream()
+            parsedGroups = Arrays.stream(groups)
                     // Parsing of the group
-                    .map(DistinguishedName::new)
+                    .map(LdapUtils::newLdapName)
                             // Filter on OU
                     .filter(dn -> {
                         String ou = getValue(dn, "OU");
@@ -73,12 +74,12 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
         return new ExtendedLDAPUserDetails(userDetails, fullName, email, parsedGroups);
     }
 
-    protected static String getValue(DistinguishedName dn, String key) {
+    protected static String getValue(LdapName dn, String key) {
         try {
-            return dn.getValue(StringUtils.upperCase(key));
+            return LdapUtils.getStringValue(dn, StringUtils.upperCase(key));
         } catch (IllegalArgumentException ignored) {
             try {
-                return dn.getValue(StringUtils.lowerCase(key));
+                return LdapUtils.getStringValue(dn, StringUtils.lowerCase(key));
             } catch (IllegalArgumentException ignored2) {
                 return null;
             }

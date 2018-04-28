@@ -117,7 +117,7 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
         // Gets the configuration representation
         ServiceConfiguration serviceConfiguration = configuredBuildSvnRevisionLink.toServiceConfiguration();
         // As json...
-        node.put("buildRevisionLink", (ObjectNode) objectMapper.valueToTree(serviceConfiguration));
+        node.set("buildRevisionLink", (ObjectNode) objectMapper.valueToTree(serviceConfiguration));
         // Logging
         try {
             logger.info(
