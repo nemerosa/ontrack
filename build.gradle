@@ -170,7 +170,7 @@ configure(coreProjects) {
             dependency 'com.google.guava:guava:25.0-jre'
             dependency 'net.sf.dbinit:dbinit:1.4.0'
             dependency 'args4j:args4j:2.33'
-            dependency 'org.jgrapht:jgrapht-core:1.0.1'
+            dependency 'org.jgrapht:jgrapht-core:1.1.0'
             dependency 'org.kohsuke:groovy-sandbox:1.15'
             dependency 'com.graphql-java:graphql-java:5.0'
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
