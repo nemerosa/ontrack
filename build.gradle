@@ -175,7 +175,7 @@ configure(coreProjects) {
             dependency 'com.graphql-java:graphql-java:5.0'
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
             // Overrides from Spring Boot
-            dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4'
+            dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
         }
     }
 
