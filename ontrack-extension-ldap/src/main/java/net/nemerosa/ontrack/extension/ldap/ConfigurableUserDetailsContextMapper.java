@@ -9,10 +9,7 @@ import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 
 import javax.naming.ldap.LdapName;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper {
@@ -56,16 +53,16 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
             parsedGroups = Arrays.stream(groups)
                     // Parsing of the group
                     .map(LdapUtils::newLdapName)
-                            // Filter on OU
+                    // Filter on OU
                     .filter(dn -> {
                         String ou = getValue(dn, "OU");
                         return StringUtils.isBlank(groupFilter) || StringUtils.equalsIgnoreCase(ou, groupFilter);
                     })
-                            // Getting the common name
+                    // Getting the common name
                     .map(dn -> getValue(dn, "CN"))
-                            // Keeps only the groups being filled in
+                    // Keeps only the groups being filled in
                     .filter(StringUtils::isNotBlank)
-                            // As a set
+                    // As a set
                     .collect(Collectors.toSet());
         } else {
             parsedGroups = Collections.emptySet();
@@ -77,10 +74,10 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
     protected static String getValue(LdapName dn, String key) {
         try {
             return LdapUtils.getStringValue(dn, StringUtils.upperCase(key));
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException | NoSuchElementException ignored) {
             try {
                 return LdapUtils.getStringValue(dn, StringUtils.lowerCase(key));
-            } catch (IllegalArgumentException ignored2) {
+            } catch (IllegalArgumentException | NoSuchElementException ignored2) {
                 return null;
             }
         }
