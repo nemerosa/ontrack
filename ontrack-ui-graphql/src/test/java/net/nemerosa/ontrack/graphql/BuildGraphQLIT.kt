@@ -64,6 +64,112 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Following build links TO`() {
+        // Three builds
+        val a = doCreateBuild()
+        val b = doCreateBuild()
+        val c = doCreateBuild()
+        // Links: a -> b -> c
+        asAdmin().execute {
+            structureService.addBuildLink(a, b)
+            structureService.addBuildLink(b, c)
+        }
+        // Query build links of "b" TO
+        val data = run("""{
+            builds(id: ${b.id}) {
+                linkedBuilds(direction: TO) {
+                    id
+                    name
+                }
+            }
+        }""")
+        // Checks the result
+        val links = data["builds"].first()["linkedBuilds"]
+        assertNotNull(links) {
+            assertEquals(1, it.size())
+            val link = it.first()
+            assertEquals(c.name, link["name"].asText())
+            assertEquals(c.id(), link["id"].asInt())
+        }
+    }
+
+    @Test
+    fun `Following build links FROM`() {
+        // Three builds
+        val a = doCreateBuild()
+        val b = doCreateBuild()
+        val c = doCreateBuild()
+        // Links: a -> b -> c
+        asAdmin().execute {
+            structureService.addBuildLink(a, b)
+            structureService.addBuildLink(b, c)
+        }
+        // Query build links of "b" FROM
+        val data = run("""{
+            builds(id: ${b.id}) {
+                linkedBuilds(direction: FROM) {
+                    id
+                    name
+                }
+            }
+        }""")
+        // Checks the result
+        val links = data["builds"].first()["linkedBuilds"]
+        assertNotNull(links) {
+            assertEquals(1, it.size())
+            val link = it.first()
+            assertEquals(a.name, link["name"].asText())
+            assertEquals(a.id(), link["id"].asInt())
+        }
+    }
+
+    @Test
+    fun `Following build links BOTH`() {
+        // Three builds
+        val a = doCreateBuild()
+        val b = doCreateBuild()
+        val c = doCreateBuild()
+        // Links: a -> b -> c
+        asAdmin().execute {
+            structureService.addBuildLink(a, b)
+            structureService.addBuildLink(b, c)
+        }
+        // Query build links of "b" BOTH
+        val data = run("""{
+            builds(id: ${b.id}) {
+                linkedBuilds(direction: BOTH) {
+                    id
+                    name
+                }
+            }
+        }""")
+        // Checks the result
+        val links = data["builds"].first()["linkedBuilds"]
+        assertNotNull(links) {
+            assertEquals(2, it.size())
+            val aLink = it[0]
+            assertEquals(a.name, aLink["name"].asText())
+            assertEquals(a.id(), aLink["id"].asInt())
+            val cLink = it[1]
+            assertEquals(c.name, cLink["name"].asText())
+            assertEquals(c.id(), cLink["id"].asInt())
+        }
+    }
+
+    @Test(expected = AssertionError::class)
+    fun `Following build links with unknown direction`() {
+        val b = doCreateBuild()
+        run("""{
+            builds(id: ${b.id}) {
+                linkedBuilds(direction: TBD) {
+                    id
+                    name
+                }
+            }
+        }""")
+    }
+
+    @Test
     fun `Promotion runs when promotion does not exist`() {
         // Creates a build
         val build = doCreateBuild()
