@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.RunInfo
-import net.nemerosa.ontrack.model.structure.RunInfoInput
-import net.nemerosa.ontrack.model.structure.RunInfoService
-import net.nemerosa.ontrack.model.structure.RunnableEntityType
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.RunInfoRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,12 +10,25 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class RunInfoServiceImpl(
         private val runInfoRepository: RunInfoRepository,
+        private val structureService: StructureService,
         private val securityService: SecurityService
 ) : RunInfoService {
 
-    override fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo =
-            runInfoRepository.getRunInfo(runnableEntityType, id)
+    override fun getRunnableEntity(runnableEntityType: RunnableEntityType, id: Int): RunnableEntity {
+        return runnableEntityType.load(structureService, id)
+    }
 
-    override fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput): RunInfo =
-            runInfoRepository.setRunInfo(runnableEntityType, id, input, securityService.currentSignature)
+    override fun getRunInfo(entity: RunnableEntity): RunInfo =
+            runInfoRepository.getRunInfo(
+                    entity.runnableEntityType,
+                    entity.id()
+            )
+
+    override fun setRunInfo(entity: RunnableEntity, input: RunInfoInput): RunInfo =
+            runInfoRepository.setRunInfo(
+                    entity.runnableEntityType,
+                    entity.id(),
+                    input,
+                    securityService.currentSignature
+            )
 }

@@ -1,13 +1,15 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.RunInfo
+import net.nemerosa.ontrack.model.structure.RunInfoInput
+import net.nemerosa.ontrack.model.structure.RunInfoService
+import net.nemerosa.ontrack.model.structure.RunnableEntityType
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/structure/run-info")
 class RunInfoController(
-        private val structureService: StructureService,
         private val runInfoService: RunInfoService
 ) : AbstractResourceController() {
 
@@ -17,13 +19,21 @@ class RunInfoController(
             @PathVariable id: Int,
             @RequestBody input: RunInfoInput
     ): RunInfo =
-            runInfoService.setRunInfo(runnableEntityType, id, input)
+            runInfoService.setRunInfo(
+                    runInfoService.getRunnableEntity(
+                            runnableEntityType, id
+                    ),
+                    input)
 
     @GetMapping("{runnableEntityType}/{id}")
     fun getRunInfo(
             @PathVariable runnableEntityType: RunnableEntityType,
             @PathVariable id: Int
     ): RunInfo =
-            runInfoService.getRunInfo(runnableEntityType, id)
+            runInfoService.getRunInfo(
+                    runInfoService.getRunnableEntity(
+                            runnableEntityType, id
+                    )
+            )
 
 }

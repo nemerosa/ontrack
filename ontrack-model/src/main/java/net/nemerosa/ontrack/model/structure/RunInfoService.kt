@@ -6,15 +6,19 @@ package net.nemerosa.ontrack.model.structure
  */
 interface RunInfoService {
     /**
-     * Gets the [RunInfo] associated with a runnable entity defined
-     * by its [type][RunnableEntityType] and [ID][id].
+     * Loads the [runnable entity][RunnableEntity] defined by
+     * its [type][RunnableEntityType] and [id].
      */
-    fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo
+    fun getRunnableEntity(runnableEntityType: RunnableEntityType, id: Int): RunnableEntity
 
     /**
-     * Sets a [run info][RunInfoInput] on a runnable entity defined
-     * by its [type][RunnableEntityType] and [ID][id] and returns
+     * Gets the [RunInfo] associated with a [runnable entity][RunnableEntity].
+     */
+    fun getRunInfo(entity: RunnableEntity): RunInfo
+
+    /**
+     * Sets a [run info][RunInfoInput] on a [runnable entity][RunnableEntity] and returns
      * a created or update [RunInfo].
      */
-    fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput): RunInfo
+    fun setRunInfo(entity: RunnableEntity, input: RunInfoInput): RunInfo
 }

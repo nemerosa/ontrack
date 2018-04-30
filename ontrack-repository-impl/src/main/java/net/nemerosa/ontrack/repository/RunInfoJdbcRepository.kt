@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunnableEntityType
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import net.nemerosa.ontrack.repository.support.getNullableInt
 import org.springframework.stereotype.Repository
 import javax.sql.DataSource
 
@@ -24,7 +25,7 @@ class RunInfoJdbcRepository(
                             rs.getString("SOURCE_URI"),
                             rs.getString("TRIGGER_TYPE"),
                             rs.getString("TRIGGER_DATA"),
-                            rs.getObject("RUN_TIME", Int::class.java),
+                            rs.getNullableInt("RUN_TIME"),
                             readSignature(rs)
                     )
                 }

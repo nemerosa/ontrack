@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +24,13 @@ public class ValidationRun implements RunnableEntity {
      * The run order is the order of run for the build. It starts with 1 for the first run.
      */
     private final int runOrder;
+
+    @NotNull
+    @Override
+    @JsonIgnore
+    public RunnableEntityType getRunnableEntityType() {
+        return RunnableEntityType.validation_run;
+    }
 
     /**
      * Must always contain at least one validation run status at creation time.
