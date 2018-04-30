@@ -122,6 +122,12 @@ constructor(
                             .type(stdList(GraphQLTypeReference(BUILD)))
                             .dataFetcher(buildLinkedFetcher())
                 }
+                // Link direction (only used for linked builds)
+                .field { f ->
+                    f.name("direction")
+                            .description("Link direction")
+                            .type(GraphQLString)
+                }
                 // OK
                 .build()
     }

@@ -57,6 +57,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             assertEquals(1, it.size())
             val link = it.first()
             assertEquals(targetBuild.name, link["name"].asText())
+            assertEquals("to", link.path("direction").asText())
             assertEquals(targetBuild.branch.name, link["branch"]["name"].asText())
             assertEquals(targetBuild.branch.project.name, link["branch"]["project"]["name"].asText())
         }
@@ -90,6 +91,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             val link = it.first()
             assertEquals(c.name, link["name"].asText())
             assertEquals(c.id(), link["id"].asInt())
+            assertEquals("to", link.path("direction").asText())
         }
     }
 
@@ -120,6 +122,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             val link = it.first()
             assertEquals(a.name, link["name"].asText())
             assertEquals(a.id(), link["id"].asInt())
+            assertEquals("from", link.path("direction").asText())
         }
     }
 
@@ -150,9 +153,11 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             val cLink = it[0]
             assertEquals(c.name, cLink["name"].asText())
             assertEquals(c.id(), cLink["id"].asInt())
+            assertEquals("to", cLink.path("direction").asText())
             val aLink = it[1]
             assertEquals(a.name, aLink["name"].asText())
             assertEquals(a.id(), aLink["id"].asInt())
+            assertEquals("from", aLink.path("direction").asText())
         }
     }
 
