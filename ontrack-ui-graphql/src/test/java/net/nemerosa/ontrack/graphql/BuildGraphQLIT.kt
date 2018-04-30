@@ -147,12 +147,12 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val links = data["builds"].first()["linkedBuilds"]
         assertNotNull(links) {
             assertEquals(2, it.size())
-            val aLink = it[0]
-            assertEquals(a.name, aLink["name"].asText())
-            assertEquals(a.id(), aLink["id"].asInt())
-            val cLink = it[1]
+            val cLink = it[0]
             assertEquals(c.name, cLink["name"].asText())
             assertEquals(c.id(), cLink["id"].asInt())
+            val aLink = it[1]
+            assertEquals(a.name, aLink["name"].asText())
+            assertEquals(a.id(), aLink["id"].asInt())
         }
     }
 

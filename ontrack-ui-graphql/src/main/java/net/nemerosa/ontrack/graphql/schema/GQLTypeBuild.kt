@@ -172,7 +172,16 @@ constructor(
     private fun buildLinkedToFetcher(): DataFetcher<List<Build>> {
         return fetcher(
                 Build::class.java,
-                structureService::getBuildLinksFrom
+                { environment, build ->
+                    val direction: String = GraphqlUtils.getStringArgument(environment, "direction")
+                            .orElse("TO")
+                    when (direction) {
+                        "TO" -> structureService.getBuildLinksFrom(build)
+                        "FROM" -> structureService.getBuildLinksTo(build)
+                        "BOTH" -> structureService.getBuildLinksFrom(build) + structureService.getBuildLinksTo(build)
+                        else -> structureService.getBuildLinksFrom(build)
+                    }
+                }
         )
     }
 
