@@ -88,6 +88,14 @@ promoted, the associated promotions will also be displayed.
 
 image::images/property-build-links-decoration-promotions.png[Build links promotions,400]
 
+[[builds-links-information]]
+===== Information
+
+The builds which are linked to a given build are displayed on the
+build page, in the information section:
+
+image::images/builds-links-information.png[Build links information,400]
+
 [[builds-links-querying]]
 ===== Querying
 
