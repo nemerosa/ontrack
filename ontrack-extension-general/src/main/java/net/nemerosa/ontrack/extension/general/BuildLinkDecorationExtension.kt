@@ -28,20 +28,7 @@ constructor(
         // Gets the list of promotion runs for this build
         val promotionRuns = structureService.getLastPromotionRunsForBuild(build.id)
         // Decoration
-        return Decoration.of(this, BuildLinkDecoration(
-                build.project.name,
-                build.name,
-                uriBuilder.getEntityPage(build),
-                promotionRuns.map {
-                    BuildLinkDecorationPromotion(
-                            it.promotionLevel.name,
-                            // See PromotionLevelController
-                            uriBuilder.url(
-                                    "/structure/promotionLevels/${it.promotionLevel.id}/image"
-                            ).toString()
-                    )
-                }
-        ))
+        return Decoration.of(this, build.asBuildLinkDecoration(uriBuilder, promotionRuns))
     }
 
 }
