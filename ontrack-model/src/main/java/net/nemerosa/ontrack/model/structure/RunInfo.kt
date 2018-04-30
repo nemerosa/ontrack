@@ -31,3 +31,12 @@ class RunInfo(
         )
     }
 }
+
+class RunInfoInput(
+        val id: Int,
+        val sourceType: String?,
+        val sourceUri: String?,
+        val triggerType: String?,
+        val triggerData: String?,
+        val runTime: Int?
+)

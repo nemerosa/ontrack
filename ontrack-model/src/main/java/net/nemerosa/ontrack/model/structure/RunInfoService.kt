@@ -10,4 +10,11 @@ interface RunInfoService {
      * by its [type][RunnableEntityType] and [ID][id].
      */
     fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo
+
+    /**
+     * Sets a [run info][RunInfoInput] on a runnable entity defined
+     * by its [type][RunnableEntityType] and [ID][id] and returns
+     * a created or update [RunInfo].
+     */
+    fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput): RunInfo
 }

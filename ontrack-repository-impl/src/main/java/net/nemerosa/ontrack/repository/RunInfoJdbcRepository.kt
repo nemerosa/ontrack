@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.structure.RunInfo
+import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunnableEntityType
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
@@ -25,5 +26,39 @@ class RunInfoJdbcRepository(
                     )
                 }
         ) ?: RunInfo.empty()
+    }
+
+    override fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput): RunInfo {
+        // Gets the existing run info if any
+        val runInfo = getRunInfo(runnableEntityType, id).takeIf { it.id != 0 }
+        // Parameters
+        val params = params("runTime", input.runTime)
+                .addValue("sourceType", input.sourceType)
+                .addValue("sourceUri", input.sourceUri)
+                .addValue("triggerType", input.triggerType)
+                .addValue("triggerData", input.triggerData)
+        // If existing, updates it
+        if (runInfo != null) {
+            namedParameterJdbcTemplate.update(
+                    "UPDATE RUN_INFO " +
+                            "SET SOURCE_TYPE = :sourceType, " +
+                            "SOURCE_URI = :sourceUri, " +
+                            "TRIGGER_TYPE = :triggerType, " +
+                            "TRIGGER_DATA = :triggerData, " +
+                            "RUN_TIME = :runTime " +
+                            "WHERE ID = :id",
+                    params.addValue("id", runInfo.id)
+            )
+        }
+        // Else, creates it
+        else {
+            namedParameterJdbcTemplate.update(
+                    "INSERT INTO RUN_INFO(${runnableEntityType.name.toUpperCase()}, SOURCE_TYPE, SOURCE_URI, TRIGGER_TYPE, TRIGGER_DATA, RUN_TIME) " +
+                            "VALUES (:entityId, :sourceType, :sourceUri, :triggerType, :triggerData, :runTime)",
+                    params.addValue("entityId", id)
+            )
+        }
+        // OK
+        return getRunInfo(runnableEntityType, id)
     }
 }
