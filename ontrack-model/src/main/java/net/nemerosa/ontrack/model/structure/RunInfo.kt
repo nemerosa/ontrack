@@ -18,7 +18,8 @@ class RunInfo(
         val sourceUri: String?,
         val triggerType: String?,
         val triggerData: String?,
-        val runTime: Int?
+        val runTime: Int?,
+        val signature: Signature?
 ) {
     companion object {
         fun empty() = RunInfo(
@@ -27,7 +28,8 @@ class RunInfo(
                 sourceUri = null,
                 triggerType = null,
                 triggerData = null,
-                runTime = null
+                runTime = null,
+                signature = null
         )
     }
 }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunnableEntityType
+import net.nemerosa.ontrack.model.structure.Signature
 
 interface RunInfoRepository {
     /**
@@ -16,5 +17,5 @@ interface RunInfoRepository {
      * by its [type][RunnableEntityType] and [ID][id] and returns
      * a created or update [RunInfo].
      */
-    fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput): RunInfo
+    fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput, signature: Signature): RunInfo
 }

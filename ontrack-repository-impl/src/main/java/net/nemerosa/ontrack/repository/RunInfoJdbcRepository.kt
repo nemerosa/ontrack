@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunnableEntityType
+import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import javax.sql.DataSource
@@ -22,13 +24,19 @@ class RunInfoJdbcRepository(
                             rs.getString("SOURCE_URI"),
                             rs.getString("TRIGGER_TYPE"),
                             rs.getString("TRIGGER_DATA"),
-                            rs.getObject("RUN_TIME", Int::class.java)
+                            rs.getObject("RUN_TIME", Int::class.java),
+                            readSignature(rs)
                     )
                 }
         ) ?: RunInfo.empty()
     }
 
-    override fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput): RunInfo {
+    override fun setRunInfo(
+            runnableEntityType: RunnableEntityType,
+            id: Int,
+            input: RunInfoInput,
+            signature: Signature
+    ): RunInfo {
         // Gets the existing run info if any
         val runInfo = getRunInfo(runnableEntityType, id).takeIf { it.id != 0 }
         // Parameters
@@ -37,6 +45,8 @@ class RunInfoJdbcRepository(
                 .addValue("sourceUri", input.sourceUri)
                 .addValue("triggerType", input.triggerType)
                 .addValue("triggerData", input.triggerData)
+                .addValue("creation", Time.forStorage(signature.time))
+                .addValue("creator", signature.user.name)
         // If existing, updates it
         if (runInfo != null) {
             namedParameterJdbcTemplate.update(
@@ -45,6 +55,8 @@ class RunInfoJdbcRepository(
                             "SOURCE_URI = :sourceUri, " +
                             "TRIGGER_TYPE = :triggerType, " +
                             "TRIGGER_DATA = :triggerData, " +
+                            "CREATION = :creation, " +
+                            "CREATOR = :creator, " +
                             "RUN_TIME = :runTime " +
                             "WHERE ID = :id",
                     params.addValue("id", runInfo.id)
@@ -53,8 +65,8 @@ class RunInfoJdbcRepository(
         // Else, creates it
         else {
             namedParameterJdbcTemplate.update(
-                    "INSERT INTO RUN_INFO(${runnableEntityType.name.toUpperCase()}, SOURCE_TYPE, SOURCE_URI, TRIGGER_TYPE, TRIGGER_DATA, RUN_TIME) " +
-                            "VALUES (:entityId, :sourceType, :sourceUri, :triggerType, :triggerData, :runTime)",
+                    "INSERT INTO RUN_INFO(${runnableEntityType.name.toUpperCase()}, SOURCE_TYPE, SOURCE_URI, TRIGGER_TYPE, TRIGGER_DATA, RUN_TIME, CREATION, CREATOR) " +
+                            "VALUES (:entityId, :sourceType, :sourceUri, :triggerType, :triggerData, :runTime, :creation, :creator)",
                     params.addValue("entityId", id)
             )
         }
