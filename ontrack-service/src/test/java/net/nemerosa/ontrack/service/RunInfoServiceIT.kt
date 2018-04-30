@@ -43,4 +43,24 @@ class RunInfoServiceIT : AbstractServiceTestSupport() {
         assertEquals(26, info.runTime)
     }
 
+    @Test
+    fun `Sets and deletes the run info for a build`() {
+        val build = doCreateBuild()
+        val info = runInfoService.setRunInfo(
+                build,
+                RunInfoInput(
+                        sourceType = "jenkins",
+                        sourceUri = "http://jenkins/job/build/1",
+                        triggerType = "scm",
+                        triggerData = "1234cde",
+                        runTime = 26
+                )
+        )
+        assertFalse(info.empty)
+        // Deletion
+        runInfoService.deleteRunInfo(build)
+        val newInfo = runInfoService.getRunInfo(build)
+        assertTrue(newInfo.empty, "No run info")
+    }
+
 }

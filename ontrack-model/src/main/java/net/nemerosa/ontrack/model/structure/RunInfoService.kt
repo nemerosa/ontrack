@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
+import net.nemerosa.ontrack.model.Ack
+
 /**
  * Management of [RunInfo] for [Build]s
  * and [ValidationRun]s.
@@ -21,4 +23,11 @@ interface RunInfoService {
      * a created or update [RunInfo].
      */
     fun setRunInfo(entity: RunnableEntity, input: RunInfoInput): RunInfo
+
+    /**
+     * Deletes any existing [RunInfo] associated with [runnableEntity].
+     *
+     * @return [Ack.OK] if the the [RunInfo] was existing, [Ack.NOK] otherwise.
+     */
+    fun deleteRunInfo(runnableEntity: RunnableEntity): Ack
 }

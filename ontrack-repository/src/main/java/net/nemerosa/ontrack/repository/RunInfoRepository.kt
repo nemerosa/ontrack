@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunnableEntityType
@@ -18,4 +19,12 @@ interface RunInfoRepository {
      * a created or update [RunInfo].
      */
     fun setRunInfo(runnableEntityType: RunnableEntityType, id: Int, input: RunInfoInput, signature: Signature): RunInfo
+
+    /**
+     * Deletes any existing [RunInfo] associated with the [type][runnableEntityType] and
+     * [id].
+     *
+     * @return [Ack.OK] if the the [RunInfo] was existing, [Ack.NOK] otherwise.
+     */
+    fun deleteRunInfo(runnableEntityType: RunnableEntityType, id: Int): Ack
 }

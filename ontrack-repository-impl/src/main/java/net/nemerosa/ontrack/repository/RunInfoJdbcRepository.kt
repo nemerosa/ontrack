@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunnableEntityType
@@ -32,6 +33,15 @@ class RunInfoJdbcRepository(
         ) ?: RunInfo.empty()
     }
 
+    override fun deleteRunInfo(runnableEntityType: RunnableEntityType, id: Int): Ack {
+        val runInfo = getRunInfo(runnableEntityType, id).takeIf { !it.empty }
+        namedParameterJdbcTemplate.update(
+                "DELETE FROM RUN_INFO WHERE ${runnableEntityType.name.toUpperCase()} = :entityId",
+                params("entityId", id)
+        )
+        return Ack.validate(runInfo != null)
+    }
+
     override fun setRunInfo(
             runnableEntityType: RunnableEntityType,
             id: Int,
@@ -39,7 +49,7 @@ class RunInfoJdbcRepository(
             signature: Signature
     ): RunInfo {
         // Gets the existing run info if any
-        val runInfo = getRunInfo(runnableEntityType, id).takeIf { it.id != 0 }
+        val runInfo = getRunInfo(runnableEntityType, id).takeIf { !it.empty }
         // Parameters
         val params = params("runTime", input.runTime)
                 .addValue("sourceType", input.sourceType)

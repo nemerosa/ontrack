@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunInfoService
@@ -31,6 +32,17 @@ class RunInfoController(
             @PathVariable id: Int
     ): RunInfo =
             runInfoService.getRunInfo(
+                    runInfoService.getRunnableEntity(
+                            runnableEntityType, id
+                    )
+            )
+
+    @DeleteMapping("{runnableEntityType}/{id}")
+    fun deleteRunInfo(
+            @PathVariable runnableEntityType: RunnableEntityType,
+            @PathVariable id: Int
+    ): Ack =
+            runInfoService.deleteRunInfo(
                     runInfoService.getRunnableEntity(
                             runnableEntityType, id
                     )

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.RunInfoRepository
@@ -30,5 +31,11 @@ class RunInfoServiceImpl(
                     entity.id(),
                     input,
                     securityService.currentSignature
+            )
+
+    override fun deleteRunInfo(runnableEntity: RunnableEntity): Ack =
+            runInfoRepository.deleteRunInfo(
+                    runnableEntity.runnableEntityType,
+                    runnableEntity.id()
             )
 }
