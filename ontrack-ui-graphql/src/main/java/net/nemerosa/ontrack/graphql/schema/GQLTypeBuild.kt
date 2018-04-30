@@ -127,6 +127,7 @@ constructor(
                     f.name("direction")
                             .description("Link direction")
                             .type(GraphQLString)
+                            .dataFetcher(fetcher(LinkedBuild::class.java, LinkedBuild::direction))
                 }
                 // OK
                 .build()
@@ -182,14 +183,18 @@ constructor(
                     val direction: String = GraphqlUtils.getStringArgument(environment, "direction")
                             .orElse("TO")
                     when (direction) {
-                        "TO" -> structureService.getBuildLinksFrom(build)
-                        "FROM" -> structureService.getBuildLinksTo(build)
-                        "BOTH" -> structureService.getBuildLinksFrom(build) + structureService.getBuildLinksTo(build)
-                        else -> structureService.getBuildLinksFrom(build)
+                        "TO" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
+                        "FROM" -> getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
+                        "BOTH" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to") +
+                                getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
+                        else -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
                     }
                 }
         )
     }
+
+    private fun getLinkedBuilds(builds: List<Build>, direction: String) =
+            builds.map { LinkedBuild(it, direction) }
 
     private fun buildValidationRunsFetcher() =
             DataFetcher<List<ValidationRun>> { environment ->
@@ -267,3 +272,14 @@ constructor(
         val BUILD = "Build"
     }
 }
+
+class LinkedBuild(
+        build: Build,
+        val direction: String
+) : Build(
+        build.id,
+        build.name,
+        build.description,
+        build.signature,
+        build.branch
+)

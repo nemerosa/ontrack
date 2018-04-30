@@ -42,6 +42,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             builds(id: ${build.id}) {
                 linkedBuilds {
                     name
+                    direction
                     branch {
                         name
                         project {
@@ -81,6 +82,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 linkedBuilds(direction: TO) {
                     id
                     name
+                    direction
                 }
             }
         }""")
@@ -112,6 +114,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 linkedBuilds(direction: FROM) {
                     id
                     name
+                    direction
                 }
             }
         }""")
@@ -143,6 +146,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 linkedBuilds(direction: BOTH) {
                     id
                     name
+                    direction
                 }
             }
         }""")
