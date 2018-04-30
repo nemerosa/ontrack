@@ -1,0 +1,22 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        This build is used by...
+    </div>
+    <div class="panel-body">
+        <span class="ot-decoration-border" ng-repeat="buildLink in value.data">
+            <!-- Build @ Project -->
+            <span ng-if="!buildLink.uri">{{buildLink.build}} @ {{buildLink.project}}</span>
+            <span ng-if="buildLink.uri">
+                <img src="extension/general/decoration/net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension/link.png"/>
+                <a href="{{buildLink.uri}}">{{buildLink.build}} @ {{buildLink.project}}</a>
+            </span>
+            <!-- Promotions -->
+            <span ng-repeat="promotion in buildLink.promotions">
+                <img ng-if="!promotion.imageLink" src="assets/default_entity_image.png" class="ot-icon"
+                     title="{{promotion.name}}"/>
+                <img ng-if="promotion.imageLink" ng-src="{{promotion.imageLink}}" class="ot-icon"
+                     title="{{promotion.name}}"/>
+            </span>
+        </span>
+    </div>
+</div>
