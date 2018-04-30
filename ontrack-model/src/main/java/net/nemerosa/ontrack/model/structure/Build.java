@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.form.Form;
 
 @Data
 @AllArgsConstructor
-public class Build implements ProjectEntity {
+public class Build implements RunnableEntity {
 
     private final ID id;
     private final String name;

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class ValidationRun implements ProjectEntity {
+public class ValidationRun implements RunnableEntity {
 
     private final ID id;
     @JsonView({ValidationRun.class, ValidationStampRunView.class})
