@@ -1,13 +1,10 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
-import graphql.schema.DataFetcher
-import graphql.schema.DataFetchingEnvironment
+import graphql.schema.*
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
-import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
-import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -105,14 +102,26 @@ constructor(
                             .dataFetcher(buildValidationsFetcher())
                 }
                 // Build links
-                .field(
-                        newFieldDefinition()
-                                .name("linkedBuilds")
-                                .description("Builds this build is linked to")
-                                .type(stdList(GraphQLTypeReference(BUILD)))
-                                .dataFetcher(buildLinkedToFetcher())
-                                .build()
-                )
+                .field { f ->
+                    f.name("linkedBuilds")
+                            .description("Builds this build is linked to")
+                            .argument { a ->
+                                a.name("direction")
+                                        .description("Direction of the link to follow.")
+                                        .type(
+                                                GraphQLEnumType.newEnum()
+                                                        .name("BuildLinkDirection")
+                                                        .description("Direction for build links.")
+                                                        .value("TO")
+                                                        .value("FROM")
+                                                        .value("BOTH")
+                                                        .build()
+                                        )
+                                        .defaultValue("TO")
+                            }
+                            .type(stdList(GraphQLTypeReference(BUILD)))
+                            .dataFetcher(buildLinkedToFetcher())
+                }
                 // OK
                 .build()
     }
