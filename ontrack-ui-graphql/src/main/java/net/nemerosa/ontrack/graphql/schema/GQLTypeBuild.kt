@@ -120,7 +120,7 @@ constructor(
                                         .defaultValue("TO")
                             }
                             .type(stdList(GraphQLTypeReference(BUILD)))
-                            .dataFetcher(buildLinkedToFetcher())
+                            .dataFetcher(buildLinkedFetcher())
                 }
                 // OK
                 .build()
@@ -169,7 +169,7 @@ constructor(
         )
     }
 
-    private fun buildLinkedToFetcher(): DataFetcher<List<Build>> {
+    private fun buildLinkedFetcher(): DataFetcher<List<Build>> {
         return fetcher(
                 Build::class.java,
                 { environment, build ->
