@@ -7,6 +7,7 @@ import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import org.springframework.stereotype.Component
@@ -17,6 +18,8 @@ class GQLTypeValidationRun(
         creation: GQLTypeCreation,
         private val validationRunStatus: GQLTypeValidationRunStatus,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+        private val runInfo: GQLTypeRunInfo,
+        private val runInfoService: RunInfoService,
         private val projectEntityInterface: GQLProjectEntityInterface
 ) : AbstractGQLProjectEntity<ValidationRun>(
         ValidationRun::class.java,
@@ -59,6 +62,13 @@ class GQLTypeValidationRun(
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
                                 .type(stdList(validationRunStatus.typeRef))
+                    }
+                    // Run info
+                    .field {
+                        it.name("runInfo")
+                                .description("Run info associated with this validation run")
+                                .type(runInfo.typeRef)
+                                .runInfoFetcher<ValidationRun> { runInfoService.getRunInfo(it) }
                     }
                     // OK
                     .build()
