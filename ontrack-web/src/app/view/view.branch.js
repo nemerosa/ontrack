@@ -164,6 +164,13 @@ angular.module('ot.view.branch', [
                 builds(generic: {type: $filterType, data: $filterData}) {
                   id
                   name
+                  runInfo {
+                    sourceType
+                    sourceUri 
+                    triggerType
+                    triggerData
+                    runTime
+                  }
                   decorations {
                     ...decorationContent
                   }
@@ -870,6 +877,13 @@ angular.module('ot.view.branch', [
                     });
                 }
             }
+        };
+
+        /**
+         * Displaying a duration (for run info)
+         */
+        $scope.displayDuration = function (duration) {
+            return moment.duration(duration, "seconds").humanize();
         };
 
     })

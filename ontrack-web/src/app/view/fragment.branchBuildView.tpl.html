@@ -206,6 +206,10 @@
             <div class="ot-branch-build-view-build-signature">
                 {{build.creation.time | date:'mediumDate'}}
                 {{build.creation.time | date:'shortTime'}}
+                <!-- Run info - run time if available -->
+                <span ng-if="build.runInfo.runTime" title="{{build.runInfo.runTime}} seconds">
+                    &nbsp;-&nbsp;{{displayDuration(build.runInfo.runTime)}}
+                </span>
             </div>
         </td>
         <!-- Promotion runs -->
