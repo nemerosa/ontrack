@@ -49,4 +49,46 @@ class ACCDSLRunInfo extends AbstractACCDSL {
         }
     }
 
+    @Test
+    void 'Validation run without run info'() {
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('1.0') {
+                validationStamp('VS')
+                def build = build('1.0.0')
+                def run = build.validate('VS')
+                // Gets the run info
+                def info = run.runInfo
+                assert info == null: "No run info"
+            }
+        }
+    }
+
+    @Test
+    void 'Validation run with run info'() {
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('1.0') {
+                validationStamp('VS')
+                def build = build('1.0.0')
+                def run = build.validate('VS')
+                // Sets the run info
+                run.setRunInfo sourceType: "jenkins",
+                        sourceUri: "http://jenkins/job/build/1",
+                        triggerType: "user",
+                        triggerData: "damien",
+                        runTime: 30
+                // Gets the run info
+                def info = run.runInfo
+                assert info != null
+                assert info.id != 0
+                assert info.sourceType == "jenkins"
+                assert info.sourceUri == "http://jenkins/job/build/1"
+                assert info.triggerType == "user"
+                assert info.triggerData == "damien"
+                assert info.runTime == 30
+            }
+        }
+    }
+
 }
