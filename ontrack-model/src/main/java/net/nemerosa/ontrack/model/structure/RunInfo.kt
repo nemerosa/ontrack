@@ -12,7 +12,7 @@ package net.nemerosa.ontrack.model.structure
  * @property triggerData Data associated with the trigger (like a user ID or a commit)
  * @property runTime Time of the run (in seconds)
  */
-class RunInfo(
+open class RunInfo(
         val id: Int,
         val sourceType: String?,
         val sourceUri: String?,

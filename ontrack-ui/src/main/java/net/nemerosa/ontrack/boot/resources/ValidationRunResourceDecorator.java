@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.boot.resources;
 
-import net.nemerosa.ontrack.boot.ui.DecorationsController;
-import net.nemerosa.ontrack.boot.ui.PropertyController;
-import net.nemerosa.ontrack.boot.ui.ValidationRunController;
-import net.nemerosa.ontrack.boot.ui.ValidationStampController;
+import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange;
 import net.nemerosa.ontrack.model.structure.ValidationRun;
 import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator;
@@ -55,6 +52,11 @@ public class ValidationRunResourceDecorator extends AbstractLinkResourceDecorato
                 link(
                         "_decorations",
                         validationRun -> on(DecorationsController.class).getDecorations(validationRun.getProjectEntityType(), validationRun.getId())
+                ),
+                // Run info
+                link(
+                        "_runInfo",
+                        validationRun -> on(RunInfoController.class).getRunInfo(validationRun.getRunnableEntityType(), validationRun.id())
                 ),
                 // Page
                 page()
