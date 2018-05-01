@@ -16,7 +16,7 @@ interface RunInfoService {
     /**
      * Gets the [RunInfo] associated with a [runnable entity][RunnableEntity].
      */
-    fun getRunInfo(entity: RunnableEntity): RunInfo
+    fun getRunInfo(entity: RunnableEntity): RunInfo?
 
     /**
      * Sets a [run info][RunInfoInput] on a [runnable entity][RunnableEntity] and returns

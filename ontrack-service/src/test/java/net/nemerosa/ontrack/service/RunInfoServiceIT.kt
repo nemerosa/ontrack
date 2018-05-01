@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.structure.RunInfoService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class RunInfoServiceIT : AbstractServiceTestSupport() {
@@ -18,7 +18,7 @@ class RunInfoServiceIT : AbstractServiceTestSupport() {
     fun `No run info by default for a build`() {
         val build = doCreateBuild()
         val info = runInfoService.getRunInfo(build)
-        assertTrue(info.empty, "No run info")
+        assertNull(info, "No run info")
     }
 
     @Test
@@ -34,7 +34,6 @@ class RunInfoServiceIT : AbstractServiceTestSupport() {
                         runTime = 26
                 )
         )
-        assertFalse(info.empty)
         assertTrue(info.id != 0)
         assertEquals("jenkins", info.sourceType)
         assertEquals("http://jenkins/job/build/1", info.sourceUri)
@@ -56,11 +55,10 @@ class RunInfoServiceIT : AbstractServiceTestSupport() {
                         runTime = 26
                 )
         )
-        assertFalse(info.empty)
         // Deletion
         runInfoService.deleteRunInfo(build)
         val newInfo = runInfoService.getRunInfo(build)
-        assertTrue(newInfo.empty, "No run info")
+        assertNull(newInfo, "No run info")
     }
 
 }

@@ -21,6 +21,8 @@ constructor(
         private val structureService: StructureService,
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val validation: GQLTypeValidation,
+        private val runInfo: GQLTypeRunInfo,
+        private val runInfoService: RunInfoService,
         creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
@@ -128,6 +130,13 @@ constructor(
                             .description("Link direction")
                             .type(GraphQLString)
                             .dataFetcher(fetcher(LinkedBuild::class.java, LinkedBuild::direction))
+                }
+                // Run info
+                .field {
+                    it.name("runInfo")
+                            .description("Run info associated with this build")
+                            .type(runInfo.typeRef)
+                            .runInfoFetcher<Build> { runInfoService.getRunInfo(it) }
                 }
                 // OK
                 .build()

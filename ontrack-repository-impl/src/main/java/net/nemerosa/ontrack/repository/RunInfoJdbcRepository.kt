@@ -15,7 +15,7 @@ import javax.sql.DataSource
 class RunInfoJdbcRepository(
         dataSource: DataSource
 ) : AbstractJdbcRepository(dataSource), RunInfoRepository {
-    override fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo {
+    override fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo? {
         return getFirstItem(
                 "SELECT * FROM RUN_INFO WHERE ${runnableEntityType.name.toUpperCase()} = :entityId",
                 params("entityId", id),
@@ -30,11 +30,11 @@ class RunInfoJdbcRepository(
                             readSignature(rs)
                     )
                 }
-        ) ?: RunInfo.empty()
+        )
     }
 
     override fun deleteRunInfo(runnableEntityType: RunnableEntityType, id: Int): Ack {
-        val runInfo = getRunInfo(runnableEntityType, id).takeIf { !it.empty }
+        val runInfo = getRunInfo(runnableEntityType, id)
         namedParameterJdbcTemplate.update(
                 "DELETE FROM RUN_INFO WHERE ${runnableEntityType.name.toUpperCase()} = :entityId",
                 params("entityId", id)
@@ -49,7 +49,7 @@ class RunInfoJdbcRepository(
             signature: Signature
     ): RunInfo {
         // Gets the existing run info if any
-        val runInfo = getRunInfo(runnableEntityType, id).takeIf { !it.empty }
+        val runInfo = getRunInfo(runnableEntityType, id)
         // Parameters
         val params = params("runTime", input.runTime)
                 .addValue("sourceType", input.sourceType)
@@ -82,6 +82,6 @@ class RunInfoJdbcRepository(
             )
         }
         // OK
-        return getRunInfo(runnableEntityType, id)
+        return getRunInfo(runnableEntityType, id) ?: throw IllegalStateException("Run info should have been created")
     }
 }

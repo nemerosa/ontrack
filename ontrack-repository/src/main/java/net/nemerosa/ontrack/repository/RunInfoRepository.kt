@@ -11,7 +11,7 @@ interface RunInfoRepository {
      * Gets the [RunInfo] associated with a runnable entity defined
      * by its [type][RunnableEntityType] and [ID][id].
      */
-    fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo
+    fun getRunInfo(runnableEntityType: RunnableEntityType, id: Int): RunInfo?
 
     /**
      * Sets a [run info][RunInfoInput] on a runnable entity defined

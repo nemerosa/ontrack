@@ -35,7 +35,7 @@ class RunInfoController(
                     runInfoService.getRunnableEntity(
                             runnableEntityType, id
                     )
-            )
+            ) ?: RunInfo.empty()
 
     @DeleteMapping("{runnableEntityType}/{id}")
     fun deleteRunInfo(

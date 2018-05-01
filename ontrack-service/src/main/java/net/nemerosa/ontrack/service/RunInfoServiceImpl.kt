@@ -19,7 +19,7 @@ class RunInfoServiceImpl(
         return runnableEntityType.load(structureService, id)
     }
 
-    override fun getRunInfo(entity: RunnableEntity): RunInfo =
+    override fun getRunInfo(entity: RunnableEntity): RunInfo? =
             runInfoRepository.getRunInfo(
                     entity.runnableEntityType,
                     entity.id()
