@@ -80,6 +80,10 @@ angular.module('ot.view.validationStamp', [
                           id
                           name
                         }
+                        creation {
+                          user
+                          time
+                        }
                         runInfo {
                           sourceType
                           sourceUri
@@ -93,10 +97,6 @@ angular.module('ot.view.validationStamp', [
                             name
                           }
                           description
-                          creation {
-                            user
-                            time
-                          }
                         }
                       }
                     }

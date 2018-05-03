@@ -17,6 +17,18 @@
                 No validation run has been done yet.
             </div>
             <table class="table table-condensed table-hover" ng-show="validationStamp.validationRunsPaginated.pageInfo.totalSize != 0">
+                <thead>
+                <tr>
+                    <th>Build</th>
+                    <th>Run</th>
+                    <th>Last status</th>
+                    <th>Description</th>
+                    <th>Creation</th>
+                    <th>Source</th>
+                    <th>Trigger</th>
+                    <th>Run time</th>
+                </tr>
+                </thead>
                 <tbody>
                     <tr ng-repeat="validationRun in validationStamp.validationRunsPaginated.pageItems">
                         <td>
@@ -38,7 +50,25 @@
                             {{validationRun.validationRunStatuses[0].description}}
                         </td>
                         <td>
-                            Signature and run info (TODO)
+                            <ot-signature value="{time: validationRun.creation.time, user: {name: validationRun.creation.user}}" user="true" time="true"></ot-signature>
+                        </td>
+                        <td>
+                           <span ng-if="validationRun.runInfo.sourceType && validationRun.runInfo.sourceUri">
+                               <a href="{{validationRun.runInfo.sourceUri}}">{{validationRun.runInfo.sourceType}}</a>
+                           </span>
+                        </td>
+                        <td>
+                           <span ng-if="validationRun.runInfo.triggerType && validationRun.runInfo.triggerData">
+                               {{validationRun.runInfo.triggerType}}
+                               ->
+                               {{validationRun.runInfo.triggerData}}
+                           </span>
+                        </td>
+                        <td>
+                            <span ng-if="validationRun.runInfo.runTime">
+                                <ot-duration duration="validationRun.runInfo.runTime"></ot-duration>
+                                <i>({{validationRun.runInfo.runTime}} seconds)</i>
+                            </span>
                         </td>
                     </tr>
                 </tbody>
