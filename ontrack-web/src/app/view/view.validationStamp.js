@@ -77,6 +77,7 @@ angular.module('ot.view.validationStamp', [
                         id
                         runOrder
                         build {
+                          id
                           name
                         }
                         runInfo {

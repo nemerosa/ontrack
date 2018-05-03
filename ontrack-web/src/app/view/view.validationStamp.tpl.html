@@ -13,12 +13,12 @@
     <div class="row">
         <div class="col-md-8">
             <ot-section-title>History</ot-section-title>
-            <div class="alert alert-warning" ng-show="validationRunResources.resources.length == 0">
+            <div class="alert alert-warning" ng-show="validationStamp.validationRunsPaginated.pageInfo.totalSize == 0">
                 No validation run has been done yet.
             </div>
-            <table class="table table-condensed table-hover" ng-show="validationRunResources.resources.length != 0">
+            <table class="table table-condensed table-hover" ng-show="validationStamp.validationRunsPaginated.pageInfo.totalSize != 0">
                 <tbody>
-                    <tr ng-repeat="validationRun in validationRunResources.resources">
+                    <tr ng-repeat="validationRun in validationStamp.validationRunsPaginated.pageItems">
                         <td>
                             <a href="#/build/{{validationRun.build.id}}">
                                 {{validationRun.build.name}}
@@ -31,14 +31,14 @@
                         </td>
                         <td>
                             <a href="#/validationRun/{{validationRun.id}}">
-                                <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
                             </a>
                         </td>
                         <td>
-                            {{validationRun.lastStatus.description}}
+                            {{validationRun.validationRunStatuses[0].description}}
                         </td>
                         <td>
-                            <ot-signature value="validationRun.lastStatus.signature" user="true" time="true"></ot-signature>
+                            Signature and run info (TODO)
                         </td>
                     </tr>
                 </tbody>
