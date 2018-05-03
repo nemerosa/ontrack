@@ -1,7 +1,8 @@
 angular.module('ot.view.validationStamp', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('validationStamp', {
