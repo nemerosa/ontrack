@@ -43,8 +43,8 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
             branch {
                 // Creates a validation stamp
                 val vs = validationStamp()
-                // Creates 10 builds...
-                repeat(10) { no ->
+                // Creates 3 builds...
+                repeat(3) { no ->
                     build("1.$no") {
                         // Validates N times the build
                         repeat(20) {
@@ -54,7 +54,7 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
                 }
                 // Checks the number of validation runs
                 assertEquals(
-                        200,
+                        60,
                         structureService.getValidationRunsCountForValidationStamp(vs.id),
                         "Checking the number of validation runs having been created"
                 )
@@ -108,15 +108,21 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
                 val pageInfo = paginated["pageInfo"]
                 val previousPage = pageInfo["previousPage"]
                 val nextPage = pageInfo["nextPage"]
-                assertEquals(200, pageInfo["totalSize"].asInt())
+                assertEquals(60, pageInfo["totalSize"].asInt())
                 assertEquals(0, pageInfo["currentOffset"].asInt())
                 assertEquals(20, pageInfo["currentSize"].asInt())
                 assertEquals(0, pageInfo["pageIndex"].asInt())
-                assertEquals(10, pageInfo["pageTotal"].asInt())
+                assertEquals(3, pageInfo["pageTotal"].asInt())
                 assertTrue(previousPage.isNull, "No previous page")
                 assertFalse(nextPage.isNull, "There is a next page")
                 assertEquals(20, nextPage["offset"].asInt())
                 assertEquals(20, nextPage["size"].asInt())
+                val pageItems = paginated["pageItems"]
+                assertEquals(20, pageItems.size())
+                repeat(20) {
+                    val buildName = pageItems[it]["build"]["name"].asText()
+                    assertEquals("1.2", buildName)
+                }
             }
         }
     }
