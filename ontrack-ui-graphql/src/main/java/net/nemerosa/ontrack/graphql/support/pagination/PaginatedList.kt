@@ -20,10 +20,8 @@ class PaginatedList<T>(
                             totalSize = total,
                             currentOffset = offset,
                             currentSize = items.size,
-                            // FIXME Previous page
-                            previousPage = null,
-                            // FIXME Next page
-                            nextPage = null
+                            previousPage = PageRequest(offset, items.size).previous(total),
+                            nextPage = PageRequest(offset, items.size).next(total)
                     ),
                     pageItems = items
             )
