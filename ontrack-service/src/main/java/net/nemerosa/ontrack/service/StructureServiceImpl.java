@@ -1163,6 +1163,11 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public int getValidationRunsCountForValidationStamp(ID validationStampId) {
+        return structureRepository.getValidationRunsCountForValidationStamp(validationStampId);
+    }
+
+    @Override
     public Optional<Project> findProjectByName(String project) {
         return structureRepository.getProjectByName(project)
                 .filter(p ->

@@ -178,5 +178,12 @@ public interface StructureRepository {
 
     List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    /**
+     * Gets the total number of validation runs for a validation stamp
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForValidationStamp(ID validationStampId);
+
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 }

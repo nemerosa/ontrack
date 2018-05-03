@@ -7,18 +7,19 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.structure.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class GQLTypeValidationStamp @Autowired
-constructor(private val structureService: StructureService,
-            creation: GQLTypeCreation,
-            private val projectEntityInterface: GQLProjectEntityInterface,
-            private val validationRun: GQLTypeValidationRun,
-            projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
+class GQLTypeValidationStamp(
+        private val structureService: StructureService,
+        creation: GQLTypeCreation,
+        private val projectEntityInterface: GQLProjectEntityInterface,
+        private val paginatedListFactory: GQLPaginatedListFactory,
+        private val validationRun: GQLTypeValidationRun,
+        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<ValidationStamp>(
         ValidationStamp::class.java,
         ProjectEntityType.VALIDATION_STAMP,
@@ -46,6 +47,26 @@ constructor(private val structureService: StructureService,
                                 .description("Reference to branch")
                                 .type(GraphQLTypeReference(GQLTypeBranch.BRANCH))
                                 .build()
+                )
+                // Paginated list of validation runs
+                .field(
+                        paginatedListFactory.createPaginatedField<ValidationStamp, ValidationRun>(
+                                fieldName = "validationRunsPaginated",
+                                fieldDescription = "Paginated list of validation runs",
+                                itemType = validationRun,
+                                itemListCounter = { validationStamp ->
+                                    structureService.getValidationRunsCountForValidationStamp(
+                                            validationStamp.id
+                                    )
+                                },
+                                itemListProvider = { _, validationStamp, offset, size ->
+                                    structureService.getValidationRunsForValidationStamp(
+                                            validationStamp.id,
+                                            offset,
+                                            size
+                                    )
+                                }
+                        )
                 )
                 // Validation runs
                 .field(

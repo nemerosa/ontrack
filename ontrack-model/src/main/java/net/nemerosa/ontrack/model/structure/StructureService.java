@@ -220,6 +220,13 @@ public interface StructureService {
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 
+    /**
+     * Gets the total number of validation runs for a validation stamp
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForValidationStamp(ID validationStampId);
+
     // Entity searches by name
 
     Optional<Project> findProjectByName(String project);

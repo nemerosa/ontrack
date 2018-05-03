@@ -938,6 +938,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public int getValidationRunsCountForValidationStamp(ID validationStampId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId",
+                params("validationStampId", validationStampId.getValue()),
+                Integer.class
+        );
+    }
+
+    @Override
     public ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus) {
         // Saves the new status
         newValidationRunStatus(validationRun.id(), runStatus);
