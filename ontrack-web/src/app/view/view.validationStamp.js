@@ -79,6 +79,13 @@ angular.module('ot.view.validationStamp', [
                         build {
                           name
                         }
+                        runInfo {
+                          sourceType
+                          sourceUri
+                          triggerType
+                          triggerData
+                          runTime
+                        }
                         validationRunStatuses {
                           statusID {
                             id
