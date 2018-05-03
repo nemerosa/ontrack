@@ -163,6 +163,39 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
                     val buildName = pageItems[it]["build"]["name"].asText()
                     assertEquals("1.1", buildName)
                 }
+
+                /**
+                 * Last page
+                 */
+
+                // Uses the next page as variables
+                params["offset"] = nextPage["offset"].asInt()
+                params["size"] = nextPage["size"].asInt()
+                // Runs the query for the first page
+                data = run(query, params)
+                // Checks the validation stamp info
+                vsNode = data["validationStamp"]
+                assertEquals(vs.name, vsNode["name"].asText())
+                // Gets the paginated list
+                paginated = vsNode["validationRunsPaginated"]
+                pageInfo = paginated["pageInfo"]
+                previousPage = pageInfo["previousPage"]
+                nextPage = pageInfo["nextPage"]
+                assertEquals(60, pageInfo["totalSize"].asInt())
+                assertEquals(40, pageInfo["currentOffset"].asInt())
+                assertEquals(20, pageInfo["currentSize"].asInt())
+                assertEquals(2, pageInfo["pageIndex"].asInt())
+                assertEquals(3, pageInfo["pageTotal"].asInt())
+                assertFalse(previousPage.isNull, "There is a previous page")
+                assertEquals(20, previousPage["offset"].asInt())
+                assertEquals(20, previousPage["size"].asInt())
+                assertTrue(nextPage.isNull, "There is no next page")
+                pageItems = paginated["pageItems"]
+                assertEquals(20, pageItems.size())
+                repeat(20) {
+                    val buildName = pageItems[it]["build"]["name"].asText()
+                    assertEquals("1.0", buildName)
+                }
             }
         }
     }
