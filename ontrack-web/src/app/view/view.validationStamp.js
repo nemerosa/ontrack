@@ -43,6 +43,10 @@ angular.module('ot.view.validationStamp', [
                     branch {
                       id
                       name
+                      project {
+                        id
+                        name
+                      }
                     }
                     links {
                       _self
@@ -93,7 +97,8 @@ angular.module('ot.view.validationStamp', [
         // Loading the validation stamp
         function loadValidationStamp() {
             otGraphqlService.pageGraphQLCall(query, queryVariables).then(function (data) {
-                $scope.validationStamp = data.validationStamp;
+                const validationStamp = data.validationStamp;
+                $scope.validationStamp = validationStamp;
                 // View setup
                 if (!viewInitialised) {
                     // View title
