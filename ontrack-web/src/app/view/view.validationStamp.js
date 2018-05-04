@@ -190,10 +190,10 @@ angular.module('ot.view.validationStamp', [
         }
 
         // Switching the page
-        $scope.switchPage = function (pageLink) {
-            ot.pageCall($http.get(pageLink)).then(function (validationRunResources) {
-                $scope.validationRunResources = validationRunResources;
-            });
+        $scope.switchPage = function (pageRequest) {
+            queryVariables.offset = pageRequest.offset;
+            queryVariables.size = pageRequest.size;
+            loadValidationStamp();
         };
 
     })
