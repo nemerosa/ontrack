@@ -18,10 +18,11 @@ angular.module('ot.view.validationStamp', [
         const validationStampId = $stateParams.validationStampId;
 
         // Initial query parameters
+        const pageSize = 20;
         const queryVariables = {
             validationStampId: validationStampId,
             offset: 0,
-            size: 20
+            size: pageSize
         };
 
         // Query for the validation stamp
@@ -192,7 +193,7 @@ angular.module('ot.view.validationStamp', [
         // Switching the page
         $scope.switchPage = function (pageRequest) {
             queryVariables.offset = pageRequest.offset;
-            queryVariables.size = pageRequest.size;
+            queryVariables.size = pageSize;
             loadValidationStamp();
         };
 
