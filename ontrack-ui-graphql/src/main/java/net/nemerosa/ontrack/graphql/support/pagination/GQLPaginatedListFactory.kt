@@ -59,6 +59,7 @@ class GQLPaginatedListFactory(
                     PaginatedList.create(
                             items = items,
                             offset = offset,
+                            pageSize = size,
                             total = total)
                 }
                 .build()

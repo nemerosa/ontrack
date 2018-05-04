@@ -14,14 +14,15 @@ class PaginatedList<T>(
         fun <T> create(
                 items: List<T>,
                 offset: Int,
+                pageSize: Int,
                 total: Int): PaginatedList<T> {
             return PaginatedList(
                     pageInfo = PageInfo(
                             totalSize = total,
                             currentOffset = offset,
                             currentSize = items.size,
-                            previousPage = PageRequest(offset, items.size).previous(total),
-                            nextPage = PageRequest(offset, items.size).next(total)
+                            previousPage = PageRequest(offset, items.size).previous(total, pageSize),
+                            nextPage = PageRequest(offset, items.size).next(total, pageSize)
                     ),
                     pageItems = items
             )
