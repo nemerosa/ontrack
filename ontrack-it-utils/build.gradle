@@ -10,7 +10,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
     compile 'org.slf4j:slf4j-api'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
-    
+    compile 'io.micrometer:micrometer-spring-legacy'
+
     runtime 'com.h2database:h2'
     runtime 'io.dropwizard.metrics:metrics-core'
     runtime 'org.hibernate:hibernate-validator'

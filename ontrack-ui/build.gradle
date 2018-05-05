@@ -16,6 +16,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
     runtime 'com.h2database:h2'
 
+    // Metric runtimes
+    runtime 'io.micrometer:micrometer-registry-influx'
+
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output

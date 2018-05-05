@@ -2,6 +2,7 @@ buildscript {
     ext {
         springBootVersion = '1.5.12.RELEASE'
         kotlinVersion = '1.2.40'
+        micrometerVersion = '1.0.3'
     }
     repositories {
         jcenter()
@@ -175,6 +176,9 @@ configure(coreProjects) {
             dependency 'org.kohsuke:groovy-sandbox:1.19'
             dependency 'com.graphql-java:graphql-java:8.0'
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
+            // Metrics
+            dependency "io.micrometer:micrometer-spring-legacy:${micrometerVersion}"
+            dependency "io.micrometer:micrometer-registry-influx:${micrometerVersion}"
             // Overrides from Spring Boot
             dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
         }
