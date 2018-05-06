@@ -40,8 +40,6 @@ dependencies {
     runtime project(':ontrack-extension-combined')
     runtime project(':ontrack-extension-ldap')
     runtime project(':ontrack-extension-stale')
-    runtime project(':ontrack-extension-metrics-graphite')
-    runtime project(':ontrack-extension-metrics-influxdb')
     runtime project(':ontrack-extension-vault')
 }
 

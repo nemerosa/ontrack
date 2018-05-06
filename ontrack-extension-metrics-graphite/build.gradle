@@ -1,4 +1,0 @@
-dependencies {
-    compile 'io.dropwizard.metrics:metrics-graphite'
-    compile project(':ontrack-extension-support')
-}
