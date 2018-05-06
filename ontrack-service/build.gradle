@@ -16,7 +16,6 @@ dependencies {
     compile 'org.kohsuke:groovy-sandbox'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-starter-cache'
-    compile 'io.dropwizard.metrics:metrics-core'
     compile 'org.jgrapht:jgrapht-core'
     compile 'com.github.ben-manes.caffeine:caffeine'
 
