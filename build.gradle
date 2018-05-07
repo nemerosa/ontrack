@@ -177,6 +177,7 @@ configure(coreProjects) {
             dependency 'com.graphql-java:graphql-java:8.0'
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
             // Metrics
+            dependency "io.micrometer:micrometer-core:${micrometerVersion}"
             dependency "io.micrometer:micrometer-spring-legacy:${micrometerVersion}"
             dependency "io.micrometer:micrometer-registry-influx:${micrometerVersion}"
             // Overrides from Spring Boot
