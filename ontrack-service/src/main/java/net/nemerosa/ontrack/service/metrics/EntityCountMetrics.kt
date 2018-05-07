@@ -1,31 +1,39 @@
 package net.nemerosa.ontrack.service.metrics
 
-import net.nemerosa.ontrack.model.metrics.OntrackMetrics
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.binder.MeterBinder
 import net.nemerosa.ontrack.repository.StatsRepository
-import org.springframework.boot.actuate.metrics.Metric
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Component
+@Transactional(readOnly = true)
 class EntityCountMetrics(
         private val repository: StatsRepository
-) : OntrackMetrics {
+) : MeterBinder {
 
-    @Transactional(readOnly = true)
-    override fun metrics(): Collection<Metric<*>> {
-        return Arrays.asList<Metric<*>>(
-                Metric("gauge.entity.project", repository.projectCount),
-                Metric("gauge.entity.branch", repository.branchCount),
-                Metric("gauge.entity.build", repository.buildCount),
-                Metric("gauge.entity.promotionLevel", repository.promotionLevelCount),
-                Metric("gauge.entity.promotionRun", repository.promotionRunCount),
-                Metric("gauge.entity.validationStamp", repository.validationStampCount),
-                Metric("gauge.entity.validationRun", repository.validationRunCount),
-                Metric("gauge.entity.validationRunStatus", repository.validationRunStatusCount),
-                Metric("gauge.entity.property", repository.propertyCount),
-                Metric("gauge.entity.event", repository.eventCount)
+    private fun MeterRegistry.count(
+            name: String,
+            countFn: StatsRepository.() -> Int
+    ) {
+        gauge(
+                "ontrack.entity.$name",
+                repository,
+                { repository.countFn().toDouble() }
         )
+    }
+
+    override fun bindTo(registry: MeterRegistry) {
+        registry.count("project", { projectCount })
+        registry.count("branch", { branchCount })
+        registry.count("build", { buildCount })
+        registry.count("promotionLevel", { promotionLevelCount })
+        registry.count("promotionRun", { promotionRunCount })
+        registry.count("validationStamp", { validationStampCount })
+        registry.count("validationRun", { validationRunCount })
+        registry.count("validationRunStatus", { validationRunStatusCount })
+        registry.count("property", { propertyCount })
+        registry.count("event", { eventCount })
     }
 
 }
