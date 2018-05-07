@@ -259,7 +259,6 @@ constructor(
                 meterRegistry.gauge("run-count".metricKey, job.key.metricTags, this, { it.jobStatus.runCount.toDouble() })
                 // last error count
                 meterRegistry.gauge("last-error-count".metricKey, job.key.metricTags, this, { it.jobStatus.lastErrorCount.toDouble() })
-                // TODO run time as Timer
             }
         }
 
