@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.job
 
+import io.micrometer.core.instrument.Tag
+
 data class JobKey(
         val type: JobType,
         val id: String
@@ -20,6 +22,14 @@ data class JobKey(
                 id
         )
     }
+
+    val metricTags: List<Tag>
+        get() = listOf(
+                Tag.of("job-id", id),
+                Tag.of("job-type", type.key),
+                Tag.of("job-category", type.category.key)
+        )
+
 
     companion object {
         @JvmStatic
