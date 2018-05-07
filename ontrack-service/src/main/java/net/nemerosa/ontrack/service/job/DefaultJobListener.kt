@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service.job
 
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tag
 import net.nemerosa.ontrack.job.JobKey
 import net.nemerosa.ontrack.job.JobListener
 import net.nemerosa.ontrack.job.JobRunProgress
@@ -12,20 +11,12 @@ import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 
 open class DefaultJobListener(
         private val logService: ApplicationLogService,
         private val meterRegistry: MeterRegistry,
         private val settingsRepository: SettingsRepository
 ) : JobListener {
-
-    private val JobKey.metricTags: List<Tag>
-        get() = listOf(
-                Tag.of("job-id", id),
-                Tag.of("job-type", type.key),
-                Tag.of("job-category", type.category.key)
-        )
 
     override fun onJobStart(key: JobKey) {
     }
