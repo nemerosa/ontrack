@@ -15,7 +15,7 @@ import java.util.List;
 public class AccountInput {
 
     @NotNull(message = "The account name is required.")
-    @Pattern(regexp = "[a-zA-Z0-9]+", message = "The account name must contain only letters and digits.")
+    @Pattern(regexp = "[a-zA-Z0-9_.-]+", message = "The account name must contain only letters, digits, underscores, dashes and dots.")
     private final String name;
     @NotNull(message = "The account full name is required.")
     @Size(min = 1, max = 100, message = "The account full name must be between 1 and 100 long.")
