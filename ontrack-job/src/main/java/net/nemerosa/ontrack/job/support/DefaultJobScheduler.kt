@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.job.support
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
@@ -13,14 +14,20 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
 
-class DefaultJobScheduler(
+/**
+ * @property meterRegistry If set, the scheduler will register job metrics
+ */
+class DefaultJobScheduler
+@JvmOverloads
+constructor(
         private val jobDecorator: JobDecorator,
         private val schedulerPool: ScheduledExecutorService,
         private val jobListener: JobListener,
         initiallyPaused: Boolean,
         private val jobPoolProvider: BiFunction<ExecutorService, Job, ExecutorService>,
         private val scattering: Boolean,
-        private val scatteringRatio: Double
+        private val scatteringRatio: Double,
+        private val meterRegistry: MeterRegistry? = null
 ) : JobScheduler {
 
     private val logger = LoggerFactory.getLogger(JobScheduler::class.java)
@@ -30,13 +37,15 @@ class DefaultJobScheduler(
 
     private val idGenerator = AtomicLong()
 
+    @JvmOverloads
     constructor(
             jobDecorator: JobDecorator,
             schedulerPool: ScheduledExecutorService,
             jobListener: JobListener,
             initiallyPaused: Boolean,
             scattering: Boolean,
-            scatteringRatio: Double
+            scatteringRatio: Double,
+            meterRegistry: MeterRegistry? = null
     ) : this(
             jobDecorator,
             schedulerPool,
@@ -44,7 +53,8 @@ class DefaultJobScheduler(
             initiallyPaused,
             BiFunction { executorService, _ -> executorService },
             scattering,
-            scatteringRatio
+            scatteringRatio,
+            meterRegistry
     )
 
     init {
