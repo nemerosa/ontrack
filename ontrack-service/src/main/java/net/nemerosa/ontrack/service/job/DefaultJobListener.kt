@@ -32,12 +32,13 @@ open class DefaultJobListener(
     }
 
     override fun onJobEnd(key: JobKey, milliseconds: Long) {
-        meterRegistry.timer("job-duration", key.metricTags).record(milliseconds, TimeUnit.MILLISECONDS)
+        meterRegistry.timer("ontrack_job_duration_ms", key.metricTags).record(milliseconds, TimeUnit.MILLISECONDS)
+        meterRegistry.counter("ontrack_job_run_count", key.metricTags).increment()
     }
 
     override fun onJobError(status: JobStatus, ex: Exception) {
         val key = status.key
-        meterRegistry.counter("job-error", key.metricTags).increment()
+        meterRegistry.counter("ontrack_job_error_count", key.metricTags).increment()
         logService.log(
                 ApplicationLogEntry.error(
                         ex,
