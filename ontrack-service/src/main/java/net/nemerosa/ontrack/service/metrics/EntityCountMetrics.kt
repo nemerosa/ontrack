@@ -17,7 +17,7 @@ class EntityCountMetrics(
             countFn: StatsRepository.() -> Int
     ) {
         gauge(
-                "ontrack.entity.$name",
+                "ontrack_entity_${name}_total",
                 repository,
                 { repository.countFn().toDouble() }
         )
