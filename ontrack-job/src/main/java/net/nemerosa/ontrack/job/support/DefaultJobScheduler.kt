@@ -57,22 +57,56 @@ constructor(
             meterRegistry
     )
 
+    private fun MeterRegistry.statusGauge(
+            name: String,
+            statusFilterFn: (JobStatus) -> Boolean
+    ) {
+        gauge(
+                "ontrack_job_${name}_total",
+                services,
+                {
+                    it.filter { (_, service) -> statusFilterFn(service.jobStatus) }
+                            .size.toDouble()
+                }
+        )
+    }
+
     init {
         Validate.inclusiveBetween(0.0, 1.0, scatteringRatio)
         this.schedulerPaused = AtomicBoolean(initiallyPaused)
+        // Metrics
+        if (meterRegistry != null) {
+            // count
+            meterRegistry.gaugeMapSize(
+                    "ontrack_job_count_total",
+                    emptyList(),
+                    services
+            )
+            meterRegistry.statusGauge("running", { it.isRunning })
+            meterRegistry.statusGauge("disabled", { it.isDisabled })
+            meterRegistry.statusGauge("paused", { it.isPaused })
+            meterRegistry.statusGauge("error", { it.isError })
+            meterRegistry.statusGauge("invalid", { !it.isValid })
+            meterRegistry.gauge(
+                    "ontrack_job_error_count_total",
+                    services,
+                    {
+                        it.values.map { it.jobStatus.lastErrorCount }.sum().toDouble()
+                    }
+            )
+        }
     }
 
     override fun schedule(job: Job, schedule: Schedule) {
         logger.info("[scheduler][job]{} Scheduling with {}", job.key, schedule)
         // Manages existing schedule
         val existingService = services[job.key]
-        val service = if (existingService != null) {
+        if (existingService != null) {
             logger.info("[scheduler][job]{} Modifying existing schedule", job.key)
             existingService.update(
                     job,
                     schedule
             )
-            existingService
         }
         // Creates and starts the scheduled service
         else {
@@ -86,10 +120,7 @@ constructor(
             )
             // Registration
             services[job.key] = jobScheduledService
-            jobScheduledService
         }
-        // Registers metrics for this service
-        service.registerMetrics()
     }
 
     override fun unschedule(key: JobKey): Boolean {
@@ -226,40 +257,6 @@ constructor(
             }
             // Initial schedule
             createSchedule()
-        }
-
-        /**
-         * Metric prefix
-         */
-        private val String.metricKey get() = "ontrack.job.${this}"
-
-        /**
-         * Flag metric
-         */
-        private fun Boolean.asGauge() = if (this) 1.0 else 0.0
-
-        /**
-         * Registers this service for metrics
-         */
-        fun registerMetrics() {
-            if (meterRegistry != null) {
-                // count
-                meterRegistry.gauge("count".metricKey, job.key.metricTags, this, { _ -> 1.0 })
-                // running
-                meterRegistry.gauge("running".metricKey, job.key.metricTags, this, { it.jobStatus.isRunning.asGauge() })
-                // disabled
-                meterRegistry.gauge("disabled".metricKey, job.key.metricTags, this, { it.jobStatus.isDisabled.asGauge() })
-                // paused
-                meterRegistry.gauge("paused".metricKey, job.key.metricTags, this, { it.jobStatus.isPaused.asGauge() })
-                // error
-                meterRegistry.gauge("error".metricKey, job.key.metricTags, this, { it.jobStatus.isError.asGauge() })
-                // invalid
-                meterRegistry.gauge("invalid".metricKey, job.key.metricTags, this, { (!it.jobStatus.isValid).asGauge() })
-                // runCount
-                meterRegistry.gauge("run-count".metricKey, job.key.metricTags, this, { it.jobStatus.runCount.toDouble() })
-                // last error count
-                meterRegistry.gauge("last-error-count".metricKey, job.key.metricTags, this, { it.jobStatus.lastErrorCount.toDouble() })
-            }
         }
 
         private fun createSchedule() {
