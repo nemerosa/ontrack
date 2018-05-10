@@ -1,0 +1,56 @@
+[[appendix-metrics-migration]]
+=== Metrics migration
+
+
+Job metrics:
+
+* `job-category.Category.*` - https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] for the jobs in a given category (for example: `ontrack.counter.job-category.SVNIndexLatest`)
+* `job.*` - https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] for all the jobs
+* `gauge.jobs` - total number of jobs
+* `gauge.jobs.running` - number of running jobs
+* `gauge.jobs.disabled` - number of disabled jobs
+* `gauge.jobs.error` - number of jobs in error
+* `gauge.jobs.invalid` - number of invalid
+* `gauge.jobs.paused` - number of invalid
+* `gauge.jobs.<category>` - total number of jobs for a given category
+* `gauge.jobs.<category>.running` - number of running jobs for a given category
+* `gauge.jobs.<category>.disabled` - number of disabled jobs for a given category
+* `gauge.jobs.<category>.error` - number of jobs in error for a given category
+* `gauge.jobs.<category>.invalid` - number of invalid jobs for a given category
+* `gauge.jobs.<category>.paused` - number of paused jobs for a given category
+
+Tagged job metrics:
+
+IMPORTANT: Only since Ontrack 2.27 and only in InfluxDB. Those metrics are
+associated with tags.
+
+* `ontrack.job.count` - total number of jobs for a given job
+* `ontrack.job.running` - number of running jobs for a given job
+* `ontrack.job.disabled` - number of disabled jobs for a given job
+* `ontrack.job.error` - number of jobs in error for a given job
+* `ontrack.job.invalid` - number of invalid jobs for a given job
+* `ontrack.job.paused` - number of paused jobs for a given job
+
+Following tags are associated with each of those measurements:
+
+* `category` of the job
+* `type` of the job
+* `jobId` of the job
+
+Entity metrics:
+
+* `gauge.entity.project` - number of projects
+* `gauge.entity.branch` - number of branches
+* `gauge.entity.build` - number of builds
+* `gauge.entity.promotionLevel` - number of promotion levels
+* `gauge.entity.promotionRun` - number of promotion runs
+* `gauge.entity.validationStamp` - number of validation stamps
+* `gauge.entity.validationRun` - number of validation runs
+* `gauge.entity.validationRunStatus` - number of validation run statuses
+* `gauge.entity.property` - number of properties attached to the entities
+* `gauge.entity.event` - number of generated events
+
+Application errors metrics:
+
+* `counter.error` - number of errors which have occurred in Ontrack - using a derivative of this value can help having an idea of the frequency of errors
+* `counter.error.*` - number of errors for a given category, like `GitService` or `UIErrorHandler`)

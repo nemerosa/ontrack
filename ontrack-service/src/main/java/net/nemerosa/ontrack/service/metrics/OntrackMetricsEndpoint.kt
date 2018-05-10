@@ -19,11 +19,14 @@ class OntrackMetricsEndpoint(
         meterRegistry.forEachMeter { meter ->
             val name: String = meter.id.name
             if (name.startsWith("ontrack")) {
+                // Tags for the meter
                 val tags: Map<String, String> = meter.id.tags
                         .associateBy(
                                 { tag -> tag.key },
                                 { tag -> tag.value }
                         )
+                // Type of meter
+                val type = meter.id.type.name
                 // Gets the first value
                 val value = meter.measure()
                         .firstOrNull()
@@ -31,6 +34,7 @@ class OntrackMetricsEndpoint(
                 // Metric item
                 metrics.add(
                         OntrackMetricsItem(
+                                type,
                                 name,
                                 tags,
                                 value
@@ -51,6 +55,7 @@ class OntrackMetricsCollection(
 )
 
 class OntrackMetricsItem(
+        val type: String,
         val name: String,
         val tags: Map<String, String>,
         val value: Double?
