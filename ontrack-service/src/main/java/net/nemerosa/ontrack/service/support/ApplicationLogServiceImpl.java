@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
@@ -12,7 +13,6 @@ import net.nemerosa.ontrack.repository.ApplicationLogEntriesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +28,13 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
 
     private final SecurityService securityService;
     private final ApplicationLogEntriesRepository entriesRepository;
-    private final CounterService counterService;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
-    public ApplicationLogServiceImpl(SecurityService securityService, ApplicationLogEntriesRepository entriesRepository, CounterService counterService) {
+    public ApplicationLogServiceImpl(SecurityService securityService, ApplicationLogEntriesRepository entriesRepository, MeterRegistry meterRegistry) {
         this.securityService = securityService;
         this.entriesRepository = entriesRepository;
-        this.counterService = counterService;
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
@@ -74,8 +74,10 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
         // Storing in database
         entriesRepository.log(entry);
         // Metrics
-        counterService.increment("error");
-        counterService.increment(String.format("error.%s", entry.getType().getName()));
+        meterRegistry.counter(
+                "ontrack_error",
+                "type", entry.getType().getName()
+        ).increment();
     }
 
     @Override

@@ -52,6 +52,11 @@ using the `/manage/ontrack_metrics` endpoint. Note that this endpoint
 needs authentication and some <<security,administrator privileges>>.
 ====
 
+General metrics:
+
+* `ontrack_error` (counter) - number of error (the `type` tag contains the
+  type of error)
+
 Statistics about the <<model,objects>> stored by Ontrack:
 
 * `ontrack_entity_project_total` (gauge) - total number of projects
@@ -79,6 +84,7 @@ Information about individual jobs:
 
 * `ontrack_job_duration_ms` (timer) - duration of the execution of the job
 * `ontrack_job_run_count` (counter) - number of times a job has run
+* `ontrack_job_error_count` (counter) - number of errors for this job
 
 [NOTE]
 ====

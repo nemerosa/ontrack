@@ -9,6 +9,8 @@ include::appendix-roadmap.adoc[]
 
 include::appendix-certificates.adoc[]
 
+include::appendix-metrics-migration.adoc[]
+
 [[dsl-doc]]
 === DSL Reference
 
