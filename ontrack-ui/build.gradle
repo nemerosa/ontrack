@@ -18,6 +18,7 @@ dependencies {
 
     // Metric runtimes
     runtime 'io.micrometer:micrometer-registry-influx'
+    runtime 'io.micrometer:micrometer-registry-prometheus'
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')

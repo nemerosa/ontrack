@@ -23,6 +23,15 @@ management:
   context-path: "/manage"
   security:
     roles: ADMIN
+  # Default settings for the metrics
+  metrics:
+    export:
+      # InfluxDB disabled by default
+      influx:
+        enabled: false
+      # Prometheus disabled by default
+      prometheus:
+        enabled: false
 
 # Security
 

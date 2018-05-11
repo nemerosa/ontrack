@@ -180,6 +180,7 @@ configure(coreProjects) {
             dependency "io.micrometer:micrometer-core:${micrometerVersion}"
             dependency "io.micrometer:micrometer-spring-legacy:${micrometerVersion}"
             dependency "io.micrometer:micrometer-registry-influx:${micrometerVersion}"
+            dependency "io.micrometer:micrometer-registry-prometheus:${micrometerVersion}"
             // Overrides from Spring Boot
             dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
         }
