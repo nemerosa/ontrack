@@ -7,39 +7,39 @@ angular.module('ot.dialog.validationStampRunView', [
         $scope.config = config;
         // Loading the validation runs
         $scope.loadingValidationRuns = true;
-        otGraphqlService.pageGraphQLCall("query ValidationRuns($buildId: Int!, $validationStamp: String!) {\n" +
-            "  builds(id: $buildId) {\n" +
-            "    id\n" +
-            "    name\n" +
-            "    validations(validationStamp: $validationStamp) {\n" +
-            "      validationStamp {\n" +
-            "        id\n" +
-            "        name\n" +
-            "        image\n" +
-            "        _image\n" +
-            "      }\n" +
-            "      validationRuns {\n" +
-            "        id\n" +
-            "        runOrder\n" +
-            "        description\n" +
-            "        validationRunStatuses {\n" +
-            "          creation {\n" +
-            "            user\n" +
-            "            time\n" +
-            "          }\n" +
-            "          description\n" +
-            "          statusID {\n" +
-            "            id\n" +
-            "            name\n" +
-            "          }\n" +
-            "        }\n" +
-            "        links {\n" +
-            "          _validationRunStatusChange\n" +
-            "        }\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}\n", {
+        otGraphqlService.pageGraphQLCall(`query ValidationRuns($buildId: Int!, $validationStamp: String!) {
+              builds(id: $buildId) {
+                id
+                name
+                validations(validationStamp: $validationStamp) {
+                  validationStamp {
+                    id
+                    name
+                    image
+                    _image
+                  }
+                  validationRuns {
+                    id
+                    runOrder
+                    description
+                    validationRunStatuses {
+                      creation {
+                        user
+                        time
+                      }
+                      description
+                      statusID {
+                        id
+                        name
+                      }
+                    }
+                    links {
+                      _validationRunStatusChange
+                    }
+                  }
+                }
+              }
+            }`, {
             buildId: $scope.config.build.id,
             validationStamp: $scope.config.validationStamp.name
         }).then(function (data) {
