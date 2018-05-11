@@ -22,6 +22,13 @@ angular.module('ot.dialog.validationStampRunView', [
                     id
                     runOrder
                     description
+                    runInfo {
+                      sourceType
+                      sourceUri 
+                      triggerType
+                      triggerData
+                      runTime
+                    }
                     validationRunStatuses {
                       creation {
                         user
