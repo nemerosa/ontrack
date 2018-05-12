@@ -13,8 +13,9 @@ angular.module('ot.dialog.validationStampRunView', [
             size: 6
         };
         // Loading the validation runs
-        $scope.loadingValidationRuns = true;
-        otGraphqlService.pageGraphQLCall(`query ValidationRuns($buildId: Int!, $validationStamp: String!, $offset: Int!, $size: Int!) {
+        function loadValidationRuns() {
+            $scope.loadingValidationRuns = true;
+            otGraphqlService.pageGraphQLCall(`query ValidationRuns($buildId: Int!, $validationStamp: String!, $offset: Int!, $size: Int!) {
               builds(id: $buildId) {
                 id
                 name
@@ -71,11 +72,18 @@ angular.module('ot.dialog.validationStampRunView', [
                 }
               }
             }`, queryParams).then(function (data) {
-            $scope.build = data.builds[0];
-            $scope.validation = data.builds[0].validations[0];
-        }).finally(function () {
-            $scope.loadingValidationRuns = false;
-        });
+                $scope.build = data.builds[0];
+                $scope.validation = data.builds[0].validations[0];
+            }).finally(function () {
+                $scope.loadingValidationRuns = false;
+            });
+        }
+        loadValidationRuns();
+        // Navigating
+        $scope.navigate = function (pageRequest) {
+            queryParams.offset = pageRequest.offset;
+            loadValidationRuns();
+        };
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');

@@ -19,7 +19,7 @@
     </div>
     <div class="panel panel-default"
          ng-hide="loadingValidationRuns"
-         ng-repeat="validationRun in validation.validationRuns | orderBy:'id':true">
+         ng-repeat="validationRun in validation.validationStamp.validationRunsPaginated.pageItems | orderBy:'id':true">
         <div class="panel-heading">
             <a href="#/validationRun/{{validationRun.id}}" ng-click="cancel()">
             Run #{{validationRun.runOrder}}
@@ -46,5 +46,13 @@
     </div>
 </div>
 <div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="navigate(validation.validationStamp.validationRunsPaginated.pageInfo.previousPage)" ng-show="validation.validationStamp.validationRunsPaginated.pageInfo.previousPage">
+        <span class="fa fa-step-backward"></span>
+        Newest
+    </button>
+    <button class="btn btn-default" type="button" ng-click="navigate(validation.validationStamp.validationRunsPaginated.pageInfo.nextPage)" ng-show="validation.validationStamp.validationRunsPaginated.pageInfo.nextPage">
+        <span class="fa fa-step-forward"></span>
+        Oldest
+    </button>
     <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
 </div>
