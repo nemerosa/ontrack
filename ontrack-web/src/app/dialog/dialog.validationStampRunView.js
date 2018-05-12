@@ -5,51 +5,72 @@ angular.module('ot.dialog.validationStampRunView', [
     .controller('otDialogValidationStampRunView', function ($scope, $modalInstance, config, otStructureService, otGraphqlService) {
         // General configuration
         $scope.config = config;
+        // Query and pagination
+        const queryParams = {
+            buildId: $scope.config.build.id,
+            validationStamp: $scope.config.validationStamp.name,
+            offset: 0,
+            size: 6
+        };
         // Loading the validation runs
         $scope.loadingValidationRuns = true;
-        otGraphqlService.pageGraphQLCall(`query ValidationRuns($buildId: Int!, $validationStamp: String!) {
+        otGraphqlService.pageGraphQLCall(`query ValidationRuns($buildId: Int!, $validationStamp: String!, $offset: Int!, $size: Int!) {
               builds(id: $buildId) {
                 id
                 name
                 validations(validationStamp: $validationStamp) {
                   validationStamp {
-                    id
-                    name
-                    image
-                    _image
-                  }
-                  validationRuns {
-                    id
-                    runOrder
-                    description
-                    runInfo {
-                      sourceType
-                      sourceUri 
-                      triggerType
-                      triggerData
-                      runTime
-                    }
-                    validationRunStatuses {
-                      creation {
-                        user
-                        time
+                      id
+                      name
+                      image
+                      _image
+                      validationRunsPaginated(buildId: $buildId, offset: $offset, size: $size) {
+                          pageInfo {
+                            totalSize
+                            currentOffset
+                            currentSize
+                            previousPage {
+                              offset
+                              size
+                            }
+                            nextPage {
+                              offset
+                              size
+                            }
+                            pageIndex
+                            pageTotal
+                          }
+                          pageItems {
+                            id
+                            runOrder
+                            description
+                            runInfo {
+                              sourceType
+                              sourceUri 
+                              triggerType
+                              triggerData
+                              runTime
+                            }
+                            validationRunStatuses {
+                              creation {
+                                user
+                                time
+                              }
+                              description
+                              statusID {
+                                id
+                                name
+                              }
+                            }
+                            links {
+                              _validationRunStatusChange
+                            }
+                          }
                       }
-                      description
-                      statusID {
-                        id
-                        name
-                      }
-                    }
-                    links {
-                      _validationRunStatusChange
-                    }
                   }
                 }
               }
-            }`, {
-            buildId: $scope.config.build.id,
-            validationStamp: $scope.config.validationStamp.name
-        }).then(function (data) {
+            }`, queryParams).then(function (data) {
             $scope.build = data.builds[0];
             $scope.validation = data.builds[0].validations[0];
         }).finally(function () {
