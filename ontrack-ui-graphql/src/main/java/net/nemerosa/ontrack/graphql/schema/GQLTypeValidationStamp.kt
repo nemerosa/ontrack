@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
+import graphql.Scalars.GraphQLInt
 import graphql.schema.DataFetcher
+import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
@@ -54,18 +56,43 @@ class GQLTypeValidationStamp(
                                 fieldName = "validationRunsPaginated",
                                 fieldDescription = "Paginated list of validation runs",
                                 itemType = validationRun,
-                                itemListCounter = { validationStamp ->
-                                    structureService.getValidationRunsCountForValidationStamp(
-                                            validationStamp.id
-                                    )
+                                itemListCounter = { environment, validationStamp ->
+                                    val buildId: Int? = environment.getArgument<Int>("buildId")
+                                    if (buildId != null) {
+                                        structureService.getValidationRunsCountForBuildAndValidationStamp(
+                                                ID.of(buildId),
+                                                validationStamp.id
+                                        )
+                                    } else {
+                                        structureService.getValidationRunsCountForValidationStamp(
+                                                validationStamp.id
+                                        )
+                                    }
                                 },
-                                itemListProvider = { _, validationStamp, offset, size ->
-                                    structureService.getValidationRunsForValidationStamp(
-                                            validationStamp.id,
-                                            offset,
-                                            size
-                                    )
-                                }
+                                itemListProvider = { environment, validationStamp, offset, size ->
+                                    val buildId: Int? = environment.getArgument<Int>("buildId")
+                                    if (buildId != null) {
+                                        structureService.getValidationRunsForBuildAndValidationStamp(
+                                                ID.of(buildId),
+                                                validationStamp.id,
+                                                offset,
+                                                size
+                                        )
+                                    } else {
+                                        structureService.getValidationRunsForValidationStamp(
+                                                validationStamp.id,
+                                                offset,
+                                                size
+                                        )
+                                    }
+                                },
+                                arguments = listOf(
+                                        GraphQLArgument.newArgument()
+                                                .name("buildId")
+                                                .description("Validation runs for this build only")
+                                                .type(GraphQLInt)
+                                                .build()
+                                )
                         )
                 )
                 // Validation runs

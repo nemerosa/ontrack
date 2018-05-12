@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.support.pagination
 
 import graphql.Scalars.GraphQLInt
 import graphql.schema.DataFetchingEnvironment
+import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
@@ -26,8 +27,9 @@ class GQLPaginatedListFactory(
             fieldName: String,
             fieldDescription: String,
             itemType: GQLType,
-            itemListCounter: (P) -> Int,
-            itemListProvider: (DataFetchingEnvironment, P, Int, Int) -> List<T>
+            itemListCounter: (DataFetchingEnvironment, P) -> Int,
+            itemListProvider: (DataFetchingEnvironment, P, Int, Int) -> List<T>,
+            arguments: List<GraphQLArgument> = emptyList()
     ): GraphQLFieldDefinition {
         return GraphQLFieldDefinition.newFieldDefinition()
                 .name(fieldName)
@@ -44,12 +46,13 @@ class GQLPaginatedListFactory(
                             .type(GraphQLInt)
                             .defaultValue(PageRequest.DEFAULT_PAGE_SIZE)
                 }
+                .argument(arguments)
                 .type(createPaginatedList(itemType))
                 .dataFetcher { environment ->
                     val source: P = environment.getSource<P>()
                     val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
                     val size = environment.getArgument<Int>(ARG_SIZE) ?: PageRequest.DEFAULT_PAGE_SIZE
-                    val total = itemListCounter(source)
+                    val total = itemListCounter(environment, source)
                     val items = itemListProvider(
                             environment,
                             source,

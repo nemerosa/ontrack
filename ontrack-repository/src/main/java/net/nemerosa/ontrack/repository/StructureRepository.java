@@ -174,9 +174,20 @@ public interface StructureRepository {
 
     List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
     List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Gets the total number of validation runs for a build and a validation stamp
+     * @param buildId ID of the build
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId);
 
     /**
      * Gets the total number of validation runs for a validation stamp

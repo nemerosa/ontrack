@@ -922,6 +922,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId ORDER BY ID DESC LIMIT :limit OFFSET :offset",
+                params("buildId", build.id()).addValue("validationStampId", validationStamp.id())
+                        .addValue("limit", count)
+                        .addValue("offset", offset),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        id -> build,
+                        id -> validationStamp,
+                        validationRunStatusService
+                )
+        );
+    }
+
+    @Override
+    public int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId",
+                params("buildId", buildId.getValue()).addValue("validationStampId", validationStampId.getValue()),
+                Integer.class
+        );
+    }
+
+    @Override
     public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId ORDER BY BUILDID DESC, ID DESC LIMIT :limit OFFSET :offset",

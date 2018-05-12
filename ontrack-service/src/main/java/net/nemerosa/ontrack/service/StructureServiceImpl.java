@@ -1140,6 +1140,20 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId, int offset, int count) {
+        Build build = getBuild(buildId);
+        ValidationStamp validationStamp = getValidationStamp(validationStampId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsForBuildAndValidationStamp(
+                build,
+                validationStamp,
+                offset,
+                count,
+                validationRunStatusService::getValidationRunStatus
+        );
+    }
+
+    @Override
     public List<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count) {
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
         securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ProjectView.class);
@@ -1160,6 +1174,11 @@ public class StructureServiceImpl implements StructureService {
         eventPostService.post(eventFactory.newValidationRunStatus(newValidationRun));
         // OK
         return newValidationRun;
+    }
+
+    @Override
+    public int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId) {
+        return structureRepository.getValidationRunsCountForBuildAndValidationStamp(buildId, validationStampId);
     }
 
     @Override
