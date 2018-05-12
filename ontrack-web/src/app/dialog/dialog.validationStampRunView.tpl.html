@@ -43,6 +43,28 @@
                 <p ng-if="validationRunStatus.description" class="ot-description">{{validationRunStatus.description}}</p>
             </li>
         </ul>
+        <div class="panel-body" ng-if="validationRun.runInfo">
+            <div class="row">
+                <div class="col-md-4">
+                    <span ng-if="validationRun.runInfo.sourceType && validationRun.runInfo.sourceUri">
+                        Source: <a href="{{validationRun.runInfo.sourceUri}}">{{validationRun.runInfo.sourceType}}</a>
+                    </span>
+                </div>
+                <div class="col-md-4">
+                    <span ng-if="validationRun.runInfo.triggerType && validationRun.runInfo.triggerData">
+                        Trigger: {{validationRun.runInfo.triggerType}}
+                        ->
+                        {{validationRun.runInfo.triggerData}}
+                    </span>
+                </div>
+                <div class="col-md-4">
+                    <span ng-if="validationRun.runInfo.runTime">
+                        <ot-duration duration="validationRun.runInfo.runTime"></ot-duration>
+                        <i>({{validationRun.runInfo.runTime}} seconds)</i>
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="modal-footer">

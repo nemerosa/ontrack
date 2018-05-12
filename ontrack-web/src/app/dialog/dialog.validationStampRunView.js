@@ -10,7 +10,7 @@ angular.module('ot.dialog.validationStampRunView', [
             buildId: $scope.config.build.id,
             validationStamp: $scope.config.validationStamp.name,
             offset: 0,
-            size: 6
+            size: 4
         };
         // Loading the validation runs
         function loadValidationRuns() {
