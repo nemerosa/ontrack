@@ -101,6 +101,17 @@ angular.module('ot.view.build', [
                 validationRuns {
                   id
                   runOrder
+                  creation {
+                    user
+                    time
+                  }
+                  validationRunStatuses {
+                    statusID {
+                      id
+                      name
+                    }
+                    description
+                  }
                   runInfo {
                     ...runInfoContent
                   }

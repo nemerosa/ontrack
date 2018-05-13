@@ -4,6 +4,7 @@
             <ot-creation creation="build.creation"></ot-creation>
         </div>
     </div>
+    <!-- Promotions -->
     <div class="row">
         <div class="col-md-4">
             <ot-section-title>Promotions</ot-section-title>
@@ -34,10 +35,57 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
+        <!-- Validations -->
+        <div class="col-md-8">
             <ot-section-title>Validations</ot-section-title>
+            <div class="ot-description" ng-if="build.validationRuns.length == 0">
+                No validation yet.
+            </div>
+            <table class="table table-condensed table-hover">
+                <tbody>
+                <tr ng-repeat="validationRun in build.validationRuns">
+                    <td>
+                        <ot-entity-image entity="validationRun.validationStamp"
+                                         link="#/validationStamp/{{validationRun.validationStamp.id}}">
+                            {{validationRun.validationStamp.name}}
+                        </ot-entity-image>
+                    </td>
+                    <td>
+                        <a href="#/validationRun/{{validationRun.id}}">
+                            #{{validationRun.runOrder}}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#/validationRun/{{validationRun.id}}">
+                            <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
+                        </a>
+                    </td>
+                    <td>
+                        {{validationRun.validationRunStatuses[0].description}}
+                    </td>
+                    <td>
+                        <ot-creation creation="validationRun.creation"></ot-creation>
+                    </td>
+                    <td>
+                           <span ng-if="validationRun.runInfo.sourceType && validationRun.runInfo.sourceUri">
+                               <a href="{{validationRun.runInfo.sourceUri}}">{{validationRun.runInfo.sourceType}}</a>
+                           </span>
+                    </td>
+                    <td>
+                           <span ng-if="validationRun.runInfo.triggerType && validationRun.runInfo.triggerData">
+                               {{validationRun.runInfo.triggerType}}
+                               ->
+                               {{validationRun.runInfo.triggerData}}
+                           </span>
+                    </td>
+                    <td>
+                            <span ng-if="validationRun.runInfo.runTime">
+                                <ot-duration duration="validationRun.runInfo.runTime"></ot-duration>
+                            </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
             <div class="row">
                 <div class="col-md-4">
                     <ot-subsection-title>Run &amp; passed</ot-subsection-title>
@@ -87,6 +135,7 @@
             </div>
         </div>
     </div>
+    <!-- TODO Used by... -->
     <div class="row">
         <div class="col-md-6">
             <ot-section-title>Properties</ot-section-title>
