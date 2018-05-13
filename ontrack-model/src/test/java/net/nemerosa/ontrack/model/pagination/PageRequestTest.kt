@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.graphql.support.pagination
+package net.nemerosa.ontrack.model.pagination
 
-import net.nemerosa.ontrack.model.pagination.PageRequest
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

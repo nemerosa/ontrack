@@ -17,14 +17,22 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
 
         val data = run("""{
             builds(id: ${build.id}) {
-                linkedBuilds {
+                uses {
                     name
+                }
+                usedBy {
+                    pageItems {
+                        name
+                    }
                 }
             }
         }""")
 
         val b = data["builds"].first()
-        assertNotNull(b["linkedBuilds"]) {
+        assertNotNull(b["uses"]) {
+            assertTrue(it.size() == 0)
+        }
+        assertNotNull(b["usedBy"]["pageItems"]) {
             assertTrue(it.size() == 0)
         }
     }
@@ -40,9 +48,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
 
         val data = run("""{
             builds(id: ${build.id}) {
-                linkedBuilds {
+                uses {
                     name
-                    direction
                     branch {
                         name
                         project {
@@ -53,12 +60,11 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             }
         }""")
 
-        val links = data["builds"].first()["linkedBuilds"]
+        val links = data["builds"].first()["uses"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
             assertEquals(targetBuild.name, link["name"].asText())
-            assertEquals("to", link.path("direction").asText())
             assertEquals(targetBuild.branch.name, link["branch"]["name"].asText())
             assertEquals(targetBuild.branch.project.name, link["branch"]["project"]["name"].asText())
         }
@@ -79,7 +85,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         // Query build links of "b" TO
         val data = run("""{
             builds(id: ${b.id}) {
-                linkedBuilds(direction: TO) {
+                uses {
                     id
                     name
                     direction
@@ -87,13 +93,12 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             }
         }""")
         // Checks the result
-        val links = data["builds"].first()["linkedBuilds"]
+        val links = data["builds"].first()["uses"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
             assertEquals(c.name, link["name"].asText())
             assertEquals(c.id(), link["id"].asInt())
-            assertEquals("to", link.path("direction").asText())
         }
     }
 
@@ -109,23 +114,25 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             structureService.addBuildLink(b, c)
         }
         // Query build links of "b" FROM
-        val data = run("""{
-            builds(id: ${b.id}) {
-                linkedBuilds(direction: FROM) {
-                    id
-                    name
-                    direction
+        val data = withGrantViewToAll {
+            run("""{
+                builds(id: ${b.id}) {
+                    usedBy {
+                        pageItems {
+                            id
+                            name
+                        }
+                    }
                 }
-            }
-        }""")
+            }""")
+        }
         // Checks the result
-        val links = data["builds"].first()["linkedBuilds"]
+        val links = data["builds"].first()["usedBy"]["pageItems"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
             assertEquals(a.name, link["name"].asText())
             assertEquals(a.id(), link["id"].asInt())
-            assertEquals("from", link.path("direction").asText())
         }
     }
 

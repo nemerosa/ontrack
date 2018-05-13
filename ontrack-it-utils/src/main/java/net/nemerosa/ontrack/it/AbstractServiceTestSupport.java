@@ -11,8 +11,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -278,6 +276,11 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         } catch (Exception ex) {
             throw new IllegalStateException("Cannot set GrantViewToAll settings", ex);
         }
+    }
+
+    protected <T> T withGrantViewToAll(Callable<T> task) throws Exception {
+        grantViewToAll(true);
+        return task.call();
     }
 
     protected <T> T withNoGrantViewToAll(Callable<T> task) throws Exception {

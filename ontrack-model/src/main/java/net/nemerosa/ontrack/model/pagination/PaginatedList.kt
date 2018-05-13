@@ -20,7 +20,7 @@ class PaginatedList<T>(
         ) = create(
                 items.subList(
                         maxOf(offset, 0),
-                        minOf(offset + pageSize, offset, items.size)
+                        maxOf(minOf(offset + pageSize, items.size), 0)
                 ),
                 offset,
                 pageSize,
