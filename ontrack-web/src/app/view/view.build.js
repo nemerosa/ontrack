@@ -1,7 +1,8 @@
 angular.module('ot.view.build', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('build', {
@@ -10,29 +11,138 @@ angular.module('ot.view.build', [
             controller: 'BuildCtrl'
         });
     })
-    .controller('BuildCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService) {
+    .controller('BuildCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService, otGraphqlService) {
         const view = ot.view();
         // Build's id
-        const buildId = $stateParams.buildId;
+        const queryParams = {
+            buildId: $stateParams.buildId,
+            usedByOffset: 0
+        };
+        // GraphQL query
+        const query = `
+            query Build($buildId: Int!, $usedByOffset: Int!) {
+              builds(id: $buildId) {
+                id
+                name
+                description
+                branch {
+                  id
+                  name
+                  project {
+                    id
+                    name
+                  }
+                }
+                usedBy(offset: $usedByOffset, size: 10) {
+                  pageInfo {
+                    ...pageInfoContent
+                  }
+                  pageItems {
+                    name
+                    branch {
+                      project {
+                        name
+                      }
+                    }
+                    links {
+                      _page
+                    }
+                  }
+                }
+                runInfo {
+                  ...runInfoContent
+                }
+                decorations {
+                  decorationType
+                  error
+                  data
+                  feature {
+                    id
+                  }
+                }
+                links {
+                  _self
+                  _buildLinks
+                  _promote
+                  _validate
+                  _update
+                  _delete
+                  _actions
+                  _next
+                  _previous
+                  _changeLogPage
+                }
+                promotionRuns {
+                  promotionLevel {
+                    id
+                    name
+                    _image
+                    image
+                    links {
+                      _page
+                    }
+                  }
+                }
+                validationRuns {
+                  id
+                  runOrder
+                  runInfo {
+                    ...runInfoContent
+                  }
+                  links {
+                    _page
+                  }
+                  validationStamp {
+                    id
+                    name
+                    image
+                    _image
+                    links {
+                      _page
+                    }
+                  }
+                }
+              }
+            }
+            
+            fragment pageInfoContent on PageInfo {
+              totalSize
+              currentOffset
+              currentSize
+              previousPage {
+                offset
+                size
+              }
+              nextPage {
+                offset
+                size
+              }
+            }
+            
+            fragment runInfoContent on RunInfo {
+              sourceType
+              sourceUri
+              triggerType
+              triggerData
+              runTime
+            }
+        `;
 
         // Loads the build
         function loadBuild() {
-            otStructureService.getBuild(buildId).then(function (build) {
+            otGraphqlService.pageGraphQLCall(query, queryParams).then(function (data) {
+                const build = data.builds[0];
                 $scope.build = build;
                 // View configuration
                 view.title = "Build " + build.name;
                 view.description = build.description;
                 view.breadcrumbs = ot.branchBreadcrumbs(build.branch);
                 view.decorationsEntity = build;
-                // Loads the promotion runs
-                loadPromotionRuns();
-                // Loads the validation runs
-                loadValidationRuns();
                 // Commands
                 view.commands = [
                     {
                         condition: function () {
-                            return build._buildLinks;
+                            return build.links._buildLinks;
                         },
                         id: 'buildLinks',
                         name: "Build links",
@@ -41,7 +151,7 @@ angular.module('ot.view.build', [
                     },
                     {
                         condition: function () {
-                            return build._promote;
+                            return build.links._promote;
                         },
                         id: 'promote',
                         name: "Promote",
@@ -50,7 +160,7 @@ angular.module('ot.view.build', [
                     },
                     {
                         condition: function () {
-                            return build._validate;
+                            return build.links._validate;
                         },
                         id: 'validate',
                         name: "Validation run",
@@ -59,21 +169,21 @@ angular.module('ot.view.build', [
                     },
                     {
                         condition: function () {
-                            return build._update;
+                            return build.links._update;
                         },
                         id: 'updateBuild',
                         name: "Update build",
                         cls: 'ot-command-build-update',
                         action: function () {
                             otStructureService.update(
-                                build._update,
+                                build.links._update,
                                 "Update build"
                             ).then(loadBuild);
                         }
                     },
                     {
                         condition: function () {
-                            return build._delete;
+                            return build.links._delete;
                         },
                         id: 'deleteBuild',
                         name: "Delete build",
@@ -84,18 +194,18 @@ angular.module('ot.view.build', [
                                 message: "Do you really want to delete the build " + build.name +
                                     " and all its associated data?"
                             }).then(function () {
-                                return ot.call($http.delete(build._delete));
+                                return ot.call($http.delete(build.links._delete));
                             }).then(function () {
                                 $state.go('branch', {branchId: build.branch.id});
                             });
                         }
                     },
-                    ot.viewApiCommand(build._self),
-                    ot.viewActionsCommand(build._actions),
+                    ot.viewApiCommand(build.links._self),
+                    ot.viewActionsCommand(build.links._actions),
                     ot.viewCloseCommand('/branch/' + build.branch.id)
                 ];
                 // Gets a reference to the next build
-                ot.call($http.get(build._next)).then(function (nextBuild) {
+                ot.call($http.get(build.links._next)).then(function (nextBuild) {
                     if (nextBuild.id) {
                         view.commands.splice(0, 0, {
                             id: 'nextBuild',
@@ -105,7 +215,7 @@ angular.module('ot.view.build', [
                             title: "Go to build " + nextBuild.name
                         });
                     }
-                    return ot.call($http.get(build._previous));
+                    return ot.call($http.get(build.links._previous));
                 }).then(function (previousBuild) {
                     if (previousBuild.id) {
                         view.commands.splice(0, 0, {
@@ -116,12 +226,12 @@ angular.module('ot.view.build', [
                             title: "Go to build " + previousBuild.name
                         });
                         // Change log since previous?
-                        if (build._changeLogPage) {
+                        if (build.links._changeLogPage) {
                             view.commands.splice(0, 0, {
                                 id: 'changeLogSincePreviousBuild',
                                 name: "Change log",
                                 cls: 'ot-command-changelog',
-                                absoluteLink: build._changeLogPage + '?from=' + previousBuild.id + '&to=' + build.id,
+                                absoluteLink: build.links._changeLogPage + '?from=' + previousBuild.id + '&to=' + build.id,
                                 title: "Change log since " + previousBuild.name
                             });
                         }
@@ -132,26 +242,6 @@ angular.module('ot.view.build', [
 
         // Page initialisation
         loadBuild();
-
-        // Loads the promotion runs
-        function loadPromotionRuns() {
-            ot.call($http.get($scope.build._lastPromotionRuns)).then(function (promotionRunCollection) {
-                angular.forEach(promotionRunCollection.resources, function (promotionRun) {
-                    promotionRun.image = promotionRun.promotionLevel.image;
-                });
-                $scope.promotionRunCollection = promotionRunCollection;
-            });
-        }
-
-        // Loads the validation runs
-        function loadValidationRuns() {
-            ot.call($http.get($scope.build._validationStampRunViews)).then(function (validationStampRunViewCollection) {
-                angular.forEach(validationStampRunViewCollection.resources, function (validationStampRunView) {
-                    validationStampRunView.image = validationStampRunView.validationStamp.image;
-                });
-                $scope.validationStampRunViewCollection = validationStampRunViewCollection;
-            });
-        }
 
         // Management of build links
         function manageBuildLinks() {
