@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.pagination.PaginatedList;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
@@ -99,6 +100,19 @@ public interface StructureService {
 
     List<Build> getBuildLinksFrom(Build build);
 
+    /**
+     * Gets the builds which use the given one.
+     *
+     * @param build  Source build
+     * @param offset Offset for pagination
+     * @param size   Page size for pagination
+     * @return List of builds which use the given one
+     */
+    PaginatedList<Build> getBuildsUsing(Build build, int offset, int size);
+
+    /**
+     * @deprecated Use {@link #getBuildsUsing(Build, int, int)} instead
+     */
     @Deprecated
     List<Build> getBuildLinksTo(Build build);
 

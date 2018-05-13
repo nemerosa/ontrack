@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
 import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
+import net.nemerosa.ontrack.model.pagination.PaginatedList;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
@@ -508,6 +509,18 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.getBuildLinksFrom(build.getId()).stream()
                 .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PaginatedList<Build> getBuildsUsing(Build build, int offset, int size) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        // Gets the complete list, filtered by ACL
+        List<Build> list = structureRepository.getBuildsUsing(build)
+                .stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+        // OK
+        return PaginatedList.create(list, offset, size);
     }
 
     @Override

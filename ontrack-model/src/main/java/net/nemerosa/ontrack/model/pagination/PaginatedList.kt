@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql.support.pagination
+package net.nemerosa.ontrack.model.pagination
 
 /**
  * List of objects with some pagination information.
@@ -11,6 +11,22 @@ class PaginatedList<T>(
         val pageItems: List<T>
 ) {
     companion object {
+
+        @JvmStatic
+        fun <T> create(
+                items: List<T>,
+                offset: Int,
+                pageSize: Int
+        ) = create(
+                items.subList(
+                        maxOf(offset, 0),
+                        minOf(offset + pageSize, offset, items.size)
+                ),
+                offset,
+                pageSize,
+                items.size
+        )
+
         fun <T> create(
                 items: List<T>,
                 offset: Int,

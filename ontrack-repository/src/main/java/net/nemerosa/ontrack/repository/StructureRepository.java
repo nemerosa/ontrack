@@ -90,6 +90,17 @@ public interface StructureRepository {
 
     List<Build> getBuildLinksFrom(ID buildId);
 
+    /**
+     * Gets the builds which use the given one.
+     *
+     * @param build Source build
+     * @return List of builds which use the given one
+     */
+    List<Build> getBuildsUsing(Build build);
+
+    /**
+     * @deprecated Use {@link #getBuildsUsing(Build)} instead.
+     */
     @Deprecated
     List<Build> getBuildLinksTo(ID buildId);
 
@@ -184,7 +195,8 @@ public interface StructureRepository {
 
     /**
      * Gets the total number of validation runs for a build and a validation stamp
-     * @param buildId ID of the build
+     *
+     * @param buildId           ID of the build
      * @param validationStampId ID of the validation stamp
      * @return Number of validation runs for the validation stamp
      */
@@ -192,6 +204,7 @@ public interface StructureRepository {
 
     /**
      * Gets the total number of validation runs for a validation stamp
+     *
      * @param validationStampId ID of the validation stamp
      * @return Number of validation runs for the validation stamp
      */

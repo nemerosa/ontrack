@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql.support.pagination
+package net.nemerosa.ontrack.model.pagination
 
 import org.apache.commons.lang3.Validate
 

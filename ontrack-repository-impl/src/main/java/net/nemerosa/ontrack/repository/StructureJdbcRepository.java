@@ -276,6 +276,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<Build> getBuildsUsing(Build build) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT F.* FROM BUILDS F " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
+                        "WHERE BL.TARGETBUILDID = :buildId " +
+                        "ORDER BY F.ID DESC ",
+                params("buildId", build.id()),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
     public List<Build> getBuildLinksTo(ID buildId) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT F.* FROM BUILDS F " +

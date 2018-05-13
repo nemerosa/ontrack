@@ -7,6 +7,8 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.model.pagination.PageRequest
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import org.springframework.stereotype.Component
 
 /**
