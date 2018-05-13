@@ -127,7 +127,14 @@ constructor(
                             .type(stdList(GraphQLTypeReference(BUILD)))
                             .dataFetcher(buildLinkedFetcher())
                 }
-                // Build links - "usedBy" direction, no pagination needed
+                // Build links - "uses" direction, no pagination needed
+                .field { f ->
+                    f.name("uses")
+                            .description("List of builds being used by this one.")
+                            .type(stdList(GraphQLTypeReference(BUILD)))
+                            .dataFetcher(buildBeingUsedFetcher())
+                }
+                // Build links - "usedBy" direction, with pagination
                 .field(
                         paginatedListFactory.createPaginatedField<Build, Build>(
                                 fieldName = "usedBy",
@@ -201,6 +208,13 @@ constructor(
                         build.id,
                         validationStamp.id
                 )
+        )
+    }
+
+    private fun buildBeingUsedFetcher(): DataFetcher<List<Build>> {
+        return fetcher(
+                Build::class.java,
+                { _, build -> structureService.getBuildLinksFrom(build) }
         )
     }
 
