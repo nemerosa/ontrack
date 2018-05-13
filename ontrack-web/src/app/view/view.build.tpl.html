@@ -86,53 +86,6 @@
                 </tr>
                 </tbody>
             </table>
-            <div class="row">
-                <div class="col-md-4">
-                    <ot-subsection-title>Run &amp; passed</ot-subsection-title>
-                    <p class="ot-description">List of validations that have run and passed.</p>
-
-                    <div class="well">
-                        <table class="ot-validation-runs">
-                            <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
-                                ng-if="validationStampRunView.run && validationStampRunView.passed">
-                                <td>
-                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <ot-subsection-title>Run &amp; failed</ot-subsection-title>
-                    <p class="ot-description">List of validations that have run and failed.</p>
-
-                    <div class="well">
-                        <table class="ot-validation-runs">
-                            <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
-                                ng-if="validationStampRunView.run && !validationStampRunView.passed">
-                                <td>
-                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <ot-subsection-title>Not run</ot-subsection-title>
-                    <p class="ot-description">List of validations that have not run.</p>
-
-                    <div class="well">
-                        <table class="ot-validation-runs">
-                            <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
-                                ng-if="!validationStampRunView.run">
-                                <td>
-                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <!-- TODO Used by... -->
