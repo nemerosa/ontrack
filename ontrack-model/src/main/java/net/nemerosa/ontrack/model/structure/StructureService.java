@@ -99,6 +99,7 @@ public interface StructureService {
 
     List<Build> getBuildLinksFrom(Build build);
 
+    @Deprecated
     List<Build> getBuildLinksTo(Build build);
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);

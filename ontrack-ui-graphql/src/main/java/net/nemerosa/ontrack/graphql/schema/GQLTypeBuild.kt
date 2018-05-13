@@ -106,6 +106,7 @@ constructor(
                 // Build links
                 .field { f ->
                     f.name("linkedBuilds")
+                            .deprecate("Use `uses` and `usedBy` fields instead.")
                             .description("Builds this build is linked to")
                             .argument { a ->
                                 a.name("direction")
