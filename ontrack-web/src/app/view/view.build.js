@@ -12,14 +12,14 @@ angular.module('ot.view.build', [
         });
     })
     .controller('BuildCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService, otGraphqlService) {
-        const view = ot.view();
-        // Build's id
-        const queryParams = {
-            buildId: $stateParams.buildId,
-            usedByOffset: 0
-        };
-        // GraphQL query
-        const query = `
+            const view = ot.view();
+            // Build's id
+            const queryParams = {
+                buildId: $stateParams.buildId,
+                usedByOffset: 0
+            };
+            // GraphQL query
+            const query = `
             query Build($buildId: Int!, $usedByOffset: Int!) {
               builds(id: $buildId) {
                 id
@@ -140,85 +140,85 @@ angular.module('ot.view.build', [
             }
         `;
 
-        // Loads the build
-        function loadBuild() {
-            otGraphqlService.pageGraphQLCall(query, queryParams).then(function (data) {
-                const build = data.builds[0];
-                $scope.build = build;
-                // View configuration
-                view.title = "Build " + build.name;
-                view.description = build.description;
-                view.breadcrumbs = ot.branchBreadcrumbs(build.branch);
-                view.decorationsEntity = build;
-                // Commands
-                view.commands = [
-                    {
-                        condition: function () {
-                            return build.links._buildLinks;
+            // Loads the build
+            function loadBuild() {
+                otGraphqlService.pageGraphQLCall(query, queryParams).then(function (data) {
+                    const build = data.builds[0];
+                    $scope.build = build;
+                    // View configuration
+                    view.title = "Build " + build.name;
+                    view.description = build.description;
+                    view.breadcrumbs = ot.branchBreadcrumbs(build.branch);
+                    view.decorationsEntity = build;
+                    // Commands
+                    view.commands = [
+                        {
+                            condition: function () {
+                                return build.links._buildLinks;
+                            },
+                            id: 'buildLinks',
+                            name: "Build links",
+                            cls: 'ot-command-link',
+                            action: manageBuildLinks
                         },
-                        id: 'buildLinks',
-                        name: "Build links",
-                        cls: 'ot-command-link',
-                        action: manageBuildLinks
-                    },
-                    {
-                        condition: function () {
-                            return build.links._promote;
+                        {
+                            condition: function () {
+                                return build.links._promote;
+                            },
+                            id: 'promote',
+                            name: "Promote",
+                            cls: 'ot-command-promote',
+                            action: promote
                         },
-                        id: 'promote',
-                        name: "Promote",
-                        cls: 'ot-command-promote',
-                        action: promote
-                    },
-                    {
-                        condition: function () {
-                            return build.links._validate;
+                        {
+                            condition: function () {
+                                return build.links._validate;
+                            },
+                            id: 'validate',
+                            name: "Validation run",
+                            cls: 'ot-command-validate',
+                            action: validate
                         },
-                        id: 'validate',
-                        name: "Validation run",
-                        cls: 'ot-command-validate',
-                        action: validate
-                    },
-                    {
-                        condition: function () {
-                            return build.links._update;
+                        {
+                            condition: function () {
+                                return build.links._update;
+                            },
+                            id: 'updateBuild',
+                            name: "Update build",
+                            cls: 'ot-command-build-update',
+                            action: function () {
+                                otStructureService.update(
+                                    build.links._update,
+                                    "Update build"
+                                ).then(loadBuild);
+                            }
                         },
-                        id: 'updateBuild',
-                        name: "Update build",
-                        cls: 'ot-command-build-update',
-                        action: function () {
-                            otStructureService.update(
-                                build.links._update,
-                                "Update build"
-                            ).then(loadBuild);
-                        }
-                    },
-                    {
-                        condition: function () {
-                            return build.links._delete;
-                        },
-                        id: 'deleteBuild',
-                        name: "Delete build",
-                        cls: 'ot-command-build-delete',
-                        action: function () {
-                            otAlertService.confirm({
-                                title: "Deleting a build",
-                                message: "Do you really want to delete the build " + build.name +
+                        {
+                            condition: function () {
+                                return build.links._delete;
+                            },
+                            id: 'deleteBuild',
+                            name: "Delete build",
+                            cls: 'ot-command-build-delete',
+                            action: function () {
+                                otAlertService.confirm({
+                                    title: "Deleting a build",
+                                    message: "Do you really want to delete the build " + build.name +
                                     " and all its associated data?"
-                            }).then(function () {
-                                return ot.call($http.delete(build.links._delete));
-                            }).then(function () {
-                                $state.go('branch', {branchId: build.branch.id});
-                            });
-                        }
-                    },
-                    ot.viewApiCommand(build.links._self),
-                    ot.viewActionsCommand(build.links._actions),
-                    ot.viewCloseCommand('/branch/' + build.branch.id)
-                ];
-                // Gets a reference to the next build
-                ot.call($http.get(build.links._next)).then(function (nextBuild) {
-                    if (nextBuild.id) {
+                                }).then(function () {
+                                    return ot.call($http.delete(build.links._delete));
+                                }).then(function () {
+                                    $state.go('branch', {branchId: build.branch.id});
+                                });
+                            }
+                        },
+                        ot.viewApiCommand(build.links._self),
+                        ot.viewActionsCommand(build.links._actions),
+                        ot.viewCloseCommand('/branch/' + build.branch.id)
+                    ];
+                    return ot.call($http.get(build.links._next));
+                }).then(function (nextBuild) {
+                    if (nextBuild && nextBuild.id) {
                         view.commands.splice(0, 0, {
                             id: 'nextBuild',
                             name: "Next build",
@@ -227,9 +227,9 @@ angular.module('ot.view.build', [
                             title: "Go to build " + nextBuild.name
                         });
                     }
-                    return ot.call($http.get(build.links._previous));
+                    return ot.call($http.get($scope.build.links._previous));
                 }).then(function (previousBuild) {
-                    if (previousBuild.id) {
+                    if (previousBuild && previousBuild.id) {
                         view.commands.splice(0, 0, {
                             id: 'previousBuild',
                             name: "Previous build",
@@ -238,46 +238,46 @@ angular.module('ot.view.build', [
                             title: "Go to build " + previousBuild.name
                         });
                         // Change log since previous?
-                        if (build.links._changeLogPage) {
+                        if ($scope.build.links._changeLogPage) {
                             view.commands.splice(0, 0, {
                                 id: 'changeLogSincePreviousBuild',
                                 name: "Change log",
                                 cls: 'ot-command-changelog',
-                                absoluteLink: build.links._changeLogPage + '?from=' + previousBuild.id + '&to=' + build.id,
+                                absoluteLink: $scope.build.links._changeLogPage + '?from=' + previousBuild.id + '&to=' + build.id,
                                 title: "Change log since " + previousBuild.name
                             });
                         }
                     }
                 });
-            });
+            }
+
+            // Page initialisation
+            loadBuild();
+
+            // Management of build links
+            function manageBuildLinks() {
+                otStructureService.update($scope.build.links._buildLinks, 'Build links').then(loadBuild);
+            }
+
+            // Promotion
+            function promote() {
+                otStructureService.create($scope.build.links._promote, 'Promotion for the build').then(loadBuild);
+            }
+
+            // Validation
+            function validate() {
+                otStructureService.create($scope.build.links._validate, 'Validation for the build').then(loadBuild);
+            }
+
+            // Deleting a promotion run
+            $scope.deletePromotionRun = function (promotionRun) {
+                otAlertService.confirm({
+                    title: "Promotion deletion",
+                    message: "Do you really want to delete this promotion?"
+                }).then(function () {
+                    return ot.call($http.delete(promotionRun.links._delete));
+                }).then(loadBuild);
+            };
         }
-
-        // Page initialisation
-        loadBuild();
-
-        // Management of build links
-        function manageBuildLinks() {
-            otStructureService.update($scope.build.links._buildLinks, 'Build links').then(loadBuild);
-        }
-
-        // Promotion
-        function promote() {
-            otStructureService.create($scope.build.links._promote, 'Promotion for the build').then(loadBuild);
-        }
-
-        // Validation
-        function validate() {
-            otStructureService.create($scope.build.links._validate, 'Validation for the build').then(loadBuild);
-        }
-
-        // Deleting a promotion run
-        $scope.deletePromotionRun = function (promotionRun) {
-            otAlertService.confirm({
-                title: "Promotion deletion",
-                message: "Do you really want to delete this promotion?"
-            }).then(function () {
-                return ot.call($http.delete(promotionRun.links._delete));
-            }).then(loadBuild);
-        };
-    })
+    )
 ;
