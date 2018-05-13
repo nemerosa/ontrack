@@ -75,6 +75,9 @@ angular.module('ot.view.build', [
                   _next
                   _previous
                   _changeLogPage
+                  _properties
+                  _events
+                  _extra
                 }
                 promotionRuns {
                   description
