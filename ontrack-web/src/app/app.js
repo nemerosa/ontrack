@@ -14,6 +14,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.properties',
         'ot.directive.health',
         'ot.directive.duration',
+        'ot.directive.creation',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services

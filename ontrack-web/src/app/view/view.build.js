@@ -25,6 +25,10 @@ angular.module('ot.view.build', [
                 id
                 name
                 description
+                creation {
+                  user
+                  time
+                }
                 branch {
                   id
                   name
@@ -245,17 +249,17 @@ angular.module('ot.view.build', [
 
         // Management of build links
         function manageBuildLinks() {
-            otStructureService.update($scope.build._buildLinks, 'Build links').then(loadBuild);
+            otStructureService.update($scope.build.links._buildLinks, 'Build links').then(loadBuild);
         }
 
         // Promotion
         function promote() {
-            otStructureService.create($scope.build._promote, 'Promotion for the build').then(loadBuild);
+            otStructureService.create($scope.build.links._promote, 'Promotion for the build').then(loadBuild);
         }
 
         // Validation
         function validate() {
-            otStructureService.create($scope.build._validate, 'Validation for the build').then(loadBuild);
+            otStructureService.create($scope.build.links._validate, 'Validation for the build').then(loadBuild);
         }
     })
 ;
