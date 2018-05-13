@@ -1,6 +1,16 @@
 [[appendix-deprecations]]
 === Deprecations and migration notes
 
+[[appendix-deprecations-2.35]]
+==== Since 2.35
+
+`StructureService` deprecated method:
+
+* The
+`getValidationRunsForBuildAndValidationStamp(net.nemerosa.ontrack.model.structure.ID, net.nemerosa.ontrack.model.structure.ID)`
+method is deprecated and should be replaced by
+`getValidationRunsForBuildAndValidationStamp(net.nemerosa.ontrack.model.structure.ID, net.nemerosa.ontrack.model.structure.ID, int, int)`.
+
 [[appendix-deprecations-2.32]]
 ==== Since 2.32
 

@@ -63,6 +63,11 @@ class Ontrack {
         this.httpClient = httpClient
     }
 
+    @DSLMethod("Gets the version of the remote Ontrack server")
+    String getVersion() {
+        return get('info').version.display as String
+    }
+
     /**
      * Gets the list of projects
      */

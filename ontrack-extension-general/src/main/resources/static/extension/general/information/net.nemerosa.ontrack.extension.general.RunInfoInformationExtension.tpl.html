@@ -1,0 +1,20 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Run information
+    </div>
+    <div class="panel-body">
+        <ul>
+            <li ng-if="value.data.sourceType && value.data.sourceUri">
+                Source:
+                <a href="{{value.data.sourceUri}}">{{value.data.sourceType}}</a>
+            </li>
+            <li ng-if="value.data.triggerType && value.data.triggerData">
+                Trigger: <code>{{value.data.triggerType}}</code>
+                <i>{{value.data.triggerData}}</i>
+            </li>
+            <li ng-if="value.data.runTime">
+                Time: <ot-duration duration="value.data.runTime"></ot-duration>
+            </li>
+        </ul>
+    </div>
+</div>

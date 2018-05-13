@@ -1,0 +1,7 @@
+Accepted parameters are:
+
+* `sourceType` - Type of source (like "jenkins")
+* `sourceUri` - URI to the source of the run (like the URL to a Jenkins job)
+* `triggerType` - Type of trigger (like "scm" or "user")
+* `triggerData` - Data associated with the trigger (like a user ID or a commit)
+* `runTime` - Time of the run (in seconds)

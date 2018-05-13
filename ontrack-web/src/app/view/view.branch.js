@@ -164,6 +164,13 @@ angular.module('ot.view.branch', [
                 builds(generic: {type: $filterType, data: $filterData}) {
                   id
                   name
+                  runInfo {
+                    sourceType
+                    sourceUri 
+                    triggerType
+                    triggerData
+                    runTime
+                  }
                   decorations {
                     ...decorationContent
                   }

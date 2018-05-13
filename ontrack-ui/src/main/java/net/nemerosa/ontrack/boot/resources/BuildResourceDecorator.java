@@ -131,6 +131,11 @@ public class BuildResourceDecorator extends AbstractLinkResourceDecorator<Build>
                                 build -> on(BuildController.class).getBuildLinkForm(build.getId()),
                                 withProjectFn(BuildConfig.class)
                         ),
+                        // Run info
+                        link(
+                            "_runInfo",
+                            build -> on(RunInfoController.class).getRunInfo(build.getRunnableEntityType(), build.id())
+                        ),
                         // Page
                         page()
                 ),

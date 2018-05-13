@@ -214,11 +214,43 @@ public interface StructureService {
 
     List<ValidationRun> getValidationRunsForBuild(ID buildId);
 
+    /**
+     * @deprecated Use {@link #getValidationRunsForBuildAndValidationStamp(ID, ID, int, int)} instead.
+     */
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId);
+
+    /**
+     * Gets the list of validation runs for a build and a validation stamp.
+     *
+     * @param buildId           ID of the build
+     * @param validationStampId ID of the validation stamp
+     * @param offset            Offset in the list
+     * @param count             Maximum number of elemnts to return
+     * @return List of validation runs
+     */
+    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId, int offset, int count);
 
     List<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
+
+    /**
+     * Gets the total number of validation runs for a build and a validation stamp
+     *
+     * @param buildId           ID of the build
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId);
+
+    /**
+     * Gets the total number of validation runs for a validation stamp
+     *
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForValidationStamp(ID validationStampId);
 
     // Entity searches by name
 

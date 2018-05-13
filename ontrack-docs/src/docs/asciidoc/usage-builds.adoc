@@ -113,3 +113,18 @@ In all those cases, the syntax to find a match is:
   the `project` project
 * `project:build*` - all builds which contain a link to a build starting with
   `build` in the `project` project. The `*` wildcard can be used in any place.
+
+[[builds-run-info]]
+==== Run info
+
+Builds can be associated with some <<model,run info>> which contains
+details about the source, the trigger and the duration of this build.
+
+Information about the duration of the builds is shown just right
+of the build name in the branch page:
+
+image::images/builds-run-info-overview.png[Build run info,400]
+
+or in the list of extensions in the build page:
+
+image::images/builds-run-info-detail.png[Build run info,400]
