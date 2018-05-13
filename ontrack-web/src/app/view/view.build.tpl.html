@@ -5,11 +5,34 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-4">
             <ot-section-title>Promotions</ot-section-title>
-            <div class="well">
-                <ot-build-promotion-runs promotion-runs="promotionRunCollection.resources"></ot-build-promotion-runs>
+            <div class="ot-description" ng-if="build.promotionRuns.length == 0">
+                No promotion yet.
             </div>
+            <table class="table table-condensed table-hover">
+                <tbody>
+                <tr ng-repeat="promotionRun in build.promotionRuns">
+                    <td>
+                        <ot-entity-image entity="promotionRun.promotionLevel"></ot-entity-image>
+                        {{promotionRun.promotionLevel.name}}
+                    </td>
+                    <td>
+                        <ot-creation creation="promotionRun.creation"></ot-creation>
+                    </td>
+                    <td>
+                        {{promotionRun.description}}
+                    </td>
+                    <td>
+                        <span
+                            ng-if="promotionRun.links._delete"
+                            ng-click="deletePromotionRun(promotionRun)"
+                            title="Delete this promotion."
+                            class="ot-command ot-command-delete"></span>
+                     </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="row">

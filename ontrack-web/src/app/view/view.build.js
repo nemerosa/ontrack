@@ -77,6 +77,14 @@ angular.module('ot.view.build', [
                   _changeLogPage
                 }
                 promotionRuns {
+                  description
+                  creation {
+                    user
+                    time
+                  }
+                  links {
+                    _delete
+                  }
                   promotionLevel {
                     id
                     name
@@ -261,5 +269,15 @@ angular.module('ot.view.build', [
         function validate() {
             otStructureService.create($scope.build.links._validate, 'Validation for the build').then(loadBuild);
         }
+
+        // Deleting a promotion run
+        $scope.deletePromotionRun = function (promotionRun) {
+            otAlertService.confirm({
+                title: "Promotion deletion",
+                message: "Do you really want to delete this promotion?"
+            }).then(function () {
+                return ot.call($http.delete(promotionRun.links._delete));
+            }).then(loadBuild);
+        };
     })
 ;
