@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +32,17 @@ public class ValidationRun implements RunnableEntity {
     @JsonIgnore
     public RunnableEntityType getRunnableEntityType() {
         return RunnableEntityType.validation_run;
+    }
+
+    @NotNull
+    @Override
+    @JsonIgnore
+    public Map<String, String> getRunMetricTags() {
+        return ImmutableMap.of(
+                "project", validationStamp.getBranch().getProject().getName(),
+                "branch", validationStamp.getBranch().getName(),
+                "validationStamp", validationStamp.getName()
+        );
     }
 
     /**

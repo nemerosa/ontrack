@@ -13,6 +13,10 @@ interface RunnableEntity : ProjectEntity {
      * Gets the type of runnable entity
      */
     val runnableEntityType: RunnableEntityType
+    /**
+     * Gets the tags for metrics
+     */
+    val runMetricTags: Map<String, String>
 }
 
 /**
