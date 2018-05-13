@@ -281,7 +281,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 "SELECT F.* FROM BUILDS F " +
                         "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
                         "WHERE BL.TARGETBUILDID = :buildId " +
-                        "ORDER BY F.ID DESC",
+                        "ORDER BY F.ID DESC " +
+                        "LIMIT 20",
                 params("buildId", buildId.get()),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );

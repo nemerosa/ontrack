@@ -90,6 +90,7 @@ public interface StructureRepository {
 
     List<Build> getBuildLinksFrom(ID buildId);
 
+    @Deprecated
     List<Build> getBuildLinksTo(ID buildId);
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
