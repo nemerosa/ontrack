@@ -18,5 +18,9 @@ _Promotion levels_ and _validation stamps_ are attached to a _branch_:
   several runs per build and per validation stamp. A run itself has a sequence
   of statuses attached to it: passed, failed, investigated, etc.
 
+Builds and validation runs can be attached to some "run info"
+which gives additional information like the duration of the build
+or the validation.
+
 _Branches_, _promotion levels_ and _validation stamps_ define the _static
 structure_ of a _project_.
