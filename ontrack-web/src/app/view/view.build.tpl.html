@@ -1,6 +1,11 @@
 <ot-view>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 ot-view-title">
+            Build {{build.name}}
+            <ot-entity-embedded-decorations decorations="build.decorations">
+            <div ng-show="build.description" class="ot-description">
+                {{build.description}}
+            </div>
             <ot-creation creation="build.creation"></ot-creation>
         </div>
     </div>
