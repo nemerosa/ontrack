@@ -8,6 +8,7 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +24,7 @@ constructor(
         private val validation: GQLTypeValidation,
         private val runInfo: GQLTypeRunInfo,
         private val runInfoService: RunInfoService,
+        private val paginatedListFactory: GQLPaginatedListFactory,
         creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
@@ -125,10 +127,26 @@ constructor(
                             .type(stdList(GraphQLTypeReference(BUILD)))
                             .dataFetcher(buildLinkedFetcher())
                 }
+                // Build links - "usedBy" direction, no pagination needed
+                .field(
+                        paginatedListFactory.createPaginatedField<Build, Build>(
+                                fieldName = "usedBy",
+                                fieldDescription = "List of builds using this one.",
+                                itemType = this,
+                                itemPaginatedListProvider = { _, build, offset, size ->
+                                    structureService.getBuildsUsing(
+                                            build,
+                                            offset,
+                                            size
+                                    )
+                                }
+                        )
+                )
                 // Link direction (only used for linked builds)
                 .field { f ->
                     f.name("direction")
                             .description("Link direction")
+                            .deprecate("Use `uses` and `usedBy` fields on the `Build` type instead.")
                             .type(GraphQLString)
                             .dataFetcher(fetcher(LinkedBuild::class.java, LinkedBuild::direction))
                 }
