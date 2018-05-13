@@ -208,7 +208,7 @@
                 {{build.creation.time | date:'shortTime'}}
                 <!-- Run info - run time if available -->
                 <span ng-if="build.runInfo.runTime" title="{{build.runInfo.runTime}} seconds">
-                    &nbsp;-&nbsp;{{displayDuration(build.runInfo.runTime)}}
+                    &nbsp;-&nbsp;<ot-duration duration="build.runInfo.runTime" detail="false"></ot-duration>
                 </span>
             </div>
         </td>

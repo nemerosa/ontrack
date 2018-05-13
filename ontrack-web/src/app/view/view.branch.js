@@ -879,12 +879,5 @@ angular.module('ot.view.branch', [
             }
         };
 
-        /**
-         * Displaying a duration (for run info)
-         */
-        $scope.displayDuration = function (duration) {
-            return moment.duration(duration, "seconds").humanize();
-        };
-
     })
 ;
