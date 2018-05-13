@@ -463,15 +463,14 @@ docker-machine rm --force ${DROPLET_NAME}
         // Publication
 
         stage('Publication') {
-            // FIXME #600 Restore release restriction
+            when {
+                branch 'release/*'
+            }
             environment {
                 ONTRACK_VERSION = "${version}"
             }
             parallel {
                 stage('Docker Hub') {
-                    when {
-                        branch 'release/*'
-                    }
                     agent {
                         dockerfile {
                             label "docker"
