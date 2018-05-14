@@ -89,7 +89,7 @@ angular.module('ot.service.user', [
                 // Reloads the user information
                 self.loadUser();
                 // Goes back to the home page
-                $location.href = '/#home';
+                location.href = '/#home';
                 location.reload();
             });
         };
