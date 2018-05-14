@@ -4,7 +4,8 @@ services:
 
   # H2 database
   h2:
-    image: "nemerosa/h2:latest"
+    # H2 1.4.197
+    image: "nemerosa/h2:0.2.0"
     ports:
       - "9082"
       - "8082"
