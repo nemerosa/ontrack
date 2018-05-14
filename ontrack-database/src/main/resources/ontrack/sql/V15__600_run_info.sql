@@ -1,7 +1,7 @@
--- 40. Run info (#600)
+-- Run info (#600)
 
 CREATE TABLE RUN_INFO (
-  ID             INTEGER      NOT NULL AUTO_INCREMENT,
+  ID             SERIAL       NOT NULL,
   BUILD          INTEGER      NULL,
   VALIDATION_RUN INTEGER      NULL,
   SOURCE_TYPE    VARCHAR(20)  NULL,
