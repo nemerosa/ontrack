@@ -1,4 +1,4 @@
-package ontrack.sql;
+package db.migration;
 
 
 import net.nemerosa.ontrack.model.events.EventFactory;
