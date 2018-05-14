@@ -126,6 +126,9 @@ class Migration(
         // BUILD_LINKS
         copy("BUILD_LINKS", "ID", "BUILDID", "TARGETBUILDID")
 
+        // RUN_INFO
+        copy("RUN_INFO", "ID", "BUILD", "VALIDATION_RUN", "SOURCE_TYPE", "SOURCE_URI", "TRIGGER_TYPE", "TRIGGER_DATA", "RUN_TIME", "CREATION", "CREATOR")
+
         // EVENTS
         if (migrationProperties.isSkipEvents) {
             logger.warn("Skipping events migration")
