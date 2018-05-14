@@ -1145,6 +1145,20 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForBuild(ID buildId, int offset, int count) {
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsForBuild(build, offset, count, validationRunStatusService::getValidationRunStatus);
+    }
+
+    @Override
+    public int getValidationRunsCountForBuild(ID buildId) {
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsCountForBuild(build);
+    }
+
+    @Override
     public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId) {
         Build build = getBuild(buildId);
         ValidationStamp validationStamp = getValidationStamp(validationStampId);

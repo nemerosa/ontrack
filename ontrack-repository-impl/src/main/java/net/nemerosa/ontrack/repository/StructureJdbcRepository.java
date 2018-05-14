@@ -921,6 +921,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId ORDER BY ID DESC LIMIT :count OFFSET :offset",
+                params("buildId", build.id())
+                        .addValue("offset", offset)
+                        .addValue("count", count),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        id -> build,
+                        this::getValidationStamp,
+                        validationRunStatusService
+                )
+        );
+    }
+
+    @Override
+    public int getValidationRunsCountForBuild(Build build) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
+                params("buildId", build.id()),
+                Integer.class
+        );
+    }
+
+    @Override
     public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId ORDER BY ID DESC",

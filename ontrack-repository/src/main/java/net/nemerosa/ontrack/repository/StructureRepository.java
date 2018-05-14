@@ -184,7 +184,30 @@ public interface StructureRepository {
 
     ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    /**
+     * @deprecated Use {@link #getValidationRunsForBuild(ID, int, int, Function)} instead.
+     */
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Gets the list of validation runs for a build.
+     *
+     * @param build                      Build to get the validation runs for
+     * @param offset                     Offset in the list
+     * @param count                      Maximum number of elements to return
+     * @param validationRunStatusService Run status mapping function (provided by caller)
+     * @return List of validation runs
+     */
+    List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Gets the number of validation runs for a build.
+     *
+     * @param build Build to get the validation runs for
+     * @return Number of validation runs
+     */
+    int getValidationRunsCountForBuild(Build build);
 
     @Deprecated
     List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String, ValidationRunStatusID> validationRunStatusService);

@@ -227,7 +227,29 @@ public interface StructureService {
 
     ValidationRun getValidationRun(ID validationRunId);
 
+    /**
+     * @deprecated Use {@link #getValidationRunsForBuild(ID, int, int)} instead.
+     */
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuild(ID buildId);
+
+    /**
+     * Gets the list of validation runs for a build.
+     *
+     * @param buildId ID of the build
+     * @param offset  Offset in the list
+     * @param count   Maximum number of elements to return
+     * @return List of validation runs
+     */
+    List<ValidationRun> getValidationRunsForBuild(ID buildId, int offset, int count);
+
+    /**
+     * Gets the number of validation runs for a build.
+     *
+     * @param buildId ID of the build
+     * @return Number of validation runs
+     */
+    int getValidationRunsCountForBuild(ID buildId);
 
     /**
      * @deprecated Use {@link #getValidationRunsForBuildAndValidationStamp(ID, ID, int, int)} instead.

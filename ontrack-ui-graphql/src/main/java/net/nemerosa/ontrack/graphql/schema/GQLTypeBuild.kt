@@ -22,6 +22,7 @@ constructor(
         private val structureService: StructureService,
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val validation: GQLTypeValidation,
+        private val validationRun: GQLTypeValidationRun,
         private val runInfo: GQLTypeRunInfo,
         private val runInfoService: RunInfoService,
         private val paginatedListFactory: GQLPaginatedListFactory,
@@ -90,6 +91,27 @@ constructor(
                                 .type(stdList(GraphQLTypeReference(GQLTypeValidationRun.VALIDATION_RUN)))
                                 .dataFetcher(buildValidationRunsFetcher())
                                 .build()
+                )
+
+                // Paginated list of validation runs
+                .field(
+                        paginatedListFactory.createPaginatedField<Build, ValidationRun>(
+                                fieldName = "validationRunsPaginated",
+                                fieldDescription = "Paginated list of validation runs",
+                                itemType = validationRun,
+                                itemListCounter = { _, build ->
+                                    structureService.getValidationRunsCountForBuild(
+                                            build.id
+                                    )
+                                },
+                                itemListProvider = { _, build, offset, size ->
+                                    structureService.getValidationRunsForBuild(
+                                            build.id,
+                                            offset,
+                                            size
+                                    )
+                                }
+                        )
                 )
                 // Validation runs per validation stamp
                 .field { f ->
