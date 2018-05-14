@@ -45,12 +45,30 @@ angular.module('ot.view.build', [
                   pageItems {
                     name
                     branch {
+                      name
+                      links {
+                        _page
+                      }
                       project {
                         name
+                        links {
+                          _page
+                        }
                       }
                     }
                     links {
                       _page
+                    }
+                    promotionRuns(lastPerLevel: true) {
+                      promotionLevel {
+                        id
+                        name
+                        image
+                        _image
+                        links {
+                          _page
+                        }
+                      }
                     }
                   }
                 }
@@ -299,6 +317,12 @@ angular.module('ot.view.build', [
             // Navigating the validation runs
             $scope.navigateValidationRuns = function (pageRequest) {
                 queryParams.validationRunsOffset = pageRequest.offset;
+                loadBuild();
+            };
+
+            // Navigating the "used by" section
+            $scope.navigateUsedBy = function (pageRequest) {
+                queryParams.usedByOffset = pageRequest.offset;
                 loadBuild();
             };
         }
