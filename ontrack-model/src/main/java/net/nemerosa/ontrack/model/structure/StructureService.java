@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.pagination.PaginatedList;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
@@ -99,6 +100,20 @@ public interface StructureService {
 
     List<Build> getBuildLinksFrom(Build build);
 
+    /**
+     * Gets the builds which use the given one.
+     *
+     * @param build  Source build
+     * @param offset Offset for pagination
+     * @param size   Page size for pagination
+     * @return List of builds which use the given one
+     */
+    PaginatedList<Build> getBuildsUsing(Build build, int offset, int size);
+
+    /**
+     * @deprecated Use {@link #getBuildsUsing(Build, int, int)} instead
+     */
+    @Deprecated
     List<Build> getBuildLinksTo(Build build);
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
@@ -212,13 +227,67 @@ public interface StructureService {
 
     ValidationRun getValidationRun(ID validationRunId);
 
+    /**
+     * @deprecated Use {@link #getValidationRunsForBuild(ID, int, int)} instead.
+     */
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuild(ID buildId);
 
+    /**
+     * Gets the list of validation runs for a build.
+     *
+     * @param buildId ID of the build
+     * @param offset  Offset in the list
+     * @param count   Maximum number of elements to return
+     * @return List of validation runs
+     */
+    List<ValidationRun> getValidationRunsForBuild(ID buildId, int offset, int count);
+
+    /**
+     * Gets the number of validation runs for a build.
+     *
+     * @param buildId ID of the build
+     * @return Number of validation runs
+     */
+    int getValidationRunsCountForBuild(ID buildId);
+
+    /**
+     * @deprecated Use {@link #getValidationRunsForBuildAndValidationStamp(ID, ID, int, int)} instead.
+     */
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId);
+
+    /**
+     * Gets the list of validation runs for a build and a validation stamp.
+     *
+     * @param buildId           ID of the build
+     * @param validationStampId ID of the validation stamp
+     * @param offset            Offset in the list
+     * @param count             Maximum number of elemnts to return
+     * @return List of validation runs
+     */
+    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId, int offset, int count);
 
     List<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
+
+    /**
+     * Gets the total number of validation runs for a build and a validation stamp
+     *
+     * @param buildId           ID of the build
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId);
+
+    /**
+     * Gets the total number of validation runs for a validation stamp
+     *
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForValidationStamp(ID validationStampId);
 
     // Entity searches by name
 

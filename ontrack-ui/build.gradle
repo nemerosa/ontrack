@@ -17,6 +17,10 @@ dependencies {
     runtime 'org.postgresql:postgresql'
     runtime 'org.flywaydb:flyway-core'
 
+    // Metric runtimes
+    runtime 'io.micrometer:micrometer-registry-influx'
+    runtime 'io.micrometer:micrometer-registry-prometheus'
+
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output
@@ -38,8 +42,6 @@ dependencies {
     runtime project(':ontrack-extension-combined')
     runtime project(':ontrack-extension-ldap')
     runtime project(':ontrack-extension-stale')
-    runtime project(':ontrack-extension-metrics-graphite')
-    runtime project(':ontrack-extension-metrics-influxdb')
     runtime project(':ontrack-extension-vault')
 }
 

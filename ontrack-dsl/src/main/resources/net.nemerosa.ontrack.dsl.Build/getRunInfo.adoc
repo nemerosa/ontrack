@@ -1,0 +1,17 @@
+The returned object has the following properties:
+
+* `sourceType` - Type of source (like "jenkins")
+* `sourceUri` - URI to the source of the run (like the URL to a Jenkins job)
+* `triggerType` - Type of trigger (like "scm" or "user")
+* `triggerData` - Data associated with the trigger (like a user ID or a commit)
+* `runTime` - Time of the run (in seconds)
+
+Example:
+
+[source,groovy]
+----
+def build = ontrack.build('project', 'branch', '1')
+def info = build.runInfo
+assert info != null
+assert info.runTime == 30
+----

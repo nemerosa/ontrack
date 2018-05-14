@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.job.support
 
 import net.nemerosa.ontrack.job.*
 
-class ConfigurableJob(
+class ConfigurableJob
+@JvmOverloads
+constructor(
         val name: String = "test",
         var count: Int = 0,
         var increment: Int = 1,

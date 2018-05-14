@@ -90,6 +90,18 @@ public interface StructureRepository {
 
     List<Build> getBuildLinksFrom(ID buildId);
 
+    /**
+     * Gets the builds which use the given one.
+     *
+     * @param build Source build
+     * @return List of builds which use the given one
+     */
+    List<Build> getBuildsUsing(Build build);
+
+    /**
+     * @deprecated Use {@link #getBuildsUsing(Build)} instead.
+     */
+    @Deprecated
     List<Build> getBuildLinksTo(ID buildId);
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
@@ -172,11 +184,54 @@ public interface StructureRepository {
 
     ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    /**
+     * @deprecated Use {@link #getValidationRunsForBuild(ID, int, int, Function)} instead.
+     */
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    /**
+     * Gets the list of validation runs for a build.
+     *
+     * @param build                      Build to get the validation runs for
+     * @param offset                     Offset in the list
+     * @param count                      Maximum number of elements to return
+     * @param validationRunStatusService Run status mapping function (provided by caller)
+     * @return List of validation runs
+     */
+    List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Gets the number of validation runs for a build.
+     *
+     * @param build Build to get the validation runs for
+     * @return Number of validation runs
+     */
+    int getValidationRunsCountForBuild(Build build);
+
+    @Deprecated
     List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
     List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Gets the total number of validation runs for a build and a validation stamp
+     *
+     * @param buildId           ID of the build
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId);
+
+    /**
+     * Gets the total number of validation runs for a validation stamp
+     *
+     * @param validationStampId ID of the validation stamp
+     * @return Number of validation runs for the validation stamp
+     */
+    int getValidationRunsCountForValidationStamp(ID validationStampId);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 }

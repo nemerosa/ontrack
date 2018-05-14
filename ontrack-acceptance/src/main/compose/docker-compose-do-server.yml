@@ -1,14 +1,6 @@
 version: "2.1"
 
 services:
-  # InfluxDB container
-  influxdb:
-    image: influxdb:1.1-alpine
-    environment:
-      PRE_CREATE_DB: "ontrack"
-    # Makes all ports accessible on the host for testing
-    ports:
-      - "8083"
 
   postgres:
     image: postgres:9.5.2
@@ -41,10 +33,6 @@ services:
        ONTRACK_CONFIG_KEY_STORE: "vault"
        ONTRACK_CONFIG_VAULT_URI: "http://vault:8200"
        ONTRACK_CONFIG_VAULT_TOKEN: "test"
-       # Sending metrics to InfluxDB
-       ONTRACK_METRICS_INFLUXDB_HOST: "influxdb"
-       ONTRACK_METRICS_INFLUXDB_PERIOD: 5
-       ONTRACK_CONFIG_METRICS_PERIOD: 5
     volumes:
       # Better startup performances in CI and DO, do not use in Prod
       - "/dev/urandom:/dev/random"

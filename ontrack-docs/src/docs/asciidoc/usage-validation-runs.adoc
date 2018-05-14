@@ -1,0 +1,32 @@
+[[validation-runs]]
+=== Managing validation runs
+
+<<model,Validation runs>> associate a validation stamp
+to a build, and a status describing the validation: passed,
+failed, etc.
+
+Additionally, a <<model,run info>> can be associated with
+the validation run to show information like a duration,
+a source or a trigger.
+
+Validation runs can be created manually, but more often,
+they will be created automatically by a CI engine like
+<<integration-jenkins,Jenkins>>.
+
+Validation runs can be seen:
+
+* in the branch overview - only their latest status is
+  then visible
+
+* in the branch overview, by clicking on a validation run
+  (at the intersection of a validation stamp and a build),
+  you can either create a new validation run (when there is
+  none) or see the list of them and their statuses.
+
+* in the build page
+
+* in the validation stamp page
+
+For one validation run, one can add comments and update
+the status to reflect (for example, to mention that
+a failure in under investigation).

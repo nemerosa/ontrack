@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.job;
 
-import net.nemerosa.ontrack.job.support.TestJob;
+import net.nemerosa.ontrack.job.support.ConfigurableJob;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,7 +12,7 @@ public class JobKeyTest {
     public void same_category() {
         JobKey key = Fixtures.TEST_CATEGORY.getType("xxx").getKey("xxx");
         assertTrue(key.sameCategory(Fixtures.TEST_CATEGORY));
-        assertTrue(TestJob.of().getKey().sameCategory(Fixtures.TEST_CATEGORY));
+        assertTrue(new ConfigurableJob().getKey().sameCategory(Fixtures.TEST_CATEGORY));
     }
 
     @Test

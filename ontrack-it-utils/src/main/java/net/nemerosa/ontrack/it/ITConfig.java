@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.it;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.nemerosa.ontrack.common.RunProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,5 +61,10 @@ public class ITConfig {
     @Bean
     public ConverterRegistry converterRegistry() {
         return new DefaultConversionService();
+    }
+
+    @Bean
+    public MeterRegistry meterRegistry() {
+        return new SimpleMeterRegistry();
     }
 }

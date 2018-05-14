@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.job;
 
-import com.codahale.metrics.MetricRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
 import net.nemerosa.ontrack.job.JobListener;
 import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.job.support.DefaultJobScheduler;
@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import net.nemerosa.ontrack.model.support.SettingsRepository;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,19 +25,16 @@ public class JobConfig {
 
     private final ApplicationLogService logService;
 
-    private final MetricRegistry metricRegistry;
-
-    private final CounterService counterService;
+    private final MeterRegistry meterRegistry;
 
     private final SettingsRepository settingsRepository;
 
     @Autowired
-    public JobConfig(OntrackConfigProperties ontrackConfigProperties, DefaultJobDecorator jobDecorator, ApplicationLogService logService, MetricRegistry metricRegistry, CounterService counterService, SettingsRepository settingsRepository) {
+    public JobConfig(OntrackConfigProperties ontrackConfigProperties, DefaultJobDecorator jobDecorator, ApplicationLogService logService, MeterRegistry meterRegistry, SettingsRepository settingsRepository) {
         this.ontrackConfigProperties = ontrackConfigProperties;
         this.jobDecorator = jobDecorator;
         this.logService = logService;
-        this.metricRegistry = metricRegistry;
-        this.counterService = counterService;
+        this.meterRegistry = meterRegistry;
         this.settingsRepository = settingsRepository;
     }
 
@@ -46,8 +42,7 @@ public class JobConfig {
     public JobListener jobListener() {
         return new DefaultJobListener(
                 logService,
-                metricRegistry,
-                counterService,
+                meterRegistry,
                 settingsRepository
         );
     }
@@ -72,7 +67,8 @@ public class JobConfig {
                 jobListener(),
                 jobConfigProperties.isPausedAtStartup(),
                 jobConfigProperties.isScattering(),
-                jobConfigProperties.getScatteringRatio()
+                jobConfigProperties.getScatteringRatio(),
+                meterRegistry
         );
     }
 

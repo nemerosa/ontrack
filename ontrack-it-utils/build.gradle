@@ -10,7 +10,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
     compile 'org.slf4j:slf4j-api'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
-
+    compile 'io.micrometer:micrometer-spring-legacy'
+    
     runtime 'org.postgresql:postgresql'
     runtime 'org.flywaydb:flyway-core'
     runtime 'io.dropwizard.metrics:metrics-core'

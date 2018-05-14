@@ -111,11 +111,11 @@ cd ontrack-extension-test
                 sh """\
 echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
 
-docker tag nemerosa/ontrack:${version} docker.nemerosa.net/nemerosa/ontrack:${version} 
+docker tag nemerosa/ontrack:${version} docker.nemerosa.net/nemerosa/ontrack:${version}
 docker tag nemerosa/ontrack-acceptance:${version} docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
 docker tag nemerosa/ontrack-extension-test:${version} docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
 
-docker push docker.nemerosa.net/nemerosa/ontrack:${version} 
+docker push docker.nemerosa.net/nemerosa/ontrack:${version}
 docker push docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
 docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
 """
@@ -133,7 +133,6 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                     stash name: "rpm", includes: "build/distributions/*.rpm"
                     stash name: "debian", includes: "build/distributions/*.deb"
-                    archiveArtifacts "build/distributions/ontrack-*-delivery.zip"
                 }
             }
         }
@@ -174,7 +173,6 @@ cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name local down --volumes
 """
-                    archiveArtifacts 'build/acceptance/**'
                     junit 'build/acceptance/*.xml'
                     script {
                         if (!pr) {
@@ -250,7 +248,6 @@ cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
 """
-                            archiveArtifacts 'build/centos/**'
                             junit 'build/centos/*.xml'
                             ontrackValidate(
                                     project: projectName,
@@ -309,7 +306,6 @@ cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
-                            archiveArtifacts 'build/debian/**'
                             junit 'build/debian/*.xml'
                             ontrackValidate(
                                     project: projectName,
@@ -358,7 +354,6 @@ cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
 """
-                            archiveArtifacts 'build/extension/**'
                             junit 'build/extension/*.xml'
                             ontrackValidate(
                                     project: projectName,
@@ -451,7 +446,6 @@ docker-compose \\
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
-                            archiveArtifacts 'build/do/**'
                             junit 'build/do/*.xml'
                             ontrackValidate(
                                     project: projectName,

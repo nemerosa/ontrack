@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.ldap
 
 import org.junit.Test
 import org.springframework.ldap.core.DirContextOperations
-import org.springframework.ldap.core.DistinguishedName
+import org.springframework.ldap.support.LdapUtils
 import org.springframework.security.ldap.userdetails.LdapUserDetails
 
 import static org.mockito.Mockito.mock
@@ -92,19 +92,19 @@ class ConfigurableUserDetailsContextMapperTest {
 
     @Test
     void 'DN value - lowercase requested from uppercase'() {
-        def dn = new DistinguishedName('cn=Damien,ou=Test')
+        def dn = LdapUtils.newLdapName('cn=Damien,ou=Test')
         assert ConfigurableUserDetailsContextMapper.getValue(dn, 'OU') == 'Test'
     }
 
     @Test
     void 'DN value - lowercase requested from lowercase'() {
-        def dn = new DistinguishedName('cn=Damien,ou=Test')
+        def dn = LdapUtils.newLdapName('cn=Damien,ou=Test')
         assert ConfigurableUserDetailsContextMapper.getValue(dn, 'ou') == 'Test'
     }
 
     @Test
     void 'DN value - not found'() {
-        def dn = new DistinguishedName('cn=Damien')
+        def dn = LdapUtils.newLdapName('cn=Damien')
         assert ConfigurableUserDetailsContextMapper.getValue(dn, 'ou') == null
     }
 

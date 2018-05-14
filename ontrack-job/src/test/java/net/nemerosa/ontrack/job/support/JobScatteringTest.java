@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.test.TestUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.Test;
 
-import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +29,7 @@ public class JobScatteringTest {
                 1.0
         );
 
-        TestJob job = TestJob.of();
+        ConfigurableJob job = new ConfigurableJob();
         scheduler.schedule(job, Schedule.everyMinutes(30));
 
         // Gets the schedule of the job
@@ -57,7 +56,7 @@ public class JobScatteringTest {
                 0.5
         );
 
-        TestJob job = TestJob.of();
+        ConfigurableJob job = new ConfigurableJob();
         scheduler.schedule(job, Schedule.everyMinutes(30));
 
         // Gets the schedule of the job
@@ -86,7 +85,7 @@ public class JobScatteringTest {
                 0.5
         );
 
-        TestJob job = TestJob.of();
+        ConfigurableJob job = new ConfigurableJob();
         scheduler.schedule(job, Schedule.everyMinutes(30).after(10));
 
         // Gets the schedule of the job
@@ -115,7 +114,7 @@ public class JobScatteringTest {
                 0.5
         );
 
-        TestJob job = TestJob.of();
+        ConfigurableJob job = new ConfigurableJob();
         scheduler.schedule(job, Schedule.NONE);
 
         // Gets the schedule of the job
@@ -143,8 +142,8 @@ public class JobScatteringTest {
                 1.0
         );
         // Creates a list of jobs with a weak key
-        List<TestJob> jobs = TestUtils.range(1, 100).stream()
-                .map(i -> TestJob.of(String.format("%d", i)))
+        List<ConfigurableJob> jobs = TestUtils.range(1, 100).stream()
+                .map(i -> new ConfigurableJob(String.format("%d", i)))
                 .collect(Collectors.toList());
         // Orchestration of all those jobs every 6 hours
         Collection<JobOrchestratorSupplier> jobOrchestratorSupplier = Collections.singletonList(

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.job.support
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
@@ -13,14 +14,20 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
 
-class DefaultJobScheduler(
+/**
+ * @property meterRegistry If set, the scheduler will register job metrics
+ */
+class DefaultJobScheduler
+@JvmOverloads
+constructor(
         private val jobDecorator: JobDecorator,
         private val schedulerPool: ScheduledExecutorService,
         private val jobListener: JobListener,
         initiallyPaused: Boolean,
         private val jobPoolProvider: BiFunction<ExecutorService, Job, ExecutorService>,
         private val scattering: Boolean,
-        private val scatteringRatio: Double
+        private val scatteringRatio: Double,
+        private val meterRegistry: MeterRegistry? = null
 ) : JobScheduler {
 
     private val logger = LoggerFactory.getLogger(JobScheduler::class.java)
@@ -30,13 +37,15 @@ class DefaultJobScheduler(
 
     private val idGenerator = AtomicLong()
 
+    @JvmOverloads
     constructor(
             jobDecorator: JobDecorator,
             schedulerPool: ScheduledExecutorService,
             jobListener: JobListener,
             initiallyPaused: Boolean,
             scattering: Boolean,
-            scatteringRatio: Double
+            scatteringRatio: Double,
+            meterRegistry: MeterRegistry? = null
     ) : this(
             jobDecorator,
             schedulerPool,
@@ -44,12 +53,48 @@ class DefaultJobScheduler(
             initiallyPaused,
             BiFunction { executorService, _ -> executorService },
             scattering,
-            scatteringRatio
+            scatteringRatio,
+            meterRegistry
     )
+
+    private fun MeterRegistry.statusGauge(
+            name: String,
+            statusFilterFn: (JobStatus) -> Boolean
+    ) {
+        gauge(
+                "ontrack_job_${name}_total",
+                services,
+                {
+                    it.filter { (_, service) -> statusFilterFn(service.jobStatus) }
+                            .size.toDouble()
+                }
+        )
+    }
 
     init {
         Validate.inclusiveBetween(0.0, 1.0, scatteringRatio)
         this.schedulerPaused = AtomicBoolean(initiallyPaused)
+        // Metrics
+        if (meterRegistry != null) {
+            // count
+            meterRegistry.gaugeMapSize(
+                    "ontrack_job_count_total",
+                    emptyList(),
+                    services
+            )
+            meterRegistry.statusGauge("running", { it.isRunning })
+            meterRegistry.statusGauge("disabled", { it.isDisabled })
+            meterRegistry.statusGauge("paused", { it.isPaused })
+            meterRegistry.statusGauge("error", { it.isError })
+            meterRegistry.statusGauge("invalid", { !it.isValid })
+            meterRegistry.gauge(
+                    "ontrack_job_error_count_total",
+                    services,
+                    {
+                        it.values.map { it.jobStatus.lastErrorCount }.sum().toDouble()
+                    }
+            )
+        }
     }
 
     override fun schedule(job: Job, schedule: Schedule) {
