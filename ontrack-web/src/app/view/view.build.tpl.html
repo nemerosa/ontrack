@@ -43,12 +43,12 @@
         <!-- Validations -->
         <div class="col-md-8">
             <ot-section-title>Validations</ot-section-title>
-            <div class="ot-description" ng-if="build.validationRuns.length == 0">
+            <div class="ot-description" ng-if="build.validationRunsPaginated.pageInfo.currentSize == 0">
                 No validation yet.
             </div>
             <table class="table table-condensed table-hover">
                 <tbody>
-                <tr ng-repeat="validationRun in build.validationRuns">
+                <tr ng-repeat="validationRun in build.validationRunsPaginated.pageItems">
                     <td>
                         <ot-entity-image entity="validationRun.validationStamp"
                                          link="#/validationStamp/{{validationRun.validationStamp.id}}">
@@ -90,6 +90,22 @@
                     </td>
                 </tr>
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <button class="btn btn-default" type="button" ng-show="build.validationRunsPaginated.pageInfo.previousPage" ng-click="navigateValidationRuns(build.validationRunsPaginated.pageInfo.previousPage)">
+                            <span class="fa fa-step-backward"></span>
+                            Newest
+                        </button>
+                    </td>
+                    <td colspan="4" style="text-align: right;">
+                        <button class="btn btn-default" type="button" ng-show="build.validationRunsPaginated.pageInfo.nextPage" ng-click="navigateValidationRuns(build.validationRunsPaginated.pageInfo.nextPage)">
+                            <span class="fa fa-step-forward"></span>
+                            Oldest
+                        </button>
+                    </td>
+                </tr>
+                </tfoot>
             </table>
         </div>
     </div>

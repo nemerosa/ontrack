@@ -16,11 +16,12 @@ angular.module('ot.view.build', [
             // Build's id
             const queryParams = {
                 buildId: $stateParams.buildId,
-                usedByOffset: 0
+                usedByOffset: 0,
+                validationRunsOffset: 0
             };
             // GraphQL query
             const query = `
-            query Build($buildId: Int!, $usedByOffset: Int!) {
+            query Build($buildId: Int!, $usedByOffset: Int!, $validationRunsOffset: Int!) {
               builds(id: $buildId) {
                 id
                 name
@@ -98,34 +99,39 @@ angular.module('ot.view.build', [
                     }
                   }
                 }
-                validationRuns {
-                  id
-                  runOrder
-                  creation {
-                    user
-                    time
+                validationRunsPaginated(offset: $validationRunsOffset, size: 10) {
+                  pageInfo {
+                    ...pageInfoContent
                   }
-                  validationRunStatuses {
-                    statusID {
+                  pageItems {
                       id
-                      name
-                    }
-                    description
-                  }
-                  runInfo {
-                    ...runInfoContent
-                  }
-                  links {
-                    _page
-                  }
-                  validationStamp {
-                    id
-                    name
-                    image
-                    _image
-                    links {
-                      _page
-                    }
+                      runOrder
+                      creation {
+                        user
+                        time
+                      }
+                      validationRunStatuses {
+                        statusID {
+                          id
+                          name
+                        }
+                        description
+                      }
+                      runInfo {
+                        ...runInfoContent
+                      }
+                      links {
+                        _page
+                      }
+                      validationStamp {
+                        id
+                        name
+                        image
+                        _image
+                        links {
+                          _page
+                        }
+                      }
                   }
                 }
               }
@@ -288,6 +294,12 @@ angular.module('ot.view.build', [
                 }).then(function () {
                     return ot.call($http.delete(promotionRun.links._delete));
                 }).then(loadBuild);
+            };
+
+            // Navigating the validation runs
+            $scope.navigateValidationRuns = function (pageRequest) {
+                queryParams.validationRunsOffset = pageRequest.offset;
+                loadBuild();
             };
         }
     )
