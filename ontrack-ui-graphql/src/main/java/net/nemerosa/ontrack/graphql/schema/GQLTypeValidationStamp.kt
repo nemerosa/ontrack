@@ -53,6 +53,7 @@ class GQLTypeValidationStamp(
                 // Paginated list of validation runs
                 .field(
                         paginatedListFactory.createPaginatedField<ValidationStamp, ValidationRun>(
+                                cache = cache,
                                 fieldName = "validationRunsPaginated",
                                 fieldDescription = "Paginated list of validation runs",
                                 itemType = validationRun,

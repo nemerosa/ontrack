@@ -96,6 +96,7 @@ constructor(
                 // Paginated list of validation runs
                 .field(
                         paginatedListFactory.createPaginatedField<Build, ValidationRun>(
+                                cache = cache,
                                 fieldName = "validationRunsPaginated",
                                 fieldDescription = "Paginated list of validation runs",
                                 itemType = validationRun,
@@ -159,6 +160,7 @@ constructor(
                 // Build links - "usedBy" direction, with pagination
                 .field(
                         paginatedListFactory.createPaginatedField<Build, Build>(
+                                cache = cache,
                                 fieldName = "usedBy",
                                 fieldDescription = "List of builds using this one.",
                                 itemType = this,

@@ -6,6 +6,7 @@ import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.model.pagination.PageRequest
 import net.nemerosa.ontrack.model.pagination.PaginatedList
@@ -35,6 +36,7 @@ class GQLPaginatedListFactory(
      * @param arguments Optional list of arguments to add to the field
      */
     fun <P, T> createPaginatedField(
+            cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
             itemType: GQLType,
@@ -42,6 +44,7 @@ class GQLPaginatedListFactory(
             arguments: List<GraphQLArgument> = emptyList()
     ): GraphQLFieldDefinition =
             createBasePaginatedListField(
+                    cache,
                     fieldName,
                     fieldDescription,
                     itemType,
@@ -69,6 +72,7 @@ class GQLPaginatedListFactory(
      * @param arguments Optional list of arguments to add to the field
      */
     fun <P, T> createPaginatedField(
+            cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
             itemType: GQLType,
@@ -77,7 +81,7 @@ class GQLPaginatedListFactory(
             arguments: List<GraphQLArgument> = emptyList()
     ): GraphQLFieldDefinition =
             createBasePaginatedListField(
-                    fieldName, fieldDescription, itemType, arguments
+                    cache, fieldName, fieldDescription, itemType, arguments
             ).dataFetcher { environment ->
                 val source: P = environment.getSource<P>()
                 val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
@@ -97,6 +101,7 @@ class GQLPaginatedListFactory(
             }.build()
 
     private fun createBasePaginatedListField(
+            cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
             itemType: GQLType,
@@ -118,7 +123,7 @@ class GQLPaginatedListFactory(
                                 .defaultValue(PageRequest.DEFAULT_PAGE_SIZE)
                     }
                     .argument(arguments)
-                    .type(createPaginatedList(itemType))
+                    .type(createPaginatedList(cache, itemType))
 
     /**
      * Creates a paginated GraphQL list type, linked to an actual
@@ -127,20 +132,27 @@ class GQLPaginatedListFactory(
      * @param itemType Type of item in the list
      */
     private fun createPaginatedList(
+            cache: GQLTypeCache,
             itemType: GQLType
     ): GraphQLObjectType {
-        return GraphQLObjectType.newObject()
-                .name("${itemType.typeName}Paginated")
-                .field {
-                    it.name("pageInfo")
-                            .description("Information about the current page")
-                            .type(pageInfo.typeRef)
+        val paginatedListTypeName = "${itemType.typeName}Paginated"
+        return cache.getOrCreate(
+                paginatedListTypeName,
+                {
+                    GraphQLObjectType.newObject()
+                            .name(paginatedListTypeName)
+                            .field {
+                                it.name("pageInfo")
+                                        .description("Information about the current page")
+                                        .type(pageInfo.typeRef)
+                            }
+                            .field {
+                                it.name("pageItems")
+                                        .description("Items in the current page")
+                                        .type(stdList(itemType.typeRef))
+                            }
+                            .build()
                 }
-                .field {
-                    it.name("pageItems")
-                            .description("Items in the current page")
-                            .type(stdList(itemType.typeRef))
-                }
-                .build()
+        )
     }
 }
