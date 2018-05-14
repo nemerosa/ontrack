@@ -309,7 +309,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "INNER JOIN BRANCHES BR ON BR.ID = T.BRANCHID " +
                         "INNER JOIN PROJECTS P ON P.ID = BR.PROJECTID " +
                         "WHERE T.NAME LIKE :buildNamePattern AND P.NAME = :projectName " +
-                        "ORDER BY F.ID DESC",
+                        "ORDER BY F.ID DESC " +
+                        "LIMIT 100",
                 params("buildNamePattern", expandBuildPattern(buildPattern)).addValue("projectName", projectName),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );
