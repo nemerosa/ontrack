@@ -168,6 +168,7 @@
             <!-- VS filter edition OFF -->
             <span ng-if="!validationStampFilter || !validationStampFilter._update || !validationStampFilterEdition">
                 <ot-entity-image entity="validationStamp"
+                                 title="{{validationStamp.name}} - {{validationStamp.description}}"
                                  link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
             </span>
         </th>

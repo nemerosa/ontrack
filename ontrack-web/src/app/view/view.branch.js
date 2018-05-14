@@ -155,6 +155,7 @@ angular.module('ot.view.branch', [
                 validationStamps {
                   id
                   name
+                  description
                   image
                   _image
                   decorations {
