@@ -41,8 +41,20 @@ public class ValidationRun implements RunnableEntity {
         return ImmutableMap.of(
                 "project", validationStamp.getBranch().getProject().getName(),
                 "branch", validationStamp.getBranch().getName(),
-                "validationStamp", validationStamp.getName()
+                "validationStamp", validationStamp.getName(),
+                "status", getLastStatusId()
         );
+    }
+
+    /**
+     * Gets the name of the last status
+     */
+    private String getLastStatusId() {
+        if (validationRunStatuses.isEmpty()) {
+            return "";
+        } else {
+            return validationRunStatuses.get(0).getStatusID().getId();
+        }
     }
 
     /**

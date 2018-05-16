@@ -94,3 +94,11 @@ They all have the following tags:
 * `job-type` - type of the job
 * `job-id` - ID of the job
 ====
+
+Run time information:
+
+* `ontrack_run_build_time_seconds` (timer) - duration of a run for a build.
+  It is associated with `project` and `branch` tags.
+* `ontrack_run_validation_run_time_seconds` (timer) - duration of a run for a
+  validation run. It is associated with `project`, `branch`, `validation_stamp`
+  and `status` tags.
