@@ -43,6 +43,9 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
             settingsRepository.setString(LDAPSettings.class, "emailAttribute", Objects.toString(settings.getEmailAttribute(), ""));
             settingsRepository.setString(LDAPSettings.class, "groupAttribute", Objects.toString(settings.getGroupAttribute(), ""));
             settingsRepository.setString(LDAPSettings.class, "groupFilter", Objects.toString(settings.getGroupFilter(), ""));
+            settingsRepository.setString(LDAPSettings.class, "groupNameAttribute", Objects.toString(settings.getGroupNameAttribute(), ""));
+            settingsRepository.setString(LDAPSettings.class, "groupSearchBase", Objects.toString(settings.getGroupSearchBase(), ""));
+            settingsRepository.setString(LDAPSettings.class, "groupSearchFilter", Objects.toString(settings.getGroupSearchFilter(), ""));
         }
     }
 
@@ -124,6 +127,30 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .help("Name of the OU field used to filter groups a user belongs to (optional).")
                                 .optional()
                                 .value(settings.getGroupFilter())
+                )
+                .with(
+                        Text.of("groupNameAttribute")
+                                .visibleIf("enabled")
+                                .label("Group name attribute")
+                                .help("The ID of the attribute which contains the name for a group (optional, defaults to cn)")
+                                .optional()
+                                .value(settings.getGroupNameAttribute())
+                )
+                .with(
+                        Text.of("groupSearchBase")
+                                .visibleIf("enabled")
+                                .label("Group search base")
+                                .help("The base DN from which the search for group membership should be performed (optional)")
+                                .optional()
+                                .value(settings.getGroupSearchBase())
+                )
+                .with(
+                        Text.of("groupSearchFilter")
+                                .visibleIf("enabled")
+                                .label("Group search filter")
+                                .help("The pattern to be used for the user search. {0} is the user's DN (optional, default to (member={0}))")
+                                .optional()
+                                .value(settings.getGroupSearchFilter())
                 )
                 ;
     }

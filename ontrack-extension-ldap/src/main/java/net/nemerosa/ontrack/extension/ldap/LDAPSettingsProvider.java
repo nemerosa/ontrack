@@ -30,7 +30,10 @@ public class LDAPSettingsProvider implements SettingsProvider<LDAPSettings> {
                 settingsRepository.getString(LDAPSettings.class, "fullNameAttribute", ""),
                 settingsRepository.getString(LDAPSettings.class, "emailAttribute", ""),
                 settingsRepository.getString(LDAPSettings.class, "groupAttribute", ""),
-                settingsRepository.getString(LDAPSettings.class, "groupFilter", "")
+                settingsRepository.getString(LDAPSettings.class, "groupFilter", ""),
+                settingsRepository.getString(LDAPSettings.class, "groupNameAttribute", "cn"),
+                settingsRepository.getString(LDAPSettings.class, "groupSearchBase", ""),
+                settingsRepository.getString(LDAPSettings.class, "groupSearchFilter", "(member={0})")
         );
     }
 
