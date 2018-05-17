@@ -16,4 +16,7 @@ class LDAPSettings {
     String emailAttribute
     String groupAttribute
     String groupFilter
+    String groupNameAttribute
+    String groupSearchBase
+    String groupSearchFilter
 }
