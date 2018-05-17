@@ -60,7 +60,7 @@ public class LDAPProviderFactoryImpl implements LDAPProviderFactory {
             bindAuthenticator.setUserSearch(userSearch);
             // Provider
             LdapAuthenticationProvider ldapAuthenticationProvider = new LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator);
-            ldapAuthenticationProvider.setUserDetailsContextMapper(new ConfigurableUserDetailsContextMapper(settings));
+            ldapAuthenticationProvider.setUserDetailsContextMapper(new ConfigurableUserDetailsContextMapper(settings, ldapContextSource));
             // OK
             return ldapAuthenticationProvider;
         }
