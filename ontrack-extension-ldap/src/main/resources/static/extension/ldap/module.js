@@ -3,7 +3,7 @@ angular.module('ontrack.extension.ldap', [])
         // Artifactory configurations
         $stateProvider.state('ldap-mapping', {
             url: '/extension/ldap/ldap-mapping',
-            templateUrl: 'extension/ldap/ldap-mapping.tpl.html',
+            templateUrl: 'extension/ldap/ldap.mapping.tpl.html',
             controller: 'LDAPMappingCtrl'
         });
     })
