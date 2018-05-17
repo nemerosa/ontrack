@@ -71,12 +71,13 @@ class ConfigurableUserDetailsContextMapperIT {
         when(ctx.getStringAttribute('cn')).thenReturn("User")
         when(ctx.getStringAttributes('memberOf')).thenReturn([] as String[])
         def originalDetails = mock(LdapUserDetails)
+        when(originalDetails.getDn()).thenReturn("cn=user,ou=people")
 
         // Groups from the search
         when(ldapTemplate.searchForSingleAttributeValues(
                 "ou=groups",
                 "(uniqueMember={0})",
-                ["user"] as String[],
+                ["cn=user,ou=people"] as String[],
                 "cn"
         )).thenReturn(['Admin', 'Developer'] as Set<String>)
 

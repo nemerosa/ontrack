@@ -56,12 +56,12 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
         // ... from the user
         parsedGroups.addAll(getGroupsFromUser(ctx));
         // ... from the groups
-        parsedGroups.addAll(getGroups(username));
+        parsedGroups.addAll(getGroups(userDetails, username));
         // OK
         return new ExtendedLDAPUserDetails(userDetails, fullName, email, parsedGroups);
     }
 
-    private Collection<String> getGroups(String username) {
+    private Collection<String> getGroups(LdapUserDetails userDetails, String username) {
         String groupSearchBase = settings.getGroupSearchBase();
         if (StringUtils.isNotBlank(groupSearchBase)) {
             String groupSearchFilter = settings.getGroupSearchFilter();
@@ -75,7 +75,7 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
             return ldapTemplate.searchForSingleAttributeValues(
                     groupSearchBase,
                     groupSearchFilter,
-                    new String[]{username},
+                    new String[]{userDetails.getDn()},
                     groupNameAttribute
 
             );
