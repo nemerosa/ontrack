@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.migration.postgresql;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,11 +24,14 @@ public class MigrationTool {
 
     private final Logger logger = LoggerFactory.getLogger(MigrationTool.class);
 
-    @Autowired
-    private MigrationProperties migrationProperties;
+    private final MigrationProperties migrationProperties;
 
-    @Autowired
-    private FlywayProperties flywayProperties;
+    private final FlywayProperties flywayProperties;
+
+    public MigrationTool(MigrationProperties migrationProperties, FlywayProperties flywayProperties) {
+        this.migrationProperties = migrationProperties;
+        this.flywayProperties = flywayProperties;
+    }
 
     @PostConstruct
     public void start() {
@@ -70,15 +73,13 @@ public class MigrationTool {
 
     private DataSource createDataSource(String name, String driver, MigrationProperties.DatabaseProperties databaseProperties) {
         logger.info("Using {} database at {}", name, databaseProperties.getUrl());
-        org.apache.tomcat.jdbc.pool.DataSource pool = new org.apache.tomcat.jdbc.pool.DataSource();
+        HikariDataSource pool = new HikariDataSource();
         pool.setDriverClassName(driver);
-        pool.setUrl(databaseProperties.getUrl());
+        pool.setJdbcUrl(databaseProperties.getUrl());
         pool.setUsername(databaseProperties.getUsername());
         pool.setPassword(databaseProperties.getPassword());
-        pool.setDefaultAutoCommit(false);
-        pool.setInitialSize(10);
-        pool.setMaxIdle(10);
-        pool.setMaxActive(20);
+        pool.setAutoCommit(false);
+        pool.setMaximumPoolSize(20);
         return pool;
     }
 
