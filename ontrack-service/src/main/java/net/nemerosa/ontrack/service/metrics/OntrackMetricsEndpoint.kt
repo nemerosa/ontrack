@@ -2,19 +2,19 @@ package net.nemerosa.ontrack.service.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.Time
-import org.springframework.boot.actuate.endpoint.AbstractEndpoint
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 @Component
+@Endpoint(id = "ontrack_metrics")
 class OntrackMetricsEndpoint(
         private val meterRegistry: MeterRegistry
-) : AbstractEndpoint<OntrackMetricsCollection>(
-        "ontrack_metrics",
-        true,
-        true
 ) {
-    override fun invoke(): OntrackMetricsCollection {
+
+    @ReadOperation
+    fun ontrackMetrics(): OntrackMetricsCollection {
         val metrics = mutableListOf<OntrackMetricsItem>()
         meterRegistry.forEachMeter { meter ->
             val name: String = meter.id.name
