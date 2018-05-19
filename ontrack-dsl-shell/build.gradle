@@ -21,6 +21,10 @@ dependencies {
     compile project(':ontrack-dsl')
 }
 
+jar {
+   enabled = true
+}
+
 bootJar {
     mainClassName = 'net.nemerosa.ontrack.shell.ShellApplication'
     launchScript()

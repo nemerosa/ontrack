@@ -51,7 +51,7 @@ task normaliseJar {
     doFirst {
         project.mkdir "${buildDir}/libs"
         // Used for local testing only
-        ant.copy file: bootRepackage.outputs.files.singleFile, tofile: "${buildDir}/libs/ontrack-acceptance.jar"
+        ant.copy file: bootJar.outputs.files.singleFile, tofile: "${buildDir}/libs/ontrack-acceptance.jar"
     }
 }
 
