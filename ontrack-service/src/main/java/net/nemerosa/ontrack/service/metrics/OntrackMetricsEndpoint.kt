@@ -4,10 +4,8 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.Time
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation
-import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
-@Component
 @Endpoint(id = "ontrack_metrics")
 class OntrackMetricsEndpoint(
         private val meterRegistry: MeterRegistry
