@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.gradle.DockerStop
 
 buildscript {
     ext {
-        springBootVersion = '1.5.12.RELEASE'
+        springBootVersion = '2.0.2.RELEASE'
         kotlinVersion = '1.2.40'
         micrometerVersion = '1.0.3'
     }

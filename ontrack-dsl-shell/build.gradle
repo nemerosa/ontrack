@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.12.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
@@ -21,15 +21,12 @@ dependencies {
     compile project(':ontrack-dsl')
 }
 
-bootRepackage {
-    executable = true
+bootJar {
+    mainClassName = 'net.nemerosa.ontrack.shell.ShellApplication'
+    launchScript()
     classifier = 'executable'
 }
 
 rootProject.tasks.publicationPackage {
-    from bootRepackage
-}
-
-springBoot {
-    mainClass = 'net.nemerosa.ontrack.shell.ShellApplication'
+    from bootJar
 }

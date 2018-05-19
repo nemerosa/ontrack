@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.12.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
@@ -39,23 +39,15 @@ configurations.all {
  * Packaging
  */
 
-task testJar(type: Jar) {
+bootJar {
     from sourceSets.test.output
-}
-
-artifacts {
-    archives testJar
-}
-
-bootRepackage {
-    mainClass = 'net.nemerosa.ontrack.acceptance.boot.Start'
-    withJarTask = 'testJar'
-    customConfiguration = 'testRuntime'
+    mainClassName = 'net.nemerosa.ontrack.acceptance.boot.Start'
+    // TODO customConfiguration = 'testRuntime'
     classifier = 'app'
 }
 
 task normaliseJar {
-    dependsOn bootRepackage
+    dependsOn bootJar
     doFirst {
         project.mkdir "${buildDir}/libs"
         // Used for local testing only
@@ -91,7 +83,7 @@ task dockerLatest(type: Exec, dependsOn: dockerBuild) {
 }
 
 rootProject.tasks.publicationPackage {
-    from bootRepackage
+    from bootJar
 }
 
 /**
@@ -124,7 +116,7 @@ publishing {
     publications {
         mavenCustom(MavenPublication) {
             // Clears all previous artifacts defined in root `build.gradle`
-            artifacts = [testJar]
+            // TODO artifacts = [testJar]
         }
     }
 }
