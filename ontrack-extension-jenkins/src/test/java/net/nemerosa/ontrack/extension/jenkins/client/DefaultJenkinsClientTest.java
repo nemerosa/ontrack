@@ -19,7 +19,7 @@ public class DefaultJenkinsClientTest {
     @Before
     public void before() {
         OTHttpClient httpClient = mock(OTHttpClient.class);
-        when(httpClient.getUrl(anyString(), any(String[].class))).thenAnswer(invocation -> {
+        when(httpClient.getUrl(anyString(), any())).thenAnswer(invocation -> {
             String path = (String) invocation.getArguments()[0];
             String parameters = (String) invocation.getArguments()[1];
             return String.format(
