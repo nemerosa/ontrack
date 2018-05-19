@@ -20,8 +20,6 @@ dependencies {
     compile 'com.github.ben-manes.caffeine:caffeine'
     compile 'org.flywaydb:flyway-core'
 
-    compile 'io.micrometer:micrometer-spring-legacy'
-
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output
     testRuntime project(':ontrack-repository-impl')

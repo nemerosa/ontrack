@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.it;
 
 import com.zaxxer.hikari.HikariDataSource;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.nemerosa.ontrack.common.RunProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +51,4 @@ public class ITConfig {
         return new DefaultConversionService();
     }
 
-    @Bean
-    public MeterRegistry meterRegistry() {
-        return new SimpleMeterRegistry();
-    }
 }
