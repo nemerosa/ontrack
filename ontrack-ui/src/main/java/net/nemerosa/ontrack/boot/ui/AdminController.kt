@@ -16,16 +16,13 @@ import net.nemerosa.ontrack.ui.resource.Pagination
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.actuate.endpoint.HealthEndpoint
 import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import org.springframework.web.util.UriComponentsBuilder
-import java.net.URI
 import javax.validation.Valid
-import kotlin.reflect.full.memberProperties
 
 @RestController
 @RequestMapping("/admin")
@@ -44,7 +41,7 @@ constructor(
      */
     @GetMapping("status")
     fun getStatus(): Resource<Health> = Resource.of(
-            healthEndpoint.invoke(),
+            healthEndpoint.health(),
             uri(on(javaClass).getStatus())
     )
 
