@@ -11,4 +11,5 @@ exec java \
     --ontrack.acceptance.timeout=${ONTRACK_ACCEPTANCE_TIMEOUT} \
     --ontrack.acceptance.implicit-wait=${ONTRACK_ACCEPTANCE_IMPLICIT_WAIT} \
     --ontrack.acceptance.output-dir=/ontrack/acceptance/output \
-    --ontrack.acceptance.result-file-name=acceptance-tests.xml
+    --ontrack.acceptance.result-file-name=acceptance-tests.xml \
+    --ontrack.acceptance.influxdb-uri=${ONTRACK_ACCEPTANCE_INFLUXDB_URI}

@@ -19,7 +19,7 @@ class InfluxDBRunInfoListener(
         val runTime = runInfo.runTime
         if (runTime != null) {
             influxDB.write(
-                    Point.measurement("ontrack_run_info_${runnableEntity.runnableEntityType.name.toLowerCase()}_time_seconds")
+                    Point.measurement("ontrack_value_run_info_${runnableEntity.runnableEntityType.name.toLowerCase()}_time_seconds")
                             .tag(runnableEntity.runMetricTags)
                             .addField("value", runTime)
                             .addField("name", runnableEntity.runMetricName)

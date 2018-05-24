@@ -4,7 +4,7 @@ apply plugin: OntrackExtensionPlugin
 
 dependencies {
     compile project(':ontrack-extension-support')
-    compile 'org.influxdb:influxdb-java:2.10'
+    compile 'org.influxdb:influxdb-java'
 
     testCompile project(':ontrack-it-utils')
     testCompile 'org.codehaus.groovy:groovy-all'
