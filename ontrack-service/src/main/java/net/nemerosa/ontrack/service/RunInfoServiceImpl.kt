@@ -18,7 +18,8 @@ class RunInfoServiceImpl(
         private val runInfoRepository: RunInfoRepository,
         private val structureService: StructureService,
         private val securityService: SecurityService,
-        private val meterRegistry: MeterRegistry
+        private val meterRegistry: MeterRegistry,
+        private val runInfoListeners: List<RunInfoListener>
 ) : RunInfoService {
 
     override fun getRunnableEntity(runnableEntityType: RunnableEntityType, id: Int): RunnableEntity {
@@ -51,6 +52,9 @@ class RunInfoServiceImpl(
                     TimeUnit.SECONDS
             )
         }
+        // Listeners
+        runInfoListeners.forEach { it.onRunInfoCreated(entity, runInfo) }
+        // OK
         return runInfo
     }
 

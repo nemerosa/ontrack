@@ -37,6 +37,13 @@ public class ValidationRun implements RunnableEntity {
     @NotNull
     @Override
     @JsonIgnore
+    public String getRunMetricName() {
+        return build.getName();
+    }
+
+    @NotNull
+    @Override
+    @JsonIgnore
     public Map<String, String> getRunMetricTags() {
         return ImmutableMap.of(
                 "project", validationStamp.getBranch().getProject().getName(),

@@ -43,6 +43,7 @@ dependencies {
     runtime project(':ontrack-extension-ldap')
     runtime project(':ontrack-extension-stale')
     runtime project(':ontrack-extension-vault')
+    runtime project(':ontrack-extension-influxdb')
 }
 
 /**

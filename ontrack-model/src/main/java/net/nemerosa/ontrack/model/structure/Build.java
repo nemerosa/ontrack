@@ -34,6 +34,13 @@ public class Build implements RunnableEntity {
     @NotNull
     @Override
     @JsonIgnore
+    public String getRunMetricName() {
+        return name;
+    }
+
+    @NotNull
+    @Override
+    @JsonIgnore
     public Map<String, String> getRunMetricTags() {
         return ImmutableMap.of(
                 "project", branch.getProject().getName(),
