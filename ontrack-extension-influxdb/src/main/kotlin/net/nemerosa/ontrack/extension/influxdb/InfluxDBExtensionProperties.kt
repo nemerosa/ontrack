@@ -12,9 +12,9 @@ const val INFLUXDB_EXTENSION_PROPERTIES_PREFIX = "ontrack.influxdb"
 @Component
 class InfluxDBExtensionProperties(
         var enabled: Boolean = false,
-        val uri: String = "http://localhost:8086",
+        var uri: String = "http://localhost:8086",
         var username: String = "root",
         var password: String = "root",
-        val db: String = "ontrack",
-        val create: Boolean = true
+        var db: String = "ontrack",
+        var create: Boolean = true
 )
