@@ -5,12 +5,8 @@ import net.nemerosa.ontrack.model.structure.RunInfoListener
 import net.nemerosa.ontrack.model.structure.RunnableEntity
 import org.influxdb.InfluxDB
 import org.influxdb.dto.Point
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
-import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
-@Component
-@ConditionalOnBean(InfluxDB::class)
 class InfluxDBRunInfoListener(
         private val influxDB: InfluxDB
 ) : RunInfoListener {

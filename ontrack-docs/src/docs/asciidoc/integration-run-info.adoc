@@ -100,4 +100,9 @@ following elements must be configured:
 | `true`
 | If `true`, the database is created at startup
 
+| `ontrack.influxdb.run-info`
+| `ONTRACK_INFLUXDB_RUN_INFO`
+| `true`
+| If `true`, the run info is exported to InfluxDB (`true` by default)
+
 |===
