@@ -1,0 +1,103 @@
+[[run-info]]
+=== Run info
+
+<<builds,Builds>> and <<validation-runs,validation runs>> can be associated with some _run information_ which contains:
+
+* source of the information, like a Jenkins job
+* trigger of the information, like a SCM change
+* duration of the collection for the information (like the duration of a job)
+
+[[run-info-collection]]
+==== Collection of run info
+
+Run info can be attached to a build or a validation run using the REST API or the DSL of Ontrack.
+
+This is typically done at CI engine level, where a solution like the
+https://plugins.jenkins.io/ontrack[Ontrack Jenkins plugin] simplifies the operation.
+
+When using the Jenkins pipeline as code, the `ontrackBuild` and `ontrackValidate` steps will do this
+automatically, so nothing to change. For example:
+
+[source,groovy]
+----
+post {
+   success {
+       ontrackBuild project: "xxx", branch: "1.0", build: version
+   }
+}
+----
+
+When using the DSL, the run info must be specified explicitly. The Jenkins plugin provides a `jenkins.runInfo`
+binding which contains some run into ready to be passed:
+
+[source,groovy]
+----
+ontrackScript script: """
+    def b = ontrack.build(...)
+    b.runInfo = jenkins.runInfo
+    """
+----
+
+[[run-info-displaying]]
+==== Displaying the run info
+
+The run info is displayed in the branch overview and the build page for builds, and in the validation stamp
+and the validation run pages for the validation runs.
+
+It is of course available through the REST API, GraphQL and the DSL.
+
+[[run-info-export]]
+==== Exporting the run info
+
+While the run info is available from Ontrack, it can also be exported to
+other databases.
+
+As of today, only InfluxDB is supported.
+
+[[run-info-export-influxdb]]
+==== Exporting the run info to InfluxDB
+
+[WARNING]
+====
+This is an experimental feature. In the future, especially when migrating
+to Spring Boot 2.0, the configuration might change. The feature is very likely
+to stay though.
+====
+
+In order to export Ontrack run info as points into an InfluxDB database,
+following elements must be configured:
+
+|===
+| Property | Environment variable | Default | Description
+
+| `ontrack.influxdb.enabled`
+| `ONTRACK_INFLUXDB_ENABLED`
+| `false`
+| Enables the export of run info to InfluxDB
+
+| `ontrack.influxdb.uri`
+| `ONTRACK_INFLUXDB_URI`
+| "http://localhost:8086"
+| URI of the InfluxDB database
+
+| `ontrack.influxdb.username`
+| `ONTRACK_INFLUXDB_USERNAME`
+| "root"
+| User name to connect to the InfluxDB database
+
+| `ontrack.influxdb.password`
+| `ONTRACK_INFLUXDB_PASSWORD`
+| "root"
+| Password to connect to the InfluxDB database
+
+| `ontrack.influxdb.db`
+| `ONTRACK_INFLUXDB_DB`
+| "ontrack"
+| Name of the InfluxDB database
+
+| `ontrack.influxdb.create`
+| `ONTRACK_INFLUXDB_CREATE`
+| `true`
+| If `true`, the database is created at startup
+
+|===
