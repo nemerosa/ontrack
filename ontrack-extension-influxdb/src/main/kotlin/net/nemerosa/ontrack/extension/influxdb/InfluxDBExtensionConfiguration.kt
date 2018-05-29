@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.influxdb
 
+import net.nemerosa.ontrack.extension.influxdb.runinfo.InfluxDBRunInfoListener
 import org.influxdb.BatchOptions
 import org.influxdb.InfluxDB
 import org.influxdb.InfluxDBFactory
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -34,5 +36,11 @@ class InfluxDBExtensionConfiguration(
         influxDB.enableBatch(BatchOptions.DEFAULTS)
         return influxDB
     }
+
+    @Bean
+    @ConditionalOnBean(InfluxDB::class)
+    @ConditionalOnProperty(prefix = INFLUXDB_EXTENSION_PROPERTIES_PREFIX, name = ["run-info"], havingValue = "true", matchIfMissing = true)
+    fun influxDBRunInfoListener(influxDB: InfluxDB) = InfluxDBRunInfoListener(influxDB)
+
 
 }
