@@ -14,4 +14,9 @@ class InfluxDBExtensionProperties {
     var password: String = "root"
     var db: String = "ontrack"
     var create: Boolean = true
+    var ssl = SSLProperties()
+
+    class SSLProperties {
+        var hostCheck: Boolean = true
+    }
 }

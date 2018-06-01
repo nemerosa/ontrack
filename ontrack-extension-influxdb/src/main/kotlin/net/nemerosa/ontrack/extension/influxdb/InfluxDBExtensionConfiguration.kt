@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.influxdb
 
 import net.nemerosa.ontrack.extension.influxdb.runinfo.InfluxDBRunInfoListener
+import okhttp3.OkHttpClient
 import org.influxdb.BatchOptions
 import org.influxdb.InfluxDB
 import org.influxdb.InfluxDBFactory
@@ -24,10 +25,17 @@ class InfluxDBExtensionConfiguration(
     fun influxDB(): InfluxDB {
         logger.info("InfluxDB URI = ${influxDBExtensionProperties.uri}")
         logger.info("InfluxDB database = ${influxDBExtensionProperties.db}")
+
+        var builder = OkHttpClient.Builder()
+        if (!influxDBExtensionProperties.ssl.hostCheck) {
+            builder = builder.hostnameVerifier { _, _ -> true }
+        }
+
         val influxDB = InfluxDBFactory.connect(
                 influxDBExtensionProperties.uri,
                 influxDBExtensionProperties.username,
-                influxDBExtensionProperties.password
+                influxDBExtensionProperties.password,
+                builder
         )
         influxDB.setDatabase(influxDBExtensionProperties.db)
         if (influxDBExtensionProperties.create) {

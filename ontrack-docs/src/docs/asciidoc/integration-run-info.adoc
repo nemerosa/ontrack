@@ -100,6 +100,12 @@ following elements must be configured:
 | `true`
 | If `true`, the database is created at startup
 
+| `ontrack.influxdb.ssl.host-check`
+| `ONTRACK_INFLUXDB_SSL_HOST_CHECK`
+| `true`
+| If `false`, disables host checking for certificates. *This should not be
+  used for a production system!*
+
 | `ontrack.influxdb.run-info`
 | `ONTRACK_INFLUXDB_RUN_INFO`
 | `true`
