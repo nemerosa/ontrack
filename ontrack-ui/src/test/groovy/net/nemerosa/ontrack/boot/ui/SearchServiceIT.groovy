@@ -1,12 +1,11 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.model.structure.SearchService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class SearchServiceIT extends AbstractServiceTestSupport {
+class SearchServiceIT extends AbstractWebTestSupport {
 
     @Autowired
     private SearchService searchService
