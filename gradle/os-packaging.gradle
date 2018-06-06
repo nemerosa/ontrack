@@ -36,11 +36,11 @@ ospackage {
 
 }
 
-task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootRepackage') {
+task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootJar') {
     link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack.sh'
 }
 
-task rpmPackage(type: Rpm, dependsOn: ':ontrack-ui:bootRepackage') {
+task rpmPackage(type: Rpm, dependsOn: ':ontrack-ui:bootJar') {
     user = 'ontrack'
     link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack.sh'
 }
