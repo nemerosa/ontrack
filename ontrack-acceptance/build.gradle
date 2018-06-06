@@ -114,11 +114,11 @@ jar {
     enabled = false
 }
 
-publishing {
-    publications {
-        mavenCustom(MavenPublication) {
-            // Clears all previous artifacts defined in root `build.gradle`
-            // TODO artifacts = [testJar]
-        }
-    }
-}
+//publishing {
+//    publications {
+//        mavenCustom(MavenPublication) {
+//            // Clears all previous artifacts defined in root `build.gradle`
+//            // TODO artifacts = [testJar]
+//        }
+//    }
+//}
