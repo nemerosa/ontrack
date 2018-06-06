@@ -226,6 +226,8 @@ configure(coreProjects) {
             dependency "io.micrometer:micrometer-spring-legacy:${micrometerVersion}"
             dependency "io.micrometer:micrometer-registry-influx:${micrometerVersion}"
             dependency "io.micrometer:micrometer-registry-prometheus:${micrometerVersion}"
+            // InfluxDB
+            dependency 'org.influxdb:influxdb-java:2.10'
             // Overrides from Spring Boot
             dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
             dependency 'org.postgresql:postgresql:9.4.1208'

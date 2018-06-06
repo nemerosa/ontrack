@@ -22,6 +22,8 @@ dependencies {
     testCompile 'org.codehaus.groovy:groovy-all'
     testCompile 'org.springframework.boot:spring-boot-starter'
 
+    testCompile 'org.influxdb:influxdb-java'
+
     testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
 }
