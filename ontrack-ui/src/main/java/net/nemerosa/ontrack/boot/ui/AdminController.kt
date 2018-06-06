@@ -13,11 +13,8 @@ import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.Page
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Pagination
-import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -31,19 +28,9 @@ class AdminController
 constructor(
         private val jobScheduler: JobScheduler,
         private val applicationLogService: ApplicationLogService,
-        private val healthEndpoint: HealthEndpoint,
         private val securityService: SecurityService,
         private val encryptionService: EncryptionService
 ) : AbstractResourceController() {
-
-    /**
-     * Gets the health status
-     */
-    @GetMapping("status")
-    fun getStatus(): Resource<Health> = Resource.of(
-            healthEndpoint.health(),
-            uri(on(javaClass).getStatus())
-    )
 
     /**
      * Gets the list of application log entries
