@@ -43,8 +43,8 @@ configurations.all {
 
 bootJar {
     from sourceSets.test.output
+    classpath configurations.testRuntime
     mainClassName = 'net.nemerosa.ontrack.acceptance.boot.Start'
-    // TODO customConfiguration = 'testRuntime'
     classifier = 'app'
 }
 
@@ -114,11 +114,11 @@ jar {
     enabled = false
 }
 
-//publishing {
-//    publications {
-//        mavenCustom(MavenPublication) {
-//            // Clears all previous artifacts defined in root `build.gradle`
-//            // TODO artifacts = [testJar]
-//        }
-//    }
-//}
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            // Clears all previous artifacts defined in root `build.gradle`
+            artifacts = [bootJar]
+        }
+    }
+}
