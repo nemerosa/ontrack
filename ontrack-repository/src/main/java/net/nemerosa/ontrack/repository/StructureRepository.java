@@ -154,6 +154,14 @@ public interface StructureRepository {
 
     Optional<PromotionRun> getEarliestPromotionRunAfterBuild(PromotionLevel promotionLevel, Build build);
 
+    /**
+     * Updates all promotion levels having the same name than the model, on all branches. The description
+     * and the image are copied from the model.
+     *
+     * @param promotionLevelId ID of the model
+     */
+    void bulkUpdatePromotionLevels(ID promotionLevelId);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);
