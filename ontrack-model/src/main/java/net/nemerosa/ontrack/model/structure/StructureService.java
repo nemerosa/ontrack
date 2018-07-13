@@ -188,6 +188,15 @@ public interface StructureService {
 
     List<PromotionRun> getPromotionRunsForPromotionLevel(ID promotionLevelId);
 
+    /**
+     * Bulk update of all promotion levels in other projects/branches and in predefined promotion levels,
+     * following the model designed by the promotion level ID.
+     *
+     * @param promotionLevelId ID of the promotion level model
+     * @return Result of the update
+     */
+    Ack bulkUpdatePromotionLevels(ID promotionLevelId);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);
