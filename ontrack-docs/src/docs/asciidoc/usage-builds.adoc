@@ -128,3 +128,5 @@ image::images/builds-run-info-overview.png[Build run info,400]
 or in the list of extensions in the build page:
 
 image::images/builds-run-info-detail.png[Build run info,400]
+
+More details about run information at <<run-info>>.

@@ -17,6 +17,10 @@ interface RunnableEntity : ProjectEntity {
      * Gets the tags for metrics
      */
     val runMetricTags: Map<String, String>
+    /**
+     * Gets a name for this entity in a metric record
+     */
+    val runMetricName: String
 }
 
 /**

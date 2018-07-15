@@ -91,7 +91,7 @@ nexusStaging {
     packageGroup = 'net.nemerosa'
     username = ossrhUser
     password = ossrhPassword
-    numberOfRetries = 30
+    numberOfRetries = 60
     delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
 }
 
@@ -226,6 +226,13 @@ task publicationGitHubReleaseJarShellUpload(type: GitHubReleaseUpload) {
     file = project.file("publication/ontrack-dsl-shell-${ontrackVersion}-executable.jar")
 }
 
+task publicationGitHubReleasePostgresqlMigrationUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack-postgresql-migration.jar'
+    fileType = 'application/zip'
+    file = project.file("publication/ontrack-postgresql-migration-${ontrackVersion}.jar")
+}
+
 task publicationGitHubReleaseDebianUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.deb'
@@ -249,6 +256,7 @@ task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {
 
 task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleaseJarUpload
+    dependsOn publicationGitHubReleasePostgresqlMigrationUpload
     dependsOn publicationGitHubReleaseJarShellUpload
     dependsOn publicationGitHubReleaseDebianUpload
     dependsOn publicationGitHubReleaseRpmUpload

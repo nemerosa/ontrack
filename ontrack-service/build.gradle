@@ -18,6 +18,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-cache'
     compile 'org.jgrapht:jgrapht-core'
     compile 'com.github.ben-manes.caffeine:caffeine'
+    compile 'org.flywaydb:flyway-core'
 
     compile 'io.micrometer:micrometer-spring-legacy'
 

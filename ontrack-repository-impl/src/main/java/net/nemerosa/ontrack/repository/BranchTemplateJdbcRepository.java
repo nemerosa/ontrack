@@ -74,7 +74,7 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
         // Definition
         getNamedParameterJdbcTemplate().update(
                 "INSERT INTO BRANCH_TEMPLATE_DEFINITIONS(BRANCHID, ABSENCEPOLICY, SYNCINTERVAL, SYNCHRONISATIONSOURCEID, SYNCHRONISATIONSOURCECONFIG) " +
-                        "VALUES (:branchId, :absencePolicy, :interval, :synchronisationSourceId, :synchronisationSourceConfig)",
+                        "VALUES (:branchId, :absencePolicy, :interval, :synchronisationSourceId, CAST(:synchronisationSourceConfig AS JSONB))",
                 params("branchId", branchId.get())
                         .addValue("absencePolicy", templateDefinition.getAbsencePolicy().name())
                         .addValue("interval", templateDefinition.getInterval())

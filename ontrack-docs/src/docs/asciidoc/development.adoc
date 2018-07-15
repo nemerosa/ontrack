@@ -10,6 +10,47 @@ Following tools must be installed before you can start coding with Ontrack:
 * https://www.docker.com/[Docker 1.11] or more recent
 * https://docs.docker.com/compose/[Docker Compose 1.6.2] or more recent
 
+[[development-postgres]]
+===== Postgres set-up
+
+Starting from release 3, Ontrack uses a Postgresql database for its backend.
+
+By default, the application will try to access it at
+`jdbc:postgresql://localhost:5432/ontrack` using `ontrack` / `ontrack` as
+credentials.
+
+You can of course set the database yourself, but the best way is to run the
+following Gradle command:
+
+[source,bash]
+----
+./gradlew devInit
+----
+
+This will use Docker in order to set up a Postgres database container, exposing
+the port `5432` on the host and named `postgresql`.
+
+Following properties are available to personalize this setup:
+
+|===
+| Property | Default | Description
+
+| `devPostgresPort` | `5432` | Port the container must expose on the host
+| `devPostgresName` | `postgresql` | Name of the container to create
+
+|===
+
+For example, to use the `5555` port:
+
+[source,bash]
+----
+./gradlew devInit -PdevPostgresPort=5555
+----
+
+NOTE: This container is used only for your local development, and is not used
+for running the <<testing,integration tests>>, where another container is
+automatically created and destroyed.
+
 [[development-build]]
 ==== Building locally
 
@@ -50,51 +91,6 @@ In order to launch the application, run the
 `--spring.profiles.active=dev` as argument.
 
 The application is then available at http://localhost:8080
-
-NOTE: By activating the `dev` profile, the working files
-and database file will be available under `work` in the root directory.
-
-WARNING: Not activating the `dev` profile without setting the database
-to connect to will result in Ontrack using a in-memory and therefore
-transient H2 database instance.
-
-[[development-h2-server]]
-==== Developing with H2 server database
-
-Ontrack uses by default a local embedded H2 database but one can configure
-it to use a H2 database deployed in server mode.
-
-The fastest way to deploy a H2 database is to use Docker, for example:
-
-[source,bash]
-----
-docker container run -d --publish 9082:9082 --name h2 nemerosa/h2:latest
-----
-
-This will create a local `h2` container running H2 and exposes its `9082`
-port.
-
-Then, you either run Ontrack with the following argument:
-
-[source]
-----
---spring.datasource.url=jdbc:h2:tcp://localhost:9082/ontrack;MODE=MYSQL
-----
-
-NOTE: `localhost` is your Docker host
-
-You can also create a local `application.properties` file and place it
-in `ontrack-ui/src/main/resources`:
-
-[source]
-.ontrack-ui/src/main/resources/application.properties
-----
-spring.datasource.url = jdbc:h2:tcp://localhost:9082/ontrack;MODE=MYSQL
-----
-
-TIP: Credentials to access the H2 database are controlled by the
-`spring.datasource.username` and `spring.datasource.password` Spring Boot
-properties and both default to `ontrack`.
 
 [[development-web]]
 ==== Developing for the web

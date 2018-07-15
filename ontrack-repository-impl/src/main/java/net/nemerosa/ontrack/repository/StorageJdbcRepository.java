@@ -32,7 +32,7 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
         // Inserting if not null
         if (node != null) {
             getNamedParameterJdbcTemplate().update(
-                    "INSERT INTO STORAGE(STORE, NAME, DATA) VALUES (:store, :key, :data)",
+                    "INSERT INTO STORAGE(STORE, NAME, DATA) VALUES (:store, :key, CAST(:data AS JSONB))",
                     params.addValue("data", writeJson(node))
             );
         }

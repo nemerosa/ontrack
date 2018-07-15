@@ -1,3 +1,19 @@
+#### Ontrack official image
+#
+#### Database configuration
+#
+# The default database connection is set to jdbc:postgresql://postgresql/ontrack, with ontrack as a user and ontrack
+# as a password). Those default settings are defined in ontrack-ui/src/main/resources/config/application.yml
+#
+# In order to override those settings, place an `application.yml` file in the `/var/ontrack/conf` volume, with the
+# following content (change the settings of course):
+#
+# spring:
+#     datasource:
+#        url: "jdbc:postgresql://postgresql/ontrack"
+#        username: ontrack
+#        password: ontrack
+
 # Base
 FROM openjdk:8u151-jdk
 
@@ -36,9 +52,6 @@ ENV JAVA_OPTIONS ''
 
 # Additional arguments to pass on the command lines
 ENV ONTRACK_ARGS ''
-
-# Database URL
-ENV ONTRACK_DB_URL "jdbc:h2:/var/ontrack/data/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
 
 # Copies the Ontrack JAR
 COPY ontrack.jar /opt/ontrack/

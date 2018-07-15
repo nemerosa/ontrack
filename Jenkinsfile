@@ -60,7 +60,7 @@ pipeline {
             agent {
                 dockerfile {
                     label "docker"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
                 }
             }
             steps {
@@ -496,12 +496,10 @@ echo "Publishing in Docker Hub..."
 echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
 
 docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION}
-docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:2
-docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:latest
+docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:3
 
 docker image push nemerosa/ontrack:${ONTRACK_VERSION}
-docker image push nemerosa/ontrack:2
-docker image push nemerosa/ontrack:latest
+docker image push nemerosa/ontrack:3
 '''
                     }
                 }
@@ -673,6 +671,114 @@ GITHUB_URI=`git config remote.origin.url`
                             build: version,
                             validationStamp: 'SITE',
                             buildResult: currentBuild.result,
+                    )
+                }
+            }
+        }
+
+        // Production
+
+        stage('Production') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            when {
+                branch 'release/3*'
+            }
+            environment {
+                ONTRACK_VERSION = "${version}"
+                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
+            }
+            steps {
+                timeout(time: 15, unit: 'MINUTES') {
+                    script {
+                        sshagent(credentials: ['ONTRACK_SSH_KEY']) {
+                            sh '''\
+#!/bin/bash
+
+set -e
+
+SSH_OPTIONS=StrictHostKeyChecking=no
+
+SSH_HOST=ontrack.nemerosa.net
+
+scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
+ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
+
+'''
+                        }
+                    }
+                }
+            }
+        }
+
+        // Production tests
+
+        stage('Production tests') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            when {
+                branch 'release/3*'
+            }
+            environment {
+                ONTRACK_VERSION = "${version}"
+                ONTRACK_ACCEPTANCE_ADMIN = credentials("ONTRACK_ACCEPTANCE_ADMIN")
+            }
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh '''\
+#!/bin/bash
+set -e
+
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
+echo "(*) Launching the tests..."
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+    --project-name production \\
+    up --exit-code-from ontrack_acceptance
+'''
+                }
+            }
+            post {
+                always {
+                    sh '''\
+#!/bin/bash
+
+echo "(*) Copying the test results..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/production
+
+echo "(*) Removing the test environment..."
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+    --project-name production \\
+    down
+
+'''
+                    archiveArtifacts 'build/production/**'
+                    junit 'build/production/*.xml'
+                    ontrackValidate(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'ONTRACK.SMOKE',
+                            buildResult: currentBuild.result,
+                    )
+                }
+                success {
+                    ontrackPromote(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            promotionLevel: 'ONTRACK',
                     )
                 }
             }

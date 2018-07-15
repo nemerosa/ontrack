@@ -1,3 +1,0 @@
--- 30. Missing index on the event table (#430)
-
-CREATE INDEX IF NOT EXISTS EVENTS_IX_EVENT_TYPE ON EVENTS(EVENT_TYPE);

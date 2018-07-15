@@ -89,10 +89,10 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
 
         def collect = buildLinks.collect { [it.project, it.name, it.page] }
         println collect
-        assert collect == [
+        assert collect as Set == [
                 [p1, '1.1', "${baseURL}/#/build/${b111}"],
                 [p2, '2.0', "${baseURL}/#/build/${b220}"],
-        ]
+        ] as Set
 
     }
 

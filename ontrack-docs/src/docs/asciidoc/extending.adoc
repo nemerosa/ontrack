@@ -247,6 +247,14 @@ See <<reference-services>> for a list of the core Ontrack services.
 [[extending-running]]
 ==== Running an extension
 
+[NOTE]
+====
+A Postgres database must be available to run an extension, since it is
+needed by Ontrack.
+
+See the <<development-postgres,development section>> to see how quickly set it up.
+====
+
 [[extending-running-gradle]]
 ===== Using Gradle
 
@@ -256,8 +264,6 @@ To run your extension using Gradle:
 ----
 ./gradlew ontrackRun
 ----
-
-WARNING: This does not work yet for Ontrack 3.0 (with Postgresql)
 
 This will make the application available at http://localhost:8080
 

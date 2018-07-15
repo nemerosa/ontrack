@@ -430,8 +430,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName) {
         return Optional.ofNullable(
                 getFirstItem(
-                        "SELECT * FROM (SELECT * FROM BUILDS WHERE BRANCHID = :branch AND NAME REGEXP '[0-9]+') " +
-                                "WHERE CONVERT(NAME,INT) >= CONVERT(:name,INT) ORDER BY CONVERT(NAME,INT) " +
+                        "SELECT * FROM (SELECT * FROM BUILDS WHERE BRANCHID = :branch AND NAME ~ '[0-9]+') AS MATCH_BUILDS " +
+                                "WHERE CAST(NAME AS INT) >= CAST(:name AS INT) ORDER BY CAST(NAME AS INT) " +
                                 "LIMIT 1",
                         params("branch", branchId.getValue()).addValue("name", buildName),
                         (rs, rowNum) -> toBuild(rs, this::getBranch)
@@ -820,6 +820,26 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void bulkUpdatePromotionLevels(ID promotionLevelId) {
+        // Description & name
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        String description = promotionLevel.getDescription();
+        String name = promotionLevel.getName();
+        // Image
+        Document image = getPromotionLevelImage(promotionLevelId);
+        // Bulk update
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content, DESCRIPTION = :description " +
+                        "WHERE ID <> :id AND NAME = :name",
+                params("id", promotionLevelId.getValue())
+                        .addValue("name", name)
+                        .addValue("description", description)
+                        .addValue("type", Document.isValid(image) ? image.getType() : null)
+                        .addValue("content", Document.isValid(image) ? image.getContent() : null)
+        );
+    }
+
+    @Override
     public void bulkUpdateValidationStamps(ID validationStampId) {
         // Description & name
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
@@ -910,7 +930,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId ORDER BY ID",
                 params("buildId", build.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,

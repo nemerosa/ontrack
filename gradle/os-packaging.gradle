@@ -8,7 +8,7 @@
  */
 def packageVersion
 if (versioning.info.display ==~ /\d+\.\d+\.\d+/) {
-    packageVersion = versioning.info.display
+    packageVersion = versioning.info.display.replaceAll(/[^0-9\.-_]/, '')
 } else {
     packageVersion = '0.0.0'
 }

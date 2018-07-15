@@ -1,11 +1,22 @@
 version: "2.1"
 
 services:
+   postgres:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
    ontrack:
       build:
         context: "./os/centos/7/docker"
       tty: true
       command: "/bin/cat"
+      environment:
+         SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+      depends_on:
+         postgres:
+            condition: service_started
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
       environment:

@@ -13,18 +13,10 @@ services:
     ports:
       - "3000"
 
-  # H2 database
-  h2:
-    image: "nemerosa/h2:latest"
-    ports:
-      - "9082"
-      - "8082"
-
   # Ontrack container
   ontrack:
     environment:
         PROFILE: acceptance
-        ONTRACK_DB_URL: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
     volumes:
       - "./ci/ontrack:/var/ontrack/conf"
       # Better startup performances in CI and DO, do not use in Prod
@@ -32,4 +24,4 @@ services:
     ports:
       - "443"
     links:
-      - "h2:h2"
+      - "postgresql:postgresql"

@@ -7,7 +7,9 @@ package net.nemerosa.ontrack.model.support;
  */
 public interface StartupService {
 
-    int JOB_REGISTRATION = 10;
+    int SYSTEM = 1;
+    int SYSTEM_REGISTRATION = 50;
+    int JOB_REGISTRATION = 100;
 
     /**
      * Display name (used for tracing information)

@@ -14,7 +14,8 @@ dependencies {
     runtime project(':ontrack-repository-impl')
     compile 'org.springframework.boot:spring-boot-starter-aop'
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
-    runtime 'com.h2database:h2'
+    runtime 'org.postgresql:postgresql'
+    runtime 'org.flywaydb:flyway-core'
 
     // Metric runtimes
     runtime 'io.micrometer:micrometer-registry-influx'
@@ -42,6 +43,7 @@ dependencies {
     runtime project(':ontrack-extension-ldap')
     runtime project(':ontrack-extension-stale')
     runtime project(':ontrack-extension-vault')
+    runtime project(':ontrack-extension-influxdb')
 }
 
 /**

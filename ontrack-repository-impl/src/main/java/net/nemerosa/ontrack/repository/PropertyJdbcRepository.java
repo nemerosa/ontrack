@@ -62,7 +62,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         // Update
         if (propertyId != null) {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE PROPERTIES SET JSON = :json, SEARCHKEY = :searchKey WHERE ID = :id",
+                    "UPDATE PROPERTIES SET JSON = CAST(:json AS JSONB), SEARCHKEY = :searchKey WHERE ID = :id",
                     params.addValue("id", propertyId)
             );
         }
@@ -71,7 +71,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
             getNamedParameterJdbcTemplate().update(
                     String.format(
                             "INSERT INTO PROPERTIES(TYPE, %s, SEARCHKEY, JSON) " +
-                                    "VALUES(:type, :entityId, :searchKey, :json)",
+                                    "VALUES(:type, :entityId, :searchKey, CAST(:json AS JSONB))",
                             entityType.name()
                     ),
                     params

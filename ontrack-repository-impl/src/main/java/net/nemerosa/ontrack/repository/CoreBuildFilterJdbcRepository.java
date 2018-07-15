@@ -150,7 +150,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
             // withPropertyValue
             String withPropertyValue = data.getWithPropertyValue();
             if (StringUtils.isNotBlank(withPropertyValue)) {
-                criteria.append(" AND PP.SEARCHKEY REGEXP :withPropertyValue");
+                criteria.append(" AND PP.SEARCHKEY ~ :withPropertyValue");
                 params.addValue("withPropertyValue", withPropertyValue);
             }
         }
@@ -405,7 +405,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
                 .addValue("propertyType", propertyType);
         // Property value
         if (StringUtils.isNotBlank(propertyValue)) {
-            sql.append(" AND PP.SEARCHKEY REGEXP :propertyValue");
+            sql.append(" AND PP.SEARCHKEY ~ :propertyValue");
             params.addValue("propertyValue", propertyValue);
         }
         // Ordering

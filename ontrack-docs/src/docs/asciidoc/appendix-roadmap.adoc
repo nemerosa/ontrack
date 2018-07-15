@@ -4,30 +4,6 @@
 Here are big ideas for the future of Ontrack. No plan yet, just rough ideas
 or wish lists.
 
-[[roadmap-postgresql]]
-==== Switch to Postgresql for the database layer
-
-NOTE: Partial support in version 3.0.
-
-WARNING: This could be replaced altogether by the support for
-         <<roadmap-neo4j,Neo4j>>.
-
-A migration to Postgres must take the following items into account:
-
-* definition of the schema
-* integration with Liquibase or Flyway (dropping DBInit)
-* definition of the different ways of working:
-** local development
-*** with Docker
-*** with a Postgres instance
-** build
-** docker
-** installation (RPM, Debian, manual)
-* extensions (like `svn`) can contribute to the schema
-* migration procedure (automated if possible)
-* use of JSON columns for configurations, properties, etc.
-* optimization of queries using JSON operators
-
 [[roadmap-jpa]]
 ==== Use JPA / Hibernate for SQL queries
 

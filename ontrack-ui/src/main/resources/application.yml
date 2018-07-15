@@ -1,17 +1,23 @@
 # Application properties
 
+# Flyway configuration
+# See RepositoryConfig for general Flyway configuration
+flyway:
+  baseline-on-migrate: true
+
 # Spring configuration
 spring:
+  # Default database connection
+  datasource:
+    url: "jdbc:postgresql://localhost/ontrack"
+    username: ontrack
+    password: ontrack
   # Default profile
   profiles:
     default: prod
   # AOP configuration
   aop:
     proxyTargetClass: true
-  # Datasource configuration
-  datasource:
-    username: ontrack
-    password: ontrack
 
 # Compression of web resources
 server:

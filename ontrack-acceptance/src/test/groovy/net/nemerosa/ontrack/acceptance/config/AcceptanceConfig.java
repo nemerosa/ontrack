@@ -73,6 +73,11 @@ public class AcceptanceConfig {
      */
     private String resultFileName = "ontrack-acceptance.xml";
 
+    /**
+     * URI to the InfluxDB database
+     */
+    private String influxdbUri = "http://localhost:8086";
+
     @PostConstruct
     public void check() throws InterruptedException, ExecutionException, TimeoutException {
         // Checks the URL is defined
@@ -136,6 +141,7 @@ public class AcceptanceConfig {
         logger.accept(String.format(">>> Implicit wait:       %s", implicitWait));
         logger.accept(String.format(">>> Output directory:    %s", outputDir));
         logger.accept(String.format(">>> Result file name:    %s", resultFileName));
+        logger.accept(String.format(">>> InfluxDB URI:        %s", influxdbUri));
     }
 
     public static AcceptanceConfig fromEnv() {
@@ -151,6 +157,7 @@ public class AcceptanceConfig {
         c.setImplicitWait(envAsInt("ontrack.acceptance.implicit-wait", c.getImplicitWait(), "GUI element wait (s)"));
         c.setOutputDir(envAsFile("ontrack.acceptance.output-dir", c.getOutputDir(), "Output directory"));
         c.setResultFileName(env("ontrack.acceptance.result-file-name", "ontrack-acceptance.xml", "Output directory"));
+        c.setInfluxdbUri(env("ontrack.acceptance.influxdb-uri", "http://localhost:8086", "URI to the InfluxDB database"));
         return c;
     }
 

@@ -113,7 +113,7 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
             return Ack.one(
                     getNamedParameterJdbcTemplate().update(
                             "INSERT INTO BUILD_FILTERS (ACCOUNTID, BRANCHID, NAME, TYPE, DATA) " +
-                                    "VALUES (:accountId, :branchId, :name, :type, :data)",
+                                    "VALUES (:accountId, :branchId, :name, :type, CAST(:data AS JSONB))",
                             params.addValue("type", type).addValue("data", writeJson(data))
                     )
             );
@@ -126,7 +126,7 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
             return Ack.one(
                     getNamedParameterJdbcTemplate().update(
                             "INSERT INTO SHARED_BUILD_FILTERS (BRANCHID, NAME, TYPE, DATA) " +
-                                    "VALUES (:branchId, :name, :type, :data)",
+                                    "VALUES (:branchId, :name, :type, CAST(:data AS JSONB))",
                             params.addValue("type", type).addValue("data", writeJson(data))
                     )
             );

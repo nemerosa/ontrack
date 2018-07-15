@@ -65,10 +65,9 @@ public class CopyServiceImplIT extends AbstractServiceTestSupport {
         // Checks the branch is created
         Branch clonedBranch = asUserWithView(clonedProject).call(() ->
                 structureService.findBranchByName(clonedProject.getName(), "B2")
-                        .orElseThrow(
-                                () -> new AssertionError("Cloned branch not found")
-                        )
+                        .orElse(null)
         );
+        assertNotNull("Cloned branch created", clonedBranch);
 
         // Checks the copy of properties for the project
         TestSimpleProperty property = asUserWithView(clonedProject).call(() ->

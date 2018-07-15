@@ -54,7 +54,7 @@ public class ValidationRunStatusServiceImpl implements ValidationRunStatusServic
 
     @Override
     public int startupOrder() {
-        return 10;
+        return SYSTEM_REGISTRATION;
     }
 
     /**

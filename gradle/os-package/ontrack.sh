@@ -38,15 +38,12 @@ EXT_DIR="$DATA_DIR/extensions"
 # java options
 SPRINGBOOTAPP_JAVA_OPTIONS="-Dloader.path=$EXT_DIR"
 
-# default JDBC URL
-ONTRACK_DB_URL="jdbc:h2:$DATA_DIR/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
-
 # Additional options
 JAVA_OPTIONS=""
 [ -r /etc/default/ontrack ] && . /etc/default/ontrack
 
 # spring boot options
-SPRINGBOOTAPP_OPTIONS="--logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files \"--spring.datasource.url=$ONTRACK_DB_URL\""
+SPRINGBOOTAPP_OPTIONS="--logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files"
 
 # additional options
 ONTRACK_ARGS=""

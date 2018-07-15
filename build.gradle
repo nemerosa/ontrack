@@ -1,3 +1,8 @@
+import net.nemerosa.ontrack.gradle.ComposeStop
+import net.nemerosa.ontrack.gradle.ComposeUp
+import net.nemerosa.ontrack.gradle.DockerStart
+import net.nemerosa.ontrack.gradle.DockerStop
+
 buildscript {
     ext {
         springBootVersion = '1.5.12.RELEASE'
@@ -50,6 +55,46 @@ allprojects {
     }
 }
 
+
+/**
+ * Integration test environment
+ */
+
+ext {
+    itJdbcUrl = project.properties.itJdbcUrl
+    itJdbcUsername = project.properties.itJdbcUsername
+    itJdbcPassword = project.properties.itJdbcPassword
+    itJdbcWait = project.properties.itJdbcWait
+}
+
+// Pre-integration tests: starting Postgresql
+
+task preIntegrationTest(type: ComposeUp) {
+    machine = project.properties.itMachine
+    dir = file("${rootDir}/gradle/it")
+    projectFiles = ['docker-compose.yml']
+    projectName = project.properties.itProject
+    forceRecreate = false
+    host = project.properties.itJdbcHost
+    // When done
+    doLast {
+        def jdbcUrl = "jdbc:postgresql://${host}:${getPublishedPort('db', 5432)}/ontrack"
+        project.ext.itJdbcUrl = jdbcUrl
+        logger.info("JDBC URL = ${project.ext.itJdbcUrl}")
+        logger.info("JDBC. Wait ${itJdbcWait} seconds for DB container to be ready...")
+        sleep ((itJdbcWait as int) * 1000)
+    }
+}
+
+// Post-integration tests: stopping Postgresql
+
+task postIntegrationTest(type: ComposeStop) {
+    machine = project.properties.itMachine
+    dir = file("${rootDir}/gradle/it")
+    projectFiles = ['docker-compose.yml']
+    projectName = project.properties.itProject
+    remove = true
+}
 
 /**
  * Java projects
@@ -181,8 +226,12 @@ configure(coreProjects) {
             dependency "io.micrometer:micrometer-spring-legacy:${micrometerVersion}"
             dependency "io.micrometer:micrometer-registry-influx:${micrometerVersion}"
             dependency "io.micrometer:micrometer-registry-prometheus:${micrometerVersion}"
+            // InfluxDB
+            dependency 'org.influxdb:influxdb-java:2.10'
             // Overrides from Spring Boot
             dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5'
+            dependency 'org.postgresql:postgresql:9.4.1208'
+            dependency 'org.flywaydb:flyway-core:4.0'
         }
     }
 
@@ -218,6 +267,17 @@ configure(coreProjects) {
         jvmArgs '-Xmx512m'
         reports {
             html.enabled = false
+        }
+        dependsOn preIntegrationTest
+        finalizedBy postIntegrationTest
+        /**
+         * Sets the JDBC URL
+         */
+        doFirst {
+            println "Setting JDBC URL for IT: ${rootProject.ext.itJdbcUrl}"
+            systemProperty 'it.jdbc.url', rootProject.ext.itJdbcUrl
+            systemProperty 'it.jdbc.user', rootProject.ext.itJdbcUsername
+            systemProperty 'it.jdbc.password', rootProject.ext.itJdbcPassword
         }
     }
 
@@ -255,6 +315,12 @@ apply from: 'gradle/docker.gradle'
  */
 
 apply from: 'gradle/acceptance.gradle'
+
+/**
+ * Development tasks
+ */
+
+apply from: 'gradle/development.gradle'
 
 /**
  * Publication tasks

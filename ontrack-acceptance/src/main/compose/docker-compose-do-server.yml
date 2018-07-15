@@ -2,13 +2,12 @@ version: "2.1"
 
 services:
 
-  # H2 database
-  h2:
-    # H2 1.4.197
-    image: "nemerosa/h2:0.2.0"
-    ports:
-      - "9082"
-      - "8082"
+  postgres:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
 
   # Vault
   # Non production setup
@@ -28,7 +27,8 @@ services:
     environment:
        PROFILE: acceptance
        ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
-       ONTRACK_DB_URL: "jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
+       # Database connection
+       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
        # Using Vault for storing the encryption keys
        ONTRACK_CONFIG_KEY_STORE: "vault"
        ONTRACK_CONFIG_VAULT_URI: "http://vault:8200"
@@ -41,5 +41,5 @@ services:
     depends_on:
       vault:
         condition: service_started
-      h2:
+      postgres:
         condition: service_started
