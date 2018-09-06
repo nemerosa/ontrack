@@ -132,6 +132,7 @@ class Build extends AbstractProjectResource {
      * If no change log is available, because the associated branch is not configured for example,
      * null is returned.
      */
+    @DSLMethod("Computes the <<changelogs,change log>> between this build and the one given in parameter.")
     ChangeLog getChangeLog(Build otherBuild) {
         try {
             return new ChangeLog(
