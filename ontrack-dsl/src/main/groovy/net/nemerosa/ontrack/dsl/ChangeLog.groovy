@@ -64,6 +64,7 @@ class ChangeLog extends AbstractResource {
         )
     }
 
+    @DSLMethod("Export the issue change log. See <<dsl-usecases-changelogs-export,this section>> for an example.")
     String exportIssues(Map map) {
         return exportIssues(new IssueChangeLogExportRequest(map))
     }
