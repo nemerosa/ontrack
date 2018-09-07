@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.acceptance.boot;
 
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig;
+import net.nemerosa.ontrack.acceptance.support.AcceptanceRunContext;
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest;
+import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -27,13 +29,20 @@ public class AcceptanceTestRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        AcceptanceTest acceptanceTest = method.getAnnotation(AcceptanceTest.class);
-        if (!config.acceptTest(acceptanceTest)) {
-            notifier.fireTestIgnored(describeChild(method));
+        AcceptanceTest root = method.getDeclaringClass().getAnnotation(AcceptanceTest.class);
+        AcceptanceTest item = method.getAnnotation(AcceptanceTest.class);
+        Description description = describeChild(method);
+        if (!config.acceptTest(root, item)) {
+            notifier.fireTestIgnored(description);
             return;
         }
         // Default
-        logger.info("\n\n[TEST] " + describeChild(method) + "\n");
+        logger.info("\n\n[TEST] " + description + "\n");
+        // Context
+        AcceptanceRunContext.instance.set(
+                new AcceptanceRunContext(description.getDisplayName())
+        );
+        // Running
         super.runChild(method, notifier);
     }
 

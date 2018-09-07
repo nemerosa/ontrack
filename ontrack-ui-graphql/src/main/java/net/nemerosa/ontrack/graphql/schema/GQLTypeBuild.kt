@@ -1,16 +1,14 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
-import graphql.schema.DataFetcher
-import graphql.schema.DataFetchingEnvironment
+import graphql.schema.*
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
-import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
-import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +22,10 @@ constructor(
         private val structureService: StructureService,
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val validation: GQLTypeValidation,
+        private val validationRun: GQLTypeValidationRun,
+        private val runInfo: GQLTypeRunInfo,
+        private val runInfoService: RunInfoService,
+        private val paginatedListFactory: GQLPaginatedListFactory,
         creation: GQLTypeCreation,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
@@ -90,6 +92,28 @@ constructor(
                                 .dataFetcher(buildValidationRunsFetcher())
                                 .build()
                 )
+
+                // Paginated list of validation runs
+                .field(
+                        paginatedListFactory.createPaginatedField<Build, ValidationRun>(
+                                cache = cache,
+                                fieldName = "validationRunsPaginated",
+                                fieldDescription = "Paginated list of validation runs",
+                                itemType = validationRun,
+                                itemListCounter = { _, build ->
+                                    structureService.getValidationRunsCountForBuild(
+                                            build.id
+                                    )
+                                },
+                                itemListProvider = { _, build, offset, size ->
+                                    structureService.getValidationRunsForBuild(
+                                            build.id,
+                                            offset,
+                                            size
+                                    )
+                                }
+                        )
+                )
                 // Validation runs per validation stamp
                 .field { f ->
                     f.name("validations")
@@ -105,14 +129,65 @@ constructor(
                             .dataFetcher(buildValidationsFetcher())
                 }
                 // Build links
+                .field { f ->
+                    f.name("linkedBuilds")
+                            .deprecate("Use `uses` and `usedBy` fields instead.")
+                            .description("Builds this build is linked to")
+                            .argument { a ->
+                                a.name("direction")
+                                        .description("Direction of the link to follow.")
+                                        .type(
+                                                GraphQLEnumType.newEnum()
+                                                        .name("BuildLinkDirection")
+                                                        .description("Direction for build links.")
+                                                        .value("TO")
+                                                        .value("FROM")
+                                                        .value("BOTH")
+                                                        .build()
+                                        )
+                                        .defaultValue("TO")
+                            }
+                            .type(stdList(GraphQLTypeReference(BUILD)))
+                            .dataFetcher(buildLinkedFetcher())
+                }
+                // Build links - "uses" direction, no pagination needed
+                .field { f ->
+                    f.name("uses")
+                            .description("List of builds being used by this one.")
+                            .type(stdList(GraphQLTypeReference(BUILD)))
+                            .dataFetcher(buildBeingUsedFetcher())
+                }
+                // Build links - "usedBy" direction, with pagination
                 .field(
-                        newFieldDefinition()
-                                .name("linkedBuilds")
-                                .description("Builds this build is linked to")
-                                .type(stdList(GraphQLTypeReference(BUILD)))
-                                .dataFetcher(buildLinkedToFetcher())
-                                .build()
+                        paginatedListFactory.createPaginatedField<Build, Build>(
+                                cache = cache,
+                                fieldName = "usedBy",
+                                fieldDescription = "List of builds using this one.",
+                                itemType = this,
+                                itemPaginatedListProvider = { _, build, offset, size ->
+                                    structureService.getBuildsUsing(
+                                            build,
+                                            offset,
+                                            size
+                                    )
+                                }
+                        )
                 )
+                // Link direction (only used for linked builds)
+                .field { f ->
+                    f.name("direction")
+                            .description("Link direction")
+                            .deprecate("Use `uses` and `usedBy` fields on the `Build` type instead.")
+                            .type(GraphQLString)
+                            .dataFetcher(fetcher(LinkedBuild::class.java, LinkedBuild::direction))
+                }
+                // Run info
+                .field {
+                    it.name("runInfo")
+                            .description("Run info associated with this build")
+                            .type(runInfo.typeRef)
+                            .runInfoFetcher<Build> { runInfoService.getRunInfo(it) }
+                }
                 // OK
                 .build()
     }
@@ -160,12 +235,32 @@ constructor(
         )
     }
 
-    private fun buildLinkedToFetcher(): DataFetcher<List<Build>> {
+    private fun buildBeingUsedFetcher(): DataFetcher<List<Build>> {
         return fetcher(
                 Build::class.java,
-                structureService::getBuildLinksFrom
+                { _, build -> structureService.getBuildLinksFrom(build) }
         )
     }
+
+    private fun buildLinkedFetcher(): DataFetcher<List<Build>> {
+        return fetcher(
+                Build::class.java,
+                { environment, build ->
+                    val direction: String = GraphqlUtils.getStringArgument(environment, "direction")
+                            .orElse("TO")
+                    when (direction) {
+                        "TO" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
+                        "FROM" -> getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
+                        "BOTH" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to") +
+                                getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
+                        else -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
+                    }
+                }
+        )
+    }
+
+    private fun getLinkedBuilds(builds: List<Build>, direction: String) =
+            builds.map { LinkedBuild(it, direction) }
 
     private fun buildValidationRunsFetcher() =
             DataFetcher<List<ValidationRun>> { environment ->
@@ -243,3 +338,14 @@ constructor(
         val BUILD = "Build"
     }
 }
+
+class LinkedBuild(
+        build: Build,
+        val direction: String
+) : Build(
+        build.id,
+        build.name,
+        build.description,
+        build.signature,
+        build.branch
+)

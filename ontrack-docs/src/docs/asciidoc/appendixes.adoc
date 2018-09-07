@@ -9,6 +9,14 @@ include::appendix-roadmap.adoc[]
 
 include::appendix-certificates.adoc[]
 
+include::appendix-metrics-migration.adoc[]
+
+include::appendix-migration-postgres.adoc[]
+
+include::appendix-postgres-flyway.adoc[]
+
+include::appendix-postgres-production-data.adoc[]
+
 [[dsl-doc]]
 === DSL Reference
 

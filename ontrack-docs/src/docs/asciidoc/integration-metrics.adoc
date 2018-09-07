@@ -18,138 +18,89 @@ in the _Admin console_ (accessible through the user menu).
 [[monitoring-metrics]]
 ==== Metrics
 
-The default Spring Boot metrics, plus specific ones for Ontrack, are accessible
-at the `/manage/metrics` end point.
+[WARNING]
+====
+Since version 2.35 / 3.35, Ontrack uses the http://micrometer.io/[Micrometer]
+framework to manage metrics, in order to allow a better integration with
+http://projects.spring.io/spring-boot/[Spring Boot 2].
 
-Additionally, Ontrack can also export those metrics to a
-http://graphite.wikidot.com[Graphite] or https://influxdb.com[InfluxDB]
-back-end, to be displayed, for example, by http://grafana.org[Grafana].
+See <<appendix-metrics-migration>> for information about the migration.
+====
 
-[[monitoring-metrics-graphite]]
-===== Export to Graphite
+By default, Ontrack supports two external registries for metrics:
 
-The following options must be passed to Ontrack, either on the command line or
-in a local `application.yml` file:
+* InfluxDB
+* Prometheus
 
-* `ontrack.metrics.graphite.host` (required to enable Graphite export) host
-  name or IP of the Graphite backend
-* `ontrack.metrics.graphite.port` (defaults to `2003`) port of the Graphite
-  backend
-* `ontrack.metrics.graphite.period` (defaults to `60`) interval (in seconds)
-  at which the data is sent to Graphite
+The export to those engine is _disabled_ by default and must be enabled
+explicitely.
 
-For example, the following `application.yml` enables export to the `graphite`
-host:
+For example, for Prometheus, you can use the
+`management.metrics.export.prometheus.enabled` property or
+the `MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED` environment variable.
 
-[source,yaml]
-----
-ontrack:
-   metrics:
-      graphite:
-         host: graphite
-----
-
-[[monitoring-metrics-influxdb]]
-===== Export to InfluxDB
-
-The following options must be passed to Ontrack, either on the command line or
-in a local `application.yml` file:
-
-* `ontrack.metrics.influxdb.host` (required to enable InfluxDB export) host
-  name or IP of the InfluxDB backend
-* `ontrack.metrics.influxdb.port` (defaults to `8086`) port of the InfluxDB
-  backend
-* `ontrack.metrics.influxdb.user` (defaults to `root`) user used to connect to
-  InfluxDB
-* `ontrack.metrics.influxdb.password` (defaults to `root`) password used to
-  connect to InfluxDB
-* `ontrack.metrics.influxdb.database` (defaults to `ontrack`) name of the
-  database in InfluxDB to send metrics to
-* `ontrack.metrics.influxdb.period` (defaults to `60`) interval (in seconds)
-  at which the data is sent to InfluxDB
-* `ontrack.metrics.influxdb.retention-policy` (defaults to `autogen`) retention policy. Use `default` for InfluxDB
-  version < 1.0.0
-
-For example, the following `application.yml` enables export to the
-`influxdb` host:
-
-[source,yaml]
-----
-ontrack:
-   metrics:
-      influxdb:
-         host: influxdb
-----
-
-[[monitoring-metrics-grafana]]
-===== Grafana dashboard
-
-You can
-https://raw.githubusercontent.com/nemerosa/ontrack/master/doc/grafana.json[download this sample dashboard]
-as a starting point for defining an Ontrack monitoring system in Grafana:
-
-1. download the https://raw.githubusercontent.com/nemerosa/ontrack/master/doc/grafana.json[`grafana.json`] JSON file
-2. import it in Grafana
+For the rest of the configuration, you have to consult the
+Spring Boot or Micrometer documentation.
 
 [[monitoring-metrics-list]]
 ===== List of metrics
 
-Provided by Spring Boot:
+[NOTE]
+====
+The list of Ontrack specific metrics and their tags and values is available
+using the `/manage/ontrack_metrics` endpoint. Note that this endpoint
+needs authentication and some <<security,administrator privileges>>.
+====
 
-* link:http://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsingle/#production-ready-system-metrics[system metrics]
-* link:http://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsingle/#production-ready-datasource-metrics[datasource metrics]
-* link:http://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsingle/#production-ready-session-metrics[session metrics]
-* link:http://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsingle/#production-ready-metrics[HTTP responses]
+General metrics:
 
-Job metrics:
+* `ontrack_error` (counter) - number of error (the `type` tag contains the
+  type of error)
 
-* `job-category.Category.*` - https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] for the jobs in a given category (for example: `ontrack.counter.job-category.SVNIndexLatest`)
-* `job.*` - https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] for all the jobs
-* `gauge.jobs` - total number of jobs
-* `gauge.jobs.running` - number of running jobs
-* `gauge.jobs.disabled` - number of disabled jobs
-* `gauge.jobs.error` - number of jobs in error
-* `gauge.jobs.invalid` - number of invalid
-* `gauge.jobs.paused` - number of invalid
-* `gauge.jobs.<category>` - total number of jobs for a given category
-* `gauge.jobs.<category>.running` - number of running jobs for a given category
-* `gauge.jobs.<category>.disabled` - number of disabled jobs for a given category
-* `gauge.jobs.<category>.error` - number of jobs in error for a given category
-* `gauge.jobs.<category>.invalid` - number of invalid jobs for a given category
-* `gauge.jobs.<category>.paused` - number of paused jobs for a given category
+Statistics about the <<model,objects>> stored by Ontrack:
 
-Tagged job metrics:
+* `ontrack_entity_project_total` (gauge) - total number of projects
+* `ontrack_entity_branch_total` (gauge) - total number of branches
+* `ontrack_entity_build_total` (gauge) - total number of builds
+* `ontrack_entity_promotionLevel_total` (gauge) - total number of promotion levels
+* `ontrack_entity_promotionRun_total` (gauge) - total number of promotion runs
+* `ontrack_entity_validationStamp_total` (gauge) - total number of validation stamps
+* `ontrack_entity_validationRun_total` (gauge) - total number of validation runs
+* `ontrack_entity_validationRunStatus_total` (gauge) - total number of validation run statuses
+* `ontrack_entity_property_total` (gauge) - total number of properties
+* `ontrack_entity_event_total` (gauge) - total number of events
 
-IMPORTANT: Only since Ontrack 2.27 and only in InfluxDB. Those metrics are
-associated with tags.
+General metrics about <<architecture-jobs,jobs>>:
 
-* `ontrack.job.count` - total number of jobs for a given job
-* `ontrack.job.running` - number of running jobs for a given job
-* `ontrack.job.disabled` - number of disabled jobs for a given job
-* `ontrack.job.error` - number of jobs in error for a given job
-* `ontrack.job.invalid` - number of invalid jobs for a given job
-* `ontrack.job.paused` - number of paused jobs for a given job
+* `ontrack_job_count_total` (gauge) - total number of jobs
+* `ontrack_job_running_total` (gauge) - total number of running jobs
+* `ontrack_job_error_total` (gauge) - total number of jobs in error
+* `ontrack_job_paused_total` (gauge) - total number of paused jobs
+* `ontrack_job_disabled_total` (gauge) - total number of disabled jobs
+* `ontrack_job_invalid_total` (gauge) - total number of invalid jobs
+* `ontrack_job_error_count_total` (gauge) - total number of errors among all the jobs
 
-Following tags are associated with each of those measurements:
+Information about individual jobs:
 
-* `category` of the job
-* `type` of the job
-* `jobId` of the job
+* `ontrack_job_duration_ms` (timer) - duration of the execution of the job
+* `ontrack_job_run_count` (counter) - number of times a job has run
+* `ontrack_job_error_count` (counter) - number of errors for this job
 
-Entity metrics:
+[NOTE]
+====
+They all have the following tags:
 
-* `gauge.entity.project` - number of projects
-* `gauge.entity.branch` - number of branches
-* `gauge.entity.build` - number of builds
-* `gauge.entity.promotionLevel` - number of promotion levels
-* `gauge.entity.promotionRun` - number of promotion runs
-* `gauge.entity.validationStamp` - number of validation stamps
-* `gauge.entity.validationRun` - number of validation runs
-* `gauge.entity.validationRunStatus` - number of validation run statuses
-* `gauge.entity.property` - number of properties attached to the entities
-* `gauge.entity.event` - number of generated events
+* `job-category` - category of the job
+* `job-type` - type of the job
+* `job-id` - ID of the job
+====
 
-Application errors metrics:
+Run information:
 
-* `counter.error` - number of errors which have occurred in Ontrack - using a derivative of this value can help having an idea of the frequency of errors
-* `counter.error.*` - number of errors for a given category, like `GitService` or `UIErrorHandler`)
+* `ontrack_run_build_time_seconds` (timer) - duration of a run for a build.
+  It is associated with `project` and `branch` tags.
+* `ontrack_run_validation_run_time_seconds` (timer) - duration of a run for a
+  validation run. It is associated with `project`, `branch`, `validation_stamp`
+  and `status` tags.
+
+More details at <<run-info>>.

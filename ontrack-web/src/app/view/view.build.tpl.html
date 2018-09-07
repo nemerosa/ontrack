@@ -1,84 +1,179 @@
 <ot-view>
     <div class="row">
-        <div class="col-md-12">
-            <ot-signature value="build.signature" time="true" user="true"></ot-signature>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <ot-section-title>Promotions</ot-section-title>
-            <div class="well">
-                <ot-build-promotion-runs promotion-runs="promotionRunCollection.resources"></ot-build-promotion-runs>
+        <div class="col-md-12 ot-view-title">
+            Build {{build.name}}
+            <ot-entity-embedded-decorations decorations="build.decorations">
+            <div ng-show="build.description" class="ot-description">
+                {{build.description}}
             </div>
+            <ot-creation creation="build.creation"></ot-creation>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <ot-section-title>Validations</ot-section-title>
+        <div class="col-md-5">
+            <!-- Promotions -->
             <div class="row">
-                <div class="col-md-4">
-                    <ot-subsection-title>Run &amp; passed</ot-subsection-title>
-                    <p class="ot-description">List of validations that have run and passed.</p>
-
-                    <div class="well">
-                        <table class="ot-validation-runs">
-                            <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
-                                ng-if="validationStampRunView.run && validationStampRunView.passed">
-                                <td>
-                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
-                                </td>
-                            </tr>
-                        </table>
+                <div class="col-md-12">
+                    <ot-section-title>Promotions</ot-section-title>
+                    <div class="ot-description" ng-if="build.promotionRuns.length == 0">
+                        No promotion yet.
                     </div>
+                    <table class="table table-condensed table-hover">
+                        <tbody>
+                        <tr ng-repeat="promotionRun in build.promotionRuns">
+                            <td>
+                                <ot-entity-image entity="promotionRun.promotionLevel"></ot-entity-image>
+                                {{promotionRun.promotionLevel.name}}
+                            </td>
+                            <td>
+                                <ot-creation creation="promotionRun.creation"></ot-creation>
+                            </td>
+                            <td>
+                                {{promotionRun.description}}
+                            </td>
+                            <td>
+                        <span
+                                ng-if="promotionRun.links._delete"
+                                ng-click="deletePromotionRun(promotionRun)"
+                                title="Delete this promotion."
+                                class="ot-command ot-command-delete"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-md-4">
-                    <ot-subsection-title>Run &amp; failed</ot-subsection-title>
-                    <p class="ot-description">List of validations that have run and failed.</p>
-
-                    <div class="well">
-                        <table class="ot-validation-runs">
-                            <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
-                                ng-if="validationStampRunView.run && !validationStampRunView.passed">
-                                <td>
-                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
-                                </td>
-                            </tr>
-                        </table>
+            </div>
+            <!-- Used by... -->
+            <div class="row">
+                <div class="col-md-12">
+                    <ot-section-title>Used by</ot-section-title>
+                    <div class="ot-description" ng-if="build.usedBy.pageInfo.currentSize == 0">
+                        This build is not marked as being used by another build.
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <ot-subsection-title>Not run</ot-subsection-title>
-                    <p class="ot-description">List of validations that have not run.</p>
-
-                    <div class="well">
-                        <table class="ot-validation-runs">
-                            <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
-                                ng-if="!validationStampRunView.run">
-                                <td>
-                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    <table class="table table-condensed table-hover">
+                        <tbody>
+                        <tr ng-repeat="usedBy in build.usedBy.pageItems">
+                            <td>
+                                <a href="{{usedBy.branch.project.links._page}}">{{usedBy.branch.project.name}}</a>
+                            </td>
+                            <td>
+                                <a href="{{usedBy.branch.links._page}}">{{usedBy.branch.name}}</a>
+                            </td>
+                            <td>
+                                <a href="{{usedBy.links._page}}">{{usedBy.name}}</a>
+                            </td>
+                            <td class="ot-build-used-by-promotions">
+                                <span ng-repeat="promotionRun in usedBy.promotionRuns">
+                                    <ot-entity-image entity="promotionRun.promotionLevel" title="{{promotionRun.promotionLevel.name}}" link="{{promotionRun.promotionLevel.links._page}}"></ot-entity-image>
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.previousPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.previousPage)">
+                                    <span class="fa fa-step-backward"></span>
+                                    Newest
+                                </button>
+                            </td>
+                            <td colspan="4" style="text-align: right;">
+                                <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.nextPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.nextPage)">
+                                    <span class="fa fa-step-forward"></span>
+                                    Oldest
+                                </button>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
+        <!-- Validations -->
+        <div class="col-md-7">
+            <ot-section-title>Validations</ot-section-title>
+            <div class="ot-description" ng-if="build.validationRunsPaginated.pageInfo.currentSize == 0">
+                No validation yet.
+            </div>
+            <table class="table table-condensed table-hover">
+                <tbody>
+                <tr ng-repeat="validationRun in build.validationRunsPaginated.pageItems">
+                    <td>
+                        <ot-entity-image entity="validationRun.validationStamp"
+                                         link="#/validationStamp/{{validationRun.validationStamp.id}}">
+                            {{validationRun.validationStamp.name}}
+                        </ot-entity-image>
+                    </td>
+                    <td>
+                        <a href="#/validationRun/{{validationRun.id}}">
+                            #{{validationRun.runOrder}}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#/validationRun/{{validationRun.id}}">
+                            <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
+                        </a>
+                    </td>
+                    <td>
+                        {{validationRun.validationRunStatuses[0].description}}
+                    </td>
+                    <td>
+                        <ot-creation creation="validationRun.creation"></ot-creation>
+                    </td>
+                    <td>
+                           <span ng-if="validationRun.runInfo.sourceType && validationRun.runInfo.sourceUri">
+                               <a href="{{validationRun.runInfo.sourceUri}}">{{validationRun.runInfo.sourceType}}</a>
+                           </span>
+                    </td>
+                    <td>
+                           <span ng-if="validationRun.runInfo.triggerType && validationRun.runInfo.triggerData">
+                               {{validationRun.runInfo.triggerType}}
+                               ->
+                               {{validationRun.runInfo.triggerData}}
+                           </span>
+                    </td>
+                    <td>
+                            <span ng-if="validationRun.runInfo.runTime">
+                                <ot-duration duration="validationRun.runInfo.runTime"></ot-duration>
+                            </span>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <button class="btn btn-default" type="button" ng-show="build.validationRunsPaginated.pageInfo.previousPage" ng-click="navigateValidationRuns(build.validationRunsPaginated.pageInfo.previousPage)">
+                            <span class="fa fa-step-backward"></span>
+                            Newest
+                        </button>
+                    </td>
+                    <td colspan="4" style="text-align: right;">
+                        <button class="btn btn-default" type="button" ng-show="build.validationRunsPaginated.pageInfo.nextPage" ng-click="navigateValidationRuns(build.validationRunsPaginated.pageInfo.nextPage)">
+                            <span class="fa fa-step-forward"></span>
+                            Oldest
+                        </button>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
+    <!-- TODO Used by... -->
     <div class="row">
         <div class="col-md-6">
             <ot-section-title>Properties</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
-                    <ot-entity-properties entity="build"></ot-entity-properties>
+                    <ot-entity-properties entity="{_properties: build.links._properties}"></ot-entity-properties>
                 </div>
             </div>
-            <ot-entity-events entity="build"></ot-entity-events>
+            <ot-entity-events entity="{_events: build.links._events}"></ot-entity-events>
         </div>
         <div class="col-md-6">
             <ot-section-title>Extra information</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
-                    <ot-entity-extra entity="build"></ot-entity-extra>
+                    <ot-entity-extra entity="{_extra: build.links._extra}"></ot-entity-extra>
                 </div>
             </div>
         </div>

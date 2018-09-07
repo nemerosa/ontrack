@@ -55,7 +55,10 @@ class LDAPSettingsManagerIT extends AbstractServiceTestSupport {
                 "fullName",
                 "email",
                 "",
-                ""
+                "",
+                "cn",
+                "ou=groups",
+                "(uniqueMember={0})"
         )
         settings
     }

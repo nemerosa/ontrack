@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
 import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
+import net.nemerosa.ontrack.model.pagination.PaginatedList;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
@@ -510,6 +511,18 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.getBuildLinksFrom(build.getId()).stream()
                 .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PaginatedList<Build> getBuildsUsing(Build build, int offset, int size) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        // Gets the complete list, filtered by ACL
+        List<Build> list = structureRepository.getBuildsUsing(build)
+                .stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+        // OK
+        return PaginatedList.create(list, offset, size);
     }
 
     @Override
@@ -1074,6 +1087,50 @@ public class StructureServiceImpl implements StructureService {
         return Ack.OK;
     }
 
+    @Override
+    public Ack bulkUpdatePromotionLevels(ID promotionLevelId) {
+        // Checks access
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        // As admin
+        securityService.asAdmin(() -> {
+            PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+            // Defining or replacing the predefined promotion level
+            Optional<PredefinedPromotionLevel> o = predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.getName());
+            if (o.isPresent()) {
+                // Updating the predefined promotion level description
+                predefinedPromotionLevelService.savePredefinedPromotionLevel(
+                        o.get().withDescription(promotionLevel.getDescription())
+                );
+                // Sets its image
+                Document image = getPromotionLevelImage(promotionLevelId);
+                predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
+                        o.get().getId(),
+                        image
+                );
+            } else {
+                // Creating the predefined promotion level
+                PredefinedPromotionLevel predefinedPromotionLevel = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                        PredefinedPromotionLevel.of(
+                                NameDescription.nd(
+                                        promotionLevel.getName(),
+                                        promotionLevel.getDescription()
+                                )
+                        )
+                );
+                // Sets its image
+                Document image = getPromotionLevelImage(promotionLevelId);
+                predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
+                        predefinedPromotionLevel.getId(),
+                        image
+                );
+            }
+            // For all promotion levels
+            structureRepository.bulkUpdatePromotionLevels(promotionLevelId);
+        });
+        // OK
+        return Ack.OK;
+    }
+
     protected <T> Optional<ValidationStamp> getValidationStampFromProperty(
             Property<T> property,
             Branch branch,
@@ -1148,11 +1205,39 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForBuild(ID buildId, int offset, int count) {
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsForBuild(build, offset, count, validationRunStatusService::getValidationRunStatus);
+    }
+
+    @Override
+    public int getValidationRunsCountForBuild(ID buildId) {
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsCountForBuild(build);
+    }
+
+    @Override
     public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId) {
         Build build = getBuild(buildId);
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
         securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
         return structureRepository.getValidationRunsForBuildAndValidationStamp(build, validationStamp, validationRunStatusService::getValidationRunStatus);
+    }
+
+    @Override
+    public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(ID buildId, ID validationStampId, int offset, int count) {
+        Build build = getBuild(buildId);
+        ValidationStamp validationStamp = getValidationStamp(validationStampId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsForBuildAndValidationStamp(
+                build,
+                validationStamp,
+                offset,
+                count,
+                validationRunStatusService::getValidationRunStatus
+        );
     }
 
     @Override
@@ -1176,6 +1261,16 @@ public class StructureServiceImpl implements StructureService {
         eventPostService.post(eventFactory.newValidationRunStatus(newValidationRun));
         // OK
         return newValidationRun;
+    }
+
+    @Override
+    public int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId) {
+        return structureRepository.getValidationRunsCountForBuildAndValidationStamp(buildId, validationStampId);
+    }
+
+    @Override
+    public int getValidationRunsCountForValidationStamp(ID validationStampId) {
+        return structureRepository.getValidationRunsCountForValidationStamp(validationStampId);
     }
 
     @Override

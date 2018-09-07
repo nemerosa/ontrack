@@ -1,3 +1,0 @@
--- 33. Index on build names (#463)
-
-CREATE INDEX IF NOT EXISTS BUILDS_IX_NAME ON BUILDS(NAME);

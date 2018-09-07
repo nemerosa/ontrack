@@ -75,6 +75,8 @@ TODO
 
 include::architecture-jobs.adoc[]
 
+include::architecture-encryption.adoc[]
+
 [[architecture-build-filters]]
 ==== Build filters
 
@@ -119,8 +121,6 @@ The service determines the type of `BuildFilter` by using its type, and uses
 injected `BuildFilterProvider`s to get an actual instance.
 
 include::reference-services.adoc[]
-
-include::architecture-metrics.adoc[]
 
 [[artifacture-technology]]
 ==== Technology

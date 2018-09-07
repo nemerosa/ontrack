@@ -1,67 +1,43 @@
 [[extending-metrics]]
 ==== Extending metrics
 
-Ontrack exports <<monitoring,metrics>> in order to allow third party
-applications to monitor its state: <<monitoring-metrics-influxdb,InfluxDB>>,
-<<monitoring-metrics-graphite,Graphite>>,
-<<monitoring-metrics-grafana,Grafana>>, etc.
-
-You can contribute to the core metrics in your own <<extending,extensions>>.
-
-Just create a class which implements the `OntrackMetrics` interface and export
-it as a `@Component`.
-
-Implement the `Collection<Metric<?>> metrics()` method. This method will be
-regularly called by Ontrack in order to collect the metrics.
-
-For example:
-
-[source,java]
-----
-@Component
-public class SampleMetrics implements OntrackMetrics {
-    @Override
-    public Collection<Metric<?>> metrics() {
-      List<Metric<?>> metrics = new ArrayList<>();
-      metrics.add(new Metric<>("gauge.mycount", myCount()));
-      return metrics;
-    }
-    protected int myCount() {
-      ...
-    }
-}
-----
-
-This code would export a `gauge.mycount` metric. Any number of metrics can
-be thus exposed.
-
-[IMPORTANT]
+[WARNING]
 ====
-By default, the metrics are collected without any authentication being enabled.
-If the collection needs to be authenticated, inject the
-<<reference-services,`SecurityService`>>
-service in your class and use the `asAdmin` method:
-
-[source,groovy]
-----
-@Component
-public class SampleMetrics implements OntrackMetrics {
-    private final SecurityService securityService;
-    @Autowired
-    public SampleMetrics(SecurityService securityService) {
-      this.securityService = securityService;
-    }
-    @Override
-    public Collection<Metric<?>> metrics() {
-      List<Metric<?>> metrics = new ArrayList<>();
-      securityService.asAdmin(() -> {
-         metrics.add(new Metric<>("gauge.mycount", myCount()));
-      });
-      return metrics;
-    }
-    protected int myCount() {
-      ...
-    }
-}
-----
+Starting from version 2.35, the metrics framework used by
+Ontrack has been migrated to http://micrometer.io/[Micrometer].
+This is a breaking change - and the way metrics can be
+contributed to by extensions is totally different and
+some effort must be done in the migration.
 ====
+
+In order for extensions to add their own metrics, they can
+interact directly with an inject `MeterRegistry` and then
+get gauges, timers, counters, etc.
+
+Or they can create some `MeterBinder` beans to register
+some gauges at startup time.
+
+Usually, migrating (monotonic) counters and timers will
+be straightforward:
+
+[source,kotlin]
+----
+val meterRegistry: MeterRegistry
+meterRegistry.counter("...", tags).increment()
+meterRegistry.timer("...", tags).record(...)
+----
+
+For gauge, you have to register them so that they can
+be call at any time by the meter registry:
+
+[source,kotlin]
+----
+val meterRegistry: MeterRegistry
+meterRegistry.gauge("...", tags,
+    sourceObject,
+    { obj -> ... }
+)
+----
+
+See the http://micrometer.io/[Micrometer] documentation
+for more information on how to register metrics.

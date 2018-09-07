@@ -228,6 +228,7 @@ Ontrack provides the following extension points:
   <<monitoring,metrics>> exported by Ontrack
 * <<extending-event-types, Event types>> - allows to define additional event types.
 * <<extending-graphql, GraphQL>> - allows contributions to the <<integration-graphql,GraphQL>> Ontrack schema.
+* <<extending-encryption, Encryption key store>> - allows to define a custom store for the <<integration-encryption,encryption keys>>.
 *  **TODO** Entity action - allows to add an action for the page of an entity
 *  **TODO** Entity information - allows to add some information into the page of an entity
 *  **TODO** Search extension - provides a search end point for global text based searches
@@ -246,6 +247,14 @@ See <<reference-services>> for a list of the core Ontrack services.
 [[extending-running]]
 ==== Running an extension
 
+[NOTE]
+====
+A Postgres database must be available to run an extension, since it is
+needed by Ontrack.
+
+See the <<development-postgres,development section>> to see how quickly set it up.
+====
+
 [[extending-running-gradle]]
 ===== Using Gradle
 
@@ -255,8 +264,6 @@ To run your extension using Gradle:
 ----
 ./gradlew ontrackRun
 ----
-
-WARNING: This does not work yet for Ontrack 3.0 (with Postgresql)
 
 This will make the application available at http://localhost:8080
 
@@ -376,6 +383,8 @@ include::extending-event-types.adoc[]
 
 include::extending-graphql.adoc[]
 
+include::extending-cache.adoc[]
+
 include::extending-metrics.adoc[]
 
 include::extending-kotlin.adoc[]
@@ -383,3 +392,5 @@ include::extending-kotlin.adoc[]
 include::extending-settings.adoc[]
 
 include::extending-security.adoc[]
+
+include::extending-encryption.adoc[]

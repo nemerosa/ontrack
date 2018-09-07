@@ -1,6 +1,21 @@
 [[appendix-deprecations]]
 === Deprecations and migration notes
 
+[[appendix-deprecations-3.35]]
+==== Since 3.35
+
+`StructureService` deprecated method:
+
+* The
+`getValidationRunsForBuildAndValidationStamp(net.nemerosa.ontrack.model.structure.ID, net.nemerosa.ontrack.model.structure.ID)`
+method is deprecated and should be replaced by
+`getValidationRunsForBuildAndValidationStamp(net.nemerosa.ontrack.model.structure.ID, net.nemerosa.ontrack.model.structure.ID, int, int)`.
+
+GraphQL schema deprecations:
+
+* `Build.linkedFrom` is now deprecated and must be replaced by either
+  `uses` or `usedBy`
+
 [[appendix-deprecations-2.28]]
 ==== Since 2.28
 

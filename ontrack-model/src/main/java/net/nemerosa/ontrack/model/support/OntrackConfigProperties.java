@@ -16,6 +16,11 @@ import javax.annotation.PostConstruct;
 @ConfigurationProperties(prefix = "ontrack.config")
 public class OntrackConfigProperties {
 
+    /**
+     * Key store type
+     */
+    public static final String KEY_STORE = "ontrack.config.key-store";
+
     private final Logger logger = LoggerFactory.getLogger(OntrackConfigProperties.class);
 
     /**

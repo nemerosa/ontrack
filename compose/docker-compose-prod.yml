@@ -1,0 +1,56 @@
+version: "2.1"
+
+services:
+  # InfluxDB container
+  influxdb:
+    image: influxdb:1.1-alpine
+    environment:
+      PRE_CREATE_DB: "ontrack"
+    restart: always
+    volumes:
+      # Keeping data on the host
+      - "/var/influxdb/data:/data"
+
+  # Grafana container
+  grafana:
+    image: grafana/grafana:4.1.1
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      # Editable dashboards
+      - "/usr/lib/grafana/dashboards:/usr/lib/grafana/dashboards"
+
+  # Ontrack container
+  ontrack:
+    image: nemerosa/ontrack:${ONTRACK_VERSION}
+    restart: always
+    environment:
+        PROFILE: prod
+        JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
+        SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+    depends_on:
+      influxdb:
+        condition: service_started
+      postgres:
+        condition: service_started
+    volumes:
+      - "/var/ontrack/conf:/var/ontrack/conf"
+      - "/var/ontrack/data:/var/ontrack/data"
+        # Using the random source from the host
+      - "/dev/urandom:/dev/random"
+    ports:
+      - "443:443"
+
+  # Postgresql database
+  postgres:
+    image: postgres:9.5.2
+    restart: always
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ${ONTRACK_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD}
+    volumes:
+      - "/var/lib/postgresql/data:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"

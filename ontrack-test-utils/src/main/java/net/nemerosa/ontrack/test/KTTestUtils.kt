@@ -18,3 +18,9 @@ fun <T> assertPresent(o: Optional<T>, message: String = "Optional must be presen
         fail(message)
     }
 }
+
+fun <T> assertNotPresent(o: Optional<T>, message: String = "Optional is not present") {
+    if (o.isPresent) {
+        fail(message)
+    }
+}

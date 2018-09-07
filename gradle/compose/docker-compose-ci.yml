@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
   # InfluxDB container
@@ -23,3 +23,5 @@ services:
       - "/dev/urandom:/dev/random"
     ports:
       - "443"
+    links:
+      - "postgresql:postgresql"

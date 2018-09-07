@@ -168,6 +168,7 @@
             <!-- VS filter edition OFF -->
             <span ng-if="!validationStampFilter || !validationStampFilter._update || !validationStampFilterEdition">
                 <ot-entity-image entity="validationStamp"
+                                 title="{{validationStamp.name}} - {{validationStamp.description}}"
                                  link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
             </span>
         </th>
@@ -206,6 +207,10 @@
             <div class="ot-branch-build-view-build-signature">
                 {{build.creation.time | date:'mediumDate'}}
                 {{build.creation.time | date:'shortTime'}}
+                <!-- Run info - run time if available -->
+                <span ng-if="build.runInfo.runTime" title="{{build.runInfo.runTime}} seconds">
+                    &nbsp;-&nbsp;<ot-duration duration="build.runInfo.runTime" detail="false"></ot-duration>
+                </span>
             </div>
         </td>
         <!-- Promotion runs -->

@@ -8,6 +8,8 @@ import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.RunInfoService
+import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import org.springframework.stereotype.Component
 import java.util.*
@@ -16,6 +18,9 @@ import java.util.*
 class GQLTypeValidationRun(
         creation: GQLTypeCreation,
         private val validationRunStatus: GQLTypeValidationRunStatus,
+        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+        private val runInfo: GQLTypeRunInfo,
+        private val runInfoService: RunInfoService,
         private val validationRunData: GQLTypeValidationRunData,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val projectEntityInterface: GQLProjectEntityInterface
@@ -28,59 +33,60 @@ class GQLTypeValidationRun(
 
     override fun getTypeName() = VALIDATION_RUN
 
-    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
-        return newObject()
-                .name(VALIDATION_RUN)
-                .withInterface(projectEntityInterface.typeRef)
-                .fields(projectEntityInterfaceFields())
-                // Build
-                .field(
-                        newFieldDefinition()
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType =
+            newObject()
+                    .name(VALIDATION_RUN)
+                    .withInterface(projectEntityInterface.typeRef)
+                    .fields(projectEntityInterfaceFields())
+                    // Build
+                    .field {
+                        it
                                 .name("build")
                                 .description("Associated build")
                                 .type(GraphQLNonNull(GraphQLTypeReference(GQLTypeBuild.BUILD)))
-                                .build()
-                )
-                // Promotion level
-                .field(
-                        newFieldDefinition()
+                    }
+                    // Promotion level
+                    .field {
+                        it
                                 .name("validationStamp")
                                 .description("Associated validation stamp")
                                 .type(GraphQLNonNull(GraphQLTypeReference(GQLTypeValidationStamp.VALIDATION_STAMP)))
-                                .build()
-                )
-                // Run order
-                .field(
-                        newFieldDefinition()
+                    }
+                    // Run order
+                    .field {
+                        it
                                 .name("runOrder")
                                 .description("Run order")
                                 .type(GraphQLInt)
-                                .build()
-                )
-                // Validation statuses
-                .field(
-                        newFieldDefinition()
+                    }
+                    // Validation statuses
+                    .field {
+                        it
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
                                 .type(stdList(validationRunStatus.typeRef))
-                                .build()
-                )
-                // Data
-                .field {
-                    it.name("data")
-                            .description("Data associated with the validation run")
-                            .type(validationRunData.typeRef)
-                }
-                // OK
-                .build()
+                    }
+                    // Run info
+                    .field {
+                        it.name("runInfo")
+                                .description("Run info associated with this validation run")
+                                .type(runInfo.typeRef)
+                                .runInfoFetcher<ValidationRun> { runInfoService.getRunInfo(it) }
+                    }
+                    // Data
+                    .field {
+                        it.name("data")
+                                .description("Data associated with the validation run")
+                                .type(validationRunData.typeRef)
+                    }
+                    // OK
+                    .build()
 
+    override fun getSignature(entity: ValidationRun): Optional<Signature> {
+        return Optional.ofNullable(entity.lastStatus.signature)
     }
 
-    override fun getSignature(entity: ValidationRun) =
-            Optional.ofNullable(entity.lastStatus.signature)
-
     companion object {
-        @JvmField
-        val VALIDATION_RUN = "ValidationRun"
+        const val VALIDATION_RUN = "ValidationRun"
     }
 }

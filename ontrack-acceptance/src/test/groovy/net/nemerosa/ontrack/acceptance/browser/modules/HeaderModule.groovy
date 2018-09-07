@@ -26,19 +26,11 @@ public class HeaderModule extends AbstractModule {
     }
 
     public void doLogin(String name, String password, long waitMs = 500) {
-        browser.screenshot("login-displayed");
-
         WebElement tName = $(By.name("name"));
         tName.sendKeys(name);
 
         WebElement tPassword = $(By.name("password"));
         tPassword.sendKeys(password);
-
-        browser.screenshot("login-filled-in");
-
-        // Logging
-        trace("Login.name = %s", tName.getAttribute("value"));
-        trace("Login.password (size) = %d", tPassword.getAttribute("value").length());
 
         // Sign in OK
         WebElement okButton = $(".btn-primary");

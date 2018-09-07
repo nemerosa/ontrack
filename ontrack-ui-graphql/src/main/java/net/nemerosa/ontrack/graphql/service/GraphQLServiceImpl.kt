@@ -1,13 +1,20 @@
 package net.nemerosa.ontrack.graphql.service
 
+import graphql.ExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
+import graphql.execution.ExecutionStrategy
 import graphql.schema.GraphQLSchema
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
 class GraphQLServiceImpl(
-        private val graphQLExceptionHandlers: List<GraphQLExceptionHandler>
+        private val graphQLExceptionHandlers: List<GraphQLExceptionHandler>,
+        @Qualifier("queryExecutionStrategy")
+        private val queryExecutionStrategy: ExecutionStrategy,
+        @Qualifier("queryExecutionStrategy")
+        private val mutationExecutionStrategy: ExecutionStrategy
 ) : GraphQLService {
     override fun execute(
             schema: GraphQLSchema,
@@ -16,25 +23,26 @@ class GraphQLServiceImpl(
             operationName: String?,
             reportErrors: Boolean
     ): ExecutionResult {
-        val result = GraphQL(schema).execute(
-                query,
-                operationName,
-                null,
-                variables
-        )
-        if (result != null) {
-            if (result.errors != null && !result.errors.isEmpty() && reportErrors) {
-                result.errors.forEach { error ->
-                    graphQLExceptionHandlers.forEach {
-                        it.handle(error)
-                    }
+        val result: ExecutionResult = GraphQL.newGraphQL(schema)
+                .queryExecutionStrategy(queryExecutionStrategy)
+                .mutationExecutionStrategy(mutationExecutionStrategy)
+                .build()
+                .execute(
+                        ExecutionInput.newExecutionInput()
+                                .query(query)
+                                .operationName(operationName)
+                                .variables(variables)
+                                .build()
+                )
+        if (result.errors != null && !result.errors.isEmpty() && reportErrors) {
+            result.errors.forEach { error ->
+                graphQLExceptionHandlers.forEach {
+                    it.handle(error)
                 }
-                throw GraphQLServiceException(result.errors)
-            } else {
-                return result
             }
+            throw GraphQLServiceException(result.errors)
         } else {
-            throw NullPointerException("No execution result returned by the GraphQL query.")
+            return result
         }
     }
 }

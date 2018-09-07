@@ -286,12 +286,25 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<Build> getBuildsUsing(Build build) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT F.* FROM BUILDS F " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
+                        "WHERE BL.TARGETBUILDID = :buildId " +
+                        "ORDER BY F.ID DESC ",
+                params("buildId", build.id()),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
     public List<Build> getBuildLinksTo(ID buildId) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT F.* FROM BUILDS F " +
                         "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
                         "WHERE BL.TARGETBUILDID = :buildId " +
-                        "ORDER BY F.ID DESC",
+                        "ORDER BY F.ID DESC " +
+                        "LIMIT 20",
                 params("buildId", buildId.get()),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );
@@ -306,7 +319,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "INNER JOIN BRANCHES BR ON BR.ID = T.BRANCHID " +
                         "INNER JOIN PROJECTS P ON P.ID = BR.PROJECTID " +
                         "WHERE T.NAME LIKE :buildNamePattern AND P.NAME = :projectName " +
-                        "ORDER BY F.ID DESC",
+                        "ORDER BY F.ID DESC " +
+                        "LIMIT 100",
                 params("buildNamePattern", expandBuildPattern(buildPattern)).addValue("projectName", projectName),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );
@@ -426,8 +440,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName) {
         return Optional.ofNullable(
                 getFirstItem(
-                        "SELECT * FROM (SELECT * FROM BUILDS WHERE BRANCHID = :branch AND NAME REGEXP '[0-9]+') " +
-                                "WHERE CONVERT(NAME,INT) >= CONVERT(:name,INT) ORDER BY CONVERT(NAME,INT) " +
+                        "SELECT * FROM (SELECT * FROM BUILDS WHERE BRANCHID = :branch AND NAME ~ '[0-9]+') AS MATCH_BUILDS " +
+                                "WHERE CAST(NAME AS INT) >= CAST(:name AS INT) ORDER BY CAST(NAME AS INT) " +
                                 "LIMIT 1",
                         params("branch", branchId.getValue()).addValue("name", buildName),
                         (rs, rowNum) -> toBuild(rs, this::getBranch)
@@ -666,7 +680,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel) {
         return Optional.ofNullable(
                 getFirstItem(
-                        "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId AND PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC LIMIT 1",
+                        "SELECT * FROM PROMOTION_RUNS " +
+                                "WHERE BUILDID = :buildId " +
+                                "AND PROMOTIONLEVELID = :promotionLevelId " +
+                                "ORDER BY CREATION DESC, ID DESC LIMIT 1",
                         params("buildId", build.id()).addValue("promotionLevelId", promotionLevel.id()),
                         (rs, rowNum) -> toPromotionRun(rs,
                                 (id) -> build,
@@ -679,7 +696,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId AND PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC",
+                "SELECT * FROM PROMOTION_RUNS " +
+                        "WHERE BUILDID = :buildId " +
+                        "AND PROMOTIONLEVELID = :promotionLevelId " +
+                        "ORDER BY CREATION DESC, ID DESC",
                 params("buildId", build.id()).addValue("promotionLevelId", promotionLevel.id()),
                 (rs, rowNum) -> toPromotionRun(rs,
                         (id) -> build,
@@ -812,6 +832,26 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void bulkUpdatePromotionLevels(ID promotionLevelId) {
+        // Description & name
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        String description = promotionLevel.getDescription();
+        String name = promotionLevel.getName();
+        // Image
+        Document image = getPromotionLevelImage(promotionLevelId);
+        // Bulk update
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content, DESCRIPTION = :description " +
+                        "WHERE ID <> :id AND NAME = :name",
+                params("id", promotionLevelId.getValue())
+                        .addValue("name", name)
+                        .addValue("description", description)
+                        .addValue("type", Document.isValid(image) ? image.getType() : null)
+                        .addValue("content", Document.isValid(image) ? image.getContent() : null)
+        );
+    }
+
+    @Override
     public void bulkUpdateValidationStamps(ID validationStampId) {
         // Description & name
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
@@ -909,7 +949,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId ORDER BY ID",
                 params("buildId", build.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
@@ -917,6 +957,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         this::getValidationStamp,
                         validationRunStatusService
                 )
+        );
+    }
+
+    @Override
+    public List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId ORDER BY ID DESC LIMIT :count OFFSET :offset",
+                params("buildId", build.id())
+                        .addValue("offset", offset)
+                        .addValue("count", count),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        id -> build,
+                        this::getValidationStamp,
+                        validationRunStatusService
+                )
+        );
+    }
+
+    @Override
+    public int getValidationRunsCountForBuild(Build build) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
+                params("buildId", build.id()),
+                Integer.class
         );
     }
 
@@ -935,6 +1000,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId ORDER BY ID DESC LIMIT :limit OFFSET :offset",
+                params("buildId", build.id()).addValue("validationStampId", validationStamp.id())
+                        .addValue("limit", count)
+                        .addValue("offset", offset),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        id -> build,
+                        id -> validationStamp,
+                        validationRunStatusService
+                )
+        );
+    }
+
+    @Override
+    public int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId",
+                params("buildId", buildId.getValue()).addValue("validationStampId", validationStampId.getValue()),
+                Integer.class
+        );
+    }
+
+    @Override
     public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId ORDER BY BUILDID DESC, ID DESC LIMIT :limit OFFSET :offset",
@@ -947,6 +1037,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         id -> validationStamp,
                         validationRunStatusService
                 )
+        );
+    }
+
+    @Override
+    public int getValidationRunsCountForValidationStamp(ID validationStampId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId",
+                params("validationStampId", validationStampId.getValue()),
+                Integer.class
         );
     }
 

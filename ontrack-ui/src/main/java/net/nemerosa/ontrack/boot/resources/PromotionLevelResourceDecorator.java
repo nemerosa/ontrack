@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
+import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.PromotionLevelDelete;
 import net.nemerosa.ontrack.model.security.PromotionLevelEdit;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
@@ -73,6 +74,12 @@ public class PromotionLevelResourceDecorator extends AbstractLinkResourceDecorat
                 link(
                         "_events",
                         promotionLevel -> on(EventController.class).getEvents(promotionLevel.getProjectEntityType(), promotionLevel.getId(), 0, 10)
+                ),
+                // Bulk update
+                link(
+                        "_bulkUpdate",
+                        promotionLevel -> on(PromotionLevelController.class).bulkUpdate(promotionLevel.getId()),
+                        withGlobalFn(GlobalSettings.class)
                 ),
                 // Page
                 page()

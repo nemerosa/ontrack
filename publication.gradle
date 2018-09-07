@@ -15,7 +15,7 @@ buildscript {
     dependencies {
         classpath 'net.nemerosa:http-client-json:1.4.1'
         classpath 'net.nemerosa.ontrack:ontrack-dsl:2.17.4'
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
     }
 }
 
@@ -91,7 +91,7 @@ nexusStaging {
     packageGroup = 'net.nemerosa'
     username = ossrhUser
     password = ossrhPassword
-    numberOfRetries = 30
+    numberOfRetries = 60
     delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
 }
 
@@ -226,18 +226,25 @@ task publicationGitHubReleaseJarShellUpload(type: GitHubReleaseUpload) {
     file = project.file("publication/ontrack-dsl-shell-${ontrackVersion}-executable.jar")
 }
 
+task publicationGitHubReleasePostgresqlMigrationUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack-postgresql-migration.jar'
+    fileType = 'application/zip'
+    file = project.file("publication/ontrack-postgresql-migration-${ontrackVersion}.jar")
+}
+
 task publicationGitHubReleaseDebianUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.deb'
     fileType = 'application/x-debian-package'
-    file = project.file("ontrack_${ontrackVersion}-1_all.deb")
+    file = project.file("build/distributions/ontrack_${ontrackVersion}-1_all.deb")
 }
 
 task publicationGitHubReleaseRpmUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.rpm'
     fileType = 'application/x-rpm'
-    file = project.file("ontrack-${ontrackVersion}-1.noarch.rpm")
+    file = project.file("build/distributions/ontrack-${ontrackVersion}-1.noarch.rpm")
 }
 
 task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {
@@ -249,6 +256,7 @@ task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {
 
 task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleaseJarUpload
+    dependsOn publicationGitHubReleasePostgresqlMigrationUpload
     dependsOn publicationGitHubReleaseJarShellUpload
     dependsOn publicationGitHubReleaseDebianUpload
     dependsOn publicationGitHubReleaseRpmUpload
@@ -279,12 +287,12 @@ task publicationGitHubRelease {
 task publicationMaven {
     description = "Publication of the DSL library to the Maven Central"
     dependsOn 'uploadArchives'
-    dependsOn 'closeAndPromoteRepository'
+    dependsOn 'closeAndReleaseRepository'
 }
-closeAndPromoteRepository.mustRunAfter uploadArchives
+closeAndReleaseRepository.mustRunAfter uploadArchives
 
 task publicationRelease {
-    dependsOn publicationMaven
+    // dependsOn publicationMaven
     dependsOn publicationGitHubRelease
 }
 

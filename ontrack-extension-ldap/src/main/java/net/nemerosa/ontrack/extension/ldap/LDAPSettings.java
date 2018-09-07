@@ -24,9 +24,29 @@ public class LDAPSettings {
     private final String groupAttribute;
     @Wither
     private final String groupFilter;
+    /**
+     * The ID of the attribute which contains the name for a group
+     */
+    @Wither
+    private String groupNameAttribute = "cn";
+
+    /**
+     * The base DN from which the search for group membership should be performed
+     */
+    @Wither
+    private String groupSearchBase;
+
+    /**
+     * The pattern to be used for the user search. {0} is the user's DN
+     */
+    @Wither
+    private String groupSearchFilter = "(member={0})";
 
     public static final LDAPSettings NONE = new LDAPSettings(
             false,
+            "",
+            "",
+            "",
             "",
             "",
             "",

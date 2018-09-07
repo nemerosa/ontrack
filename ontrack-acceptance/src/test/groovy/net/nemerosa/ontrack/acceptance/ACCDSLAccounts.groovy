@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -16,6 +17,64 @@ class ACCDSLAccounts extends AbstractACCDSL {
     void 'Creation of accounts'() {
         // Account
         def name = uid('A')
+        ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
+        // Checks it has been created
+        def account = ontrack.admin.accounts.find { it.name == name }
+        assert account != null
+        assert account.fullName == "Damien Coraboeuf"
+        assert account.email == "dcoraboeuf@nemerosa.net"
+        assert account.authenticationSource.allowingPasswordChange
+        assert account.authenticationSource.id == "password"
+        assert account.authenticationSource.name == "Built-in"
+        assert account.role == "USER"
+        assert account.accountGroups == []
+    }
+
+    @Test
+    void 'Creation of account with a dot in its name'() {
+        // Account
+        def name = uid('A.B')
+        ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
+        // Checks it has been created
+        def account = ontrack.admin.accounts.find { it.name == name }
+        assert account != null
+        assert account.fullName == "Damien Coraboeuf"
+        assert account.email == "dcoraboeuf@nemerosa.net"
+        assert account.authenticationSource.allowingPasswordChange
+        assert account.authenticationSource.id == "password"
+        assert account.authenticationSource.name == "Built-in"
+        assert account.role == "USER"
+        assert account.accountGroups == []
+    }
+
+    @Test(expected = OTMessageClientException.class)
+    void 'Creation of account with an invalid character in its name'() {
+        // Account
+        def name = uid('A/B')
+        ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
+    }
+
+    @Test
+    void 'Creation of account with a dash in its name'() {
+        // Account
+        def name = uid('A-B')
+        ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
+        // Checks it has been created
+        def account = ontrack.admin.accounts.find { it.name == name }
+        assert account != null
+        assert account.fullName == "Damien Coraboeuf"
+        assert account.email == "dcoraboeuf@nemerosa.net"
+        assert account.authenticationSource.allowingPasswordChange
+        assert account.authenticationSource.id == "password"
+        assert account.authenticationSource.name == "Built-in"
+        assert account.role == "USER"
+        assert account.accountGroups == []
+    }
+
+    @Test
+    void 'Creation of account with an underscore in its name'() {
+        // Account
+        def name = uid('A_B')
         ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
         // Checks it has been created
         def account = ontrack.admin.accounts.find { it.name == name }

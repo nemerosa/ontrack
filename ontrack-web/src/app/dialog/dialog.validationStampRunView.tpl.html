@@ -24,7 +24,7 @@
     </div>
     <div class="panel panel-default"
          ng-hide="loadingValidationRuns"
-         ng-repeat="validationRun in validation.validationRuns | orderBy:'id':true">
+         ng-repeat="validationRun in validation.validationStamp.validationRunsPaginated.pageItems | orderBy:'id':true">
         <div class="panel-heading">
             <a href="#/validationRun/{{validationRun.id}}" ng-click="cancel()">
             Run #{{validationRun.runOrder}}
@@ -51,8 +51,37 @@
                 <p ng-if="validationRunStatus.description" class="ot-description">{{validationRunStatus.description}}</p>
             </li>
         </ul>
+        <div class="panel-body" ng-if="validationRun.runInfo">
+            <div class="row">
+                <div class="col-md-4">
+                    <span ng-if="validationRun.runInfo.sourceType && validationRun.runInfo.sourceUri">
+                        Source: <a href="{{validationRun.runInfo.sourceUri}}">{{validationRun.runInfo.sourceType}}</a>
+                    </span>
+                </div>
+                <div class="col-md-4">
+                    <span ng-if="validationRun.runInfo.triggerType && validationRun.runInfo.triggerData">
+                        Trigger: {{validationRun.runInfo.triggerType}}
+                        ->
+                        {{validationRun.runInfo.triggerData}}
+                    </span>
+                </div>
+                <div class="col-md-4">
+                    <span ng-if="validationRun.runInfo.runTime">
+                        <ot-duration duration="validationRun.runInfo.runTime"></ot-duration>
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="navigate(validation.validationStamp.validationRunsPaginated.pageInfo.previousPage)" ng-show="validation.validationStamp.validationRunsPaginated.pageInfo.previousPage">
+        <span class="fa fa-step-backward"></span>
+        Newest
+    </button>
+    <button class="btn btn-default" type="button" ng-click="navigate(validation.validationStamp.validationRunsPaginated.pageInfo.nextPage)" ng-show="validation.validationStamp.validationRunsPaginated.pageInfo.nextPage">
+        <span class="fa fa-step-forward"></span>
+        Oldest
+    </button>
     <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
 </div>

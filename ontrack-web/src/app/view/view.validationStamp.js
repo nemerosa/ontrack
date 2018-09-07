@@ -1,7 +1,8 @@
 angular.module('ot.view.validationStamp', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('validationStamp', {
@@ -10,84 +11,174 @@ angular.module('ot.view.validationStamp', [
             controller: 'ValidationStampCtrl'
         });
     })
-    .controller('ValidationStampCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService) {
-        var view = ot.view();
+    .controller('ValidationStampCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService, otGraphqlService) {
+        const view = ot.view();
+        let viewInitialised = false;
         // ValidationStamp's id
-        var validationStampId = $stateParams.validationStampId;
+        const validationStampId = $stateParams.validationStampId;
 
-        // Loading the promotion level
+        // Initial query parameters
+        const pageSize = 20;
+        const queryVariables = {
+            validationStampId: validationStampId,
+            offset: 0,
+            size: pageSize
+        };
+
+        // Query for the validation stamp
+        const query = `
+            query PaginatedValidationRuns($validationStampId: Int!, $offset: Int = 0, $size: Int = 20) {
+                validationStamp(id: $validationStampId) {
+                    id
+                    name
+                    description
+                    image
+                    _image
+                    decorations {
+                      decorationType
+                      data
+                      error
+                      feature {
+                        id
+                      }
+                    }
+                    branch {
+                      id
+                      name
+                      project {
+                        id
+                        name
+                      }
+                    }
+                    links {
+                      _self
+                      _bulkUpdate
+                      _update
+                      _delete
+                      _properties
+                      _events
+                    }
+                    validationRunsPaginated(offset: $offset, size: $size) {
+                      pageInfo {
+                        totalSize
+                        currentOffset
+                        currentSize
+                        previousPage {
+                          offset
+                          size
+                        }
+                        nextPage {
+                          offset
+                          size
+                        }
+                        pageIndex
+                        pageTotal
+                      }
+                      pageItems {
+                        id
+                        runOrder
+                        build {
+                          id
+                          name
+                        }
+                        creation {
+                          user
+                          time
+                        }
+                        runInfo {
+                          sourceType
+                          sourceUri
+                          triggerType
+                          triggerData
+                          runTime
+                        }
+                        validationRunStatuses {
+                          statusID {
+                            id
+                            name
+                          }
+                          description
+                        }
+                      }
+                    }
+                }
+            }`;
+
+        // Loading the validation stamp
         function loadValidationStamp() {
-            otStructureService.getValidationStamp(validationStampId).then(function (validationStamp) {
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then(function (data) {
+                const validationStamp = data.validationStamp;
                 $scope.validationStamp = validationStamp;
-                // View title
-                view.breadcrumbs = ot.branchBreadcrumbs(validationStamp.branch);
-                // Commands
-                view.commands = [
-                    {
-                        condition: function () {
-                            return validationStamp._update;
+                // View setup
+                if (!viewInitialised) {
+                    // View title
+                    view.breadcrumbs = ot.branchBreadcrumbs(validationStamp.branch);
+                    // Commands
+                    view.commands = [
+                        {
+                            condition: function () {
+                                return validationStamp.links._update;
+                            },
+                            id: 'updateValidationStampImage',
+                            name: "Change image",
+                            cls: 'ot-command-validation-stamp-image',
+                            action: changeImage
                         },
-                        id: 'updateValidationStampImage',
-                        name: "Change image",
-                        cls: 'ot-command-validation-stamp-image',
-                        action: changeImage
-                    },
-                    {
-                        condition: function () {
-                            return validationStamp._update;
+                        {
+                            condition: function () {
+                                return validationStamp.links._update;
+                            },
+                            id: 'updateValidationStamp',
+                            name: "Update validation stamp",
+                            cls: 'ot-command-validation-stamp-update',
+                            action: function () {
+                                otStructureService.update(
+                                    validationStamp.links._update,
+                                    "Update validation stamp"
+                                ).then(loadValidationStamp);
+                            }
                         },
-                        id: 'updateValidationStamp',
-                        name: "Update validation stamp",
-                        cls: 'ot-command-validation-stamp-update',
-                        action: function () {
-                            otStructureService.update(
-                                validationStamp._update,
-                                "Update validation stamp"
-                            ).then(loadValidationStamp);
-                        }
-                    },
-                    {
-                        condition: function () {
-                            return validationStamp._delete;
-                        },
-                        id: 'deleteValidationStamp',
-                        name: "Delete validation stamp",
-                        cls: 'ot-command-validation-stamp-delete',
-                        action: function () {
-                            otAlertService.confirm({
-                                title: "Deleting a validation stamp",
-                                message: "Do you really want to delete the validation stamp " + validationStamp.name +
+                        {
+                            condition: function () {
+                                return validationStamp.links._delete;
+                            },
+                            id: 'deleteValidationStamp',
+                            name: "Delete validation stamp",
+                            cls: 'ot-command-validation-stamp-delete',
+                            action: function () {
+                                otAlertService.confirm({
+                                    title: "Deleting a validation stamp",
+                                    message: "Do you really want to delete the validation stamp " + validationStamp.name +
                                     " and all its associated data?"
-                            }).then(function () {
-                                return ot.call($http.delete(validationStamp._delete));
-                            }).then(function () {
-                                $state.go('branch', {branchId: validationStamp.branch.id});
-                            });
-                        }
-                    },
-                    {
-                        condition: function () {
-                            return validationStamp._bulkUpdate;
+                                }).then(function () {
+                                    return ot.call($http.delete(validationStamp.links._delete));
+                                }).then(function () {
+                                    $state.go('branch', {branchId: validationStamp.branch.id});
+                                });
+                            }
                         },
-                        id: 'bulkUpdateValidationStamp',
-                        name: "Bulk update",
-                        cls: 'ot-command-update',
-                        action: function () {
-                            otAlertService.confirm({
-                                title: "Validation stamps bulk update",
-                                message: "Updates all other validation stamps with the same name?"
-                            }).then(function () {
-                                return ot.call($http.put(validationStamp._bulkUpdate));
-                            }).then(loadValidationStamp);
-                        }
-                    },
-                    ot.viewApiCommand($scope.validationStamp._self),
-                    ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
-                ];
-                // Loading the validation runs
-                return ot.pageCall($http.get(validationStamp._runs));
-            }).then(function (validationRunResources) {
-                $scope.validationRunResources = validationRunResources;
+                        {
+                            condition: function () {
+                                return validationStamp.links._bulkUpdate;
+                            },
+                            id: 'bulkUpdateValidationStamp',
+                            name: "Bulk update",
+                            cls: 'ot-command-update',
+                            action: function () {
+                                otAlertService.confirm({
+                                    title: "Validation stamps bulk update",
+                                    message: "Updates all other validation stamps with the same name?"
+                                }).then(function () {
+                                    return ot.call($http.put(validationStamp.links._bulkUpdate, {}));
+                                }).then(loadValidationStamp);
+                            }
+                        },
+                        ot.viewApiCommand($scope.validationStamp.links._self),
+                        ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
+                    ];
+                    // View OK now
+                    viewInitialised = true;
+                }
             });
         }
 
@@ -95,15 +186,15 @@ angular.module('ot.view.validationStamp', [
         loadValidationStamp();
 
         // Changing the image
-        function changeImage () {
+        function changeImage() {
             otStructureService.changeValidationStampImage($scope.validationStamp).then(loadValidationStamp);
         }
 
         // Switching the page
-        $scope.switchPage = function (pageLink) {
-            ot.pageCall($http.get(pageLink)).then(function (validationRunResources) {
-                $scope.validationRunResources = validationRunResources;
-            });
+        $scope.switchPage = function (pageRequest) {
+            queryVariables.offset = pageRequest.offset;
+            queryVariables.size = pageSize;
+            loadValidationStamp();
         };
 
     })

@@ -14,7 +14,12 @@ dependencies {
     runtime project(':ontrack-repository-impl')
     compile 'org.springframework.boot:spring-boot-starter-aop'
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
-    runtime 'com.h2database:h2'
+    runtime 'org.postgresql:postgresql'
+    runtime 'org.flywaydb:flyway-core'
+
+    // Metric runtimes
+    runtime 'io.micrometer:micrometer-registry-influx'
+    runtime 'io.micrometer:micrometer-registry-prometheus'
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
@@ -37,8 +42,8 @@ dependencies {
     runtime project(':ontrack-extension-combined')
     runtime project(':ontrack-extension-ldap')
     runtime project(':ontrack-extension-stale')
-    runtime project(':ontrack-extension-metrics-graphite')
-    runtime project(':ontrack-extension-metrics-influxdb')
+    runtime project(':ontrack-extension-vault')
+    runtime project(':ontrack-extension-influxdb')
 }
 
 /**
@@ -105,6 +110,9 @@ processResources.mustRunAfter copyWebResources
 processResources.mustRunAfter generateVersionInfo
 
 bootRun.dependsOn jar
+
+// Running with `dev` profile by default with `bootRun`
+bootRun.args("--spring.profiles.active=dev")
 
 /**
  * Spring boot packaging

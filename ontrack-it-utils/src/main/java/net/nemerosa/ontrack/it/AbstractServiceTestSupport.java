@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.it;
 
+import com.google.common.collect.ImmutableSet;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsManagerService;
@@ -260,6 +261,10 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return new AdminCall();
     }
 
+    protected AnonymousCall asAnonymous() {
+        return new AnonymousCall();
+    }
+
     protected UserCall asUserWithView(ProjectEntity... entities) {
         UserCall user = asUser();
         for (ProjectEntity entity : entities) {
@@ -290,6 +295,11 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         } catch (Exception ex) {
             throw new IllegalStateException("Cannot set GrantViewToAll settings", ex);
         }
+    }
+
+    protected <T> T withGrantViewToAll(Callable<T> task) throws Exception {
+        grantViewToAll(true);
+        return task.call();
     }
 
     protected <T> T withNoGrantViewToAll(Callable<T> task) throws Exception {
@@ -332,6 +342,16 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         protected abstract void contextSetup();
     }
 
+    protected static class AnonymousCall extends AbstractContextCall {
+
+        @Override
+        protected void contextSetup() {
+            SecurityContext context = new SecurityContextImpl();
+            context.setAuthentication(null);
+            SecurityContextHolder.setContext(context);
+        }
+    }
+
     protected static class AccountCall<T extends AccountCall<T>> extends AbstractContextCall {
 
         protected final Account account;
@@ -344,12 +364,13 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
             this(Account.of(name, name, name + "@test.com", role, AuthenticationSource.none()));
         }
 
-        public T with(Class<? extends GlobalFunction> fn) {
+        @SafeVarargs
+        public final T with(Class<? extends GlobalFunction>... fn) {
             account.withGlobalRole(
                     Optional.of(
                             new GlobalRole(
                                     "test", "Test global role", "",
-                                    Collections.singleton(fn),
+                                    ImmutableSet.copyOf(fn),
                                     Collections.emptySet()
                             )
                     )

@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 public final class MessageAnnotationUtils {
 

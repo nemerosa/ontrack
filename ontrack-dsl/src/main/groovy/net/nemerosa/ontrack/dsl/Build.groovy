@@ -152,6 +152,7 @@ class Build extends AbstractProjectResource {
      *
      * Date is expected to be UTC.
      */
+    @DSLMethod(id = "signature", count = 2)
     def signature(String user = null, Date date = null) {
         ontrack.put(
                 link('signature'),
@@ -166,6 +167,7 @@ class Build extends AbstractProjectResource {
      * Previous build
      * @return Null if none
      */
+    @DSLMethod("Returns the previous build in the same branch, or `null` if there is none.")
     Build getPreviousBuild() {
         def json = ontrack.get(link('previous'))
         if (json) {
@@ -179,6 +181,7 @@ class Build extends AbstractProjectResource {
      * Next build
      * @return Null if none
      */
+    @DSLMethod("Returns the next build in the same branch, or `null` if there is none.")
     Build getNextBuild() {
         def json = ontrack.get(link('next'))
         if (json) {
@@ -194,6 +197,7 @@ class Build extends AbstractProjectResource {
      * If no change log is available, because the associated branch is not configured for example,
      * null is returned.
      */
+    @DSLMethod("Computes the <<changelogs,change log>> between this build and the one given in parameter.")
     ChangeLog getChangeLog(Build otherBuild) {
         try {
             return new ChangeLog(
@@ -216,6 +220,7 @@ class Build extends AbstractProjectResource {
     /**
      * Release decoration
      */
+    @DSLMethod("Returns any label associated with this build.")
     String getReleaseDecoration() {
         getDecoration('net.nemerosa.ontrack.extension.general.ReleaseDecorationExtension') as String
     }
@@ -223,6 +228,7 @@ class Build extends AbstractProjectResource {
     /**
      * Build links decorations.
      */
+    @DSLMethod("Returns the build links associated with this build")
     List<?> getBuildLinkDecorations() {
         getDecorations('net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension')
     }
@@ -260,4 +266,18 @@ class Build extends AbstractProjectResource {
         getDecoration('net.nemerosa.ontrack.extension.svn.SVNRevisionDecorationExtension') as Long
     }
 
+    @DSLMethod("Gets the associated run info with this build, or `null` if none")
+    RunInfo getRunInfo() {
+        def result = ontrack.get(link("runInfo"))
+        def info = new RunInfo(ontrack, result)
+        return info.id != 0 ? info : null
+    }
+
+    @DSLMethod("Sets the run info for this build.")
+    void setRunInfo(Map<String, ?> info) {
+        ontrack.put(
+                link("runInfo"),
+                info
+        )
+    }
 }

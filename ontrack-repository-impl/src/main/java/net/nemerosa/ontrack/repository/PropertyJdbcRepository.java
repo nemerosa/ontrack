@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +30,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     }
 
     @Override
+    @Cacheable(cacheNames = "properties", key="#typeName + #entityType.name() + #entityId.value")
     public TProperty loadProperty(String typeName, ProjectEntityType entityType, ID entityId) {
         return getFirstItem(
                 String.format(
@@ -40,6 +43,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     }
 
     @Override
+    @CacheEvict(cacheNames = "properties", key="#typeName + #entityType.name() + #entityId.value")
     public void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data, String searchKey) {
         MapSqlParameterSource params = params("type", typeName).addValue("entityId", entityId.getValue());
         // Any previous value?
@@ -58,7 +62,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         // Update
         if (propertyId != null) {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE PROPERTIES SET JSON = :json, SEARCHKEY = :searchKey WHERE ID = :id",
+                    "UPDATE PROPERTIES SET JSON = CAST(:json AS JSONB), SEARCHKEY = :searchKey WHERE ID = :id",
                     params.addValue("id", propertyId)
             );
         }
@@ -67,7 +71,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
             getNamedParameterJdbcTemplate().update(
                     String.format(
                             "INSERT INTO PROPERTIES(TYPE, %s, SEARCHKEY, JSON) " +
-                                    "VALUES(:type, :entityId, :searchKey, :json)",
+                                    "VALUES(:type, :entityId, :searchKey, CAST(:json AS JSONB))",
                             entityType.name()
                     ),
                     params
@@ -76,6 +80,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     }
 
     @Override
+    @CacheEvict(cacheNames = "properties", key="#typeName + #entityType.name() + #entityId.value")
     public Ack deleteProperty(String typeName, ProjectEntityType entityType, ID entityId) {
         return Ack.one(
                 getNamedParameterJdbcTemplate().update(

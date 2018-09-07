@@ -196,17 +196,6 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         });
     }
 
-    /**
-     * Test that the plain configuration that was saved by {@link net.nemerosa.ontrack.service.support.configuration.TestConfigurationUncryptedAction}
-     * is encrypted.
-     */
-    @Test
-    public void encryptedConfigurationMigration() throws Exception {
-        Optional<TestConfiguration> conf = configurationRepository.find(TestConfiguration.class, "plain");
-        assertTrue(conf.isPresent());
-        assertNotEquals("Password should have been encrypted by migration", PLAIN_PASSWORD, conf.get().getPassword());
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void update_name_check() throws Exception {
         asUser().with(GlobalSettings.class).call(() -> {

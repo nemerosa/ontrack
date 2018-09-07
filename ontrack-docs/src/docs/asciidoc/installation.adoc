@@ -16,8 +16,41 @@ Ontrack runs fine with 512 Mb of memory. However, think of upgrading to 2 Gb of
 memory if you intend to host a lot of projects. See the different installation
 modes (Docker, RPM, etc.) to know how to setup the memory settings.
 
-Ontrack stores its data in a local H2 database. This one can grow up to 500 Mb
-for big volumes (hundreds of projects).
+Ontrack stores its data in a Postgres database.
+
+[[installation-quick-start]]
+=== Quick start
+
+The fastest way to start Ontrack is to use <<installation-docker-compose,Docker Compose>>.
+
+[[installation-postgres]]
+=== Postgres database
+
+Unless you choose to deploy with <<installation-docker-compose,Docker Compose>>,
+you will need to have a Postgres database accessible by Ontrack.
+
+Version 9.5 of Postgres has been tested successfully with Ontrack, but
+any later 9.x version should be OK as well.
+
+No test with Postgres 10.x has been performed yet.
+
+Ontrack will by default try to connect to
+`jdbc:postgresql://postgresql/ontrack`, using `ontrack / ontrack`
+as credentials.
+
+Those parameters can be configured using normal Spring Boot JDBC <<configuration,configuration>>,
+for example using arguments at startup:
+
+[source]
+----
+--spring.datasource.url=jdbc:postgresql://localhost:5432/ontrack
+--spring.datasource.username=myuser
+--spring.datasource.password=password
+----
+
+See the https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-external-config[Spring Boot documentation]
+to see other and better ways to pass
+those <<configuration,configuration>> parameters.
 
 [[installation-docker]]
 === Installing using Docker
@@ -31,8 +64,13 @@ The Ontrack image exposes the ports `443` and `8080`.
 
 Two volumes are defined:
 
-* `/var/ontrack/data` - contains the data for Ontrack (files & database) but also the log files. This is typically provided through a data volume container.
+* `/var/ontrack/data` - contains some working files but also the log files.
 * `/var/ontrack/conf` - contains the <<configuration-properties,configuration files>> for Ontrack (see later).
+
+Several modes of database setup can be done:
+
+* <<installation-docker-db-volume,database persisted in volume>>
+* <<installation-docker-db-server,using a H2 server database>>
 
 [[installation-docker-basic]]
 ==== Basic deployment
@@ -63,6 +101,103 @@ docker run \
    --env "JAVA_OPTIONS=-Xmx2048m" \
    ...
 ----
+
+Additional arguments to the Ontrack process, like
+<<configuration,configuration arguments>>
+passed on the command line, can use the `ONTRACK_ARGS` environment variable.
+
+[source,bash]
+----
+docker run \
+   ...
+   --env "ONTRACK_ARGS=..."
+   ...
+----
+
+[[installation-docker-db-volume]]
+==== Database persisted in volume
+
+By default, the database JDBC URL is set to:
+
+[source]
+----
+jdbc:h2:/var/ontrack/data/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE
+----
+
+TIP: In order to put the database file on the host or in a data
+volume, share the `/var/ontrack/data` volume.
+
+NOTE: In this mode, the H2 database is NOT accessible while the Ontrack
+process runs. One will prefer to use the
+<<installation-docker-db-server,H2 server mode>>.
+
+[[installation-docker-db-server]]
+==== Database as H2 server
+
+NOTE: This is the preferred mode when running in production mode.
+
+One can run a H2 server by using Docker. For example:
+
+[source,bash]
+----
+docker container run -d --publish 9082:9082 --name h2 nemerosa/h2:latest
+----
+
+NOTE: Running H2 as a Docker container is not at all required, and any
+other way is fine as long as the running database is accessible from
+the Ontrack process.
+
+Then, just specify the H2 server address as argument. Using the database of
+the example above:
+
+[source,bash]
+----
+docker run \
+   ...
+   --env "ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
+   ...
+----
+
+[[installation-docker-compose]]
+==== Docker Compose deployment
+
+Create the following file:
+
+[source,yaml]
+.docker-compose.yml
+----
+version: "2.1"
+
+services:
+  # Ontrack container
+  ontrack:
+    image: nemerosa/ontrack:3
+    environment:
+        PROFILE: prod
+    links:
+      - "postgresql:postgresql"
+    ports:
+      - "8080:8080"
+
+  # Postgresql database
+  postgresql:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+    ports:
+      - "5432"
+----
+
+In the same directory, run:
+
+[source,bash]
+----
+docker-compose up -d
+----
+
+After some time, Ontrack becomes available at http://localhost:8080
 
 [[installation-rpm]]
 === RPM installation
@@ -122,14 +257,20 @@ sudo rpm --upgrade ontrack.rpm
 sudo service ontrack start
 ----
 
-The optional `/etc/default/ontrack` file can be used to define the
-`JAVA_OPTIONS`, for example:
+The optional `/etc/default/ontrack` file can be used to define
+environment variables like
+`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+For example:
 
 [source]
 ./etc/default/ontrack
 ----
 JAVA_OPTIONS=-Xmx2048m
+ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
 ----
+
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
 
 [[installation-debian]]
 === Debian installation
@@ -166,14 +307,20 @@ service ontrack status
 service ontrack stop
 ----
 
-The optional `/etc/default/ontrack` file can be used to define the
-`JAVA_OPTIONS`, for example:
+The optional `/etc/default/ontrack` file can be used to define
+environment variables like
+`JAVA_OPTIONS` or `ONTRACK_DB_URL` (to use the H2 server mode).
+For example:
 
 [source]
 ./etc/default/ontrack
 ----
 JAVA_OPTIONS=-Xmx2048m
+ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL
 ----
+
+The `ONTRACK_ARGS` environment variable can be use to pass
+additional application parameters.
 
 [[installation-sa]]
 === Standalone installation
@@ -183,27 +330,12 @@ Ontrack can be downloaded as a JAR and started as a Spring Boot application.
 Download the JAR from the
 https://github.com/nemerosa/ontrack/releases[Ontrack release page]
 
-Start it using `java -jar ontrack.jar` with the following options:
+Start it using `java -jar ontrack.jar`.
 
-* `--spring.datasource.url=jdbc:h2:/var/ontrack/data/database/data`
-* or `--spring.datasource.url=jdbc:h2:./database/data`
-* and any other Java option, like memory settings: `-Xmx2048m`
-* or <<configuration,configuration parameter>> like `--server.port=9999`
+<<configuration,Options>> can be passed on the command line.
 
-to specify the location of the H2 database files.
-
-<<configuration-properties,Options>> can also be specified in an `application.yml` file in
-the working directory.
-
-For example:
-
-[source,yaml]
-.application.yml
-----
-spring:
-   datasource:
-      url: "jdbc:h2:/var/ontrack/data/database/data"
-----
+NOTE: See the <<installation-docker,Docker installation>> section for information
+on how to connect to the database.
 
 [[configuration]]
 === Configuration

@@ -37,6 +37,21 @@ class ValidationRun extends AbstractProjectResource {
         node.validationRunStatuses
     }
 
+    @DSLMethod("Gets the associated run info with this validation run or `null` if none")
+    RunInfo getRunInfo() {
+        def result = ontrack.get(link("runInfo"))
+        def info = new RunInfo(ontrack, result)
+        return info.id != 0 ? info : null
+    }
+
+    @DSLMethod("Sets the run info for this validation run.")
+    void setRunInfo(Map<String, ?> info) {
+        ontrack.put(
+                link("runInfo"),
+                info
+        )
+    }
+
     @DSLMethod("Gets the data for the validation run, map with `id` and `data`, or null if not defined.")
     def getData() {
         if (node.data) {

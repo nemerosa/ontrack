@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -31,6 +32,7 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
     private BuildFilterJdbcRepository repository;
 
     private Branch branch;
+    private String accountName;
     private Account account;
 
     @Before
@@ -39,9 +41,10 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         // Creates an account
         AuthenticationSource authenticationSource = mock(AuthenticationSource.class);
         when(authenticationSource.getId()).thenReturn("test");
+        accountName = uid("A");
         account = accountRepository.newAccount(
                 Account.of(
-                        "test",
+                        accountName,
                         "Test user",
                         "test@test.com",
                         SecurityRole.USER,

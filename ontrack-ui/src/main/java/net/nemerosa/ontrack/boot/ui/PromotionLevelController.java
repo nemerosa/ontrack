@@ -130,4 +130,16 @@ public class PromotionLevelController extends AbstractResourceController {
         );
     }
 
+    /**
+     * Bulk update of all promotion levels in other projects/branches and in predefined promotion levels,
+     * following the model designed by the promotion level ID.
+     *
+     * @param promotionLevelId ID of the promotion level model
+     * @return Result of the update
+     */
+    @PutMapping("promotionLevels/{promotionLevelId}/bulk")
+    public Ack bulkUpdate(@PathVariable ID promotionLevelId) {
+        return structureService.bulkUpdatePromotionLevels(promotionLevelId);
+    }
+
 }

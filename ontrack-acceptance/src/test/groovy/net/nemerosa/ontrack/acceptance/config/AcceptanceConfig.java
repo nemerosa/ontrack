@@ -35,7 +35,15 @@ public class AcceptanceConfig {
     /**
      * Optional Selenium Grid/Node URL
      */
-    private String seleniumUrl = "";
+    private String seleniumGridUrl = "";
+    /**
+     * Optional URL to the Ontrack instance, useable from the Selenium node
+     */
+    private String seleniumTargetUrl = "";
+    /**
+     * Selenium browser name
+     */
+    private String seleniumBrowserName = "firefox";
     /**
      * Disabling the SSL checks
      */
@@ -65,6 +73,11 @@ public class AcceptanceConfig {
      */
     private String resultFileName = "ontrack-acceptance.xml";
 
+    /**
+     * URI to the InfluxDB database
+     */
+    private String influxdbUri = "http://localhost:8086";
+
     @PostConstruct
     public void check() throws InterruptedException, ExecutionException, TimeoutException {
         // Checks the URL is defined
@@ -84,34 +97,59 @@ public class AcceptanceConfig {
         }
     }
 
+    public boolean acceptTest(AcceptanceTest root, AcceptanceTest member) {
+        if (acceptTest(root)) {
+            if (root != null && root.explicit()) {
+                // If no context is required on the member, it is accepted
+                // Else checks the member
+                return member == null || acceptTest(member);
+            } else {
+                return acceptTest(member);
+            }
+        } else {
+            return false;
+        }
+    }
+
     public boolean acceptTest(AcceptanceTest acceptanceTest) {
+        // Explicit check
+        if (acceptanceTest != null && acceptanceTest.explicit()) {
+            // The current context must be defined
+            // and equal to one of the accepted contexts
+            return context != null && Arrays.asList(acceptanceTest.value()).contains(context);
+        }
         // No context, all tests are eligible
         // If there is a context, but no annotation, the test cannot be accepted
         // There is a context *and* an annotation, checks the context is part of the
         // accepted values in the annotation
-        return StringUtils.isBlank(context) || StringUtils.equals(CONTEXT_ALL, context) ||
-                (
-                        acceptanceTest != null &&
-                                Arrays.asList(acceptanceTest.value()).contains(context)
-                );
+        else {
+            return StringUtils.isBlank(this.context) ||
+                    StringUtils.equals(CONTEXT_ALL, this.context) ||
+                    acceptanceTest != null && Arrays.asList(acceptanceTest.value()).contains(context);
+        }
     }
 
     public void log(Consumer<String> logger) {
-        logger.accept(String.format(">>> Ontrack URL:      %s", url));
-        logger.accept(String.format(">>> Selenium URL:     %s", seleniumUrl));
-        logger.accept(String.format(">>> Disable SSL:      %s", disableSsl));
-        logger.accept(String.format(">>> Admin password:   %s", "admin".equals(admin) ? "admin" : "****"));
-        logger.accept(String.format(">>> Context:          %s", context));
-        logger.accept(String.format(">>> Timeout:          %s", timeout));
-        logger.accept(String.format(">>> Implicit wait:    %s", implicitWait));
-        logger.accept(String.format(">>> Output directory: %s", outputDir));
-        logger.accept(String.format(">>> Result file name: %s", resultFileName));
+        logger.accept(String.format(">>> Ontrack URL:         %s", url));
+        logger.accept(String.format(">>> Selenium grid URL:   %s", seleniumGridUrl));
+        logger.accept(String.format(">>> Selenium browser:    %s", seleniumBrowserName));
+        logger.accept(String.format(">>> Selenium target URL: %s", seleniumTargetUrl));
+        logger.accept(String.format(">>> Disable SSL:         %s", disableSsl));
+        logger.accept(String.format(">>> Admin password:      %s", "admin".equals(admin) ? "admin" : "****"));
+        logger.accept(String.format(">>> Context:             %s", context));
+        logger.accept(String.format(">>> Timeout:             %s", timeout));
+        logger.accept(String.format(">>> Implicit wait:       %s", implicitWait));
+        logger.accept(String.format(">>> Output directory:    %s", outputDir));
+        logger.accept(String.format(">>> Result file name:    %s", resultFileName));
+        logger.accept(String.format(">>> InfluxDB URI:        %s", influxdbUri));
     }
 
     public static AcceptanceConfig fromEnv() {
         AcceptanceConfig c = new AcceptanceConfig();
         c.setUrl(env("ontrack.acceptance.url", c.getUrl(), "Ontrack URL"));
-        c.setSeleniumUrl(env("ontrack.acceptance.selenium-url", c.getSeleniumUrl(), "Selenium URL"));
+        c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-grid-url", c.getSeleniumGridUrl(), "Selenium Grid URL"));
+        c.setSeleniumBrowserName(env("ontrack.acceptance.selenium-browser-name", c.getSeleniumBrowserName(), "Selenium Browser Name"));
+        c.setSeleniumGridUrl(env("ontrack.acceptance.selenium-target-url", c.getSeleniumTargetUrl(), "Selenium Target URL"));
         c.setDisableSsl(envAsBoolean("ontrack.acceptance.disable-ssl", c.isDisableSsl(), "Disabling SSL"));
         c.setAdmin(env("ontrack.acceptance.admin", c.getAdmin(), "Admin password"));
         c.setContext(env("ontrack.acceptance.context", c.getContext(), "Test context"));
@@ -119,6 +157,7 @@ public class AcceptanceConfig {
         c.setImplicitWait(envAsInt("ontrack.acceptance.implicit-wait", c.getImplicitWait(), "GUI element wait (s)"));
         c.setOutputDir(envAsFile("ontrack.acceptance.output-dir", c.getOutputDir(), "Output directory"));
         c.setResultFileName(env("ontrack.acceptance.result-file-name", "ontrack-acceptance.xml", "Output directory"));
+        c.setInfluxdbUri(env("ontrack.acceptance.influxdb-uri", "http://localhost:8086", "URI to the InfluxDB database"));
         return c;
     }
 

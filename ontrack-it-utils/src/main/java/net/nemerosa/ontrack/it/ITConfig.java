@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.it;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.nemerosa.ontrack.common.RunProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +35,21 @@ public class ITConfig {
 
     @Bean
     public DataSource dataSource() throws IOException {
-        String dbURL = "jdbc:h2:mem:ontrack;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE";
+        // Configuration using system properties
+        String dbURL = System.getProperty("it.jdbc.url", "jdbc:postgresql://localhost/ontrack");
+        String dbUser = System.getProperty("it.jdbc.user", "ontrack");
+        String dbPassword = System.getProperty("it.jdbc.password", "ontrack");
+
         logger.info("Using database at {}", dbURL);
         org.apache.tomcat.jdbc.pool.DataSource pool = new org.apache.tomcat.jdbc.pool.DataSource();
-        pool.setDriverClassName("org.h2.Driver");
+        pool.setDriverClassName("org.postgresql.Driver");
         pool.setUrl(dbURL);
-        pool.setUsername("sa");
-        pool.setPassword("");
+        pool.setUsername(dbUser);
+        pool.setPassword(dbPassword);
         pool.setDefaultAutoCommit(false);
-        pool.setInitialSize(1);
-        pool.setMaxActive(2);
+        pool.setInitialSize(10);
+        pool.setMaxIdle(10);
+        pool.setMaxActive(20);
         return pool;
     }
 
@@ -54,5 +61,10 @@ public class ITConfig {
     @Bean
     public ConverterRegistry converterRegistry() {
         return new DefaultConversionService();
+    }
+
+    @Bean
+    public MeterRegistry meterRegistry() {
+        return new SimpleMeterRegistry();
     }
 }

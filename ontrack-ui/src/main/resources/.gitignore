@@ -1,5 +1,4 @@
 *.json
 /static
 /application.properties
-/application.yml
-/application-dev.yml
+/config

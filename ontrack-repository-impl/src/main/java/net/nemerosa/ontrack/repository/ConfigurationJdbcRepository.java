@@ -50,13 +50,13 @@ public class ConfigurationJdbcRepository extends AbstractJdbcRepository implemen
         if (id != null) {
             // Update
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE CONFIGURATIONS SET CONTENT = :content WHERE ID = :id",
+                    "UPDATE CONFIGURATIONS SET CONTENT = CAST(:content AS JSONB) WHERE ID = :id",
                     params.addValue("content", writeJson(configuration)).addValue("id", id)
             );
         } else {
             // Creation
             getNamedParameterJdbcTemplate().update(
-                    "INSERT INTO CONFIGURATIONS(TYPE, NAME, CONTENT) VALUES (:type, :name, :content)",
+                    "INSERT INTO CONFIGURATIONS(TYPE, NAME, CONTENT) VALUES (:type, :name, CAST(:content AS JSONB))",
                     params.addValue("content", writeJson(configuration))
             );
         }

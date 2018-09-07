@@ -1,3 +1,0 @@
--- 16. Maximum branch name size (#269)
-
-ALTER TABLE BRANCHES ALTER COLUMN NAME VARCHAR(120) NOT NULL;

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import com.google.common.base.CaseFormat;
 import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -96,11 +97,15 @@ public class DefaultURIBuilder implements URIBuilder {
         }
     }
 
+    String getEntityPageName(ProjectEntityType projectEntityType) {
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, projectEntityType.name().toLowerCase());
+    }
+
     @Override
     public URI getEntityPage(ProjectEntity entity) {
         return page(
                 "%s/%d",
-                entity.getProjectEntityType().name().toLowerCase(),
+                getEntityPageName(entity.getProjectEntityType()),
                 entity.id()
         );
     }

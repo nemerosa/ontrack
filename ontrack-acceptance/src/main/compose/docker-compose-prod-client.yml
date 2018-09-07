@@ -1,0 +1,25 @@
+version: "2.1"
+
+services:
+   selenium:
+      image: "selenium/standalone-chrome:3.8.1"
+      environment:
+         JAVA_OPTS: "-Xmx2048m"
+   ontrack_acceptance:
+      image: "docker.nemerosa.net/nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      depends_on:
+         selenium:
+            condition: service_started
+      environment:
+         ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
+         ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
+         # By default in "production" mode
+         ONTRACK_ACCEPTANCE_CONTEXT: production
+         # Injected by the CI/CD environment
+         ONTRACK_ACCEPTANCE_TARGET_URL: "https://ontrack.nemerosa.net"
+         # Admin password injected by CI/CD
+         ONTRACK_ACCEPTANCE_ADMIN: "${ONTRACK_ACCEPTANCE_ADMIN}"
+         # Misc. settings
+         ONTRACK_ACCEPTANCE_TIMEOUT: 300
+      volumes:
+         - "./build:/ontrack/acceptance/output:rw"

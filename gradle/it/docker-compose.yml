@@ -1,0 +1,9 @@
+# Database
+db:
+  image: postgres:9.5.2
+  environment:
+    POSTGRES_DB      : ontrack
+    POSTGRES_USER    : ontrack
+    POSTGRES_PASSWORD: ontrack
+  ports:
+    - "5432"

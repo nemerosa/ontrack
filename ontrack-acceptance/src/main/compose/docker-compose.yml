@@ -1,0 +1,47 @@
+version: "2.1"
+
+services:
+   postgres:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+   influxdb:
+    image: influxdb:1.5.2
+   ontrack:
+      image: "docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+      depends_on:
+         postgres:
+            condition: service_started
+         influxdb:
+           condition: service_started
+      environment:
+         PROFILE: acceptance
+         ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
+         SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+         # InfluxDB being enabled
+         ONTRACK_INFLUXDB_ENABLED: "true"
+         ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
+   selenium:
+      image: "selenium/standalone-chrome:3.11.0"
+      environment:
+         JAVA_OPTS: "-Xmx3072m -Xms3072m"
+   ontrack_acceptance:
+      image: "docker.nemerosa.net/nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      depends_on:
+         ontrack:
+            condition: service_healthy
+         selenium:
+            condition: service_started
+      environment:
+         ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
+         ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
+         ONTRACK_ACCEPTANCE_SELENIUM_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 30
+         ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_INFLUXDB_URI: http://influxdb:8086
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
+      volumes:
+         - "./build:/ontrack/acceptance/output:rw"

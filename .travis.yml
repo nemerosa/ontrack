@@ -1,4 +1,8 @@
 language: java
+sudo: required
+
+services:
+  - docker
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -20,4 +24,4 @@ before_install:
   - git config --global user.name "Travis CI"
 
 script:
-  - ./gradlew test integrationTest --stacktrace
+  - ./gradlew test integrationTest -x javadoc --stacktrace

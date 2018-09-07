@@ -4,7 +4,7 @@
             <ot-entity-image entity="validationStamp">
                 {{validationStamp.name}}
             </ot-entity-image>
-            <ot-entity-decorations entity="validationStamp"></ot-entity-decorations>
+            <ot-entity-embedded-decorations decorations="validationStamp.decorations"></ot-entity-embedded-decorations>
             <div ng-show="validationStamp.description" class="ot-description">
                 {{validationStamp.description}}
             </div>
@@ -22,12 +22,24 @@
             </div>
 
             <ot-section-title>History</ot-section-title>
-            <div class="alert alert-warning" ng-show="validationRunResources.resources.length == 0">
+            <div class="alert alert-warning" ng-show="validationStamp.validationRunsPaginated.pageInfo.totalSize == 0">
                 No validation run has been done yet.
             </div>
-            <table class="table table-condensed table-hover" ng-show="validationRunResources.resources.length != 0">
+            <table class="table table-condensed table-hover" ng-show="validationStamp.validationRunsPaginated.pageInfo.totalSize != 0">
+                <thead>
+                <tr>
+                    <th>Build</th>
+                    <th>Run</th>
+                    <th>Last status</th>
+                    <th>Description</th>
+                    <th>Creation</th>
+                    <th>Source</th>
+                    <th>Trigger</th>
+                    <th>Run time</th>
+                </tr>
+                </thead>
                 <tbody>
-                    <tr ng-repeat="validationRun in validationRunResources.resources">
+                    <tr ng-repeat="validationRun in validationStamp.validationRunsPaginated.pageItems">
                         <td>
                             <a href="#/build/{{validationRun.build.id}}">
                                 {{validationRun.build.name}}
@@ -45,27 +57,44 @@
                         </td>
                         <td>
                             <a href="#/validationRun/{{validationRun.id}}">
-                                <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
                             </a>
                         </td>
                         <td>
-                            {{validationRun.lastStatus.description}}
+                            {{validationRun.validationRunStatuses[0].description}}
                         </td>
                         <td>
-                            <ot-signature value="validationRun.lastStatus.signature" user="true" time="true"></ot-signature>
+                            <ot-signature value="{time: validationRun.creation.time, user: {name: validationRun.creation.user}}" user="true" time="true"></ot-signature>
+                        </td>
+                        <td>
+                           <span ng-if="validationRun.runInfo.sourceType && validationRun.runInfo.sourceUri">
+                               <a href="{{validationRun.runInfo.sourceUri}}">{{validationRun.runInfo.sourceType}}</a>
+                           </span>
+                        </td>
+                        <td>
+                           <span ng-if="validationRun.runInfo.triggerType && validationRun.runInfo.triggerData">
+                               {{validationRun.runInfo.triggerType}}
+                               ->
+                               {{validationRun.runInfo.triggerData}}
+                           </span>
+                        </td>
+                        <td>
+                            <span ng-if="validationRun.runInfo.runTime">
+                                <ot-duration duration="validationRun.runInfo.runTime"></ot-duration>
+                            </span>
                         </td>
                     </tr>
                 </tbody>
                 <tfoot>
                 <tr>
                     <td colspan="4" align="left">
-                        <button class="btn btn-link" ng-show="validationRunResources.pagination.prev" ng-click="switchPage(validationRunResources.pagination.prev)">
+                        <button class="btn btn-link" ng-show="validationStamp.validationRunsPaginated.pageInfo.previousPage" ng-click="switchPage(validationStamp.validationRunsPaginated.pageInfo.previousPage)">
                             <span class="fa fa-step-backward"></span>
                             Newer ones
                         </button>
                     </td>
-                    <td colspan="2" align="right">
-                        <button class="btn btn-link" ng-show="validationRunResources.pagination.next" ng-click="switchPage(validationRunResources.pagination.next)">
+                    <td colspan="4" align="right">
+                        <button class="btn btn-link" ng-show="validationStamp.validationRunsPaginated.pageInfo.nextPage" ng-click="switchPage(validationStamp.validationRunsPaginated.pageInfo.nextPage)">
                             <span class="fa fa-step-forward"></span>
                             Older ones
                         </button>
@@ -78,10 +107,10 @@
             <ot-section-title>Properties</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
-                    <ot-entity-properties entity="validationStamp"></ot-entity-properties>
+                    <ot-entity-properties entity="{_properties: validationStamp.links._properties}"></ot-entity-properties>
                 </div>
             </div>
         </div>
     </div>
-    <ot-entity-events entity="validationStamp"></ot-entity-events>
+    <ot-entity-events entity="{_events: validationStamp.links._events}"></ot-entity-events>
 </ot-view>

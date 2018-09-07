@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
   # InfluxDB container
@@ -20,3 +20,13 @@ services:
       JAVA_OPTIONS: "${JAVA_OPTIONS}"
     links:
       - "influxdb:influxdb"
+
+  # Postgresql database
+  postgresql:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+    ports:
+      - "5432"

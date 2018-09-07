@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
@@ -171,7 +172,7 @@ public class DSLDocExtractor {
         String path = String.format("/%s/%s.groovy", method.getDeclaringClass().getName(), getMethodId(methodDsl, method));
         InputStream in = clazz.getResourceAsStream(path);
         if (in != null) {
-            return IOUtils.toString(in);
+            return IOUtils.toString(in, Charset.forName("UTF-8"));
         } else {
             return null;
         }
@@ -181,13 +182,13 @@ public class DSLDocExtractor {
         String path = String.format("/%s/sample.groovy", clazz.getName());
         InputStream in = clazz.getResourceAsStream(path);
         if (in != null) {
-            return IOUtils.toString(in);
+            return IOUtils.toString(in, Charset.forName("UTF-8"));
         } else {
             return null;
         }
     }
 
-    private String getMethodDescription(DSLMethod methodDsl) throws IOException {
+    private String getMethodDescription(DSLMethod methodDsl) {
         if (StringUtils.isNotBlank(methodDsl.value())) {
             return methodDsl.value();
         } else {
@@ -198,7 +199,7 @@ public class DSLDocExtractor {
     private String getMethodLongDescription(DSLMethod methodDsl, Class<?> clazz, Method method) throws IOException {
         InputStream in = clazz.getResourceAsStream(String.format("/%s/%s.adoc", method.getDeclaringClass().getName(), getMethodId(methodDsl, method)));
         if (in != null) {
-            return IOUtils.toString(in);
+            return IOUtils.toString(in, Charset.forName("UTF-8"));
         } else {
             return null;
         }
@@ -207,7 +208,7 @@ public class DSLDocExtractor {
     private String getClassLongDescription(Class<?> clazz) throws IOException {
         InputStream in = clazz.getResourceAsStream(String.format("/%s/description.adoc", clazz.getName()));
         if (in != null) {
-            return IOUtils.toString(in);
+            return IOUtils.toString(in, Charset.forName("UTF-8"));
         } else {
             return null;
         }
@@ -217,7 +218,7 @@ public class DSLDocExtractor {
         return method.getName();
     }
 
-    private String getClassDescription(DSL dsl) throws IOException {
+    private String getClassDescription(DSL dsl) {
         if (StringUtils.isNotBlank(dsl.value())) {
             return dsl.value();
         } else {

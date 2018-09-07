@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,11 +84,11 @@ public final class Utils {
             LOGGER.trace("RUN EXIT {}", exit);
             // In case of error
             if (exit != 0) {
-                String error = IOUtils.toString(process.getErrorStream());
+                String error = IOUtils.toString(process.getErrorStream(), Charset.defaultCharset());
                 LOGGER.trace("RUN ERROR {}", error);
                 throw new ProcessExitException(exit, error);
             } else {
-                String output = IOUtils.toString(process.getInputStream());
+                String output = IOUtils.toString(process.getInputStream(), Charset.defaultCharset());
                 LOGGER.trace("RUN OUT   {}", output);
                 return output;
             }

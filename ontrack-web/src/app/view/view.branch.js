@@ -155,6 +155,7 @@ angular.module('ot.view.branch', [
                 validationStamps {
                   id
                   name
+                  description
                   image
                   _image
                   decorations {
@@ -171,6 +172,13 @@ angular.module('ot.view.branch', [
                 builds(generic: {type: $filterType, data: $filterData}) {
                   id
                   name
+                  runInfo {
+                    sourceType
+                    sourceUri 
+                    triggerType
+                    triggerData
+                    runTime
+                  }
                   decorations {
                     ...decorationContent
                   }

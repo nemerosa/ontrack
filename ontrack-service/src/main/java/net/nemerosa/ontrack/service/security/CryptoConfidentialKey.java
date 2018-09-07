@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.security.ConfidentialStore;
+import net.nemerosa.ontrack.model.security.EncryptionException;
+import org.apache.commons.lang3.Validate;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,15 +27,39 @@ public class CryptoConfidentialKey implements ConfidentialKey {
         return id;
     }
 
+    @Override
+    public String exportKey() throws IOException {
+        byte[] payload = confidentialStore.load(id);
+        if (payload != null) {
+            return Base64.getEncoder().encodeToString(
+                    payload
+            );
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void importKey(String key) throws IOException {
+        Validate.notNull(key, "Key to import must not be null");
+        confidentialStore.store(
+                id,
+                Base64.getDecoder().decode(key)
+        );
+        // Reimporting the secret key
+        this.secret = null;
+        getKey();
+    }
+
     private SecretKey getKey() {
         try {
             if (secret == null) {
                 synchronized (this) {
                     if (secret == null) {
-                        byte[] payload = confidentialStore.load(this);
+                        byte[] payload = confidentialStore.load(id);
                         if (payload == null) {
                             payload = confidentialStore.randomBytes(256);
-                            confidentialStore.store(this, payload);
+                            confidentialStore.store(id, payload);
                         }
                         // Due to the stupid US export restriction JDK only ships 128bit version.
                         secret = new SecretKeySpec(payload, 0, 128 / 8, ALGORITHM);
