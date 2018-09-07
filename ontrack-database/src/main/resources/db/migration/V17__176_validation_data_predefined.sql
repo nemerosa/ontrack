@@ -1,4 +1,4 @@
--- 41. Validation data for predefined validation stamps (#176)
+-- Validation data for predefined validation stamps (#176)
 
 ALTER TABLE PREDEFINED_VALIDATION_STAMPS
   ADD DATA_TYPE_ID VARCHAR(120) NULL;
