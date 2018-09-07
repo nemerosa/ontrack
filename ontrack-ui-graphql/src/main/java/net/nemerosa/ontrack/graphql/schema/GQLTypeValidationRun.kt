@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.GraphQLInt
-import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
@@ -22,7 +21,6 @@ class GQLTypeValidationRun(
         private val runInfo: GQLTypeRunInfo,
         private val runInfoService: RunInfoService,
         private val validationRunData: GQLTypeValidationRunData,
-        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val projectEntityInterface: GQLProjectEntityInterface
 ) : AbstractGQLProjectEntity<ValidationRun>(
         ValidationRun::class.java,
