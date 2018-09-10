@@ -47,8 +47,10 @@ If the failure threshold is 50, and the total number of tests is 200, and the nu
 of passed tests is 99, then, we're below the threshold of 50 (%) and the validation
 run is marked as a failure.
 
-TODO Screenshot for this sample
-TODO Link to the validation run data section
+image::images/validation-stamp-data-type.png[Validation stamp data type]
+
+For the creation of data associated with validation runs, see
+the <<validation-runs-data,associated documentation>>.
 
 [[validation-stamps-auto]]
 ==== Auto creation of validation stamps
