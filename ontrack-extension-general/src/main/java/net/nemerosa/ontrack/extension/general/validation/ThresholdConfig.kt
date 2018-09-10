@@ -33,12 +33,14 @@ fun ThresholdConfig?.toForm(): Form =
                 .with(
                         IntField.of("warningThreshold")
                                 .label("Warning threshold")
+                                .help("Percentage to reach before having a warning. Optional.")
                                 .optional()
                                 .value(this?.warningThreshold)
                 )
                 .with(
                         IntField.of("failureThreshold")
                                 .label("Failure threshold")
+                                .help("Percentage to reach before having a failure. Optional.")
                                 .optional()
                                 .value(this?.failureThreshold)
                 )
