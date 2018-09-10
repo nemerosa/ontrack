@@ -8,9 +8,9 @@
     </div>
     <table class="table table-hover">
         <tr ng-if="validationRun.data">
-            <td colspan="4" title="{{validationRun.data.descriptor.displayName}}">
+            <td colspan="4">
                 <p>
-                    Config:
+                    Config ({{validationRun.data.descriptor.displayName}}):
                     <ot-validation-data-type-config value="validationStamp.dataType"></ot-validation-data-type-config>
                 </p>
                 <p>
