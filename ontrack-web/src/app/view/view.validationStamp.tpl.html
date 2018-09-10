@@ -31,6 +31,7 @@
                     <th>Build</th>
                     <th>Run</th>
                     <th>Last status</th>
+                    <th>Data</th>
                     <th>Description</th>
                     <th>Creation</th>
                     <th>Source</th>
@@ -51,14 +52,14 @@
                             </a>
                         </td>
                         <td>
-                            <span ng-if="validationRun.data">
-                                <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
-                            </span>
-                        </td>
-                        <td>
                             <a href="#/validationRun/{{validationRun.id}}">
                                 <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
                             </a>
+                        </td>
+                        <td>
+                            <span ng-if="validationRun.data">
+                                <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
+                            </span>
                         </td>
                         <td>
                             {{validationRun.validationRunStatuses[0].description}}
