@@ -983,10 +983,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
                         "WHERE VR.BUILDID = :buildId " +
                         "ORDER BY VR.ID DESC " +
-                        "LIMIT :count OFFSET :offset",
+                        "LIMIT :limit OFFSET :offset",
                 params("buildId", build.id())
                         .addValue("offset", offset)
-                        .addValue("count", count),
+                        .addValue("limit", count),
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         id -> build,
@@ -1033,7 +1033,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "WHERE VR.BUILDID = :buildId " +
                         "AND VR.VALIDATIONSTAMPID = :validationStampId " +
                         "ORDER BY VR.ID DESC " +
-                        "LIMIT :count OFFSET :offset",
+                        "LIMIT :limit OFFSET :offset",
                 params("buildId", build.id()).addValue("validationStampId", validationStamp.id())
                         .addValue("limit", count)
                         .addValue("offset", offset),
@@ -1063,7 +1063,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
                         "WHERE VR.VALIDATIONSTAMPID = :validationStampId " +
                         "ORDER BY VR.BUILDID DESC, VR.ID DESC " +
-                        "LIMIT :count OFFSET :offset",
+                        "LIMIT :limit OFFSET :offset",
                 params("validationStampId", validationStamp.id())
                         .addValue("limit", count)
                         .addValue("offset", offset),
