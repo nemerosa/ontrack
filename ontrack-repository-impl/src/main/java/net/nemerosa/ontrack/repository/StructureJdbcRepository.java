@@ -917,12 +917,20 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
         // Validation run itself (parent)
         int id = dbCreate(
-                "INSERT INTO VALIDATION_RUNS(BUILDID, VALIDATIONSTAMPID, DATA_TYPE_ID, DATA) VALUES (:buildId, :validationStampId, :dataTypeId, :data)",
+                "INSERT INTO VALIDATION_RUNS(BUILDID, VALIDATIONSTAMPID) VALUES (:buildId, :validationStampId)",
                 params("buildId", validationRun.getBuild().id())
                         .addValue("validationStampId", validationRun.getValidationStamp().id())
-                        .addValue("dataTypeId", validationRun.getData() != null ? validationRun.getData().getDescriptor().getId() : null)
-                        .addValue("data", validationRun.getData() != null ? writeJson(validationRun.getData().getData()) : null)
         );
+
+        // Data
+        if (validationRun.getData() != null) {
+            getNamedParameterJdbcTemplate().update(
+                    "INSERT INTO VALIDATION_RUN_DATA(VALIDATION_RUN, DATA_TYPE_ID, DATA) VALUES (:validationRunId, :dataTypeId, :data)",
+                    params("validationRunId", id)
+                            .addValue("dataTypeId", validationRun.getData().getDescriptor().getId())
+                            .addValue("data", writeJson(validationRun.getData().getData()))
+            );
+        }
 
         // Statuses
         validationRun.getValidationRunStatuses()
@@ -935,7 +943,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().queryForObject(
-                "SELECT * FROM VALIDATION_RUNS WHERE ID = :id",
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "WHERE VR.ID = :id",
                 params("id", validationRunId.getValue()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
@@ -949,7 +960,11 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId ORDER BY ID",
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "WHERE VR.BUILDID = :buildId " +
+                        "ORDER BY VR.ID",
                 params("buildId", build.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
@@ -963,7 +978,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId ORDER BY ID DESC LIMIT :count OFFSET :offset",
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "WHERE VR.BUILDID = :buildId " +
+                        "ORDER BY VR.ID DESC " +
+                        "LIMIT :count OFFSET :offset",
                 params("buildId", build.id())
                         .addValue("offset", offset)
                         .addValue("count", count),
@@ -988,7 +1008,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId ORDER BY ID DESC",
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "WHERE VR.BUILDID = :buildId " +
+                        "AND VR.VALIDATIONSTAMPID = :validationStampId " +
+                        "ORDER BY VR.ID DESC ",
                 params("buildId", build.id()).addValue("validationStampId", validationStamp.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
@@ -1002,7 +1027,13 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId ORDER BY ID DESC LIMIT :limit OFFSET :offset",
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "WHERE VR.BUILDID = :buildId " +
+                        "AND VR.VALIDATIONSTAMPID = :validationStampId " +
+                        "ORDER BY VR.ID DESC " +
+                        "LIMIT :count OFFSET :offset",
                 params("buildId", build.id()).addValue("validationStampId", validationStamp.id())
                         .addValue("limit", count)
                         .addValue("offset", offset),
@@ -1027,7 +1058,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId ORDER BY BUILDID DESC, ID DESC LIMIT :limit OFFSET :offset",
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "WHERE VR.VALIDATIONSTAMPID = :validationStampId " +
+                        "ORDER BY VR.BUILDID DESC, VR.ID DESC " +
+                        "LIMIT :count OFFSET :offset",
                 params("validationStampId", validationStamp.id())
                         .addValue("limit", count)
                         .addValue("offset", offset),
