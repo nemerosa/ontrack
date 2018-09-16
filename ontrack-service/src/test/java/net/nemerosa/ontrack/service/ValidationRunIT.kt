@@ -332,4 +332,34 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         }
     }
 
+    @Test
+    fun `Validation data still present when validation stamp has no longer a validation data type`() {
+        // Creates a basic stamp, with some data type
+        val vs = doCreateValidationStamp(
+                testNumberValidationDataType.config(50)
+        )
+        // Creates a build
+        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
+        // ... and validates it with some data
+        val runId = doValidateBuild(build, vs, ValidationRunStatusID.STATUS_PASSED,
+                testNumberValidationDataType.data(40)
+        ).id
+
+        // Now, changes the data type for the validation stamp to null
+        asAdmin().execute {
+            structureService.saveValidationStamp(
+                    vs.withDataType(null)
+            )
+        }
+
+        // Gets the validation run back
+        val run = asUser().withView(vs).call { structureService.getValidationRun(runId) }
+
+        // Checks it has still some data
+        assertNotNull(run.data, "Data still associated with validation run after migration") {
+            assertEquals(TestNumberValidationDataType::class.qualifiedName, it.descriptor.id)
+            assertEquals(40, it.data as Int)
+        }
+    }
+
 }
