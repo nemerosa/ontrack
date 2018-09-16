@@ -30,3 +30,18 @@ Validation runs can be seen:
 For one validation run, one can add comments and update
 the status to reflect (for example, to mention that
 a failure in under investigation).
+
+[[validation-runs-data]]
+==== Validation run data
+
+Some additional data can be associated with a validation run, according
+to a format defined by their <<validation-stamps-data,validation stamp>>.
+For example, passed and total tests, or a coverage percentage.
+
+When creating a validation run, either though the GUI or through any
+of the API, the data will be validated according to the rules defined
+by the validation stamp.
+
+In particular, the validation run status (passed, warning, failed, etc.)
+will be computed in some cases, when a threshold of quality is associated
+with the validation stamp (like a % of passed tests).
