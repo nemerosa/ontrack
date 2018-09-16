@@ -27,6 +27,6 @@ abstract class AbstractThresholdConfigValidationDataType<T>(
     override fun computeStatus(config: ThresholdConfig?, data: T): ValidationRunStatusID? =
             config?.computeStatus(toIntValue(data))
 
-    abstract protected fun toIntValue(data: T): Int
+    protected abstract fun toIntValue(data: T): Int
 
 }

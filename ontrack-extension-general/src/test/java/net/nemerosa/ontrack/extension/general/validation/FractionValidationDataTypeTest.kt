@@ -88,11 +88,21 @@ class FractionValidationDataTypeTest {
         val config = ThresholdConfig(50, 25, true)
         assertEquals(ValidationRunStatusID.STATUS_PASSED.id, dataType.computeStatus(config, FractionValidationData(24, 24))?.id)
         assertEquals(ValidationRunStatusID.STATUS_PASSED.id, dataType.computeStatus(config, FractionValidationData(13, 24))?.id)
-        assertEquals(ValidationRunStatusID.STATUS_WARNING.id, dataType.computeStatus(config, FractionValidationData(12, 24))?.id)
+        assertEquals(ValidationRunStatusID.STATUS_PASSED.id, dataType.computeStatus(config, FractionValidationData(12, 24))?.id)
         assertEquals(ValidationRunStatusID.STATUS_WARNING.id, dataType.computeStatus(config, FractionValidationData(11, 24))?.id)
-        assertEquals(ValidationRunStatusID.STATUS_FAILED.id, dataType.computeStatus(config, FractionValidationData(6, 24))?.id)
+        assertEquals(ValidationRunStatusID.STATUS_WARNING.id, dataType.computeStatus(config, FractionValidationData(6, 24))?.id)
         assertEquals(ValidationRunStatusID.STATUS_FAILED.id, dataType.computeStatus(config, FractionValidationData(5, 24))?.id)
         assertEquals(ValidationRunStatusID.STATUS_FAILED.id, dataType.computeStatus(config, FractionValidationData(0, 24))?.id)
+    }
+
+    @Test
+    fun `Status with threshold at 100%`() {
+        val config = ThresholdConfig(100, 80, true)
+        assertEquals(ValidationRunStatusID.STATUS_PASSED.id, dataType.computeStatus(config, FractionValidationData(10000, 10000))?.id)
+        assertEquals(ValidationRunStatusID.STATUS_WARNING.id, dataType.computeStatus(config, FractionValidationData(9999, 10000))?.id)
+        assertEquals(ValidationRunStatusID.STATUS_WARNING.id, dataType.computeStatus(config, FractionValidationData(8000, 10000))?.id)
+        assertEquals(ValidationRunStatusID.STATUS_FAILED.id, dataType.computeStatus(config, FractionValidationData(7999, 10000))?.id)
+
     }
 
 }
