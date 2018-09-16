@@ -124,6 +124,13 @@ In this case:
 * in any other case, a new validation stamp is created in the branch, with the requested name (and with
   an empty image and a default description)
 
+[[validation-stamps-auto-data]]
+===== Predefined validation stamps and validation data
+
+As for validation stamps associated with branches, the predefined
+validation stamps can be associated with some
+<<validation-stamps-data,validation data>>.
+
 [[validation-stamps-bulk-update]]
 ==== Bulk update of validation stamps
 
@@ -148,3 +155,6 @@ image and the same description.
 
 A <<validation-stamps-auto-predefined,predefined validation stamp>> will
 also be updated or created.
+
+NOTE: any <<validation-stamps-data,validation data configuration>> is also
+part of the bulk update.
