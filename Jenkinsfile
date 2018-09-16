@@ -198,6 +198,7 @@ docker-compose --project-name local down --volumes
                 ONTRACK_VERSION = "${version}"
             }
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             parallel {
@@ -464,6 +465,7 @@ docker-machine rm --force ${DROPLET_NAME}
 
         stage('Publication') {
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             environment {
@@ -569,6 +571,7 @@ set -e
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             steps {
@@ -629,6 +632,7 @@ set -e
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             steps {
@@ -686,6 +690,7 @@ GITHUB_URI=`git config remote.origin.url`
                 }
             }
             when {
+                beforeAgent true
                 branch 'release/3*'
             }
             environment {
@@ -725,6 +730,7 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
                 }
             }
             when {
+                beforeAgent true
                 branch 'release/3*'
             }
             environment {
