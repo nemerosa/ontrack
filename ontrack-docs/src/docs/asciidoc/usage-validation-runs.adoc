@@ -45,3 +45,28 @@ by the validation stamp.
 In particular, the validation run status (passed, warning, failed, etc.)
 will be computed in some cases, when a threshold of quality is associated
 with the validation stamp (like a % of passed tests).
+
+In order to use create a validation run with some validation data,
+you can also use the <<dsl,DSL>>:
+
+[source,groovy]
+----
+def build = ...
+build.validationWithText("Text data", "PASSED", "Some text")
+build.validateWithCHML("CHML data", 1, 10, 100, 1000)
+build.validateWithNumber("Number data", 80)
+build.validateWithPercentage("Percentage data", 57)
+build.validateWithFraction("Fraction data", 99, 100)
+----
+
+For a custom validation data type, you can use:
+
+[source,groovy]
+----
+build.validateWithData(
+    "Validation stamp name",
+    [:] // Validation data
+)
+----
+
+NOTE: The actual validation data type is taken from the validation stamp.

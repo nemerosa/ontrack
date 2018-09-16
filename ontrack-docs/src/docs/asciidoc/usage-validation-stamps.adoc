@@ -52,6 +52,29 @@ image::images/validation-stamp-data-type.png[Validation stamp data type]
 For the creation of data associated with validation runs, see
 the <<validation-runs-data,associated documentation>>.
 
+In order to use create a validation stamp with some validation data type,
+you can also use the <<dsl,DSL>>:
+
+[source,groovy]
+----
+def branch = ...
+branch.validationStamp("Text data") {
+    setTextDataType()
+}
+branch.validationStamp("CHML data") {
+    setCHMLDataType("HIGH", 1, "CRITICAL", 1)
+}
+branch.validationStamp("Number data") {
+    setNumberDataType(10, 100, true)
+}
+branch.validationStamp("Percentage data") {
+    setPercentageDataType(0, 50, false)
+}
+branch.validationStamp("Fraction data") {
+    setFractionDataType(100, 90, true)
+}
+----
+
 [[validation-stamps-auto]]
 ==== Auto creation of validation stamps
 
