@@ -84,7 +84,7 @@ Information about individual jobs:
 
 * `ontrack_job_duration_ms` (timer) - duration of the execution of the job
 * `ontrack_job_run_count` (counter) - number of times a job has run
-* `ontrack_job_error_count` (counter) - number of errors for this job
+* `ontrack_job_errors` (counter) - number of errors for this job
 
 [NOTE]
 ====
