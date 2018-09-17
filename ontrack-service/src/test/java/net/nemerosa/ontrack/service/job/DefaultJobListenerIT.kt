@@ -10,7 +10,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class DefaultJobListenerTest : AbstractServiceTestSupport() {
+class DefaultJobListenerIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var logService: ApplicationLogService
