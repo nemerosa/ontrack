@@ -38,7 +38,7 @@ open class DefaultJobListener(
 
     override fun onJobError(status: JobStatus, ex: Exception) {
         val key = status.key
-        meterRegistry.counter("ontrack_job_error_count", key.metricTags).increment()
+        meterRegistry.counter("ontrack_job_errors", key.metricTags).increment()
         logService.log(
                 ApplicationLogEntry.error(
                         ex,
