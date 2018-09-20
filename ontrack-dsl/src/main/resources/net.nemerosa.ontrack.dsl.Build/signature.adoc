@@ -1,0 +1,5 @@
+Sets the signature of the build. This method is granted
+only for users having the `ProjectEdit` function:
+administrators, project owners, project managers.
+
+Date is expected to be UTC.

@@ -820,6 +820,26 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void bulkUpdatePromotionLevels(ID promotionLevelId) {
+        // Description & name
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        String description = promotionLevel.getDescription();
+        String name = promotionLevel.getName();
+        // Image
+        Document image = getPromotionLevelImage(promotionLevelId);
+        // Bulk update
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content, DESCRIPTION = :description " +
+                        "WHERE ID <> :id AND NAME = :name",
+                params("id", promotionLevelId.getValue())
+                        .addValue("name", name)
+                        .addValue("description", description)
+                        .addValue("type", Document.isValid(image) ? image.getType() : null)
+                        .addValue("content", Document.isValid(image) ? image.getContent() : null)
+        );
+    }
+
+    @Override
     public void bulkUpdateValidationStamps(ID validationStampId) {
         // Description & name
         ValidationStamp validationStamp = getValidationStamp(validationStampId);

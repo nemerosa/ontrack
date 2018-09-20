@@ -356,7 +356,12 @@ constructor(
                         lastErrorCount.incrementAndGet()
                         lastError.set(ex.message)
                         logger.debug("[job][task]{} Failure: {}", job.key, ex.message)
-                        jobListener.onJobError(jobStatus, ex)
+                        try {
+                            jobListener.onJobError(jobStatus, ex)
+                        } catch (uncaught: Exception) {
+                            logger.error("[job][task]${job.key} Could not process error for job because of:", uncaught)
+                            logger.error("[job][task]${job.key} Initial error for job:", ex)
+                        }
                     }
 
                     override fun onCompletion() {

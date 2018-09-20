@@ -65,6 +65,22 @@ angular.module('ot.view.promotionLevel', [
                             });
                         }
                     },
+                    {
+                        condition: function () {
+                            return promotionLevel._bulkUpdate;
+                        },
+                        id: 'bulkUpdatePromotionLevel',
+                        name: "Bulk update",
+                        cls: 'ot-command-update',
+                        action: function () {
+                            otAlertService.confirm({
+                                title: "Promotion levels bulk update",
+                                message: "Updates all other promotion levels with the same name?"
+                            }).then(function () {
+                                return ot.call($http.put(promotionLevel._bulkUpdate, {}));
+                            }).then(loadPromotionLevel);
+                        }
+                    },
                     ot.viewApiCommand($scope.promotionLevel._self),
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                 ];

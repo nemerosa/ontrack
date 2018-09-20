@@ -23,6 +23,7 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-api').sourceSets.test.output
     testRuntime project(':ontrack-repository-impl')
+    testRuntime 'io.micrometer:micrometer-registry-prometheus'
 
     // Dependencies needed for LDAP integration tests
     def apacheDsVersion = '1.5.5'

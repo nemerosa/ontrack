@@ -1081,6 +1081,50 @@ public class StructureServiceImpl implements StructureService {
         return Ack.OK;
     }
 
+    @Override
+    public Ack bulkUpdatePromotionLevels(ID promotionLevelId) {
+        // Checks access
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        // As admin
+        securityService.asAdmin(() -> {
+            PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+            // Defining or replacing the predefined promotion level
+            Optional<PredefinedPromotionLevel> o = predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.getName());
+            if (o.isPresent()) {
+                // Updating the predefined promotion level description
+                predefinedPromotionLevelService.savePredefinedPromotionLevel(
+                        o.get().withDescription(promotionLevel.getDescription())
+                );
+                // Sets its image
+                Document image = getPromotionLevelImage(promotionLevelId);
+                predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
+                        o.get().getId(),
+                        image
+                );
+            } else {
+                // Creating the predefined promotion level
+                PredefinedPromotionLevel predefinedPromotionLevel = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                        PredefinedPromotionLevel.of(
+                                NameDescription.nd(
+                                        promotionLevel.getName(),
+                                        promotionLevel.getDescription()
+                                )
+                        )
+                );
+                // Sets its image
+                Document image = getPromotionLevelImage(promotionLevelId);
+                predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
+                        predefinedPromotionLevel.getId(),
+                        image
+                );
+            }
+            // For all promotion levels
+            structureRepository.bulkUpdatePromotionLevels(promotionLevelId);
+        });
+        // OK
+        return Ack.OK;
+    }
+
     protected <T> Optional<ValidationStamp> getValidationStampFromProperty(
             Property<T> property,
             Branch branch,

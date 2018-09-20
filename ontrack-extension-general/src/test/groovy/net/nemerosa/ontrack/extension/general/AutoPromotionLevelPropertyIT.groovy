@@ -24,7 +24,11 @@ class AutoPromotionLevelPropertyIT extends AbstractServiceTestSupport {
     @Test
     void 'Auto creation of promotion levels must preserve the order'() {
         asUser().with(GlobalSettings).call {
-            // Creating three predefined promotion levels
+            // Clears all existing predefined promotion levels for isolation
+            predefinedPromotionLevelService.predefinedPromotionLevels.each {
+                predefinedPromotionLevelService.deletePredefinedPromotionLevel(it.id)
+            }
+            // Creating four predefined promotion levels
             def copper = predefinedPromotionLevelService.newPredefinedPromotionLevel(
                     PredefinedPromotionLevel.of(nd('COPPER', ''))
             )
