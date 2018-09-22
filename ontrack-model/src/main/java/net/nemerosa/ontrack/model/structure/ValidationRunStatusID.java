@@ -22,7 +22,7 @@ public class ValidationRunStatusID {
     public static final String PASSED = "PASSED";
     public static final ValidationRunStatusID STATUS_PASSED = ValidationRunStatusID.of(PASSED, "Passed", true, true);
     public static final String WARNING = "WARNING";
-    public static final ValidationRunStatusID STATUS_WARNING = ValidationRunStatusID.of(WARNING, "Warning", true, true);
+    public static final ValidationRunStatusID STATUS_WARNING = ValidationRunStatusID.of(WARNING, "Warning", true, false);
 
     private final String id;
     private final String name;
