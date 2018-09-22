@@ -381,6 +381,8 @@ include::extending-pages.adoc[]
 
 include::extending-event-types.adoc[]
 
+include::extending-validation-data.adoc[]
+
 include::extending-graphql.adoc[]
 
 include::extending-cache.adoc[]
