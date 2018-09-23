@@ -504,6 +504,17 @@ docker image push nemerosa/ontrack:${ONTRACK_VERSION}
 docker image push nemerosa/ontrack:3
 '''
                     }
+                    post {
+                        always {
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'DOCKER.HUB',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
+                    }
                 }
                 stage('Maven publication') {
                     agent {
@@ -550,6 +561,17 @@ set -e
     -PossrhPassword=${OSSRH_PSW} \\
     publicationMaven
 '''
+                    }
+                    post {
+                        always {
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'MAVEN.CENTRAL',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
                     }
                 }
             }
