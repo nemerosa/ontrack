@@ -85,9 +85,8 @@ constructor(
     fun newValidationRun(@PathVariable buildId: ID, @RequestBody validationRunRequest: ValidationRunRequest): ValidationRun {
         // Gets the build
         val build = structureService.getBuild(buildId)
-        // Delegates to the service
-        return structureService.newValidationRun(build, validationRunRequest)
-        /*
+        // FIXME Delegates to the service
+        // return structureService.newValidationRun(build, validationRunRequest)
         // Gets the validation stamp
         val validationStamp = getValidationStamp(
                 build.branch,
@@ -128,7 +127,6 @@ constructor(
         }
         // OK
         return validationRun
-        */
     }
 
     protected fun getValidationStamp(branch: Branch, validationStampId: Int?, validationStampName: String?): ValidationStamp {
