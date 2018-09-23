@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.pagination.PaginatedList;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
@@ -232,7 +233,13 @@ public interface StructureService {
 
     // Validation runs
 
+    /**
+     * @see #newValidationRun(Build, ValidationRunRequest)
+     */
+    @Deprecated
     ValidationRun newValidationRun(ValidationRun validationRun);
+
+    ValidationRun newValidationRun(@NotNull Build build, @NotNull ValidationRunRequest validationRunRequest);
 
     ValidationRun getValidationRun(ID validationRunId);
 

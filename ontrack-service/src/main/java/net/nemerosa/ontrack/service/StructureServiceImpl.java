@@ -23,6 +23,7 @@ import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -1180,6 +1181,12 @@ public class StructureServiceImpl implements StructureService {
         eventPostService.post(eventFactory.newValidationRun(newValidationRun));
         // OK
         return newValidationRun;
+    }
+
+    @Override
+    public ValidationRun newValidationRun(@NotNull Build build, @NotNull ValidationRunRequest validationRunRequest) {
+        // FIXME Method net.nemerosa.ontrack.service.StructureServiceImpl.newValidationRun
+        return null;
     }
 
     private void validateRunData(ValidationRun validationRun) {
