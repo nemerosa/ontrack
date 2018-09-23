@@ -258,10 +258,10 @@ task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleaseJarUpload
     dependsOn publicationGitHubReleasePostgresqlMigrationUpload
     dependsOn publicationGitHubReleaseJarShellUpload
-    dependsOn publicationGitHubReleaseDebianUpload
+    dependsOn publicationGitHubReleasePdfUpload
     if (ontrackVersion ==~ /\d+\.\d+\.\d+/) {
+        dependsOn publicationGitHubReleaseDebianUpload
         dependsOn publicationGitHubReleaseRpmUpload
-        dependsOn publicationGitHubReleasePdfUpload
     }
 }
 
