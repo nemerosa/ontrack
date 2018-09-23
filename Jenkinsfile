@@ -176,19 +176,20 @@ docker-compose --project-name local down --volumes
                     script {
                         def results = junit('build/acceptance/*.xml')
                         if (!pr) {
-                            ontrackScript logging: true,
-                                    bindings: [
-                                            PROJECT: projectName,
-                                            BRANCH: branchName,
-                                            VERSION: version,
-                                            PASSED: results.passCount,
-                                            TOTAL: results.totalCount,
-                                    ],
-                                    script: '''
-                                        def build = ontrack.build(PROJECT, BRANCH, VERSION)
-                                        build.validateWithFraction('ACCEPTANCE', PASSED, TOTAL)
-                                        0
-                                    '''
+                            // TODO #176 Validation
+                            // ontrackScript logging: true,
+                            //         bindings: [
+                            //                 PROJECT: projectName,
+                            //                 BRANCH: branchName,
+                            //                 VERSION: version,
+                            //                 PASSED: results.passCount,
+                            //                 TOTAL: results.totalCount,
+                            //         ],
+                            //         script: '''
+                            //             def build = ontrack.build(PROJECT, BRANCH, VERSION)
+                            //             build.validateWithFraction('ACCEPTANCE', PASSED, TOTAL)
+                            //             0
+                            //         '''
                         }
                     }
                 }
