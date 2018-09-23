@@ -77,8 +77,7 @@ interface StructureService {
      */
     fun getBuildView(build: Build, withDecorations: Boolean): BuildView
 
-    // TODO Replace by Build?
-    fun getLastBuildForBranch(branch: Branch): Build
+    fun getLastBuildForBranch(branch: Branch): Build?
 
     /**
      * Gets the number of builds for a branch.
@@ -153,7 +152,7 @@ interface StructureService {
 
     fun getPromotionLevelImage(promotionLevelId: ID): Document
 
-    fun setPromotionLevelImage(promotionLevelId: ID, document: Document)
+    fun setPromotionLevelImage(promotionLevelId: ID, document: Document?)
 
     fun savePromotionLevel(promotionLevel: PromotionLevel)
 
@@ -217,7 +216,7 @@ interface StructureService {
 
     fun getValidationStampImage(validationStampId: ID): Document
 
-    fun setValidationStampImage(validationStampId: ID, document: Document)
+    fun setValidationStampImage(validationStampId: ID, document: Document?)
 
     fun saveValidationStamp(validationStamp: ValidationStamp)
 
@@ -321,8 +320,7 @@ interface StructureService {
      * @return Project if it exists and is authorized, or null if if does not exist
      * @throws AccessDeniedException If the project does exist but the user has no access to it
      */
-    // TODO Replace by Project?
-    fun findProjectByNameIfAuthorized(project: String): Project
+    fun findProjectByNameIfAuthorized(project: String): Project?
 
     // TODO Replace by Branch?
     fun findBranchByName(project: String, branch: String): Optional<Branch>
