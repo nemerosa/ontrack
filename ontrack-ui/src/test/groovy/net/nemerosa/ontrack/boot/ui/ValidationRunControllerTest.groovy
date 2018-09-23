@@ -45,7 +45,6 @@ class ValidationRunControllerTest {
                 structureService,
                 validationRunStatusService,
                 validationDataTypeService,
-                propertyService,
                 securityService
         )
         // Mock URI builder for tests

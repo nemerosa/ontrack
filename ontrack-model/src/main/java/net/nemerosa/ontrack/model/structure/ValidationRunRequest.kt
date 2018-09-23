@@ -7,10 +7,10 @@ class ValidationRunRequest
 constructor(
         @Deprecated("")
         val validationStampId: Int? = null,
-        val validationStampData: ServiceConfiguration?,
-        val validationStampName: String?,
-        val validationRunStatusId: String?,
-        val description: String?,
+        val validationStampData: ServiceConfiguration? = null,
+        val validationStampName: String? = null,
+        val validationRunStatusId: String? = null,
+        val description: String? = null,
         val properties: List<PropertyCreationRequest> = listOf()) {
 
     val actualValidationStampName: String?

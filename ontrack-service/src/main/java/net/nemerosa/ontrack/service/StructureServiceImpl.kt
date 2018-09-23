@@ -1045,6 +1045,45 @@ class StructureServiceImpl(
     }
 
     override fun newValidationRun(validationRun: ValidationRun): ValidationRun {
+        return newValidationRun(
+                validationRun.build,
+                ValidationRunRequest(
+                        validationStampId = validationRun.validationStamp.id(),
+                        validationRunStatusId = validationRun.lastStatus.statusID.id,
+                        description = validationRun.lastStatus.description
+                )
+        )
+    }
+
+    override fun newValidationRun(build: Build, validationRunRequest: ValidationRunRequest): ValidationRun {
+        // Gets the validation stamp
+        val validationStamp = getOrCreateValidationStamp(
+                build.branch,
+                validationRunRequest.validationStampId,
+                validationRunRequest.actualValidationStampName)
+        // Validation run data
+        val runDataJson = validationStamp.dataType?.let {
+            ServiceConfiguration(
+                    validationStamp.dataType.descriptor.id,
+                    validationRunRequest.validationStampData?.data
+            )
+        }
+        // Validation of the run data
+        val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
+                runDataJson,
+                validationStamp.dataType,
+                validationRunRequest.validationRunStatusId,
+                validationRunStatusService::getValidationRunStatus
+        )
+        // Validation run to create
+        val validationRun = ValidationRun.of(
+                build,
+                validationStamp,
+                0,
+                securityService.currentSignature,
+                status.runStatusID,
+                validationRunRequest.description
+        ).withData(status.runData)
         // Validation
         isEntityNew(validationRun, "Validation run must be new")
         isEntityDefined(validationRun.build, "Build must be defined")
@@ -1059,13 +1098,16 @@ class StructureServiceImpl(
         val newValidationRun = structureRepository.newValidationRun(validationRun) { validationRunStatusService.getValidationRunStatus(it) }
         // Event
         eventPostService.post(eventFactory.newValidationRun(newValidationRun))
+        // Saves the properties
+        for ((propertyTypeName, propertyData) in validationRunRequest.properties) {
+            propertyService.editProperty(
+                    newValidationRun,
+                    propertyTypeName,
+                    propertyData
+            )
+        }
         // OK
         return newValidationRun
-    }
-
-    override fun newValidationRun(build: Build, validationRunRequest: ValidationRunRequest): ValidationRun {
-        // FIXME Method net.nemerosa.ontrack.service.StructureServiceImpl.newValidationRun
-        TODO()
     }
 
     private fun validateRunData(validationRun: ValidationRun) {

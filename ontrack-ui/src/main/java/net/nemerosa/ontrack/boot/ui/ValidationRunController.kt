@@ -23,7 +23,6 @@ constructor(
         private val structureService: StructureService,
         private val validationRunStatusService: ValidationRunStatusService,
         private val validationDataTypeService: ValidationDataTypeService,
-        private val propertyService: PropertyService,
         private val securityService: SecurityService
 ) : AbstractResourceController() {
 
@@ -85,52 +84,8 @@ constructor(
     fun newValidationRun(@PathVariable buildId: ID, @RequestBody validationRunRequest: ValidationRunRequest): ValidationRun {
         // Gets the build
         val build = structureService.getBuild(buildId)
-        // FIXME Delegates to the service
-        // return structureService.newValidationRun(build, validationRunRequest)
-        // Gets the validation stamp
-        val validationStamp = getValidationStamp(
-                build.branch,
-                validationRunRequest.validationStampId,
-                validationRunRequest.actualValidationStampName)
-        // Validation run data
-        val runDataJson = validationStamp.dataType?.let {
-            ServiceConfiguration(
-                    validationStamp.dataType.descriptor.id,
-                    validationRunRequest.validationStampData?.data
-            )
-        }
-        // Validation of the run data
-        val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
-                runDataJson,
-                validationStamp.dataType,
-                validationRunRequest.validationRunStatusId,
-                validationRunStatusService::getValidationRunStatus
-        )
-        // Validation run to create
-        var validationRun = ValidationRun.of(
-                build,
-                validationStamp,
-                0,
-                securityService.currentSignature,
-                status.runStatusID,
-                validationRunRequest.description
-        ).withData(status.runData)
-        // Creation
-        validationRun = structureService.newValidationRun(validationRun)
-        // Saves the properties
-        for ((propertyTypeName, propertyData) in validationRunRequest.properties) {
-            propertyService.editProperty(
-                    validationRun,
-                    propertyTypeName,
-                    propertyData
-            )
-        }
-        // OK
-        return validationRun
-    }
-
-    protected fun getValidationStamp(branch: Branch, validationStampId: Int?, validationStampName: String?): ValidationStamp {
-        return structureService.getOrCreateValidationStamp(branch, validationStampId, validationStampName)
+        // Delegates to the service
+        return structureService.newValidationRun(build, validationRunRequest)
     }
 
     @GetMapping("validationRuns/{validationRunId}")
