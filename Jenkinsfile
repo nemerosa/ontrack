@@ -173,16 +173,22 @@ cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name local down --volumes
 """
-                    junit 'build/acceptance/*.xml'
                     script {
+                        def results = junit('build/acceptance/*.xml')
                         if (!pr) {
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE',
-                                    buildResult: currentBuild.result,
-                            )
+                            ontrackScript logging: true,
+                                    bindings: [
+                                            PROJECT: projectName,
+                                            BRANCH: branchName,
+                                            VERSION: version,
+                                            PASSED: results.passCount,
+                                            TOTAL: results.totalCount,
+                                    ],
+                                    script: '''
+                                        def build = ontrack.build(PROJECT, BRANCH, VERSION)
+                                        build.validateWithFraction('ACCEPTANCE', PASSED, TOTAL)
+                                        0
+                                    '''
                         }
                     }
                 }
