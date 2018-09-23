@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -1320,4 +1321,14 @@ public class StructureServiceImpl implements StructureService {
                 .filter(pl -> securityService.isProjectFunctionGranted(pl.projectId(), ProjectView.class));
     }
 
+    @NotNull
+    @Override
+    public BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader() {
+        return new BiFunction<ProjectEntityType, ID, ProjectEntity>() {
+            @Override
+            public ProjectEntity apply(ProjectEntityType projectEntityType, ID id) {
+                return projectEntityType.getEntityFn(StructureServiceImpl.this).apply(id);
+            }
+        };
+    }
 }
