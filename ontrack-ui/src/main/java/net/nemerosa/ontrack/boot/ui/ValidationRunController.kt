@@ -94,7 +94,7 @@ constructor(
 
     // Validation run status
 
-    @GetMapping(value = "validationRuns/{validationRunId}/status/change")
+    @GetMapping("validationRuns/{validationRunId}/status/change")
     fun getValidationRunStatusChangeForm(@PathVariable validationRunId: ID): Form {
         val validationRun = structureService.getValidationRun(validationRunId)
         return Form.create()
@@ -126,7 +126,7 @@ constructor(
     /**
      * List of validation runs for a validation stamp
      */
-    @GetMapping(value = "validationStamps/{validationStampId}/validationRuns")
+    @GetMapping("validationStamps/{validationStampId}/validationRuns")
     fun getValidationRunsForValidationStamp(
             @PathVariable validationStampId: ID,
             @RequestParam(required = false, defaultValue = "0") offset: Int,
