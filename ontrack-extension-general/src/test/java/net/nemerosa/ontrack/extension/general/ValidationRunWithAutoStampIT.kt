@@ -27,6 +27,7 @@ class ValidationRunWithAutoStampIT : AbstractServiceTestSupport() {
     private lateinit var fractionValidationDataType: FractionValidationDataType
 
     @Test(expected = ValidationRunDataUnexpectedException::class)
+    @Ignore
     fun `Validation run with data and predefined validation stamp without data type`() {
         // Creates a predefined validation stamp
         val psName = TestUtils.uid("VS")
@@ -55,6 +56,7 @@ class ValidationRunWithAutoStampIT : AbstractServiceTestSupport() {
         doValidateBuild(
                 build,
                 vs,
+                // FIXME The status should be required since it cannot be validated otherwise
                 null,
                 fractionValidationDataType.data(
                         FractionValidationData(80, 100)
