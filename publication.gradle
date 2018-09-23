@@ -259,8 +259,10 @@ task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleasePostgresqlMigrationUpload
     dependsOn publicationGitHubReleaseJarShellUpload
     dependsOn publicationGitHubReleaseDebianUpload
-    dependsOn publicationGitHubReleaseRpmUpload
-    dependsOn publicationGitHubReleasePdfUpload
+    if (versioning.info.display ==~ /\d+\.\d+\.\d+/) {
+        dependsOn publicationGitHubReleaseRpmUpload
+        dependsOn publicationGitHubReleasePdfUpload
+    }
 }
 
 task publicationOntrackChangeLog(type: OntrackChangeLog) {
