@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.Iterables
 import net.nemerosa.ontrack.common.CachedSupplier
 import net.nemerosa.ontrack.common.Document
@@ -1062,15 +1063,17 @@ class StructureServiceImpl(
                 validationRunRequest.validationStampId,
                 validationRunRequest.actualValidationStampName)
         // Validation run data
-        val runDataJson = validationStamp.dataType?.let {
-            ServiceConfiguration(
-                    validationStamp.dataType.descriptor.id,
-                    validationRunRequest.validationStampData?.data
-            )
-        }
+        val rawDataType: String? = validationRunRequest.validationStampData?.type ?: validationStamp.dataType?.descriptor?.id
+        val rawDataJson: JsonNode? = validationRunRequest.validationStampData?.data
+        val rawDataId: ValidationRunRawDataId? =
+                if (rawDataType != null && rawDataJson != null) {
+                    ValidationRunRawDataId(rawDataType, rawDataJson)
+                } else {
+                    null
+                }
         // Validation of the run data
         val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
-                runDataJson,
+                rawDataId,
                 validationStamp.dataType,
                 validationRunRequest.validationRunStatusId,
                 validationRunStatusService::getValidationRunStatus

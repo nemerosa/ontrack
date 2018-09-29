@@ -7,7 +7,7 @@ class ValidationRunRequest
 constructor(
         @Deprecated("")
         val validationStampId: Int? = null,
-        val validationStampData: ServiceConfiguration? = null,
+        val validationStampData: ValidationRunDataRequest? = null,
         val validationStampName: String? = null,
         val validationRunStatusId: String? = null,
         val description: String? = null,

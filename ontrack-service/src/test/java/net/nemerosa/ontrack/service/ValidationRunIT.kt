@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.extension.api.support.TestValidationData
 import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -16,7 +16,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class ValidationRunIT : AbstractServiceTestSupport() {
+class ValidationRunIT : AbstractDSLTestSupport() {
 
     private lateinit var branch: Branch
     private lateinit var build: Build
@@ -45,25 +45,62 @@ class ValidationRunIT : AbstractServiceTestSupport() {
 
     @Test
     fun validationRunWithData() {
-        // Creates a validation run
-        val run = createValidationRunWithData()
+        project {
+            branch {
+                val vs = validationStamp(
+                        "VS",
+                        testValidationDataType.config(null)
+                )
+                // Build
+                build("1.0.0") {
+                    // Creates a validation run with data
+                    val run = validateWithData(
+                            validationStamp = vs,
+                            validationDataType = testValidationDataType,
+                            validationRunData = TestValidationData(2, 4, 8)
+                    )
+                    // Loads the validation run
+                    val loadedRun = asUserWithView(branch).call { structureService.getValidationRun(run.id) }
 
-        // Loads the validation run
-        val loadedRun = asUserWithView(branch).call { structureService.getValidationRun(run.id) }
+                    // Checks the data is still there
+                    @Suppress("UNCHECKED_CAST")
+                    val data: ValidationRunData<TestValidationData> = loadedRun.data as ValidationRunData<TestValidationData>
+                    assertNotNull(data, "Data type is loaded")
+                    assertEquals(TestValidationDataType::class.java.name, data.descriptor.id)
+                    assertEquals(2, data.data.critical)
+                    assertEquals(4, data.data.high)
+                    assertEquals(8, data.data.medium)
 
-        // Checks the data is still there
-        @Suppress("UNCHECKED_CAST")
-        val data: ValidationRunData<TestValidationData> = loadedRun.data as ValidationRunData<TestValidationData>
-        assertNotNull(data, "Data type is loaded")
-        assertEquals(TestValidationDataType::class.java.name, data.descriptor.id)
-        assertEquals(2, data.data.critical)
-        assertEquals(4, data.data.high)
-        assertEquals(8, data.data.medium)
+                    // Checks the status
+                    val status = loadedRun.lastStatus
+                    assertNotNull(status)
+                    assertEquals(ValidationRunStatusID.STATUS_FAILED.id, status.statusID.id)
+                }
+            }
+        }
+    }
 
-        // Checks the status
-        val status = loadedRun.lastStatus
-        assertNotNull(status)
-        assertEquals(ValidationRunStatusID.STATUS_PASSED, status.statusID)
+    @Test
+    fun validationRunWithDataAndForcedStatus() {
+        project {
+            branch {
+                val vs = validationStamp(
+                        "VS",
+                        testValidationDataType.config(null)
+                )
+                // Build
+                build("1.0.0") {
+                    // Creates a validation run with data
+                    val run = validateWithData(
+                            validationStamp = vs,
+                            validationRunStatusID = ValidationRunStatusID.STATUS_FAILED,
+                            validationRunData = TestValidationData(0, 0, 8)
+                    )
+                    // Checks the status
+                    assertEquals(ValidationRunStatusID.STATUS_PASSED.id, run.lastStatus.statusID.id)
+                }
+            }
+        }
     }
 
     @Test
@@ -157,6 +194,30 @@ class ValidationRunIT : AbstractServiceTestSupport() {
         val status = loadedRun.lastStatus
         assertNotNull(status)
         assertEquals(ValidationRunStatusID.STATUS_PASSED, status.statusID)
+    }
+
+    @Test
+    fun validationRunWithDataAndNoDataTypeOnValidationStamp() {
+        project {
+            branch {
+                // Validation data without data
+                val vs = validationStamp("VS")
+                // Build
+                build("1.0.0") {
+                    val run = validateWithData(
+                            vs,
+                            ValidationRunStatusID.STATUS_PASSED,
+                            testValidationDataType,
+                            TestValidationData(0, 10, 100)
+                    )
+                    assertEquals(
+                            ValidationRunStatusID.PASSED,
+                            run.lastStatus.statusID.id
+                    )
+                }
+            }
+        }
+
     }
 
     @Test(expected = ValidationRunDataInputException::class)

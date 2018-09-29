@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.it
 
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,8 +37,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * @param name Name of the validation stamp to create
      * @return Created validation stamp
      */
-    fun Branch.validationStamp(name: String = uid("VS")): ValidationStamp =
-            doCreateValidationStamp(this, NameDescription.nd(name, ""))
+    fun Branch.validationStamp(
+            name: String = uid("VS"),
+            validationDataTypeConfig: ValidationDataTypeConfig<*>? = null
+    ): ValidationStamp =
+            doCreateValidationStamp(this, NameDescription.nd(name, ""), validationDataTypeConfig)
 
     fun Branch.build(name: String, init: (Build.() -> Unit)? = {}): Build {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
@@ -66,8 +70,41 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * @param validationStamp Stamp to apply
      * @param validationRunStatusID Status to apply
      */
-    fun Build.validate(validationStamp: ValidationStamp, validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED) {
-        doValidateBuild(this, validationStamp, validationRunStatusID)
+    fun Build.validate(
+            validationStamp: ValidationStamp,
+            validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED
+    ): ValidationRun {
+        return this.validateWithData<Any>(
+                validationStamp,
+                validationRunStatusID
+        )
+    }
+
+    /**
+     * Creates a validation run on a build, possibly with some data and a status.
+     */
+    fun <T> Build.validateWithData(
+            validationStamp: ValidationStamp,
+            validationRunStatusID: ValidationRunStatusID? = null,
+            validationDataType: ValidationDataType<*, T>? = null,
+            validationRunData: T? = null
+    ): ValidationRun {
+        return asUser().with(this, ValidationRunCreate::class.java).call {
+            structureService.newValidationRun(
+                    this,
+                    ValidationRunRequest(
+                            validationStampData = ValidationRunDataRequest(
+                                    id = validationStamp.name,
+                                    type = validationDataType?.descriptor?.id,
+                                    data = if (validationDataType != null && validationRunData != null) {
+                                        validationDataType.toJson(validationRunData)
+                                    } else {
+                                        null
+                                    }
+                            )
+                    )
+            )
+        }
     }
 
     fun Build.linkTo(project: Project, buildName: String) {

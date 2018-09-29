@@ -46,7 +46,7 @@ constructor(
         ).runData
     }
 
-    override fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>?, status: String?, statusLoader: (String) -> ValidationRunStatusID): ValidationRunDataWithStatus<T> {
+    override fun <C, T> validateData(data: ValidationRunRawDataId?, config: ValidationDataTypeConfig<C>?, status: String?, statusLoader: (String) -> ValidationRunStatusID): ValidationRunDataWithStatus<T> {
         return doValidateData(
                 data?.id,
                 { type -> type.fromForm(data?.data) },

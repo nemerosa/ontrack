@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 /**
  * Association between a configuration service ID and an actual configuration data.
  */
-data class ServiceConfiguration(
+open class ServiceConfiguration(
         val id: String,
         val data: JsonNode?
 ) {

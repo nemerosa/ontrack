@@ -34,7 +34,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     build.id,
                     ValidationRunRequest(
                             null,
-                            ServiceConfiguration(vs.name, null),
+                            ValidationRunDataRequest(vs.name, null),
                             null,
                             "PASSED",
                             "No description"
@@ -68,9 +68,9 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     build.id,
                     ValidationRunRequest(
                             null,
-                            ServiceConfiguration(
-                                    vs.name,
-                                    JsonUtils.format(mapOf("value" to 70))
+                            ValidationRunDataRequest(
+                                    id = vs.name,
+                                    data = JsonUtils.format(mapOf("value" to 70))
                             ),
                             null,
                             "FAILED",
@@ -98,9 +98,8 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     build.id,
                     ValidationRunRequest(
                             null,
-                            ServiceConfiguration(
-                                    vs.name,
-                                    null
+                            ValidationRunDataRequest(
+                                    vs.name
                             ),
                             null,
                             "FAILED",
@@ -125,9 +124,8 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                         build.id,
                         ValidationRunRequest(
                                 null,
-                                ServiceConfiguration(
-                                        vs.name,
-                                        null
+                                ValidationRunDataRequest(
+                                        vs.name
                                 ),
                                 null,
                                 null,
@@ -154,9 +152,9 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     build.id,
                     ValidationRunRequest(
                             null,
-                            ServiceConfiguration(
-                                    vs.name,
-                                    mapOf("value" to 80).toJson()
+                            ValidationRunDataRequest(
+                                    id = vs.name,
+                                    data = mapOf("value" to 80).toJson()
                             ),
                             null,
                             "WARNING",
@@ -186,9 +184,9 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     build.id,
                     ValidationRunRequest(
                             null,
-                            ServiceConfiguration(
-                                    vs.name,
-                                    mapOf("value" to 80).toJson()
+                            ValidationRunDataRequest(
+                                    id = vs.name,
+                                    data = mapOf("value" to 80).toJson()
                             ),
                             null,
                             null,
@@ -218,9 +216,9 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     build.id,
                     ValidationRunRequest(
                             null,
-                            ServiceConfiguration(
-                                    vs.name,
-                                    mapOf("value" to 40).toJson()
+                            ValidationRunDataRequest(
+                                    id = vs.name,
+                                    data = mapOf("value" to 40).toJson()
                             ),
                             null,
                             null,
