@@ -6,11 +6,8 @@ import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
-import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
-import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
-import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -19,33 +16,10 @@ import kotlin.test.assertNull
 
 class ValidationRunIT : AbstractDSLTestSupport() {
 
-    @Deprecated("Prefer inline in the test")
-    private lateinit var branch: Branch
-    @Deprecated("Prefer inline in the test")
-    private lateinit var build: Build
-    @Deprecated("Prefer inline in the test")
-    private lateinit var vs: ValidationStamp
-
     @Autowired
     private lateinit var testValidationDataType: TestValidationDataType
     @Autowired
     private lateinit var testNumberValidationDataType: TestNumberValidationDataType
-
-    @Before
-    fun init() {
-        // Build & Branch
-        build = doCreateBuild()
-        branch = build.branch
-        // Creates a validation stamp with an associated percentage data type w/ threshold
-        vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VSPercent", "")
-                    ).withDataType(testValidationDataType.config(null))
-            )
-        }
-    }
 
     @Test
     fun validationRunWithData() {
@@ -141,30 +115,6 @@ class ValidationRunIT : AbstractDSLTestSupport() {
                     assertEquals(ValidationRunStatusID.STATUS_DEFECTIVE.id, newRun.lastStatus.statusID.id)
                 }
             }
-        }
-    }
-
-    @Deprecated("Use the DSL instead")
-    private fun createValidationRunWithData(statusId: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED): ValidationRun {
-        return asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            statusId,
-                            ""
-                    ).withData(
-                            testValidationDataType.data(
-                                    TestValidationData(
-                                            critical = 2,
-                                            high = 4,
-                                            medium = 8
-                                    )
-                            )
-                    )
-            )
         }
     }
 
