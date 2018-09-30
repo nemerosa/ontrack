@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.support.TestValidationData
 import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
@@ -59,7 +60,7 @@ class ValidationRunIT : AbstractDSLTestSupport() {
                     // Creates a validation run with data
                     val run = validateWithData(
                             validationStamp = vs,
-                            validationDataType = testValidationDataType,
+                            validationDataTypeId = testValidationDataType.descriptor.id,
                             validationRunData = TestValidationData(2, 4, 8)
                     )
                     // Loads the validation run
@@ -160,43 +161,25 @@ class ValidationRunIT : AbstractDSLTestSupport() {
 
     @Test
     fun validationRunWithoutData() {
-        // Build & Branch
-        val build = doCreateBuild()
-        val branch = build.branch
-        // Creates a validation stamp with no required data
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VSNormal", "")
-                    )
-            )
+        project {
+            branch {
+                // Creates a validation stamp with no required data
+                val vs = validationStamp("VS")
+                // Creates a validation run without data
+                build("1.0.0") {
+                    val run = validate(vs)
+                    // Loads the validation run
+                    val loadedRun = asUserWithView(branch).call { structureService.getValidationRun(run.id) }
+                    // Checks the data
+                    val data = loadedRun.data
+                    assertNull(data, "No data is loaded")
+                    // Checks the status
+                    val status = loadedRun.lastStatus
+                    assertNotNull(status)
+                    assertEquals(ValidationRunStatusID.STATUS_PASSED.id, status.statusID.id)
+                }
+            }
         }
-        // Creates a validation run
-        val run = asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            ValidationRunStatusID.STATUS_PASSED,
-                            ""
-                    )
-            )
-        }
-
-        // Loads the validation run
-        val loadedRun = asUserWithView(branch).call { structureService.getValidationRun(run.id) }
-
-        // Checks the data
-        val data = loadedRun.data
-        assertNull(data, "No data is loaded")
-
-        // Checks the status
-        val status = loadedRun.lastStatus
-        assertNotNull(status)
-        assertEquals(ValidationRunStatusID.STATUS_PASSED, status.statusID)
     }
 
     @Test
@@ -210,7 +193,7 @@ class ValidationRunIT : AbstractDSLTestSupport() {
                     val run = validateWithData(
                             vs,
                             ValidationRunStatusID.STATUS_PASSED,
-                            testValidationDataType,
+                            testValidationDataType.descriptor.id,
                             TestValidationData(0, 10, 100)
                     )
                     assertEquals(
@@ -234,7 +217,7 @@ class ValidationRunIT : AbstractDSLTestSupport() {
                 build("1.0.0") {
                     validateWithData(
                             validationStamp = vs,
-                            validationDataType = testValidationDataType,
+                            validationDataTypeId = testValidationDataType.descriptor.id,
                             validationRunData = TestValidationData(-1, 0, 0)
                     )
                 }
@@ -242,68 +225,55 @@ class ValidationRunIT : AbstractDSLTestSupport() {
         }
     }
 
+    // FIXME This is not valid
     @Test(expected = ValidationRunDataInputException::class)
     fun validationRunWithUnrequestedData() {
-        // Build & Branch
-        val build = doCreateBuild()
-        val branch = build.branch
-        // Creates a "normal" validation stamp
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VSPercent", "")
+        project {
+            branch {
+                // Creates a "normal" validation stamp
+                val vs = validationStamp("VS")
+                // Build
+                build("1.0.0") {
+                    // Creates a validation run with data
+                    validateWithData(
+                            validationStamp = vs,
+                            validationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+                            validationDataTypeId = testNumberValidationDataType.descriptor.id,
+                            validationRunData = 80
                     )
-            )
-        }
-        // Creates a validation run with data
-        asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            ValidationRunStatusID.STATUS_PASSED,
-                            ""
-                    ).withData(
-                            testNumberValidationDataType.data(80)
-                    )
-            )
+                }
+            }
         }
     }
 
     @Test
     fun validationRunWithMissingDataOKWithStatus() {
-        // Creates a validation run with no data
-        asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            ValidationRunStatusID.STATUS_PASSED,
-                            ""
+        project {
+            branch {
+                val vs = validationStamp("VS", testNumberValidationDataType.config(50))
+                build("1.0.0") {
+                    val run = validateWithData<Any>(
+                            validationStamp = vs,
+                            validationRunStatusID = ValidationRunStatusID.STATUS_PASSED
                     )
-            )
+                    assertEquals(
+                            ValidationRunStatusID.STATUS_PASSED.id,
+                            run.lastStatus.statusID.id
+                    )
+                }
+            }
         }
     }
 
-    @Test(expected = ValidationRunDataInputException::class)
+    @Test(expected = ValidationRunDataStatusRequiredException::class)
     fun validationRunWithMissingDataNotOKWithoutStatus() {
-        // Creates a validation run with no data
-        asUser().with(branch, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            1,
-                            Signature.of("test"),
-                            null,
-                            ""
-                    )
-            )
+        project {
+            branch {
+                val vs = validationStamp("VS", testNumberValidationDataType.config(50))
+                build("1.0.0") {
+                    validateWithData<Any>(vs)
+                }
+            }
         }
     }
 
@@ -347,7 +317,7 @@ class ValidationRunIT : AbstractDSLTestSupport() {
                     val runId: ID = validateWithData(
                             validationStamp = vs,
                             validationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
-                            validationDataType = testNumberValidationDataType,
+                            validationDataTypeId = testNumberValidationDataType.descriptor.id,
                             validationRunData = 40
                     ).id
                     // Now, changes the data type for the validation stamp
@@ -404,32 +374,38 @@ class ValidationRunIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Validation data still present when validation stamp has no longer a validation data type`() {
-        // Creates a basic stamp, with some data type
-        val vs = doCreateValidationStamp(
-                testNumberValidationDataType.config(50)
-        )
-        // Creates a build
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        // ... and validates it with some data
-        val runId = doValidateBuild(build, vs, ValidationRunStatusID.STATUS_PASSED,
-                testNumberValidationDataType.data(40)
-        ).id
+        project {
+            branch {
+                // Creates a basic stamp, with some data type
+                val vs = validationStamp("VS", testNumberValidationDataType.config(50))
+                // Creates a build
+                build("1.0.0") {
+                    // ... and validates it with some data
+                    val runId = validateWithData(
+                            validationStamp = vs,
+                            validationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+                            validationDataTypeId = testNumberValidationDataType.descriptor.id,
+                            validationRunData = 40
+                    ).id
+                    // Now, changes the data type for the validation stamp to null
+                    asAdmin().execute {
+                        structureService.saveValidationStamp(
+                                vs.withDataType(null)
+                        )
+                    }
+                    // Gets the validation run back
+                    val run = asUser().withView(vs).call { structureService.getValidationRun(runId) }
 
-        // Now, changes the data type for the validation stamp to null
-        asAdmin().execute {
-            structureService.saveValidationStamp(
-                    vs.withDataType(null)
-            )
+                    // Checks it has still some data
+                    assertNotNull(run.data, "Data still associated with validation run after migration") {
+                        assertEquals(TestNumberValidationDataType::class.qualifiedName, it.descriptor.id)
+                        assertEquals(40, it.data as Int)
+                    }
+
+                }
+            }
         }
 
-        // Gets the validation run back
-        val run = asUser().withView(vs).call { structureService.getValidationRun(runId) }
-
-        // Checks it has still some data
-        assertNotNull(run.data, "Data still associated with validation run after migration") {
-            assertEquals(TestNumberValidationDataType::class.qualifiedName, it.descriptor.id)
-            assertEquals(40, it.data as Int)
-        }
     }
 
 }

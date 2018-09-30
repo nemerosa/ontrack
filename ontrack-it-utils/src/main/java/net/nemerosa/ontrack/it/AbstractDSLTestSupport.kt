@@ -86,7 +86,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun <T> Build.validateWithData(
             validationStamp: ValidationStamp,
             validationRunStatusID: ValidationRunStatusID? = null,
-            validationDataType: ValidationDataType<*, T>? = null,
+            validationDataTypeId: String? = null,
             validationRunData: T? = null
     ): ValidationRun {
         return asUser().with(this, ValidationRunCreate::class.java).call {
@@ -96,12 +96,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                             validationRunStatusId = validationRunStatusID?.id,
                             validationStampData = ValidationRunDataRequest(
                                     name = validationStamp.name,
-                                    type = validationDataType?.descriptor?.id,
-                                    data = if (validationDataType != null && validationRunData != null) {
-                                        validationDataType.toJson(validationRunData)
-                                    } else {
-                                        null
-                                    }
+                                    type = validationDataTypeId,
+                                    data = validationRunData
                             )
                     )
             )
