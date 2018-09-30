@@ -184,8 +184,7 @@ class ValidationRunIT : AbstractDSLTestSupport() {
         }
     }
 
-    // FIXME This is not valid
-    @Test(expected = ValidationRunDataInputException::class)
+    @Test
     fun validationRunWithUnrequestedData() {
         project {
             branch {
