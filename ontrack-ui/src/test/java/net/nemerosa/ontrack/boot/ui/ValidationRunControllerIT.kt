@@ -1,237 +1,287 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
-import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
-import net.nemerosa.ontrack.model.security.ValidationRunCreate
-import net.nemerosa.ontrack.model.security.ValidationStampCreate
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
+import net.nemerosa.ontrack.model.structure.ValidationRun
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
+import net.nemerosa.ontrack.model.structure.ValidationStamp
+import net.nemerosa.ontrack.model.structure.config
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
+/**
+ * All tests with data associated to validation runs.
+ *
+ * Different axes of test:
+ *
+ * * validation stamp with or without data type
+ * * validation stamp data type with or without computed status
+ * * validation run with or without data
+ * * validation run status provided or not
+ * * validation run data valid or invalid
+ */
 class ValidationRunControllerIT : AbstractWebTestSupport() {
 
     @Autowired
     private lateinit var validationRunController: ValidationRunController
 
     @Autowired
+    private lateinit var validationRunStatusService: ValidationRunStatusService
+
+    @Autowired
     private lateinit var testNumberValidationDataType: TestNumberValidationDataType
 
     @Test
-    fun `Validation with no required data`() {
-        // Creates a validation stamp with no data type
-        val vs = doCreateValidationStamp()
-        // Creates a build
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        // Validates the build
-        val run = asUser().with(vs, ValidationRunCreate::class.java).call {
-            validationRunController.newValidationRun(
-                    build.id,
-                    ValidationRunRequest(
-                            null,
-                            ValidationRunDataRequest(vs.name, null),
-                            null,
-                            "PASSED",
-                            "No description"
-                    )
-            )
-        }
-        // Checks the run has no data
-        assertNull(run.data, "Validation run has no data")
+    fun `Stamp with type, computed status, run with data, provided status, valid data`() {
+        doTestVS().withType().withComputedStatus(50)
+                .forRun().withData(40).withStatus("PASSED")
+                .execute()
+                .mustBe("PASSED").withData(40)
+    }
+
+    @Test(expected = ValidationRunDataInputException::class)
+    fun `Stamp with type, computed status, run with data, provided status, invalid data`() {
+        doTestVS().withType().withComputedStatus(50)
+                .forRun().withData("text").withStatus("PASSED")
+                .execute()
     }
 
     @Test
-    fun `Validation with required data and status being passed`() {
-        // Creates a validation stamp with a percentage type
-        val branch = doCreateBranch()
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call({
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            NameDescription.nd("VS1", "")
-                    ).withDataType(
-                            testNumberValidationDataType.config(60)
-                    )
-            )
-        }
-        )
-        // Creates a build
-        val build = doCreateBuild(branch, NameDescription.nd("1", ""))
-        // Validates the build with some data, and a fixed status
-        val run = asUser().with(vs, ValidationRunCreate::class.java).call {
-            validationRunController.newValidationRun(
-                    build.id,
-                    ValidationRunRequest(
-                            null,
-                            ValidationRunDataRequest(
-                                    name = vs.name,
-                                    data = JsonUtils.format(mapOf("value" to 70))
-                            ),
-                            null,
-                            "FAILED",
-                            "No description"
-                    )
-            )
-        }
-        // Checks the run has some data
-        @Suppress("UNCHECKED_CAST")
-        val data: ValidationRunData<Int> = run.data as ValidationRunData<Int>
-        assertNotNull(data, "Validation run has some data")
-        assertEquals(TestNumberValidationDataType::class.qualifiedName, data.descriptor.id)
-        assertEquals(70, data.data)
+    fun `Stamp with type, computed status, run with data, unprovided status, valid data`() {
+        doTestVS().withType().withComputedStatus(50)
+                .forRun().withData(40)
+                .execute()
+                .mustBe("FAILED").withData(40)
     }
 
     @Test
-    fun `Validation with no data type and with status`() {
-        // Creates a validation stamp
-        val vs = doCreateValidationStamp()
-        // Creates a build
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        // Validates the build
-        val run = asUser().with(vs, ValidationRunCreate::class.java).call {
-            validationRunController.newValidationRun(
-                    build.id,
-                    ValidationRunRequest(
-                            null,
-                            ValidationRunDataRequest(
-                                    vs.name
-                            ),
-                            null,
-                            "FAILED",
-                            "No description"
-                    )
-            )
-        }
-        // Checks the status
-        assertEquals("FAILED", run.lastStatus.statusID.id)
+    fun `Stamp with type, computed status, run with data, unprovided status, invalid data`() {
+        TODO()
     }
 
     @Test
-    fun `Status is required when no data type is associated with the validation stamp`() {
-        // Creates a validation stamp
-        val vs = doCreateValidationStamp()
-        // Creates a build
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        // Validates the build
-        assertFailsWith<ValidationRunDataStatusRequiredException> {
-            asUser().with(vs, ValidationRunCreate::class.java).call {
-                validationRunController.newValidationRun(
-                        build.id,
-                        ValidationRunRequest(
-                                null,
-                                ValidationRunDataRequest(
-                                        vs.name
-                                ),
-                                null,
-                                null,
-                                "No description"
+    fun `Stamp with type, computed status, run without data, provided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, computed status, run without data, provided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, computed status, run without data, unprovided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, computed status, run without data, unprovided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run with data, provided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run with data, provided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run with data, unprovided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run with data, unprovided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run without data, provided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run without data, provided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run without data, unprovided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp with type, no computed status, run without data, unprovided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run with data, provided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run with data, provided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run with data, unprovided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run with data, unprovided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run without data, provided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run without data, provided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run without data, unprovided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, computed status, run without data, unprovided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run with data, provided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run with data, provided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run with data, unprovided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run with data, unprovided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run without data, provided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run without data, provided status, invalid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run without data, unprovided status, valid data`() {
+        TODO()
+    }
+
+    @Test
+    fun `Stamp without type, no computed status, run without data, unprovided status, invalid data`() {
+        TODO()
+    }
+
+    private fun doTestVS() = VS()
+
+    private inner class VS {
+
+        var typed: Boolean = false
+        var threshold: Int? = null
+
+        fun withType() = apply {
+            typed = true
+        }
+
+        fun withComputedStatus(value: Int) = apply {
+            threshold = value
+        }
+
+        fun forRun() = VRun(this)
+
+        fun <T> withValidationStamp(fn: (ValidationStamp) -> T): T =
+                project<T> {
+                    branch<T> {
+                        val vs = validationStamp(
+                                "VS",
+                                if (typed) {
+                                    testNumberValidationDataType.config(threshold)
+                                } else {
+                                    null
+                                }
                         )
-                )
+                        fn(vs)
+                    }
+                }
+    }
+
+    private inner class VRun(private val vs: VS) {
+        private var data: Any? = null
+        private var type: String? = null
+        private var status: String? = null
+        fun withData(value: Any) = apply {
+            data = value
+        }
+
+        fun withStatus(s: String) = apply {
+            status = s
+        }
+
+        fun withType(s: String) = apply {
+            type = s
+        }
+
+        fun execute(): VTest {
+            val run = vs.withValidationStamp {
+                it.branch.build<ValidationRun>("1.0.0") {
+                    validateWithData(
+                            validationStampName = it.name,
+                            validationRunStatusID = status?.run { validationRunStatusService.getValidationRunStatus(this) },
+                            validationDataTypeId = type,
+                            validationRunData = data
+                    )
+                }
             }
-        }.apply {
-            assertEquals("Validation Run Status is required.", message)
+            return VTest(run)
         }
+
     }
 
-    @Test
-    fun `Validation with data type and with status`() {
-        // Creates a validation stamp
-        val vs = doCreateValidationStamp(
-                testNumberValidationDataType.config(60)
-        )
-        // Creates a build
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        // Validates the build
-        val run = asUser().with(vs, ValidationRunCreate::class.java).call {
-            validationRunController.newValidationRun(
-                    build.id,
-                    ValidationRunRequest(
-                            null,
-                            ValidationRunDataRequest(
-                                    name = vs.name,
-                                    data = mapOf("value" to 80).toJson()
-                            ),
-                            null,
-                            "WARNING",
-                            "No description"
-                    )
+    private class VTest(private val run: ValidationRun) {
+        fun mustBe(status: String) = apply {
+            assertEquals(
+                    status,
+                    run.lastStatus.statusID.id
             )
         }
-        // Checks the data
-        assertNotNull(run.data, "Run is associated with some data") {
-            assertEquals(80, it.data as Int, "... and the data is 80")
-        }
-        // Checks the status
-        assertEquals("PASSED", run.lastStatus.statusID.id)
-    }
 
-    @Test
-    fun `Validation with data type and with computed passed status`() {
-        // Creates a validation stamp
-        val vs = doCreateValidationStamp(
-                testNumberValidationDataType.config(60)
-        )
-        // Creates a build
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        // Validates the build
-        val run = asUser().with(vs, ValidationRunCreate::class.java).call {
-            validationRunController.newValidationRun(
-                    build.id,
-                    ValidationRunRequest(
-                            null,
-                            ValidationRunDataRequest(
-                                    name = vs.name,
-                                    data = mapOf("value" to 80).toJson()
-                            ),
-                            null,
-                            null,
-                            "No description"
-                    )
-            )
+        fun withData(expectedValue: Int) = apply {
+            assertNotNull(run.data) {
+                assertIs<Int>(it.data) {
+                    assertEquals(expectedValue, it)
+                }
+            }
         }
-        // Checks the data
-        assertNotNull(run.data, "Run is associated with some data") {
-            assertEquals(80, it.data as Int, "... and the data is 80")
-        }
-        // Checks the status
-        assertEquals("PASSED", run.lastStatus.statusID.id)
-    }
-
-    @Test
-    fun `Validation with data type and with computed failed status`() {
-        // Creates a validation stamp
-        val vs = doCreateValidationStamp(
-                testNumberValidationDataType.config(60)
-        )
-        // Creates a build
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        // Validates the build
-        val run = asUser().with(vs, ValidationRunCreate::class.java).call {
-            validationRunController.newValidationRun(
-                    build.id,
-                    ValidationRunRequest(
-                            null,
-                            ValidationRunDataRequest(
-                                    name = vs.name,
-                                    data = mapOf("value" to 40).toJson()
-                            ),
-                            null,
-                            null,
-                            "No description"
-                    )
-            )
-        }
-        // Checks the data
-        assertNotNull(run.data, "Run is associated with some data") {
-            assertEquals(40, it.data as Int, "... and the data is 80")
-        }
-        // Checks the status
-        assertEquals("FAILED", run.lastStatus.statusID.id)
     }
 
 }

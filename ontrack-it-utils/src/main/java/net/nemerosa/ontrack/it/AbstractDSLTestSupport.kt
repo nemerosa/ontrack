@@ -21,10 +21,22 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return project
     }
 
+    fun <T> project(init: Project.() -> T): T {
+        val project = doCreateProject()
+        return asAdmin().call {
+            project.init()
+        }
+    }
+
     fun Project.branch(name: String = uid("B"), init: Branch.() -> Unit = {}): Branch {
         val branch = doCreateBranch(this, NameDescription.nd(name, ""))
         branch.init()
         return branch
+    }
+
+    fun <T> Project.branch(name: String = uid("B"), init: Branch.() -> T): T {
+        val branch = doCreateBranch(this, NameDescription.nd(name, ""))
+        return branch.init()
     }
 
     fun Branch.promotionLevel(name: String): PromotionLevel =
@@ -49,6 +61,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             build.init()
         }
         return build
+    }
+
+    fun <T> Branch.build(name: String, init: Build.() -> T): T {
+        val build = doCreateBuild(this, NameDescription.nd(name, ""))
+        return build.init()
     }
 
     protected fun <T, P : PropertyType<T>> Build.property(type: KClass<P>, value: T) {
