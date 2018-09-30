@@ -169,6 +169,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         );
     }
 
+    @Deprecated
     public ValidationRun doValidateBuild(
             Build build,
             ValidationStamp vs,
