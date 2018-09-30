@@ -88,6 +88,21 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationRunStatusID: ValidationRunStatusID? = null,
             validationDataTypeId: String? = null,
             validationRunData: T? = null
+    ) = validateWithData(
+            validationStamp.name,
+            validationRunStatusID,
+            validationDataTypeId,
+            validationRunData
+    )
+
+    /**
+     * Creates a validation run on a build, possibly with some data and a status.
+     */
+    fun <T> Build.validateWithData(
+            validationStampName: String,
+            validationRunStatusID: ValidationRunStatusID? = null,
+            validationDataTypeId: String? = null,
+            validationRunData: T? = null
     ): ValidationRun {
         return asUser().with(this, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
@@ -95,7 +110,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                     ValidationRunRequest(
                             validationRunStatusId = validationRunStatusID?.id,
                             validationStampData = ValidationRunDataRequest(
-                                    name = validationStamp.name,
+                                    name = validationStampName,
                                     type = validationDataTypeId,
                                     data = validationRunData
                             )

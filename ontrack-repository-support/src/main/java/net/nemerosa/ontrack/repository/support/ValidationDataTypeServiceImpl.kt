@@ -54,7 +54,7 @@ constructor(
                 throw ValidationRunDataStatusRequiredException()
             } else {
                 return ValidationRunDataWithStatus(
-                        null,
+                        typedData, // Might defined... or not. No matter here.
                         statusLoader(status)
                 )
             }

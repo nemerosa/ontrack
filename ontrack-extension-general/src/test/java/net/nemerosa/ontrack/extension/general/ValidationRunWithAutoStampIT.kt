@@ -3,14 +3,11 @@ package net.nemerosa.ontrack.extension.general
 import net.nemerosa.ontrack.extension.general.validation.FractionValidationData
 import net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.ThresholdConfig
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataUnexpectedException
-import net.nemerosa.ontrack.model.security.ProjectEdit
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Ignore
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -18,7 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @Component
-class ValidationRunWithAutoStampIT : AbstractServiceTestSupport() {
+class ValidationRunWithAutoStampIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var predefinedValidationStampService: PredefinedValidationStampService
@@ -26,8 +23,7 @@ class ValidationRunWithAutoStampIT : AbstractServiceTestSupport() {
     @Autowired
     private lateinit var fractionValidationDataType: FractionValidationDataType
 
-    @Test(expected = ValidationRunDataUnexpectedException::class)
-    @Ignore
+    @Test
     fun `Validation run with data and predefined validation stamp without data type`() {
         // Creates a predefined validation stamp
         val psName = TestUtils.uid("VS")
@@ -38,34 +34,44 @@ class ValidationRunWithAutoStampIT : AbstractServiceTestSupport() {
                     )
             )
         }
-        // Creates a build
-        val build = doCreateBuild()
-        // Enables auto creation of validation stamps
-        asAdmin().execute {
+
+        // Project...
+        project {
             setProperty(
-                    build.project,
+                    this,
                     AutoValidationStampPropertyType::class.java,
                     AutoValidationStampProperty(true, false)
             )
+            branch {
+                // Creates a build
+                build("1.0.0") {
+                    // Validates with data
+                    val run = validateWithData(
+                            validationStampName = psName,
+                            // Status is required since no validation can be performed
+                            validationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+                            validationDataTypeId = fractionValidationDataType.descriptor.id,
+                            validationRunData = FractionValidationData(80, 100)
+                    )
+                    // Checks the run status
+                    assertEquals(
+                            ValidationRunStatusID.STATUS_PASSED.id,
+                            run.lastStatus.statusID.id
+                    )
+                    // Checks its data
+                    val runData: ValidationRunData<*>? = run.data
+                    assertNotNull(runData) {
+                        assertIs<FractionValidationData>(it.data) {
+                            assertEquals(80, it.numerator)
+                            assertEquals(100, it.denominator)
+                        }
+                    }
+                }
+            }
         }
-        // Auto creation of the validation stamp
-        val vs = asUser().with(build.branch, ProjectEdit::class.java).call {
-            structureService.getOrCreateValidationStamp(build.branch, null, psName)
-        }
-        // Validation with data
-        doValidateBuild(
-                build,
-                vs,
-                // FIXME The status should be required since it cannot be validated otherwise
-                null,
-                fractionValidationDataType.data(
-                        FractionValidationData(80, 100)
-                )
-        )
     }
 
     @Test
-    @Ignore
     fun `Validation run with data and predefined validation stamp with data type`() {
         // Creates a predefined validation stamp with data
         val psName = TestUtils.uid("VS")
@@ -80,39 +86,41 @@ class ValidationRunWithAutoStampIT : AbstractServiceTestSupport() {
                     )
             )
         }
-        // Creates a build
-        val build = doCreateBuild()
-        // Enables auto creation of validation stamps
-        asAdmin().execute {
-            setProperty(
-                    build.project,
-                    AutoValidationStampPropertyType::class.java,
-                    AutoValidationStampProperty(true, false)
-            )
-        }
-        // Auto creation of the validation stamp
-        val vs = asUser().with(build.branch, ProjectEdit::class.java).call {
-            structureService.getOrCreateValidationStamp(build.branch, null, psName)
-        }
-        // Validation with data
-        val run = doValidateBuild(
-                build,
-                vs,
-                null,
-                fractionValidationDataType.data(
-                        FractionValidationData(80, 100)
+
+        project {
+            // Enables auto creation of validation stamps
+            asAdmin().execute {
+                setProperty(
+                        this,
+                        AutoValidationStampPropertyType::class.java,
+                        AutoValidationStampProperty(true, false)
                 )
-        )
-        assertEquals(
-                ValidationRunStatusID.STATUS_FAILED.id,
-                run.lastStatus.statusID.id
-        )
-        assertNotNull(run.data) {
-            assertIs<FractionValidationData>(it.data) {
-                assertEquals(80, it.numerator)
-                assertEquals(100, it.denominator)
+            }
+            // Creates a build
+            branch {
+                build("1.0.0") {
+                    // Validation with data
+                    val run = validateWithData(
+                            validationStampName = psName,
+                            validationDataTypeId = fractionValidationDataType.descriptor.id,
+                            validationRunData = FractionValidationData(80, 100)
+                    )
+                    // Checks the status (computed)
+                    assertEquals(
+                            ValidationRunStatusID.STATUS_FAILED.id,
+                            run.lastStatus.statusID.id
+                    )
+                    // Checks the data
+                    assertNotNull(run.data) {
+                        assertIs<FractionValidationData>(it.data) {
+                            assertEquals(80, it.numerator)
+                            assertEquals(100, it.denominator)
+                        }
+                    }
+                }
             }
         }
+
     }
 
 }
