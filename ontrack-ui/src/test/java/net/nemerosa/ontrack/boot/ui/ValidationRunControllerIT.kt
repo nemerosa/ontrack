@@ -69,7 +69,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     ValidationRunRequest(
                             null,
                             ValidationRunDataRequest(
-                                    id = vs.name,
+                                    name = vs.name,
                                     data = JsonUtils.format(mapOf("value" to 70))
                             ),
                             null,
@@ -153,7 +153,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     ValidationRunRequest(
                             null,
                             ValidationRunDataRequest(
-                                    id = vs.name,
+                                    name = vs.name,
                                     data = mapOf("value" to 80).toJson()
                             ),
                             null,
@@ -185,7 +185,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     ValidationRunRequest(
                             null,
                             ValidationRunDataRequest(
-                                    id = vs.name,
+                                    name = vs.name,
                                     data = mapOf("value" to 80).toJson()
                             ),
                             null,
@@ -217,7 +217,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     ValidationRunRequest(
                             null,
                             ValidationRunDataRequest(
-                                    id = vs.name,
+                                    name = vs.name,
                                     data = mapOf("value" to 40).toJson()
                             ),
                             null,

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 class ValidationRunRequest
 @JvmOverloads
 constructor(
-        @Deprecated("")
+        @Deprecated("Editing a validation run using its stamp ID must be replaced by using its name.")
         val validationStampId: Int? = null,
         val validationStampData: ValidationRunDataRequest? = null,
         val validationStampName: String? = null,
@@ -15,6 +15,6 @@ constructor(
 
     val actualValidationStampName: String?
         @JsonIgnore
-        get() = validationStampData?.id ?: validationStampName
+        get() = validationStampData?.name ?: validationStampName
 
 }

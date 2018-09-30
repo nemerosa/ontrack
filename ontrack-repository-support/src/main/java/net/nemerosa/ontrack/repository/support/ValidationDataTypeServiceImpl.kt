@@ -37,32 +37,14 @@ constructor(
         }
     }
 
-    override fun <C, T> validateData(data: ValidationRunData<T>?, config: ValidationDataTypeConfig<C>?, status: ValidationRunStatusID?): ValidationRunData<T>? {
-        return doValidateData<C, T>(
-                data?.descriptor?.id,
-                { _ -> data?.data },
-                status?.let { { it } },
-                config
-        ).runData
-    }
-
-    override fun <C, T> validateData(data: ValidationRunRawDataId?, config: ValidationDataTypeConfig<C>?, status: String?, statusLoader: (String) -> ValidationRunStatusID): ValidationRunDataWithStatus<T> {
-        return doValidateData(
-                data?.id,
-                { type -> type.fromForm(data?.data) },
-                status?.let { { statusLoader(it) } },
-                config
-        )
-    }
-
-    private fun <C, T> doValidateData(
-            dataId: String?,
-            dataRawData: (ValidationDataType<C, T>) -> T?,
-            status: (() -> ValidationRunStatusID)?,
-            config: ValidationDataTypeConfig<C>?
+    override fun <C, T> validateData(
+            typedData: ValidationRunData<T>?,
+            config: ValidationDataTypeConfig<C>?,
+            status: String?,
+            statusLoader: (String) -> ValidationRunStatusID
     ): ValidationRunDataWithStatus<T> {
         if (config == null) {
-            if (dataId == null) {
+            if (typedData == null) {
                 // OK, no data requested, no data as input
                 // ... but status is therefore required
                 if (status == null) {
@@ -70,43 +52,43 @@ constructor(
                 } else {
                     return ValidationRunDataWithStatus(
                             null,
-                            status()
+                            statusLoader(status)
                     )
                 }
             } else {
                 // Data is sent, not asked for...
+                // FIXME Just storing the data is fine, but status is required
                 throw ValidationRunDataUnexpectedException()
             }
-        } else if (dataId == null) {
-            // No data as input. OK as long as the status is passed
+        } else if (typedData == null) {
+            // No data as input. OK as long as the status is provided
             if (status == null) {
                 throw ValidationRunDataStatusRequiredException()
             } else {
                 return ValidationRunDataWithStatus(
                         null,
-                        status()
+                        statusLoader(status)
                 )
             }
-        } else if (dataId != config.descriptor.id) {
+        } else if (typedData.descriptor.id != config.descriptor.id) {
             // Different type of data
             throw ValidationRunDataMismatchException(
                     config.descriptor.id,
-                    dataId
+                    typedData.descriptor.id
             )
         } else {
             // Gets the type
-            val validationDataType = getValidationDataType<C, T>(dataId) ?:
-                    throw ValidationRunDataTypeNotFoundException(dataId)
-            // Parsing & validation
-            val parsedData = dataRawData(validationDataType)
-            val validatedData = validationDataType.validateData(config.config, parsedData)
+            val validationDataType = getValidationDataType<C, T>(typedData.descriptor.id) ?:
+                    throw ValidationRunDataTypeNotFoundException(typedData.descriptor.id)
+            // Validation
+            val validatedData: T = validationDataType.validateData(config.config, typedData.data)
             // Computing the status
-            val computedStatus = validationDataType.computeStatus(config.config, validatedData)
+            val computedStatus: ValidationRunStatusID? = validationDataType.computeStatus(config.config, validatedData)
             // Final status
             val finalStatus: ValidationRunStatusID =
                     when {
                         computedStatus != null -> computedStatus
-                        status != null -> status()
+                        status != null -> statusLoader(status)
                         else -> ValidationRunStatusID.STATUS_PASSED
                     }
             // OK

@@ -95,7 +95,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                     ValidationRunRequest(
                             validationRunStatusId = validationRunStatusID?.id,
                             validationStampData = ValidationRunDataRequest(
-                                    id = validationStamp.name,
+                                    name = validationStamp.name,
                                     type = validationDataType?.descriptor?.id,
                                     data = if (validationDataType != null && validationRunData != null) {
                                         validationDataType.toJson(validationRunData)

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.Iterables
 import net.nemerosa.ontrack.common.CachedSupplier
 import net.nemerosa.ontrack.common.Document
@@ -1063,17 +1062,25 @@ class StructureServiceImpl(
                 validationRunRequest.validationStampId,
                 validationRunRequest.actualValidationStampName)
         // Validation run data
-        val rawDataType: String? = validationRunRequest.validationStampData?.type ?: validationStamp.dataType?.descriptor?.id
-        val rawDataJson: JsonNode? = validationRunRequest.validationStampData?.data
-        val rawDataId: ValidationRunRawDataId? =
-                if (rawDataType != null && rawDataJson != null) {
-                    ValidationRunRawDataId(rawDataType, rawDataJson)
-                } else {
-                    null
-                }
+        val rawDataTypeId: String? = validationRunRequest.validationStampData?.type
+                ?: validationStamp.dataType?.descriptor?.id
+        val rawData: Any? = validationRunRequest.validationStampData?.data
+        // Gets the data type
+        val rawDataType: ValidationDataType<Any, Any>? = rawDataTypeId?.run {
+            validationDataTypeService.getValidationDataType<Any, Any>(this)
+        }
+        // Type descriptor + data
+        val rawRunData: ValidationRunData<Any>? = if (rawDataType != null && rawData != null) {
+            ValidationRunData(
+                    rawDataType.descriptor,
+                    rawData
+            )
+        } else {
+            null
+        }
         // Validation of the run data
         val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
-                rawDataId,
+                rawRunData,
                 validationStamp.dataType,
                 validationRunRequest.validationRunStatusId,
                 validationRunStatusService::getValidationRunStatus
@@ -1095,8 +1102,6 @@ class StructureServiceImpl(
                 "Validation run for a validation stamp can be done only on the same branch than the build.")
         // Checks the authorization
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ValidationRunCreate::class.java)
-        // Data validation
-        validateRunData(validationRun)
         // Actual creation
         val newValidationRun = structureRepository.newValidationRun(validationRun) { validationRunStatusService.getValidationRunStatus(it) }
         // Event
@@ -1111,14 +1116,6 @@ class StructureServiceImpl(
         }
         // OK
         return newValidationRun
-    }
-
-    private fun validateRunData(validationRun: ValidationRun) {
-        validationDataTypeService.validateData(
-                validationRun.data,
-                validationRun.validationStamp.dataType,
-                validationRun.lastStatus.statusID
-        )
     }
 
     override fun getValidationRun(validationRunId: ID): ValidationRun {
