@@ -109,33 +109,42 @@ class ValidationRunIT : AbstractDSLTestSupport() {
 
     @Test
     fun validationRunWithDataAndStatusUpdate() {
-        // Creates a validation run with data
-        val run = createValidationRunWithData(ValidationRunStatusID.STATUS_FAILED)
-        // Checks the initial status
-        val status = run.lastStatus
-        assertNotNull(status)
-        assertEquals(ValidationRunStatusID.STATUS_FAILED.id, status.statusID.id)
-        // Updates the status
-        asUser().with(branch, ValidationRunStatusChange::class.java).execute {
-            structureService.newValidationRunStatus(
-                    run,
-                    ValidationRunStatus.of(
-                            Signature.of("test"),
-                            ValidationRunStatusID.STATUS_DEFECTIVE,
-                            "This is a defect"
+        project {
+            branch {
+                val vs = validationStamp("VS", testValidationDataType.config(null))
+                build("1.0.0") {
+                    // Creates a validation run with data
+                    val run = validateWithData(
+                            validationStamp = vs,
+                            validationDataTypeId = testValidationDataType.descriptor.id,
+                            validationRunStatusID = ValidationRunStatusID.STATUS_FAILED,
+                            validationRunData = TestValidationData(0, 0, 10)
                     )
-            )
+                    // Checks the initial status
+                    assertEquals(ValidationRunStatusID.STATUS_FAILED.id, run.lastStatus.statusID.id)
+                    // Updates the status
+                    asUser().with(branch, ValidationRunStatusChange::class.java).execute {
+                        structureService.newValidationRunStatus(
+                                run,
+                                ValidationRunStatus.of(
+                                        Signature.of("test"),
+                                        ValidationRunStatusID.STATUS_DEFECTIVE,
+                                        "This is a defect"
+                                )
+                        )
+                    }
+                    // Reloads
+                    val newRun = asUser().withView(branch).call {
+                        structureService.getValidationRun(run.id)
+                    }
+                    // Checks the new status
+                    assertEquals(ValidationRunStatusID.STATUS_DEFECTIVE.id, newRun.lastStatus.statusID.id)
+                }
+            }
         }
-        // Reloads
-        val newRun = asUser().withView(branch).call {
-            structureService.getValidationRun(run.id)
-        }
-        // Checks the new status
-        val newStatus = newRun.lastStatus
-        assertNotNull(newStatus)
-        assertEquals(ValidationRunStatusID.STATUS_DEFECTIVE.id, newStatus.statusID.id)
     }
 
+    @Deprecated("Use the DSL instead")
     private fun createValidationRunWithData(statusId: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED): ValidationRun {
         return asUser().with(branch, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(

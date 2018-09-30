@@ -87,8 +87,11 @@ constructor(
             // Final status
             val finalStatus: ValidationRunStatusID =
                     when {
-                        computedStatus != null -> computedStatus
+                        // Provided status has priority
                         status != null -> statusLoader(status)
+                        // But it can be computed
+                        computedStatus != null -> computedStatus
+                        // Else, we consider it valid
                         else -> ValidationRunStatusID.STATUS_PASSED
                     }
             // OK
