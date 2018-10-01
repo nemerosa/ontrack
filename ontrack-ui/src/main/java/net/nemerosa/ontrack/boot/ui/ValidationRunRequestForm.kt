@@ -27,7 +27,7 @@ class ValidationRunRequestForm(
  * @property data Data to associate with the run
  */
 class ValidationRunRequestFormData(
-        id: String,
+        val id: String,
         val type: String? = null,
-        data: JsonNode? = null
-) : ServiceConfiguration(id, data)
+        val data: JsonNode? = null
+)
