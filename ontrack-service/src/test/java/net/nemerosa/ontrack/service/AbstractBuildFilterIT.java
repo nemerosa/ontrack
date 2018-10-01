@@ -98,7 +98,6 @@ public abstract class AbstractBuildFilterIT extends AbstractServiceTestSupport {
                             build,
                             new ValidationRunRequest(
                                     null,
-                                    null,
                                     stamp.getName(),
                                     status.getId()
                             )

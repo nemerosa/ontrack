@@ -159,7 +159,6 @@ class ProjectQLIT extends AbstractQLITSupport {
                             build,
                             new ValidationRunRequest(
                                     null,
-                                    null,
                                     vs.name,
                                     "PASSED",
                                     "Validation"
@@ -195,7 +194,6 @@ class ProjectQLIT extends AbstractQLITSupport {
             structureService.newValidationRun(
                     build,
                     new ValidationRunRequest(
-                            null,
                             null,
                             vs.name,
                             "FAILED"

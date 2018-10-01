@@ -178,7 +178,6 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
                 build,
                 new ValidationRunRequest(
                         null,
-                        null,
                         stamp.getName(),
                         ValidationRunStatusID.PASSED
                 )
@@ -196,7 +195,6 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
                 structureService.newValidationRun(
                         build,
                         new ValidationRunRequest(
-                                null,
                                 null,
                                 stamp.getName(),
                                 ValidationRunStatusID.PASSED

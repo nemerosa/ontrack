@@ -125,12 +125,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             structureService.newValidationRun(
                     this,
                     ValidationRunRequest(
-                            validationRunStatusId = validationRunStatusID?.id,
                             validationStampData = ValidationRunDataRequest(
                                     name = validationStampName,
                                     type = validationDataTypeId,
                                     data = validationRunData
-                            )
+                            ),
+                            validationRunStatusId = validationRunStatusID?.id
                     )
             )
         }

@@ -226,7 +226,7 @@ interface StructureService {
 
     fun newValidationStampFromPredefined(branch: Branch, stamp: PredefinedValidationStamp): ValidationStamp
 
-    fun getOrCreateValidationStamp(branch: Branch, validationStampId: Int?, validationStampName: String?): ValidationStamp
+    fun getOrCreateValidationStamp(branch: Branch, validationStampName: String): ValidationStamp
 
     /**
      * Bulk update of all validation stamps in other projects/branches and in predefined validation stamps,

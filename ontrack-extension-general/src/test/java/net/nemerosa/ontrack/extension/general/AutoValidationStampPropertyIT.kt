@@ -31,7 +31,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
     fun `Get validation stamp by name - numeric`() {
         val vs = doCreateValidationStamp()
         val vss = asUser().with(vs, ProjectEdit::class.java).call {
-            structureService.getOrCreateValidationStamp(vs.branch, vs.id(), null)
+            structureService.getOrCreateValidationStamp(vs.branch, vs.name)
         }
         assertEquals(vs.id, vss.id)
     }
@@ -46,7 +46,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
         // Tries to create the validation stamp by ID
         assertFailsWith<ValidationStampNotFoundException> {
             asUser().with(vs, ProjectEdit::class.java).call {
-                structureService.getOrCreateValidationStamp(vs.branch, vs.id(), null)
+                structureService.getOrCreateValidationStamp(vs.branch, vs.name)
             }
         }
     }
@@ -55,7 +55,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
     fun `Get validation stamp by name - found`() {
         val vs = doCreateValidationStamp()
         val vss = asUser().with(vs, ProjectEdit::class.java).call {
-            structureService.getOrCreateValidationStamp(vs.branch, null, vs.name)
+            structureService.getOrCreateValidationStamp(vs.branch, vs.name)
         }
         assertEquals(vs.id, vss.id)
     }
@@ -78,7 +78,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
         }
 
         val vs = asUser().with(branch, ProjectEdit::class.java).call {
-            structureService.getOrCreateValidationStamp(branch, null, name)
+            structureService.getOrCreateValidationStamp(branch, name)
         }
 
         assertNotNull(vs) {
@@ -112,7 +112,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
         }
 
         val vs = asUser().with(branch, ProjectEdit::class.java).call {
-            structureService.getOrCreateValidationStamp(branch, null, name)
+            structureService.getOrCreateValidationStamp(branch, name)
         }
 
         assertNotNull(vs) {
@@ -138,7 +138,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
 
         assertFailsWith<ValidationStampNotFoundException> {
             asUser().with(branch, ProjectEdit::class.java).call {
-                structureService.getOrCreateValidationStamp(branch, null, name)
+                structureService.getOrCreateValidationStamp(branch, name)
             }
         }
     }
@@ -149,7 +149,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
         val branch = doCreateBranch()
         assertFailsWith<ValidationStampNotFoundException> {
             asUser().with(branch, ProjectEdit::class.java).call {
-                structureService.getOrCreateValidationStamp(branch, null, name)
+                structureService.getOrCreateValidationStamp(branch, name)
             }
         }
     }
@@ -168,7 +168,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
 
         assertFailsWith<ValidationStampNotFoundException> {
             asUser().with(branch, ProjectEdit::class.java).call {
-                structureService.getOrCreateValidationStamp(branch, null, name)
+                structureService.getOrCreateValidationStamp(branch, name)
             }
         }
     }
@@ -186,7 +186,7 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
         }
 
         val vs = asUser().with(branch, ProjectEdit::class.java).call {
-            structureService.getOrCreateValidationStamp(branch, null, name)
+            structureService.getOrCreateValidationStamp(branch, name)
         }
 
         assertNotNull(vs) {

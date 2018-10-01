@@ -889,38 +889,34 @@ class StructureServiceImpl(
         eventPostService.post(eventFactory.reorderValidationStamps(branch))
     }
 
-    override fun getOrCreateValidationStamp(branch: Branch, validationStampId: Int?, validationStampName: String?): ValidationStamp {
-        if (validationStampId != null) {
-            return getValidationStamp(ID.of(validationStampId))
+    override fun getOrCreateValidationStamp(branch: Branch, validationStampName: String): ValidationStamp {
+        var oValidationStamp = findValidationStampByName(
+                branch.project.name,
+                branch.name,
+                validationStampName
+        )
+        if (oValidationStamp.isPresent) {
+            return oValidationStamp.get()
         } else {
-            var oValidationStamp = findValidationStampByName(
-                    branch.project.name,
-                    branch.name,
-                    validationStampName!!
-            )
-            if (oValidationStamp.isPresent) {
-                return oValidationStamp.get()
-            } else {
-                val properties = propertyService.getProperties(branch.project)
-                for (property in properties) {
-                    val type = property.type
-                    if (type is ValidationStampPropertyType<*> && !property.isEmpty) {
-                        oValidationStamp = getValidationStampFromProperty(
-                                property,
-                                branch,
-                                validationStampName
-                        )
-                        if (oValidationStamp.isPresent) {
-                            return oValidationStamp.get()
-                        }
+            val properties = propertyService.getProperties(branch.project)
+            for (property in properties) {
+                val type = property.type
+                if (type is ValidationStampPropertyType<*> && !property.isEmpty) {
+                    oValidationStamp = getValidationStampFromProperty(
+                            property,
+                            branch,
+                            validationStampName
+                    )
+                    if (oValidationStamp.isPresent) {
+                        return oValidationStamp.get()
                     }
                 }
-                throw ValidationStampNotFoundException(
-                        branch.project.name,
-                        branch.name,
-                        validationStampName
-                )
             }
+            throw ValidationStampNotFoundException(
+                    branch.project.name,
+                    branch.name,
+                    validationStampName
+            )
         }
     }
 
@@ -1048,7 +1044,6 @@ class StructureServiceImpl(
         // Gets the validation stamp
         val validationStamp = getOrCreateValidationStamp(
                 build.branch,
-                validationRunRequest.validationStampId,
                 validationRunRequest.actualValidationStampName)
         // Validation run data
         val rawDataTypeId: String? = validationRunRequest.validationStampData?.type

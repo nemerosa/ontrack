@@ -93,13 +93,13 @@ constructor(
         val build = structureService.getBuild(buildId)
         // Creates the service validation run request from the form
         val validationRunRequest = ValidationRunRequest(
-                description = validationRunRequestForm.description,
-                validationRunStatusId = validationRunRequestForm.validationRunStatusId,
                 validationStampData = ValidationRunDataRequest(
                         name = validationRunRequestForm.validationStampData.id,
                         type = validationRunRequestForm.validationStampData.type,
                         data = parseValidationRunData(build, validationRunRequestForm)
                 ),
+                validationRunStatusId = validationRunRequestForm.validationRunStatusId,
+                description = validationRunRequestForm.description,
                 properties = validationRunRequestForm.properties
         )
         // Delegates to the service
