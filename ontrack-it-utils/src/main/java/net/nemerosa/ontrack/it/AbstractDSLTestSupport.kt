@@ -121,7 +121,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationDataTypeId: String? = null,
             validationRunData: T? = null
     ): ValidationRun {
-        return asUser().with(this, ValidationRunCreate::class.java).call {
+        return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
                     this,
                     ValidationRunRequest(

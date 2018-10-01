@@ -93,15 +93,14 @@ public abstract class AbstractBuildFilterIT extends AbstractServiceTestSupport {
         }
 
         public BuildCreator withValidation(ValidationStamp stamp, ValidationRunStatusID status) throws Exception {
-            asUser().with(branch, ValidationRunCreate.class).call(() ->
+            asUser().withView(branch).with(branch, ValidationRunCreate.class).call(() ->
                     structureService.newValidationRun(
-                            ValidationRun.of(
-                                    build,
-                                    stamp,
-                                    1,
-                                    Signature.of("user"),
-                                    status,
-                                    ""
+                            build,
+                            new ValidationRunRequest(
+                                    null,
+                                    null,
+                                    stamp.getName(),
+                                    status.getId()
                             )
                     )
             );

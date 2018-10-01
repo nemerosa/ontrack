@@ -169,23 +169,25 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         );
     }
 
-    @Deprecated
     public ValidationRun doValidateBuild(
             Build build,
             ValidationStamp vs,
             ValidationRunStatusID statusId,
             ValidationRunData<?> runData
     ) throws Exception {
-        return asUser().with(build, ValidationRunCreate.class).call(() ->
+        return asUser().withView(build).with(build, ValidationRunCreate.class).call(() ->
                 structureService.newValidationRun(
-                        ValidationRun.of(
-                                build,
-                                vs,
-                                1,
-                                Signature.of("test"),
-                                statusId,
-                                ""
-                        ).withData(runData)
+                        build,
+                        new ValidationRunRequest(
+                                null,
+                                new ValidationRunDataRequest(
+                                        vs.getName(),
+                                        runData != null ? runData.getDescriptor().getId() : null,
+                                        runData != null ? runData.getData() : null
+                                ),
+                                null,
+                                statusId.getId()
+                        )
                 )
         );
     }
