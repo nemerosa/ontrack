@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.boot.ui
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.toJson
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataFormatException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
 import net.nemerosa.ontrack.model.structure.ValidationStamp
@@ -13,6 +15,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 /**
  * All tests with data associated to validation runs.
@@ -44,7 +47,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .mustBe("PASSED").withData(40)
     }
 
-    @Test(expected = ValidationRunDataInputException::class)
+    @Test(expected = ValidationRunDataFormatException::class)
     fun `Stamp with type, computed status, run with data, provided status, invalid data`() {
         doTestVS().withType().withComputedStatus(50)
                 .forRun().withData("text".toJson()!!).withStatus("PASSED")
@@ -59,149 +62,115 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .mustBe("FAILED").withData(40)
     }
 
-    @Test
+    @Test(expected = ValidationRunDataInputException::class)
     fun `Stamp with type, computed status, run with data, unprovided status, invalid data`() {
-        TODO()
+        doTestVS().withType().withComputedStatus(50)
+                .forRun().withData("text".toJson()!!)
+                .execute()
     }
 
     @Test
-    fun `Stamp with type, computed status, run without data, provided status, valid data`() {
-        TODO()
+    fun `Stamp with type, computed status, run without data, provided status`() {
+        doTestVS().withType().withComputedStatus(50)
+                .forRun().withStatus("PASSED")
+                .execute()
+                .mustBe("PASSED").withNoData()
     }
 
-    @Test
-    fun `Stamp with type, computed status, run without data, provided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp with type, computed status, run without data, unprovided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp with type, computed status, run without data, unprovided status, invalid data`() {
-        TODO()
+    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    fun `Stamp with type, computed status, run without data, unprovided status`() {
+        doTestVS().withType().withComputedStatus(50)
+                .forRun()
+                .execute()
     }
 
     @Test
     fun `Stamp with type, no computed status, run with data, provided status, valid data`() {
-        TODO()
+        doTestVS().withType()
+                .forRun().withData(mapOf("value" to 40)).withStatus("PASSED")
+                .execute()
+                .mustBe("PASSED").withData(40)
     }
 
-    @Test
+    @Test(expected = ValidationRunDataFormatException::class)
     fun `Stamp with type, no computed status, run with data, provided status, invalid data`() {
-        TODO()
+        doTestVS().withType()
+                .forRun().withData("text".toJson()!!).withStatus("PASSED")
+                .execute()
     }
 
     @Test
     fun `Stamp with type, no computed status, run with data, unprovided status, valid data`() {
-        TODO()
+        doTestVS().withType()
+                .forRun().withData(mapOf("value" to 40))
+                .execute()
+                .mustBe("PASSED").withData(40)
     }
 
-    @Test
+    @Test(expected = ValidationRunDataFormatException::class)
     fun `Stamp with type, no computed status, run with data, unprovided status, invalid data`() {
-        TODO()
+        doTestVS().withType()
+                .forRun().withData("text".toJson()!!)
+                .execute()
     }
 
     @Test
-    fun `Stamp with type, no computed status, run without data, provided status, valid data`() {
-        TODO()
+    fun `Stamp with type, no computed status, run without data, provided status`() {
+        doTestVS().withType()
+                .forRun().withStatus("FAILED")
+                .execute()
+                .mustBe("FAILED").withNoData()
+    }
+
+    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    fun `Stamp with type, no computed status, run without data, unprovided status`() {
+        doTestVS().withType()
+                .forRun()
+                .execute()
     }
 
     @Test
-    fun `Stamp with type, no computed status, run without data, provided status, invalid data`() {
-        TODO()
+    fun `Stamp without type, run with data, provided status, valid data`() {
+        doTestVS()
+                .forRun().withData(mapOf("value" to 40)).withStatus("FAILED")
+                .execute()
+                .mustBe("FAILED").withData(40)
+    }
+
+    @Test(expected = ValidationRunDataFormatException::class)
+    fun `Stamp without type, run with data, provided status, invalid data`() {
+        doTestVS()
+                .forRun().withData("text".toJson()!!).withStatus("FAILED")
+                .execute()
+    }
+
+    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    fun `Stamp without type, run with data, unprovided status, valid data`() {
+        doTestVS()
+                .forRun().withData("value" to 40)
+                .execute()
+    }
+
+    @Test(expected = ValidationRunDataFormatException::class)
+    fun `Stamp without type, run with data, unprovided status, invalid data`() {
+        doTestVS()
+                .forRun().withData("text".toJson()!!)
+                .execute()
     }
 
     @Test
-    fun `Stamp with type, no computed status, run without data, unprovided status, valid data`() {
-        TODO()
+    fun `Stamp without type, run without data, provided status`() {
+        doTestVS()
+                .forRun().withStatus("FAILED")
+                .execute()
+                .mustBe("FAILED").withNoData()
     }
 
-    @Test
-    fun `Stamp with type, no computed status, run without data, unprovided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run with data, provided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run with data, provided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run with data, unprovided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run with data, unprovided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run without data, provided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run without data, provided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run without data, unprovided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, computed status, run without data, unprovided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run with data, provided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run with data, provided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run with data, unprovided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run with data, unprovided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run without data, provided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run without data, provided status, invalid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run without data, unprovided status, valid data`() {
-        TODO()
-    }
-
-    @Test
-    fun `Stamp without type, no computed status, run without data, unprovided status, invalid data`() {
-        TODO()
+    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    fun `Stamp without type, run without data, unprovided status`() {
+        doTestVS()
+                .forRun()
+                .execute()
     }
 
     private fun doTestVS() = VS()
@@ -239,23 +208,20 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
 
     private inner class VRun(private val vs: VS) {
         private var data: JsonNode? = null
-        private var type: String? = null
         private var status: String? = null
 
         fun withData(value: JsonNode) = apply {
             data = value
         }
 
-        fun withData(map: Map<String,*>) = apply {
+        fun withData(map: Map<String, *>) = apply {
             data = map.toJson()!!
         }
 
+        fun withData(pair: Pair<String, *>) = withData(mapOf(pair))
+
         fun withStatus(s: String) = apply {
             status = s
-        }
-
-        fun withType(s: String) = apply {
-            type = s
         }
 
         fun execute(): VTest {
@@ -269,7 +235,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                                     validationRunStatusId = status,
                                     validationStampData = ValidationRunRequestFormData(
                                             id = it.name,
-                                            type = type,
+                                            type = if (vs.typed) null else testNumberValidationDataType.descriptor.id,
                                             data = data
                                     )
                             )
@@ -295,6 +261,10 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                     assertEquals(expectedValue, it)
                 }
             }
+        }
+
+        fun withNoData() = apply {
+            assertNull(run.data)
         }
     }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.json.toJson
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataFormatException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -60,13 +61,19 @@ class TestNumberValidationDataType(
                     .optional()
             )
 
-    override fun fromForm(node: JsonNode?): Int? {
-        return if (node?.has("value") == true) {
-            node.get("value")?.asInt()
-        } else {
-            null
-        }
-    }
+    override fun fromForm(node: JsonNode?): Int? =
+            node?.run {
+                if (has("value")) {
+                    val valueNode = get("value")
+                    if (valueNode.isInt) {
+                        valueNode.asInt()
+                    } else {
+                        throw ValidationRunDataFormatException("`value` attribute for the run data must be an integer.")
+                    }
+                } else {
+                    throw ValidationRunDataFormatException("Cannot find `value` attribute for the run data.")
+                }
+            }
 
     override fun computeStatus(config: Int?, data: Int): ValidationRunStatusID? {
         if (config != null) {

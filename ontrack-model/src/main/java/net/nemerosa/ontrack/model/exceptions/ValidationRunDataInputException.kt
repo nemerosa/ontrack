@@ -6,6 +6,8 @@ class ValidationRunDataStatusRequiredException : ValidationRunDataInputException
         "Validation Run Status is required."
 )
 
+class ValidationRunDataFormatException(message: String) : ValidationRunDataInputException(message)
+
 @Deprecated("Run with data when stamp has no data type is valid.")
 class ValidationRunDataUnexpectedException : ValidationRunDataInputException(
         "Validation Run Data is not expected."
