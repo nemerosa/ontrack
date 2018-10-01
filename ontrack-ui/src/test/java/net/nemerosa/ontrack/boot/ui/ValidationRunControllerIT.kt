@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.ui
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
+import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
@@ -37,7 +39,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
     @Test
     fun `Stamp with type, computed status, run with data, provided status, valid data`() {
         doTestVS().withType().withComputedStatus(50)
-                .forRun().withData(40).withStatus("PASSED")
+                .forRun().withData(mapOf("value" to 40)).withStatus("PASSED")
                 .execute()
                 .mustBe("PASSED").withData(40)
     }
@@ -45,14 +47,14 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
     @Test(expected = ValidationRunDataInputException::class)
     fun `Stamp with type, computed status, run with data, provided status, invalid data`() {
         doTestVS().withType().withComputedStatus(50)
-                .forRun().withData("text").withStatus("PASSED")
+                .forRun().withData("text".toJson()!!).withStatus("PASSED")
                 .execute()
     }
 
     @Test
     fun `Stamp with type, computed status, run with data, unprovided status, valid data`() {
         doTestVS().withType().withComputedStatus(50)
-                .forRun().withData(40)
+                .forRun().withData(mapOf("value" to 40))
                 .execute()
                 .mustBe("FAILED").withData(40)
     }
@@ -236,11 +238,16 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
     }
 
     private inner class VRun(private val vs: VS) {
-        private var data: Any? = null
+        private var data: JsonNode? = null
         private var type: String? = null
         private var status: String? = null
-        fun withData(value: Any) = apply {
+
+        fun withData(value: JsonNode) = apply {
             data = value
+        }
+
+        fun withData(map: Map<String,*>) = apply {
+            data = map.toJson()!!
         }
 
         fun withStatus(s: String) = apply {
@@ -254,11 +261,18 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         fun execute(): VTest {
             val run = vs.withValidationStamp {
                 it.branch.build<ValidationRun>("1.0.0") {
-                    validateWithData(
-                            validationStampName = it.name,
-                            validationRunStatusID = status?.run { validationRunStatusService.getValidationRunStatus(this) },
-                            validationDataTypeId = type,
-                            validationRunData = data
+                    // Calling the validation run controller
+                    validationRunController.newValidationRun(
+                            id,
+                            ValidationRunRequestForm(
+                                    description = "",
+                                    validationRunStatusId = status,
+                                    validationStampData = ValidationRunRequestFormData(
+                                            id = it.name,
+                                            type = type,
+                                            data = data
+                                    )
+                            )
                     )
                 }
             }

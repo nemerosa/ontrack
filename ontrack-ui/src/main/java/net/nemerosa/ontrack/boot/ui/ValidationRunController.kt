@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
@@ -79,13 +80,57 @@ constructor(
                 .description()
     }
 
+    /**
+     * See [newValidationRunForm] to get the mapping from the form.
+     *
+     * Note that some properties, like the `type` of data are provided only when using the DSL
+     * or the raw REST API, never through the GUI.
+     */
     @PostMapping("builds/{buildId}/validationRuns/create")
     @ResponseStatus(HttpStatus.CREATED)
-    fun newValidationRun(@PathVariable buildId: ID, @RequestBody validationRunRequest: ValidationRunRequest): ValidationRun {
+    fun newValidationRun(@PathVariable buildId: ID, @RequestBody validationRunRequestForm: ValidationRunRequestForm): ValidationRun {
         // Gets the build
         val build = structureService.getBuild(buildId)
+        // Creates the service validation run request from the form
+        val validationRunRequest = ValidationRunRequest(
+                description = validationRunRequestForm.description,
+                validationRunStatusId = validationRunRequestForm.validationRunStatusId,
+                validationStampData = ValidationRunDataRequest(
+                        name = validationRunRequestForm.validationStampData.id,
+                        type = validationRunRequestForm.validationStampData.type,
+                        data = parseValidationRunData(build, validationRunRequestForm)
+                ),
+                properties = validationRunRequestForm.properties
+        )
         // Delegates to the service
         return structureService.newValidationRun(build, validationRunRequest)
+    }
+
+    private fun parseValidationRunData(build: Build, validationRunRequestForm: ValidationRunRequestForm): Any? {
+        return validationRunRequestForm.validationStampData.data?.run {
+            // Gets the validation stamp
+            val validationStamp: ValidationStamp = structureService.findValidationStampByName(
+                    build.project.name,
+                    build.branch.name,
+                    validationRunRequestForm.validationStampData.id
+            ).orElseThrow {
+                ValidationStampNotFoundException(
+                        build.project.name,
+                        build.branch.name,
+                        validationRunRequestForm.validationStampData.id
+                )
+            }
+            // Gets the data type ID if any
+            val typeId: String? = validationStamp.dataType?.descriptor?.id ?: validationRunRequestForm.validationStampData.type
+            // If no type, ignore the data
+            return typeId?.run {
+                // Gets the actual type
+                validationDataTypeService.getValidationDataType<Any, Any>(this)
+            }?.run {
+                // Parses data from the form
+                fromForm(validationRunRequestForm.validationStampData.data)
+            }
+        }
     }
 
     @GetMapping("validationRuns/{validationRunId}")
