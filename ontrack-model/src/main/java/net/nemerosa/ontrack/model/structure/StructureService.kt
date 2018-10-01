@@ -239,12 +239,6 @@ interface StructureService {
 
     // Validation runs
 
-    /**
-     * @see .newValidationRun
-     */
-    @Deprecated("")
-    fun newValidationRun(validationRun: ValidationRun): ValidationRun
-
     fun newValidationRun(build: Build, validationRunRequest: ValidationRunRequest): ValidationRun
 
     fun getValidationRun(validationRunId: ID): ValidationRun

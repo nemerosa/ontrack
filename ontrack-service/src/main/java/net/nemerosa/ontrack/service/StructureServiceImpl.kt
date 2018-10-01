@@ -1044,17 +1044,6 @@ class StructureServiceImpl(
         return validationStamp
     }
 
-    override fun newValidationRun(validationRun: ValidationRun): ValidationRun {
-        return newValidationRun(
-                validationRun.build,
-                ValidationRunRequest(
-                        validationStampId = validationRun.validationStamp.id(),
-                        validationRunStatusId = validationRun.lastStatus.statusID.id,
-                        description = validationRun.lastStatus.description
-                )
-        )
-    }
-
     override fun newValidationRun(build: Build, validationRunRequest: ValidationRunRequest): ValidationRun {
         // Gets the validation stamp
         val validationStamp = getOrCreateValidationStamp(

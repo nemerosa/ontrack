@@ -17,13 +17,12 @@ class ValidationRunQLIT extends AbstractQLITSupport {
         def build = doCreateBuild(branch, nd("1", "Build 1"))
         def validationRun = asUser().with(project, ValidationRunCreate).call {
             structureService.newValidationRun(
-                    ValidationRun.of(
-                            build,
-                            vs,
-                            0,
-                            Signature.of('test'),
-                            ValidationRunStatusID.STATUS_FAILED,
-                            "Validation failed"
+                    build,
+                    new ValidationRunRequest(
+                            null,
+                            null,
+                            vs.name,
+                            "FAILED"
                     )
             )
         }
