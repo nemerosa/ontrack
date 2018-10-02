@@ -94,7 +94,9 @@ constructor(
         // Creates the service validation run request from the form
         val validationRunRequest = ValidationRunRequest(
                 validationStampName = validationRunRequestForm.validationStampData.id,
-                validationRunStatusId = validationRunRequestForm.validationRunStatusId,
+                validationRunStatusId = validationRunRequestForm.validationRunStatusId?.run {
+                    validationRunStatusService.getValidationRunStatus(this)
+                },
                 dataTypeId = validationRunRequestForm.validationStampData.type,
                 data = parseValidationRunData(build, validationRunRequestForm),
                 description = validationRunRequestForm.description,

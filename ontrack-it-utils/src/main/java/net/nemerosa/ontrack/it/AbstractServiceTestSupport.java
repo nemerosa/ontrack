@@ -180,7 +180,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                         build,
                         new ValidationRunRequest(
                                 vs.getName(),
-                                statusId.getId(),
+                                statusId,
                                 runData != null ? runData.getDescriptor().getId() : null,
                                 runData != null ? runData.getData() : null,
                                 null

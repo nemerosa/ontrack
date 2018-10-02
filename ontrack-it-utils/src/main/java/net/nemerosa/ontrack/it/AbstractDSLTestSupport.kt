@@ -128,7 +128,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                             validationStampName = validationStampName,
                             dataTypeId = validationDataTypeId,
                             data = validationRunData,
-                            validationRunStatusId = validationRunStatusID?.id
+                            validationRunStatusId = validationRunStatusID
                     )
             )
         }

@@ -1066,8 +1066,7 @@ class StructureServiceImpl(
         val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
                 rawRunData,
                 validationStamp.dataType,
-                validationRunRequest.validationRunStatusId,
-                validationRunStatusService::getValidationRunStatus
+                validationRunRequest.validationRunStatusId
         )
         // Validation run to create
         val validationRun = ValidationRun.of(

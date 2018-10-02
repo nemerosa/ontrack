@@ -20,9 +20,6 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
     @Autowired
     private StructureService structureService;
 
-    @Autowired
-    private ValidationRunStatusService validationRunStatusService;
-
     @Test(expected = IllegalArgumentException.class)
     public void newProject_null() {
         structureService.newProject(null);
@@ -177,9 +174,8 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         asUser().withView(branch).execute(() -> structureService.newValidationRun(
                 build,
                 new ValidationRunRequest(
-                        null,
                         stamp.getName(),
-                        ValidationRunStatusID.PASSED
+                        ValidationRunStatusID.STATUS_PASSED
                 )
         ));
     }
@@ -195,9 +191,8 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
                 structureService.newValidationRun(
                         build,
                         new ValidationRunRequest(
-                                null,
                                 stamp.getName(),
-                                ValidationRunStatusID.PASSED
+                                ValidationRunStatusID.STATUS_PASSED
                         )
                 )
         );

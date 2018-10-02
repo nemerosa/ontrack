@@ -43,8 +43,7 @@ constructor(
     override fun <C, T> validateData(
             typedData: ValidationRunData<T>?,
             config: ValidationDataTypeConfig<C>?,
-            status: String?,
-            statusLoader: (String) -> ValidationRunStatusID
+            status: ValidationRunStatusID?
     ): ValidationRunDataWithStatus<T> {
         if (config == null) {
             // OK, there might be data, there might be not,
@@ -55,7 +54,7 @@ constructor(
             } else {
                 return ValidationRunDataWithStatus(
                         typedData, // Might defined... or not. No matter here.
-                        statusLoader(status)
+                        status
                 )
             }
         } else if (typedData == null) {
@@ -65,7 +64,7 @@ constructor(
             } else {
                 return ValidationRunDataWithStatus(
                         null,
-                        statusLoader(status)
+                        status
                 )
             }
         } else if (typedData.descriptor.id != config.descriptor.id) {
@@ -86,7 +85,7 @@ constructor(
             val finalStatus: ValidationRunStatusID =
                     when {
                     // Provided status has priority
-                        status != null -> statusLoader(status)
+                        status != null -> status
                     // But it can be computed
                         computedStatus != null -> computedStatus
                     // Else, we consider it valid
