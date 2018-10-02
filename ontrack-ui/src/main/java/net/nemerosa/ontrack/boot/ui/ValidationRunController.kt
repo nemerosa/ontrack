@@ -93,11 +93,11 @@ constructor(
         val build = structureService.getBuild(buildId)
         // Creates the service validation run request from the form
         val validationRunRequest = ValidationRunRequest(
-                validationStampName = validationRunRequestForm.validationStampData.id,
+                validationStampName = validationRunRequestForm.actualValidationStampName,
                 validationRunStatusId = validationRunRequestForm.validationRunStatusId?.run {
                     validationRunStatusService.getValidationRunStatus(this)
                 },
-                dataTypeId = validationRunRequestForm.validationStampData.type,
+                dataTypeId = validationRunRequestForm.validationStampData?.type,
                 data = parseValidationRunData(build, validationRunRequestForm),
                 description = validationRunRequestForm.description,
                 properties = validationRunRequestForm.properties
@@ -107,7 +107,7 @@ constructor(
     }
 
     private fun parseValidationRunData(build: Build, validationRunRequestForm: ValidationRunRequestForm): Any? {
-        return validationRunRequestForm.validationStampData.data?.run {
+        return validationRunRequestForm.validationStampData?.data?.run {
             // Gets the validation stamp
             val validationStamp: ValidationStamp = structureService.findValidationStampByName(
                     build.project.name,

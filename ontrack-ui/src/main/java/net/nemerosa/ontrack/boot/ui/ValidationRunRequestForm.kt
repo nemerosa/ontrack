@@ -11,9 +11,14 @@ import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 class ValidationRunRequestForm(
         val description: String? = null,
         val validationRunStatusId: String? = null,
-        val validationStampData: ValidationRunRequestFormData,
+        val validationStampName: String? = null,
+        val validationStampData: ValidationRunRequestFormData? = null,
         val properties: List<PropertyCreationRequest> = listOf()
-)
+) {
+    val actualValidationStampName: String
+        get() = validationStampName ?: validationStampData?.id
+        ?: throw IllegalStateException("Validation stamp name is required")
+}
 
 /**
  * This contains the mapping to the validation and any associated data.
