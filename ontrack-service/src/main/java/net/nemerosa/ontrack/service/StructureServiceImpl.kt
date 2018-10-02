@@ -214,7 +214,7 @@ class StructureServiceImpl(
         )
     }
 
-    override fun getLastPromotionRunForPromotionLevel(promotionLevel: PromotionLevel): PromotionRun {
+    override fun getLastPromotionRunForPromotionLevel(promotionLevel: PromotionLevel): PromotionRun? {
         securityService.checkProjectFunction(promotionLevel.projectId(), ProjectView::class.java)
         return structureRepository.getLastPromotionRunForPromotionLevel(promotionLevel)
     }

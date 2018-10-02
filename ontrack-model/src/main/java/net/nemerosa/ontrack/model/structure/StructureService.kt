@@ -182,8 +182,7 @@ interface StructureService {
 
     fun getPromotionRunsForBuildAndPromotionLevel(build: Build, promotionLevel: PromotionLevel): List<PromotionRun>
 
-    // TODO Replace by PromotionRun?
-    fun getLastPromotionRunForPromotionLevel(promotionLevel: PromotionLevel): PromotionRun
+    fun getLastPromotionRunForPromotionLevel(promotionLevel: PromotionLevel): PromotionRun?
 
     fun getPromotionRunView(promotionLevel: PromotionLevel): PromotionRunView
 
