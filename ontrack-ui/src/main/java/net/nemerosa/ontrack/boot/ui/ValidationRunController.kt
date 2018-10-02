@@ -109,17 +109,10 @@ constructor(
     private fun parseValidationRunData(build: Build, validationRunRequestForm: ValidationRunRequestForm): Any? {
         return validationRunRequestForm.validationStampData?.data?.run {
             // Gets the validation stamp
-            val validationStamp: ValidationStamp = structureService.findValidationStampByName(
-                    build.project.name,
-                    build.branch.name,
-                    validationRunRequestForm.validationStampData.id
-            ).orElseThrow {
-                ValidationStampNotFoundException(
-                        build.project.name,
-                        build.branch.name,
-                        validationRunRequestForm.validationStampData.id
-                )
-            }
+            val validationStamp: ValidationStamp = structureService.getOrCreateValidationStamp(
+                    build.branch,
+                    validationRunRequestForm.actualValidationStampName
+            )
             // Gets the data type ID if any
             val typeId: String? = validationStamp.dataType?.descriptor?.id
                     ?: validationRunRequestForm.validationStampData.type
