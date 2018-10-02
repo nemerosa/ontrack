@@ -44,7 +44,7 @@ constructor(
     @GetMapping("builds/{buildId}/validationRuns")
     fun getValidationRuns(@PathVariable buildId: ID): Resources<ValidationRun> {
         return Resources.of(
-                structureService.getValidationRunsForBuild(buildId),
+                structureService.getValidationRunsForBuild(buildId, 0, 100),
                 uri(on(ValidationRunController::class.java).getValidationRuns(buildId))
         ).forView(Build::class.java)
     }
@@ -93,12 +93,10 @@ constructor(
         val build = structureService.getBuild(buildId)
         // Creates the service validation run request from the form
         val validationRunRequest = ValidationRunRequest(
-                validationStampData = ValidationRunDataRequest(
-                        name = validationRunRequestForm.validationStampData.id,
-                        type = validationRunRequestForm.validationStampData.type,
-                        data = parseValidationRunData(build, validationRunRequestForm)
-                ),
+                validationStampName = validationRunRequestForm.validationStampData.id,
                 validationRunStatusId = validationRunRequestForm.validationRunStatusId,
+                dataTypeId = validationRunRequestForm.validationStampData.type,
+                data = parseValidationRunData(build, validationRunRequestForm),
                 description = validationRunRequestForm.description,
                 properties = validationRunRequestForm.properties
         )
@@ -121,7 +119,8 @@ constructor(
                 )
             }
             // Gets the data type ID if any
-            val typeId: String? = validationStamp.dataType?.descriptor?.id ?: validationRunRequestForm.validationStampData.type
+            val typeId: String? = validationStamp.dataType?.descriptor?.id
+                    ?: validationRunRequestForm.validationStampData.type
             // If no type, ignore the data
             return typeId?.run {
                 // Gets the actual type

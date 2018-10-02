@@ -125,11 +125,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             structureService.newValidationRun(
                     this,
                     ValidationRunRequest(
-                            validationStampData = ValidationRunDataRequest(
-                                    name = validationStampName,
-                                    type = validationDataTypeId,
-                                    data = validationRunData
-                            ),
+                            validationStampName = validationStampName,
+                            dataTypeId = validationDataTypeId,
+                            data = validationRunData,
                             validationRunStatusId = validationRunStatusID?.id
                     )
             )
@@ -140,7 +138,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         val build = structureService.buildSearch(
                 project.id,
                 BuildSearchForm().withBuildExactMatch(true).withBuildName(buildName)
-        ).first() ?: throw BuildNotFoundException(project.name, buildName)
+        ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
         structureService.addBuildLink(
                 this,
                 build

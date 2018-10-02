@@ -1044,11 +1044,11 @@ class StructureServiceImpl(
         // Gets the validation stamp
         val validationStamp = getOrCreateValidationStamp(
                 build.branch,
-                validationRunRequest.actualValidationStampName)
+                validationRunRequest.validationStampName)
         // Validation run data
-        val rawDataTypeId: String? = validationRunRequest.validationStampData?.type
+        val rawDataTypeId: String? = validationRunRequest.dataTypeId
                 ?: validationStamp.dataType?.descriptor?.id
-        val rawData: Any? = validationRunRequest.validationStampData?.data
+        val rawData: Any? = validationRunRequest.data
         // Gets the data type
         val rawDataType: ValidationDataType<Any, Any>? = rawDataTypeId?.run {
             validationDataTypeService.getValidationDataType<Any, Any>(this)
