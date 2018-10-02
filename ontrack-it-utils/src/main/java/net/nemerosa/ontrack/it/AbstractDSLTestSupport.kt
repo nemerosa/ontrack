@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.it
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
+import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
@@ -89,11 +90,13 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     fun Build.validate(
             validationStamp: ValidationStamp,
-            validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED
+            validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+            description: String? = null
     ): ValidationRun {
         return this.validateWithData<Any>(
-                validationStamp,
-                validationRunStatusID
+                validationStampName = validationStamp.name,
+                validationRunStatusID = validationRunStatusID,
+                description = description
         )
     }
 
@@ -104,12 +107,14 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationStamp: ValidationStamp,
             validationRunStatusID: ValidationRunStatusID? = null,
             validationDataTypeId: String? = null,
-            validationRunData: T? = null
+            validationRunData: T? = null,
+            description: String? = null
     ) = validateWithData(
-            validationStamp.name,
-            validationRunStatusID,
-            validationDataTypeId,
-            validationRunData
+            validationStampName = validationStamp.name,
+            validationRunStatusID = validationRunStatusID,
+            validationDataTypeId = validationDataTypeId,
+            validationRunData = validationRunData,
+            description = description
     )
 
     /**
@@ -119,7 +124,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationStampName: String,
             validationRunStatusID: ValidationRunStatusID? = null,
             validationDataTypeId: String? = null,
-            validationRunData: T? = null
+            validationRunData: T? = null,
+            description: String? = null
     ): ValidationRun {
         return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
@@ -128,7 +134,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                             validationStampName = validationStampName,
                             dataTypeId = validationDataTypeId,
                             data = validationRunData,
-                            validationRunStatusId = validationRunStatusID
+                            validationRunStatusId = validationRunStatusID,
+                            description = description
                     )
             )
         }
@@ -143,6 +150,22 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 this,
                 build
         )
+    }
+
+    /**
+     * Change of status for a validation run
+     */
+    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String) {
+        asUser().with(this, ValidationRunStatusChange::class.java).execute {
+            structureService.newValidationRunStatus(
+                    this,
+                    ValidationRunStatus.of(
+                            Signature.of("test"),
+                            status,
+                            description
+                    )
+            )
+        }
     }
 
 }
