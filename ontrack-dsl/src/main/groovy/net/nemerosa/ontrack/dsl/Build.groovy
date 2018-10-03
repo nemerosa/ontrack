@@ -88,7 +88,7 @@ class Build extends AbstractProjectResource {
         return validateWithData(
                 validationStamp,
                 [value: text],
-                'net.nemerosa.ontrack.extension.api.support.TestValidationDataType',
+                'net.nemerosa.ontrack.extension.general.validation.TextValidationDataType',
                 status
         )
     }
