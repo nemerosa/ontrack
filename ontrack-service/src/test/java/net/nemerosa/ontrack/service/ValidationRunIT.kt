@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.api.support.TestValidationData
 import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
@@ -223,7 +223,7 @@ class ValidationRunIT : AbstractDSLTestSupport() {
         }
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataException::class)
     fun validationRunWithMissingDataNotOKWithoutStatus() {
         project {
             branch {

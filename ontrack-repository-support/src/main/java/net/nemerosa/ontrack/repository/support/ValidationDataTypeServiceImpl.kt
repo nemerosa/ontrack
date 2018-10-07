@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.repository.support
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataMismatchException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
+import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -50,7 +47,11 @@ constructor(
             // We do not validate...
             // ... but status is therefore required
             if (status == null) {
-                throw ValidationRunDataStatusRequiredException()
+                if (typedData == null) {
+                    throw ValidationRunDataStatusRequiredBecauseNoDataException()
+                } else {
+                    throw ValidationRunDataStatusRequiredBecauseNoDataTypeException()
+                }
             } else {
                 return ValidationRunDataWithStatus(
                         typedData, // Might defined... or not. No matter here.
@@ -60,7 +61,7 @@ constructor(
         } else if (typedData == null) {
             // No data as input. OK as long as the status is provided
             if (status == null) {
-                throw ValidationRunDataStatusRequiredException()
+                throw ValidationRunDataStatusRequiredBecauseNoDataException()
             } else {
                 return ValidationRunDataWithStatus(
                         null,

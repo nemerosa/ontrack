@@ -5,7 +5,8 @@ import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataFormatException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataTypeException
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
 import net.nemerosa.ontrack.model.structure.ValidationStamp
@@ -77,7 +78,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .mustBe("PASSED").withNoData()
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataException::class)
     fun `Stamp with type, computed status, run without data, unprovided status`() {
         doTestVS().withType().withComputedStatus(50)
                 .forRun()
@@ -122,7 +123,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .mustBe("FAILED").withNoData()
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataException::class)
     fun `Stamp with type, no computed status, run without data, unprovided status`() {
         doTestVS().withType()
                 .forRun()
@@ -144,7 +145,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .execute()
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataTypeException::class)
     fun `Stamp without type, run with data, unprovided status, valid data`() {
         doTestVS()
                 .forRun().withData("value" to 40)
@@ -166,7 +167,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .mustBe("FAILED").withNoData()
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredException::class)
+    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataException::class)
     fun `Stamp without type, run without data, unprovided status`() {
         doTestVS()
                 .forRun()

@@ -2,8 +2,12 @@ package net.nemerosa.ontrack.model.exceptions
 
 open class ValidationRunDataInputException(pattern: String) : InputException(pattern)
 
-class ValidationRunDataStatusRequiredException : ValidationRunDataInputException(
-        "Validation Run Status is required."
+class ValidationRunDataStatusRequiredBecauseNoDataTypeException : ValidationRunDataInputException(
+        "Validation Run Status is required because the validation stamp has no data type."
+)
+
+class ValidationRunDataStatusRequiredBecauseNoDataException : ValidationRunDataInputException(
+        "Validation Run Status is required because no data is provided."
 )
 
 class ValidationRunDataFormatException(message: String) : ValidationRunDataInputException(message)
