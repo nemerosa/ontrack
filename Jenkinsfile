@@ -258,14 +258,16 @@ cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
 """
-                            junit 'build/centos/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.CENTOS.7',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/centos/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -316,14 +318,16 @@ cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
-                            junit 'build/debian/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DEBIAN',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/debian/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DEBIAN',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -364,14 +368,16 @@ cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
 """
-                            junit 'build/extension/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'EXTENSIONS',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/extension/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'EXTENSIONS',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -456,14 +462,16 @@ docker-compose \\
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
-                            junit 'build/do/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DO',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/do/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DO',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -801,14 +809,16 @@ docker-compose \\
 
 '''
                     archiveArtifacts 'build/production/**'
-                    junit 'build/production/*.xml'
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ONTRACK.SMOKE',
-                            buildResult: currentBuild.result,
-                    )
+                    script {
+                        def results = junit 'build/production/*.xml'
+                        ontrackValidate(
+                                project: projectName,
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'ONTRACK.SMOKE',
+                                testResults: results,
+                        )
+                    }
                 }
                 success {
                     ontrackPromote(
