@@ -1051,7 +1051,8 @@ class StructureServiceImpl(
         val rawData: Any? = validationRunRequest.data
         // Gets the data type
         val rawDataType: ValidationDataType<Any, Any>? = rawDataTypeId?.run {
-            validationDataTypeService.getValidationDataType<Any, Any>(this)
+            validationDataTypeService.getValidationDataType(this)
+                    ?: throw ValidationRunDataTypeNotFoundException(this)
         }
         // Type descriptor + data
         val rawRunData: ValidationRunData<Any>? = if (rawDataType != null && rawData != null) {

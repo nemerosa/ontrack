@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.boot.ui
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataFormatException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException
-import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataTypeException
+import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
 import net.nemerosa.ontrack.model.structure.ValidationStamp
@@ -174,6 +171,15 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .execute()
     }
 
+    // ---
+
+    @Test(expected = ValidationRunDataTypeNotFoundException::class)
+    fun `Stamp without type, run with data, unprovided status, unknown type`() {
+        doTestVS()
+                .forRun().withData("value" to 50).withDataType("unknown")
+                .execute()
+    }
+
     private fun doTestVS() = VS()
 
     private inner class VS {
@@ -209,6 +215,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
 
     private inner class VRun(private val vs: VS) {
         private var data: JsonNode? = null
+        private var dataType: String? = null
         private var status: String? = null
 
         fun withData(value: JsonNode) = apply {
@@ -225,6 +232,10 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
             status = s
         }
 
+        fun withDataType(s: String) = apply {
+            dataType = s
+        }
+
         fun execute(): VTest {
             val run = vs.withValidationStamp {
                 it.branch.build<ValidationRun>("1.0.0") {
@@ -236,7 +247,7 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                                     validationRunStatusId = status,
                                     validationStampData = ValidationRunRequestFormData(
                                             id = it.name,
-                                            type = if (vs.typed) null else testNumberValidationDataType.descriptor.id,
+                                            type = dataType ?: if (vs.typed) null else testNumberValidationDataType.descriptor.id,
                                             data = data
                                     )
                             )

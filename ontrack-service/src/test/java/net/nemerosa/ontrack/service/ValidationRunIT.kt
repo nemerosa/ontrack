@@ -6,11 +6,13 @@ import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -368,6 +370,26 @@ class ValidationRunIT : AbstractDSLTestSupport() {
             }
         }
 
+    }
+
+    @Test
+    fun `Validation run data with unknown type`() {
+        project {
+            branch {
+                val vs = validationStamp("VS")
+                // Build
+                build("1.0.0") {
+                    // Creates a validation run with data, and an unknown data type
+                    assertFailsWith<ValidationRunDataTypeNotFoundException> {
+                        validateWithData(
+                                validationStamp = vs,
+                                validationDataTypeId = "unknown",
+                                validationRunData = TestValidationData(2, 4, 8)
+                        )
+                    }
+                }
+            }
+        }
     }
 
 }
