@@ -68,11 +68,20 @@ pipeline {
 git checkout -B ${BRANCH_NAME}
 git clean -xfd
 '''
+                sh ''' ./gradlew clean versionDisplay versionFile'''
+                script {
+                    // Reads version information
+                    def props = readProperties(file: 'build/version.properties')
+                    version = props.VERSION_DISPLAY
+                    gitCommit = props.VERSION_COMMIT
+                    // If not a PR, create a build
+                    if (!pr) {
+                        ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                    }
+                }
+                echo "Version = ${version}"
                 sh '''\
 ./gradlew \\
-    clean \\
-    versionDisplay \\
-    versionFile \\
     test \\
     build \\
     integrationTest \\
@@ -87,13 +96,6 @@ git clean -xfd
     --parallel \\
     --console plain
 '''
-                script {
-                    // Reads version information
-                    def props = readProperties(file: 'build/version.properties')
-                    version = props.VERSION_DISPLAY
-                    gitCommit = props.VERSION_COMMIT
-                }
-                echo "Version = ${version}"
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
@@ -122,14 +124,21 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             }
             post {
                 always {
-                    junit '**/build/test-results/**/*.xml'
-                }
-                success {
                     script {
+                        def results = junit '**/build/test-results/**/*.xml'
+                        // If not a PR, create a build validation stamp
                         if (!pr) {
-                            ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'BUILD',
+                                    testResults: results,
+                            )
                         }
                     }
+                }
+                success {
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                     stash name: "rpm", includes: "build/distributions/*.rpm"
                     stash name: "debian", includes: "build/distributions/*.deb"
@@ -176,20 +185,13 @@ docker-compose --project-name local down --volumes
                     script {
                         def results = junit('build/acceptance/*.xml')
                         if (!pr) {
-                            // TODO #176 Validation
-                            // ontrackScript logging: true,
-                            //         bindings: [
-                            //                 PROJECT: projectName,
-                            //                 BRANCH: branchName,
-                            //                 VERSION: version,
-                            //                 PASSED: results.passCount,
-                            //                 TOTAL: results.totalCount,
-                            //         ],
-                            //         script: '''
-                            //             def build = ontrack.build(PROJECT, BRANCH, VERSION)
-                            //             build.validateWithFraction('ACCEPTANCE', PASSED, TOTAL)
-                            //             0
-                            //         '''
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE',
+                                    testResults: results,
+                            )
                         }
                     }
                 }
