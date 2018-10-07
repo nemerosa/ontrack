@@ -71,8 +71,8 @@ constructor(
         } else if (typedData.descriptor.id != config.descriptor.id) {
             // Different type of data
             throw ValidationRunDataMismatchException(
-                    config.descriptor.id,
-                    typedData.descriptor.id
+                    actualId = typedData.descriptor.id,
+                    expectedId= config.descriptor.id
             )
         } else {
             // Gets the type
