@@ -747,7 +747,7 @@ set -e
 
 SSH_OPTIONS=StrictHostKeyChecking=no
 
-SSH_HOST=ontrack.nemerosa.net
+SSH_HOST=${ONTRACK_IP}
 
 scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
 ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
