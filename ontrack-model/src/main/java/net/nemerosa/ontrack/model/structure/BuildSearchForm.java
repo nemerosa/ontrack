@@ -24,7 +24,7 @@ public class BuildSearchForm {
     private String validationStampName;
     @Wither
     private String property;
-    @Size(max = 40)
+    @Size(max = 200)
     @Wither
     private String propertyValue;
     @Wither
