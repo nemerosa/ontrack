@@ -68,11 +68,20 @@ pipeline {
 git checkout -B ${BRANCH_NAME}
 git clean -xfd
 '''
+                sh ''' ./gradlew clean versionDisplay versionFile'''
+                script {
+                    // Reads version information
+                    def props = readProperties(file: 'build/version.properties')
+                    version = props.VERSION_DISPLAY
+                    gitCommit = props.VERSION_COMMIT
+                    // If not a PR, create a build
+                    if (!pr) {
+                        ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                    }
+                }
+                echo "Version = ${version}"
                 sh '''\
 ./gradlew \\
-    clean \\
-    versionDisplay \\
-    versionFile \\
     test \\
     build \\
     integrationTest \\
@@ -87,13 +96,6 @@ git clean -xfd
     --parallel \\
     --console plain
 '''
-                script {
-                    // Reads version information
-                    def props = readProperties(file: 'build/version.properties')
-                    version = props.VERSION_DISPLAY
-                    gitCommit = props.VERSION_COMMIT
-                }
-                echo "Version = ${version}"
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
@@ -122,14 +124,21 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             }
             post {
                 always {
-                    junit '**/build/test-results/**/*.xml'
-                }
-                success {
                     script {
+                        def results = junit '**/build/test-results/**/*.xml'
+                        // If not a PR, create a build validation stamp
                         if (!pr) {
-                            ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'BUILD',
+                                    testResults: results,
+                            )
                         }
                     }
+                }
+                success {
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                     stash name: "rpm", includes: "build/distributions/*.rpm"
                     stash name: "debian", includes: "build/distributions/*.deb"
@@ -176,20 +185,13 @@ docker-compose --project-name local down --volumes
                     script {
                         def results = junit('build/acceptance/*.xml')
                         if (!pr) {
-                            // TODO #176 Validation
-                            // ontrackScript logging: true,
-                            //         bindings: [
-                            //                 PROJECT: projectName,
-                            //                 BRANCH: branchName,
-                            //                 VERSION: version,
-                            //                 PASSED: results.passCount,
-                            //                 TOTAL: results.totalCount,
-                            //         ],
-                            //         script: '''
-                            //             def build = ontrack.build(PROJECT, BRANCH, VERSION)
-                            //             build.validateWithFraction('ACCEPTANCE', PASSED, TOTAL)
-                            //             0
-                            //         '''
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'ACCEPTANCE',
+                                    testResults: results,
+                            )
                         }
                     }
                 }
@@ -256,14 +258,16 @@ cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
 """
-                            junit 'build/centos/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.CENTOS.7',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/centos/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -314,14 +318,16 @@ cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
-                            junit 'build/debian/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DEBIAN',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/debian/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DEBIAN',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -362,14 +368,16 @@ cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
 """
-                            junit 'build/extension/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'EXTENSIONS',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/extension/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'EXTENSIONS',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -454,14 +462,16 @@ docker-compose \\
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
-                            junit 'build/do/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DO',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/do/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DO',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -799,14 +809,16 @@ docker-compose \\
 
 '''
                     archiveArtifacts 'build/production/**'
-                    junit 'build/production/*.xml'
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ONTRACK.SMOKE',
-                            buildResult: currentBuild.result,
-                    )
+                    script {
+                        def results = junit 'build/production/*.xml'
+                        ontrackValidate(
+                                project: projectName,
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'ONTRACK.SMOKE',
+                                testResults: results,
+                        )
+                    }
                 }
                 success {
                     ontrackPromote(
