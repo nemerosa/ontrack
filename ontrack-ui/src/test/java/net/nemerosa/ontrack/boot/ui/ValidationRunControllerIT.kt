@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
+import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.structure.ValidationRun
@@ -36,6 +37,9 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
 
     @Autowired
     private lateinit var testNumberValidationDataType: TestNumberValidationDataType
+
+    @Autowired
+    private lateinit var testValidationDataType: TestValidationDataType
 
     @Test
     fun `Stamp with type, computed status, run with data, provided status, valid data`() {
@@ -180,6 +184,35 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 .execute()
     }
 
+    // ---
+
+    @Test(expected = ValidationRunDataJSONInputException::class)
+    fun `Invalid JSON must be caught as an input exception`() {
+        project {
+            branch {
+                val vs = validationStamp(
+                        "VS",
+                        testValidationDataType.config(null)
+                )
+                build<ValidationRun>("1.0.0") {
+                    // Calling the validation run controller
+                    validationRunController.newValidationRun(
+                            id,
+                            ValidationRunRequestForm(
+                                    description = "",
+                                    validationRunStatusId = null,
+                                    validationStampData = ValidationRunRequestFormData(
+                                            id = vs.name,
+                                            type = testValidationDataType.descriptor.id,
+                                            data = mapOf("CRITICAL" to 1).toJson() // CRITICAL instead of critical
+                                    )
+                            )
+                    )
+                }
+            }
+        }
+    }
+
     private fun doTestVS() = VS()
 
     private inner class VS {
@@ -247,7 +280,8 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                                     validationRunStatusId = status,
                                     validationStampData = ValidationRunRequestFormData(
                                             id = it.name,
-                                            type = dataType ?: if (vs.typed) null else testNumberValidationDataType.descriptor.id,
+                                            type = dataType
+                                                    ?: if (vs.typed) null else testNumberValidationDataType.descriptor.id,
                                             data = data
                                     )
                             )

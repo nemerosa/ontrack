@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
+import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
@@ -122,7 +123,11 @@ constructor(
                 validationDataTypeService.getValidationDataType<Any, Any>(this)
             }?.run {
                 // Parses data from the form
-                fromForm(validationRunRequestForm.validationStampData.data)
+                try {
+                    fromForm(validationRunRequestForm.validationStampData.data)
+                } catch (ex: JsonParseException) {
+                    throw ValidationRunDataJSONInputException(ex)
+                }
             }
         }
     }

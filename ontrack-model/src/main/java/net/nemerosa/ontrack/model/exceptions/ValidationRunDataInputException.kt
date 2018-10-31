@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.exceptions
 
+import net.nemerosa.ontrack.json.JsonParseException
+
 open class ValidationRunDataInputException(pattern: String) : InputException(pattern)
 
 class ValidationRunDataStatusRequiredBecauseNoDataTypeException : ValidationRunDataInputException(
@@ -8,6 +10,10 @@ class ValidationRunDataStatusRequiredBecauseNoDataTypeException : ValidationRunD
 
 class ValidationRunDataStatusRequiredBecauseNoDataException : ValidationRunDataInputException(
         "Validation Run Status is required because no data is provided."
+)
+
+class ValidationRunDataJSONInputException(ex: JsonParseException) : ValidationRunDataInputException(
+        "Could not parse the JSON for the validation data: ${ex.message}"
 )
 
 class ValidationRunDataFormatException(message: String) : ValidationRunDataInputException(message)
