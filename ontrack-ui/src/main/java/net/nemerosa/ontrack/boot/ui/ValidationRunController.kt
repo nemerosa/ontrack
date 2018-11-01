@@ -126,7 +126,7 @@ constructor(
                 try {
                     fromForm(validationRunRequestForm.validationStampData.data)
                 } catch (ex: JsonParseException) {
-                    throw ValidationRunDataJSONInputException(ex)
+                    throw ValidationRunDataJSONInputException(ex, validationRunRequestForm.validationStampData.data)
                 }
             }
         }

@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.model.exceptions
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.json.JsonUtils
 
 open class ValidationRunDataInputException(pattern: String) : InputException(pattern)
 
@@ -12,8 +14,8 @@ class ValidationRunDataStatusRequiredBecauseNoDataException : ValidationRunDataI
         "Validation Run Status is required because no data is provided."
 )
 
-class ValidationRunDataJSONInputException(ex: JsonParseException) : ValidationRunDataInputException(
-        "Could not parse the JSON for the validation data: ${ex.message}"
+class ValidationRunDataJSONInputException(ex: JsonParseException, data: JsonNode) : ValidationRunDataInputException(
+        "Could not parse the JSON for the validation data: ${ex.message} for ${JsonUtils.toJSONString(data)}"
 )
 
 class ValidationRunDataFormatException(message: String) : ValidationRunDataInputException(message)
