@@ -213,6 +213,36 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         }
     }
 
+    // ---
+
+    @Test(expected = ValidationRunDataMismatchException::class)
+    fun `Request type is more important for the parsing than the stamp type`() {
+        project {
+            branch {
+                val vs = validationStamp(
+                        "VS",
+                        testValidationDataType.config(null)
+                )
+                build<ValidationRun>("1.0.0") {
+                    // Calling the validation run controller
+                    validationRunController.newValidationRun(
+                            id,
+                            ValidationRunRequestForm(
+                                    description = "",
+                                    validationRunStatusId = null,
+                                    validationStampData = ValidationRunRequestFormData(
+                                            id = vs.name,
+                                            // Sending a number type where a fraction is expected
+                                            type = testNumberValidationDataType.descriptor.id,
+                                            data = mapOf("value" to 42).toJson()
+                                    )
+                            )
+                    )
+                }
+            }
+        }
+    }
+
     private fun doTestVS() = VS()
 
     private inner class VS {

@@ -115,8 +115,8 @@ constructor(
                     validationRunRequestForm.actualValidationStampName
             )
             // Gets the data type ID if any
-            val typeId: String? = validationStamp.dataType?.descriptor?.id
-                    ?: validationRunRequestForm.validationStampData.type
+            // First, the data type in the request, and if not specified, the type of the validation stamp
+            val typeId: String? = validationRunRequestForm.validationStampData.type ?: validationStamp.dataType?.descriptor?.id
             // If no type, ignore the data
             return typeId?.run {
                 // Gets the actual type
