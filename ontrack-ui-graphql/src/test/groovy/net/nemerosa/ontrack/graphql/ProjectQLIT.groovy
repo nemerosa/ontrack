@@ -16,14 +16,6 @@ class ProjectQLIT extends AbstractQLITSupport {
     private StructureRepository structureRepository
 
     @Test
-    void 'All projects'() {
-        def p = doCreateProject()
-        def data = run('{projects { id name }}')
-        assert data.projects*.name.contains(p.name)
-        assert data.projects*.id.contains(p.id())
-    }
-
-    @Test
     void 'Project by ID'() {
         def p = doCreateProject()
         def data = run("{projects(id: ${p.id}) { name }}")

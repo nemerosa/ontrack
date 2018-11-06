@@ -6,8 +6,18 @@ import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
+
+    @Test
+    fun `All projects`() {
+        val p = doCreateProject()
+        val data = run("{projects { id name }}")
+        assertNotNull(data["projects"].find { it["name"].asText() == p.name }) {
+            assertEquals(p.id(), it["id"].asInt())
+        }
+    }
 
     @Test
     fun `Project by name when not authorized must throw an authentication exception`() {
