@@ -40,7 +40,7 @@ services:
         # Using the random source from the host
       - "/dev/urandom:/dev/random"
     ports:
-      - "443:443"
+      - "8080:8080"
 
   # Postgresql database
   postgres:
@@ -52,5 +52,3 @@ services:
       POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD}
     volumes:
       - "/var/lib/postgresql/data:/var/lib/postgresql/data"
-    ports:
-      - "5432:5432"

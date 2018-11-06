@@ -23,8 +23,8 @@ constructor(
     override fun <C> getServiceConfigurationForConfig(config: ValidationDataTypeConfig<C>?): ServiceConfiguration? {
         if (config != null) {
             // Gets the type
-            val validationDataType = getValidationDataType<C, Any>(config.descriptor.id) ?:
-                    throw ValidationRunDataInputException("Cannot find any data type for ID `${config.descriptor.id}`")
+            val validationDataType = getValidationDataType<C, Any>(config.descriptor.id)
+                    ?: throw ValidationRunDataInputException("Cannot find any data type for ID `${config.descriptor.id}`")
             // Converts the typed data into JSON for the client
             val json: JsonNode? = config.config?.let { validationDataType.configToFormJson(it) }
             // OK
@@ -37,76 +37,59 @@ constructor(
         }
     }
 
-    override fun <C, T> validateData(data: ValidationRunData<T>?, config: ValidationDataTypeConfig<C>?, status: ValidationRunStatusID?): ValidationRunData<T>? {
-        return doValidateData<C, T>(
-                data?.descriptor?.id,
-                { _ -> data?.data },
-                status?.let { { it } },
-                config
-        ).runData
-    }
-
-    override fun <C, T> validateData(data: ServiceConfiguration?, config: ValidationDataTypeConfig<C>?, status: String?, statusLoader: (String) -> ValidationRunStatusID): ValidationRunDataWithStatus<T> {
-        return doValidateData(
-                data?.id,
-                { type -> type.fromForm(data?.data) },
-                status?.let { { statusLoader(it) } },
-                config
-        )
-    }
-
-    private fun <C, T> doValidateData(
-            dataId: String?,
-            dataRawData: (ValidationDataType<C, T>) -> T?,
-            status: (() -> ValidationRunStatusID)?,
-            config: ValidationDataTypeConfig<C>?
+    override fun <C, T> validateData(
+            typedData: ValidationRunData<T>?,
+            config: ValidationDataTypeConfig<C>?,
+            status: ValidationRunStatusID?
     ): ValidationRunDataWithStatus<T> {
         if (config == null) {
-            if (dataId == null) {
-                // OK, no data requested, no data as input
-                // ... but status is therefore required
-                if (status == null) {
-                    throw ValidationRunDataStatusRequiredException()
+            // OK, there might be data, there might be not,
+            // We do not validate...
+            // ... but status is therefore required
+            if (status == null) {
+                if (typedData == null) {
+                    throw ValidationRunDataStatusRequiredBecauseNoDataException()
                 } else {
-                    return ValidationRunDataWithStatus(
-                            null,
-                            status()
-                    )
+                    throw ValidationRunDataStatusRequiredBecauseNoDataTypeException()
                 }
             } else {
-                // Data is sent, not asked for...
-                throw ValidationRunDataUnexpectedException()
+                return ValidationRunDataWithStatus(
+                        typedData, // Might defined... or not. No matter here.
+                        status
+                )
             }
-        } else if (dataId == null) {
-            // No data as input. OK as long as the status is passed
+        } else if (typedData == null) {
+            // No data as input. OK as long as the status is provided
             if (status == null) {
-                throw ValidationRunDataStatusRequiredException()
+                throw ValidationRunDataStatusRequiredBecauseNoDataException()
             } else {
                 return ValidationRunDataWithStatus(
                         null,
-                        status()
+                        status
                 )
             }
-        } else if (dataId != config.descriptor.id) {
+        } else if (typedData.descriptor.id != config.descriptor.id) {
             // Different type of data
             throw ValidationRunDataMismatchException(
-                    config.descriptor.id,
-                    dataId
+                    actualId = typedData.descriptor.id,
+                    expectedId= config.descriptor.id
             )
         } else {
             // Gets the type
-            val validationDataType = getValidationDataType<C, T>(dataId) ?:
-                    throw ValidationRunDataTypeNotFoundException(dataId)
-            // Parsing & validation
-            val parsedData = dataRawData(validationDataType)
-            val validatedData = validationDataType.validateData(config.config, parsedData)
+            val validationDataType = getValidationDataType<C, T>(typedData.descriptor.id)
+                    ?: throw ValidationRunDataTypeNotFoundException(typedData.descriptor.id)
+            // Validation
+            val validatedData: T = validationDataType.validateData(config.config, typedData.data)
             // Computing the status
-            val computedStatus = validationDataType.computeStatus(config.config, validatedData)
+            val computedStatus: ValidationRunStatusID? = validationDataType.computeStatus(config.config, validatedData)
             // Final status
             val finalStatus: ValidationRunStatusID =
                     when {
+                    // Provided status has priority
+                        status != null -> status
+                    // But it can be computed
                         computedStatus != null -> computedStatus
-                        status != null -> status()
+                    // Else, we consider it valid
                         else -> ValidationRunStatusID.STATUS_PASSED
                     }
             // OK

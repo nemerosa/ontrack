@@ -78,7 +78,9 @@ class TestValidationDataType(
                     )
 
     override fun fromForm(node: JsonNode?): TestValidationData? =
-            JsonUtils.parse(node, TestValidationData::class.java)
+            node?.run {
+                JsonUtils.parse(this, TestValidationData::class.java)
+            }
 
     override fun computeStatus(config: Any?, data: TestValidationData): ValidationRunStatusID? =
             when {

@@ -768,7 +768,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
             // Insertion
             int id = dbCreate(
-                    "INSERT INTO VALIDATION_STAMPS(BRANCHID, NAME, DESCRIPTION, ORDERNB, CREATION, CREATOR, DATA_TYPE_ID, DATA_TYPE_CONFIG) VALUES (:branchId, :name, :description, :orderNb, :creation, :creator, :dataTypeId, :dataTypeConfig)",
+                    "INSERT INTO VALIDATION_STAMPS(BRANCHID, NAME, DESCRIPTION, ORDERNB, CREATION, CREATOR, DATA_TYPE_ID, DATA_TYPE_CONFIG) VALUES (:branchId, :name, :description, :orderNb, :creation, :creator, :dataTypeId, CAST(:dataTypeConfig AS JSONB))",
                     params("name", validationStamp.getName())
                             .addValue("description", validationStamp.getDescription())
                             .addValue("branchId", validationStamp.getBranch().id())
@@ -862,7 +862,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Bulk update
         getNamedParameterJdbcTemplate().update(
                 "UPDATE VALIDATION_STAMPS SET IMAGETYPE = :type, IMAGEBYTES = :content, DESCRIPTION = :description, " +
-                        "DATA_TYPE_ID = :dataTypeId, DATA_TYPE_CONFIG = :dataTypeConfig " +
+                        "DATA_TYPE_ID = :dataTypeId, DATA_TYPE_CONFIG = CAST(:dataTypeConfig AS JSONB) " +
                         "WHERE ID <> :id AND NAME = :name",
                 params("id", validationStampId.getValue())
                         .addValue("name", name)
@@ -879,7 +879,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Update
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE VALIDATION_STAMPS SET NAME = :name, DESCRIPTION = :description, DATA_TYPE_ID = :dataTypeId, DATA_TYPE_CONFIG = :dataTypeConfig WHERE ID = :id",
+                    "UPDATE VALIDATION_STAMPS SET NAME = :name, DESCRIPTION = :description, DATA_TYPE_ID = :dataTypeId, DATA_TYPE_CONFIG = CAST(:dataTypeConfig AS JSONB) WHERE ID = :id",
                     params("name", validationStamp.getName())
                             .addValue("description", validationStamp.getDescription())
                             .addValue("id", validationStamp.id())
@@ -925,7 +925,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Data
         if (validationRun.getData() != null) {
             getNamedParameterJdbcTemplate().update(
-                    "INSERT INTO VALIDATION_RUN_DATA(VALIDATION_RUN, DATA_TYPE_ID, DATA) VALUES (:validationRunId, :dataTypeId, :data)",
+                    "INSERT INTO VALIDATION_RUN_DATA(VALIDATION_RUN, DATA_TYPE_ID, DATA) VALUES (:validationRunId, :dataTypeId, CAST(:data AS JSONB))",
                     params("validationRunId", id)
                             .addValue("dataTypeId", validationRun.getData().getDescriptor().getId())
                             .addValue("data", writeJson(validationRun.getData().getData()))

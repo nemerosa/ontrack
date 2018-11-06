@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.it
 
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.ValidationRunCreate
+import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,10 +22,22 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return project
     }
 
+    fun <T> project(init: Project.() -> T): T {
+        val project = doCreateProject()
+        return asAdmin().call {
+            project.init()
+        }
+    }
+
     fun Project.branch(name: String = uid("B"), init: Branch.() -> Unit = {}): Branch {
         val branch = doCreateBranch(this, NameDescription.nd(name, ""))
         branch.init()
         return branch
+    }
+
+    fun <T> Project.branch(name: String = uid("B"), init: Branch.() -> T): T {
+        val branch = doCreateBranch(this, NameDescription.nd(name, ""))
+        return branch.init()
     }
 
     fun Branch.promotionLevel(name: String): PromotionLevel =
@@ -36,8 +50,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * @param name Name of the validation stamp to create
      * @return Created validation stamp
      */
-    fun Branch.validationStamp(name: String = uid("VS")): ValidationStamp =
-            doCreateValidationStamp(this, NameDescription.nd(name, ""))
+    fun Branch.validationStamp(
+            name: String = uid("VS"),
+            validationDataTypeConfig: ValidationDataTypeConfig<*>? = null
+    ): ValidationStamp =
+            doCreateValidationStamp(this, NameDescription.nd(name, ""), validationDataTypeConfig)
 
     fun Branch.build(name: String, init: (Build.() -> Unit)? = {}): Build {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
@@ -45,6 +62,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             build.init()
         }
         return build
+    }
+
+    fun <T> Branch.build(name: String, init: Build.() -> T): T {
+        val build = doCreateBuild(this, NameDescription.nd(name, ""))
+        return build.init()
     }
 
     protected fun <T, P : PropertyType<T>> Build.property(type: KClass<P>, value: T) {
@@ -66,19 +88,84 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * @param validationStamp Stamp to apply
      * @param validationRunStatusID Status to apply
      */
-    fun Build.validate(validationStamp: ValidationStamp, validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED) {
-        doValidateBuild(this, validationStamp, validationRunStatusID)
+    fun Build.validate(
+            validationStamp: ValidationStamp,
+            validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
+            description: String? = null
+    ): ValidationRun {
+        return this.validateWithData<Any>(
+                validationStampName = validationStamp.name,
+                validationRunStatusID = validationRunStatusID,
+                description = description
+        )
+    }
+
+    /**
+     * Creates a validation run on a build, possibly with some data and a status.
+     */
+    fun <T> Build.validateWithData(
+            validationStamp: ValidationStamp,
+            validationRunStatusID: ValidationRunStatusID? = null,
+            validationDataTypeId: String? = null,
+            validationRunData: T? = null,
+            description: String? = null
+    ) = validateWithData(
+            validationStampName = validationStamp.name,
+            validationRunStatusID = validationRunStatusID,
+            validationDataTypeId = validationDataTypeId,
+            validationRunData = validationRunData,
+            description = description
+    )
+
+    /**
+     * Creates a validation run on a build, possibly with some data and a status.
+     */
+    fun <T> Build.validateWithData(
+            validationStampName: String,
+            validationRunStatusID: ValidationRunStatusID? = null,
+            validationDataTypeId: String? = null,
+            validationRunData: T? = null,
+            description: String? = null
+    ): ValidationRun {
+        return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
+            structureService.newValidationRun(
+                    this,
+                    ValidationRunRequest(
+                            validationStampName = validationStampName,
+                            dataTypeId = validationDataTypeId,
+                            data = validationRunData,
+                            validationRunStatusId = validationRunStatusID,
+                            description = description
+                    )
+            )
+        }
     }
 
     fun Build.linkTo(project: Project, buildName: String) {
         val build = structureService.buildSearch(
                 project.id,
                 BuildSearchForm().withBuildExactMatch(true).withBuildName(buildName)
-        ).first() ?: throw BuildNotFoundException(project.name, buildName)
+        ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
         structureService.addBuildLink(
                 this,
                 build
         )
+    }
+
+    /**
+     * Change of status for a validation run
+     */
+    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String) {
+        asUser().with(this, ValidationRunStatusChange::class.java).execute {
+            structureService.newValidationRunStatus(
+                    this,
+                    ValidationRunStatus.of(
+                            Signature.of("test"),
+                            status,
+                            description
+                    )
+            )
+        }
     }
 
 }

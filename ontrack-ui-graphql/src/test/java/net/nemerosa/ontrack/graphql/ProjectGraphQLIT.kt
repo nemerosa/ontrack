@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
@@ -59,6 +60,47 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         assertEquals(1, runNodes.size())
         val build = runNodes[0]["build"]
         assertEquals(build2.name, build["name"].asText())
+    }
+
+    @Test
+    fun `Validation run statuses for a run for a validation stamp`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build("1") {
+                    validate(vs, ValidationRunStatusID.STATUS_FAILED, description = "Validation failed").apply {
+                        validationStatus(ValidationRunStatusID.STATUS_INVESTIGATING, "Investigating")
+                        validationStatus(ValidationRunStatusID.STATUS_EXPLAINED, "Explained")
+                    }
+                    val data = run("""{
+                        projects (id: ${project.id}) {
+                            branches (name: "${branch.name}") {
+                                validationStamps {
+                                    name
+                                    validationRuns {
+                                        validationRunStatuses {
+                                            statusID {
+                                                id
+                                            }
+                                            description
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }""")
+                    val validationRunStatuses = data["projects"][0]["branches"][0]["validationStamps"][0]["validationRuns"][0]["validationRunStatuses"]
+                    assertEquals(
+                            listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
+                            validationRunStatuses.map { it["statusID"]["id"].asText() }
+                    )
+                    assertEquals(
+                            listOf("Explained", "Investigating", "Validation failed"),
+                            validationRunStatuses.map { it["description"].asText() }
+                    )
+                }
+            }
+        }
     }
 
 }

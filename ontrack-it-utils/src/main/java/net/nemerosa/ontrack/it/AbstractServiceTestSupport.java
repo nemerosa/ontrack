@@ -175,16 +175,16 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
             ValidationRunStatusID statusId,
             ValidationRunData<?> runData
     ) throws Exception {
-        return asUser().with(build, ValidationRunCreate.class).call(() ->
+        return asUser().withView(build).with(build, ValidationRunCreate.class).call(() ->
                 structureService.newValidationRun(
-                        ValidationRun.of(
-                                build,
-                                vs,
-                                1,
-                                Signature.of("test"),
+                        build,
+                        new ValidationRunRequest(
+                                vs.getName(),
                                 statusId,
-                                ""
-                        ).withData(runData)
+                                runData != null ? runData.getDescriptor().getId() : null,
+                                runData != null ? runData.getData() : null,
+                                null
+                        )
                 )
         );
     }

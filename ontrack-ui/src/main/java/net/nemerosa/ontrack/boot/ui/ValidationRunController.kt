@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.json.JsonParseException
+import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
@@ -23,7 +25,6 @@ constructor(
         private val structureService: StructureService,
         private val validationRunStatusService: ValidationRunStatusService,
         private val validationDataTypeService: ValidationDataTypeService,
-        private val propertyService: PropertyService,
         private val securityService: SecurityService
 ) : AbstractResourceController() {
 
@@ -44,7 +45,7 @@ constructor(
     @GetMapping("builds/{buildId}/validationRuns")
     fun getValidationRuns(@PathVariable buildId: ID): Resources<ValidationRun> {
         return Resources.of(
-                structureService.getValidationRunsForBuild(buildId),
+                structureService.getValidationRunsForBuild(buildId, 0, 100),
                 uri(on(ValidationRunController::class.java).getValidationRuns(buildId))
         ).forView(Build::class.java)
     }
@@ -80,55 +81,55 @@ constructor(
                 .description()
     }
 
+    /**
+     * See [newValidationRunForm] to get the mapping from the form.
+     *
+     * Note that some properties, like the `type` of data are provided only when using the DSL
+     * or the raw REST API, never through the GUI.
+     */
     @PostMapping("builds/{buildId}/validationRuns/create")
     @ResponseStatus(HttpStatus.CREATED)
-    fun newValidationRun(@PathVariable buildId: ID, @RequestBody validationRunRequest: ValidationRunRequest): ValidationRun {
+    fun newValidationRun(@PathVariable buildId: ID, @RequestBody validationRunRequestForm: ValidationRunRequestForm): ValidationRun {
         // Gets the build
         val build = structureService.getBuild(buildId)
-        // Gets the validation stamp
-        val validationStamp = getValidationStamp(
-                build.branch,
-                validationRunRequest.validationStampId,
-                validationRunRequest.actualValidationStampName)
-        // Validation run data
-        val runDataJson = validationStamp.dataType?.let {
-            ServiceConfiguration(
-                    validationStamp.dataType.descriptor.id,
-                    validationRunRequest.validationStampData?.data
-            )
-        }
-        // Validation of the run data
-        val status: ValidationRunDataWithStatus<Any> = validationDataTypeService.validateData(
-                runDataJson,
-                validationStamp.dataType,
-                validationRunRequest.validationRunStatusId,
-                validationRunStatusService::getValidationRunStatus
+        // Creates the service validation run request from the form
+        val validationRunRequest = ValidationRunRequest(
+                validationStampName = validationRunRequestForm.actualValidationStampName,
+                validationRunStatusId = validationRunRequestForm.validationRunStatusId?.run {
+                    validationRunStatusService.getValidationRunStatus(this)
+                },
+                dataTypeId = validationRunRequestForm.validationStampData?.type,
+                data = parseValidationRunData(build, validationRunRequestForm),
+                description = validationRunRequestForm.description,
+                properties = validationRunRequestForm.properties
         )
-        // Validation run to create
-        var validationRun = ValidationRun.of(
-                build,
-                validationStamp,
-                0,
-                securityService.currentSignature,
-                status.runStatusID,
-                validationRunRequest.description
-        ).withData(status.runData)
-        // Creation
-        validationRun = structureService.newValidationRun(validationRun)
-        // Saves the properties
-        for ((propertyTypeName, propertyData) in validationRunRequest.properties) {
-            propertyService.editProperty(
-                    validationRun,
-                    propertyTypeName,
-                    propertyData
-            )
-        }
-        // OK
-        return validationRun
+        // Delegates to the service
+        return structureService.newValidationRun(build, validationRunRequest)
     }
 
-    protected fun getValidationStamp(branch: Branch, validationStampId: Int?, validationStampName: String?): ValidationStamp {
-        return structureService.getOrCreateValidationStamp(branch, validationStampId, validationStampName)
+    private fun parseValidationRunData(build: Build, validationRunRequestForm: ValidationRunRequestForm): Any? {
+        return validationRunRequestForm.validationStampData?.data?.run {
+            // Gets the validation stamp
+            val validationStamp: ValidationStamp = structureService.getOrCreateValidationStamp(
+                    build.branch,
+                    validationRunRequestForm.actualValidationStampName
+            )
+            // Gets the data type ID if any
+            // First, the data type in the request, and if not specified, the type of the validation stamp
+            val typeId: String? = validationRunRequestForm.validationStampData.type ?: validationStamp.dataType?.descriptor?.id
+            // If no type, ignore the data
+            return typeId?.run {
+                // Gets the actual type
+                validationDataTypeService.getValidationDataType<Any, Any>(this)
+            }?.run {
+                // Parses data from the form
+                try {
+                    fromForm(validationRunRequestForm.validationStampData.data)
+                } catch (ex: JsonParseException) {
+                    throw ValidationRunDataJSONInputException(ex, validationRunRequestForm.validationStampData.data)
+                }
+            }
+        }
     }
 
     @GetMapping("validationRuns/{validationRunId}")
@@ -137,7 +138,7 @@ constructor(
 
     // Validation run status
 
-    @GetMapping(value = "validationRuns/{validationRunId}/status/change")
+    @GetMapping("validationRuns/{validationRunId}/status/change")
     fun getValidationRunStatusChangeForm(@PathVariable validationRunId: ID): Form {
         val validationRun = structureService.getValidationRun(validationRunId)
         return Form.create()
@@ -169,7 +170,7 @@ constructor(
     /**
      * List of validation runs for a validation stamp
      */
-    @GetMapping(value = "validationStamps/{validationStampId}/validationRuns")
+    @GetMapping("validationStamps/{validationStampId}/validationRuns")
     fun getValidationRunsForValidationStamp(
             @PathVariable validationStampId: ID,
             @RequestParam(required = false, defaultValue = "0") offset: Int,

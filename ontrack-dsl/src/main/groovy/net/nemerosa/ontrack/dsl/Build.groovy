@@ -65,8 +65,8 @@ class Build extends AbstractProjectResource {
         run
     }
 
-    @DSLMethod(value = "Associates some data with the validation.", count = 3)
-    ValidationRun validateWithData(String validationStamp, Object data, String status = null) {
+    @DSLMethod(value = "Associates some data with the validation.", count = 4)
+    ValidationRun validateWithData(String validationStamp, Object data, String dataType = null, String status = null) {
         new ValidationRun(
                 ontrack,
                 ontrack.post(
@@ -74,6 +74,7 @@ class Build extends AbstractProjectResource {
                         [
                                 validationStampData  : [
                                         id  : validationStamp,
+                                        type: dataType,
                                         data: data,
                                 ],
                                 validationRunStatusId: status
@@ -87,44 +88,59 @@ class Build extends AbstractProjectResource {
         return validateWithData(
                 validationStamp,
                 [value: text],
+                'net.nemerosa.ontrack.extension.general.validation.TextValidationDataType',
                 status
         )
     }
 
-    @DSLMethod(count = 5, value = """
+    @DSLMethod(count = 6, value = """
         Associates some critical / high / medium / low issue counts with the validation. The
         validation stamp must be configured to accept CHML as validation data.""")
-    ValidationRun validateWithCHML(String validationStamp, int critical = 0, int high = 0, int medium = 0, int low = 0) {
+    ValidationRun validateWithCHML(String validationStamp, int critical = 0, int high = 0, int medium = 0, int low = 0, String status = null) {
         return validateWithData(validationStamp, [
                 CRITICAL: critical,
                 HIGH    : high,
                 MEDIUM  : medium,
                 LOW     : low,
-        ])
+        ], 'net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType', status)
     }
 
-    @DSLMethod("""
+    @DSLMethod(count = 3, value = """
         Associates some number with the validation. The
         validation stamp must be configured to accept number as validation data.""")
-    ValidationRun validateWithNumber(String validationStamp, int value) {
-        return validateWithData(validationStamp, [value: value])
+    ValidationRun validateWithNumber(String validationStamp, int value, String status = null) {
+        return validateWithData(
+                validationStamp,
+                [value: value],
+                'net.nemerosa.ontrack.extension.general.validation.ThresholdNumberValidationDataType',
+                status
+        )
     }
 
-    @DSLMethod("""
+    @DSLMethod(count = 3, value = """
         Associates some percentage with the validation. The
         validation stamp must be configured to accept percentage as validation data.""")
-    ValidationRun validateWithPercentage(String validationStamp, int value) {
-        return validateWithData(validationStamp, [value: value])
+    ValidationRun validateWithPercentage(String validationStamp, int value, String status = null) {
+        return validateWithData(
+                validationStamp,
+                [value: value],
+                'net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType',
+                status
+        )
     }
 
-    @DSLMethod("""
+    @DSLMethod(count = 4, value = """
         Associates some fraction with the validation. The
         validation stamp must be configured to accept fraction as validation data.""")
-    ValidationRun validateWithFraction(String validationStamp, int numerator, int denominator) {
-        return validateWithData(validationStamp, [
+    ValidationRun validateWithFraction(String validationStamp, int numerator, int denominator, String status = null) {
+        return validateWithData(
+                validationStamp, [
                 numerator  : numerator,
                 denominator: denominator,
-        ])
+        ],
+                'net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType',
+                status
+        )
     }
 
     @DSLMethod("Gets the list of promotion runs for this build")

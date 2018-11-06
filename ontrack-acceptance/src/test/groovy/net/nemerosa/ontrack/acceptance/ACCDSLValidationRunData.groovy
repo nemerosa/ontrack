@@ -97,6 +97,23 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
     }
 
     @Test
+    void 'Validation run with CHML when Fraction is excepted'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setFractionDataType(100, 90, true)
+        }
+        // Creates a build and validates it with CHML
+        def build = ontrack.branch(projectName, "master").build("1")
+        validationError("Data associated with the validation run as different type than the one " +
+                "associated with the validation stamp. " +
+                "`net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType` is expected " +
+                "and `net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType` was given.") {
+            build.validateWithCHML("VS", 1, 20, 4, 8)
+        }
+    }
+
+    @Test
     void 'Validation run with partial CHML'() {
         def projectName = uid("P")
         // Validation stamp data type

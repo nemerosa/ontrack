@@ -1,20 +1,12 @@
 package net.nemerosa.ontrack.model.structure
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-
 class ValidationRunRequest
 @JvmOverloads
 constructor(
-        @Deprecated("")
-        val validationStampId: Int? = null,
-        val validationStampData: ServiceConfiguration?,
-        val validationStampName: String?,
-        val validationRunStatusId: String?,
-        val description: String?,
-        val properties: List<PropertyCreationRequest> = listOf()) {
-
-    val actualValidationStampName: String?
-        @JsonIgnore
-        get() = validationStampData?.id ?: validationStampName
-
-}
+        val validationStampName: String,
+        val validationRunStatusId: ValidationRunStatusID? = null,
+        val dataTypeId: String? = null,
+        val data: Any? = null,
+        val description: String? = null,
+        val properties: List<PropertyCreationRequest> = listOf()
+)

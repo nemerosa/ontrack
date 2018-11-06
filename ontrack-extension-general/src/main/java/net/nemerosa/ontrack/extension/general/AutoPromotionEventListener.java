@@ -92,7 +92,7 @@ public class AutoPromotionEventListener implements EventListener {
         }
     }
 
-    protected void checkPromotionLevel(Build build, PromotionLevel promotionLevel, List<ValidationStamp> validationStamps) {
+    private void checkPromotionLevel(Build build, PromotionLevel promotionLevel, List<ValidationStamp> validationStamps) {
         Optional<AutoPromotionProperty> oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType.class).option();
         if (oProperty.isPresent()) {
             AutoPromotionProperty property = oProperty.get();
@@ -103,16 +103,21 @@ public class AutoPromotionEventListener implements EventListener {
                 boolean allPassed = validationStamps.stream()
                         // Keeps only the ones selectable for the autopromotion property
                         .filter(property::contains)
-                                // They must all pass
+                        // They must all pass
                         .allMatch(validationStamp -> isPassed(build, validationStamp));
                 if (allPassed) {
                     // Promotes
-                    structureService.newPromotionRun(
-                            PromotionRun.of(
-                                    build,
-                                    promotionLevel,
-                                    securityService.getCurrentSignature(),
-                                    "Auto promotion"
+                    // Makes sure to raise the auth level because the one
+                    // having made a validation might not be granted to
+                    // creation a promotion
+                    securityService.asAdmin(() ->
+                            structureService.newPromotionRun(
+                                    PromotionRun.of(
+                                            build,
+                                            promotionLevel,
+                                            securityService.getCurrentSignature(),
+                                            "Auto promotion"
+                                    )
                             )
                     );
                 }
@@ -120,8 +125,13 @@ public class AutoPromotionEventListener implements EventListener {
         }
     }
 
-    protected boolean isPassed(Build build, ValidationStamp validationStamp) {
-        List<ValidationRun> runs = structureService.getValidationRunsForBuildAndValidationStamp(build.getId(), validationStamp.getId());
+    private boolean isPassed(Build build, ValidationStamp validationStamp) {
+        List<ValidationRun> runs = structureService.getValidationRunsForBuildAndValidationStamp(
+                build.getId(),
+                validationStamp.getId(),
+                0,
+                1
+        );
         if (runs.isEmpty()) {
             return false;
         } else {
