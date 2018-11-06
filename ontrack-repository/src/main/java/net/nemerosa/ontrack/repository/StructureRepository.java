@@ -193,7 +193,7 @@ public interface StructureRepository {
     ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     /**
-     * @deprecated Use {@link #getValidationRunsForBuild(ID, int, int, Function)} instead.
+     * @deprecated Use {@link #getValidationRunsForBuild(Build, int, int, Function)} instead.
      */
     @Deprecated
     List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService);

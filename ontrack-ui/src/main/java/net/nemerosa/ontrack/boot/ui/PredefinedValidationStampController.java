@@ -3,10 +3,9 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.ServiceConfigurator;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -16,8 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-
 import java.io.IOException;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -31,10 +31,12 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class PredefinedValidationStampController extends AbstractResourceController {
 
     private final PredefinedValidationStampService predefinedValidationStampService;
+    private final ValidationDataTypeService validationDataTypeService;
 
     @Autowired
-    public PredefinedValidationStampController(PredefinedValidationStampService predefinedValidationStampService) {
+    public PredefinedValidationStampController(PredefinedValidationStampService predefinedValidationStampService, ValidationDataTypeService validationDataTypeService) {
         this.predefinedValidationStampService = predefinedValidationStampService;
+        this.validationDataTypeService = validationDataTypeService;
     }
 
     /**
@@ -52,16 +54,51 @@ public class PredefinedValidationStampController extends AbstractResourceControl
 
     @RequestMapping(value = "predefinedValidationStamps/create", method = RequestMethod.GET)
     public Form getPredefinedValidationStampCreationForm() {
-        return PredefinedValidationStamp.form();
+        return Form.nameAndDescription()
+                .with(
+                        ServiceConfigurator.of("dataType")
+                                .label("Data type")
+                                .help("Type of the data to associate with a validation run.")
+                                .optional()
+                                .sources(
+                                        validationDataTypeService.getAllTypes().stream()
+                                                .map(
+                                                        dataType -> new ServiceConfigurationSource(
+                                                                dataType.getClass().getName(),
+                                                                dataType.getDisplayName(),
+                                                                dataType.getConfigForm(null),
+                                                                Collections.emptyMap()
+                                                        )
+                                                )
+                                                .collect(Collectors.toList())
+                                )
+                );
     }
 
     @RequestMapping(value = "predefinedValidationStamps/create", method = RequestMethod.POST)
-    public PredefinedValidationStamp newPredefinedValidationStamp(@RequestBody @Valid NameDescription nameDescription) {
+    public PredefinedValidationStamp newPredefinedValidationStamp(@RequestBody @Valid ValidationStampInput input) {
+        ValidationDataTypeConfig<?> config = validateValidationDataTypeConfig(input);
         return predefinedValidationStampService.newPredefinedValidationStamp(
                 PredefinedValidationStamp.of(
-                        nameDescription
-                )
+                        NameDescription.nd(input.getName(), input.getDescription())
+                ).withDataType(config)
         );
+    }
+
+    private <C> ValidationDataTypeConfig<C> validateValidationDataTypeConfig(ValidationStampInput input) {
+        // Validating the data type configuration if needed
+        ServiceConfiguration inputConfig = input.getDataType();
+        if (inputConfig != null) {
+            ValidationDataType<C, ?> dataType = validationDataTypeService.getValidationDataType(inputConfig.getId());
+            if (dataType != null) {
+                // Parsing without exception
+                return new ValidationDataTypeConfig<>(
+                        dataType.getDescriptor(),
+                        dataType.fromConfigForm(inputConfig.getData())
+                );
+            }
+        }
+        return null;
     }
 
     @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}", method = RequestMethod.GET)
@@ -71,15 +108,25 @@ public class PredefinedValidationStampController extends AbstractResourceControl
 
     @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}/update", method = RequestMethod.GET)
     public Form updateValidationStampForm(@PathVariable ID predefinedValidationStampId) {
-        return predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId).asForm();
+        PredefinedValidationStamp validationStamp = predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId);
+        return getPredefinedValidationStampCreationForm()
+                .fill("name", validationStamp.getName())
+                .fill("description", validationStamp.getDescription())
+                .fill("dataType", validationDataTypeService.getServiceConfigurationForConfig(validationStamp.getDataType()))
+                ;
     }
 
     @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}/update", method = RequestMethod.PUT)
-    public PredefinedValidationStamp updateValidationStamp(@PathVariable ID predefinedValidationStampId, @RequestBody @Valid NameDescription nameDescription) {
+    public PredefinedValidationStamp updateValidationStamp(@PathVariable ID predefinedValidationStampId, @RequestBody @Valid ValidationStampInput input) {
         // Gets from the repository
         PredefinedValidationStamp validationStamp = predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId);
+        // Validation
+        ValidationDataTypeConfig<?> dataTypeServiceConfig = validateValidationDataTypeConfig(input);
         // Updates
-        validationStamp = validationStamp.update(nameDescription);
+        validationStamp = validationStamp
+                .update(NameDescription.nd(input.getName(), input.getDescription()))
+                .withDataType(dataTypeServiceConfig)
+        ;
         // Saves in repository
         predefinedValidationStampService.savePredefinedValidationStamp(validationStamp);
         // OK

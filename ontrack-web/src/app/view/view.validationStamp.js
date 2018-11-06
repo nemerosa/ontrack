@@ -42,6 +42,16 @@ angular.module('ot.view.validationStamp', [
                         id
                       }
                     }
+                    dataType {
+                      descriptor {
+                        id
+                        displayName
+                        feature {
+                          id
+                        }
+                      }
+                      config
+                    }
                     branch {
                       id
                       name
@@ -91,6 +101,15 @@ angular.module('ot.view.validationStamp', [
                           triggerType
                           triggerData
                           runTime
+                        }
+                        data {
+                          descriptor {
+                            id
+                            feature {
+                              id
+                            }
+                          }
+                          data
                         }
                         validationRunStatuses {
                           statusID {

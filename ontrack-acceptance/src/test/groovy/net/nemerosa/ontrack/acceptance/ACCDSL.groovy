@@ -323,11 +323,11 @@ class ACCDSL extends AbstractACCDSL {
         def runs = ontrack.build(branch.project, branch.name, '2').validationRuns
         assert runs.size() == 2
         runs.each { assert it.validationStamp.name == 'SMOKE' }
-        assert runs[0].validationRunStatuses[0].statusID.id == 'FAILED'
-        assert runs[1].validationRunStatuses[0].statusID.id == 'PASSED'
+        assert runs[0].validationRunStatuses[0].statusID.id == 'PASSED'
+        assert runs[1].validationRunStatuses[0].statusID.id == 'FAILED'
         // Shortcuts
-        assert runs[0].status == 'FAILED'
-        assert runs[1].status == 'PASSED'
+        assert runs[0].status == 'PASSED'
+        assert runs[1].status == 'FAILED'
     }
 
     @Test

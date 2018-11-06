@@ -125,10 +125,14 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
     }
 
     protected String writeJson(Object any) {
-        try {
-            return objectMapper.writeValueAsString(any);
-        } catch (JsonProcessingException e) {
-            throw new JsonWritingException(e);
+        if (any == null) {
+            return null;
+        } else {
+            try {
+                return objectMapper.writeValueAsString(any);
+            } catch (JsonProcessingException e) {
+                throw new JsonWritingException(e);
+            }
         }
     }
 

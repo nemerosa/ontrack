@@ -12,6 +12,15 @@
     </div>
     <div class="row">
         <div class="col-md-8">
+
+            <div ng-if="validationStamp.dataType">
+                <ot-section-title>Data type</ot-section-title>
+                <p>
+                    {{validationStamp.dataType.descriptor.displayName}}
+                    <ot-validation-data-type-config value="validationStamp.dataType"></ot-validation-data-type-config>
+                </p>
+            </div>
+
             <ot-section-title>History</ot-section-title>
             <div class="alert alert-warning" ng-show="validationStamp.validationRunsPaginated.pageInfo.totalSize == 0">
                 No validation run has been done yet.
@@ -22,6 +31,7 @@
                     <th>Build</th>
                     <th>Run</th>
                     <th>Last status</th>
+                    <th>Data</th>
                     <th>Description</th>
                     <th>Creation</th>
                     <th>Source</th>
@@ -45,6 +55,11 @@
                             <a href="#/validationRun/{{validationRun.id}}">
                                 <ot-validation-run-status status="validationRun.validationRunStatuses[0]"></ot-validation-run-status>
                             </a>
+                        </td>
+                        <td>
+                            <span ng-if="validationRun.data">
+                                <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
+                            </span>
                         </td>
                         <td>
                             {{validationRun.validationRunStatuses[0].description}}

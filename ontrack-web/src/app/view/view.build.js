@@ -128,6 +128,15 @@ angular.module('ot.view.build', [
                         user
                         time
                       }
+                      data {
+                        descriptor {
+                          id
+                          feature {
+                            id
+                          }
+                        }
+                        data
+                      }
                       validationRunStatuses {
                         statusID {
                           id
@@ -146,6 +155,16 @@ angular.module('ot.view.build', [
                         name
                         image
                         _image
+                        dataType {
+                          descriptor {
+                            id
+                            displayName
+                            feature {
+                              id
+                            }
+                          }
+                          config
+                        }
                         links {
                           _page
                         }

@@ -21,6 +21,7 @@ class GQLTypeValidationStamp(
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val paginatedListFactory: GQLPaginatedListFactory,
         private val validationRun: GQLTypeValidationRun,
+        private val validationDataTypeConfig: GQLTypeValidationDataTypeConfig,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<ValidationStamp>(
         ValidationStamp::class.java,
@@ -41,6 +42,12 @@ class GQLTypeValidationStamp(
                     f.name("image")
                             .description("Flag to indicate if an image is associated")
                             .type(Scalars.GraphQLBoolean)
+                }
+                // Data type
+                .field {
+                    it.name("dataType")
+                            .description("Data definition associated with the validation stamp")
+                            .type(validationDataTypeConfig.typeRef)
                 }
                 // Ref to branch
                 .field(

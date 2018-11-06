@@ -51,7 +51,6 @@ public class GQLTypeProperty implements GQLType {
                                 .name("value")
                                 .description("JSON representation of the value")
                                 .type(GQLScalarJSON.INSTANCE)
-                                .dataFetcher(GraphqlUtils.fetcher(Property.class, this::getValue))
                                 .build()
                 )
                 // Editable
@@ -65,11 +64,6 @@ public class GQLTypeProperty implements GQLType {
                 )
                 // OK
                 .build();
-    }
-
-    private String getValue(Property<?> p) {
-        Object value = p.getValue();
-        return value == null ? null : JsonUtils.toJSONString(value);
     }
 
 }

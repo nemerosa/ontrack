@@ -2,9 +2,6 @@ package net.nemerosa.ontrack.graphql.schema;
 
 import graphql.schema.GraphQLObjectType;
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON;
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.structure.Decoration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +47,6 @@ public class GQLTypeDecoration implements GQLType {
                                 .name("data")
                                 .description("JSON representation of the decoration data")
                                 .type(GQLScalarJSON.INSTANCE)
-                                .dataFetcher(GraphqlUtils.fetcher(Decoration.class, this::getData))
                                 .build()
                 )
                 // Error
@@ -68,11 +64,6 @@ public class GQLTypeDecoration implements GQLType {
                 )
                 // OK
                 .build();
-    }
-
-    private String getData(Decoration<?> p) {
-        Object value = p.getData();
-        return value == null ? null : JsonUtils.toJSONString(value);
     }
 
 }

@@ -15,6 +15,10 @@ import org.springframework.security.access.AccessDeniedException
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 
+/**
+ * @deprecated Prefer using test classes per entity
+ */
+@Deprecated
 class StructureServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
@@ -180,10 +184,14 @@ class StructureServiceIT extends AbstractServiceTestSupport {
         def branch = doCreateBranch(project, nd('Branch 1', ''))
         def build = doCreateBuild(branch, nd('Build 1', ''))
         // Correct pattern
-        def builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBranchName('.*1$')) }
+        def builds = asUser().withView(build).call {
+            structureService.buildSearch(build.project.id, new BuildSearchForm().withBranchName('.*1$'))
+        }
         assert builds*.id == [build.id]
         // Incorrect pattern (unmatched parenthesis)
-        builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBranchName('.*1)')) }
+        builds = asUser().withView(build).call {
+            structureService.buildSearch(build.project.id, new BuildSearchForm().withBranchName('.*1)'))
+        }
         assert builds.empty: "No match, but no failure"
     }
 
@@ -192,10 +200,14 @@ class StructureServiceIT extends AbstractServiceTestSupport {
         def branch = doCreateBranch()
         def build = doCreateBuild(branch, nd('Build 1', ''))
         // Correct pattern
-        def builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBuildName('.*1$')) }
+        def builds = asUser().withView(build).call {
+            structureService.buildSearch(build.project.id, new BuildSearchForm().withBuildName('.*1$'))
+        }
         assert builds*.id == [build.id]
         // Incorrect pattern (unmatched parenthesis)
-        builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBuildName('.*1)')) }
+        builds = asUser().withView(build).call {
+            structureService.buildSearch(build.project.id, new BuildSearchForm().withBuildName('.*1)'))
+        }
         assert builds.empty: "No match, but no failure"
     }
 
@@ -210,7 +222,7 @@ class StructureServiceIT extends AbstractServiceTestSupport {
             structureService.getBranchesForProject(project.id)
         }
         // Checks the order
-        assert branches*.name == [ '1.0', '2.1', '2.0' ]
+        assert branches*.name == ['1.0', '2.1', '2.0']
     }
 
 }

@@ -20,6 +20,7 @@ class GQLTypeValidationRun(
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val runInfo: GQLTypeRunInfo,
         private val runInfoService: RunInfoService,
+        private val validationRunData: GQLTypeValidationRunData,
         private val projectEntityInterface: GQLProjectEntityInterface
 ) : AbstractGQLProjectEntity<ValidationRun>(
         ValidationRun::class.java,
@@ -69,6 +70,12 @@ class GQLTypeValidationRun(
                                 .description("Run info associated with this validation run")
                                 .type(runInfo.typeRef)
                                 .runInfoFetcher<ValidationRun> { runInfoService.getRunInfo(it) }
+                    }
+                    // Data
+                    .field {
+                        it.name("data")
+                                .description("Data associated with the validation run")
+                                .type(validationRunData.typeRef)
                     }
                     // OK
                     .build()

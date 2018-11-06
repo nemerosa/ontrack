@@ -164,15 +164,26 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     }
 
     public ValidationRun doValidateBuild(Build build, ValidationStamp vs, ValidationRunStatusID statusId) throws Exception {
-        return asUser().with(build, ValidationRunCreate.class).call(() ->
+        return doValidateBuild(
+                build, vs, statusId, null
+        );
+    }
+
+    public ValidationRun doValidateBuild(
+            Build build,
+            ValidationStamp vs,
+            ValidationRunStatusID statusId,
+            ValidationRunData<?> runData
+    ) throws Exception {
+        return asUser().withView(build).with(build, ValidationRunCreate.class).call(() ->
                 structureService.newValidationRun(
-                        ValidationRun.of(
-                                build,
-                                vs,
-                                1,
-                                Signature.of("test"),
+                        build,
+                        new ValidationRunRequest(
+                                vs.getName(),
                                 statusId,
-                                ""
+                                runData != null ? runData.getDescriptor().getId() : null,
+                                runData != null ? runData.getData() : null,
+                                null
                         )
                 )
         );
@@ -200,13 +211,21 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return doCreateValidationStamp(doCreateBranch(), nameDescription());
     }
 
+    protected ValidationStamp doCreateValidationStamp(ValidationDataTypeConfig<?> config) throws Exception {
+        return doCreateValidationStamp(doCreateBranch(), nameDescription(), config);
+    }
+
     public ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription) throws Exception {
+        return doCreateValidationStamp(branch, nameDescription, null);
+    }
+
+    public ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription, ValidationDataTypeConfig<?> config) throws Exception {
         return asUser().with(branch.getProject().id(), ValidationStampCreate.class).call(() ->
                 structureService.newValidationStamp(
                         ValidationStamp.of(
                                 branch,
                                 nameDescription
-                        )
+                        ).withDataType(config)
                 )
         );
     }

@@ -68,11 +68,20 @@ pipeline {
 git checkout -B ${BRANCH_NAME}
 git clean -xfd
 '''
+                sh ''' ./gradlew clean versionDisplay versionFile'''
+                script {
+                    // Reads version information
+                    def props = readProperties(file: 'build/version.properties')
+                    version = props.VERSION_DISPLAY
+                    gitCommit = props.VERSION_COMMIT
+                    // If not a PR, create a build
+                    if (!pr) {
+                        ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                    }
+                }
+                echo "Version = ${version}"
                 sh '''\
 ./gradlew \\
-    clean \\
-    versionDisplay \\
-    versionFile \\
     test \\
     build \\
     integrationTest \\
@@ -87,13 +96,6 @@ git clean -xfd
     --parallel \\
     --console plain
 '''
-                script {
-                    // Reads version information
-                    def props = readProperties(file: 'build/version.properties')
-                    version = props.VERSION_DISPLAY
-                    gitCommit = props.VERSION_COMMIT
-                }
-                echo "Version = ${version}"
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
@@ -122,14 +124,21 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             }
             post {
                 always {
-                    junit '**/build/test-results/**/*.xml'
-                }
-                success {
                     script {
+                        def results = junit '**/build/test-results/**/*.xml'
+                        // If not a PR, create a build validation stamp
                         if (!pr) {
-                            ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'BUILD',
+                                    testResults: results,
+                            )
                         }
                     }
+                }
+                success {
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                     stash name: "rpm", includes: "build/distributions/*.rpm"
                     stash name: "debian", includes: "build/distributions/*.deb"
@@ -173,15 +182,15 @@ cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name local down --volumes
 """
-                    junit 'build/acceptance/*.xml'
                     script {
+                        def results = junit('build/acceptance/*.xml')
                         if (!pr) {
                             ontrackValidate(
                                     project: projectName,
                                     branch: branchName,
                                     build: version,
                                     validationStamp: 'ACCEPTANCE',
-                                    buildResult: currentBuild.result,
+                                    testResults: results,
                             )
                         }
                     }
@@ -198,6 +207,7 @@ docker-compose --project-name local down --volumes
                 ONTRACK_VERSION = "${version}"
             }
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             parallel {
@@ -248,14 +258,16 @@ cp -r ontrack-acceptance/src/main/compose/build build/centos
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
 """
-                            junit 'build/centos/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.CENTOS.7',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/centos/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -306,14 +318,16 @@ cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
 """
-                            junit 'build/debian/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DEBIAN',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/debian/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DEBIAN',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -354,14 +368,16 @@ cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
 docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
 """
-                            junit 'build/extension/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'EXTENSIONS',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/extension/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'EXTENSIONS',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -446,14 +462,16 @@ docker-compose \\
 echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
 docker-machine rm --force ${DROPLET_NAME}
 '''
-                            junit 'build/do/*.xml'
-                            ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'ACCEPTANCE.DO',
-                                    buildResult: currentBuild.result,
-                            )
+                            script {
+                                def results = junit 'build/do/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DO',
+                                        testResults: results,
+                                )
+                            }
                         }
                     }
                 }
@@ -464,6 +482,7 @@ docker-machine rm --force ${DROPLET_NAME}
 
         stage('Publication') {
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             environment {
@@ -501,6 +520,17 @@ docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemeros
 docker image push nemerosa/ontrack:${ONTRACK_VERSION}
 docker image push nemerosa/ontrack:3
 '''
+                    }
+                    post {
+                        always {
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'DOCKER.HUB',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
                     }
                 }
                 stage('Maven publication') {
@@ -549,6 +579,17 @@ set -e
     publicationMaven
 '''
                     }
+                    post {
+                        always {
+                            ontrackValidate(
+                                    project: projectName,
+                                    branch: branchName,
+                                    build: version,
+                                    validationStamp: 'MAVEN.CENTRAL',
+                                    buildResult: currentBuild.result,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -569,6 +610,7 @@ set -e
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             steps {
@@ -629,6 +671,7 @@ set -e
                 GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
+                beforeAgent true
                 branch 'release/*'
             }
             steps {
@@ -686,6 +729,7 @@ GITHUB_URI=`git config remote.origin.url`
                 }
             }
             when {
+                beforeAgent true
                 branch 'release/3*'
             }
             environment {
@@ -703,7 +747,7 @@ set -e
 
 SSH_OPTIONS=StrictHostKeyChecking=no
 
-SSH_HOST=ontrack.nemerosa.net
+SSH_HOST=${ONTRACK_IP}
 
 scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
 ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
@@ -725,6 +769,7 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
                 }
             }
             when {
+                beforeAgent true
                 branch 'release/3*'
             }
             environment {
@@ -764,14 +809,16 @@ docker-compose \\
 
 '''
                     archiveArtifacts 'build/production/**'
-                    junit 'build/production/*.xml'
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'ONTRACK.SMOKE',
-                            buildResult: currentBuild.result,
-                    )
+                    script {
+                        def results = junit 'build/production/*.xml'
+                        ontrackValidate(
+                                project: projectName,
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'ONTRACK.SMOKE',
+                                testResults: results,
+                        )
+                    }
                 }
                 success {
                     ontrackPromote(

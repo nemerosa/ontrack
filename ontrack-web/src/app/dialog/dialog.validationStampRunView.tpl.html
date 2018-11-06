@@ -17,6 +17,11 @@
             Loading the validation runs...
         </div>
     </div>
+    <div class="panel panel-default" ng-if="validation.validationStamp.dataType">
+        <div class="panel-body">
+            <ot-validation-data-type-config value="validation.validationStamp.dataType"></ot-validation-data-type-config>
+        </div>
+    </div>
     <div class="panel panel-default"
          ng-hide="loadingValidationRuns"
          ng-repeat="validationRun in validation.validationStamp.validationRunsPaginated.pageItems | orderBy:'id':true">
@@ -28,6 +33,9 @@
                     ng-click="changeStatus(validationRun)">
                 <span class="fa fa-comment-o"></span>
             </p>
+        </div>
+        <div class="panel-body" ng-if="validationRun.data">
+            <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
         </div>
         <ul class="list-group">
             <li class="list-group-item" ng-repeat="validationRunStatus in validationRun.validationRunStatuses">

@@ -1,6 +1,80 @@
 [[validation-stamps]]
 === Managing validation stamps
 
+[[validation-stamps-data]]
+==== Validation stamp data configuration
+
+<<model,Validation stamps>> are often created by tests, or scans, or any other
+kind of automated process. This is often associated with some metrics. For example:
+
+* a security scan could bring a list of critical and high defects
+* a test run has a list of passed and total tests
+* a coverage test has a coverage %
+* etc.
+
+Ontrack is able to associate such data to a <<model,validation run>> for a given
+build and validation stamp.
+
+The only precondition is that the validation stamp must be configured for a given
+type of data.
+
+When creating or edition a validation stamp, you can select the type of data
+you want to associate with any validation run for this validation stamp.
+
+There is a list of predefined data types:
+
+* plain text
+* CHML (Critical / High / Medium / Low)
+* Number (with or without threshold)
+* Fraction (with or without threshold)
+* Percentage (with or without threshold)
+
+NOTE: You can create your own <<extending-validation-data,validation data types>>.
+
+Every type is associated with a configuration. For some of them, nothing is needed.
+
+For data types with threshold, you might want to select threshold for generating
+warnings, failures, according to a given direction.
+
+For example, a validation stamp could be associated with a number of passed tests
+linked with a total number of tests. This is a "fraction" type, where the numerator
+is the number of passed tests, and the denominator is the total number of tests.
+
+The warning and failure thresholds are expressed as percentages, and we can choose a
+direction (higher is better by default).
+
+If the failure threshold is 50, and the total number of tests is 200, and the number
+of passed tests is 99, then, we're below the threshold of 50 (%) and the validation
+run is marked as a failure.
+
+image::images/validation-stamp-data-type.png[Validation stamp data type]
+
+For the creation of data associated with validation runs, see
+the <<validation-runs-data,associated documentation>>.
+
+In order to use create a validation stamp with some validation data type,
+you can also use the <<dsl,DSL>>:
+
+[source,groovy]
+----
+def branch = ...
+branch.validationStamp("Text data") {
+    setTextDataType()
+}
+branch.validationStamp("CHML data") {
+    setCHMLDataType("HIGH", 1, "CRITICAL", 1)
+}
+branch.validationStamp("Number data") {
+    setNumberDataType(10, 100, true)
+}
+branch.validationStamp("Percentage data") {
+    setPercentageDataType(0, 50, false)
+}
+branch.validationStamp("Fraction data") {
+    setFractionDataType(100, 90, true)
+}
+----
+
 [[validation-stamps-auto]]
 ==== Auto creation of validation stamps
 
@@ -73,6 +147,13 @@ In this case:
 * in any other case, a new validation stamp is created in the branch, with the requested name (and with
   an empty image and a default description)
 
+[[validation-stamps-auto-data]]
+===== Predefined validation stamps and validation data
+
+As for validation stamps associated with branches, the predefined
+validation stamps can be associated with some
+<<validation-stamps-data,validation data>>.
+
 [[validation-stamps-bulk-update]]
 ==== Bulk update of validation stamps
 
@@ -97,3 +178,6 @@ image and the same description.
 
 A <<validation-stamps-auto-predefined,predefined validation stamp>> will
 also be updated or created.
+
+NOTE: any <<validation-stamps-data,validation data configuration>> is also
+part of the bulk update.

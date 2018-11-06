@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -65,6 +66,12 @@ public class ValidationRun implements RunnableEntity {
     }
 
     /**
+     * Data used for the link to an optional {@link ValidationDataType} and its data
+     */
+    @Wither
+    private final ValidationRunData<?> data;
+
+    /**
      * Must always contain at least one validation run status at creation time.
      */
     @JsonView({ValidationRun.class, BranchBuildView.class, Build.class, ValidationStampRunView.class})
@@ -78,6 +85,7 @@ public class ValidationRun implements RunnableEntity {
                 build,
                 validationStamp,
                 runOrder,
+                data,
                 Collections.unmodifiableList(statuses)
         );
     }
@@ -126,6 +134,7 @@ public class ValidationRun implements RunnableEntity {
                 build,
                 validationStamp,
                 runOrder,
+                null,
                 statuses
         );
     }
@@ -136,6 +145,7 @@ public class ValidationRun implements RunnableEntity {
                 build,
                 validationStamp,
                 runOrder,
+                data,
                 validationRunStatuses
         );
     }

@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.model.form.Form;
 
 /**
  * Validation stamp defined at global level, allowing some projects to create them automatically.
@@ -14,7 +13,7 @@ import net.nemerosa.ontrack.model.form.Form;
 public class PredefinedValidationStamp implements Entity {
 
     public static PredefinedValidationStamp of(NameDescription nameDescription) {
-        return new PredefinedValidationStamp(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), false);
+        return new PredefinedValidationStamp(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), false, null);
     }
 
     private final ID id;
@@ -22,23 +21,18 @@ public class PredefinedValidationStamp implements Entity {
     @Wither
     private final String description;
     private final Boolean image;
+    /**
+     * Data used for the link to an optional {@link ValidationDataType} and its configuration
+     */
+    @Wither
+    private final ValidationDataTypeConfig<?> dataType;
 
     public PredefinedValidationStamp withId(ID id) {
-        return new PredefinedValidationStamp(id, name, description, image);
+        return new PredefinedValidationStamp(id, name, description, image, dataType);
     }
 
     public PredefinedValidationStamp withImage(boolean image) {
-        return new PredefinedValidationStamp(id, name, description, image);
-    }
-
-    public static Form form() {
-        return Form.nameAndDescription();
-    }
-
-    public Form asForm() {
-        return form()
-                .fill("name", name)
-                .fill("description", description);
+        return new PredefinedValidationStamp(id, name, description, image, dataType);
     }
 
     public PredefinedValidationStamp update(NameDescription nameDescription) {
@@ -46,7 +40,8 @@ public class PredefinedValidationStamp implements Entity {
                 id,
                 nameDescription.getName(),
                 nameDescription.getDescription(),
-                image
+                image,
+                dataType
         );
     }
 }

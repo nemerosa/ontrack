@@ -25,6 +25,15 @@ angular.module('ot.dialog.validationStampRunView', [
                       name
                       image
                       _image
+                      dataType {
+                        descriptor {
+                          id
+                          feature {
+                            id
+                          }
+                        }
+                        config
+                      }
                       validationRunsPaginated(buildId: $buildId, offset: $offset, size: $size) {
                           pageInfo {
                             totalSize
@@ -45,6 +54,15 @@ angular.module('ot.dialog.validationStampRunView', [
                             id
                             runOrder
                             description
+                            data {
+                              descriptor {
+                                id
+                                feature {
+                                  id
+                                }
+                              }
+                              data
+                            }
                             runInfo {
                               sourceType
                               sourceUri 

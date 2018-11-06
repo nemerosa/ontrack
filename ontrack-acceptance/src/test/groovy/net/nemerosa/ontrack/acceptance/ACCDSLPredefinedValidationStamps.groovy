@@ -153,4 +153,63 @@ class ACCDSLPredefinedValidationStamps extends AbstractACCDSL {
         assert vs.description == "Validation automatically created on demand."
     }
 
+    @Test
+    void 'Predefined validation stamp with data type'() {
+        // Name of the validation stamp
+        def vsName = uid('VS')
+        // Creation of a predefined validation stamp with a data type
+        ontrack.configure {
+            predefinedValidationStamp(vsName, 'Validation stamp').setDataType(
+                    "net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType",
+                    [
+                            warningThreshold: 25,
+                            failureThreshold: 10,
+                            okIfGreater     : true,
+                    ]
+            )
+        }
+        // Checks it has been created
+        def pvs = ontrack.config.predefinedValidationStamps.find { it.name == vsName }
+        assert pvs != null
+        // Checks its data type
+        def type = pvs.dataType
+        assert type != null
+        assert type.id == "net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType"
+        assert type.config == [
+                warningThreshold: 25,
+                failureThreshold: 10,
+                okIfGreater     : true,
+        ]
+
+        // Creating a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B')
+        }
+
+        // Enabling the auto validation stamps on the project
+        ontrack.project(projectName).config {
+            autoValidationStamp()
+        }
+
+        // Creates a build
+        def build = ontrack.branch(projectName, 'B').build('1')
+
+        // Validates a build using a non existing validation stamp on the branch
+        build.validateWithPercentage(vsName, 20)
+
+        // Checks the validation stamp has been created
+        def vs = ontrack.validationStamp(projectName, 'B', vsName)
+        assert vs.id > 0
+        // Checks its data type
+        type = vs.dataType
+        assert type != null
+        assert type.id == "net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType"
+        assert type.config == [
+                warningThreshold: 25,
+                failureThreshold: 10,
+                okIfGreater     : true,
+        ]
+    }
+
 }

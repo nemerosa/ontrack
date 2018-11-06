@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.acceptance.browser.support.AbstractDialog
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
-public class BranchDialog extends AbstractDialog<BranchDialog> {
+class BranchDialog extends AbstractDialog<BranchDialog> {
 
     @FindBy(name = "name")
     private WebElement nameInput;
@@ -13,15 +13,15 @@ public class BranchDialog extends AbstractDialog<BranchDialog> {
     @FindBy(name = "description")
     private WebElement descriptionInput;
 
-    public BranchDialog(Browser browser) {
+    BranchDialog(Browser browser) {
         super(browser);
     }
 
-    public void setName(String value) {
+    void setName(String value) {
         nameInput.sendKeys(value);
     }
 
-    public void setDescription(String value) {
+    void setDescription(String value) {
         descriptionInput.sendKeys(value);
     }
 }

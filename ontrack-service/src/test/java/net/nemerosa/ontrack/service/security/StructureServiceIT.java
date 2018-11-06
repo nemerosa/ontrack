@@ -20,16 +20,13 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
     @Autowired
     private StructureService structureService;
 
-    @Autowired
-    private ValidationRunStatusService validationRunStatusService;
-
     @Test(expected = IllegalArgumentException.class)
-    public void newProject_null() throws Exception {
+    public void newProject_null() {
         structureService.newProject(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void newProject_existing() throws Exception {
+    public void newProject_existing() {
         structureService.newProject(Project.of(nameDescription()).withId(ID.of(1)));
     }
 
@@ -173,19 +170,14 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         Branch branch = doCreateBranch();
         ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
         Build build = doCreateBuild(branch, nameDescription());
-        // Status id
-        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusID.PASSED);
         // Creation of the run
-        structureService.newValidationRun(
-                ValidationRun.of(
-                        build,
-                        stamp,
-                        0,
-                        Signature.of("user"),
-                        passed,
-                        "Passed test"
+        asUser().withView(branch).execute(() -> structureService.newValidationRun(
+                build,
+                new ValidationRunRequest(
+                        stamp.getName(),
+                        ValidationRunStatusID.STATUS_PASSED
                 )
-        );
+        ));
     }
 
     @Test
@@ -194,20 +186,15 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         Branch branch = doCreateBranch();
         ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
         Build build = doCreateBuild(branch, nameDescription());
-        // Status id
-        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusID.PASSED);
         // Creation of the run
-        ValidationRun run = asUser().with(branch.getProject().id(), ValidationRunCreate.class).call(() ->
-                        structureService.newValidationRun(
-                                ValidationRun.of(
-                                        build,
-                                        stamp,
-                                        0,
-                                        Signature.of("user"),
-                                        passed,
-                                        "Passed test"
-                                )
+        ValidationRun run = asUser().withView(branch).with(branch, ValidationRunCreate.class).call(() ->
+                structureService.newValidationRun(
+                        build,
+                        new ValidationRunRequest(
+                                stamp.getName(),
+                                ValidationRunStatusID.STATUS_PASSED
                         )
+                )
         );
         Entity.isEntityDefined(run, "Validation run is defined");
         assertEquals("Validation run order must be 1", 1, run.getRunOrder());

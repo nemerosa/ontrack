@@ -161,6 +161,13 @@ angular.module('ot.view.branch', [
                   decorations {
                     ...decorationContent
                   }
+                  dataType {
+                    descriptor {
+                      id
+                      displayName
+                    }
+                    config
+                  }
                 }
                 builds(generic: {type: $filterType, data: $filterData}) {
                   id
@@ -196,6 +203,12 @@ angular.module('ot.view.branch', [
                     validationStamp {
                       id
                       name
+                      dataType {
+                        descriptor {
+                          id
+                        }
+                        config
+                      }
                     }
                     validationRuns(count: 1) {
                       validationRunStatuses {
@@ -528,7 +541,14 @@ angular.module('ot.view.branch', [
                 'Validation for the build',
                 {
                     postForm: function (form) {
-                        return otFormService.updateFieldValue(form, 'validationStampId', validationStamp.id);
+                        return otFormService.updateFieldValue(
+                            form,
+                            'validationStampData',
+                            {
+                                id: validationStamp.name,
+                                data: validationStamp.dataType ? validationStamp.dataType.config : undefined
+                            }
+                        );
                     }
                 }
             ).then(loadBuildView);

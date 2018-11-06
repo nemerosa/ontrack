@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.model.form.Form;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -14,8 +13,16 @@ public class ValidationStamp implements ProjectEntity {
     public static ValidationStamp of(Branch branch, NameDescription nameDescription) {
         Entity.isEntityDefined(branch, "Branch must be defined");
         Entity.isEntityDefined(branch.getProject(), "Project must be defined");
-        return new ValidationStamp(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), branch, null, false,
-                Signature.none());
+        return new ValidationStamp(
+                ID.NONE,
+                nameDescription.getName(),
+                nameDescription.getDescription(),
+                branch,
+                null,
+                false,
+                Signature.none(),
+                null
+        );
     }
 
     private final ID id;
@@ -28,6 +35,11 @@ public class ValidationStamp implements ProjectEntity {
     private final Boolean image;
     @Wither
     private final Signature signature;
+    /**
+     * Data used for the link to an optional {@link ValidationDataType} and its configuration
+     */
+    @Wither
+    private final ValidationDataTypeConfig<?> dataType;
 
     @Override
     public Project getProject() {
@@ -45,22 +57,11 @@ public class ValidationStamp implements ProjectEntity {
     }
 
     public ValidationStamp withId(ID id) {
-        return new ValidationStamp(id, name, description, branch, owner, image, signature);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType);
     }
 
     public ValidationStamp withImage(boolean image) {
-        return new ValidationStamp(id, name, description, branch, owner, image, signature);
-    }
-
-    public static Form form() {
-        // TODO User selection
-        return Form.nameAndDescription();
-    }
-
-    public Form asForm() {
-        return form()
-                .fill("name", name)
-                .fill("description", description);
+        return new ValidationStamp(id, name, description, branch, owner, image, signature, dataType);
     }
 
     public ValidationStamp update(NameDescription nameDescription) {
@@ -71,7 +72,8 @@ public class ValidationStamp implements ProjectEntity {
                 branch,
                 owner,
                 image,
-                signature
+                signature,
+                dataType
         );
     }
 }

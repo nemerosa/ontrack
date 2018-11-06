@@ -8,10 +8,20 @@ import kotlin.test.assertTrue
 class GQLScalarJSONTest {
 
     @Test
+    fun `JSON text`() {
+        // Data as string
+        val data = "Some text"
+        // Serialization
+        val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
+        // Checks the data
+        assertEquals("Some text", json.asText())
+    }
+
+    @Test
     fun `Obfuscation of password`() {
         // Data with password
         val data = SampleConfig("user", "secret")
-        // As JSON scaler
+        // As JSON scalar
         val json = GQLScalarJSON.INSTANCE.coercing.serialize(data) as JsonNode
         // Checks the data
         assertEquals("user", json["user"].asText())
