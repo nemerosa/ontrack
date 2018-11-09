@@ -65,6 +65,11 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
+    String getIssueExtractionRegex(IssueServiceConfiguration issueServiceConfiguration) {
+        return '#(\\d+)'
+    }
+
+    @Override
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         Set<String> result = new HashSet<>()
         if (StringUtils.isNotBlank(message)) {

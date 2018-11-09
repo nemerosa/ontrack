@@ -56,7 +56,9 @@ public interface IssueServiceExtension extends Extension {
      * @param issueServiceConfiguration Configuration for the service
      * @param message                   Message to scan
      * @return List of keys (can be empty, never <code>null</code>)
+     * @deprecated Use {@link #getIssueExtractionRegex(IssueServiceConfiguration)} instead.
      */
+    @Deprecated
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
 
     /**
@@ -89,8 +91,22 @@ public interface IssueServiceExtension extends Extension {
      * using the
      * {@link #extractIssueKeysFromMessage(net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration, String)}
      * method.
+     *
+     * @deprecated Use {@link #getIssueExtractionRegex(IssueServiceConfiguration)} instead.
      */
+    @Deprecated
     boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys);
+
+    /**
+     * Gets a regular expression which can be used against a commit message to extract a list of issue keys.
+     *
+     * The first matching group of the expression is used to identify the issue key. The regular expression will
+     * be used to find several keys into the message.
+     *
+     * @param issueServiceConfiguration Configuration of the service
+     * @return A regular expression.
+     */
+    String getIssueExtractionRegex(IssueServiceConfiguration issueServiceConfiguration);
 
     /**
      * List of supported export formats for the issues.

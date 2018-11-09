@@ -79,6 +79,13 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
     }
 
     @Override
+    public String getIssueExtractionRegex(IssueServiceConfiguration issueServiceConfiguration) {
+        return getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .map(ConfiguredIssueService::getIssueExtractionRegex)
+                .collect(Collectors.joining("|"));
+    }
+
+    @Override
     public Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         return getConfiguredIssueServices(issueServiceConfiguration).stream()
                 .map(

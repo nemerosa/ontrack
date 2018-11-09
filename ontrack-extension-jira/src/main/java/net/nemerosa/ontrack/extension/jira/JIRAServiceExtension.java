@@ -199,6 +199,11 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
         return tx.getResource(JIRASession.class, configuration.getName(), () -> jiraSessionFactory.create(configuration));
     }
 
+    @Override
+    public String getIssueExtractionRegex(IssueServiceConfiguration issueServiceConfiguration) {
+        return JIRAConfiguration.ISSUE_PATTERN_REGEX;
+    }
+
     protected Set<String> extractJIRAIssuesFromMessage(JIRAConfiguration configuration, String message) {
         Set<String> result = new HashSet<>();
         if (StringUtils.isNotBlank(message)) {

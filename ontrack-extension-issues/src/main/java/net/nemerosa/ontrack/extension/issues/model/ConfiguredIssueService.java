@@ -43,12 +43,27 @@ public class ConfiguredIssueService {
         return issueServiceExtension.getMessageAnnotator(issueServiceConfiguration);
     }
 
+    /**
+     * @deprecated Use {@link #getIssueExtractionRegex()} instead
+     */
+    @Deprecated
     public Set<String> extractIssueKeysFromMessage(String message) {
         return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message);
     }
 
+    /**
+     * @deprecated Use {@link #getIssueExtractionRegex()} instead
+     */
+    @Deprecated
     public boolean containsIssueKey(String key, Set<String> keys) {
         return issueServiceExtension.containsIssueKey(issueServiceConfiguration, key, keys);
+    }
+
+    /**
+     * @see IssueServiceExtension#getIssueExtractionRegex(IssueServiceConfiguration)
+     */
+    public String getIssueExtractionRegex() {
+        return issueServiceExtension.getIssueExtractionRegex(issueServiceConfiguration);
     }
 
     public Optional<String> getIssueId(String token) {
