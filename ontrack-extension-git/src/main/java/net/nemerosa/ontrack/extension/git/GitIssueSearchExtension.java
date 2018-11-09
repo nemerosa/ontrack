@@ -90,7 +90,8 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                 // Skipping if associated project is already associated with the issue
                 if (!projectResults.containsKey(projectId)) {
                     // ... searches for the issue token in the git repository
-                    final boolean found = gitService.isPatternFound(c.getGitBranchConfiguration(), token);
+                    final boolean found = c.getConfiguredIssueService().getIssueServiceExtension().validIssueToken(token)
+                            && gitService.isPatternFound(c.getGitBranchConfiguration(), token);
                     // ... and if found
                     if (found) {
                         // ... loads the issue
