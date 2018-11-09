@@ -140,4 +140,13 @@ public interface GitService extends SCMService {
     void scheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property);
 
     void unscheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property);
+
+    /**
+     * Checks the log history and returns <code>true</code> if the token can be found.
+     *
+     * @param branchConfiguration Git configuration
+     * @param token               Expression to be searched for
+     * @return Result of the search
+     */
+    boolean isPatternFound(GitBranchConfiguration branchConfiguration, String token);
 }

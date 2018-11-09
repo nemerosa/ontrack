@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -23,6 +24,7 @@ import org.eclipse.jgit.revplot.PlotLane;
 import org.eclipse.jgit.revplot.PlotWalk;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.filter.MessageRevFilter;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -206,6 +208,22 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                     commits
             );
 
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
+    public boolean isPatternFound(String token) {
+        try {
+            LogCommand log = git.log()
+                    .all()
+                    .setRevFilter(MessageRevFilter.create(token))
+                    .setMaxCount(1);
+            Iterable<RevCommit> commits = log.call();
+            return commits.iterator().hasNext();
+        } catch (GitAPIException e) {
+            throw new GitRepositoryAPIException(repository.getRemote(), e);
         } catch (IOException e) {
             throw new GitRepositoryIOException(repository.getRemote(), e);
         }

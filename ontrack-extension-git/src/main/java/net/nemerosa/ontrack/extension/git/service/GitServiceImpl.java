@@ -341,6 +341,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
+    public boolean isPatternFound(GitBranchConfiguration branchConfiguration, String token) {
+        // Gets the client
+        GitRepositoryClient client = gitRepositoryClientFactory.getClient(branchConfiguration.getConfiguration().getGitRepository());
+        // Scanning
+        return client.isPatternFound(token);
+    }
+
+    @Override
     public boolean scanCommits(GitBranchConfiguration branchConfiguration, Predicate<RevCommit> scanFunction) {
         // Gets the client
         GitRepositoryClient client = gitRepositoryClientFactory.getClient(branchConfiguration.getConfiguration().getGitRepository());

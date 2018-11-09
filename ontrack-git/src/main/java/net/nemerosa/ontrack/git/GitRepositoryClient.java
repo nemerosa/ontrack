@@ -153,4 +153,12 @@ public interface GitRepositoryClient {
      * Resets the repository. Performs even if there is a synchronisation going on.
      */
     void reset();
+
+    /**
+     * Checks the log history and returns <code>true</code> if the token can be found.
+     *
+     * @param token Expression to be searched for
+     * @return Result of the search
+     */
+    boolean isPatternFound(String token);
 }

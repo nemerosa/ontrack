@@ -8,18 +8,20 @@ import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.git.exceptions.GitRepositoryException;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -89,13 +91,11 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                 // Skipping if associated project is already associated with the issue
                 if (!projectResults.containsKey(projectId)) {
                     // ... searches for the issue token in the git repository
-                    boolean found;
-                    try {
-                        found = gitService.scanCommits(c.getGitBranchConfiguration(), commit -> scanIssue(c, commit, token));
-                    } catch (GitRepositoryException ignored) {
-                        // Silent failure in case of problems with the Git repository
-                        found = false;
-                    }
+                    // Gets the regular expression to be used to identify issues in commit messages
+                    String issueRegex = c.getConfiguredIssueService().getIssueExtractionRegex();
+                    // Does the pattern match?
+                    final boolean found = (Pattern.matches(issueRegex, issueRegex))
+                            && gitService.isPatternFound(c.getGitBranchConfiguration(), token);
                     // ... and if found
                     if (found) {
                         // ... loads the issue
@@ -128,10 +128,5 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
             return projectResults.values();
         }
 
-        private boolean scanIssue(BranchSearchConfiguration c, RevCommit commit, String key) {
-            String message = commit.getFullMessage();
-            Set<String> keys = c.getConfiguredIssueService().extractIssueKeysFromMessage(message);
-            return c.getConfiguredIssueService().containsIssueKey(key, keys);
-        }
     }
 }
