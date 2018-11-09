@@ -362,8 +362,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets the details about the issue
         Issue issue = configuredIssueService.getIssue(key);
 
-        // Collects commits per branches
-        List<OntrackGitIssueCommitInfo> commitInfos = collectIssueCommitInfos(branch.getProject(), issue);
+        // Collects commits for this branch
+        List<OntrackGitIssueCommitInfo> commitInfos = collectIssueCommitInfos(branch, branchConfiguration, issue);
 
         // OK
         return new OntrackGitIssueInfo(
@@ -373,70 +373,54 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private List<OntrackGitIssueCommitInfo> collectIssueCommitInfos(Project project, Issue issue) {
+    private List<OntrackGitIssueCommitInfo> collectIssueCommitInfos(Branch branch, GitBranchConfiguration branchConfiguration, Issue issue) {
         // Index of commit infos
         Map<String, OntrackGitIssueCommitInfo> commitInfos = new LinkedHashMap<>();
-        // For all configured branches
-        forEachConfiguredBranch((branch, branchConfiguration) -> {
-            // Filter per project
-            if (branch.projectId() != project.id()) {
-                return;
-            }
-            // Gets the branch configuration
-            GitConfiguration configuration = branchConfiguration.getConfiguration();
-            // Gets the Git client for this project
-            GitRepositoryClient client = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
-            // Issue service
-            ConfiguredIssueService configuredIssueService = configuration.getConfiguredIssueService().orElse(null);
-            if (configuredIssueService != null) {
-                // List of commits for this branch
-                List<RevCommit> revCommits = new ArrayList<>();
-                // Scanning this branch's repository for the commit
-                client.scanCommits(branchConfiguration.getBranch(), revCommit -> {
-                    String message = revCommit.getFullMessage();
-                    Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
-                    // Gets all linked issues
-                    boolean matching = configuredIssueService.getLinkedIssues(branch.getProject(), issue).stream()
-                            .map(Issue::getKey)
-                            .anyMatch(key -> configuredIssueService.containsIssueKey(key, keys));
-                    if (matching) {
-                        // We have a commit for this branch!
-                        revCommits.add(revCommit);
-                    }
-                    return false; // Scanning all commits
-                });
-                // If at least one commit
-                if (revCommits.size() > 0) {
-                    // Gets the last commit (which is the first in the list)
-                    RevCommit revCommit = revCommits.get(0);
-                    // Commit explained (independent from the branch)
-                    GitCommit commit = client.toCommit(revCommit);
-                    String commitId = commit.getId();
-                    // Gets any existing commit info
-                    OntrackGitIssueCommitInfo commitInfo = commitInfos.get(commitId);
-                    // If not defined, creates an entry
-                    if (commitInfo == null) {
-                        // UI commit (independent from the branch)
-                        GitUICommit uiCommit = toUICommit(
-                                configuration.getCommitLink(),
-                                getMessageAnnotators(configuration),
-                                commit
-                        );
-                        // Commit info
-                        commitInfo = OntrackGitIssueCommitInfo.of(uiCommit);
-                        // Indexation
-                        commitInfos.put(commitId, commitInfo);
-                    }
-                    // Collects branch info
-                    SCMIssueCommitBranchInfo branchInfo = SCMIssueCommitBranchInfo.of(branch);
-                    // Gets the last build for this branch
-                    Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client);
-                    branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo);
-                    // Adds the info
-                    commitInfo.add(branchInfo);
+        // Gets the branch configuration
+        GitConfiguration configuration = branchConfiguration.getConfiguration();
+        // Gets the Git client for this project
+        GitRepositoryClient client = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
+        // Issue service
+        ConfiguredIssueService configuredIssueService = configuration.getConfiguredIssueService().orElse(null);
+        if (configuredIssueService != null) {
+            // Regular expression to identify the issue and all its linked issues
+            Set<String> allKeys = configuredIssueService.getLinkedIssues(branch.getProject(), issue)
+                    .stream()
+                    .map(Issue::getDisplayKey)
+                    .collect(Collectors.toSet());
+            allKeys.add(issue.getDisplayKey());
+            String regex = String.join("|", allKeys);
+            // Gets the first commit whose message contains this issue and its linked issues
+            RevCommit revCommit = client.findCommitForRegex(branchConfiguration.getBranch(), regex);
+            // If at least one commit
+            if (revCommit != null) {
+                // Commit explained (independent from the branch)
+                GitCommit commit = client.toCommit(revCommit);
+                String commitId = commit.getId();
+                // Gets any existing commit info
+                OntrackGitIssueCommitInfo commitInfo = commitInfos.get(commitId);
+                // If not defined, creates an entry
+                if (commitInfo == null) {
+                    // UI commit (independent from the branch)
+                    GitUICommit uiCommit = toUICommit(
+                            configuration.getCommitLink(),
+                            getMessageAnnotators(configuration),
+                            commit
+                    );
+                    // Commit info
+                    commitInfo = OntrackGitIssueCommitInfo.of(uiCommit);
+                    // Indexation
+                    commitInfos.put(commitId, commitInfo);
                 }
+                // Collects branch info
+                SCMIssueCommitBranchInfo branchInfo = SCMIssueCommitBranchInfo.of(branch);
+                // Gets the last build for this branch
+                Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client);
+                branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo);
+                // Adds the info
+                commitInfo.add(branchInfo);
             }
-        });
+        }
         // OK
         return Lists.newArrayList(commitInfos.values());
     }

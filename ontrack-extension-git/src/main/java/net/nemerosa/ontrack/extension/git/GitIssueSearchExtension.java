@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -91,11 +90,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                 // Skipping if associated project is already associated with the issue
                 if (!projectResults.containsKey(projectId)) {
                     // ... searches for the issue token in the git repository
-                    // Gets the regular expression to be used to identify issues in commit messages
-                    String issueRegex = c.getConfiguredIssueService().getIssueExtractionRegex();
-                    // Does the pattern match?
-                    final boolean found = (Pattern.matches(issueRegex, issueRegex))
-                            && gitService.isPatternFound(c.getGitBranchConfiguration(), token);
+                    final boolean found = gitService.isPatternFound(c.getGitBranchConfiguration(), token);
                     // ... and if found
                     if (found) {
                         // ... loads the issue

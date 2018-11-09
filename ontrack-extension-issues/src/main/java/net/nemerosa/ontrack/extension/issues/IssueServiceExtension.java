@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.issues;
 
-import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 
@@ -56,7 +56,7 @@ public interface IssueServiceExtension extends Extension {
      * @param issueServiceConfiguration Configuration for the service
      * @param message                   Message to scan
      * @return List of keys (can be empty, never <code>null</code>)
-     * @deprecated Use {@link #getIssueExtractionRegex(IssueServiceConfiguration)} instead.
+     * @deprecated Should not be used at all.
      */
     @Deprecated
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
@@ -92,21 +92,10 @@ public interface IssueServiceExtension extends Extension {
      * {@link #extractIssueKeysFromMessage(net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration, String)}
      * method.
      *
-     * @deprecated Use {@link #getIssueExtractionRegex(IssueServiceConfiguration)} instead.
+     * @deprecated Should not be used at all.
      */
     @Deprecated
     boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys);
-
-    /**
-     * Gets a regular expression which can be used against a commit message to extract a list of issue keys.
-     *
-     * The first matching group of the expression is used to identify the issue key. The regular expression will
-     * be used to find several keys into the message.
-     *
-     * @param issueServiceConfiguration Configuration of the service
-     * @return A regular expression.
-     */
-    String getIssueExtractionRegex(IssueServiceConfiguration issueServiceConfiguration);
 
     /**
      * List of supported export formats for the issues.

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.issues.support;
 
-import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
@@ -10,6 +9,7 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 
 import java.util.List;
 import java.util.Map;

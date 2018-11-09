@@ -44,7 +44,7 @@ public class ConfiguredIssueService {
     }
 
     /**
-     * @deprecated Use {@link #getIssueExtractionRegex()} instead
+     * @deprecated Do not use
      */
     @Deprecated
     public Set<String> extractIssueKeysFromMessage(String message) {
@@ -52,18 +52,11 @@ public class ConfiguredIssueService {
     }
 
     /**
-     * @deprecated Use {@link #getIssueExtractionRegex()} instead
+     * @deprecated Do not use
      */
     @Deprecated
     public boolean containsIssueKey(String key, Set<String> keys) {
         return issueServiceExtension.containsIssueKey(issueServiceConfiguration, key, keys);
-    }
-
-    /**
-     * @see IssueServiceExtension#getIssueExtractionRegex(IssueServiceConfiguration)
-     */
-    public String getIssueExtractionRegex() {
-        return issueServiceExtension.getIssueExtractionRegex(issueServiceConfiguration);
     }
 
     public Optional<String> getIssueId(String token) {

@@ -65,11 +65,6 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    String getIssueExtractionRegex(IssueServiceConfiguration issueServiceConfiguration) {
-        return '#(\\d+)'
-    }
-
-    @Override
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         Set<String> result = new HashSet<>()
         if (StringUtils.isNotBlank(message)) {
@@ -86,7 +81,7 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
+    Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
         if (StringUtils.isNumeric(token) || validIssueToken(token)) {
             return Optional.of(String.valueOf(getIssueId(token)));
         } else {
@@ -99,7 +94,7 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
+    boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
         // Searchable key?
         if (StringUtils.isNumeric(key) || validIssueToken(key)) {
             keys.collect { getIssueId(it) }.contains(getIssueId(key))

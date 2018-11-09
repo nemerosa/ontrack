@@ -230,6 +230,32 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     @Override
+    public RevCommit findCommitForRegex(String branch, String regex) {
+        try {
+            ObjectId resolvedBranch = git.getRepository().resolve(getBranchRef(branch));
+            if (resolvedBranch != null) {
+                LogCommand log = git.log()
+                        .add(resolvedBranch)
+                        .setRevFilter(MessageRevFilter.create(regex))
+                        .setMaxCount(1);
+                Iterable<RevCommit> commits = log.call();
+                Iterator<RevCommit> i = commits.iterator();
+                if (i.hasNext()) {
+                    return i.next();
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } catch (GitAPIException e) {
+            throw new GitRepositoryAPIException(repository.getRemote(), e);
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
     public boolean scanCommits(String branch, Predicate<RevCommit> scanFunction) {
         // All commits
         try {

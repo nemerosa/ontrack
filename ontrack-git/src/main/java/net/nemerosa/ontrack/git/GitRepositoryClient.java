@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.git;
 import net.nemerosa.ontrack.git.model.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -161,4 +162,14 @@ public interface GitRepositoryClient {
      * @return Result of the search
      */
     boolean isPatternFound(String token);
+
+    /**
+     * Checks the log history and returns the first commit whose message matches with the regex.
+     *
+     * @param branch Name of the branch to look for the commit on
+     * @param regex  Expression to be searched for
+     * @return Result of the search (null if not found)
+     */
+    @Nullable
+    RevCommit findCommitForRegex(String branch, String regex);
 }

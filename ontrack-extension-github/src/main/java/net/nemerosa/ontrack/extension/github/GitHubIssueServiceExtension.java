@@ -80,11 +80,6 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public String getIssueExtractionRegex(IssueServiceConfiguration issueServiceConfiguration) {
-        return GITHUB_ISSUE_PATTERN;
-    }
-
-    @Override
     public Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         Set<String> result = new HashSet<>();
         if (StringUtils.isNotBlank(message)) {
