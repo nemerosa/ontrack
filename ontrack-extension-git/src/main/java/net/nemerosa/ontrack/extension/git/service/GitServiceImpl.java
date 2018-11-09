@@ -567,23 +567,13 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             GitConfiguration configuration = branchConfiguration.getConfiguration();
             // Gets the client client for this branch
             GitRepositoryClient gitClient = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
-            // Scan for this commit in this branch
-            AtomicReference<RevCommit> revCommitRef = new AtomicReference<>();
-            gitClient.scanCommits(branchConfiguration.getBranch(), revCommit -> {
-                String commitId = gitClient.getId(revCommit);
-                if (StringUtils.equals(commit, commitId)) {
-                    revCommitRef.set(revCommit);
-                    return true;
-                } else {
-                    return false;
-                }
-            });
+            // Gets the commit
+            Optional<GitCommit> commitFor = gitClient.getCommitFor(commit);
             // If present...
-            RevCommit revCommit = revCommitRef.get();
-            if (revCommit != null) {
+            if (commitFor.isPresent()) {
                 // Reference
                 if (theCommit.get() == null) {
-                    theCommit.set(gitClient.toCommit(revCommit));
+                    theCommit.set(commitFor.get());
                     theConfiguration.set(configuration);
                 }
                 // Gets the earliest build on this branch that contains this commit
