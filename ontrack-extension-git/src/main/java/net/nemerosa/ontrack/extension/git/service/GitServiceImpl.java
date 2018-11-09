@@ -349,14 +349,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public boolean scanCommits(GitBranchConfiguration branchConfiguration, Predicate<RevCommit> scanFunction) {
-        // Gets the client
-        GitRepositoryClient client = gitRepositoryClientFactory.getClient(branchConfiguration.getConfiguration().getGitRepository());
-        // Scanning
-        return client.scanCommits(branchConfiguration.getBranch(), scanFunction);
-    }
-
-    @Override
     public OntrackGitIssueInfo getIssueInfo(ID branchId, String key) {
         Branch branch = structureService.getBranch(branchId);
         // Configuration

@@ -72,16 +72,6 @@ public interface GitService extends SCMService {
     void forEachConfiguredBranch(BiConsumer<Branch, GitBranchConfiguration> consumer);
 
     /**
-     * Scans the whole history of a repository.
-     *
-     * @param branchConfiguration Repository branch to scan
-     * @param scanFunction        Function that scans the commits. Returns <code>true</code> if the scan
-     *                            must not go on, <code>false</code> otherwise.
-     * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
-     */
-    boolean scanCommits(GitBranchConfiguration branchConfiguration, Predicate<RevCommit> scanFunction);
-
-    /**
      * Gets information about an issue in a Git-configured branch
      */
     OntrackGitIssueInfo getIssueInfo(ID branchId, String key);
