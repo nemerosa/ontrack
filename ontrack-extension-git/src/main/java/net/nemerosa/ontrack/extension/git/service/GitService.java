@@ -85,9 +85,9 @@ public interface GitService extends SCMService {
     Optional<GitUICommit> lookupCommit(GitConfiguration configuration, String id);
 
     /**
-     * Gets information about a commit in a Git-configured branch.
+     * Gets information about a commit in a Git-configured project.
      */
-    OntrackGitCommitInfo getCommitInfo(ID branchId, String commit);
+    OntrackGitCommitInfo getCommitProjectInfo(ID projectId, String commit);
 
     /**
      * Gets the list of remote branches, as defined under <code>ref/heads</code>.

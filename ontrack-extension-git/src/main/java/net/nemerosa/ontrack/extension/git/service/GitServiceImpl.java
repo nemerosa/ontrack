@@ -447,8 +447,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public OntrackGitCommitInfo getCommitInfo(ID branchId, String commit) {
-        return getOntrackGitCommitInfo(commit);
+    public OntrackGitCommitInfo getCommitProjectInfo(ID projectId, String commit) {
+        return getOntrackGitCommitInfo(structureService.getProject(projectId), commit);
     }
 
     @Override
@@ -539,7 +539,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
+    private OntrackGitCommitInfo getOntrackGitCommitInfo(Project project, String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();
         AtomicReference<GitConfiguration> theConfiguration = new AtomicReference<>();

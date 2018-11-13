@@ -363,11 +363,23 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     /**
      * Commit information
      */
+    @Deprecated
     @RequestMapping(value = "{branchId}/commit/{commit}", method = RequestMethod.GET)
     public Resource<OntrackGitCommitInfo> commitInfo(@PathVariable ID branchId, @PathVariable String commit) {
+        return commitProjectInfo(
+                structureService.getBranch(branchId).getProject().getId(),
+                commit
+        );
+    }
+
+    /**
+     * Commit information in a project
+     */
+    @RequestMapping(value = "{projectId}/commit-info/{commit}", method = RequestMethod.GET)
+    public Resource<OntrackGitCommitInfo> commitProjectInfo(@PathVariable ID projectId, @PathVariable String commit) {
         return Resource.of(
-                gitService.getCommitInfo(branchId, commit),
-                uri(on(getClass()).commitInfo(branchId, commit))
+                gitService.getCommitProjectInfo(projectId, commit),
+                uri(on(getClass()).commitProjectInfo(projectId, commit))
         ).withView(Build.class);
     }
 
