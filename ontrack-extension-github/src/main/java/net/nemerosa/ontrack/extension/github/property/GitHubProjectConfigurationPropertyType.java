@@ -77,7 +77,7 @@ public class GitHubProjectConfigurationPropertyType
         // Adds the configuration for THIS project
         availableIssueServiceConfigurations.add(
                 0,
-                IssueServiceConfigurationRepresentation.self("GitHub issues", GitHubIssueServiceExtension.GITHUB_SERVICE_ID)
+                IssueServiceConfigurationRepresentation.Companion.self("GitHub issues", GitHubIssueServiceExtension.GITHUB_SERVICE_ID)
         );
         return Form.create()
                 .with(

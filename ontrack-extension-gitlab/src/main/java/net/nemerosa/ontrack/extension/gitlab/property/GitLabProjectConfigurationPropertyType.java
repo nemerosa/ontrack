@@ -80,7 +80,7 @@ public class GitLabProjectConfigurationPropertyType
         // Adds the configuration for THIS project
         availableIssueServiceConfigurations.add(
                 0,
-                IssueServiceConfigurationRepresentation.self("GitLab issues", GitLabIssueServiceExtension.GITLAB_SERVICE_ID)
+                IssueServiceConfigurationRepresentation.Companion.self("GitLab issues", GitLabIssueServiceExtension.GITLAB_SERVICE_ID)
         );
         // Edition form
         return Form.create()

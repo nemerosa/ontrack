@@ -377,7 +377,7 @@ class GitRepositoryClientImpl(
 
     }
 
-    override fun download(branch: String, path: String): Optional<String> {
+    override fun download(branch: String, path: String): String? {
         // Sync first
         sync(Consumer { logger.debug(it) })
         // Git show

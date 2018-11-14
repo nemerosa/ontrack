@@ -302,11 +302,11 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
             return commits;
         }
         // Loads the commits
-        commits = gitService.getChangeLogCommits(changeLog);
+        GitChangeLogCommits loadedCommits = changeLog.loadCommits(gitService::getChangeLogCommits);
         // Stores in cache
-        logCache.put(uuid, changeLog.withCommits(commits));
+        logCache.put(uuid, changeLog);
         // OK
-        return commits;
+        return loadedCommits;
     }
 
     /**

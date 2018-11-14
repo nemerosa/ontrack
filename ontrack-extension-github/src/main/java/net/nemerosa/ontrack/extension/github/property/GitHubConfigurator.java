@@ -51,7 +51,7 @@ public class GitHubConfigurator implements GitConfigurator {
 
     private ConfiguredIssueService getConfiguredIssueService(GitHubProjectConfigurationProperty property) {
         String identifier = property.getIssueServiceConfigurationIdentifier();
-        if (StringUtils.isBlank(identifier) || IssueServiceConfigurationRepresentation.isSelf(identifier)) {
+        if (StringUtils.isBlank(identifier) || IssueServiceConfigurationRepresentation.Companion.isSelf(identifier)) {
             return new ConfiguredIssueService(
                     issueServiceExtension,
                     new GitHubIssueServiceConfiguration(

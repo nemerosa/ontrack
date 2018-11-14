@@ -33,7 +33,7 @@ public class ConfiguredIssueService {
     }
 
     public IssueServiceConfigurationRepresentation getIssueServiceConfigurationRepresentation() {
-        return IssueServiceConfigurationRepresentation.of(
+        return IssueServiceConfigurationRepresentation.Companion.of(
                 issueServiceExtension,
                 issueServiceConfiguration
         );

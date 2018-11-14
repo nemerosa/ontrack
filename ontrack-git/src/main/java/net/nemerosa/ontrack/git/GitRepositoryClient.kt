@@ -146,9 +146,12 @@ interface GitRepositoryClient {
 
     /**
      * Downloads a document
+     *
+     * @param branch Branch to use when looking for the file
+     * @param path Path to the document (relative to the root of the repository)
+     * @return Content of the document (assumed to be a [String]) or `null` if not present
      */
-    // TODO Kotlin: use nullable
-    fun download(branch: String, path: String): Optional<String>
+    fun download(branch: String, path: String): String?
 
     /**
      * Resets the repository. Performs even if there is a synchronisation going on.

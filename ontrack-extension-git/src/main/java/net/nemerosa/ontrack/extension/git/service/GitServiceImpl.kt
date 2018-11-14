@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.service
 
 import com.google.common.collect.Lists
 import net.nemerosa.ontrack.common.FutureUtils
+import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
 import net.nemerosa.ontrack.extension.git.model.*
@@ -226,9 +227,8 @@ class GitServiceImpl(
 
     override fun getChangeLogIssues(changeLog: GitChangeLog): GitChangeLogIssues {
         // Commits must have been loaded first
-        if (changeLog.commits ==
-                null) {
-            changeLog.withCommits(getChangeLogCommits(changeLog))
+        val commits: GitChangeLogCommits = changeLog.loadCommits {
+            getChangeLogCommits(it)
         }
         // In a transaction
         transactionService.start().use { _ ->
@@ -240,7 +240,7 @@ class GitServiceImpl(
             // Index of issues, sorted by keys
             val issues = TreeMap<String, GitChangeLogIssue>()
             // For all commits in this commit log
-            for (gitUICommit in changeLog.commits.log.commits) {
+            for (gitUICommit in commits.log.commits) {
                 val keys = configuredIssueService.extractIssueKeysFromMessage(gitUICommit.commit.fullMessage)
                 for (key in keys) {
                     var existingIssue: GitChangeLogIssue? = issues[key]
@@ -305,7 +305,7 @@ class GitServiceImpl(
         // Issue service
         val configuredIssueService = configuration.configuredIssueService.orElse(null)
                 ?: throw GitBranchIssueServiceNotConfiguredException(branchId)
-// Gets the details about the issue
+        // Gets the details about the issue
         val issue = configuredIssueService.getIssue(key)
 
         // Collects commits for this branch
@@ -425,7 +425,7 @@ class GitServiceImpl(
             val client = gitRepositoryClientFactory.getClient(
                     branchConfiguration.configuration.gitRepository
             )
-            client.download(branchConfiguration.branch, path)
+            client.download(branchConfiguration.branch, path).asOptional()
         }
     }
 
