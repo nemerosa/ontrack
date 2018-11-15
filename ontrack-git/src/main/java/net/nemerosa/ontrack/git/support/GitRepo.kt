@@ -17,6 +17,7 @@ class GitRepo(val dir: File) {
         /**
          * Preparing a repository
          */
+        @JvmStatic
         fun prepare(preparation: GitRepo.() -> Unit): GitRepoOperations {
             // Creates the repository
             val origin = GitRepo()
@@ -29,6 +30,7 @@ class GitRepo(val dir: File) {
         /**
          * Cloning a local test repository
          */
+        @JvmStatic
         fun cloneRepo(wd: File, origin: GitRepo): GitRepositoryClient {
             // Repository definition for the `origin` repository
             val originRepository = GitRepository(
@@ -84,6 +86,7 @@ class GitRepo(val dir: File) {
     /**
      * Creates or updates a file with some content, and optionally adds it to the index
      */
+    @JvmOverloads
     fun file(path: String, content: String, add: Boolean = true) {
         val file = File(dir, path)
         file.parentFile.mkdirs()
@@ -103,6 +106,7 @@ class GitRepo(val dir: File) {
         }
     }
 
+    @JvmOverloads
     fun commit(no: Any, message: String? = null) {
         val fileName = "file$no"
         cmd("touch", fileName)
@@ -111,6 +115,7 @@ class GitRepo(val dir: File) {
         git("commit", "-m", commitMessage)
     }
 
+    @JvmOverloads
     fun commitLookup(message: String, shortId: Boolean = true): String {
         val commitFormat = if (shortId) "%h" else "%H"
         val info = git("log", "--all", "--grep", message, "--pretty=format:$commitFormat")

@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
-
+import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.graphql.AbstractQLITSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator

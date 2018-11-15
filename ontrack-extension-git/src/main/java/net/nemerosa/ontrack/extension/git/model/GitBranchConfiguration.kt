@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.git.model
 
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 
-class GitBranchConfiguration(
+class GitBranchConfiguration
+@JvmOverloads
+constructor(
 
         /**
          * Main project's configuration
@@ -17,12 +19,12 @@ class GitBranchConfiguration(
         /**
          * Configured link
          */
-        val buildCommitLink: ConfiguredBuildGitCommitLink<*>,
+        val buildCommitLink: ConfiguredBuildGitCommitLink<*> = TagBuildNameGitCommitLink.DEFAULT,
 
         /**
          * Build overriding policy when synchronizing
          */
-        val isOverride: Boolean = false,
+        val override: Boolean = false,
 
         /**
          * Interval in minutes for build/tag synchronization

@@ -121,7 +121,7 @@ class GitServiceImplTest {
 
         // Git configuration
         BasicGitConfiguration gitConfiguration = BasicGitConfiguration.empty()
-        GitBranchConfiguration branchConfiguration = GitBranchConfiguration.of(
+        GitBranchConfiguration branchConfiguration = new GitBranchConfiguration(
                 BasicGitActualConfiguration.of(gitConfiguration),
                 branch.name
         )

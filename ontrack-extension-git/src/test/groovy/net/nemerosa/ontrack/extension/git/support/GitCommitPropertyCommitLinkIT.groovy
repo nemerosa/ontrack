@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
-
+import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -125,7 +125,7 @@ class GitCommitPropertyCommitLinkIT extends AbstractServiceTestSupport {
             // Commit info
 
             def commitInfo = asUser().with(project, ProjectView).call {
-                gitService.getCommitInfo(branch.id, commits[4] as String)
+                gitService.getCommitProjectInfo(project.id, commits[4] as String)
             }
             assert commitInfo != null
             assert commitInfo.uiCommit.commit.id == commits[4] as String

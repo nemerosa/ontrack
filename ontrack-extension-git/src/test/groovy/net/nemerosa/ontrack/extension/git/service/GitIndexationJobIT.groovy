@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
-
+import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.JobScheduler
@@ -37,10 +37,10 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
      */
     @Test
     void 'Git configuration change changes the indexation job'() {
-        GitRepo.prepare { GitRepo repo ->
+        GitRepo.prepare {
 
             // Some content
-            git 'init'
+            gitInit()
             commit 1, '#1'
             commit 2, '#2'
             git 'log', '--oneline', '--decorate'
@@ -99,7 +99,7 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
             }
 
             // Runs the orchestration
-            jobOrchestrator.orchestrate(JobRunListener.out());
+            jobOrchestrator.orchestrate(JobRunListener.out())
 
             // Checks that the NEW indexation job is registered
             statuses = jobScheduler.getJobStatuses()

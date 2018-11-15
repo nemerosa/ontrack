@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
-
+import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.it.ResourceDecorationContributorTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings

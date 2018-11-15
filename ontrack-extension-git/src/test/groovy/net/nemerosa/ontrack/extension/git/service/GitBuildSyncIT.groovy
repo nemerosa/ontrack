@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.FutureUtils
+
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
@@ -51,7 +51,7 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
         prepare {
 
             int no = 0
-            git 'init'
+            gitInit()
 
             commit no++
             git 'tag', '1.1.6'
