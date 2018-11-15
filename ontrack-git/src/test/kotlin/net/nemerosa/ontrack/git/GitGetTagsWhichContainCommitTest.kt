@@ -34,12 +34,13 @@ import kotlin.test.assertEquals
 class GitGetTagsWhichContainCommitTest {
 
     companion object {
-        private lateinit var repo: GitRepo
+        private var repo = GitRepo()
 
         /**
          * Preparation of the Git repository
          */
         @BeforeClass
+        @JvmStatic
         fun `Git repository`() {
             // Gets a repository
             repo = GitRepo()
@@ -85,6 +86,7 @@ class GitGetTagsWhichContainCommitTest {
          * Removing the Git repository
          */
         @AfterClass
+        @JvmStatic
         fun `Git repository deletion`() {
             repo.close()
         }

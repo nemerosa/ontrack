@@ -39,7 +39,7 @@ class GitRepositoryClientImplTest {
                 assertEquals(2, branches.branches.size)
 
                 assertEquals("2.1", branches.branches[0].name)
-                assertEquals("Commit 2", branches.branches[0].commit.shortMessage)
+                assertEquals("Commit 3", branches.branches[0].commit.shortMessage)
 
                 assertEquals("master", branches.branches[1].name)
                 assertEquals("Commit 4", branches.branches[1].commit.shortMessage)
@@ -141,7 +141,7 @@ class GitRepositoryClientImplTest {
             tag("v2.2")
 
             log()
-        } and { repoClient, repo ->
+        } and { repoClient, _ ->
             val log = repoClient.graph("v2.2", "v2.1")
             assertEquals(
                     listOf("Commit 11", "Commit 9", "Commit 8", "Commit 7", "Merge 2.1", "Commit 4"),
@@ -163,7 +163,7 @@ class GitRepositoryClientImplTest {
     fun `Log between tags on different hierarchical branches`() {
         GitRepo.prepare {
             prepareBranches()
-        } and { repoClient, repo ->
+        } and { repoClient, _ ->
             val log = repoClient.graph("v2.2", "v2.1")
             assertEquals(
                     listOf(
@@ -227,7 +227,7 @@ class GitRepositoryClientImplTest {
             tag("v7")
             commit(8)
             log()
-        } and { client, repo ->
+        } and { client, _ ->
             val log = client.graph("v7", "v4")
             assertEquals(
                     listOf("Commit 7", "Commit 6", "Commit 5"),
@@ -253,7 +253,7 @@ class GitRepositoryClientImplTest {
         } and { _, repo ->
             GitRepo.prepare {
                 git("clone", repo.dir.absolutePath, ".")
-            } and { cloneClient, clone ->
+            } and { cloneClient, _ ->
                 val branches = cloneClient.remoteBranches
                 // Checks the list
                 assertEquals(
@@ -268,9 +268,9 @@ class GitRepositoryClientImplTest {
     fun `Get tags`() {
         GitRepo.prepare {
             prepareBranches()
-        } withClone { client, clientRepo, origin ->
+        } withClone { client, _, _ ->
             client.sync(Consumer { println(it) })
-            val expectedDate = Time.now().toLocalDate();
+            val expectedDate = Time.now().toLocalDate()
             assertEquals(
                     listOf("v2.1", "v2.2"),
                     client.tags.map { it.name }
