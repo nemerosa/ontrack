@@ -11,84 +11,83 @@ import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
-import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
-import static net.nemerosa.ontrack.test.TestUtils.uid
-
-class GitIndexationJobIT extends AbstractServiceTestSupport {
-
-    @Autowired
-    private GitConfigurationService gitConfigurationService
+class GitIndexationJobIT : AbstractServiceTestSupport() {
 
     @Autowired
-    private PropertyService propertyService
+    private lateinit var gitConfigurationService: GitConfigurationService
 
     @Autowired
-    private JobScheduler jobScheduler
+    private lateinit var jobScheduler: JobScheduler
 
     @Autowired
-    private JobOrchestrator jobOrchestrator
+    private lateinit var jobOrchestrator: JobOrchestrator
 
     /**
      * Regression test for #434. Checks that changing a Git configuration does change the associated indexation job
      * for a project.
      */
     @Test
-    void 'Git configuration change changes the indexation job'() {
+    fun `Git configuration change changes the indexation job`() {
         GitRepo.prepare {
 
             // Some content
             gitInit()
-            commit 1, '#1'
-            commit 2, '#2'
-            git 'log', '--oneline', '--decorate'
+            commit(1, "#1")
+            commit(2, "#2")
+            log()
 
             // Create a Git configuration
-            String gitConfigurationName = uid('C')
-            BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+            val gitConfigurationName = uid("C")
+            val gitConfiguration = asUser().with(GlobalSettings::class.java).call {
                 gitConfigurationService.newConfiguration(
                         BasicGitConfiguration.empty()
                                 .withName(gitConfigurationName)
                                 .withIssueServiceConfigurationIdentifier(MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
-                                .withRemote("file://${repo.dir.absolutePath}")
+                                .withRemote("file://${dir.absolutePath}")
                 )
             }
 
             // Creates a project
-            def project = doCreateProject()
+            val project = doCreateProject()
 
             // Configures the project
-            asUser().with(project, ProjectEdit).call {
+            asUser().with(project, ProjectEdit::class.java).call {
                 propertyService.editProperty(
                         project,
-                        GitProjectConfigurationPropertyType,
-                        new GitProjectConfigurationProperty(gitConfiguration)
+                        GitProjectConfigurationPropertyType::class.java,
+                        GitProjectConfigurationProperty(gitConfiguration)
                 )
             }
 
             // Runs the orchestration
-            jobOrchestrator.orchestrate(JobRunListener.out());
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
 
             // Checks that the indexation job is registered
-            def statuses = jobScheduler.getJobStatuses()
-            def status = statuses.find {
-                it.description == "file://${repo.dir.absolutePath} (${gitConfigurationName} @ basic)" as String
+            var statuses = jobScheduler.jobStatuses
+            var status = statuses.find {
+                it.description == "file://${dir.absolutePath} ($gitConfigurationName @ basic)" as String
             }
-            assert status != null: "The indexation job must be present"
+            assertNotNull(status, "The indexation job must be present")
 
             // Creates a new repository all together
-            GitRepo newRepo = new GitRepo()
-            newRepo.with {
-                git 'init'
-                commit 1, '#1'
-                commit 2, '#2'
-                git 'log', '--oneline', '--decorate'
+            val newRepo = GitRepo()
+            newRepo.apply {
+                gitInit()
+                commit(1, "#1")
+                commit(2, "#2")
+                log()
             }
 
             // Updates the configuration
-            asUser().with(GlobalSettings).call {
+            asUser().with(GlobalSettings::class.java).call {
                 gitConfigurationService.updateConfiguration(
                         gitConfigurationName,
                         BasicGitConfiguration.empty()
@@ -99,19 +98,21 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
             }
 
             // Runs the orchestration
-            jobOrchestrator.orchestrate(JobRunListener.out())
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
 
             // Checks that the NEW indexation job is registered
-            statuses = jobScheduler.getJobStatuses()
+            statuses = jobScheduler.jobStatuses
             status = statuses.find {
                 it.description == "file://${newRepo.dir.absolutePath} (${gitConfigurationName} @ basic)" as String
             }
-            assert status != null: "The new indexation job must be present"
+            assertNotNull(status, "The new indexation job must be present")
             // Checks that the OLD indexation job is gone
             status = statuses.find {
-                it.description == "file://${repo.dir.absolutePath} (${gitConfigurationName} @ basic)" as String
+                it.description == "file://${dir.absolutePath} ($gitConfigurationName @ basic)" as String
             }
-            assert status == null: "The old indexation job must be done"
+            assertNull(status, "The old indexation job must be done")
         }
     }
 

@@ -174,7 +174,7 @@ class GitServiceImpl(
         }
     }
 
-    protected fun syncAndWait(gitConfiguration: GitConfiguration): Any {
+    protected fun syncAndWait(gitConfiguration: GitConfiguration): Any? {
         return FutureUtils.wait("Synchronisation for " + gitConfiguration.name, sync(gitConfiguration, GitSynchronisationRequest.SYNC))
     }
 
