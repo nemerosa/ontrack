@@ -12,7 +12,7 @@ class GitChangeLog(
         project: Project,
         scmBuildFrom: SCMBuildView<GitBuildInfo>,
         scmBuildTo: SCMBuildView<GitBuildInfo>,
-        val isSyncError: Boolean
+        val syncError: Boolean
 ) : SCMChangeLog<GitBuildInfo>(uuid, project, scmBuildFrom, scmBuildTo) {
 
     @JsonIgnore // Not sent to the client

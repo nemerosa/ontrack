@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.model
 
-class GitChangeLogFiles(
+// TODO #532 Workaround
+open class GitChangeLogFiles(
         val list: List<GitChangeLogFile>
 )

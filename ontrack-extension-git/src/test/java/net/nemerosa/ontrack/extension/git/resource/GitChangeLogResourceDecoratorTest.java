@@ -290,7 +290,7 @@ public class GitChangeLogResourceDecoratorTest {
         );
     }
 
-    static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
+    private static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
         assertEquals(
                 mapper.getObjectMapper().writeValueAsString(expectedJson),
                 mapper.write(o)
