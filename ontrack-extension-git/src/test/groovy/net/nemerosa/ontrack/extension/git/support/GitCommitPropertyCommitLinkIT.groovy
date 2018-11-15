@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
-import net.nemerosa.ontrack.git.support.GitRepo
+
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit

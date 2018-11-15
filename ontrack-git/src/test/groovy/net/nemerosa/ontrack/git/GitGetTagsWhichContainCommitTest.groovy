@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.git
 
-import net.nemerosa.ontrack.git.support.GitRepo
+
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
