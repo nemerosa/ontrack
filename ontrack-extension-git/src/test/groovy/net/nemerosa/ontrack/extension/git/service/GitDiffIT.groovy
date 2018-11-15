@@ -115,7 +115,7 @@ class GitDiffIT extends AbstractServiceTestSupport {
         }
 
         // Job registration
-        jobOrchestrator.orchestrate(JobRunListener.out());
+        asAdmin().execute { jobOrchestrator.orchestrate(JobRunListener.out()) }
 
         // Creates builds for the commits
         asUser().with(project, ProjectEdit).call {
