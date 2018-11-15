@@ -9,7 +9,7 @@ import java.io.File
 /**
  * Utility class to deal with a Git repository.
  */
-class GitRepo(private val dir: File) {
+class GitRepo(val dir: File) {
     constructor() : this(createTempDir("ontrack-git"))
 
     companion object {
@@ -121,11 +121,23 @@ class GitRepo(private val dir: File) {
         }
     }
 
+    fun log() {
+        git("log", "--oneline", "--graph", "--decorate", "--all")
+    }
+
+    fun gitInit() {
+        git("init")
+    }
+
+    fun tag(name: String) {
+        git("tag", name)
+    }
+
     class GitRepoOperations(private val repo: GitRepo) {
         /**
          * Chaining of operations
          */
-        fun and(clientAction: (GitRepositoryClient, GitRepo) -> Unit): GitRepoOperations {
+        infix fun and(clientAction: (GitRepositoryClient, GitRepo) -> Unit): GitRepoOperations {
             clientAction(repo.client, repo)
             return this
         }
@@ -133,7 +145,7 @@ class GitRepo(private val dir: File) {
         /**
          * Clones this repository and performs some operation on it
          */
-        fun withClone(clientAction: (GitRepositoryClient, GitRepo, GitRepo) -> Unit) {
+        infix fun withClone(clientAction: (GitRepositoryClient, GitRepo, GitRepo) -> Unit) {
             try {
                 val wd = createTempDir("ontrack-git", "")
                 try {
