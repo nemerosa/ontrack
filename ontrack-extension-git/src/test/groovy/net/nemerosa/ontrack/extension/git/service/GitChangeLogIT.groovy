@@ -99,7 +99,9 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
             }
 
             // Job registration
-            jobOrchestrator.orchestrate(JobRunListener.out());
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
 
             // Creates builds for some commits
             asUser().with(project, ProjectEdit).call {
@@ -200,7 +202,9 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
             }
 
             // Job registration
-            jobOrchestrator.orchestrate(JobRunListener.out());
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
 
             // Creates builds for some tags
             asUser().with(project, ProjectEdit).call {
