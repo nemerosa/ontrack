@@ -297,7 +297,7 @@ class GitServiceImpl(
         return client.isPatternFound(token)
     }
 
-    override fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo {
+    override fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo? {
         val branch = structureService.getBranch(branchId)
         // Configuration
         val branchConfiguration = getRequiredBranchConfiguration(branch)
@@ -306,17 +306,20 @@ class GitServiceImpl(
         val configuredIssueService = configuration.configuredIssueService.orElse(null)
                 ?: throw GitBranchIssueServiceNotConfiguredException(branchId)
         // Gets the details about the issue
-        val issue = configuredIssueService.getIssue(key)
+        val issue: Issue? = configuredIssueService.getIssue(key)
+        return if (issue != null) {
+            // Collects commits for this branch
+            val commitInfos = collectIssueCommitInfos(branch, branchConfiguration, issue)
 
-        // Collects commits for this branch
-        val commitInfos = collectIssueCommitInfos(branch, branchConfiguration, issue)
-
-        // OK
-        return OntrackGitIssueInfo(
-                configuredIssueService.issueServiceConfigurationRepresentation,
-                issue,
-                commitInfos
-        )
+            // OK
+            OntrackGitIssueInfo(
+                    configuredIssueService.issueServiceConfigurationRepresentation,
+                    issue,
+                    commitInfos
+            )
+        } else {
+            null
+        }
     }
 
     private fun collectIssueCommitInfos(branch: Branch, branchConfiguration: GitBranchConfiguration, issue: Issue): List<OntrackGitIssueCommitInfo> {

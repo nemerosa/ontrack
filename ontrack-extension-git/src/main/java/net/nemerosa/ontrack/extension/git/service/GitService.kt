@@ -75,7 +75,7 @@ interface GitService : SCMService {
     /**
      * Gets information about an issue in a Git-configured branch
      */
-    fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo
+    fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo?
 
     /**
      * Looks up a commit in the given `configuration`.
