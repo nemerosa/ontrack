@@ -59,7 +59,9 @@ class GitBuildResourceDecorationContributorIT extends AbstractServiceTestSupport
         // Creates a build
         def build = doCreateBuild()
 
-        JsonNode node = resourceObjectMapper.objectMapper.valueToTree(build)
+        JsonNode node = asUserWithView(build).call {
+            resourceObjectMapper.objectMapper.valueToTree(build)
+        }
         assert node.get("_changeLog") == null
         assert node.get("_changeLogPage") == null
     }
@@ -109,7 +111,9 @@ class GitBuildResourceDecorationContributorIT extends AbstractServiceTestSupport
                 )
             }
 
-            JsonNode node = resourceObjectMapper.objectMapper.valueToTree(build)
+            JsonNode node = asUserWithView(build).call {
+                resourceObjectMapper.objectMapper.valueToTree(build)
+            }
 
             println resourceObjectMapper.objectMapper.writeValueAsString(build)
             assert node.get("_changeLog").asText() == "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:BuildDiffRequest%28from%3D${build.id}%2C+to%3Dnull%29" as String
