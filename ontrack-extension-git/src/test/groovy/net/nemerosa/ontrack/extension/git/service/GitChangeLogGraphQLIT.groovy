@@ -121,7 +121,9 @@ class GitChangeLogGraphQLIT extends AbstractQLITSupport {
             }
 
             // Test
-            testCode(branch)
+            asUserWithView(branch).execute {
+                testCode(branch)
+            }
 
         } finally {
             repo.close()
