@@ -288,7 +288,7 @@ class GitRepositoryClientImpl(
             return if (resolvedBranch != null) {
                 val log = git.log()
                         .add(resolvedBranch)
-                        .setRevFilter(MessageRevFilter.create(regex))
+                        .setRevFilter(MessageRevFilter.create("($regex)"))
                         .setMaxCount(1)
                 val commits = log.call()
                 val i = commits.iterator()
