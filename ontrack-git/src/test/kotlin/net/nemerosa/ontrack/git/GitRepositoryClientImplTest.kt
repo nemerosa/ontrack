@@ -11,6 +11,48 @@ import kotlin.test.assertNotNull
 class GitRepositoryClientImplTest {
 
     /**
+     * ```
+     *     *   C4 (master)
+     *     | * C3 (2.1)
+     *     |/
+     *     * C2 (2.0)
+     *     * C1
+     * ```
+     */
+    @Test
+    fun `List of branches for a commit`() {
+        GitRepo.prepare {
+            gitInit()
+            commit(1)
+            git("checkout", "-b", "2.0")
+            commit(2)
+            git("checkout", "-b", "2.1")
+            commit(3)
+            git("checkout", "master")
+            commit(4)
+
+            log()
+        } and { _, repo ->
+            GitRepo.prepare {
+                git("clone", repo.dir.absolutePath, ".")
+            } and { cloneClient, cloneRepo ->
+                cloneClient.getBranchesForCommit(cloneRepo.commitLookup("Commit 3")).apply {
+                    assertEquals(listOf("2.1"), this)
+                }
+                cloneClient.getBranchesForCommit(cloneRepo.commitLookup("Commit 4")).apply {
+                    assertEquals(listOf("master"), this)
+                }
+                cloneClient.getBranchesForCommit(cloneRepo.commitLookup("Commit 2")).apply {
+                    assertEquals(listOf("2.0", "2.1"), this)
+                }
+                cloneClient.getBranchesForCommit(cloneRepo.commitLookup("Commit 1")).apply {
+                    assertEquals(listOf("2.0", "2.1", "master"), this)
+                }
+            }
+        }
+    }
+
+    /**
      * <pre>
      *     *   C4 (master)
      *     | * C3 (2.1)

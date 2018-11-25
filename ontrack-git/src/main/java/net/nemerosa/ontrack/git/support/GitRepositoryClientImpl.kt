@@ -103,6 +103,24 @@ class GitRepositoryClientImpl(
             GitBranchesInfo.empty()
         }
 
+    override fun getBranchesForCommit(commit: String): List<String> {
+        try {
+            val list = git.branchList()
+                    .setContains(commit)
+                    .setListMode(ListBranchCommand.ListMode.ALL)
+                    .call()
+            return list.map {
+                StringUtils.removeStart(it.name, "refs/remotes/origin/")
+            }.map {
+                StringUtils.removeStart(it, "refs/heads/")
+            }.filter {
+                it != "HEAD"
+            }.distinct().sorted()
+        } catch (e: IOException) {
+            throw GitRepositoryIOException(repository.remote, e)
+        }
+    }
+
     override val tags: Collection<GitTag>
         get() {
             try {

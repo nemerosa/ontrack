@@ -33,6 +33,14 @@ interface GitRepositoryClient {
     val branches: GitBranchesInfo
 
     /**
+     * Gets the list of branches for a given commit.
+     *
+     * @param commit Commit hash
+     * @return List of branches this commit belongs to
+     */
+    fun getBranchesForCommit(commit: String): List<String>
+
+    /**
      * Tests the connection
      *
      * @throws net.nemerosa.ontrack.common.BaseException When the remote Git repository is not reachable
