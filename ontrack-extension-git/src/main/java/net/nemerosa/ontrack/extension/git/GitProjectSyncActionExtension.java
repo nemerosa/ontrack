@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.ProjectEntityActionExtension;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
@@ -31,12 +32,18 @@ public class GitProjectSyncActionExtension extends AbstractExtension implements 
     @Override
     public Optional<Action> getAction(ProjectEntity entity) {
         if (entity instanceof Project && securityService.isProjectFunctionGranted(entity, ProjectConfig.class)) {
-            return gitService.getProjectConfiguration((Project) entity)
-                    .map(gitConfiguration -> Action.of(
-                            "git-project-sync",
-                            "Force Git project sync",
-                            String.format("project-sync/%d", entity.id())
-                    ));
+            GitConfiguration projectConfiguration = gitService.getProjectConfiguration((Project) entity);
+            if (projectConfiguration != null) {
+                return Optional.of(
+                        Action.of(
+                                "git-project-sync",
+                                "Force Git project sync",
+                                String.format("project-sync/%d", entity.id())
+                        )
+                );
+            } else {
+                return Optional.empty();
+            }
         } else {
             return Optional.empty();
         }

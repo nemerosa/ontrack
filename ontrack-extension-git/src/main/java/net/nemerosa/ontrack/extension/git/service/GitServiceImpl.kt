@@ -61,7 +61,9 @@ class GitServiceImpl(
         structureService.projectList
                 .forEach { project ->
                     val configuration = getProjectConfiguration(project)
-                    configuration.ifPresent { gitConfiguration -> consumer.accept(project, gitConfiguration) }
+                    if (configuration != null) {
+                        consumer.accept(project, configuration)
+                    }
                 }
     }
 
@@ -137,12 +139,11 @@ class GitServiceImpl(
             }
             // Project Git configuration
             val oProjectConfiguration = getProjectConfiguration(project)
-            if (oProjectConfiguration.isPresent) {
+            if (oProjectConfiguration != null) {
                 // Forces Git sync before
                 var syncError: Boolean
-                val gitConfiguration = oProjectConfiguration.get()
                 try {
-                    syncAndWait(gitConfiguration)
+                    syncAndWait(oProjectConfiguration)
                     syncError = false
                 } catch (ex: GitRepositorySyncException) {
                     applicationLogService.log(
@@ -152,10 +153,10 @@ class GitServiceImpl(
                                             "git-sync",
                                             "Git synchronisation issue"
                                     ),
-                                    gitConfiguration.remote
+                                    oProjectConfiguration.remote
                             ).withDetail("project", project.name)
-                                    .withDetail("git-name", gitConfiguration.name)
-                                    .withDetail("git-remote", gitConfiguration.remote)
+                                    .withDetail("git-name", oProjectConfiguration.name)
+                                    .withDetail("git-remote", oProjectConfiguration.remote)
                     )
                     syncError = true
                 }
@@ -179,15 +180,13 @@ class GitServiceImpl(
     }
 
     protected fun getRequiredProjectConfiguration(project: Project): GitConfiguration {
-        return getProjectConfiguration(project)
-                .orElseThrow { GitProjectNotConfiguredException(project.id) }
+        return getProjectConfiguration(project) ?: throw GitProjectNotConfiguredException(project.id)
     }
 
     protected fun getGitRepositoryClient(project: Project): GitRepositoryClient {
-        return getProjectConfiguration(project)
-                .map { it.gitRepository }
-                .map { gitRepositoryClientFactory.getClient(it) }
-                .orElseThrow { GitProjectNotConfiguredException(project.id) }
+        return getProjectConfiguration(project)?.gitRepository
+                ?.let { gitRepositoryClientFactory.getClient(it) }
+                ?: throw GitProjectNotConfiguredException(project.id)
     }
 
     override fun getChangeLogCommits(changeLog: GitChangeLog): GitChangeLogCommits {
@@ -435,9 +434,12 @@ class GitServiceImpl(
     override fun projectSync(project: Project, request: GitSynchronisationRequest): Ack {
         securityService.checkProjectFunction(project, ProjectConfig::class.java)
         val projectConfiguration = getProjectConfiguration(project)
-        return projectConfiguration
-                .map { gitConfiguration -> Ack.validate(sync(gitConfiguration, request).isPresent) }
-                .orElse(Ack.NOK)
+        if (projectConfiguration != null) {
+            val sync = sync(projectConfiguration, request)
+            return Ack.validate(sync)
+        } else {
+            return Ack.NOK
+        }
     }
 
     override fun sync(gitConfiguration: GitConfiguration, request: GitSynchronisationRequest): Optional<Future<*>> {
@@ -452,8 +454,8 @@ class GitServiceImpl(
     override fun getProjectGitSyncInfo(project: Project): GitSynchronisationInfo {
         securityService.checkProjectFunction(project, ProjectConfig::class.java)
         return getProjectConfiguration(project)
-                .map { this.getGitSynchronisationInfo(it) }
-                .orElseThrow { GitProjectNotConfiguredException(project.id) }
+                ?.let { getGitSynchronisationInfo(it) }
+                ?: throw GitProjectNotConfiguredException(project.id)
     }
 
     private fun getGitSynchronisationInfo(gitConfiguration: GitConfiguration): GitSynchronisationInfo {
@@ -608,12 +610,12 @@ class GitServiceImpl(
         return SCMBuildView(getBuildView(buildId), GitBuildInfo())
     }
 
-    override fun getProjectConfiguration(project: Project): Optional<GitConfiguration> {
-        return gitConfigurators.stream()
+    override fun getProjectConfiguration(project: Project): GitConfiguration? {
+        return gitConfigurators
                 .map { c -> c.getConfiguration(project) }
                 .filter { it.isPresent }
                 .map { it.get() }
-                .findFirst()
+                .firstOrNull()
     }
 
     protected fun getRequiredBranchConfiguration(branch: Branch): GitBranchConfiguration {
@@ -624,7 +626,7 @@ class GitServiceImpl(
     override fun getBranchConfiguration(branch: Branch): Optional<GitBranchConfiguration> {
         // Get the configuration for the project
         val configuration = getProjectConfiguration(branch.project)
-        if (configuration.isPresent) {
+        if (configuration != null) {
             // Gets the configuration for a branch
             val gitBranch: String
             val buildCommitLink: ConfiguredBuildGitCommitLink<*>
@@ -647,7 +649,7 @@ class GitServiceImpl(
             // OK
             return Optional.of(
                     GitBranchConfiguration(
-                            configuration.get(),
+                            configuration,
                             gitBranch,
                             buildCommitLink,
                             override,

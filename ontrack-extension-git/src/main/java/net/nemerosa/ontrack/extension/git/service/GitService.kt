@@ -24,8 +24,7 @@ interface GitService : SCMService {
     /**
      * Gets the configuration for a project.
      */
-    // TODO Kotlin, use nullable
-    fun getProjectConfiguration(project: Project): Optional<GitConfiguration>
+    fun getProjectConfiguration(project: Project): GitConfiguration?
 
     /**
      * Gets the configuration for a branch

@@ -202,20 +202,23 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Gets the configuration for the project
-        return gitService.getProjectConfiguration(project)
-                .flatMap(GitConfiguration::getConfiguredIssueService)
-                .map(configuredIssueService -> Resources.of(
-                        configuredIssueService.getIssueServiceExtension().exportFormats(
-                                configuredIssueService.getIssueServiceConfiguration()
+        GitConfiguration projectConfiguration = gitService.getProjectConfiguration(project);
+        if (projectConfiguration != null) {
+            Optional<ConfiguredIssueService> configuredIssueService = projectConfiguration.getConfiguredIssueService();
+            if (configuredIssueService.isPresent()) {
+                return Resources.of(
+                        configuredIssueService.get().getIssueServiceExtension().exportFormats(
+                                configuredIssueService.get().getIssueServiceConfiguration()
                         ),
                         uri(on(GitController.class).changeLogExportFormats(projectId))
-                ))
-                .orElse(
-                        Resources.of(
-                                Collections.emptyList(),
-                                uri(on(GitController.class).changeLogExportFormats(projectId))
-                        )
                 );
+            }
+        }
+        // Not found
+        return Resources.of(
+                Collections.emptyList(),
+                uri(on(GitController.class).changeLogExportFormats(projectId))
+        );
     }
 
     /**
@@ -228,8 +231,10 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the associated project
         Project project = changeLog.getProject();
         // Gets the configuration for the project
-        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project)
-                .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
+        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
+        if (gitConfiguration == null) {
+            throw new GitProjectNotConfiguredException(project.getId());
+        }
         // Gets the issue service
         Optional<ConfiguredIssueService> optConfiguredIssueService = gitConfiguration.getConfiguredIssueService();
         if (!optConfiguredIssueService.isPresent()) {
