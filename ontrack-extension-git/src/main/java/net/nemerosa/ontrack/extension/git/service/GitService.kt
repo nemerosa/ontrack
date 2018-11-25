@@ -8,11 +8,9 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
-import org.eclipse.jgit.revwalk.RevCommit
-import java.util.Optional
+import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
-import java.util.function.Predicate
 
 interface GitService : SCMService {
 
@@ -117,8 +115,7 @@ interface GitService : SCMService {
      * @return Result. The synchronisation will occur asynchronously, but the acknowledgment returns if the
      * synchronisation was actually launched.
      */
-    // TODO Kotlin, use nullable
-    fun sync(gitConfiguration: GitConfiguration, request: GitSynchronisationRequest): Optional<Future<*>>
+    fun sync(gitConfiguration: GitConfiguration, request: GitSynchronisationRequest): Future<*>?
 
     /**
      * Gets the Git synchronisation information.

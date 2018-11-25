@@ -434,19 +434,19 @@ class GitServiceImpl(
         val projectConfiguration = getProjectConfiguration(project)
         if (projectConfiguration != null) {
             val sync = sync(projectConfiguration, request)
-            return Ack.validate(sync)
+            return Ack.validate(sync != null)
         } else {
             return Ack.NOK
         }
     }
 
-    override fun sync(gitConfiguration: GitConfiguration, request: GitSynchronisationRequest): Optional<Future<*>> {
+    override fun sync(gitConfiguration: GitConfiguration, request: GitSynchronisationRequest): Future<*>? {
         // Reset the repository?
         if (request.isReset) {
             gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).reset()
         }
         // Schedules the job
-        return jobScheduler.fireImmediately(getGitIndexationJobKey(gitConfiguration))
+        return jobScheduler.fireImmediately(getGitIndexationJobKey(gitConfiguration)).orElse(null)
     }
 
     override fun getProjectGitSyncInfo(project: Project): GitSynchronisationInfo {
