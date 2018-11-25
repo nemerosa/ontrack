@@ -434,17 +434,17 @@ class GitRepositoryClientImpl(
 
     }
 
-    override fun getCommitFor(id: String): Optional<GitCommit> {
+    override fun getCommitFor(id: String): GitCommit? {
         return try {
             val repo = git.repository
             val objectId = repo.resolve("$id^0")
             if (objectId != null) {
-                Optional.of(toCommit(RevWalk(repo).parseCommit(objectId)))
+                toCommit(RevWalk(repo).parseCommit(objectId))
             } else {
-                Optional.empty()
+                null
             }
         } catch (e: IOException) {
-            Optional.empty()
+            null
         }
 
     }

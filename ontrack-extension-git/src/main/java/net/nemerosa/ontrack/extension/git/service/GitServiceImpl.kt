@@ -378,14 +378,14 @@ class GitServiceImpl(
         val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
         // Gets the commit
         val optGitCommit = gitClient.getCommitFor(id)
-        return if (optGitCommit.isPresent) {
+        return if (optGitCommit != null) {
             val commitLink = configuration.commitLink
             val messageAnnotators = getMessageAnnotators(configuration)
             Optional.of(
                     toUICommit(
                             commitLink,
                             messageAnnotators,
-                            optGitCommit.get()
+                            optGitCommit
                     )
             )
         } else {
@@ -493,10 +493,10 @@ class GitServiceImpl(
             // Gets the commit
             val commitFor = gitClient.getCommitFor(commit)
             // If present...
-            if (commitFor.isPresent) {
+            if (commitFor != null) {
                 // Reference
                 if (theCommit.get() == null) {
-                    theCommit.set(commitFor.get())
+                    theCommit.set(commitFor)
                     theConfiguration.set(configuration)
                 }
                 // Gets the earliest build on this branch that contains this commit

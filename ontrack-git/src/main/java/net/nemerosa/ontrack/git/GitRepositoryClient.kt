@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.git
 
 import net.nemerosa.ontrack.git.model.*
 import org.eclipse.jgit.revwalk.RevCommit
-import java.util.Optional
 import java.util.function.Consumer
 import java.util.function.Predicate
 import java.util.stream.Stream
@@ -122,9 +121,11 @@ interface GitRepositoryClient {
 
     /**
      * Looks for a commit using its hash
+     *
+     * @param id Commit
+     * @return Associated commit or `null` if not found.
      */
-    // TODO Kotlin: use nullable
-    fun getCommitFor(id: String): Optional<GitCommit>
+    fun getCommitFor(id: String): GitCommit?
 
     /**
      * Checks if the `commitish` string can be parsed into this repository
