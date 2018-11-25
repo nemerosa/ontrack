@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension;
 import net.nemerosa.ontrack.extension.api.model.BuildValidationException;
+import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.structure.Build;
@@ -22,13 +23,14 @@ public class GitBuildValidationExtension extends AbstractExtension implements Bu
     @Override
     public void validateBuild(Build build) throws BuildValidationException {
         // Gets the Git branch configuration
-        gitService.getBranchConfiguration(build.getBranch()).ifPresent(gitBranchConfiguration -> {
-            if (!gitBranchConfiguration.getBuildCommitLink().isBuildNameValid(build.getName())) {
+        GitBranchConfiguration branchConfiguration = gitService.getBranchConfiguration(build.getBranch());
+        if (branchConfiguration != null) {
+            if (!branchConfiguration.getBuildCommitLink().isBuildNameValid(build.getName())) {
                 throw new BuildValidationException(String.format(
                         "Build name %s is not valid for the branch Git configuration",
                         build.getName()
                 ));
             }
-        });
+        }
     }
 }

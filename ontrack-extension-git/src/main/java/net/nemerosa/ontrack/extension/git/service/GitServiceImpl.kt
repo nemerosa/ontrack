@@ -73,7 +73,9 @@ class GitServiceImpl(
                     .filter { branch -> branch.type != BranchType.TEMPLATE_DEFINITION }
                     .forEach { branch ->
                         val configuration = getBranchConfiguration(branch)
-                        configuration.ifPresent { gitBranchConfiguration -> consumer.accept(branch, gitBranchConfiguration) }
+                        if (configuration != null) {
+                            consumer.accept(branch, configuration)
+                        }
                     }
         }
     }
@@ -97,7 +99,7 @@ class GitServiceImpl(
     }
 
     override fun isBranchConfiguredForGit(branch: Branch): Boolean {
-        return getBranchConfiguration(branch).isPresent
+        return getBranchConfiguration(branch) != null
     }
 
     override fun launchBuildSync(branchId: ID, synchronous: Boolean): Future<*>? {
@@ -106,9 +108,9 @@ class GitServiceImpl(
         // Gets its configuration
         val branchConfiguration = getBranchConfiguration(branch)
         // If valid, launches a job
-        return if (branchConfiguration.isPresent && branchConfiguration.get().buildCommitLink.link is IndexableBuildGitCommitLink<*>) {
+        return if (branchConfiguration != null && branchConfiguration.buildCommitLink.link is IndexableBuildGitCommitLink<*>) {
             if (synchronous) {
-                buildSync<Any>(branch, branchConfiguration.get(), JobRunListener.logger(logger))
+                buildSync<Any>(branch, branchConfiguration, JobRunListener.logger(logger))
                 null
             } else {
                 jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch)).orElse(null)
@@ -220,8 +222,9 @@ class GitServiceImpl(
 
     protected fun getCommitFromBuild(build: Build): String {
         return getBranchConfiguration(build.branch)
-                .map { c -> c.buildCommitLink.getCommitFromBuild(build) }
-                .orElseThrow { GitBranchNotConfiguredException(build.branch.id) }
+                ?.buildCommitLink
+                ?.getCommitFromBuild(build)
+                ?: throw GitBranchNotConfiguredException(build.branch.id)
     }
 
     override fun getChangeLogIssues(changeLog: GitChangeLog): GitChangeLogIssues {
@@ -618,10 +621,10 @@ class GitServiceImpl(
 
     protected fun getRequiredBranchConfiguration(branch: Branch): GitBranchConfiguration {
         return getBranchConfiguration(branch)
-                .orElseThrow { GitBranchNotConfiguredException(branch.id) }
+                ?: throw GitBranchNotConfiguredException(branch.id)
     }
 
-    override fun getBranchConfiguration(branch: Branch): Optional<GitBranchConfiguration> {
+    override fun getBranchConfiguration(branch: Branch): GitBranchConfiguration? {
         // Get the configuration for the project
         val configuration = getProjectConfiguration(branch.project)
         if (configuration != null) {
@@ -645,17 +648,15 @@ class GitServiceImpl(
                 buildTagInterval = 0
             }
             // OK
-            return Optional.of(
-                    GitBranchConfiguration(
-                            configuration,
-                            gitBranch,
-                            buildCommitLink,
-                            override,
-                            buildTagInterval
-                    )
+            return GitBranchConfiguration(
+                    configuration,
+                    gitBranch,
+                    buildCommitLink,
+                    override,
+                    buildTagInterval
             )
         } else {
-            return Optional.empty()
+            return null
         }
     }
 
@@ -822,13 +823,14 @@ class GitServiceImpl(
 
     override fun getSCMPathInfo(branch: Branch): Optional<SCMPathInfo> {
         return getBranchConfiguration(branch)
-                .map { gitBranchConfiguration ->
+                ?.let {
                     SCMPathInfo(
                             "git",
-                            gitBranchConfiguration.configuration.remote,
-                            gitBranchConfiguration.branch, null
+                            it.configuration.remote,
+                            it.branch, null
                     )
                 }
+                .asOptional()
     }
 
     companion object {

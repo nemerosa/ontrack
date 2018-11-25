@@ -33,7 +33,7 @@ public class GitBranchResourceDecorationContributor implements ResourceDecoratio
                                 branch.getId(), null
                         ),
                         (branch, rc) -> rc.isProjectFunctionGranted(branch, ProjectConfig.class) &&
-                                gitService.getBranchConfiguration(branch).isPresent()
+                                gitService.getBranchConfiguration(branch) != null
                 )
         );
     }

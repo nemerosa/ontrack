@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
-import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
 
@@ -30,8 +29,7 @@ interface GitService : SCMService {
      * @param branch Branch to check
      * @return Configuration.
      */
-    // TODO Kotlin, use nullable
-    fun getBranchConfiguration(branch: Branch): Optional<GitBranchConfiguration>
+    fun getBranchConfiguration(branch: Branch): GitBranchConfiguration?
 
     /**
      * Launches the build/tag synchronisation for a branch
