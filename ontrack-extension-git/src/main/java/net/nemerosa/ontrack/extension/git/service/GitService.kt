@@ -80,10 +80,9 @@ interface GitService : SCMService {
      * Looks up a commit in the given `configuration`.
      *
      * @param id Commit long or short ID
-     * @return The content of a commit if it exists, empty otherwise.
+     * @return The content of a commit if it exists, `null` otherwise.
      */
-    // TODO Kotlin, use nullable
-    fun lookupCommit(configuration: GitConfiguration, id: String): Optional<GitUICommit>
+    fun lookupCommit(configuration: GitConfiguration, id: String): GitUICommit?
 
     /**
      * Gets information about a commit in a Git-configured project.

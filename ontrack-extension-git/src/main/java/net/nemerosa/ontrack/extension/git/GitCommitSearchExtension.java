@@ -61,10 +61,10 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
             // For all Git-configured projects
             gitService.forEachConfiguredProject((project, gitConfiguration) -> {
                 // ... scans for the commit
-                Optional<GitUICommit> commit = gitService.lookupCommit(gitConfiguration, token);
+                GitUICommit commit = gitService.lookupCommit(gitConfiguration, token);
                 // ... and if found
-                if (commit.isPresent()) {
-                    GitCommit theCommit = commit.get().getCommit();
+                if (commit != null) {
+                    GitCommit theCommit = commit.getCommit();
                     // ... creates a result entry
                     results.add(
                             new SearchResult(
@@ -74,7 +74,7 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
                                             theCommit.getShortMessage()),
                                     String.format("%s - %s",
                                             theCommit.getAuthor().getName(),
-                                            commit.get().getFullAnnotatedMessage()),
+                                            commit.getFullAnnotatedMessage()),
                                     uri(on(GitController.class)
                                             .commitProjectInfo(project.getId(), theCommit.getId())),
                                     uriBuilder.page("extension/git/%d/commit/%s",

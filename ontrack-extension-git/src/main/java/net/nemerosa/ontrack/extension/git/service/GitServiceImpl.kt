@@ -372,7 +372,7 @@ class GitServiceImpl(
         return Lists.newArrayList(commitInfos.values)
     }
 
-    override fun lookupCommit(configuration: GitConfiguration, id: String): Optional<GitUICommit> {
+    override fun lookupCommit(configuration: GitConfiguration, id: String): GitUICommit? {
         // Gets the client client for this configuration
         val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
         // Gets the commit
@@ -380,15 +380,13 @@ class GitServiceImpl(
         return if (optGitCommit != null) {
             val commitLink = configuration.commitLink
             val messageAnnotators = getMessageAnnotators(configuration)
-            Optional.of(
-                    toUICommit(
-                            commitLink,
-                            messageAnnotators,
-                            optGitCommit
-                    )
+            toUICommit(
+                    commitLink,
+                    messageAnnotators,
+                    optGitCommit
             )
         } else {
-            Optional.empty()
+            null
         }
     }
 
