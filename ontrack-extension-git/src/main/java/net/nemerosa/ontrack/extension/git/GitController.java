@@ -179,7 +179,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
     public Ack launchBuildSync(@PathVariable ID branchId) {
-        return Ack.validate(gitService.launchBuildSync(branchId, false));
+        return Ack.validate(gitService.launchBuildSync(branchId, false) != null);
     }
 
     /**

@@ -100,7 +100,7 @@ class GitServiceImpl(
         return getBranchConfiguration(branch).isPresent
     }
 
-    override fun launchBuildSync(branchId: ID, synchronous: Boolean): Optional<Future<*>> {
+    override fun launchBuildSync(branchId: ID, synchronous: Boolean): Future<*>? {
         // Gets the branch
         val branch = structureService.getBranch(branchId)
         // Gets its configuration
@@ -109,12 +109,12 @@ class GitServiceImpl(
         return if (branchConfiguration.isPresent && branchConfiguration.get().buildCommitLink.link is IndexableBuildGitCommitLink<*>) {
             if (synchronous) {
                 buildSync<Any>(branch, branchConfiguration.get(), JobRunListener.logger(logger))
-                Optional.empty()
+                null
             } else {
-                jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch))
+                jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch)).orElse(null)
             }
         } else {
-            Optional.empty()
+            null
         }
     }
 

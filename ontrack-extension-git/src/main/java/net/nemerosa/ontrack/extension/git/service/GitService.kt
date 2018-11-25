@@ -36,8 +36,7 @@ interface GitService : SCMService {
     /**
      * Launches the build/tag synchronisation for a branch
      */
-    // TODO Kotlin, use nullable
-    fun launchBuildSync(branchId: ID, synchronous: Boolean): Optional<Future<*>>
+    fun launchBuildSync(branchId: ID, synchronous: Boolean): Future<*>?
 
     /**
      * Change log
