@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.SearchExtension;
-import net.nemerosa.ontrack.extension.git.model.GitUICommit;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.git.model.GitCommit;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -61,25 +59,24 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
             // For all Git-configured projects
             gitService.forEachConfiguredProject((project, gitConfiguration) -> {
                 // ... scans for the commit
-                GitUICommit commit = gitService.lookupCommit(gitConfiguration, token);
+                GitCommit commit = gitService.lookupCommit(gitConfiguration, token);
                 // ... and if found
                 if (commit != null) {
-                    GitCommit theCommit = commit.getCommit();
                     // ... creates a result entry
                     results.add(
                             new SearchResult(
                                     String.format("[%s] %s %s",
                                             project.getName(),
-                                            theCommit.getId(),
-                                            theCommit.getShortMessage()),
+                                            commit.getId(),
+                                            commit.getShortMessage()),
                                     String.format("%s - %s",
-                                            theCommit.getAuthor().getName(),
-                                            commit.getFullAnnotatedMessage()),
+                                            commit.getAuthor().getName(),
+                                            commit.getFullMessage()),
                                     uri(on(GitController.class)
-                                            .commitProjectInfo(project.getId(), theCommit.getId())),
+                                            .commitProjectInfo(project.getId(), commit.getId())),
                                     uriBuilder.page("extension/git/%d/commit/%s",
                                             project.id(),
-                                            theCommit.getId()),
+                                            commit.getId()),
                                     100
                             )
                     );

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.scm.service.SCMService
+import net.nemerosa.ontrack.git.model.GitCommit
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
@@ -86,7 +87,7 @@ interface GitService : SCMService {
      * @param id Commit long or short ID
      * @return The content of a commit if it exists, `null` otherwise.
      */
-    fun lookupCommit(configuration: GitConfiguration, id: String): GitUICommit?
+    fun lookupCommit(configuration: GitConfiguration, id: String): GitCommit?
 
     /**
      * Gets information about a commit in a Git-configured project.

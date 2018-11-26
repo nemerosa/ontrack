@@ -377,22 +377,11 @@ class GitServiceImpl(
         return Lists.newArrayList(commitInfos.values)
     }
 
-    override fun lookupCommit(configuration: GitConfiguration, id: String): GitUICommit? {
+    override fun lookupCommit(configuration: GitConfiguration, id: String): GitCommit? {
         // Gets the client client for this configuration
         val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
         // Gets the commit
-        val optGitCommit = gitClient.getCommitFor(id)
-        return if (optGitCommit != null) {
-            val commitLink = configuration.commitLink
-            val messageAnnotators = getMessageAnnotators(configuration)
-            toUICommit(
-                    commitLink,
-                    messageAnnotators,
-                    optGitCommit
-            )
-        } else {
-            null
-        }
+        return gitClient.getCommitFor(id)
     }
 
     override fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo {
