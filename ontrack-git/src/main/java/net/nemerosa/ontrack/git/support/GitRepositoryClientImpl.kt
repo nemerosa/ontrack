@@ -230,6 +230,32 @@ class GitRepositoryClientImpl(
         return this.repository == repository
     }
 
+    override fun <T> forEachCommitFrom(
+            branch: String,
+            commit: String,
+            code: (RevCommit) -> T?
+    ): T? {
+        try {
+            val gitRepository = git.repository
+            val oCommit = gitRepository.resolve(commit)
+            val oHead = gitRepository.resolve(branch)
+            val i = git.log().addRange(oCommit, oHead).call().iterator()
+            while (i.hasNext()) {
+                val revCommit = i.next()
+                val value = code(revCommit)
+                if (value != null) {
+                    return value
+                }
+            }
+            // Nothing found
+            return null
+        } catch (e: GitAPIException) {
+            throw GitRepositoryAPIException(repository.remote, e)
+        } catch (e: IOException) {
+            throw GitRepositoryIOException(repository.remote, e)
+        }
+    }
+
     override fun log(from: String, to: String): Stream<GitCommit> {
         try {
             val gitRepository = git.repository
