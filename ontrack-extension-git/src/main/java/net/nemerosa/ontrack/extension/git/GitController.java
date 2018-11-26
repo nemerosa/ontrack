@@ -366,18 +366,6 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     }
 
     /**
-     * Commit information
-     */
-    @Deprecated
-    @RequestMapping(value = "{branchId}/commit/{commit}", method = RequestMethod.GET)
-    public Resource<OntrackGitCommitInfo> commitInfo(@PathVariable ID branchId, @PathVariable String commit) {
-        return commitProjectInfo(
-                structureService.getBranch(branchId).getProject().getId(),
-                commit
-        );
-    }
-
-    /**
      * Commit information in a project
      */
     @RequestMapping(value = "{projectId}/commit-info/{commit}", method = RequestMethod.GET)
