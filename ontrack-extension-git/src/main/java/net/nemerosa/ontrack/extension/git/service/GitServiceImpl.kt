@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjec
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException
@@ -52,7 +53,8 @@ class GitServiceImpl(
         private val gitRepositoryClientFactory: GitRepositoryClientFactory,
         private val buildGitCommitLinkService: BuildGitCommitLinkService,
         private val gitConfigurators: Collection<GitConfigurator>,
-        private val scmService: SCMUtilsService
+        private val scmService: SCMUtilsService,
+        private val gitRepositoryHelper: GitRepositoryHelper
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
     private val logger = LoggerFactory.getLogger(GitService::class.java)
@@ -658,6 +660,11 @@ class GitServiceImpl(
         } else {
             return null
         }
+    }
+
+    override fun findBranchWithGitBranch(project: Project, branchName: String): Branch? {
+        return gitRepositoryHelper.findBranchWithProjectAndGitBranch(project, branchName)
+                ?.let { structureService.getBranch(ID.of(it)) }
     }
 
     private fun <T> toConfiguredBuildGitCommitLink(serviceConfiguration: ServiceConfiguration): ConfiguredBuildGitCommitLink<T> {

@@ -32,6 +32,15 @@ interface GitService : SCMService {
     fun getBranchConfiguration(branch: Branch): GitBranchConfiguration?
 
     /**
+     * Gets an Ontrack branch for a given Git branch inside an Ontrack project.
+     *
+     * @param project Project where to look for the branch
+     * @param branchName Name of the Git branch
+     * @return Ontrack branch or `null` if not found
+     */
+    fun findBranchWithGitBranch(project: Project, branchName: String): Branch?
+
+    /**
      * Launches the build/tag synchronisation for a branch
      */
     fun launchBuildSync(branchId: ID, synchronous: Boolean): Future<*>?
