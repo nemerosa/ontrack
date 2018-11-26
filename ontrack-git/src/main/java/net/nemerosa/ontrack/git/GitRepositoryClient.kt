@@ -100,6 +100,11 @@ interface GitRepositoryClient {
     fun getBranchRef(branch: String): String
 
     /**
+     * Loops through commits on a branch, starting from a given commit.
+     */
+    fun <T> forEachCommitFrom(branch: String, commit: String, code: (RevCommit) -> T?): T?
+
+    /**
      * Gets the earliest commit that contains the commit.
      *
      *

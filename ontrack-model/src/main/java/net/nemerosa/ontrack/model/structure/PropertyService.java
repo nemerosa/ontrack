@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -117,6 +118,12 @@ public interface PropertyService {
             BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
             Predicate<T> predicate
     );
+
+    /**
+     * Finds an item using its search key.
+     */
+    @Nullable
+    <T> ID findBuildByBranchAndSearchkey(ID branchId, Class<? extends PropertyType<T>> propertyType, String searchKey);
 
     /**
      * Tests if a property is defined.

@@ -8,10 +8,7 @@ import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,8 +22,10 @@ import java.util.stream.Stream
  * set on the build.
  */
 @Component
-class GitCommitPropertyCommitLink @Autowired
-constructor(private val propertyService: PropertyService, private val structureService: StructureService) : BuildGitCommitLink<NoConfig> {
+class GitCommitPropertyCommitLink(
+        private val propertyService: PropertyService,
+        private val structureService: StructureService
+) : BuildGitCommitLink<NoConfig> {
 
     override fun getId(): String {
         return "git-commit-property"
@@ -60,7 +59,16 @@ constructor(private val propertyService: PropertyService, private val structureS
     }
 
     override fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: NoConfig, commit: String): Int? {
-        return null
+        // Loops over the commits on this branch, starting from this commit
+        val buildId: ID? = gitClient.forEachCommitFrom(branchConfiguration.branch, commit) { revCommit ->
+            // Gets the build for this commit
+            propertyService.findBuildByBranchAndSearchkey(
+                    branch.id,
+                    GitCommitPropertyType::class.java,
+                    gitClient.getId(revCommit)
+            )
+        }
+        return buildId?.value
     }
 
     override fun getBuildCandidateReferences(commit: String, branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: NoConfig): Stream<String> {
