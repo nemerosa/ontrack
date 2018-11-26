@@ -172,7 +172,7 @@ angular.module('ontrack.extension.git', [
 
     .config(function ($stateProvider) {
         $stateProvider.state('git-commit', {
-            url: '/extension/git/{branch}/commit/{commit}',
+            url: '/extension/git/{project}/commit/{commit}',
             templateUrl: 'extension/git/git.commit.tpl.html',
             controller: 'GitCommitCtrl'
         });
@@ -184,7 +184,7 @@ angular.module('ontrack.extension.git', [
 
         ot.call(
             $http.get(
-                $interpolate('extension/git/{{branch}}/commit/{{commit}}')($stateParams)
+                $interpolate('extension/git/{{project}}/commit-info/{{commit}}')($stateParams)
             )).then(function (ontrackGitCommitInfo) {
                 $scope.ontrackGitCommitInfo = ontrackGitCommitInfo;
             });
