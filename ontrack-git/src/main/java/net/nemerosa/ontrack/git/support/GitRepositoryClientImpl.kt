@@ -326,29 +326,6 @@ class GitRepositoryClientImpl(
 
     }
 
-    override fun scanCommits(branch: String, scanFunction: Predicate<RevCommit>): Boolean {
-        // All commits
-        try {
-            val resolvedBranch = git.repository.resolve(getBranchRef(branch))
-            if (resolvedBranch != null) {
-                val commits = git.log().add(resolvedBranch).call()
-                for (commit in commits) {
-                    if (scanFunction.test(commit)) {
-                        // Not going on
-                        return true
-                    }
-                }
-            }
-            // Default behaviour
-            return false
-        } catch (e: GitAPIException) {
-            throw GitRepositoryAPIException(repository.remote, e)
-        } catch (e: IOException) {
-            throw GitRepositoryIOException(repository.remote, e)
-        }
-
-    }
-
     /**
      * {@inheritDoc}
      *

@@ -94,17 +94,6 @@ interface GitRepositoryClient {
      */
     fun toCommit(revCommit: RevCommit): GitCommit
 
-
-    /**
-     * Scans the whole history.
-     *
-     * @param branch       Branch to follow
-     * @param scanFunction Function that scans the commits. Returns `true` if the scan
-     * must not go on, `false` otherwise.
-     * @return `true` if at least one call to `scanFunction` has returned `true`.
-     */
-    fun scanCommits(branch: String, scanFunction: Predicate<RevCommit>): Boolean
-
     /**
      * Gets the reference string for a branch given with its local name.
      */
