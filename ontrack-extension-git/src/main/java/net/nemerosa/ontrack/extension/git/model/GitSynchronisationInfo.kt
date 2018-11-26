@@ -6,7 +6,8 @@ import net.nemerosa.ontrack.git.model.GitSynchronisationStatus
 /**
  * Information about a Git repository and the ways to synchronise it.
  */
-class GitSynchronisationInfo(
+// TODO #532 Workaround
+open class GitSynchronisationInfo(
 
         /**
          * Type of Git provided (github, basic, etc.)
