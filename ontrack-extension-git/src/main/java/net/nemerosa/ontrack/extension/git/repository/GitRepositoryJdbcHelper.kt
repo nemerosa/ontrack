@@ -10,7 +10,7 @@ import javax.sql.DataSource
 class GitRepositoryJdbcHelper(dataSource: DataSource) : AbstractJdbcRepository(dataSource), GitRepositoryHelper {
 
     override fun findBranchWithProjectAndGitBranch(project: Project, gitBranch: String): Int? {
-        return namedParameterJdbcTemplate.queryForObject(
+        return getFirstItem(
                 """SELECT b.ID FROM PROPERTIES p
                         INNER JOIN BRANCHES b ON b.ID = p.BRANCH
                         WHERE p.TYPE = :type
