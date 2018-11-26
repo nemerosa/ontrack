@@ -473,59 +473,54 @@ class GitServiceImpl(
     }
 
     private fun getOntrackGitCommitInfo(project: Project, commit: String): OntrackGitCommitInfo {
-        // Reference data
-        val theCommit = AtomicReference<GitCommit>()
-        val theConfiguration = AtomicReference<GitConfiguration>()
+        // Gets the project configuration
+        val projectConfiguration = getRequiredProjectConfiguration(project)
+        // Gets a client for this configuration
+        val repositoryClient = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
+        // Looks for all Git branches for this commit
+        val gitBranches = repositoryClient.getBranchesForCommit(commit)
+        // Converts to Ontrack branches
+        val branches = gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
         // Data to collect
         val buildViews = ArrayList<BuildView>()
         val branchStatusViews = ArrayList<BranchStatusView>()
-        // For all configured branches
-        forEachConfiguredBranch(BiConsumer { branch, branchConfiguration ->
-            val configuration = branchConfiguration.configuration
-            // Gets the client client for this branch
-            val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
-            // Gets the commit
-            val commitFor = gitClient.getCommitFor(commit)
-            // If present...
-            if (commitFor != null) {
-                // Reference
-                if (theCommit.get() == null) {
-                    theCommit.set(commitFor)
-                    theConfiguration.set(configuration)
-                }
-                // Gets the earliest build on this branch that contains this commit
-                getEarliestBuildAfterCommit<Any>(commit, branch, branchConfiguration, gitClient)
-                        // ... and it present collect its data
-                        .ifPresent { build ->
-                            // Gets the build view
-                            val buildView = structureService.getBuildView(build, true)
-                            // Adds it to the list
-                            buildViews.add(buildView)
-                            // Collects the promotions for the branch
-                            branchStatusViews.add(
-                                    structureService.getEarliestPromotionsAfterBuild(build)
-                            )
-                        }
+        // For each branch
+        branches.forEach { branch ->
+            // Gets its Git configuration
+            val branchConfiguration = getRequiredBranchConfiguration(branch)
+            // Gets the earliest build on this branch that contains this commit
+            val oBuild = getEarliestBuildAfterCommit<Any>(commit, branch, branchConfiguration, repositoryClient)
+            if (oBuild.isPresent) {
+                val build = oBuild.get()
+                // Gets the build view
+                val buildView = structureService.getBuildView(build, true)
+                // Adds it to the list
+                buildViews.add(buildView)
+                // Collects the promotions for the branch
+                branchStatusViews.add(
+                        structureService.getEarliestPromotionsAfterBuild(build)
+                )
             }
-        })
-
-        // OK
-        if (theCommit.get() != null) {
-            val commitLink = theConfiguration.get().commitLink
-            val messageAnnotators = getMessageAnnotators(theConfiguration.get())
-            return OntrackGitCommitInfo(
-                    toUICommit(
-                            commitLink,
-                            messageAnnotators,
-                            theCommit.get()
-                    ),
-                    buildViews,
-                    branchStatusViews
-            )
-        } else {
+        }
+        // At least one branch
+        if (branches.isEmpty()) {
             throw GitCommitNotFoundException(commit)
         }
-
+        // Gets the commit
+        val commitObject = repositoryClient.getCommitFor(commit) ?: throw GitCommitNotFoundException(commit)
+        // Gets the annotated commit
+        val messageAnnotators = getMessageAnnotators(projectConfiguration)
+        val uiCommit = toUICommit(
+                projectConfiguration.commitLink,
+                messageAnnotators,
+                commitObject
+        )
+        // Result
+        return OntrackGitCommitInfo(
+                uiCommit,
+                buildViews,
+                branchStatusViews
+        )
     }
 
     protected fun <T> getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Optional<Build> {
