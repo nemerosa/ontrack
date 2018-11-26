@@ -489,9 +489,8 @@ class GitServiceImpl(
             // Gets its Git configuration
             val branchConfiguration = getRequiredBranchConfiguration(branch)
             // Gets the earliest build on this branch that contains this commit
-            val oBuild = getEarliestBuildAfterCommit<Any>(commit, branch, branchConfiguration, repositoryClient)
-            if (oBuild.isPresent) {
-                val build = oBuild.get()
+            val build = getEarliestBuildAfterCommit<Any>(commit, branch, branchConfiguration, repositoryClient)
+            if (build != null) {
                 // Gets the build view
                 val buildView = structureService.getBuildView(build, true)
                 // Adds it to the list
@@ -523,7 +522,7 @@ class GitServiceImpl(
         )
     }
 
-    protected fun <T> getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Optional<Build> {
+    protected fun <T> getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
         @Suppress("UNCHECKED_CAST")
         val configuredBuildGitCommitLink = branchConfiguration.buildCommitLink as ConfiguredBuildGitCommitLink<T>
         // Delegates to the build commit link...
@@ -535,11 +534,7 @@ class GitServiceImpl(
                 commit
         )
         // Loading
-        return if (buildId != null) {
-            Optional.of(structureService.getBuild(ID.of(buildId)))
-        } else {
-            Optional.empty()
-        }
+        return buildId?.let { structureService.getBuild(ID.of(it)) }
     }
 
     private fun getDiffUrl(diff: GitDiff, entry: GitDiffEntry, fileChangeLinkFormat: String): String {

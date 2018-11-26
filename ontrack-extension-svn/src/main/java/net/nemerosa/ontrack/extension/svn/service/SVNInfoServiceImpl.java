@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -132,7 +133,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
                 // Gets the first copy event on this path after this revision
                 SVNLocation firstCopy = svnService.getFirstCopyAfter(repository, basicInfo.toLocation());
                 // Identifies a possible build given the path/revision and the first copy
-                Optional<Build> buildAfterCommit = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
+                Build buildAfterCommit = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
                 branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo);
                 // OK
                 issueRevisionInfo.add(branchInfo);
@@ -183,16 +184,16 @@ public class SVNInfoServiceImpl implements SVNInfoService {
                     if (branch.getType() != BranchType.TEMPLATE_DEFINITION &&
                             propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class)) {
                         // Identifies a possible build given the path/revision and the first copy
-                        Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
+                        Build build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
                         // Build found
-                        if (build.isPresent()) {
+                        if (build != null) {
                             // Gets the build view
-                            BuildView buildView = structureService.getBuildView(build.get(), true);
+                            BuildView buildView = structureService.getBuildView(build, true);
                             // Adds it to the list
                             buildViews.add(buildView);
                             // Collects the promotions for the branch
                             branchStatusViews.add(
-                                    structureService.getEarliestPromotionsAfterBuild(build.get())
+                                    structureService.getEarliestPromotionsAfterBuild(build)
                             );
                         }
                     }
@@ -210,18 +211,19 @@ public class SVNInfoServiceImpl implements SVNInfoService {
 
     }
 
-    protected Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
+    protected @Nullable
+    Build lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
         // Gets the SVN configuration for the branch
         Property<SVNBranchConfigurationProperty> configurationProperty = propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);
         if (configurationProperty.isEmpty()) {
-            return Optional.empty();
+            return null;
         }
         // Gets the build link
         ConfiguredBuildSvnRevisionLink<Object> revisionLink = buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(
                 configurationProperty.getValue().getBuildRevisionLink()
         );
         // Gets the earliest build
-        return revisionLink.getEarliestBuild(branch, location, firstCopy, configurationProperty.getValue());
+        return revisionLink.getEarliestBuild(branch, location, firstCopy, configurationProperty.getValue()).orElse(null);
     }
 
 }
