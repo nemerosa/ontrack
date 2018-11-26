@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 
+import javax.annotation.Nullable;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -66,6 +67,7 @@ public interface BuildGitCommitLink<T> {
      * @param data                Configuration data
      * @return Candidate build names
      */
+    @Deprecated
     Stream<String> getBuildCandidateReferences(String commit, Branch branch, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, T data);
 
     /**
@@ -76,7 +78,19 @@ public interface BuildGitCommitLink<T> {
      * @param data  Configuration data
      * @return <code>true</code> if the build is linked to the configuration
      */
+    @Deprecated
     boolean isBuildEligible(Build build, T data);
+
+    /**
+     * Gets the earliest build after a given commit on a branch.
+     * TODO Documentation
+     */
+    // TODO Documentation
+    // FIXME Implementation
+    @Nullable
+    default Integer getEarliestBuildAfterCommit(Branch branch, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, T data, String commit) {
+        return null;
+    }
 
     /**
      * Checks if a build name is valid for this configuration.

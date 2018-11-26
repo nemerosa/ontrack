@@ -527,19 +527,19 @@ class GitServiceImpl(
         @Suppress("UNCHECKED_CAST")
         val configuredBuildGitCommitLink = branchConfiguration.buildCommitLink as ConfiguredBuildGitCommitLink<T>
         // Delegates to the build commit link...
-        return configuredBuildGitCommitLink.link
-                // ... by getting candidate references
-                .getBuildCandidateReferences(commit, branch, client, branchConfiguration, configuredBuildGitCommitLink.data)
-                // ... gets the builds
-                .map { buildName -> structureService.findBuildByName(branch.project.name, branch.name, buildName) }
-                // ... filter on existing builds
-                .filter { it.isPresent }.map { it.get() }
-                // ... filter the builds using the link
-                .filter { build -> configuredBuildGitCommitLink.link.isBuildEligible(build, configuredBuildGitCommitLink.data) }
-                // ... sort by decreasing date
-                .sorted { o1, o2 -> o1.id() - o2.id() }
-                // ... takes the first build
-                .findFirst()
+        val buildId = configuredBuildGitCommitLink.link.getEarliestBuildAfterCommit(
+                branch,
+                client,
+                branchConfiguration,
+                configuredBuildGitCommitLink.data,
+                commit
+        )
+        // Loading
+        return if (buildId != null) {
+            Optional.of(structureService.getBuild(ID.of(buildId)))
+        } else {
+            Optional.empty()
+        }
     }
 
     private fun getDiffUrl(diff: GitDiff, entry: GitDiffEntry, fileChangeLinkFormat: String): String {

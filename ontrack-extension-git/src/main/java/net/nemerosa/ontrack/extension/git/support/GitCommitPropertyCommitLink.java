@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -73,6 +74,12 @@ public class GitCommitPropertyCommitLink implements BuildGitCommitLink<NoConfig>
     @Override
     public Form getForm() {
         return Form.create();
+    }
+
+    @Nullable
+    @Override
+    public Integer getEarliestBuildAfterCommit(Branch branch, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, NoConfig data, String commit) {
+        return null;
     }
 
     @Override
