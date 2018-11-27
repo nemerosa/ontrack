@@ -128,7 +128,10 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
      */
     protected fun GitRepo.commits(n: Int) =
             (1..n).associate {
-                it to commit(it, "Commit $it")
+                val message = "Commit $it"
+                commit(it, message)
+                val hash = commitLookup(message, false)
+                it to hash
             }
 
 }

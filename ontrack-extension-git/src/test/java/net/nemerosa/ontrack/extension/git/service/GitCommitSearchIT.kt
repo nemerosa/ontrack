@@ -22,6 +22,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
 
             // Creates 10 commits
             val commits = repo.commits(10)
+            repo.log()
 
             project {
                 gitProject(repo)
