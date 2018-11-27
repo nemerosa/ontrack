@@ -58,7 +58,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         val info = gitService.getCommitProjectInfo(project.id, commit)
         // Commit message & hash
         assertEquals(commit, info.uiCommit.id)
-        assertEquals("Commit $no", info.uiCommit.fullAnnotatedMessage)
+        assertEquals("Commit $no", info.uiCommit.annotatedMessage)
         // Tests
         info.tests()
     }

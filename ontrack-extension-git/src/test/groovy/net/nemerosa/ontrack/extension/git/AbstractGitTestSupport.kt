@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -30,12 +31,15 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var gitConfigurationService: GitConfigurationService
 
+    @Autowired
+    private lateinit var gitRepositoryClientFactory: GitRepositoryClientFactory
+
     /**
      * Creates and saves a Git configuration
      */
-    protected fun createGitConfiguration(repo: GitRepo): BasicGitConfiguration {
+    protected fun createGitConfiguration(repo: GitRepo, sync: Boolean = true): BasicGitConfiguration {
         val gitConfigurationName = TestUtils.uid("C")
-        return asUser().with(GlobalSettings::class.java).call {
+        val gitConfiguration = asUser().with(GlobalSettings::class.java).call {
             gitConfigurationService.newConfiguration(
                     BasicGitConfiguration.empty()
                             .withName(gitConfigurationName)
@@ -43,14 +47,18 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                             .withRemote("file://${repo.dir.absolutePath}")
             )
         }
+        if (sync) {
+            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).sync(Consumer { println(it) })
+        }
+        return gitConfiguration
     }
 
     /**
      * Configures a project for Git.
      */
-    protected fun Project.gitProject(repo: GitRepo) {
+    protected fun Project.gitProject(repo: GitRepo, sync: Boolean = true) {
         // Create a Git configuration
-        val gitConfiguration = createGitConfiguration(repo)
+        val gitConfiguration = createGitConfiguration(repo, sync)
         // Configures the project
         setProperty(
                 this,
@@ -137,9 +145,8 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                 gitInit()
                 value = init()
                 log()
-            } withClone { client, clientRepo, _ ->
-                client.sync(Consumer { println(it) })
-                code(clientRepo, value!!)
+            } and { _, repo ->
+                code(repo, value!!)
             }
         }
     }

@@ -142,7 +142,7 @@ class GitRepo(val dir: File): AutoCloseable {
         /**
          * Chaining of operations
          */
-        infix fun and(clientAction: (GitRepositoryClient, GitRepo) -> Unit): GitRepoOperations {
+        infix fun and(clientAction: (client: GitRepositoryClient, repo: GitRepo) -> Unit): GitRepoOperations {
             clientAction(repo.client, repo)
             return this
         }
