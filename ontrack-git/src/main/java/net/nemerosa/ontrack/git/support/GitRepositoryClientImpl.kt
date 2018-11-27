@@ -250,7 +250,7 @@ class GitRepositoryClientImpl(
                 }
             }
 
-            val oHead = gitRepository.resolve(branch)
+            val oHead = gitRepository.resolve(getBranchRef(branch))
 
             val walk = RevWalk(gitRepository)
 

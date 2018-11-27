@@ -9,7 +9,7 @@ import java.io.File
 /**
  * Utility class to deal with a Git repository.
  */
-class GitRepo(val dir: File): AutoCloseable {
+class GitRepo(val dir: File) : AutoCloseable {
     constructor() : this(createTempDir("ontrack-git"))
 
     companion object {
@@ -112,7 +112,8 @@ class GitRepo(val dir: File): AutoCloseable {
         cmd("touch", fileName)
         git("add", fileName)
         val commitMessage = message ?: "Commit $no"
-        return git("commit", "-m", commitMessage)
+        git("commit", "-m", commitMessage)
+        return commitLookup(commitMessage, false)
     }
 
     @JvmOverloads

@@ -134,6 +134,38 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                 it to hash
             }
 
+    /**
+     * Creates a sequence of commits on different branches.
+     */
+    protected fun GitRepo.sequence(vararg commands: Any): Map<Int, String> {
+        val index = mutableMapOf<Int, String>()
+        val branches = mutableSetOf("master")
+        commands.forEach { command ->
+            when (command) {
+                // Branch
+                is String -> branch(command, branches)
+                // Single commit
+                is Int -> index[command] = commit(command)
+                // Range of commit
+                is IntRange -> command.forEach {
+                    index[it] = commit(it)
+                }
+                // Any other item
+                else -> throw IllegalArgumentException("Unknown type: $command")
+            }
+        }
+        return index
+    }
+
+    private fun GitRepo.branch(branch: String, branches: MutableSet<String>) {
+        if (branches.contains(branch)) {
+            git("checkout", branch)
+        } else {
+            branches += branch
+            git("checkout", "-b", branch)
+        }
+    }
+
     protected fun <T> createRepo(init: GitRepo.() -> T) = RepoTestActions(init)
 
     protected class RepoTestActions<T>(

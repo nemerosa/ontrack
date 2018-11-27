@@ -48,6 +48,64 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         }
     }
 
+    @Test
+    fun `Commit on two branches with commit property`() {
+        createRepo {
+            sequence(
+                    (1..3),
+                    "release/2.0",
+                    4,
+                    "master",
+                    5,
+                    "release/2.0",
+                    (6..7),
+                    "master",
+                    (8..10)
+            )
+        } and { repo, commits: Map<Int, String> ->
+            project {
+                gitProject(repo)
+                branch("master") {
+                    gitBranch("master") {
+                        commitAsProperty()
+                    }
+                    // Validations
+                    val test1 = validationStamp("Test1")
+                    val test2 = validationStamp("Test2")
+                    // Promotions
+                    val silver = promotionLevel("SILVER")
+                    // Creates some builds on this branch
+                    build(1, commits, listOf(test1))
+                    build(3, commits, listOf(test1, test2), listOf(silver))
+                    build(5, commits)
+                    build(9, commits, listOf(test1, test2), listOf(silver))
+                }
+                branch("release-2.0") {
+                    gitBranch("release/2.0") {
+                        commitAsProperty()
+                    }
+                    // Validations
+                    val test1 = validationStamp("Test1")
+                    val test2 = validationStamp("Test2")
+                    // Promotions
+                    val silver = promotionLevel("SILVER")
+                    val gold = promotionLevel("GOLD")
+                    // Creates some builds on this branch
+                    build(4, commits, listOf(test1))
+                    build(8, commits, listOf(test1, test2), listOf(silver, gold))
+                }
+                // Tests for commit 2
+                commitInfoTest(this, commits, 2) {
+                    assertCountBuildViews(2)
+                    buildViewTest(0, "3", setOf("Test1", "Test2"), setOf("SILVER"))
+                    buildViewTest(1, "4", setOf("Test1"))
+                }
+            }
+        }
+    }
+
+    // TODO Excludes disabled branches
+
     private fun commitInfoTest(
             project: Project,
             commits: Map<Int, String>,
@@ -77,7 +135,10 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         assertEquals(buildName, buildView.build.name)
         assertEquals(
                 validations,
-                buildView.validationStampRunViews.map { it.validationStamp.name }.toSet()
+                buildView.validationStampRunViews
+                        .filterNot { it.validationRun.isEmpty() }
+                        .map { it.validationStamp.name }
+                        .toSet()
         )
         assertEquals(
                 promotions,
