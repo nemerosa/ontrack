@@ -9,7 +9,7 @@ import java.io.File
 /**
  * Utility class to deal with a Git repository.
  */
-class GitRepo(val dir: File) {
+class GitRepo(val dir: File): AutoCloseable {
     constructor() : this(createTempDir("ontrack-git"))
 
     companion object {
@@ -60,7 +60,7 @@ class GitRepo(val dir: File) {
     /**
      * Closes this repository
      */
-    fun close() {
+    override fun close() {
         FileUtils.deleteDirectory(dir)
     }
 
@@ -107,12 +107,12 @@ class GitRepo(val dir: File) {
     }
 
     @JvmOverloads
-    fun commit(no: Any, message: String? = null) {
+    fun commit(no: Any, message: String? = null): String {
         val fileName = "file$no"
         cmd("touch", fileName)
         git("add", fileName)
         val commitMessage = message ?: "Commit $no"
-        git("commit", "-m", commitMessage)
+        return git("commit", "-m", commitMessage)
     }
 
     @JvmOverloads
