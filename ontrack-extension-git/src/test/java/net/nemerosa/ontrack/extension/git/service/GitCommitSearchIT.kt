@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.function.Consumer
 import kotlin.test.assertEquals
 
 class GitCommitSearchIT : AbstractGitTestSupport() {
@@ -25,7 +26,10 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
             gitInit()
             commits = commits(10)
             log()
-        } withClone { _, clientRepo, _ ->
+        } withClone { client, clientRepo, _ ->
+
+            client.sync(Consumer { println(it) })
+
             project {
                 gitProject(clientRepo)
                 branch("master") {
