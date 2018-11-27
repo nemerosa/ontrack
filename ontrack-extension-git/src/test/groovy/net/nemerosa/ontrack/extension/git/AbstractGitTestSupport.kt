@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.NoConfig
 import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.function.Consumer
 
 abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
 
@@ -124,5 +125,23 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                 val hash = commitLookup(message, false)
                 it to hash
             }
+
+    protected fun <T> createRepo(init: GitRepo.() -> T) = RepoTestActions(init)
+
+    protected class RepoTestActions<T>(
+            private val init: GitRepo.() -> T
+    ) {
+        infix fun and(code: (GitRepo, T) -> Unit) {
+            var value: T? = null
+            GitRepo.prepare {
+                gitInit()
+                value = init()
+                log()
+            } withClone { client, clientRepo, origin ->
+                client.sync(Consumer { println(it) })
+                code(clientRepo, value!!)
+            }
+        }
+    }
 
 }
