@@ -104,7 +104,64 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         }
     }
 
-    // TODO Excludes disabled branches
+    @Test
+    fun `Commit on two branches with commit property but one branch is disabled`() {
+        createRepo {
+            sequence(
+                    (1..3),
+                    "release/2.0",
+                    4,
+                    "master",
+                    5,
+                    "release/2.0",
+                    (6..7),
+                    "master",
+                    (8..10)
+            )
+        } and { repo, commits: Map<Int, String> ->
+            project {
+                gitProject(repo)
+                branch("master") {
+                    gitBranch("master") {
+                        commitAsProperty()
+                    }
+                    // Validations
+                    val test1 = validationStamp("Test1")
+                    val test2 = validationStamp("Test2")
+                    // Promotions
+                    val silver = promotionLevel("SILVER")
+                    // Creates some builds on this branch
+                    build(1, commits, listOf(test1))
+                    build(3, commits, listOf(test1, test2), listOf(silver))
+                    build(5, commits)
+                    build(9, commits, listOf(test1, test2), listOf(silver))
+                }
+                branch("release-2.0") {
+                    gitBranch("release/2.0") {
+                        commitAsProperty()
+                    }
+                    // Validations
+                    val test1 = validationStamp("Test1")
+                    val test2 = validationStamp("Test2")
+                    // Promotions
+                    val silver = promotionLevel("SILVER")
+                    val gold = promotionLevel("GOLD")
+                    // Creates some builds on this branch
+                    build(4, commits, listOf(test1))
+                    build(8, commits, listOf(test1, test2), listOf(silver, gold))
+                    // Disables the branch
+                    asAdmin().execute {
+                        structureService.disableBranch(this)
+                    }
+                }
+                // Tests for commit 2
+                commitInfoTest(this, commits, 2) {
+                    assertCountBuildViews(1)
+                    buildViewTest(0, "3", setOf("Test1", "Test2"), setOf("SILVER"))
+                }
+            }
+        }
+    }
 
     private fun commitInfoTest(
             project: Project,

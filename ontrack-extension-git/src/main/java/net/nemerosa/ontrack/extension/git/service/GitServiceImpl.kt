@@ -37,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
-import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiConsumer
 import java.util.stream.Stream
 
@@ -485,22 +484,25 @@ class GitServiceImpl(
         val buildViews = ArrayList<BuildView>()
         val branchStatusViews = ArrayList<BranchStatusView>()
         // For each branch
-        branches.forEach { branch ->
-            // Gets its Git configuration
-            val branchConfiguration = getRequiredBranchConfiguration(branch)
-            // Gets the earliest build on this branch that contains this commit
-            val build = getEarliestBuildAfterCommit<Any>(commit, branch, branchConfiguration, repositoryClient)
-            if (build != null) {
-                // Gets the build view
-                val buildView = structureService.getBuildView(build, true)
-                // Adds it to the list
-                buildViews.add(buildView)
-                // Collects the promotions for the branch
-                branchStatusViews.add(
-                        structureService.getEarliestPromotionsAfterBuild(build)
-                )
-            }
-        }
+        branches
+                .filterNot { branch -> branch.isDisabled }
+                .filter { branch -> branch.type != BranchType.TEMPLATE_DEFINITION }
+                .forEach { branch ->
+                    // Gets its Git configuration
+                    val branchConfiguration = getRequiredBranchConfiguration(branch)
+                    // Gets the earliest build on this branch that contains this commit
+                    val build = getEarliestBuildAfterCommit<Any>(commit, branch, branchConfiguration, repositoryClient)
+                    if (build != null) {
+                        // Gets the build view
+                        val buildView = structureService.getBuildView(build, true)
+                        // Adds it to the list
+                        buildViews.add(buildView)
+                        // Collects the promotions for the branch
+                        branchStatusViews.add(
+                                structureService.getEarliestPromotionsAfterBuild(build)
+                        )
+                    }
+                }
         // At least one branch
         if (branches.isEmpty()) {
             throw GitCommitNotFoundException(commit)
