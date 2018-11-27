@@ -150,7 +150,7 @@ class GitRepo(val dir: File): AutoCloseable {
         /**
          * Clones this repository and performs some operation on it
          */
-        infix fun withClone(clientAction: (GitRepositoryClient, GitRepo, GitRepo) -> Unit) {
+        infix fun withClone(clientAction: (client: GitRepositoryClient, clientRepo: GitRepo, origin: GitRepo) -> Unit) {
             try {
                 val wd = createTempDir("ontrack-git", "")
                 try {

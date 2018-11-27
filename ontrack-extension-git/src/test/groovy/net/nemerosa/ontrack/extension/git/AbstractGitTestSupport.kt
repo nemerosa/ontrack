@@ -112,15 +112,6 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
     }
 
     /**
-     * Creating and initializing a Git repository, running some code in it, and discarding it.
-     */
-    protected fun withRepo(code: (GitRepo) -> Unit) {
-        GitRepo()
-                .apply { gitInit() }
-                .use(code)
-    }
-
-    /**
      * Creates [n] commits, from 1 to [n], with message being "Commit `i`" by default.
      *
      * @param n Number of commits to create

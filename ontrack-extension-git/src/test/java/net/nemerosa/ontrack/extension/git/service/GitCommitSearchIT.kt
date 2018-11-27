@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.service
 import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
+import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PromotionLevel
@@ -18,14 +19,15 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
 
     @Test
     fun `Commit on one branch with commit property`() {
-        withRepo { repo ->
-
+        lateinit var commits: Map<Int, String>
+        GitRepo.prepare {
             // Creates 10 commits
-            val commits = repo.commits(10)
-            repo.log()
-
+            gitInit()
+            commits = commits(10)
+            log()
+        } withClone { _, clientRepo, _ ->
             project {
-                gitProject(repo)
+                gitProject(clientRepo)
                 branch("master") {
                     gitBranch("master") {
                         commitAsProperty()

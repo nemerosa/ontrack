@@ -107,7 +107,7 @@ class GitRepositoryClientImpl(
         try {
             val list = git.branchList()
                     .setContains(commit)
-                    .setListMode(ListBranchCommand.ListMode.ALL)
+                    .setListMode(ListBranchCommand.ListMode.REMOTE)
                     .call()
             return list.map {
                 StringUtils.removeStart(it.name, "refs/remotes/origin/")
