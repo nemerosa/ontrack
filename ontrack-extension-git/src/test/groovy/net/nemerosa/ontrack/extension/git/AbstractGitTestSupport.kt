@@ -137,7 +137,7 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                 gitInit()
                 value = init()
                 log()
-            } withClone { client, clientRepo, origin ->
+            } withClone { client, clientRepo, _ ->
                 client.sync(Consumer { println(it) })
                 code(clientRepo, value!!)
             }
