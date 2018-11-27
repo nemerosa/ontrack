@@ -12,6 +12,91 @@ class GitRepositoryClientImplTest {
 
     /**
      * ```
+     *     *   C5 (master)
+     *     | * C4 (2.1)
+     *     |/
+     *     * C3
+     *     * C2
+     *     * C1
+     * ```
+     */
+    @Test
+    fun `Iterating over commits on a branch`() {
+        GitRepo.prepare {
+            gitInit()
+            commit(1)
+            commit(2)
+            commit(3)
+            git("checkout", "-b", "2.1")
+            commit(4)
+            git("checkout", "master")
+            commit(5)
+
+            log()
+        } and { client, repo ->
+            val c1 = repo.commitLookup("Commit 1")
+            val messages = mutableListOf<String>()
+            client.forEachCommitFrom("master", c1) { r ->
+                messages.add(r.fullMessage.trim())
+                // Going on
+                null
+            }
+            assertEquals(
+                    listOf(
+                            "Commit 1",
+                            "Commit 2",
+                            "Commit 3",
+                            "Commit 5"
+                    ),
+                    messages
+            )
+        }
+    }
+
+    /**
+     * ```
+     *     *   C5 (master)
+     *     | * C4 (2.1)
+     *     |/
+     *     * C3
+     *     * C2
+     *     * C1
+     * ```
+     */
+    @Test
+    fun `Iterating over commits on a branch not including the start`() {
+        GitRepo.prepare {
+            gitInit()
+            commit(1)
+            commit(2)
+            commit(3)
+            git("checkout", "-b", "2.1")
+            commit(4)
+            git("checkout", "master")
+            commit(5)
+
+            log()
+        } and { client, repo ->
+            val c1 = repo.commitLookup("Commit 1")
+            val messages = mutableListOf<String>()
+            client.forEachCommitFrom("master", c1, include = false) { r ->
+                messages.add(r.fullMessage.trim())
+                // Going on
+                null
+            }
+            assertEquals(
+                    listOf(
+                            "Commit 2",
+                            "Commit 3",
+                            "Commit 5"
+                    ),
+                    messages
+            )
+        }
+    }
+
+    /**
+     * ```
      *     *   C4 (master)
      *     | * C3 (2.1)
      *     |/

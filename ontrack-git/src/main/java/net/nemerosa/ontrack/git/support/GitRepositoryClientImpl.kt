@@ -20,6 +20,7 @@ import org.eclipse.jgit.revplot.PlotCommitList
 import org.eclipse.jgit.revplot.PlotLane
 import org.eclipse.jgit.revplot.PlotWalk
 import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.revwalk.filter.MessageRevFilter
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
@@ -233,13 +234,32 @@ class GitRepositoryClientImpl(
     override fun <T> forEachCommitFrom(
             branch: String,
             commit: String,
+            include: Boolean,
             code: (RevCommit) -> T?
     ): T? {
         try {
             val gitRepository = git.repository
+
             val oCommit = gitRepository.resolve(commit)
+
+            if (include) {
+                val revCommit = gitRepository.parseCommit(oCommit)
+                val value = code(revCommit)
+                if (value != null) {
+                    return value
+                }
+            }
+
             val oHead = gitRepository.resolve(branch)
-            val i = git.log().addRange(oCommit, oHead).call().iterator()
+
+            val walk = RevWalk(gitRepository)
+
+            walk.markUninteresting(walk.lookupCommit(oCommit))
+            walk.markStart(walk.lookupCommit(oHead))
+            walk.sort(RevSort.COMMIT_TIME_DESC, true)
+            walk.sort(RevSort.REVERSE, true)
+
+            val i = walk.iterator()
             while (i.hasNext()) {
                 val revCommit = i.next()
                 val value = code(revCommit)

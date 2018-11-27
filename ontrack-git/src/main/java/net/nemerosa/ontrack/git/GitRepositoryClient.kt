@@ -102,7 +102,7 @@ interface GitRepositoryClient {
     /**
      * Loops through commits on a branch, starting from a given commit.
      */
-    fun <T> forEachCommitFrom(branch: String, commit: String, code: (RevCommit) -> T?): T?
+    fun <T> forEachCommitFrom(branch: String, commit: String, include: Boolean = true, code: (RevCommit) -> T?): T?
 
     /**
      * Gets the earliest commit that contains the commit.
