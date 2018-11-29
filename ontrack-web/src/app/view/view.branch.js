@@ -203,6 +203,10 @@ angular.module('ot.view.branch', [
                           id
                           name
                         }
+                        description
+                        creation {
+                          user
+                        }
                       }
                     }
                   }
