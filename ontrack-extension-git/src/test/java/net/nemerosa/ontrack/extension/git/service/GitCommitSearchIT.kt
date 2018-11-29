@@ -163,6 +163,51 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         }
     }
 
+    @Test
+    fun `Commit on two branches with long commit id as build name`() {
+        createRepo {
+            sequence(
+                    (1..3),
+                    "release/2.0",
+                    4,
+                    "master",
+                    5,
+                    "release/2.0",
+                    (6..7),
+                    "master",
+                    (8..10)
+            )
+        } and { repo, commits: Map<Int, String> ->
+            project {
+                gitProject(repo)
+                branch("master") {
+                    gitBranch("master") {
+                        buildNameAsCommit(abbreviated = false)
+                    }
+                    // Creates some builds on this branch
+                    build(commits.getOrFail(1))
+                    build(commits.getOrFail(3))
+                    build(commits.getOrFail(5))
+                    build(commits.getOrFail(9))
+                }
+                branch("release-2.0") {
+                    gitBranch("release/2.0") {
+                        buildNameAsCommit(abbreviated = false)
+                    }
+                    // Creates some builds on this branch
+                    build(commits.getOrFail(4))
+                    build(commits.getOrFail(8))
+                }
+                // Tests for commit 2
+                commitInfoTest(this, commits, 2) {
+                    assertCountBuildViews(2)
+                    buildViewTest(0, commits.getOrFail(3))
+                    buildViewTest(1, commits.getOrFail(4))
+                }
+            }
+        }
+    }
+
     private fun commitInfoTest(
             project: Project,
             commits: Map<Int, String>,
