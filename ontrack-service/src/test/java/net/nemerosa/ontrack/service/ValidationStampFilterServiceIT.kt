@@ -65,10 +65,10 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
                         listOf(vsf.name),
                         newFilters.map { it.name }
                 )
-                // ... and that the name is gone from the list
+                // ... and that the name is NOT gone from the list
                 assertEquals(
-                        listOf(emptyList<String>()),
-                        newFilters.map { it.vsNames }
+                        listOf(listOf(vs.name)),
+                        filters.map { it.vsNames }
                 )
             }
         }
