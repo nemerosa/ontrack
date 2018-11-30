@@ -8,14 +8,16 @@ import java.net.URI
 class BuildLinkDecoration(
         val project: String,
         val build: String,
+        val label: String,
         val uri: URI,
         val promotions: List<BuildLinkDecorationPromotion>
 )
 
-fun Build.asBuildLinkDecoration(uriBuilder: URIBuilder, promotionRuns: List<PromotionRun>) =
+fun Build.asBuildLinkDecoration(uriBuilder: URIBuilder, promotionRuns: List<PromotionRun>, label: String) =
         BuildLinkDecoration(
                 this.project.name,
                 this.name,
+                label,
                 uriBuilder.getEntityPage(this),
                 promotionRuns.map {
                     BuildLinkDecorationPromotion(
