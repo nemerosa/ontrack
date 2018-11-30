@@ -205,30 +205,24 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
     private ValidationStampFilter toValidationStampFilter(
             ResultSet rs,
             Function<Integer, Project> projectLoader,
-            Function<Integer, Branch> branchLoader
-    ) throws SQLException {
-        Branch branch = branchLoader.apply(rs.getObject("BRANCH", Integer.class));
-        Function<String, Boolean> validationStampBranchCheck = (name) -> structureRepository.getValidationStampByName(branch, name).isPresent();
+            Function<Integer, Branch> branchLoader) throws SQLException {
         return new ValidationStampFilter(
                 id(rs),
                 rs.getString("NAME"),
                 projectLoader.apply(rs.getObject("PROJECT", Integer.class)),
-                branch,
-                loadVsNames(rs.getString("VSNAMES"), validationStampBranchCheck)
+                branchLoader.apply(rs.getObject("BRANCH", Integer.class)),
+                loadVsNames(rs.getString("VSNAMES"))
         );
     }
 
-    private List<String> loadVsNames(String vsNames, Function<String, Boolean> validationStampBranchCheck) {
+    private List<String> loadVsNames(String vsNames) {
         if (StringUtils.isNotBlank(vsNames)) {
             // Parses as JSON list
             JsonNode json = readJson(vsNames);
             if (json.isArray()) {
                 List<String> values = new ArrayList<>();
                 for (JsonNode node : json) {
-                    String vsName = node.asText();
-                    if (validationStampBranchCheck.apply(vsName)) {
-                        values.add(vsName);
-                    }
+                    values.add(node.asText());
                 }
                 return ImmutableList.copyOf(values);
             } else {
