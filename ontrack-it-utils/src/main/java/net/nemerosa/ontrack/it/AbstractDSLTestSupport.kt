@@ -39,7 +39,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun Branch.validationStamp(name: String = uid("VS")): ValidationStamp =
             doCreateValidationStamp(this, NameDescription.nd(name, ""))
 
-    fun Branch.build(name: String, init: (Build.() -> Unit)? = {}): Build {
+    fun Branch.build(name: String = uid("B"), init: (Build.() -> Unit)? = {}): Build {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
         if (init != null) {
             build.init()
