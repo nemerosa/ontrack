@@ -288,8 +288,8 @@ angular.module('ot.view.branch', [
             // Checking the filter before using it
             if (filterType) {
                 otGraphqlService.pageGraphQLCall(`
-                    query BuildFilterValidation($branchId: Int!, $filterType: String, $filterData: String) {
-                        buildFilterValidation({type: $filterType, data: $filterData}) {
+                    query BuildFilterValidation($branchId: Int!, $filterType: String!, $filterData: String!) {
+                        buildFilterValidation(branchId: $branchId,filter: {type: $filterType, data: $filterData}) {
                             error
                         }
                     }
