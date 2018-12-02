@@ -103,25 +103,7 @@ angular.module('ot.view.branch', [
         // Switch branches loaded?
         let switchBranchesLoaded = false;
 
-        // Loading the build view
-        function loadBuildView() {
-            // Parameters for the call
-            let config = {};
-            let filterType = null;
-            let filterData = null;
-            // Adds the filter parameters
-            let currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
-            if (currentBuildFilterResource) {
-                filterType = currentBuildFilterResource.type;
-                if (currentBuildFilterResource.data) {
-                    filterData = JSON.stringify(currentBuildFilterResource.data);
-                }
-                $scope.currentBuildFilterResource = currentBuildFilterResource;
-                config.params = currentBuildFilterResource.data;
-            } else {
-                $scope.currentBuildFilterResource = undefined;
-            }
-            // Call
+        function callBuildView(filterType, filterData) {
             $scope.loadingBuildView = true;
             otGraphqlService.pageGraphQLCall(`query BranchView($branchId: Int!, $filterType: String, $filterData: String) {
               branches(id: $branchId) {
@@ -285,6 +267,53 @@ angular.module('ot.view.branch', [
             }).finally(function () {
                 $scope.loadingBuildView = false;
             });
+        }
+
+// Loading the build view
+        function loadBuildView() {
+            // Parameters for the call
+            let filterType = null;
+            let filterData = null;
+            // Adds the filter parameters
+            let currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
+            if (currentBuildFilterResource) {
+                filterType = currentBuildFilterResource.type;
+                if (currentBuildFilterResource.data) {
+                    filterData = JSON.stringify(currentBuildFilterResource.data);
+                }
+                $scope.currentBuildFilterResource = currentBuildFilterResource;
+            } else {
+                $scope.currentBuildFilterResource = undefined;
+            }
+            // Checking the filter before using it
+            if (filterType) {
+                otGraphqlService.pageGraphQLCall(`
+                    query BuildFilterValidation($branchId: Int!, $filterType: String, $filterData: String) {
+                        buildFilterValidation({type: $filterType, data: $filterData}) {
+                            error
+                        }
+                    }
+                `, {
+                    branchId: $scope.branch.id,
+                    filterType: filterType,
+                    filterData: filterData
+                }).then(function (data) {
+                    const message = data.buildFilterValidation.error;
+                    if (message) {
+                        if ($scope.currentBuildFilterResource && $scope.currentBuildFilterResource.name) {
+                            // FIXME #628 Display a message to allow the deletion of this filter (if allowed)
+                        }
+                        // Calling with the default filter
+                        callBuildView(undefined, undefined);
+                    } else {
+                        // No validation issue, calling the view call
+                        callBuildView(filterType, filterData);
+                    }
+                });
+            } else {
+                // Direct actual branch view call
+                callBuildView(filterType, filterData);
+            }
         }
 
         // Loading the branch

@@ -178,13 +178,28 @@ class BuildFilterServiceImpl(
                 ?: throw BuildFilterProviderNotFoundException(filterType)
     }
 
-    override fun <T> validateBuildFilterProviderData(branch: Branch, filterType: String, parameters: T): String? {
-        val buildFilterProvider = getBuildFilterProviderByType<T>(filterType)
+    override fun validateBuildFilterProviderData(branch: Branch, filterType: String, parameters: JsonNode): String? {
+        val buildFilterProvider: BuildFilterProvider<*>? = getBuildFilterProviderByType<Any>(filterType)
         return if (buildFilterProvider != null) {
-            buildFilterProvider.validateData(branch, parameters)
+            validateBuildFilterProviderData(branch, buildFilterProvider, parameters)
         } else {
             BuildFilterProviderNotFoundException(filterType).message
         }
+    }
+
+    private fun <T> validateBuildFilterProviderData(
+            branch: Branch,
+            buildFilterProvider: BuildFilterProvider<T>,
+            parameters: JsonNode
+    ): String? {
+        // Parsing
+        val data: T = try {
+            buildFilterProvider.parse(parameters).orElse(null)
+        } catch (ex: Exception) {
+            return "Cannot parse build filter data: ${ex.message}"
+        }
+        // Validation
+        return buildFilterProvider.validateData(branch, data)
     }
 
     protected fun <T> getBuildFilterProviderData(provider: BuildFilterProvider<T>, parameters: JsonNode): BuildFilterProviderData<T> {

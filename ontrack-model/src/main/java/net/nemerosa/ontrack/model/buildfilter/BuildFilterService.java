@@ -76,13 +76,13 @@ public interface BuildFilterService {
     /**
      * Validates the data for the given type.
      *
-     * @param branch Branch used for the validation
+     * @param branch     Branch used for the validation
      * @param filterType Qualified type for the filter
      * @param parameters Parameters for the filter
      * @return Error message or <code>null</code> if OK
      */
     @Nullable
-    <T> String validateBuildFilterProviderData(Branch branch, String filterType, T parameters);
+    String validateBuildFilterProviderData(Branch branch, String filterType, JsonNode parameters);
 
     /**
      * Gets the form to edit an existing filter.
