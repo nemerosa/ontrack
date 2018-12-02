@@ -40,7 +40,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return branch.init()
     }
 
-    fun Branch.promotionLevel(name: String): PromotionLevel =
+    fun Branch.promotionLevel(name: String = uid("P")): PromotionLevel =
             doCreatePromotionLevel(this, NameDescription.nd(name, ""))
 
     /**
@@ -56,7 +56,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     ): ValidationStamp =
             doCreateValidationStamp(this, NameDescription.nd(name, ""), validationDataTypeConfig)
 
-    fun Branch.build(name: String, init: (Build.() -> Unit)? = {}): Build {
+    fun Branch.build(name: String = uid("B"), init: (Build.() -> Unit)? = {}): Build {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
         if (init != null) {
             build.init()
