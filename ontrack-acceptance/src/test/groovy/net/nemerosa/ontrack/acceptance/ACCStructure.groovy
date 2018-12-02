@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
 import static net.nemerosa.ontrack.json.JsonUtils.object
+import static net.nemerosa.ontrack.test.TestUtils.uid
 
 @AcceptanceTestSuite
 class ACCStructure extends AcceptanceTestClient {
@@ -38,6 +39,19 @@ class ACCStructure extends AcceptanceTestClient {
     void 'Name validation for a project (correct)'() {
         def project = doCreateProject(nameDescription())
         assert project.path('id').asInt() > 0
+    }
+
+    @Test
+    void 'Branch name with an extension'() {
+        // Creates a branch with a ".js" as the end of its name
+        def projectName = uid('P')
+        def branchName = "bugfix-PRJ-678-some-file.js"
+        ontrack.project(projectName) {
+            branch(branchName)
+        }
+        // Tries to access the branch
+        def branch = ontrack.branch(projectName, branchName)
+        assert branch.name == branchName
     }
 
 }

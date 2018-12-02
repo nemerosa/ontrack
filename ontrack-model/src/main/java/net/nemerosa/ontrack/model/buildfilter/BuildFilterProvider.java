@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,5 +58,17 @@ public interface BuildFilterProvider<T> {
 
     default BuildFilterProviderData<T> withData(T data) {
         return BuildFilterProviderData.of(this, data);
+    }
+
+    /**
+     * Validates the data for this type.
+     *
+     * @param branch Branch used for the validation
+     * @param data   Filter data
+     * @return Error message or <code>null</code> if OK
+     */
+    @Nullable
+    default String validateData(Branch branch, @NotNull T data) {
+        return null;
     }
 }

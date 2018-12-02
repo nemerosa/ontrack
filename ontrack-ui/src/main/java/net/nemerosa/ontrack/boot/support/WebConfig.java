@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer.favorParameter(false);
-//        configurer.favorPathExtension(false).favorParameter(false);
+        configurer.favorPathExtension(false);
     }
 
     /**
@@ -52,6 +53,23 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         converters.add(new DocumentHttpMessageConverter());
         // JSON
         converters.add(new ResourceHttpMessageConverter(uriBuilder, securityService, resourceModules));
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/graphql/**");
+        registry.addMapping("/accounts/**");
+        registry.addMapping("/admin/**");
+        registry.addMapping("/api/**");
+        registry.addMapping("/structure/**");
+        registry.addMapping("/branches/**");
+        registry.addMapping("/events/**");
+        registry.addMapping("/info/**");
+        registry.addMapping("/properties/**");
+        registry.addMapping("/search/**");
+        registry.addMapping("/settings/**");
+        registry.addMapping("/user/**");
+        registry.addMapping("/validation-stamp-filters/**");
     }
 
 }
