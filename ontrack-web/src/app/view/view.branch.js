@@ -547,7 +547,11 @@ angular.module('ot.view.branch', [
         // Gets the tooltip for a build filter
         $scope.getBuildFilterTooltip = (buildFilterResource) => {
             if (buildFilterResource.error) {
-                return `Invalid build filter (you should delete it): ${buildFilterResource.error}`;
+                if (buildFilterResource._delete) {
+                    return `Invalid build filter (you should delete it): ${buildFilterResource.error}`;
+                } else {
+                    return `Invalid build filter: ${buildFilterResource.error}`;
+                }
             } else {
                 return "";
             }
