@@ -12,7 +12,7 @@ import org.mockito.Mockito.mock
 
 class StandardBuildFilterProviderTest {
 
-    private var provider: StandardBuildFilterProvider? = null
+    private lateinit var provider: StandardBuildFilterProvider
 
     @Before
     fun before() {
@@ -29,7 +29,7 @@ class StandardBuildFilterProviderTest {
 
     @Test
     fun parse_count_only() {
-        val data = provider!!.parse(JsonUtils.`object`().with("count", 5).end())
+        val data = provider.parse(JsonUtils.`object`().with("count", 5).end())
         assertTrue(data.isPresent)
         assertEquals(5, data.get().count.toLong())
         assertNull(data.get().withPromotionLevel)
@@ -37,7 +37,7 @@ class StandardBuildFilterProviderTest {
 
     @Test
     fun parse_with_promotion_level_null() {
-        val data = provider!!.parse(JsonUtils.`object`()
+        val data = provider.parse(JsonUtils.`object`()
                 .with("count", 5)
                 .with("withPromotionLevel", null as String?)
                 .end())
@@ -48,7 +48,7 @@ class StandardBuildFilterProviderTest {
 
     @Test
     fun parse_with_after_date_null() {
-        val data = provider!!.parse(JsonUtils.`object`()
+        val data = provider.parse(JsonUtils.`object`()
                 .with("count", 5)
                 .withNull("afterDate")
                 .end())
