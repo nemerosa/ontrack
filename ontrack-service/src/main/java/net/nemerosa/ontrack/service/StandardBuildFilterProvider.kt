@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException
 import net.nemerosa.ontrack.model.form.Date
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
@@ -217,14 +218,58 @@ class StandardBuildFilterProvider(
     }
 
     override fun validateData(branch: Branch, data: StandardBuildFilterData): String? {
-        // TODO Since promotion
-        // TODO With promotion
-        // TODO Since validation
-        // TODO With validation
-        // TODO Since property
-        // TODO With property
-        // TODO
-        return null
+        // Since promotion
+        return validatePromotion(branch, data.sincePromotionLevel, "Since promotion")
+        // With promotion
+                ?: validatePromotion(branch, data.withPromotionLevel, "With promotion")
+                // Since validation
+                ?: validateValidation(branch, data.sinceValidationStamp, "Since validation")
+                // With validation
+                ?: validateValidation(branch, data.withValidationStamp, "With validation")
+                // Since property
+                ?: validateProperty(data.sinceProperty, "Since property")
+                // With property
+                ?: validateProperty(data.withProperty, "With property")
+    }
+
+    private fun validateProperty(property: String?, field: String): String? {
+        return property
+                ?.let {
+                    try {
+                        propertyService.getPropertyTypeByName<Any>(property)
+                        null
+                    } catch (ex: PropertyTypeNotFoundException) {
+                        """Property "$property" does not exist for filter "$field"."""
+                    }
+                }
+    }
+
+    private fun validateValidation(branch: Branch, validationStamp: String?, field: String): String? {
+        return validationStamp
+                ?.let {
+                    if (structureService.findValidationStampByName(
+                                    branch.project.name,
+                                    branch.name,
+                                    it).isPresent) {
+                        null
+                    } else {
+                        """Validation stamp $validationStamp does not exist for filter "$field"."""
+                    }
+                }
+    }
+
+    private fun validatePromotion(branch: Branch, promotionLevel: String?, field: String): String? {
+        return promotionLevel
+                ?.let {
+                    if (structureService.findPromotionLevelByName(
+                                    branch.project.name,
+                                    branch.name,
+                                    it).isPresent) {
+                        null
+                    } else {
+                        """Promotion level $promotionLevel does not exist for filter "$field"."""
+                    }
+                }
     }
 
 }
