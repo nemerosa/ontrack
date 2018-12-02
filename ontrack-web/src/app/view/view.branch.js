@@ -544,6 +544,15 @@ angular.module('ot.view.branch', [
             otCopyService.copyFrom($scope.branch).then(loadBranch);
         }
 
+        // Gets the tooltip for a build filter
+        $scope.getBuildFilterTooltip = (buildFilterResource) => {
+            if (buildFilterResource.error) {
+                return `Invalid build filter (you should delete it): ${buildFilterResource.error}`;
+            } else {
+                return "";
+            }
+        };
+
         // Creation of a promotion level
         $scope.createPromotionLevel = function () {
             otStructureService.create($scope.branch._createPromotionLevel, "New promotion level").then(loadBranch);
