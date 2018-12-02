@@ -284,6 +284,7 @@ angular.module('ot.view.branch', [
                 $scope.currentBuildFilterResource = currentBuildFilterResource;
             } else {
                 $scope.currentBuildFilterResource = undefined;
+                $scope.invalidBuildFilterMessage = undefined;
             }
             // Checking the filter before using it
             if (filterType) {
@@ -300,8 +301,10 @@ angular.module('ot.view.branch', [
                 }).then(function (data) {
                     const message = data.buildFilterValidation.error;
                     if (message) {
-                        if ($scope.currentBuildFilterResource && $scope.currentBuildFilterResource.name) {
-                            // FIXME #628 Display a message to allow the deletion of this filter (if allowed)
+                        if ($scope.currentBuildFilterResource) {
+                            // Displays a message to allow the deletion of this filter (if allowed)
+                            $scope.invalidBuildFilterResource = $scope.currentBuildFilterResource;
+                            $scope.invalidBuildFilterMessage = message;
                         }
                         // Removes current filter
                         otBuildFilterService.eraseCurrent($scope.branch.id);
@@ -661,6 +664,7 @@ angular.module('ot.view.branch', [
          */
         $scope.buildFilterErase = function () {
             otBuildFilterService.eraseCurrent(branchId);
+            $scope.invalidBuildFilterResource = undefined;
             loadBuildView();
         };
 

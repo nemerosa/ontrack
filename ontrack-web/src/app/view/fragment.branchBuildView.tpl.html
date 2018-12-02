@@ -1,3 +1,12 @@
+<div class="alert alert-warning" ng-if="!!invalidBuildFilterResource">
+    <p>Current build filter {{invalidBuildFilterResource.name}} is invalid and cannot be used any longer:</p>
+    <p><i>{{invalidBuildFilterMessage}}</i></p>
+    <p>It has been replaced by the default filter.</p>
+    <p ng-if="!invalidBuildFilterResource.shared || branch._buildFilterShare">
+        You should <a href ng-click="buildFilterRemove(invalidBuildFilterResource)">delete</a> this filter.
+    </p>
+</div>
+
 <table class="ot-branch-build-view">
     <thead>
     <tr>
