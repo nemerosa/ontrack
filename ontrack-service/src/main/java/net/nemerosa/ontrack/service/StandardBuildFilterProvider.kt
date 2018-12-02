@@ -1,84 +1,61 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.service
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.form.*;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.form.Date
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Selection
+import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Component
 @Transactional
-public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<StandardBuildFilterData> {
+class StandardBuildFilterProvider(
+        private val structureService: StructureService,
+        private val validationRunStatusService: ValidationRunStatusService,
+        private val propertyService: PropertyService,
+        private val coreBuildFilterRepository: CoreBuildFilterRepository
+) : AbstractBuildFilterProvider<StandardBuildFilterData>() {
 
-    private final StructureService structureService;
-    private final ValidationRunStatusService validationRunStatusService;
-    private final PropertyService propertyService;
-    private final CoreBuildFilterRepository coreBuildFilterRepository;
-
-    @Autowired
-    public StandardBuildFilterProvider(
-            StructureService structureService,
-            ValidationRunStatusService validationRunStatusService,
-            PropertyService propertyService,
-            CoreBuildFilterRepository coreBuildFilterRepository
-    ) {
-        this.structureService = structureService;
-        this.validationRunStatusService = validationRunStatusService;
-        this.propertyService = propertyService;
-        this.coreBuildFilterRepository = coreBuildFilterRepository;
+    override fun getType(): String {
+        return StandardBuildFilterProvider::class.java.name
     }
 
-    @Override
-    public String getType() {
-        return StandardBuildFilterProvider.class.getName();
+    override fun getName(): String {
+        return "Standard filter"
     }
 
-    @Override
-    public String getName() {
-        return "Standard filter";
-    }
-
-    @Override
-    public List<Build> filterBranchBuilds(Branch branch, StandardBuildFilterData data) {
+    override fun filterBranchBuilds(branch: Branch, data: StandardBuildFilterData): List<Build> {
         return coreBuildFilterRepository.standardFilter(
                 branch,
                 data
-        );
+        )
     }
 
-    @Override
-    public boolean isPredefined() {
-        return false;
+    override fun isPredefined(): Boolean {
+        return false
     }
 
-    @Override
-    protected Form blankForm(ID branchId) {
+    override fun blankForm(branchId: ID): Form {
         // Promotion levels for this branch
-        List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branchId);
+        val promotionLevels = structureService.getPromotionLevelListForBranch(branchId)
         // Validation stamps for this branch
-        List<ValidationStamp> validationStamps = structureService.getValidationStampListForBranch(branchId);
+        val validationStamps = structureService.getValidationStampListForBranch(branchId)
         // List of validation run statuses
-        List<ValidationRunStatusID> statuses = new ArrayList<>(validationRunStatusService.getValidationRunStatusList());
+        val statuses = ArrayList(validationRunStatusService.validationRunStatusList)
         // List of properties for a build
-        //noinspection Convert2MethodRef
-        List<PropertyTypeDescriptor> properties = propertyService.getPropertyTypes().stream()
-                .filter(type -> type.getSupportedEntityTypes().contains(ProjectEntityType.BUILD))
-                .map(type -> PropertyTypeDescriptor.of(type))
-                .collect(Collectors.toList());
+
+        val properties = propertyService.propertyTypes
+                .filter { type -> type.supportedEntityTypes.contains(ProjectEntityType.BUILD) }
+                .map { type -> PropertyTypeDescriptor.of(type) }
         // Form
         return Form.create()
                 .with(
-                        Int.of("count")
+                        net.nemerosa.ontrack.model.form.Int.of("count")
                                 .label("Maximum count")
                                 .help("Maximum number of builds to display")
                                 .min(1)
@@ -169,8 +146,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .with(
                         Text.of("linkedFrom")
                                 .label("Linked from")
-                                .help("The build must be linked FROM the builds selected by the pattern.\n" +
-                                        "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
+                                .help("The build must be linked FROM the builds selected by the pattern.\n" + "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
                                 )
                                 .length(40)
                                 .optional()
@@ -185,8 +161,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .with(
                         Text.of("linkedTo")
                                 .label("Linked to")
-                                .help("The build must be linked TO the builds selected by the pattern.\n" +
-                                        "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
+                                .help("The build must be linked TO the builds selected by the pattern.\n" + "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
                                 )
                                 .length(40)
                                 .optional()
@@ -198,34 +173,30 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                                 .length(40)
                                 .optional()
                 )
-                ;
     }
 
-    @Override
-    protected Form fill(Form form, StandardBuildFilterData data) {
+    override fun fill(form: Form, data: StandardBuildFilterData): Form {
         return form
-                .fill("count", data.getCount())
-                .fill("sincePromotionLevel", data.getSincePromotionLevel())
-                .fill("withPromotionLevel", data.getWithPromotionLevel())
-                .fill("afterDate", data.getAfterDate())
-                .fill("beforeDate", data.getBeforeDate())
-                .fill("sinceValidationStamp", data.getSinceValidationStamp())
-                .fill("sinceValidationStampStatus", data.getSinceValidationStampStatus())
-                .fill("withValidationStamp", data.getWithValidationStamp())
-                .fill("withValidationStampStatus", data.getWithValidationStampStatus())
-                .fill("sinceProperty", data.getSinceProperty())
-                .fill("sincePropertyValue", data.getSincePropertyValue())
-                .fill("withProperty", data.getWithProperty())
-                .fill("withPropertyValue", data.getWithPropertyValue())
-                .fill("linkedFrom", data.getLinkedFrom())
-                .fill("linkedFromPromotion", data.getLinkedFromPromotion())
-                .fill("linkedToPromotion", data.getLinkedToPromotion())
-                ;
+                .fill("count", data.count)
+                .fill("sincePromotionLevel", data.sincePromotionLevel)
+                .fill("withPromotionLevel", data.withPromotionLevel)
+                .fill("afterDate", data.afterDate)
+                .fill("beforeDate", data.beforeDate)
+                .fill("sinceValidationStamp", data.sinceValidationStamp)
+                .fill("sinceValidationStampStatus", data.sinceValidationStampStatus)
+                .fill("withValidationStamp", data.withValidationStamp)
+                .fill("withValidationStampStatus", data.withValidationStampStatus)
+                .fill("sinceProperty", data.sinceProperty)
+                .fill("sincePropertyValue", data.sincePropertyValue)
+                .fill("withProperty", data.withProperty)
+                .fill("withPropertyValue", data.withPropertyValue)
+                .fill("linkedFrom", data.linkedFrom)
+                .fill("linkedFromPromotion", data.linkedFromPromotion)
+                .fill("linkedToPromotion", data.linkedToPromotion)
     }
 
-    @Override
-    public Optional<StandardBuildFilterData> parse(JsonNode data) {
-        StandardBuildFilterData filter = StandardBuildFilterData.of(JsonUtils.getInt(data, "count", 10))
+    override fun parse(data: JsonNode): Optional<StandardBuildFilterData> {
+        val filter = StandardBuildFilterData.of(JsonUtils.getInt(data, "count", 10))
                 .withSincePromotionLevel(JsonUtils.get(data, "sincePromotionLevel", null))
                 .withWithPromotionLevel(JsonUtils.get(data, "withPromotionLevel", null))
                 .withAfterDate(JsonUtils.getDate(data, "afterDate", null))
@@ -241,13 +212,11 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withLinkedFrom(JsonUtils.get(data, "linkedFrom", null))
                 .withLinkedFromPromotion(JsonUtils.get(data, "linkedFromPromotion", null))
                 .withLinkedTo(JsonUtils.get(data, "linkedTo", null))
-                .withLinkedToPromotion(JsonUtils.get(data, "linkedToPromotion", null));
-        return Optional.of(filter);
+                .withLinkedToPromotion(JsonUtils.get(data, "linkedToPromotion", null))
+        return Optional.of(filter)
     }
 
-    @Nullable
-    @Override
-    public String validateData(Branch branch, @NotNull StandardBuildFilterData data) {
+    override fun validateData(branch: Branch, data: StandardBuildFilterData): String? {
         // TODO Since promotion
         // TODO With promotion
         // TODO Since validation
@@ -255,7 +224,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
         // TODO Since property
         // TODO With property
         // TODO
-        return null;
+        return null
     }
 
 }
