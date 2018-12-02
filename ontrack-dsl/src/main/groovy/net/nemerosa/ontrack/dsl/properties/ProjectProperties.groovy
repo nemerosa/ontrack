@@ -185,4 +185,20 @@ class ProjectProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType')?.autoCreate
     }
 
+    /**
+     * Build link display options
+     */
+
+    @DSLMethod("Sets the display options for the build links targeting this project.")
+    def buildLinkDisplayOptions(boolean useLabel) {
+        property('net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType', [
+                useLabel: useLabel
+        ])
+    }
+
+    @DSLMethod(see = "buildLinkDisplayOptions")
+    boolean getBuildLinkDisplayOptions() {
+        property('net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType')
+    }
+
 }
