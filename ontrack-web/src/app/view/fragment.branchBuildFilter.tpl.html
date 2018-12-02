@@ -32,7 +32,13 @@
                 <span class="fa fa-check" ng-show="currentBuildFilterResource.name == buildFilterResource.name"></span>
                 <!-- Filter name -->
                 <span ng-click="buildFilterApply(buildFilterResource)"
-                      ng-class="{'ot-buildfilter-local': !buildFilterResource._update, 'ot-buildfilter-remote': buildFilterResource._update}">
+                      ng-class="{
+                        'ot-buildfilter-local': !buildFilterResource._update,
+                        'ot-buildfilter-remote': buildFilterResource._update,
+                        'ot-buildfilter-invalid': !!buildFilterResource.error
+                      }"
+                      title="{{getBuildFilterTooltip(buildFilterResource)}}"
+                >
                     {{buildFilterResource.name}}
                     <span ng-if="!buildFilterResource._update"> (local)</span>
                 </span>
