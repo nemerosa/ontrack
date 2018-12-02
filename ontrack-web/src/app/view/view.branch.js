@@ -303,6 +303,8 @@ angular.module('ot.view.branch', [
                         if ($scope.currentBuildFilterResource && $scope.currentBuildFilterResource.name) {
                             // FIXME #628 Display a message to allow the deletion of this filter (if allowed)
                         }
+                        // Removes current filter
+                        otBuildFilterService.eraseCurrent($scope.branch.id);
                         // Calling with the default filter
                         callBuildView(undefined, undefined);
                     } else {
