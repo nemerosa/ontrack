@@ -48,7 +48,7 @@ class GQLRootQueryBuildFilterValidation(
                     val branchId = GraphqlUtils.getIntArgument(environment, "branchId")
                             .orElseThrow { IllegalStateException("From argument is required") }
                     val branch = structureService.getBranch(ID.of(branchId))
-                    val genericFilter: Any? = environment.getArgument<Any>("generic")
+                    val genericFilter: Any? = environment.getArgument<Any>("filter")
                     val filterType = inputBuildGenericFilter.getFilterType(genericFilter)
                     val filterData = inputBuildGenericFilter.getFilterData(genericFilter)
                     mapOf(
