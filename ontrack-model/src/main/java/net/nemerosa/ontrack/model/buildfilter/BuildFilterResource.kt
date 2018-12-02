@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.Branch
  * @property name Name for this filter
  * @property type Type for this filter
  * @property data Specific data for this filter
+ * @property error Error message if this filter is not valid
  */
 class BuildFilterResource<T>(
         @JsonIgnore
@@ -19,5 +20,6 @@ class BuildFilterResource<T>(
         val shared: Boolean,
         val name: String,
         val type: String,
-        val data: T
+        val data: T,
+        val error: String?
 )

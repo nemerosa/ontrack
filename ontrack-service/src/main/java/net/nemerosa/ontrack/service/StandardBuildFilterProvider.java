@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,6 +243,19 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withLinkedTo(JsonUtils.get(data, "linkedTo", null))
                 .withLinkedToPromotion(JsonUtils.get(data, "linkedToPromotion", null));
         return Optional.of(filter);
+    }
+
+    @Nullable
+    @Override
+    public String validateData(Branch branch, @NotNull StandardBuildFilterData data) {
+        // TODO Since promotion
+        // TODO With promotion
+        // TODO Since validation
+        // TODO With validation
+        // TODO Since property
+        // TODO With property
+        // TODO
+        return null;
     }
 
 }

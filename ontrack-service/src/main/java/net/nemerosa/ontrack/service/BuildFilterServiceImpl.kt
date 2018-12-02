@@ -178,6 +178,15 @@ class BuildFilterServiceImpl(
                 ?: throw BuildFilterProviderNotFoundException(filterType)
     }
 
+    override fun <T> validateBuildFilterProviderData(branch: Branch, filterType: String, parameters: T): String? {
+        val buildFilterProvider = getBuildFilterProviderByType<T>(filterType)
+        return if (buildFilterProvider != null) {
+            buildFilterProvider.validateData(branch, parameters)
+        } else {
+            BuildFilterProviderNotFoundException(filterType).message
+        }
+    }
+
     protected fun <T> getBuildFilterProviderData(provider: BuildFilterProvider<T>, parameters: JsonNode): BuildFilterProviderData<T> {
         val data = provider.parse(parameters)
         return if (data.isPresent) {
@@ -299,7 +308,8 @@ class BuildFilterServiceImpl(
                             shared,
                             name,
                             provider.type,
-                            parsedData
+                            parsedData,
+                            provider.validateData(branch, parsedData)
                     )
                 }.orElse(null)
     }
