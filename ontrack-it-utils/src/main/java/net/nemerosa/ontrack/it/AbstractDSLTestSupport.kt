@@ -26,7 +26,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return branch
     }
 
-    fun Branch.promotionLevel(name: String): PromotionLevel =
+    fun Branch.promotionLevel(name: String = uid("P")): PromotionLevel =
             doCreatePromotionLevel(this, NameDescription.nd(name, ""))
 
     /**
