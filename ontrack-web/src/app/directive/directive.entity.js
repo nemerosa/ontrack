@@ -159,6 +159,18 @@ angular.module('ot.directive.entity', [
             templateUrl: 'app/directive/directive.validationRunStatus.tpl.html',
             scope: {
                 status: '='
+            },
+            link: function (scope) {
+                scope.tooltip = function (validationRunStatus) {
+                    const id = validationRunStatus.statusID.name;
+                    const description = validationRunStatus.description;
+                    if (description) {
+                        const user = validationRunStatus.creation.user;
+                        return `${id} - ${description} (${user})`;
+                    } else {
+                        return id;
+                    }
+                };
             }
         };
     })

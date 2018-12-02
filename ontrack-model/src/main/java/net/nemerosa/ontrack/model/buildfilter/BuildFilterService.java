@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
@@ -70,6 +72,17 @@ public interface BuildFilterService {
      * @throws BuildFilterProviderDataParsingException If the parameters cannot be parsed
      */
     <T> BuildFilterProviderData<T> getBuildFilterProviderData(String filterType, T parameters);
+
+    /**
+     * Validates the data for the given type.
+     *
+     * @param branch     Branch used for the validation
+     * @param filterType Qualified type for the filter
+     * @param parameters Parameters for the filter
+     * @return Error message or <code>null</code> if OK
+     */
+    @Nullable
+    String validateBuildFilterProviderData(Branch branch, String filterType, JsonNode parameters);
 
     /**
      * Gets the form to edit an existing filter.
