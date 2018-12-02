@@ -284,6 +284,7 @@ angular.module('ot.view.branch', [
                 $scope.currentBuildFilterResource = currentBuildFilterResource;
             } else {
                 $scope.currentBuildFilterResource = undefined;
+                $scope.invalidBuildFilterResource = undefined;
                 $scope.invalidBuildFilterMessage = undefined;
             }
             // Checking the filter before using it
