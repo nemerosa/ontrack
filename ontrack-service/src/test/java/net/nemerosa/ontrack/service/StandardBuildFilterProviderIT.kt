@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
@@ -88,7 +89,7 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                 buildFilterService.validateBuildFilterProviderData(
                         this,
                         StandardBuildFilterProvider::class.java.name,
-                        filter
+                        JsonUtils.format(filter)
                 ),
                 "No validation error"
         )
@@ -100,7 +101,7 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                 buildFilterService.validateBuildFilterProviderData(
                         this,
                         StandardBuildFilterProvider::class.java.name,
-                        filter
+                        JsonUtils.format(filter)
                 )
         )
     }
