@@ -7,6 +7,7 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,7 +31,9 @@ constructor(
                 .field {
                     it.name("creation")
                             .type(creation.typeRef)
-                            .dataFetcher(GQLTypeCreation.dataFetcher<ValidationRunStatus> { validationRunStatus -> validationRunStatus.signature })
+                            .dataFetcher(GQLTypeCreation.dataFetcher<Data> { gqlTypeValidationRunStatusWrapper ->
+                                gqlTypeValidationRunStatusWrapper.delegate.signature
+                            })
                 }
                 // Status ID
                 .field(
@@ -47,34 +50,40 @@ constructor(
                     it.name("annotatedDescription")
                             .type(Scalars.GraphQLString)
                             .description("Description with links.")
-                            .dataFetcher {
-                                GraphqlUtils.fetcher(ValidationRunStatus::class.java) { status ->
-                                    annotatedDescription(status)
-                                }
-                            }
+                            .dataFetcher(
+                                    GraphqlUtils.fetcher(Data::class.java) { wrapper ->
+                                        annotatedDescription(wrapper)
+                                    }
+                            )
                 }
                 // OK
                 .build()
 
     }
 
-    private fun annotatedDescription(validationRunStatus: ValidationRunStatus): String {
-        val description: String? = validationRunStatus.description
+    private fun annotatedDescription(wrapper: Data): String {
+        val description: String? = wrapper.description
         return if (description.isNullOrBlank()) {
             ""
         } else {
-            TODO("We need the validation run accessible from the validation run status")
-//            val validationRun: ValidationRun
-//            // Gets the list of message annotators to use
-//            val annotators = freeTextAnnotatorContributors.mapNotNull { it.getMessageAnnotator(validationRun) }
-//            // Annotates the message
-//            MessageAnnotationUtils.annotate(description, annotators)
+            val validationRun = wrapper.validationRun
+            // Gets the list of message annotators to use
+            val annotators = freeTextAnnotatorContributors.mapNotNull { it.getMessageAnnotator(validationRun) }
+            // Annotates the message
+            MessageAnnotationUtils.annotate(description, annotators)
         }
     }
 
     companion object {
+        const val VALIDATION_RUN_STATUS = "ValidationRunStatus"
+    }
 
-        val VALIDATION_RUN_STATUS = "ValidationRunStatus"
+    class Data(
+            val validationRun: ValidationRun,
+            val delegate: ValidationRunStatus
+    ) {
+        val statusID: ValidationRunStatusID get() = delegate.statusID
+        val description: String? get() = delegate.description
     }
 
 }
