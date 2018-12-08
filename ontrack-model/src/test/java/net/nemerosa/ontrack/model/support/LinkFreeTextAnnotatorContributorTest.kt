@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.support
 
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Project
 import org.apache.commons.text.StringEscapeUtils.escapeHtml4
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -75,7 +77,7 @@ class LinkFreeTextAnnotatorContributorTest {
     private infix fun String?.gives(expected: String?) {
         val actual = MessageAnnotationUtils.annotate(
                 this,
-                listOf(contributor.messageAnnotator)
+                listOf(contributor.getMessageAnnotator(Project.of(NameDescription.nd("P", ""))))
         )
         assertEquals(
                 expected,

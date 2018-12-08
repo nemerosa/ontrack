@@ -5,6 +5,7 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
@@ -29,7 +30,7 @@ constructor(
                 .field {
                     it.name("creation")
                             .type(creation.typeRef)
-                            .dataFetcher(GQLTypeCreation.dataFetcher<ValidationRunStatus> { it.signature })
+                            .dataFetcher(GQLTypeCreation.dataFetcher<ValidationRunStatus> { validationRunStatus -> validationRunStatus.signature })
                 }
                 // Status ID
                 .field(
@@ -59,13 +60,15 @@ constructor(
 
     private fun annotatedDescription(validationRunStatus: ValidationRunStatus): String {
         val description: String? = validationRunStatus.description
-        if (description.isNullOrBlank()) {
-            return ""
+        return if (description.isNullOrBlank()) {
+            ""
         } else {
-            // Gets the list of message annotators to use
-            val annotators = freeTextAnnotatorContributors.map { it.messageAnnotator }
-            // Annotates the message
-            return MessageAnnotationUtils.annotate(description, annotators)
+            TODO("We need the validation run accessible from the validation run status")
+//            val validationRun: ValidationRun
+//            // Gets the list of message annotators to use
+//            val annotators = freeTextAnnotatorContributors.mapNotNull { it.getMessageAnnotator(validationRun) }
+//            // Annotates the message
+//            MessageAnnotationUtils.annotate(description, annotators)
         }
     }
 
