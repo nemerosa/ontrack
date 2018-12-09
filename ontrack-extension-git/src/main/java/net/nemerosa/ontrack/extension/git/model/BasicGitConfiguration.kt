@@ -46,6 +46,17 @@ class BasicGitConfiguration(
 
     override fun getPassword(): String? = password
 
+    fun withUser(user: String?) = BasicGitConfiguration(
+            name,
+            remote,
+            user,
+            password,
+            commitLink,
+            fileAtCommitLink,
+            indexationInterval,
+            issueServiceConfigurationIdentifier
+    )
+
     override fun withPassword(password: String?) = BasicGitConfiguration(
             name,
             remote,
@@ -58,6 +69,17 @@ class BasicGitConfiguration(
     )
 
     fun withName(name: String) = BasicGitConfiguration(
+            name,
+            remote,
+            user,
+            password,
+            commitLink,
+            fileAtCommitLink,
+            indexationInterval,
+            issueServiceConfigurationIdentifier
+    )
+
+    fun withRemote(remote: String) = BasicGitConfiguration(
             name,
             remote,
             user,
@@ -94,8 +116,8 @@ class BasicGitConfiguration(
 
     @JsonIgnore
     override fun getCredentials(): Optional<UserPassword> {
-        return if (!user.isNullOrBlank() && !password.isNullOrBlank())
-            Optional.of(UserPassword(user!!, password!!))
+        return if (user != null && user.isNotBlank())
+            Optional.of(UserPassword(user, password ?: ""))
         else
             Optional.empty()
     }
