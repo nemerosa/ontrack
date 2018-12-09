@@ -117,6 +117,7 @@ angular.module('ot.view.validationStamp', [
                             name
                           }
                           description
+                          annotatedDescription
                         }
                       }
                     }
