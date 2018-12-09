@@ -1628,10 +1628,10 @@ class ACCDSL extends AbstractACCDSL {
     @Test
     void 'Configuration - SVN and wrong format for JIRA identifier'() {
         def jiraName = uid('J')
-        validationError "Wrong format for an issue service configuration ID: jira//${jiraName}", {
+        validationError "Wrong format for an issue service configuration ID: jira:${jiraName}", {
             def svnName = uid('S')
             ontrack.configure {
-                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
+                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
             }
         }
     }
