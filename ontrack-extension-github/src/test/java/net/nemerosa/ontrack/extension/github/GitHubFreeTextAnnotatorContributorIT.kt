@@ -23,14 +23,14 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
     private lateinit var gitHubFreeTextAnnotatorContributor: GitHubFreeTextAnnotatorContributor
 
     @Test
-    fun `No Git configuration`() {
+    fun `GitHub Git configuration`() {
         project {
             expects("Text with #123" to "Text with #123")
         }
     }
 
     @Test
-    fun `Git configuration without any issue service`() {
+    fun `GitHub configuration without any issue service`() {
         project {
             gitHubConfig(issueServiceConfigurationIdentifier = null)
             expects("Text with #123" to """Text with #123""")
@@ -38,7 +38,15 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Git configuration with an issue service`() {
+    fun `GitHub configuration with own issue service`() {
+        project {
+            gitHubConfig(issueServiceConfigurationIdentifier = "github")
+            expects("Text with #123" to """Text with <a href="https://github.com/nemerosa/test/issues/123">#123</a>""")
+        }
+    }
+
+    @Test
+    fun `GitHub configuration with an issue service`() {
         project {
             gitHubConfig(issueServiceConfigurationIdentifier = MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
             expects("Text with #123" to """Text with <a href="http://issue/123">#123</a>""")
@@ -61,6 +69,11 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
                 )
             }
         }
+        val actualIssueServiceConfigurationIdentifier: String? = when (issueServiceConfigurationIdentifier) {
+            null -> null
+            "github" -> "github//${gitConfigurationName}:nemerosa/test"
+            else -> issueServiceConfigurationIdentifier
+        }
         setProperty(
                 this,
                 GitHubProjectConfigurationPropertyType::class.java,
@@ -68,7 +81,7 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
                         gitConfiguration,
                         "nemerosa/test",
                         0,
-                        issueServiceConfigurationIdentifier
+                        actualIssueServiceConfigurationIdentifier
                 )
         )
     }
