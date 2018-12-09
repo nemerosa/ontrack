@@ -117,8 +117,7 @@
                     <td>
                         <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
                     </td>
-                    <td>
-                        {{validationRun.validationRunStatuses[0].description}}
+                    <td ng-bind-html="validationRun.validationRunStatuses[0].annotatedDescription">
                     </td>
                     <td>
                         <ot-creation creation="validationRun.creation"></ot-creation>
