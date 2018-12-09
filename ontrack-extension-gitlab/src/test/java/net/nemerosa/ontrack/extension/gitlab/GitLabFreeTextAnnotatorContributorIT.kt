@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.gitlab
 
+import net.nemerosa.ontrack.extension.git.model.GitFreeTextAnnotatorContributor
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration
 import net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType
@@ -19,7 +20,7 @@ class GitLabFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
     private lateinit var gitLabConfigurationService: GitLabConfigurationService
 
     @Autowired
-    private lateinit var gitLabFreeTextAnnotatorContributor: GitLabFreeTextAnnotatorContributor
+    private lateinit var gitFreeTextAnnotatorContributor: GitFreeTextAnnotatorContributor
 
     @Test
     fun `No Git configuration`() {
@@ -76,7 +77,7 @@ class GitLabFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
         val input = transformation.first
         val expected = transformation.second
         // Gets the annotators
-        val annotators = gitLabFreeTextAnnotatorContributor.getMessageAnnotators(this)
+        val annotators = gitFreeTextAnnotatorContributor.getMessageAnnotators(this)
         // Annotation
         val actual = MessageAnnotationUtils.annotate(input, annotators)
         // Comparison

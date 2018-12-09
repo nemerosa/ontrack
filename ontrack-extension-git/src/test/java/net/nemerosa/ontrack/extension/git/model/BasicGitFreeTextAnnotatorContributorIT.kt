@@ -19,7 +19,7 @@ class BasicGitFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
     private lateinit var gitConfigurationService: GitConfigurationService
 
     @Autowired
-    private lateinit var basicGitFreeTextAnnotatorContributor: BasicGitFreeTextAnnotatorContributor
+    private lateinit var gitFreeTextAnnotatorContributor: GitFreeTextAnnotatorContributor
 
     @Test
     fun `No Git configuration`() {
@@ -67,7 +67,7 @@ class BasicGitFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
         val input = transformation.first
         val expected = transformation.second
         // Gets the annotators
-        val annotators = basicGitFreeTextAnnotatorContributor.getMessageAnnotators(this)
+        val annotators = gitFreeTextAnnotatorContributor.getMessageAnnotators(this)
         // Annotation
         val actual = MessageAnnotationUtils.annotate(input, annotators)
         // Comparison

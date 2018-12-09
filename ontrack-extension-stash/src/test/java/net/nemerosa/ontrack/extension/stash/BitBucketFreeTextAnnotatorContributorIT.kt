@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.stash
 
+import net.nemerosa.ontrack.extension.git.model.GitFreeTextAnnotatorContributor
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationProperty
@@ -19,7 +20,7 @@ class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
     private lateinit var stashConfigurationService: StashConfigurationService
 
     @Autowired
-    private lateinit var bitBucketFreeTextAnnotatorContributor: BitBucketFreeTextAnnotatorContributor
+    private lateinit var gitFreeTextAnnotatorContributor: GitFreeTextAnnotatorContributor
 
     @Test
     fun `No Git configuration`() {
@@ -76,7 +77,7 @@ class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
         val input = transformation.first
         val expected = transformation.second
         // Gets the annotators
-        val annotators = bitBucketFreeTextAnnotatorContributor.getMessageAnnotators(this)
+        val annotators = gitFreeTextAnnotatorContributor.getMessageAnnotators(this)
         // Annotation
         val actual = MessageAnnotationUtils.annotate(input, annotators)
         // Comparison
