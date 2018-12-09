@@ -19,7 +19,8 @@ import java.util.function.Function
  * @property user User name
  * @property password User password
  */
-class StashConfiguration(
+// TODO #532 Workaround
+open class StashConfiguration(
         private val name: String,
         val url: String,
         private val user: String,

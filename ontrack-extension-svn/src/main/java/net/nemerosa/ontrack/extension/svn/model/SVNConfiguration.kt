@@ -11,7 +11,8 @@ import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
 import java.util.function.Function
 
-class SVNConfiguration(
+// TODO #532 Workaround
+open class SVNConfiguration(
         private val name: String,
         val url: String,
         private val user: String?,

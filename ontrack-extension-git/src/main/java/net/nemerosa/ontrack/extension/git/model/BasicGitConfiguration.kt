@@ -29,7 +29,8 @@ import java.util.function.Function
  *  [net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration] associated
  *  with this repository.
  */
-class BasicGitConfiguration(
+// TODO #532 Workaround
+open class BasicGitConfiguration(
         private val name: String,
         val remote: String,
         private val user: String?,
