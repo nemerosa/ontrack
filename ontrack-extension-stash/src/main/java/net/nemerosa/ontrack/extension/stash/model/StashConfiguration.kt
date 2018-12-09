@@ -23,8 +23,8 @@ import java.util.function.Function
 open class StashConfiguration(
         private val name: String,
         val url: String,
-        private val user: String,
-        private val password: String
+        private val user: String?,
+        private val password: String?
 ) : UserPasswordConfiguration<StashConfiguration> {
 
     override fun getName(): String = name
@@ -52,7 +52,7 @@ open class StashConfiguration(
         return withPassword("")
     }
 
-    override fun withPassword(password: String): StashConfiguration {
+    override fun withPassword(password: String?): StashConfiguration {
         return StashConfiguration(
                 name,
                 url,
@@ -73,18 +73,18 @@ open class StashConfiguration(
         return StashConfiguration(
                 targetConfigurationName,
                 replacementFunction.apply(url),
-                replacementFunction.apply(user),
+                user?.let { replacementFunction.apply(it) },
                 password
         )
     }
 
     @JsonIgnore
     override fun getCredentials(): Optional<UserPassword> {
-        return if (StringUtils.isNotBlank(user)) {
+        return if (user != null && user.isNotBlank()) {
             Optional.of(
                     UserPassword(
                             user,
-                            password
+                            password ?: ""
                     )
             )
         } else {

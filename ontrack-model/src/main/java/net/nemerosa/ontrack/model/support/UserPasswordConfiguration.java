@@ -20,7 +20,7 @@ public interface UserPasswordConfiguration<T extends UserPasswordConfiguration<T
     @Nullable
     String getPassword();
 
-    T withPassword(String password);
+    T withPassword(@Nullable String password);
 
     T clone(String targetConfigurationName, Function<String, String> replacementFunction);
 
