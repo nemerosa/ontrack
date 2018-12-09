@@ -31,6 +31,21 @@ class SVNConfiguration(
 
     override fun getPassword(): String? = password
 
+    fun withUser(user: String?) =
+            SVNConfiguration(
+                    name,
+                    url,
+                    user,
+                    password,
+                    tagFilterPattern,
+                    browserForPath,
+                    browserForRevision,
+                    browserForChange,
+                    indexationInterval,
+                    indexationStart,
+                    issueServiceConfigurationIdentifier
+            )
+
     fun withIssueServiceConfigurationIdentifier(issueServiceConfigurationIdentifier: String?) =
             SVNConfiguration(
                     name,
@@ -147,7 +162,7 @@ class SVNConfiguration(
     }
 
     companion object {
-
+        @JvmStatic
         fun of(name: String, url: String): SVNConfiguration {
             return SVNConfiguration(
                     name,
