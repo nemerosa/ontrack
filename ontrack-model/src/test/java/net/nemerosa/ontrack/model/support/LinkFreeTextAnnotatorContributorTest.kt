@@ -77,7 +77,7 @@ class LinkFreeTextAnnotatorContributorTest {
     private infix fun String?.gives(expected: String?) {
         val actual = MessageAnnotationUtils.annotate(
                 this,
-                listOf(contributor.getMessageAnnotator(Project.of(NameDescription.nd("P", ""))))
+                contributor.getMessageAnnotators(Project.of(NameDescription.nd("P", "")))
         )
         assertEquals(
                 expected,

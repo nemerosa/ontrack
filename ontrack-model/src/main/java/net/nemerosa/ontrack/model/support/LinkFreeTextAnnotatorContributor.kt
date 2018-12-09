@@ -13,13 +13,15 @@ class LinkFreeTextAnnotatorContributor : FreeTextAnnotatorContributor {
 
     private val pattern = Pattern.compile("((https?://|ftp://|www\\.)\\S+)")
 
-    override fun getMessageAnnotator(entity: ProjectEntity) =
-            RegexMessageAnnotator(
-                    pattern
-            ) { link ->
-                MessageAnnotation.of("a")
-                        .attr("href", link)
-                        .attr("target", "_blank")
-                        .text(link)
-            }
+    override fun getMessageAnnotators(entity: ProjectEntity): List<MessageAnnotator> =
+            listOf(
+                    RegexMessageAnnotator(
+                            pattern
+                    ) { link ->
+                        MessageAnnotation.of("a")
+                                .attr("href", link)
+                                .attr("target", "_blank")
+                                .text(link)
+                    }
+            )
 }

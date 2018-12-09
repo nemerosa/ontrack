@@ -68,7 +68,7 @@ constructor(
         } else {
             val validationRun = wrapper.validationRun
             // Gets the list of message annotators to use
-            val annotators = freeTextAnnotatorContributors.mapNotNull { it.getMessageAnnotator(validationRun) }
+            val annotators = freeTextAnnotatorContributors.flatMap { it.getMessageAnnotators(validationRun) }
             // Annotates the message
             MessageAnnotationUtils.annotate(description, annotators)
         }
