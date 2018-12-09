@@ -46,6 +46,21 @@ class SVNConfiguration(
                     issueServiceConfigurationIdentifier
             )
 
+    fun withIndexationInterval(indexationInterval: Int) =
+            SVNConfiguration(
+                    name,
+                    url,
+                    user,
+                    password,
+                    tagFilterPattern,
+                    browserForPath,
+                    browserForRevision,
+                    browserForChange,
+                    indexationInterval,
+                    indexationStart,
+                    issueServiceConfigurationIdentifier
+            )
+
     fun withIssueServiceConfigurationIdentifier(issueServiceConfigurationIdentifier: String?) =
             SVNConfiguration(
                     name,
