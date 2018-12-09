@@ -17,10 +17,10 @@ open class SVNConfiguration(
         val url: String,
         private val user: String?,
         private val password: String?,
-        val tagFilterPattern: String,
-        val browserForPath: String,
-        val browserForRevision: String,
-        val browserForChange: String,
+        val tagFilterPattern: String?,
+        val browserForPath: String?,
+        val browserForRevision: String?,
+        val browserForChange: String?,
         val indexationInterval: Int,
         val indexationStart: Long,
         val issueServiceConfigurationIdentifier: String?
@@ -138,7 +138,7 @@ open class SVNConfiguration(
     }
 
     fun getRevisionBrowsingURL(revision: Long): String {
-        return if (StringUtils.isNotBlank(browserForRevision)) {
+        return if (browserForRevision != null) {
             browserForRevision.replace("{revision}", revision.toString())
         } else {
             revision.toString()
@@ -146,7 +146,7 @@ open class SVNConfiguration(
     }
 
     fun getPathBrowsingURL(path: String): String {
-        return if (StringUtils.isNotBlank(browserForPath)) {
+        return if (browserForPath != null) {
             browserForPath.replace("{path}", path)
         } else {
             path
@@ -154,7 +154,7 @@ open class SVNConfiguration(
     }
 
     fun getFileChangeBrowsingURL(path: String, revision: Long): String {
-        return if (StringUtils.isNotBlank(browserForChange)) {
+        return if (browserForChange != null) {
             browserForChange.replace("{path}", path).replace("{revision}", revision.toString())
         } else {
             path
@@ -167,10 +167,10 @@ open class SVNConfiguration(
                 replacementFunction.apply(url),
                 user?.let { replacementFunction.apply(it) },
                 password,
-                replacementFunction.apply(tagFilterPattern),
-                replacementFunction.apply(browserForPath),
-                replacementFunction.apply(browserForRevision),
-                replacementFunction.apply(browserForChange),
+                tagFilterPattern?.let { replacementFunction.apply(it) },
+                browserForPath?.let { replacementFunction.apply(it) },
+                browserForRevision?.let { replacementFunction.apply(it) },
+                browserForChange?.let { replacementFunction.apply(it) },
                 indexationInterval,
                 indexationStart,
                 issueServiceConfigurationIdentifier
