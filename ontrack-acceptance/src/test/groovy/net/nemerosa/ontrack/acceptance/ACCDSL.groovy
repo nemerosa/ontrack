@@ -1592,7 +1592,7 @@ class ACCDSL extends AbstractACCDSL {
         def gitName = uid('G')
         ontrack.configure {
             jira jiraName, 'http://jira'
-            git gitName, remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+            git gitName, remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
         }
     }
 
@@ -1628,10 +1628,10 @@ class ACCDSL extends AbstractACCDSL {
     @Test
     void 'Configuration - SVN and wrong format for JIRA identifier'() {
         def jiraName = uid('J')
-        validationError "Wrong format for an issue service configuration ID: jira:${jiraName}", {
+        validationError "Wrong format for an issue service configuration ID: jira//${jiraName}", {
             def svnName = uid('S')
             ontrack.configure {
-                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
             }
         }
     }
