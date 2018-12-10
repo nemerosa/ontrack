@@ -31,6 +31,56 @@ For one validation run, one can add comments and update
 the status to reflect (for example, to mention that
 a failure in under investigation).
 
+[[validation-run-status]]
+==== Validation run status
+
+[[validation-run-status-hyperlink]]
+===== Hyperlinks in descriptions
+
+The free text which is entered as description for
+the validation run statuses can be automatically extended
+with hyperlinks.
+
+Such link expansions are done for:
+
+* raw hyperlinks in the text
+* issue references, depending on the project configuration
+
+For example, if one enters the following text as
+a validation run status:
+
+```
+For more information, see http://nemerosa.github.io/ontrack/
+```
+
+the link will be rendered as such:
+
+image::images/extension-free-text-annotations-link.png[Links,400]
+
+If the project is configured with JIRA, any reference
+will be converted to a link to the issue. So a text like
+
+```
+See CLOUD-6800
+```
+
+would be rendered as:
+
+image::images/extension-free-text-annotations-jira.png[JIRA,400]
+
+Same thing for GitHub or GitLab, a text like:
+
+```
+See #631
+```
+
+will be rendered as:
+
+image::images/extension-free-text-annotations-github.png[GitHub,400]
+
+See <<extension-free-text-annotations>> for a way to extend
+this hyperlinking feature.
+
 [[validation-runs-data]]
 ==== Validation run data
 

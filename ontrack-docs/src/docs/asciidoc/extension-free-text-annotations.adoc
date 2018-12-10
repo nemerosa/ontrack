@@ -5,46 +5,53 @@ Some free text can be entered as description for some
 elements of the <<model,model>> and can be automatically extended
 with hyperlinks.
 
-[NOTE]
-====
-As-of now, only the descriptions entered for the
-<<validation-runs,validation run statuses>> are supported
-but this will be extended to other elements in the future.
-====
+See <<validation-run-status-hyperlink>> for this
+feature in the validation run statuses.
 
-Such link expansions are done for:
+Using <<extending,extensions>>, it is possible to extend
+this hyperlinked to other elements.
 
-* raw hyperlinks in the text
-* issue references, depending on the project configuration
+For example, let's imagine that we have a system
+where all references like `[1234]` can be replaced
+to a link to `http://reference/1234` with `1234`
+as a text.
 
-For example, if one enters the following text as
-a validation run status:
+For this, you have to create a `@Component` bean which
+implements the `FreeTextAnnotatorContributor` interface.
 
-```
-For more information, see http://nemerosa.github.io/ontrack/
-```
+The `getMessageAnnotators` returns a list
+of `MessageAnnotator`s used to transform the text
+into a tree of nodes (typically some HTML).
 
-the link will be rendered as such:
+In our example, this can give something like:
 
-image::images/extension-free-text-annotations-link.png[Links,400]
+[source,kotlin]
+----
+@Component
+class RefFreeTextAnnotatorContributor : FreeTextAnnotatorContributor {
+    override fun getMessageAnnotators(entity: ProjectEntity): List<MessageAnnotator> {
+        val regex = "\\[(d+)\\]".toRegex()
+        return listOf(
+                RegexMessageAnnotator(
+                        "\\[d+]\\"
+                ) { match ->
+                    val result = regex.matchEntire(match)
+                    result
+                            ?.let {
+                                val id = it.groups[1].value.toInt(10)
+                                MessageAnnotation.of("a")
+                                        .attr("href", "http://reference/$id")
+                                        .text(id.toString())
+                            }
+                            ?: match
+                }
+        )
+    }
+}
+----
 
-If the project is configured with JIRA, any reference
-will be converted to a link to the issue. So a text like
+This component returns a single `RegexMessageAnnotator` (other implementations are of course possible,
+but this one is very convenient) which, given a regular expression, uses any match to transform
+into something else.
 
-```
-See CLOUD-6800
-```
-
-would be rendered as:
-
-image::images/extension-free-text-annotations-jira.png[JIRA,400]
-
-Same thing for GitHub or GitLab, a text like:
-
-```
-See #631
-```
-
-will be rendered as:
-
-image::images/extension-free-text-annotations-github.png[GitHub,400]
+In our example, we extract the ID from the expression and return a link.
