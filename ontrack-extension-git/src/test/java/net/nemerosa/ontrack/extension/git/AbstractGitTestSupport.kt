@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
@@ -108,6 +109,11 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
             gitCommitPropertyCommitLink,
             NoConfig.INSTANCE
     )
+
+    /**
+     * Configuration of a build commit link based on tag as build name.
+     */
+    protected fun tagBuildName() = TagBuildNameGitCommitLink.DEFAULT
 
     /**
      * Sets the Git commit property on a build

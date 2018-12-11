@@ -208,6 +208,44 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         }
     }
 
+    @Test
+    fun `Commit on one branch with tag build name property`() {
+        createRepo {
+            sequence(
+                    (1..3),
+                    4 to "1.0.0",
+                    5,
+                    6 to "1.0.1",
+                    (7..8),
+                    9 to "1.0.2",
+                    10
+            )
+        } and { repo, commits ->
+            project {
+                gitProject(repo)
+                branch("master") {
+                    gitBranch("master") {
+                        tagBuildName()
+                    }
+                    // Validations
+                    val test1 = validationStamp("Test1")
+                    val test2 = validationStamp("Test2")
+                    // Promotions
+                    val silver = promotionLevel("SILVER")
+                    // Creates some builds on this branch, using the tags above
+                    build(4, commits, listOf(test1), name = "1.0.0")
+                    build(6, commits, listOf(test1, test2), listOf(silver), name = "1.0.1")
+                    build(9, commits, name = "1.0.2")
+                }
+                // Tests for commit 2
+                commitInfoTest(this, commits, 5) {
+                    assertCountBuildViews(1)
+                    buildViewTest(0, "1.0.1", setOf("Test1", "Test2"), setOf("SILVER"))
+                }
+            }
+        }
+    }
+
     private fun commitInfoTest(
             project: Project,
             commits: Map<Int, String>,
@@ -252,9 +290,11 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
             no: Int,
             commits: Map<Int, String>,
             validations: List<ValidationStamp> = emptyList(),
-            promotions: List<PromotionLevel> = emptyList()
+            promotions: List<PromotionLevel> = emptyList(),
+            name: String? = null
     ) {
-        build(no.toString()) {
+        val buildName = name ?: no.toString()
+        build(buildName) {
             gitCommitProperty(commits.getOrFail(no))
             validations.forEach { validate(it) }
             promotions.forEach { promote(it) }
