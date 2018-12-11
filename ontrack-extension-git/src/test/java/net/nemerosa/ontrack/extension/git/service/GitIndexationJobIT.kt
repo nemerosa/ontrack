@@ -73,7 +73,7 @@ class GitIndexationJobIT : AbstractServiceTestSupport() {
             // Checks that the indexation job is registered
             var statuses = jobScheduler.jobStatuses
             var status = statuses.find {
-                it.description == "file://${dir.absolutePath} ($gitConfigurationName @ basic)" as String
+                it.description == "file://${dir.absolutePath} ($gitConfigurationName @ basic)"
             }
             assertNotNull(status, "The indexation job must be present")
 
@@ -105,12 +105,12 @@ class GitIndexationJobIT : AbstractServiceTestSupport() {
             // Checks that the NEW indexation job is registered
             statuses = jobScheduler.jobStatuses
             status = statuses.find {
-                it.description == "file://${newRepo.dir.absolutePath} (${gitConfigurationName} @ basic)" as String
+                it.description == "file://${newRepo.dir.absolutePath} (${gitConfigurationName} @ basic)"
             }
             assertNotNull(status, "The new indexation job must be present")
             // Checks that the OLD indexation job is gone
             status = statuses.find {
-                it.description == "file://${dir.absolutePath} ($gitConfigurationName @ basic)" as String
+                it.description == "file://${dir.absolutePath} ($gitConfigurationName @ basic)"
             }
             assertNull(status, "The old indexation job must be done")
         }

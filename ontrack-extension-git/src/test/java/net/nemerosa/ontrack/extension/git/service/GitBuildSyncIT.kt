@@ -56,7 +56,7 @@ class GitBuildSyncIT : AbstractServiceTestSupport() {
 
             log()
 
-        } and { client, repo ->
+        } and { _, repo ->
 
             // Create a Git configuration
             val gitConfigurationName = uid("C")
