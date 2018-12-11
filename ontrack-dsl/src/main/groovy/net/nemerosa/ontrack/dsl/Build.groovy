@@ -46,14 +46,14 @@ class Build extends AbstractProjectResource {
         run
     }
 
-    @DSLMethod(id = "validate", count = 2)
-    ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED') {
+    @DSLMethod(id = "validate", count = 3)
+    ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED', String description = "") {
         new ValidationRun(
                 ontrack,
                 ontrack.post(link('validate'), [
                         validationStampName  : validationStamp,
                         validationRunStatusId: validationStampStatus,
-                        description          : ''
+                        description          : description
                 ])
         )
     }

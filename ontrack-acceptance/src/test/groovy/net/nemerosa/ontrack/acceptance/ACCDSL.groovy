@@ -1592,7 +1592,7 @@ class ACCDSL extends AbstractACCDSL {
         def gitName = uid('G')
         ontrack.configure {
             jira jiraName, 'http://jira'
-            git gitName, remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+            git gitName, remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
         }
     }
 

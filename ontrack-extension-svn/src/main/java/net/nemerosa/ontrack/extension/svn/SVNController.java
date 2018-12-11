@@ -134,7 +134,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return SVNConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
+        return SVNConfiguration.Companion.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**

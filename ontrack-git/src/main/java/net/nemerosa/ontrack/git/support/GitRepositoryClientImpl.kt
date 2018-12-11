@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
+import java.lang.IllegalStateException
 import java.lang.String.format
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -250,7 +251,9 @@ class GitRepositoryClientImpl(
                 }
             }
 
-            val oHead = gitRepository.resolve(getBranchRef(branch))
+            val oHead: ObjectId = gitRepository.resolve(getBranchRef(branch))
+                    ?: gitRepository.resolve("refs/heads/$branch")
+                    ?: throw IllegalStateException("Cannot resolve commit for branch $branch")
 
             val walk = RevWalk(gitRepository)
 

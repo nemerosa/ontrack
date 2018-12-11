@@ -63,6 +63,15 @@ class GQLTypeValidationRun(
                                 .name("validationRunStatuses")
                                 .description("List of validation statuses")
                                 .type(stdList(validationRunStatus.typeRef))
+                                .dataFetcher { environment ->
+                                    val validationRun = environment.getSource<ValidationRun>()
+                                    validationRun.validationRunStatuses.map { status ->
+                                        GQLTypeValidationRunStatus.Data(
+                                                validationRun,
+                                                status
+                                        )
+                                    }
+                                }
                     }
                     // Run info
                     .field {

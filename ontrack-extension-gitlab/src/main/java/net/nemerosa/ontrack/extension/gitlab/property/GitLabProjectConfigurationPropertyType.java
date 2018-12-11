@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -131,7 +132,7 @@ public class GitLabProjectConfigurationPropertyType
         // OK
         return new GitLabProjectConfigurationProperty(
                 configuration,
-                node.path("issueServiceConfigurationIdentifier").asText(),
+                JsonUtils.get(node, "issueServiceConfigurationIdentifier", null),
                 node.path("repository").asText(),
                 node.path("indexationInterval").asInt()
         );
