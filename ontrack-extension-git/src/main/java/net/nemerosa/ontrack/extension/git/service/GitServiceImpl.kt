@@ -366,7 +366,7 @@ class GitServiceImpl(
                 // Collects branch info
                 var branchInfo = SCMIssueCommitBranchInfo.of(branch)
                 // Gets the last build for this branch
-                val buildAfterCommit = getEarliestBuildAfterCommit<Any>(commitId, branch, branchConfiguration, client)
+                val buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client)
                 branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo)
                 // Adds the info
                 commitInfo!!.add(branchInfo)
@@ -491,7 +491,7 @@ class GitServiceImpl(
                     // Gets its Git configuration
                     val branchConfiguration = getRequiredBranchConfiguration(branch)
                     // Gets the earliest build on this branch that contains this commit
-                    val build = getEarliestBuildAfterCommit<Any>(commit, branch, branchConfiguration, repositoryClient)
+                    val build = getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient)
                     if (build != null) {
                         // Gets the build view
                         val buildView = structureService.getBuildView(build, true)
@@ -524,9 +524,12 @@ class GitServiceImpl(
         )
     }
 
-    protected fun <T> getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
-        @Suppress("UNCHECKED_CAST")
-        val configuredBuildGitCommitLink = branchConfiguration.buildCommitLink as ConfiguredBuildGitCommitLink<T>
+    internal fun getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
+        val configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<*> = branchConfiguration.buildCommitLink
+        return getEarliestBuildAfterCommit(commit, branch, branchConfiguration, client, configuredBuildGitCommitLink)
+    }
+
+    private fun <T> getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient, configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<T>): Build? {
         // Delegates to the build commit link...
         val buildId = configuredBuildGitCommitLink.link.getEarliestBuildAfterCommit(
                 branch,
