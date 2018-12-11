@@ -162,6 +162,13 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                 is IntRange -> command.forEach {
                     index[it] = commit(it)
                 }
+                // Commit to tag
+                is Pair<*, *> -> {
+                    val commit = command.first as Int
+                    val tag = command.second as String
+                    index[commit] = commit(commit)
+                    tag(tag)
+                }
                 // Any other item
                 else -> throw IllegalArgumentException("Unknown type: $command")
             }

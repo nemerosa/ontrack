@@ -227,20 +227,15 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     gitBranch("master") {
                         tagBuildName()
                     }
-                    // Validations
-                    val test1 = validationStamp("Test1")
-                    val test2 = validationStamp("Test2")
-                    // Promotions
-                    val silver = promotionLevel("SILVER")
                     // Creates some builds on this branch, using the tags above
-                    build(4, commits, listOf(test1), name = "1.0.0")
-                    build(6, commits, listOf(test1, test2), listOf(silver), name = "1.0.1")
-                    build(9, commits, name = "1.0.2")
+                    build("1.0.0")
+                    build("1.0.1")
+                    build("1.0.2")
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 5) {
                     assertCountBuildViews(1)
-                    buildViewTest(0, "1.0.1", setOf("Test1", "Test2"), setOf("SILVER"))
+                    buildViewTest(0, "1.0.1")
                 }
             }
         }
@@ -290,11 +285,9 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
             no: Int,
             commits: Map<Int, String>,
             validations: List<ValidationStamp> = emptyList(),
-            promotions: List<PromotionLevel> = emptyList(),
-            name: String? = null
+            promotions: List<PromotionLevel> = emptyList()
     ) {
-        val buildName = name ?: no.toString()
-        build(buildName) {
+        build(no.toString()) {
             gitCommitProperty(commits.getOrFail(no))
             validations.forEach { validate(it) }
             promotions.forEach { promote(it) }

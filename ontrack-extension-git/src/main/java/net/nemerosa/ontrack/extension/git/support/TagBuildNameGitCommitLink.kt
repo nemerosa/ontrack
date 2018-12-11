@@ -58,8 +58,8 @@ class TagBuildNameGitCommitLink(
         return gitClient.getTagsWhichContainCommit(commit)
                 // ... gets the builds
                 .mapNotNull { buildName -> structureService.findBuildByName(branch.project.name, branch.name, buildName).orElse(null) }
-                // ... sort by decreasing date
-                .sortedByDescending { it.id() }
+                // ... sort by ID (from the oldest build to the newest)
+                .sortedBy { it.id() }
                 // ... takes the first build
                 .firstOrNull()
                 // ... and its ID
@@ -84,5 +84,5 @@ class TagBuildNameGitCommitLink(
     override fun isBuildNameValid(name: String, data: NoConfig): Boolean {
         return true
     }
-    
+
 }
