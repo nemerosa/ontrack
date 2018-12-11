@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 import java.util.stream.Stream
 
 @Component
@@ -20,15 +19,10 @@ class TagBuildNameGitCommitLink(
         private val structureService: StructureService
 ) : IndexableBuildGitCommitLink<NoConfig> {
 
-    override fun getId(): String {
-        return "tag"
-    }
+    override val id: String = "tag"
+    override val name: String = "Tag as name"
 
-    override fun getName(): String {
-        return "Tag as name"
-    }
-
-    override fun clone(data: NoConfig, replacementFunction: Function<String, String>): NoConfig {
+    override fun clone(data: NoConfig, replacementFunction: (String) -> String): NoConfig {
         return data
     }
 
@@ -36,7 +30,7 @@ class TagBuildNameGitCommitLink(
         return build.name
     }
 
-    override fun parseData(node: JsonNode): NoConfig {
+    override fun parseData(node: JsonNode?): NoConfig {
         return NoConfig.INSTANCE
     }
 
@@ -44,9 +38,7 @@ class TagBuildNameGitCommitLink(
         return JsonUtils.`object`().end()
     }
 
-    override fun getForm(): Form {
-        return Form.create()
-    }
+    override val form: Form = Form.create()
 
     override fun getEarliestBuildAfterCommit(
             branch: Branch,

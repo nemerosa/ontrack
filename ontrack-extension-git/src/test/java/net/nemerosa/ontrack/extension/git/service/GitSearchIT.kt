@@ -41,6 +41,9 @@ class GitSearchIT : AbstractServiceTestSupport() {
     @Autowired
     private lateinit var mockIssueServiceExtension: MockIssueServiceExtension
 
+    @Autowired
+    private lateinit var commitBuildNameGitCommitLink: CommitBuildNameGitCommitLink
+
     @Test
     fun `Issue search on one branch`() {
         // Git repository
@@ -84,7 +87,7 @@ class GitSearchIT : AbstractServiceTestSupport() {
                         GitBranchConfigurationProperty(
                                 "master",
                                 ConfiguredBuildGitCommitLink(
-                                        CommitBuildNameGitCommitLink(),
+                                        commitBuildNameGitCommitLink,
                                         CommitLinkConfig(true)
                                 ).toServiceConfiguration(),
                                 false, 0
@@ -178,7 +181,7 @@ class GitSearchIT : AbstractServiceTestSupport() {
                         GitBranchConfigurationProperty(
                                 "master",
                                 ConfiguredBuildGitCommitLink(
-                                        CommitBuildNameGitCommitLink(),
+                                        commitBuildNameGitCommitLink,
                                         CommitLinkConfig(true)
                                 ).toServiceConfiguration(),
                                 false, 0
@@ -190,7 +193,7 @@ class GitSearchIT : AbstractServiceTestSupport() {
                         GitBranchConfigurationProperty(
                                 "1.0",
                                 ConfiguredBuildGitCommitLink(
-                                        CommitBuildNameGitCommitLink(),
+                                        commitBuildNameGitCommitLink,
                                         CommitLinkConfig(true)
                                 ).toServiceConfiguration(),
                                 false, 0
