@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
-import java.util.function.Function
 import java.util.regex.Pattern
 import java.util.stream.Stream
 
@@ -22,15 +21,10 @@ class CommitBuildNameGitCommitLink : BuildGitCommitLink<CommitLinkConfig> {
     private val abbreviatedPattern = Pattern.compile("[0-9a-f]{7}")
     private val fullPattern = Pattern.compile("[0-9a-f]{40}")
 
-    override fun getId(): String {
-        return "commit"
-    }
+    override val id: String = "commit"
+    override val name: String = "Commit as name"
 
-    override fun getName(): String {
-        return "Commit as name"
-    }
-
-    override fun clone(data: CommitLinkConfig, replacementFunction: Function<String, String>): CommitLinkConfig {
+    override fun clone(data: CommitLinkConfig, replacementFunction: (String) -> String): CommitLinkConfig {
         return data
     }
 
@@ -38,7 +32,7 @@ class CommitBuildNameGitCommitLink : BuildGitCommitLink<CommitLinkConfig> {
         return build.name
     }
 
-    override fun parseData(node: JsonNode): CommitLinkConfig {
+    override fun parseData(node: JsonNode?): CommitLinkConfig {
         try {
             return ObjectMapperFactory.create().treeToValue(node, CommitLinkConfig::class.java)
         } catch (e: JsonProcessingException) {
@@ -51,14 +45,17 @@ class CommitBuildNameGitCommitLink : BuildGitCommitLink<CommitLinkConfig> {
         return ObjectMapperFactory.create().valueToTree(data)
     }
 
-    override fun getForm(): Form {
-        return Form.create()
+    override val form: Form
+        get() = Form.create()
                 .with(
                         YesNo.of("abbreviated")
                                 .label("Abbreviated")
                                 .help("Using abbreviated commit hashes or not.")
                                 .value(true)
                 )
+
+    override fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: CommitLinkConfig, commit: String): Int? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun getBuildCandidateReferences(commit: String, branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: CommitLinkConfig): Stream<String> {

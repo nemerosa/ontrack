@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
-import java.util.function.Function
 import java.util.stream.Stream
 
 /**
@@ -25,15 +24,10 @@ class GitCommitPropertyCommitLink(
         private val propertyService: PropertyService
 ) : BuildGitCommitLink<NoConfig> {
 
-    override fun getId(): String {
-        return "git-commit-property"
-    }
+    override val id: String = "git-commit-property"
+    override val name: String = "Git Commit Property"
 
-    override fun getName(): String {
-        return "Git Commit Property"
-    }
-
-    override fun clone(data: NoConfig, replacementFunction: Function<String, String>): NoConfig {
+    override fun clone(data: NoConfig, replacementFunction: (String) -> String): NoConfig {
         return data
     }
 
@@ -44,7 +38,7 @@ class GitCommitPropertyCommitLink(
                 .orElseThrow { NoGitCommitPropertyException(build.entityDisplayName) }
     }
 
-    override fun parseData(node: JsonNode): NoConfig {
+    override fun parseData(node: JsonNode?): NoConfig {
         return NoConfig.INSTANCE
     }
 
@@ -52,9 +46,7 @@ class GitCommitPropertyCommitLink(
         return JsonUtils.`object`().end()
     }
 
-    override fun getForm(): Form {
-        return Form.create()
-    }
+    override val form: Form = Form.create()
 
     override fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: NoConfig, commit: String): Int? {
         // Loops over the commits on this branch, starting from this commit

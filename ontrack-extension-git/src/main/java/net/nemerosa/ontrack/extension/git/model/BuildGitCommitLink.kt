@@ -1,0 +1,91 @@
+package net.nemerosa.ontrack.extension.git.model
+
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
+import java.util.stream.Stream
+
+/**
+ * Defines the way to link builds to Git commits, in order to manage the change logs, the Git searches
+ * and synchronisations.
+ *
+ * @param <T> Type of configuration data
+ */
+interface BuildGitCommitLink<T> {
+
+    /**
+     * ID of the link
+     */
+    val id: String
+
+    /**
+     * Display name for the link
+     */
+    val name: String
+
+    /**
+     * Creates a form for the edition of the link configuration.
+     */
+    val form: Form
+
+    /**
+     * Clones the configuration.
+     */
+    fun clone(data: T, replacementFunction: (String) -> String): T
+
+    /**
+     * For the given `build`, returns the corresponding Git commit
+     *
+     * @param build Build to get the commit for
+     * @param data  Configuration of the link
+     * @return Committish (short or long SHA, tag, head, etc.)
+     */
+    fun getCommitFromBuild(build: Build, data: T): String
+
+    /**
+     * Parses the configuration from a JSON node
+     */
+    fun parseData(node: JsonNode?): T
+
+    /**
+     * Formats the configuration data as JSON
+     */
+    fun toJson(data: T): JsonNode
+
+    /**
+     * Gets the list of build names from Git reference candidates
+     *
+     * @param commit              The commit to start from
+     * @param branch              Branch where to look the build into
+     * @param gitClient           The Git client to use for the connection
+     * @param branchConfiguration Git branch configuration
+     * @param data                Configuration data
+     * @return Candidate build names
+     */
+    @Deprecated("")
+    fun getBuildCandidateReferences(commit: String, branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: T): Stream<String>
+
+    /**
+     * Checks if a build is eligible after it has been loaded from a
+     * [.getBuildCandidateReferences]
+     *
+     * @param build Build to check
+     * @param data  Configuration data
+     * @return `true` if the build is linked to the configuration
+     */
+    @Deprecated("")
+    fun isBuildEligible(build: Build, data: T): Boolean
+
+    /**
+     * Gets the earliest build after a given commit on a branch.
+     */
+    // TODO Documentation
+    fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: T, commit: String): Int?
+
+    /**
+     * Checks if a build name is valid for this configuration.
+     */
+    fun isBuildNameValid(name: String, data: T): Boolean
+}

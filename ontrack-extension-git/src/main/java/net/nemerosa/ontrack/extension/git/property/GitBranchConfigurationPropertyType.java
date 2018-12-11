@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
-import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.*;
@@ -162,18 +161,18 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     public GitBranchConfigurationProperty replaceValue(GitBranchConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitBranchConfigurationProperty(
                 replacementFunction.apply(value.getBranch()),
-                replaceBuildCommitLink(value.getBuildCommitLink(), replacementFunction),
+                value.getBuildCommitLink() != null ? replaceBuildCommitLink(value.getBuildCommitLink(), replacementFunction) : null,
                 value.isOverride(),
                 value.getBuildTagInterval()
         );
     }
 
-    protected <T> ServiceConfiguration replaceBuildCommitLink(ServiceConfiguration configuration, Function<String, String> replacementFunction) {
+    private <T> ServiceConfiguration replaceBuildCommitLink(ServiceConfiguration configuration, Function<String, String> replacementFunction) {
         String linkId = configuration.getId();
         @SuppressWarnings("unchecked")
         BuildGitCommitLink<T> link = (BuildGitCommitLink<T>) buildGitCommitLinkService.getLink(linkId);
         T linkData = link.parseData(configuration.getData());
-        T clonedData = link.clone(linkData, replacementFunction);
+        T clonedData = link.clone(linkData, replacementFunction::apply);
         JsonNode node = link.toJson(clonedData);
         return new ServiceConfiguration(
                 linkId,
