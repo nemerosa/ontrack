@@ -30,6 +30,9 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
     private lateinit var gitCommitPropertyCommitLink: GitCommitPropertyCommitLink
 
     @Autowired
+    private lateinit var tagBuildNameGitCommitLink: TagBuildNameGitCommitLink
+
+    @Autowired
     private lateinit var gitConfigurationService: GitConfigurationService
 
     @Autowired
@@ -113,7 +116,10 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
     /**
      * Configuration of a build commit link based on tag as build name.
      */
-    protected fun tagBuildName() = TagBuildNameGitCommitLink.DEFAULT
+    protected fun tagBuildName() = ConfiguredBuildGitCommitLink(
+            tagBuildNameGitCommitLink,
+            NoConfig.INSTANCE
+    )
 
     /**
      * Sets the Git commit property on a build

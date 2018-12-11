@@ -12,7 +12,7 @@ class GitBranchConfigurationProperty(
         /**
          * Build link
          */
-        val buildCommitLink: ServiceConfiguration,
+        val buildCommitLink: ServiceConfiguration?,
 
         /**
          * Build overriding policy when synchronizing

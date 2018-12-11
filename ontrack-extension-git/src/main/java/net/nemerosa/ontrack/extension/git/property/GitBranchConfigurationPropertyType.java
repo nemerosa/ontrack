@@ -126,12 +126,12 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
             JsonNode linkNode = node.get("buildCommitLink");
             configuredBuildGitCommitLink = parseBuildCommitLink(linkNode);
         } else {
-            configuredBuildGitCommitLink = TagBuildNameGitCommitLink.Companion.getDEFAULT();
+            configuredBuildGitCommitLink = null;
         }
-        boolean indexationAvailable = configuredBuildGitCommitLink.getLink() instanceof IndexableBuildGitCommitLink;
+        boolean indexationAvailable = configuredBuildGitCommitLink != null && configuredBuildGitCommitLink.getLink() instanceof IndexableBuildGitCommitLink;
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
-                configuredBuildGitCommitLink.toServiceConfiguration(),
+                configuredBuildGitCommitLink != null ? configuredBuildGitCommitLink.toServiceConfiguration() : null,
                 indexationAvailable && JsonUtils.getBoolean(node, "override", false),
                 indexationAvailable ? JsonUtils.getInt(node, "buildTagInterval", 0) : 0
         );

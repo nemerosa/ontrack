@@ -3,17 +3,16 @@ package net.nemerosa.ontrack.extension.git.support
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
-import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.support.NoConfig
-import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.util.Collections
 import java.util.function.Function
 import java.util.stream.Stream
 
@@ -23,8 +22,7 @@ import java.util.stream.Stream
  */
 @Component
 class GitCommitPropertyCommitLink(
-        private val propertyService: PropertyService,
-        private val structureService: StructureService
+        private val propertyService: PropertyService
 ) : BuildGitCommitLink<NoConfig> {
 
     override fun getId(): String {

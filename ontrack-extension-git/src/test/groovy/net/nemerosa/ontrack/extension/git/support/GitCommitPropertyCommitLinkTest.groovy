@@ -15,15 +15,12 @@ class GitCommitPropertyCommitLinkTest {
 
     private GitCommitPropertyCommitLink link
     private PropertyService propertyService
-    private StructureService structureService
 
     @Before
     void before() {
         propertyService = mock(PropertyService)
-        structureService = mock(StructureService)
         link = new GitCommitPropertyCommitLink(
-                propertyService,
-                structureService
+                propertyService
         )
     }
 

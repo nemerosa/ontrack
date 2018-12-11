@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git.support
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink
 import net.nemerosa.ontrack.git.GitRepositoryClient
@@ -9,15 +8,17 @@ import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
-
-import java.util.Optional
+import java.util.*
 import java.util.function.Function
 import java.util.stream.Stream
 
 @Component
-class TagBuildNameGitCommitLink : IndexableBuildGitCommitLink<NoConfig> {
+class TagBuildNameGitCommitLink(
+        private val structureService: StructureService
+) : IndexableBuildGitCommitLink<NoConfig> {
 
     override fun getId(): String {
         return "tag"
@@ -54,8 +55,15 @@ class TagBuildNameGitCommitLink : IndexableBuildGitCommitLink<NoConfig> {
             data: NoConfig,
             commit: String
     ): Int? {
-        val tags = gitClient.getTagsWhichContainCommit(commit)
-        return super.getEarliestBuildAfterCommit(branch, gitClient, branchConfiguration, data, commit)
+        return gitClient.getTagsWhichContainCommit(commit)
+                // ... gets the builds
+                .mapNotNull { buildName -> structureService.findBuildByName(branch.project.name, branch.name, buildName).orElse(null) }
+                // ... sort by decreasing date
+                .sortedByDescending { it.id() }
+                // ... takes the first build
+                .firstOrNull()
+                // ... and its ID
+                ?.id()
     }
 
     /**
@@ -76,15 +84,5 @@ class TagBuildNameGitCommitLink : IndexableBuildGitCommitLink<NoConfig> {
     override fun isBuildNameValid(name: String, data: NoConfig): Boolean {
         return true
     }
-
-    companion object {
-
-        /**
-         * Available as default
-         */
-        val DEFAULT = ConfiguredBuildGitCommitLink(
-                TagBuildNameGitCommitLink(),
-                NoConfig.INSTANCE
-        )
-    }
+    
 }

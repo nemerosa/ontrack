@@ -88,7 +88,7 @@ class GitServiceImpl(
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch(BiConsumer { branch, branchConfiguration ->
             // Build/tag sync job
-            if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink.link is IndexableBuildGitCommitLink<*>) {
+            if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
                 jobs.add(
                         JobRegistration.of(createBuildSyncJob(branch))
                                 .everyMinutes(branchConfiguration.buildTagInterval.toLong())
@@ -109,7 +109,7 @@ class GitServiceImpl(
         // Gets its configuration
         val branchConfiguration = getBranchConfiguration(branch)
         // If valid, launches a job
-        return if (branchConfiguration != null && branchConfiguration.buildCommitLink.link is IndexableBuildGitCommitLink<*>) {
+        return if (branchConfiguration != null && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
             if (synchronous) {
                 buildSync<Any>(branch, branchConfiguration, JobRunListener.logger(logger))
                 null
@@ -525,8 +525,10 @@ class GitServiceImpl(
     }
 
     internal fun getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
-        val configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<*> = branchConfiguration.buildCommitLink
-        return getEarliestBuildAfterCommit(commit, branch, branchConfiguration, client, configuredBuildGitCommitLink)
+        val configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<*>? = branchConfiguration.buildCommitLink
+        return configuredBuildGitCommitLink?.let {
+            getEarliestBuildAfterCommit(commit, branch, branchConfiguration, client, it)
+        }
     }
 
     private fun <T> getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient, configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<T>): Build? {
@@ -616,22 +618,19 @@ class GitServiceImpl(
         if (configuration != null) {
             // Gets the configuration for a branch
             val gitBranch: String
-            val buildCommitLink: ConfiguredBuildGitCommitLink<*>
+            val buildCommitLink: ConfiguredBuildGitCommitLink<*>?
             val override: Boolean
             val buildTagInterval: Int
             val branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java)
             if (!branchConfig.isEmpty) {
                 gitBranch = branchConfig.value.branch
-                buildCommitLink = toConfiguredBuildGitCommitLink<Any>(
-                        branchConfig.value.buildCommitLink
-                )
+                buildCommitLink = branchConfig.value.buildCommitLink?.let {
+                    toConfiguredBuildGitCommitLink<Any>(it)
+                }
                 override = branchConfig.value.isOverride
                 buildTagInterval = branchConfig.value.buildTagInterval
             } else {
-                gitBranch = "master"
-                buildCommitLink = TagBuildNameGitCommitLink.DEFAULT
-                override = false
-                buildTagInterval = 0
+                return null
             }
             // OK
             return GitBranchConfiguration(
@@ -727,9 +726,14 @@ class GitServiceImpl(
         val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
         // Link
         @Suppress("UNCHECKED_CAST")
-        val link = branchConfiguration.buildCommitLink.link as IndexableBuildGitCommitLink<T>
+        val link = branchConfiguration.buildCommitLink?.link as IndexableBuildGitCommitLink<T>?
         @Suppress("UNCHECKED_CAST")
-        val linkData = branchConfiguration.buildCommitLink.data as T
+        val linkData = branchConfiguration.buildCommitLink?.data as T?
+        // Check for configuration
+        if (link == null || linkData == null) {
+            listener.message("No commit link configuration on the branch - no synchronization.")
+            return
+        }
         // Configuration for the sync
         val confProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java)
         val override = !confProperty.isEmpty && confProperty.value.isOverride
