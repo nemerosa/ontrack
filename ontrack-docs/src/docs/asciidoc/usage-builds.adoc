@@ -88,6 +88,14 @@ promoted, the associated promotions will also be displayed.
 
 image::images/property-build-links-decoration-promotions.png[Build links promotions,400]
 
+[NOTE]
+====
+If the target project (the project containing the build targeted by
+the link) has been <<property-build-link-display-options,configured accordingly>>,
+the _label_ associated to the build will be displayed instead of its
+name.
+====
+
 [[builds-links-information]]
 ===== Information
 
