@@ -7,6 +7,39 @@ import kotlin.test.assertEquals
 class ValidationRunQLIT : AbstractQLKTITSupport() {
 
     @Test
+    fun `Validation run status with links in description`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    val run = validate(
+                            validationStamp = vs,
+                            validationRunStatusID = ValidationRunStatusID.STATUS_FAILED,
+                            description = "Some text"
+                    ).apply {
+                        validationStatus(ValidationRunStatusID.STATUS_DEFECTIVE, "See https://issues/browser/ONT-1234")
+                    }
+                    val data = run("""{
+                        validationRuns(id: ${run.id}) {
+                            validationRunStatuses {
+                                annotatedDescription
+                            }
+                        }
+                    }""")
+                    val descriptions = data["validationRuns"][0]["validationRunStatuses"].map { it["annotatedDescription"].asText() }
+                    assertEquals(
+                            listOf(
+                                    """See <a href="https://issues/browser/ONT-1234" target="_blank">https://issues/browser/ONT-1234</a>""",
+                                    "Some text"
+                            ),
+                            descriptions
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Validation run statuses for a validation run`() {
         project {
             branch {

@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -130,7 +131,7 @@ public class GitHubProjectConfigurationPropertyType
                 configuration,
                 node.path("repository").asText(),
                 node.path("indexationInterval").asInt(),
-                node.path("issueServiceConfigurationIdentifier").asText()
+                JsonUtils.get(node, "issueServiceConfigurationIdentifier", null)
         );
     }
 

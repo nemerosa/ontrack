@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationIdentifier;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
@@ -15,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-
-import static net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration.CONFIGURATION_REPOSITORY_SEPARATOR;
 
 @Component
 public class GitHubConfigurator implements GitConfigurator {
@@ -60,14 +57,7 @@ public class GitHubConfigurator implements GitConfigurator {
                     )
             );
         } else {
-            return issueServiceRegistry.getConfiguredIssueService(
-                    new IssueServiceConfigurationIdentifier(
-                            GitHubIssueServiceExtension.GITHUB_SERVICE_ID,
-                            property.getConfiguration().getName()
-                                    + CONFIGURATION_REPOSITORY_SEPARATOR
-                                    + property.getRepository()
-                    ).format()
-            );
+            return issueServiceRegistry.getConfiguredIssueService(identifier);
         }
     }
 }

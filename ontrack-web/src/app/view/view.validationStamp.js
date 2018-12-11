@@ -112,11 +112,16 @@ angular.module('ot.view.validationStamp', [
                           data
                         }
                         validationRunStatuses {
+                          creation {
+                            user
+                            time
+                          }
                           statusID {
                             id
                             name
                           }
                           description
+                          annotatedDescription
                         }
                       }
                     }

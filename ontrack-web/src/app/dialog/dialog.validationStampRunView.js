@@ -76,6 +76,7 @@ angular.module('ot.dialog.validationStampRunView', [
                                 time
                               }
                               description
+                              annotatedDescription
                               statusID {
                                 id
                                 name

@@ -396,3 +396,5 @@ include::extending-settings.adoc[]
 include::extending-security.adoc[]
 
 include::extending-encryption.adoc[]
+
+include::extension-free-text-annotations.adoc[]

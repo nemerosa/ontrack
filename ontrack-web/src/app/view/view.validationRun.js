@@ -1,7 +1,8 @@
 angular.module('ot.view.validationRun', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('validationRun', {
@@ -10,31 +11,97 @@ angular.module('ot.view.validationRun', [
             controller: 'ValidationRunCtrl'
         });
     })
-    .controller('ValidationRunCtrl', function ($scope, $stateParams, $http, ot, otStructureService) {
-        var view = ot.view();
+    .controller('ValidationRunCtrl', function ($scope, $stateParams, $http, ot, otStructureService, otGraphqlService) {
+        const view = ot.view();
         // Validation run's id
-        var validationRunId = $stateParams.validationRunId;
-
-        // Loads the validation stamp for the run
-        function loadValidationStamp() {
-            ot.call($http.get($scope.validationRun._validationStampLink)).then(function (validationStampResource) {
-                $scope.validationStamp = validationStampResource;
-            });
-        }
+        const validationRunId = $stateParams.validationRunId;
+        // GraphQL query to load the validation run
+        const query = `
+            query LoadValidationRun($validationRunId: Int!) {
+                validationRuns(id: $validationRunId) {
+                    id
+                    runOrder
+                    validationStamp {
+                        id
+                        name
+                        image
+                        _image
+                    }
+                    decorations {
+                      decorationType
+                      data
+                      error
+                      feature {
+                        id
+                      }
+                    }
+                    build {
+                      id
+                      name
+                      branch {
+                        id
+                        name
+                        project {
+                          id
+                          name
+                        }
+                      }
+                    }
+                    creation {
+                      user
+                      time
+                    }
+                    data {
+                      descriptor {
+                        id
+                        feature {
+                          id
+                        }
+                      }
+                      data
+                    }
+                    validationRunStatuses {
+                      statusID {
+                        id
+                        name
+                      }
+                      creation {
+                        user
+                        time
+                      }
+                      description
+                      annotatedDescription
+                    }
+                    links {
+                        _self
+                        _validationRunStatusChange
+                        _properties
+                        _extra
+                    }
+                }
+            }
+        `;
+        const queryVariables = {
+            validationRunId: validationRunId
+        };
+        let viewInitialised = false;
 
         // Loads the validation run
         function loadValidationRun() {
-            ot.call($http.get('structure/validationRuns/' + validationRunId)).then(function (validationRunResource) {
-                $scope.validationRun = validationRunResource;
-                // View configuration
-                view.breadcrumbs = ot.buildBreadcrumbs(validationRunResource.build);
-                // Loads the validation stamp
-                loadValidationStamp();
-                // Commands
-                view.commands = [
-                    ot.viewApiCommand(validationRunResource._self),
-                    ot.viewCloseCommand('/build/' + validationRunResource.build.id)
-                ];
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then(function (data) {
+                const validationRun = data.validationRuns[0];
+                $scope.validationRun = validationRun;
+                if (!viewInitialised) {
+                    // View configuration
+                    view.breadcrumbs = ot.buildBreadcrumbs(validationRun.build);
+                    // Commands
+                    view.commands = [
+                        ot.viewApiCommand(validationRun.links._self),
+                        ot.viewCloseCommand('/build/' + validationRun.build.id)
+                    ];
+                    // OK
+                    viewInitialised = true;
+                }
             });
         }
 
@@ -44,7 +111,7 @@ angular.module('ot.view.validationRun', [
         // Changing the validation run status
         $scope.validationRunStatusChange = function () {
             otStructureService.create(
-                $scope.validationRun._validationRunStatusChange,
+                $scope.validationRun.links._validationRunStatusChange,
                 'Status').then(loadValidationRun);
         };
 

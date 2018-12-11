@@ -142,7 +142,12 @@ angular.module('ot.view.build', [
                           id
                           name
                         }
+                        creation {
+                          user
+                          time
+                        }
                         description
+                        annotatedDescription
                       }
                       runInfo {
                         ...runInfoContent

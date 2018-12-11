@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.extension.stash.StashExtensionFeature;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -122,7 +123,7 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
                 node.path("project").asText(),
                 node.path("repository").asText(),
                 node.path("indexationInterval").asInt(),
-                node.path("issueServiceConfigurationIdentifier").asText()
+                JsonUtils.get(node, "issueServiceConfigurationIdentifier", null)
         );
     }
 
