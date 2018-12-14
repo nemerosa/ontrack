@@ -51,7 +51,7 @@ You can `POST` this file to the Ontrack GraphQL end point, for example:
 
 [source,bash]
 ----
-curl -X POST --user user http://localhost:8080/graphql --data @query.json
+curl -X POST --user user http://localhost:8080/graphql --data @query.json -H "Content-Type: application/json"
 ----
 
 [[integration-graphql-dsl]]
