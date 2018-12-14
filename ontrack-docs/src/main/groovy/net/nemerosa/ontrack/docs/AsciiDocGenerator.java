@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class AsciiDocGenerator {
@@ -159,20 +160,23 @@ public class AsciiDocGenerator {
          * Properties summary
          */
 
-        writer.format("2+h| Configuration property summary%n");
-        writer.format("| Property | Description%n%n");
-        propertyClass.getMethods()
-                .stream()
-                .sorted(Comparator.comparing(DSLDocMethod::getName))
-                .forEach(dslDocMethod ->
-                        writer.format(
-                                "| <<dsl-%s-%s,`%s`>> | `%s`%n%n%s%n%n",
-                                propertyClass.getId(),
-                                dslDocMethod.getId(),
-                                dslDocMethod.getName(),
-                                dslDocMethod.getSignature(),
-                                safe(dslDocMethod.getDescription()))
-                );
+        List<DSLDocMethod> propertyClassMethods = propertyClass.getMethods();
+        if (!propertyClassMethods.isEmpty()) {
+            writer.format("2+h| Configuration property summary%n");
+            writer.format("| Property | Description%n%n");
+            propertyClassMethods
+                    .stream()
+                    .sorted(Comparator.comparing(DSLDocMethod::getName))
+                    .forEach(dslDocMethod ->
+                            writer.format(
+                                    "| <<dsl-%s-%s,`%s`>> | `%s`%n%n%s%n%n",
+                                    propertyClass.getId(),
+                                    dslDocMethod.getId(),
+                                    dslDocMethod.getName(),
+                                    dslDocMethod.getSignature(),
+                                    safe(dslDocMethod.getDescription()))
+                    );
+        }
 
         /*
          * End of properties header
@@ -180,11 +184,11 @@ public class AsciiDocGenerator {
 
         writer.format("|===%n");
 
-
         // Methods
-        propertyClass.getMethods().forEach(
+        propertyClassMethods.forEach(
                 dslDocMethod -> adocMethod(writer, propertyClass, dslDocMethod, true)
         );
+
         // Separator
         writer.println();
     }

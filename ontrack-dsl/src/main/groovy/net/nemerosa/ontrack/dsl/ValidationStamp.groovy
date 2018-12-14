@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.doc.DSLMethod
-import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
 import net.nemerosa.ontrack.dsl.properties.ValidationStampProperties
 
 @DSL
@@ -29,7 +28,8 @@ class ValidationStamp extends AbstractProjectResource {
         closure()
     }
 
-    ProjectEntityProperties getConfig() {
+    @DSLMethod("Access to the validation stamp properties")
+    ValidationStampProperties getConfig() {
         new ValidationStampProperties(ontrack, this)
     }
 
