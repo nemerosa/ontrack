@@ -45,7 +45,7 @@ pipeline {
                         echo "Ontrack setup for ${branchName}"
                         ontrackBranchSetup(project: projectName, branch: branchName, script: """
                             branch.config {
-                                gitBranch '${branchName}', [
+                                gitBranch '${BRANCH_NAME}', [
                                     buildCommitLink: [
                                         id: 'git-commit-property'
                                     ]
