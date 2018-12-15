@@ -194,6 +194,10 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
         }
     }
 
+    protected fun withRepo(code: (GitRepo) -> Unit) {
+        createRepo { commits(1) } and { repo, _ -> code(repo) }
+    }
+
     protected fun <T> createRepo(init: GitRepo.() -> T) = RepoTestActions(init)
 
     protected class RepoTestActions<T>(

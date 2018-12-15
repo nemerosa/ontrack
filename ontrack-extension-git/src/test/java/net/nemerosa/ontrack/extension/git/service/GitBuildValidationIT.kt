@@ -32,9 +32,9 @@ class GitBuildValidationIT : AbstractGitTestSupport() {
      */
     @Test
     fun `Build validation OK with tag pattern`() {
-        createRepo repo@{
+        withRepo { repo ->
             project {
-                gitProject(this@repo)
+                gitProject(repo)
                 branch {
                     gitBranch {
                         tagPatternBuildName("1.1.*")
@@ -51,9 +51,9 @@ class GitBuildValidationIT : AbstractGitTestSupport() {
      */
     @Test(expected = BuildValidationException::class)
     fun `Build validation not OK with tag pattern`() {
-        createRepo repo@{
+        withRepo { repo ->
             project {
-                gitProject(this@repo)
+                gitProject(repo)
                 branch {
                     gitBranch {
                         tagPatternBuildName("1.1.*")
@@ -70,9 +70,9 @@ class GitBuildValidationIT : AbstractGitTestSupport() {
      */
     @Test(expected = BuildValidationException::class)
     fun `Build validation not OK on rename`() {
-        createRepo repo@{
+        withRepo { repo ->
             project {
-                gitProject(this@repo)
+                gitProject(repo)
                 branch branch@{
                     gitBranch {
                         tagPatternBuildName("1.1.*")
