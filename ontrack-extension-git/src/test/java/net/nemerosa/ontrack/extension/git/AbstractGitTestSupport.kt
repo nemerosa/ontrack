@@ -210,7 +210,9 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                 value = init()
                 log()
             } and { _, repo ->
-                code(repo, value!!)
+                repo.use {
+                    code(it, value!!)
+                }
             }
         }
     }
