@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.job.JobRunListener
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
@@ -38,6 +40,9 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var gitRepositoryClientFactory: GitRepositoryClientFactory
+
+    @Autowired
+    private lateinit var jobOrchestrator: JobOrchestrator
 
     /**
      * Creates and saves a Git configuration
@@ -70,6 +75,12 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                 GitProjectConfigurationPropertyType::class.java,
                 GitProjectConfigurationProperty(gitConfiguration)
         )
+        // Makes sure to register the project
+        if (sync) {
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
+        }
     }
 
     /**
