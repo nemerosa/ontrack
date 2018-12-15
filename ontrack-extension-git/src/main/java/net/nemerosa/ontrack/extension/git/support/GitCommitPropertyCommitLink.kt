@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
-import java.util.stream.Stream
 
 /**
  * Build/commit link based on a [net.nemerosa.ontrack.extension.git.property.GitCommitProperty] property
@@ -59,14 +58,6 @@ class GitCommitPropertyCommitLink(
             )
         }
         return buildId?.value
-    }
-
-    override fun getBuildCandidateReferences(commit: String, branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: NoConfig): Stream<String> {
-        return Stream.empty()
-    }
-
-    override fun isBuildEligible(build: Build, data: NoConfig): Boolean {
-        return propertyService.hasProperty(build, GitCommitPropertyType::class.java)
     }
 
     /**

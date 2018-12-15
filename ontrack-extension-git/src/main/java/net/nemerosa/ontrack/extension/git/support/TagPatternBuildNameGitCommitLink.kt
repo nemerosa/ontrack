@@ -15,7 +15,6 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.stream.Stream
 
 @Component
 class TagPatternBuildNameGitCommitLink(
@@ -75,22 +74,8 @@ class TagPatternBuildNameGitCommitLink(
                 ?.id()
     }
 
-    override fun getBuildCandidateReferences(commit: String, branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: TagPattern): Stream<String> {
-        return gitClient.getTagsWhichContainCommit(commit)
-                // ... filter on valid tags only
-                .filter { data.isValidTagName(it) }
-                // ... get build names
-                .mapNotNull { data.getBuildNameFromTagName(it).orElse(null) }
-                // ... as a string
-                .stream()
-    }
-
     override fun getBuildNameFromTagName(tagName: String, data: TagPattern): Optional<String> {
         return data.getBuildNameFromTagName(tagName)
-    }
-
-    override fun isBuildEligible(build: Build, data: TagPattern): Boolean {
-        return true
     }
 
     override fun isBuildNameValid(name: String, data: TagPattern): Boolean {

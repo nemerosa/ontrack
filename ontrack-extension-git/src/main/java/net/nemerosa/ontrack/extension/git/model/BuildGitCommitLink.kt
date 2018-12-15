@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
-import java.util.stream.Stream
 
 /**
  * Defines the way to link builds to Git commits, in order to manage the change logs, the Git searches
@@ -55,33 +54,15 @@ interface BuildGitCommitLink<T> {
     fun toJson(data: T): JsonNode
 
     /**
-     * Gets the list of build names from Git reference candidates
-     *
-     * @param commit              The commit to start from
-     * @param branch              Branch where to look the build into
-     * @param gitClient           The Git client to use for the connection
-     * @param branchConfiguration Git branch configuration
-     * @param data                Configuration data
-     * @return Candidate build names
-     */
-    @Deprecated("")
-    fun getBuildCandidateReferences(commit: String, branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: T): Stream<String>
-
-    /**
-     * Checks if a build is eligible after it has been loaded from a
-     * [.getBuildCandidateReferences]
-     *
-     * @param build Build to check
-     * @param data  Configuration data
-     * @return `true` if the build is linked to the configuration
-     */
-    @Deprecated("")
-    fun isBuildEligible(build: Build, data: T): Boolean
-
-    /**
      * Gets the earliest build after a given commit on a branch.
+     *
+     * @param branch Branch to look the build into
+     * @param gitClient Preconfigured Git client
+     * @param branchConfiguration Git configuration of the branch
+     * @param data Configuration data for this link
+     * @param commit The commit to look for
+     * @return ID of the build or `null` if not found
      */
-    // TODO Documentation
     fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: T, commit: String): Int?
 
     /**

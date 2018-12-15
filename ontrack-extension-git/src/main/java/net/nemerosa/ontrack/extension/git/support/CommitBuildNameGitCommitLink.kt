@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
-import java.util.stream.Stream
 import kotlin.streams.asSequence
 
 @Component
@@ -77,28 +76,6 @@ class CommitBuildNameGitCommitLink(
         } else {
             null
         }
-    }
-
-    override fun getBuildCandidateReferences(commit: String, branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: CommitLinkConfig): Stream<String> {
-        return if (gitClient.isCommit(commit)) {
-            gitClient.log(
-                    String.format("%s~1", commit),
-                    gitClient.getBranchRef(branchConfiguration.branch)
-            )
-                    .sorted()
-                    .map { gitCommit ->
-                        if (data.isAbbreviated)
-                            gitCommit.shortId
-                        else
-                            gitCommit.id
-                    }
-        } else {
-            emptyList<String>().stream()
-        }
-    }
-
-    override fun isBuildEligible(build: Build, data: CommitLinkConfig): Boolean {
-        return true
     }
 
     override fun isBuildNameValid(name: String, data: CommitLinkConfig): Boolean {
