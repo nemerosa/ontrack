@@ -190,6 +190,32 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     }
 
     @Test
+    fun `Commit on one branch with short commit id as build name`() {
+        createRepo {
+            commits(9)
+        } and { repo, commits: Map<Int, String> ->
+            project {
+                gitProject(repo)
+                branch("master") {
+                    gitBranch("master") {
+                        buildNameAsCommit(abbreviated = true)
+                    }
+                    // Creates some builds on this branch
+                    build(repo.commitLookup("Commit 1"))
+                    build(repo.commitLookup("Commit 3"))
+                    build(repo.commitLookup("Commit 5"))
+                    build(repo.commitLookup("Commit 9"))
+                }
+                // Tests for commit 2
+                commitInfoTest(this, commits, 2) {
+                    assertCountBuildViews(1)
+                    buildViewTest(0, repo.commitLookup("Commit 3"))
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Commit on one branch with tag build name property`() {
         createRepo {
             sequence(
