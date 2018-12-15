@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -136,7 +137,11 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
         );
     }
 
+    @Nullable
     private <T> ConfiguredBuildGitCommitLink<T> parseBuildCommitLink(JsonNode linkNode) {
+        if (linkNode.isNull()) {
+            return null;
+        }
         String linkId = JsonUtils.get(linkNode, "id");
         // Gets the link data
         JsonNode linkDataNode = linkNode.get("data");
