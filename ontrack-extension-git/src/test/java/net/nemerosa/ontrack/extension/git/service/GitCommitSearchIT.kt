@@ -248,6 +248,38 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
         }
     }
 
+    @Test
+    fun `Commit on one branch with tag pattern build name property`() {
+        createRepo {
+            sequence(
+                    (1..3),
+                    4 to "1.0.0",
+                    5,
+                    6 to "test",
+                    (7..8),
+                    9 to "1.0.2",
+                    10
+            )
+        } and { repo, commits ->
+            project {
+                gitProject(repo)
+                branch("master") {
+                    gitBranch("master") {
+                        tagPatternBuildName("1.0.*")
+                    }
+                    // Creates some builds on this branch, using the tags above
+                    build("1.0.0")
+                    build("1.0.2")
+                }
+                // Tests for commit 2
+                commitInfoTest(this, commits, 5) {
+                    assertCountBuildViews(1)
+                    buildViewTest(0, "1.0.2")
+                }
+            }
+        }
+    }
+
     private fun commitInfoTest(
             project: Project,
             commits: Map<Int, String>,
