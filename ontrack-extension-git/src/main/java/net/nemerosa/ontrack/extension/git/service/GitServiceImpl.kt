@@ -648,6 +648,7 @@ class GitServiceImpl(
     override fun findBranchWithGitBranch(project: Project, branchName: String): Branch? {
         return gitRepositoryHelper.findBranchWithProjectAndGitBranch(project, branchName)
                 ?.let { structureService.getBranch(ID.of(it)) }
+                ?.takeIf { !it.isDisabled && it.type != BranchType.TEMPLATE_DEFINITION }
     }
 
     private fun <T> toConfiguredBuildGitCommitLink(serviceConfiguration: ServiceConfiguration): ConfiguredBuildGitCommitLink<T> {
