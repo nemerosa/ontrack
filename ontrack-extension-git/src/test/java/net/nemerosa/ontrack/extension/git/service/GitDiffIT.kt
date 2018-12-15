@@ -54,38 +54,38 @@ class GitDiffIT : AbstractGitTestSupport() {
     fun `Full diff`() {
         changeLog {
             val diff = gitService.diff(this, emptyList())
-            assertEquals("""\
-diff-- git a / file1 b / file1
+            assertEquals("""
+diff --git a/file1 b/file1
 index 3be9c81..6ad36e5 100644
----a / file1
-+++b / file1
-@@ -1 + 1, 3 @@
-Line 1
+--- a/file1
++++ b/file1
+@@ -1 +1,3 @@
+ Line 1
 +Line 2
 +Line 3
-diff-- git a / file2 b / file2
+diff --git a/file2 b/file2
 index 3be9c81..c82de6a 100644
----a / file2
-+++b / file2
-@@ -1 + 1, 2 @@
-Line 1
+--- a/file2
++++ b/file2
+@@ -1 +1,2 @@
+ Line 1
 +Line 2
-diff-- git a / file3 b / file3
+diff --git a/file3 b/file3
 new file mode 100644
 index 0000000..c82de6a
----/ dev /null
-+++b / file3
-@@ -0, 0+1, 2 @@
+--- /dev/null
++++ b/file3
+@@ -0,0 +1,2 @@
 +Line 1
 +Line 2
-diff-- git a / file4 b / file4
+diff --git a/file4 b/file4
 deleted file mode 100644
 index 3be9c81..0000000
----a / file4
-+++/ dev /null
-@@ -1 + 0, 0 @@
+--- a/file4
++++ /dev/null
+@@ -1 +0,0 @@
 -Line 1
-""", diff)
+""".trim(), diff.trim())
         }
     }
 
@@ -93,16 +93,16 @@ index 3be9c81..0000000
     fun `Filtered diff`() {
         changeLog {
             val diff = gitService.diff(this, listOf("file1"))
-            assertEquals("""\
-diff-- git a / file1 b / file1
-        index 3be9c81..6ad36e5 100644
----a / file1
-+++b / file1
-@@ -1 + 1, 3 @@
-Line 1
+            assertEquals("""
+diff --git a/file1 b/file1
+index 3be9c81..6ad36e5 100644
+--- a/file1
++++ b/file1
+@@ -1 +1,3 @@
+ Line 1
 +Line 2
 +Line 3
-""", diff)
+""".trim(), diff.trim())
         }
     }
 
