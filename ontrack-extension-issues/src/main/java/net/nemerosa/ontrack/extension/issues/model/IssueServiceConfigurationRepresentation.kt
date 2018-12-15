@@ -33,7 +33,8 @@ class IssueServiceConfigurationRepresentation(
          *
          * @param id ID to check
          */
-        fun isSelf(id: String): Boolean {
+        @JvmStatic
+        fun isSelf(id: String?): Boolean {
             return SELF_ID == id
         }
 

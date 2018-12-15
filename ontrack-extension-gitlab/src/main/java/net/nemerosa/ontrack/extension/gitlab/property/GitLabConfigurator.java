@@ -44,7 +44,7 @@ public class GitLabConfigurator implements GitConfigurator {
 
     private ConfiguredIssueService getConfiguredIssueService(GitLabProjectConfigurationProperty property) {
         String identifier = property.getIssueServiceConfigurationIdentifier();
-        if (IssueServiceConfigurationRepresentation.Companion.isSelf(identifier)) {
+        if (IssueServiceConfigurationRepresentation.isSelf(identifier)) {
             return new ConfiguredIssueService(
                     issueServiceExtension,
                     new GitLabIssueServiceConfiguration(
