@@ -4,11 +4,9 @@ import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
-import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
-import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
-import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
-import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
+import net.nemerosa.ontrack.extension.git.support.*
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -31,6 +29,9 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var tagBuildNameGitCommitLink: TagBuildNameGitCommitLink
+
+    @Autowired
+    private lateinit var tagPatternBuildNameGitCommitLink: TagPatternBuildNameGitCommitLink
 
     @Autowired
     private lateinit var gitConfigurationService: GitConfigurationService
@@ -79,7 +80,7 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
      * @param commitLinkConfiguration Returns the build commit link, defaults to [buildNameAsCommit]
      */
     protected fun Branch.gitBranch(
-            branchName: String,
+            branchName: String = "master",
             commitLinkConfiguration: () -> ConfiguredBuildGitCommitLink<*> = { buildNameAsCommit() }
     ) {
         asAdmin().execute {
@@ -119,6 +120,14 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
     protected fun tagBuildName() = ConfiguredBuildGitCommitLink(
             tagBuildNameGitCommitLink,
             NoConfig.INSTANCE
+    )
+
+    /**
+     * Configuration of a build commit link based on tag pattern as build name.
+     */
+    protected fun tagPatternBuildName(pattern: String) = ConfiguredBuildGitCommitLink(
+            tagPatternBuildNameGitCommitLink,
+            TagPattern(pattern)
     )
 
     /**
