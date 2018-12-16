@@ -12,11 +12,24 @@
             <!-- Summary for the commit -->
             <ot-extension-git-commit-summary ui-commit="gitCommitInfo.uiCommit" title="true"></ot-extension-git-commit-summary>
 
-            <!-- Builds for the revision -->
-            <ot-extension-git-commit-builds commit-info="ontrackGitCommitInfo"></ot-extension-git-commit-builds>
-
-            <!-- Promotions for the commits -->
-            <ot-extension-git-commit-promotions commit-info="ontrackGitCommitInfo"></ot-extension-git-commit-promotions>
+            <!-- Graph of branch infos -->
+            <div class="row" ng-if="gitCommitInfo.firstBuild">
+                <div class="col-md-12">
+                    <!--<svg style="display: inline;" width="2em" height="2em">-->
+                        <!--<circle cx="1em" cy="1em" r="0.5em" fill="gray" />-->
+                    <!--</svg>-->
+                    <b>First build</b>
+                    <a href="{{gitCommitInfo.firstBuild.links._page}}">{{gitCommitInfo.firstBuild.name}}</a>
+                    <ot-entity-embedded-decorations decorations="gitCommitInfo.firstBuild.decorations"></ot-entity-embedded-decorations>
+                    on branch
+                    <a href="{{gitCommitInfo.firstBuild.branch.links._page}}">{{gitCommitInfo.firstBuild.branch.name}}</a>
+                    <span class="ot-description">
+                        --
+                        {{gitCommitInfo.firstBuild.creation.time | date:'mediumDate'}}
+                        {{gitCommitInfo.firstBuild.creation.time | date:'shortTime'}}
+                    </span>
+                </div>
+            </div>
 
         </div>
     </div>

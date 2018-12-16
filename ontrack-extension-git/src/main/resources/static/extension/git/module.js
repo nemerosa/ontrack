@@ -186,7 +186,7 @@ angular.module('ontrack.extension.git', [
                       id
                       name
                       links {
-                        _self
+                        _page
                       }
                     }
                     ...buildFields
@@ -198,7 +198,7 @@ angular.module('ontrack.extension.git', [
                         id
                         name
                         links {
-                          _self
+                          _page
                         }
                       }
                       firstBuild {
@@ -211,6 +211,9 @@ angular.module('ontrack.extension.git', [
                           description
                           image
                           _image
+                          links {
+                            _page
+                          }
                         }
                         build {
                           ...buildFields
@@ -229,7 +232,15 @@ angular.module('ontrack.extension.git', [
                 time
               }
               links {
-                _self
+                _page
+              }
+              decorations {
+                decorationType
+                error
+                data
+                feature {
+                  id
+                }
               }
             }
         `;
