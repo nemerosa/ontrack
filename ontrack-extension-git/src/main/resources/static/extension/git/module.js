@@ -17,24 +17,6 @@ angular.module('ontrack.extension.git', [
             }
         };
     })
-    .directive('otExtensionGitCommitBuilds', function () {
-        return {
-            restrict: 'E',
-            templateUrl: 'extension/git/directive.commit.builds.tpl.html',
-            scope: {
-                commitInfo: '='
-            }
-        };
-    })
-    .directive('otExtensionGitCommitPromotions', function () {
-        return {
-            restrict: 'E',
-            templateUrl: 'extension/git/directive.commit.promotions.tpl.html',
-            scope: {
-                commitInfo: '='
-            }
-        };
-    })
 
     // Sync
 
