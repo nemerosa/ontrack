@@ -10,9 +10,12 @@ import net.nemerosa.ontrack.model.structure.PromotionRun
  * @property branch Associated branch
  * @property firstBuild First build on this branch
  * @property promotions Information about the promotions on this branch
+ * @property isEmpty Checks if the branch info contains any information
  */
 class BranchInfo(
         val branch: Branch,
         val firstBuild: Build?,
         val promotions: List<PromotionRun>
-)
+) {
+    val isEmpty: Boolean = firstBuild == null && promotions.isEmpty()
+}

@@ -535,6 +535,10 @@ class GitServiceImpl(
                         promotions
                 )
             }
+        }.mapValues { (_, infos) ->
+            infos.filter { !it.isEmpty }
+        }.filterValues {
+            !it.isEmpty()
         }
         // Result
         return OntrackGitCommitInfo(
