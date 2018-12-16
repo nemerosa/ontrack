@@ -98,6 +98,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     assertBranchInfos(
                             "Releases" to listOf(
                                     BranchInfoTest(
+                                            branch = "release-2.0",
                                             firstBuild = "4",
                                             promotions = listOf(
                                                     "SILVER" to "8",
@@ -330,10 +331,13 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     }
 
     private class BranchInfoTest(
+            private val branch: String,
             private val firstBuild: String?,
             private val promotions: List<Pair<String, String>>
     ) {
         operator fun invoke(branchInfo: BranchInfo) {
+            // Branch
+            assertEquals(branch, branchInfo.branch.name)
             // First build test
             if (firstBuild != null) {
                 assertNotNull(branchInfo.firstBuild, "First build expected") {
