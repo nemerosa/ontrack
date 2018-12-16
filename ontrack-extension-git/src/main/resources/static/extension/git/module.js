@@ -162,27 +162,75 @@ angular.module('ontrack.extension.git', [
     })
     .controller('GitCommitCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otGraphqlService) {
         const view = ot.view();
-        view.title = $interpolate("Commit {{commit}}")($stateParams);
+        view.title = "";
 
         const query = `
             query CommitInfo($project: Int!, $commit: String!) {
-                projects(id: $project) {
-                    id
-                    name
-                    gitCommitInfo(commit: $commit) {
-                        uiCommit {
-                            link
-                            commit {
-                                id
-                                author {
-                                    name
-                                }
-                                commitTime
-                            }
-                            fullAnnotatedMessage
-                        }
+              projects(id: $project) {
+                id
+                name
+                gitCommitInfo(commit: $commit) {
+                  uiCommit {
+                    link
+                    commit {
+                      id
+                      author {
+                        name
+                      }
+                      commitTime
                     }
+                    fullAnnotatedMessage
+                  }
+                  firstBuild {
+                    branch {
+                      id
+                      name
+                      links {
+                        _self
+                      }
+                    }
+                    ...buildFields
+                  }
+                  branchInfosList {
+                    type
+                    branchInfoList {
+                      branch {
+                        id
+                        name
+                        links {
+                          _self
+                        }
+                      }
+                      firstBuild {
+                        ...buildFields
+                      }
+                      promotions {
+                        promotionLevel {
+                          id
+                          name
+                          description
+                          image
+                          _image
+                        }
+                        build {
+                          ...buildFields
+                        }
+                      }
+                    }
+                  }
                 }
+              }
+            }
+            
+            fragment buildFields on Build {
+              id
+              name
+              creation {
+                time
+              }
+              links {
+                _self
+              }
             }
         `;
 
