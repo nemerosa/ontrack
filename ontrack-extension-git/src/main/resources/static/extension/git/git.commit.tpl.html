@@ -35,13 +35,13 @@
             <div class="row" ng-repeat="branchInfos in gitCommitInfo.branchInfosList">
                 <div class="col-md-12">
                     <svg style="vertical-align:center;display: inline;" width="20px" height="20px">
-                        <circle cx="10px" cy="15px" r="5px" fill="gray" />
                     </svg>
+                    <i class="fa fa-tags"></i>
                     <b><i>{{branchInfos.type}}</i></b>
                     <div class="col-md-12" ng-repeat="branchInfo in branchInfos.branchInfoList">
                         <svg style="vertical-align:center;display: inline;" width="40px" height="20px">
-                            <circle cx="30px" cy="15px" r="5px" fill="gray" />
                         </svg>
+                        <i class="fa fa-code-fork"></i>
                         <b>Branch</b>
                         <a href="{{branchInfo.branch.links._page}}">{{branchInfo.branch.name}}</a>
                         <!-- First build for this branch -->
