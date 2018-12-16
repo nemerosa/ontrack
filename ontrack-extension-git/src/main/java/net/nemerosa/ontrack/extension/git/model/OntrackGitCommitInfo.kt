@@ -1,26 +1,16 @@
 package net.nemerosa.ontrack.extension.git.model
 
-import net.nemerosa.ontrack.model.structure.BranchStatusView
-import net.nemerosa.ontrack.model.structure.BuildView
+import net.nemerosa.ontrack.model.structure.Build
 
 /**
  * All the information about a commit in a Git configuration, with its links with all
  * the projects.
+ *
+ * @property uiCommit Basic info about the commit
+ * @property firstBuild First build after the commit
  */
 class OntrackGitCommitInfo(
-        /**
-         * Basic info about the commit
-         */
         val uiCommit: GitUICommit,
-
-        /**
-         * Collection of build views
-         */
-        val buildViews: Collection<BuildView>,
-
-        /**
-         * Collection of promotions for the branches
-         */
-        val branchStatusViews: Collection<BranchStatusView>
-
+        val firstBuild: Build?,
+        val branchInfos: Map<String, List<BranchInfo>>
 )

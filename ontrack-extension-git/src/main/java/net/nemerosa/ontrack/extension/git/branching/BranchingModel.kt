@@ -44,13 +44,12 @@ class BranchingModel(
      */
     fun groupBranches(
             branches: List<Branch>,
-            gitBranchAccessor: (Branch) -> String
+            gitBranchAccessor: (Branch) -> String?
     ): Map<String, List<Branch>> =
             patterns.mapValues { (_, regex) ->
                 branches.filter { branch ->
-                    regex.toRegex().matches(
-                            gitBranchAccessor(branch)
-                    )
+                    val gitBranch = gitBranchAccessor(branch)
+                    gitBranch != null && regex.toRegex().matches(gitBranch)
                 }.sortedBy { it.id() }
             }
 }

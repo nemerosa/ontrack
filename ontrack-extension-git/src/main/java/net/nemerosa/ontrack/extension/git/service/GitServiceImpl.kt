@@ -5,11 +5,11 @@ import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
+import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
-import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView
@@ -53,7 +53,8 @@ class GitServiceImpl(
         private val buildGitCommitLinkService: BuildGitCommitLinkService,
         private val gitConfigurators: Collection<GitConfigurator>,
         private val scmService: SCMUtilsService,
-        private val gitRepositoryHelper: GitRepositoryHelper
+        private val gitRepositoryHelper: GitRepositoryHelper,
+        private val branchingModelService: BranchingModelService
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
     private val logger = LoggerFactory.getLogger(GitService::class.java)
@@ -476,37 +477,7 @@ class GitServiceImpl(
         val projectConfiguration = getRequiredProjectConfiguration(project)
         // Gets a client for this configuration
         val repositoryClient = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
-        // Looks for all Git branches for this commit
-        val gitBranches = repositoryClient.getBranchesForCommit(commit)
-        // Converts to Ontrack branches
-        val branches = gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
-        // Data to collect
-        val buildViews = ArrayList<BuildView>()
-        val branchStatusViews = ArrayList<BranchStatusView>()
-        // For each branch
-        branches
-                .filterNot { branch -> branch.isDisabled }
-                .filter { branch -> branch.type != BranchType.TEMPLATE_DEFINITION }
-                .forEach { branch ->
-                    // Gets its Git configuration
-                    val branchConfiguration = getRequiredBranchConfiguration(branch)
-                    // Gets the earliest build on this branch that contains this commit
-                    val build = getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient)
-                    if (build != null) {
-                        // Gets the build view
-                        val buildView = structureService.getBuildView(build, true)
-                        // Adds it to the list
-                        buildViews.add(buildView)
-                        // Collects the promotions for the branch
-                        branchStatusViews.add(
-                                structureService.getEarliestPromotionsAfterBuild(build)
-                        )
-                    }
-                }
-        // At least one branch
-        if (branches.isEmpty()) {
-            throw GitCommitNotFoundException(commit)
-        }
+
         // Gets the commit
         val commitObject = repositoryClient.getCommitFor(commit) ?: throw GitCommitNotFoundException(commit)
         // Gets the annotated commit
@@ -516,11 +487,60 @@ class GitServiceImpl(
                 messageAnnotators,
                 commitObject
         )
+
+        // Looks for all Git branches for this commit
+        val gitBranches = repositoryClient.getBranchesForCommit(commit)
+        // Converts to Ontrack branches (non templates)
+        val branches = gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
+
+        // Index of first build per branch
+        // Used to avoid its recomputation when looking for indexed branch information
+        val firstBuilds = mutableMapOf<Int, Build>()
+
+        // Getting the very first build in all the branches (promotion of not)
+        // The branch it belongs to might very well be disabled
+        val firstBuild = branches.mapNotNull { branch ->
+            // Gets its Git configuration
+            val branchConfiguration = getRequiredBranchConfiguration(branch)
+            // Gets the earliest build on this branch that contains this commit
+            val build = getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient)
+            // Indexation
+            if (build != null) {
+                firstBuilds[branch.id()] = build
+            }
+            // OK
+            build
+        }.sortedBy { it.id() }.firstOrNull()
+
+        // Sorts the branches according to the branching model
+        val indexedBranches = branchingModelService.getBranchingModel(project)
+                .groupBranches(branches) { getBranchConfiguration(it)?.branch }
+
+        // For every indexation group of branches
+        val branchInfos = indexedBranches.mapValues { (_, branches) ->
+            branches.map { branch ->
+                // Gets the first build for this branch (using index)
+                val firstBuildOnThisBranch = firstBuilds[branch.id()]
+                // Promotions
+                val promotions: List<PromotionRun> = firstBuildOnThisBranch?.let { build ->
+                    structureService.getPromotionLevelListForBranch(branch.id)
+                            .mapNotNull { promotionLevel ->
+                                structureService.getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
+                            }
+                } ?: emptyList()
+                // Complete branch info
+                BranchInfo(
+                        branch,
+                        firstBuildOnThisBranch,
+                        promotions
+                )
+            }
+        }
         // Result
         return OntrackGitCommitInfo(
                 uiCommit,
-                buildViews,
-                branchStatusViews
+                firstBuild,
+                branchInfos
         )
     }
 
@@ -648,7 +668,7 @@ class GitServiceImpl(
     override fun findBranchWithGitBranch(project: Project, branchName: String): Branch? {
         return gitRepositoryHelper.findBranchWithProjectAndGitBranch(project, branchName)
                 ?.let { structureService.getBranch(ID.of(it)) }
-                ?.takeIf { !it.isDisabled && it.type != BranchType.TEMPLATE_DEFINITION }
+                ?.takeIf { it.type != BranchType.TEMPLATE_DEFINITION }
     }
 
     private fun <T> toConfiguredBuildGitCommitLink(serviceConfiguration: ServiceConfiguration): ConfiguredBuildGitCommitLink<T> {
