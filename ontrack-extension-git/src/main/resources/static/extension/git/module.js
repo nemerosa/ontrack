@@ -205,6 +205,9 @@ angular.module('ontrack.extension.git', [
                         ...buildFields
                       }
                       promotions {
+                        creation {
+                          time
+                        }
                         promotionLevel {
                           id
                           name
