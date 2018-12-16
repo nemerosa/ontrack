@@ -3,7 +3,8 @@ angular.module('ontrack.extension.git', [
     'ot.service.configuration',
     'ot.service.form',
     'ot.service.structure',
-    'ot.service.plot'
+    'ot.service.plot',
+    'ot.service.graphql'
 ])
     .directive('otExtensionGitCommitSummary', function () {
         return {
@@ -177,17 +178,31 @@ angular.module('ontrack.extension.git', [
             controller: 'GitCommitCtrl'
         });
     })
-    .controller('GitCommitCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
-
-        var view = ot.view();
+    .controller('GitCommitCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otGraphqlService) {
+        const view = ot.view();
         view.title = $interpolate("Commit {{commit}}")($stateParams);
 
-        ot.call(
-            $http.get(
-                $interpolate('extension/git/{{project}}/commit-info/{{commit}}')($stateParams)
-            )).then(function (ontrackGitCommitInfo) {
-                $scope.ontrackGitCommitInfo = ontrackGitCommitInfo;
-            });
+        const query = `
+            query CommitInfo($project: Int!, $commit: String!) {
+                projects(id: $project) {
+                    gitCommitInfo(commit: $commit) {
+                        uiCommit {
+                            annotatedMessage
+                        }
+                    }
+                }
+            }
+        `;
+
+        const queryVariables = {
+            project: $stateParams.project,
+            commit: $stateParams.commit
+        };
+
+
+        otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+            $scope.gitCommitInfo = data.projects[0].gitCommitInfo
+        });
     })
 
     // Change log

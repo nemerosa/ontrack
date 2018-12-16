@@ -39,7 +39,7 @@ class GitCommitInfoProjectGraphQLFieldContributor(
                                 .dataFetcher { environment ->
                                     val project: Project = environment.getSource()
                                     val commit: String = environment.getArgument("commit")
-                                    val first: Boolean? = environment.getArgument("commit")
+                                    val first: Boolean? = environment.getArgument("first")
                                     val gitCommitInfo = gitService.getCommitProjectInfo(project.id, commit)
                                     if (first != null && first) {
                                            gitCommitInfo.first()
