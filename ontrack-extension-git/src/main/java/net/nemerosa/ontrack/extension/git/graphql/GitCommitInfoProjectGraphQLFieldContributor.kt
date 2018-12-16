@@ -30,11 +30,22 @@ class GitCommitInfoProjectGraphQLFieldContributor(
                                             .description("Full or abbreviated hash of the commit to look for")
                                             .type(GraphQLNonNull(Scalars.GraphQLString))
                                 }
+                                .argument {
+                                    it.name("first")
+                                            .description("Flag to display only the first branch per type")
+                                            .type(Scalars.GraphQLBoolean)
+                                }
                                 .type(ontrackGitCommitInfoGQLType.typeRef)
                                 .dataFetcher { environment ->
                                     val project: Project = environment.getSource()
                                     val commit: String = environment.getArgument("commit")
-                                    gitService.getCommitProjectInfo(project.id, commit)
+                                    val first: Boolean? = environment.getArgument("commit")
+                                    val gitCommitInfo = gitService.getCommitProjectInfo(project.id, commit)
+                                    if (first != null && first) {
+                                           gitCommitInfo.first()
+                                    } else {
+                                        gitCommitInfo
+                                    }
                                 }
                                 .build()
                 )

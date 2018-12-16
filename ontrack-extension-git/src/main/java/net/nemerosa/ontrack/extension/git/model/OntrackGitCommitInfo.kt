@@ -13,4 +13,15 @@ class OntrackGitCommitInfo(
         val uiCommit: GitUICommit,
         val firstBuild: Build?,
         val branchInfos: Map<String, List<BranchInfo>>
-)
+) {
+    /**
+     * Keeps only the first branch per type
+     */
+    fun first() = OntrackGitCommitInfo(
+            uiCommit,
+            firstBuild,
+            branchInfos.mapValues { (_, branchInfoList) ->
+                branchInfoList.take(1)
+            }
+    )
+}
