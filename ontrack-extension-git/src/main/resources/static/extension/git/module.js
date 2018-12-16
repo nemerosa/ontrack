@@ -198,7 +198,7 @@ angular.module('ontrack.extension.git', [
             $scope.gitCommitInfo = data.projects[0].gitCommitInfo;
             if (!viewInitialised) {
                 // View configuration
-                view.breadcrumbs = ot.buildBreadcrumbs($scope.project);
+                view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
                 // Commands
                 view.commands = [
                     ot.viewCloseCommand('/project/' + $scope.project.id)
