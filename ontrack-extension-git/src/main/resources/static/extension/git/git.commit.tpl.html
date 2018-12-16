@@ -15,9 +15,9 @@
             <!-- Graph of branch infos -->
             <div class="row" ng-if="gitCommitInfo.firstBuild">
                 <div class="col-md-12">
-                    <!--<svg style="display: inline;" width="2em" height="2em">-->
-                        <!--<circle cx="1em" cy="1em" r="0.5em" fill="gray" />-->
-                    <!--</svg>-->
+                    <svg style="vertical-align:center;display: inline;" width="20px" height="20px">
+                        <circle cx="10px" cy="15px" r="5px" fill="gray" />
+                    </svg>
                     <b>First build</b>
                     <a href="{{gitCommitInfo.firstBuild.links._page}}">{{gitCommitInfo.firstBuild.name}}</a>
                     <ot-entity-embedded-decorations decorations="gitCommitInfo.firstBuild.decorations"></ot-entity-embedded-decorations>
