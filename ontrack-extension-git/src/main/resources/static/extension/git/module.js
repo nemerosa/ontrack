@@ -185,9 +185,19 @@ angular.module('ontrack.extension.git', [
         const query = `
             query CommitInfo($project: Int!, $commit: String!) {
                 projects(id: $project) {
+                    id
+                    name
                     gitCommitInfo(commit: $commit) {
                         uiCommit {
-                            annotatedMessage
+                            link
+                            commit {
+                                id
+                                author {
+                                    name
+                                }
+                                commitTime
+                            }
+                            fullAnnotatedMessage
                         }
                     }
                 }
@@ -200,8 +210,20 @@ angular.module('ontrack.extension.git', [
         };
 
 
+        let viewInitialised = false;
         otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
-            $scope.gitCommitInfo = data.projects[0].gitCommitInfo
+            $scope.project = data.projects[0];
+            $scope.gitCommitInfo = data.projects[0].gitCommitInfo;
+            if (!viewInitialised) {
+                // View configuration
+                view.breadcrumbs = ot.buildBreadcrumbs($scope.project);
+                // Commands
+                view.commands = [
+                    ot.viewCloseCommand('/project/' + $scope.project.id)
+                ];
+                // OK
+                viewInitialised = true;
+            }
         });
     })
 

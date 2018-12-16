@@ -1,16 +1,16 @@
 <ot-view>
 
-    <div class="row" ng-hide="ontrackGitCommitInfo">
+    <div class="row" ng-hide="gitCommitInfo">
         <div class="col-md-12 alert alert-warning">
             The commit information is loading. This may take some time...
         </div>
     </div>
 
-    <div class="row" ng-if="ontrackGitCommitInfo">
+    <div class="row" ng-if="gitCommitInfo">
         <div class="col-md-12">
 
             <!-- Summary for the commit -->
-            <ot-extension-git-commit-summary ui-commit="ontrackGitCommitInfo.uiCommit" title="false"></ot-extension-git-commit-summary>
+            <ot-extension-git-commit-summary ui-commit="gitCommitInfo.uiCommit" title="false"></ot-extension-git-commit-summary>
 
             <!-- Builds for the revision -->
             <ot-extension-git-commit-builds commit-info="ontrackGitCommitInfo"></ot-extension-git-commit-builds>
