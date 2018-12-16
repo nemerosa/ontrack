@@ -12,7 +12,7 @@
             <!-- Summary for the commit -->
             <ot-extension-git-commit-summary ui-commit="gitCommitInfo.uiCommit" title="true"></ot-extension-git-commit-summary>
 
-            <!-- Graph of branch infos -->
+            <!-- First build -->
             <div class="row" ng-if="gitCommitInfo.firstBuild">
                 <div class="col-md-12">
                     <svg style="vertical-align:center;display: inline;" width="20px" height="20px">
@@ -28,6 +28,37 @@
                         {{gitCommitInfo.firstBuild.creation.time | date:'mediumDate'}}
                         {{gitCommitInfo.firstBuild.creation.time | date:'shortTime'}}
                     </span>
+                </div>
+            </div>
+
+            <!-- Branch types -->
+            <div class="row" ng-repeat="branchInfos in gitCommitInfo.branchInfosList">
+                <div class="col-md-12">
+                    <svg style="vertical-align:center;display: inline;" width="20px" height="20px">
+                        <circle cx="10px" cy="15px" r="5px" fill="gray" />
+                    </svg>
+                    <b><i>{{branchInfos.type}}</i></b>
+                    <div class="col-md-12" ng-repeat="branchInfo in branchInfos.branchInfoList">
+                        <svg style="vertical-align:center;display: inline;" width="40px" height="20px">
+                            <circle cx="30px" cy="15px" r="5px" fill="gray" />
+                        </svg>
+                        <b>Branch</b>
+                        <a href="{{branchInfo.branch.links._page}}">{{branchInfo.branch.name}}</a>
+                        <!-- First build for this branch -->
+                        <div class="col-md-12" ng-if="branchInfo.firstBuild">
+                            <svg style="vertical-align:center;display: inline;" width="60px" height="20px">
+                                <circle cx="50px" cy="15px" r="5px" fill="gray" />
+                            </svg>
+                            <span>First build</span>
+                            <a href="{{branchInfo.firstBuild.links._page}}">{{branchInfo.firstBuild.name}}</a>
+                            <ot-entity-embedded-decorations decorations="branchInfo.firstBuild.decorations"></ot-entity-embedded-decorations>
+                            <span class="ot-description">
+                                --
+                                {{branchInfo.firstBuild.creation.time | date:'mediumDate'}}
+                                {{branchInfo.firstBuild.creation.time | date:'shortTime'}}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
