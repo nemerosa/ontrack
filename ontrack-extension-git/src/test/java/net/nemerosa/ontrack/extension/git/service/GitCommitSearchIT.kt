@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -11,6 +12,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class GitCommitSearchIT : AbstractGitTestSupport() {
@@ -92,9 +94,18 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    // TODO assertCountBuildViews(2)
-                    // TODO buildViewTest(0, "3", setOf("Test1", "Test2"), setOf("SILVER"))
-                    // TODO buildViewTest(1, "4", setOf("Test1"))
+                    assertFirstBuild("3")
+                    assertBranchInfos(
+                            "Releases" to listOf(
+                                    BranchInfoTest(
+                                            firstBuild = "4",
+                                            promotions = listOf(
+                                                    "SILVER" to "8",
+                                                    "GOLD" to "8"
+                                            )
+                                    )
+                            )
+                    )
                 }
             }
         }
@@ -299,6 +310,47 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
 
     private fun OntrackGitCommitInfo.assertNoBranchInfos() {
         assertTrue(branchInfos.isEmpty(), "No branch infos being found")
+    }
+
+    private fun OntrackGitCommitInfo.assertBranchInfos(
+            vararg tests: Pair<String, List<BranchInfoTest>>
+    ) {
+        assertEquals(tests.size, branchInfos.size, "Number of tests must match the number of collected branch infos")
+        // Test per test
+        tests.forEach { (type, branchInfoTests) ->
+            val branchInfoList = branchInfos[type]
+            assertNotNull(branchInfoList) { it ->
+                assertEquals(branchInfoTests.size, it.size, "Number of tests for type $type must match the number of collect branch infos")
+                // Group by pair
+                it.zip(branchInfoTests).forEach { (branchInfo, branchInfoTest) ->
+                    branchInfoTest(branchInfo)
+                }
+            }
+        }
+    }
+
+    private class BranchInfoTest(
+            private val firstBuild: String?,
+            private val promotions: List<Pair<String, String>>
+    ) {
+        operator fun invoke(branchInfo: BranchInfo) {
+            // First build test
+            if (firstBuild != null) {
+                assertNotNull(branchInfo.firstBuild, "First build expected") {
+                    assertEquals(firstBuild, it.name)
+                }
+            } else {
+                assertNull(branchInfo.firstBuild, "No first build")
+            }
+            // Promotion tests
+            assertEquals(promotions.size, branchInfo.promotions.size)
+            branchInfo.promotions.zip(promotions).forEach { (run, promotionTest) ->
+                val promotion = promotionTest.first
+                val name = promotionTest.second
+                assertEquals(promotion, run.promotionLevel.name)
+                assertEquals(name, run.build.name)
+            }
+        }
     }
 
     private fun Branch.build(
