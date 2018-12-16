@@ -3,13 +3,18 @@ package net.nemerosa.ontrack.extension.git.graphql
 import graphql.Scalars
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNonNull
+import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 
 @Component
-class GitCommitInfoProjectGraphQLFieldContributor : GQLProjectEntityFieldContributor {
+class GitCommitInfoProjectGraphQLFieldContributor(
+        private val ontrackGitCommitInfoGQLType: OntrackGitCommitInfoGQLType,
+        private val gitService: GitService
+) : GQLProjectEntityFieldContributor {
 
     override fun getFields(
             projectEntityClass: Class<out ProjectEntity>,
@@ -25,8 +30,12 @@ class GitCommitInfoProjectGraphQLFieldContributor : GQLProjectEntityFieldContrib
                                             .description("Full or abbreviated hash of the commit to look for")
                                             .type(GraphQLNonNull(Scalars.GraphQLString))
                                 }
-                                // TODO OntrackGitCommitInfo type
-                                // TODO Fetcher
+                                .type(ontrackGitCommitInfoGQLType.typeRef)
+                                .dataFetcher { environment ->
+                                    val project: Project = environment.getSource()
+                                    val commit: String = environment.getArgument("commit")
+                                    gitService.getCommitProjectInfo(project.id, commit)
+                                }
                                 .build()
                 )
             } else {

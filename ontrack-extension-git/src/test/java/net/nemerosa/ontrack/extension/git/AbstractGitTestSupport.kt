@@ -1,27 +1,33 @@
 package net.nemerosa.ontrack.extension.git
 
+import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
+import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
+import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
 import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
+import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.git.support.*
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NoConfig
 import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
-abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
+abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var commitBuildNameGitCommitLink: CommitBuildNameGitCommitLink
@@ -40,6 +46,9 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var gitRepositoryClientFactory: GitRepositoryClientFactory
+
+    @Autowired
+    private lateinit var gitService: GitService
 
     @Autowired
     private lateinit var jobOrchestrator: JobOrchestrator
@@ -225,6 +234,88 @@ abstract class AbstractGitTestSupport : AbstractDSLTestSupport() {
                     code(it, value!!)
                 }
             }
+        }
+    }
+
+    protected fun commitInfoTest(
+            project: Project,
+            commits: Map<Int, String>,
+            no: Int,
+            tests: OntrackGitCommitInfo.() -> Unit
+    ) {
+        val commit = commits.getOrFail(no)
+        val info = gitService.getCommitProjectInfo(project.id, commit)
+        // Commit message & hash
+        assertEquals(commit, info.uiCommit.id)
+        assertEquals("Commit $no", info.uiCommit.annotatedMessage)
+        // Tests
+        info.tests()
+    }
+
+    protected fun OntrackGitCommitInfo.assertFirstBuild(expectedName: String) {
+        assertNotNull(firstBuild) {
+            assertEquals(expectedName, it.name)
+        }
+    }
+
+    protected fun OntrackGitCommitInfo.assertNoBranchInfos() {
+        assertTrue(branchInfos.isEmpty(), "No branch infos being found")
+    }
+
+    protected fun OntrackGitCommitInfo.assertBranchInfos(
+            vararg tests: Pair<String, List<BranchInfoTest>>
+    ) {
+        assertEquals(tests.size, branchInfos.size, "Number of tests must match the number of collected branch infos")
+        // Test per test
+        tests.forEach { (type, branchInfoTests) ->
+            val branchInfoList = branchInfos[type]
+            assertNotNull(branchInfoList) { it ->
+                assertEquals(branchInfoTests.size, it.size, "Number of tests for type $type must match the number of collect branch infos")
+                // Group by pair
+                it.zip(branchInfoTests).forEach { (branchInfo, branchInfoTest) ->
+                    branchInfoTest(branchInfo)
+                }
+            }
+        }
+    }
+
+    protected class BranchInfoTest(
+            private val branch: String,
+            private val firstBuild: String?,
+            private val promotions: List<Pair<String, String>>
+    ) {
+        operator fun invoke(branchInfo: BranchInfo) {
+            // Branch
+            assertEquals(branch, branchInfo.branch.name)
+            // First build test
+            if (firstBuild != null) {
+                assertNotNull(branchInfo.firstBuild, "First build expected") {
+                    assertEquals(firstBuild, it.name)
+                }
+            } else {
+                assertNull(branchInfo.firstBuild, "No first build")
+            }
+            // Promotion tests
+            assertEquals(promotions.size, branchInfo.promotions.size)
+            branchInfo.promotions.zip(promotions).forEach { (run, promotionTest) ->
+                val promotion = promotionTest.first
+                val name = promotionTest.second
+                assertEquals(promotion, run.promotionLevel.name)
+                assertEquals(name, run.build.name)
+            }
+        }
+    }
+
+    protected fun Branch.build(
+            no: Int,
+            commits: Map<Int, String>,
+            validations: List<ValidationStamp> = emptyList(),
+            promotions: List<PromotionLevel> = emptyList()
+    ) {
+        build(no.toString()) {
+            gitCommitProperty(commits.getOrFail(no))
+            validations.forEach { validate(it) }
+            promotions.forEach { promote(it) }
         }
     }
 

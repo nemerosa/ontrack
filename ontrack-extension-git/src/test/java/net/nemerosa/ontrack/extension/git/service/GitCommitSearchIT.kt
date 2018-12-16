@@ -2,23 +2,9 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
-import net.nemerosa.ontrack.extension.git.model.BranchInfo
-import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.ValidationStamp
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class GitCommitSearchIT : AbstractGitTestSupport() {
-
-    @Autowired
-    private lateinit var gitService: GitService
 
     @Test
     fun `Commit on one branch with commit property`() {
@@ -296,88 +282,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                     assertNoBranchInfos()
                 }
             }
-        }
-    }
-
-    private fun commitInfoTest(
-            project: Project,
-            commits: Map<Int, String>,
-            no: Int,
-            tests: OntrackGitCommitInfo.() -> Unit
-    ) {
-        val commit = commits.getOrFail(no)
-        val info = gitService.getCommitProjectInfo(project.id, commit)
-        // Commit message & hash
-        assertEquals(commit, info.uiCommit.id)
-        assertEquals("Commit $no", info.uiCommit.annotatedMessage)
-        // Tests
-        info.tests()
-    }
-
-    private fun OntrackGitCommitInfo.assertFirstBuild(expectedName: String) {
-        assertNotNull(firstBuild) {
-            assertEquals(expectedName, it.name)
-        }
-    }
-
-    private fun OntrackGitCommitInfo.assertNoBranchInfos() {
-        assertTrue(branchInfos.isEmpty(), "No branch infos being found")
-    }
-
-    private fun OntrackGitCommitInfo.assertBranchInfos(
-            vararg tests: Pair<String, List<BranchInfoTest>>
-    ) {
-        assertEquals(tests.size, branchInfos.size, "Number of tests must match the number of collected branch infos")
-        // Test per test
-        tests.forEach { (type, branchInfoTests) ->
-            val branchInfoList = branchInfos[type]
-            assertNotNull(branchInfoList) { it ->
-                assertEquals(branchInfoTests.size, it.size, "Number of tests for type $type must match the number of collect branch infos")
-                // Group by pair
-                it.zip(branchInfoTests).forEach { (branchInfo, branchInfoTest) ->
-                    branchInfoTest(branchInfo)
-                }
-            }
-        }
-    }
-
-    private class BranchInfoTest(
-            private val branch: String,
-            private val firstBuild: String?,
-            private val promotions: List<Pair<String, String>>
-    ) {
-        operator fun invoke(branchInfo: BranchInfo) {
-            // Branch
-            assertEquals(branch, branchInfo.branch.name)
-            // First build test
-            if (firstBuild != null) {
-                assertNotNull(branchInfo.firstBuild, "First build expected") {
-                    assertEquals(firstBuild, it.name)
-                }
-            } else {
-                assertNull(branchInfo.firstBuild, "No first build")
-            }
-            // Promotion tests
-            assertEquals(promotions.size, branchInfo.promotions.size)
-            branchInfo.promotions.zip(promotions).forEach { (run, promotionTest) ->
-                val promotion = promotionTest.first
-                val name = promotionTest.second
-                assertEquals(promotion, run.promotionLevel.name)
-                assertEquals(name, run.build.name)
-            }
-        }
-    }
-
-    private fun Branch.build(
-            no: Int,
-            commits: Map<Int, String>,
-            validations: List<ValidationStamp> = emptyList(),
-            promotions: List<PromotionLevel> = emptyList()
-    ) {
-        build(no.toString()) {
-            gitCommitProperty(commits.getOrFail(no))
-            validations.forEach { validate(it) }
-            promotions.forEach { promote(it) }
         }
     }
 
