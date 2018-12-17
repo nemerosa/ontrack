@@ -4,16 +4,12 @@ import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 /**
  * Integration tests for downloading a file
  */
 class GitDownloadIT : AbstractGitTestSupport() {
-
-    @Autowired
-    private lateinit var gitService: GitService
 
     @Test
     fun `Download files`() {

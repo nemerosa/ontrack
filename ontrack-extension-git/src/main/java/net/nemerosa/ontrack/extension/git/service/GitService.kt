@@ -79,7 +79,17 @@ interface GitService : SCMService {
     /**
      * Gets information about an issue in a Git-configured branch
      */
+    @Deprecated("Use getIssueProjectInfo instead")
     fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo?
+
+    /**
+     * Gets information about an issue in a Git-configured project
+     *
+     * @param projectId ID of the project
+     * @param key Display key of the issue
+     * @return Issue & commit information about the issue in the project if available
+     */
+    fun getIssueProjectInfo(projectId: ID, key: String): OntrackGitIssueInfo?
 
     /**
      * Looks up a commit in the given `configuration`.

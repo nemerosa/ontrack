@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView
@@ -302,28 +303,7 @@ class GitServiceImpl(
     }
 
     override fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo? {
-        val branch = structureService.getBranch(branchId)
-        // Configuration
-        val branchConfiguration = getRequiredBranchConfiguration(branch)
-        val configuration = branchConfiguration.configuration
-        // Issue service
-        val configuredIssueService = configuration.configuredIssueService.orElse(null)
-                ?: throw GitBranchIssueServiceNotConfiguredException(branchId)
-        // Gets the details about the issue
-        val issue: Issue? = configuredIssueService.getIssue(key)
-        return if (issue != null) {
-            // Collects commits for this branch
-            val commitInfos = collectIssueCommitInfos(branch, branchConfiguration, issue)
-
-            // OK
-            OntrackGitIssueInfo(
-                    configuredIssueService.issueServiceConfigurationRepresentation,
-                    issue,
-                    commitInfos
-            )
-        } else {
-            null
-        }
+        TODO("This method must be removed")
     }
 
     private fun collectIssueCommitInfos(branch: Branch, branchConfiguration: GitBranchConfiguration, issue: Issue): List<OntrackGitIssueCommitInfo> {
@@ -470,6 +450,46 @@ class GitServiceImpl(
                 status,
                 branches
         )
+    }
+
+    override fun getIssueProjectInfo(projectId: ID, key: String): OntrackGitIssueInfo? {
+        // Gets the project
+        val project = structureService.getProject(projectId)
+        // Gets the project configuration
+        val projectConfiguration = getRequiredProjectConfiguration(project)
+        // Issue service
+        val configuredIssueService: ConfiguredIssueService? = projectConfiguration.configuredIssueService.orElse(null)
+        // Gets the details about the issue
+        val issue: Issue? = configuredIssueService?.getIssue(key)
+        // If no issue, no info
+        if (issue == null) {
+            return null
+        } else {
+            // Gets a client for this project
+            val repositoryClient: GitRepositoryClient = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
+            // Regular expression for the issue
+            val regex = configuredIssueService.getMessageRegex(issue)
+            // Now, get the last commit for this issue
+            val commit = repositoryClient.getLastCommitForExpression(regex)
+            // If commit is found, we collect the commit info
+            return if (commit != null) {
+                val commitInfo = getOntrackGitCommitInfo(project, commit)
+                // We now return the commit info together with the issue
+                OntrackGitIssueInfo(
+                        configuredIssueService.issueServiceConfigurationRepresentation,
+                        issue,
+                        commitInfo
+                )
+            }
+            // If not found, no commit info
+            else {
+                OntrackGitIssueInfo(
+                        configuredIssueService.issueServiceConfigurationRepresentation,
+                        issue,
+                        null
+                )
+            }
+        }
     }
 
     private fun getOntrackGitCommitInfo(project: Project, commit: String): OntrackGitCommitInfo {

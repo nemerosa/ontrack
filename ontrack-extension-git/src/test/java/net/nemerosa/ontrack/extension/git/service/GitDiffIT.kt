@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -14,9 +13,6 @@ import kotlin.test.assertNotNull
  * Integration tests for getting a diff from a Git change log.
  */
 class GitDiffIT : AbstractGitTestSupport() {
-
-    @Autowired
-    private lateinit var gitService: GitService
 
     @Test
     fun `File change indicator`() {

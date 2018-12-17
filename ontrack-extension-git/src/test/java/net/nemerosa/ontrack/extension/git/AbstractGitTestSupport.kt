@@ -48,7 +48,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
     private lateinit var gitRepositoryClientFactory: GitRepositoryClientFactory
 
     @Autowired
-    private lateinit var gitService: GitService
+    protected lateinit var gitService: GitService
 
     @Autowired
     private lateinit var jobOrchestrator: JobOrchestrator

@@ -354,7 +354,6 @@ class GitRepositoryClientImpl(
             val resolvedBranch = git.repository.resolve(getBranchRef(branch))
             return if (resolvedBranch != null) {
                 val log = git.log()
-                        .add(resolvedBranch)
                         .setRevFilter(MessageRevFilter.create("($regex)"))
                         .setMaxCount(1)
                 val commits = log.call()
@@ -373,6 +372,26 @@ class GitRepositoryClientImpl(
             throw GitRepositoryIOException(repository.remote, e)
         }
 
+    }
+
+    override fun getLastCommitForExpression(regex: String): String? {
+        return try {
+            val log = git.log()
+                    .all()
+                    .setRevFilter(MessageRevFilter.create(regex))
+                    .setMaxCount(1)
+            val commits = log.call()
+            val i = commits.iterator()
+            if (i.hasNext()) {
+                getId(i.next())
+            } else {
+                null
+            }
+        } catch (e: GitAPIException) {
+            throw GitRepositoryAPIException(repository.remote, e)
+        } catch (e: IOException) {
+            throw GitRepositoryIOException(repository.remote, e)
+        }
     }
 
     /**

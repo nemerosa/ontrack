@@ -1,235 +1,128 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
-import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.OntrackGitIssueInfo
-import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
-import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
-import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
-import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.issues.support.MockIssue
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
-import net.nemerosa.ontrack.git.GitRepositoryClientFactory
-import net.nemerosa.ontrack.git.support.GitRepo
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.model.security.GlobalSettings
-import net.nemerosa.ontrack.model.security.ProjectEdit
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
-import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Ignore
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.function.Consumer
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
-class GitSearchIT : AbstractServiceTestSupport() {
-
-    @Autowired
-    private lateinit var gitConfigurationService: GitConfigurationService
-
-    @Autowired
-    private lateinit var gitService: GitService
-
-    @Autowired
-    private lateinit var gitRepositoryClientFactory: GitRepositoryClientFactory
+class GitSearchIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var mockIssueServiceExtension: MockIssueServiceExtension
 
-    @Autowired
-    private lateinit var commitBuildNameGitCommitLink: CommitBuildNameGitCommitLink
-
     @Test
     fun `Issue search on one branch`() {
-        // Git repository
-        val repo = GitRepo()
-        try {
-            repo.apply {
-                gitInit()
-                commit(1, "#1")
-                commit(2, "#2")
-                commit(3, "#2")
-                commit(4, "#1")
-                log()
+        createRepo {
+            commit(1, "#1 First commit")
+            commit(2, "#2 Second commit")
+            commit(3, "#2 Third commit")
+            commit(4, "#1 Fourth commit")
+        } and { repo, _ ->
+            project {
+                gitProject(repo)
+                branch {
+                    gitBranch {
+                        buildNameAsCommit(abbreviated = true)
+                    }
+                    build(repo.commitLookup("#1 First commit"))
+                    build(repo.commitLookup("#2 Third commit"))
+                    build(repo.commitLookup("#1 Fourth commit"))
+                }
+                // Looks for an issue
+                val info = asUserWithView(this).call {
+                    gitService.getIssueProjectInfo(id, "#2")
+                }
+                assertNotNull(info) { gitIssueInfo ->
+                    assertEquals("2", gitIssueInfo.issue.key)
+                    assertEquals("#2", gitIssueInfo.issue.displayKey)
+                    assertNotNull(gitIssueInfo.commitInfo) { gitCommitInfo ->
+                        assertNotNull(gitCommitInfo.firstBuild) { build ->
+                            assertEquals(repo.commitLookup("#2 Third commit"), build.name)
+                        }
+                        assertTrue(gitCommitInfo.branchInfos.isEmpty(), "No branch info")
+                    }
+                }
             }
-
-            // Create a Git configuration
-            val gitConfigurationName = uid("C")
-            val gitConfiguration = asUser().with(GlobalSettings::class.java).call {
-                gitConfigurationService.newConfiguration(
-                        BasicGitConfiguration.empty()
-                                .withName(gitConfigurationName)
-                                .withIssueServiceConfigurationIdentifier(MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
-                                .withRemote("file://${repo.dir.absolutePath}")
-                )
-            }
-
-            // Creates a project and branch
-            val branch = doCreateBranch()
-            val project = branch.project
-
-            // Configures the project
-            asUser().with(project, ProjectEdit::class.java).call {
-                propertyService.editProperty(
-                        project,
-                        GitProjectConfigurationPropertyType::class.java,
-                        GitProjectConfigurationProperty(gitConfiguration)
-                )
-                // ...  & the branch with a link based on commits
-                propertyService.editProperty(
-                        branch,
-                        GitBranchConfigurationPropertyType::class.java,
-                        GitBranchConfigurationProperty(
-                                "master",
-                                ConfiguredBuildGitCommitLink(
-                                        commitBuildNameGitCommitLink,
-                                        CommitLinkConfig(true)
-                                ).toServiceConfiguration(),
-                                false, 0
-                        )
-                )
-            }
-
-            // Need to force the Git sync first
-            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).sync(Consumer { println(it) })
-
-            // Looks for an issue
-            val info: OntrackGitIssueInfo? = asUserWithView(project).call { gitService.getIssueInfo(branch.id, "2") }
-            assertNotNull(info) {
-                assertEquals("2", it.issue.key)
-                assertEquals("#2", it.issue.displayKey)
-                val commitInfos = it.commitInfos
-                assertEquals(1, commitInfos.size)
-                val ci = commitInfos.first()
-                val branchInfos = ci.branchInfos
-                assertEquals(1, branchInfos.size)
-                assertEquals(branch.id(), branchInfos.first().branch.id())
-            }
-
-        } finally {
-            repo.close()
         }
-
     }
 
     /**
-     * Gets issue info across two branches by following issue links.
+     * Gets issue info across two branches.
      *
-     * <pre>
+     * ```
      *     |  |
-     *     *  | Commit #3 (master)
+     *     *  | Commit #2 (master)
      *     |  |
-     *     |  * Commit #2 (1.0)
+     *     |  * Commit #2 (release/1.0)
      *     |  |
      *     |  /
      *     | /
-     *     * Commit #1
-     * </pre>
+     *     * Commit #2
+     * ```
      *
-     * If issues #3 and #2 are linked, lLooking for issue #3 must bring two branches:
-     * trunk with revision 5, and branch 1.0 with revision 4
+     * Last commit for issue #2 is located on branch `master` and therefore
+     * does not have any branch info (because not on a release branch).
      */
-    // FIXME #625 This test must be fixed (looking for issues)
     @Test
-    @Ignore
-    fun `Issue search with links between two branches`() {
-        // Git repository
-        val repo = GitRepo()
-        try {
-            repo.apply {
-                gitInit()
-                commit(1, "#1")
-                git("checkout", "-b", "1.0")
-                commit(2, "#2")
-                git("checkout", "master")
-                commit(3, "#3")
-                log()
+    fun `Issue search between two branches`() {
+        createRepo {
+            val commit1 = commit(1, "Commit #2")
+            git("checkout", "-b", "1.0")
+            val commit2 = commit(2, "Commit #2")
+            git("checkout", "master")
+            val commit3 = commit(3, "Commit #2")
+            // Commits index
+            listOf(commit1, commit2, commit3)
+        } and { repo, commits ->
+            // Creates a project and two branches<
+            project {
+                gitProject(repo)
+                branch("master") {
+                    gitBranch("master") {
+                        commitAsProperty()
+                    }
+                    build("1") {
+                        gitCommitProperty(commits[1])
+                    }
+                    build("3") {
+                        gitCommitProperty(commits[3])
+                    }
+                }
+                branch("release-1.0") {
+                    gitBranch("release/1.0") {
+                        commitAsProperty()
+                    }
+                    build("2") {
+                        gitCommitProperty(commits[2])
+                    }
+                }
+
+                // Issue service
+                val issue2 = MockIssue(2, MockIssueStatus.OPEN, "feature")
+                mockIssueServiceExtension.register(issue2)
+
+                // Issue info
+                val info = asUserWithView(this).call {
+                    gitService.getIssueProjectInfo(id, "#2")
+                }
+                assertNotNull(info) { gitIssueInfo ->
+                    assertEquals("2", gitIssueInfo.issue.key)
+                    assertEquals("#2", gitIssueInfo.issue.displayKey)
+                    assertNotNull(gitIssueInfo.commitInfo) { gitCommitInfo ->
+                        assertNotNull(gitCommitInfo.firstBuild) { build ->
+                            assertEquals("3", build.name)
+                        }
+                        assertTrue(gitCommitInfo.branchInfos.isEmpty(), "No branch info")
+                    }
+                }
             }
 
-            // Create a Git configuration
-            val gitConfigurationName = uid("C")
-            val gitConfiguration = asUser().with(GlobalSettings::class.java).call {
-                gitConfigurationService.newConfiguration(
-                        BasicGitConfiguration.empty()
-                                .withName(gitConfigurationName)
-                                .withIssueServiceConfigurationIdentifier(MockIssueServiceConfiguration.INSTANCE.toIdentifier().format())
-                                .withRemote("file://${repo.dir.absolutePath}")
-                )
-            }
-
-            // Creates a project and two branches
-            val project = doCreateProject()
-            val master = doCreateBranch(project, nd("master", "Master branch"))
-            val branch10 = doCreateBranch(project, nd("1.0", "1.0 branch"))
-
-            // Configures the project
-            asUser().with(project, ProjectEdit::class.java).call {
-                propertyService.editProperty(
-                        project,
-                        GitProjectConfigurationPropertyType::class.java,
-                        GitProjectConfigurationProperty(gitConfiguration)
-                )
-                // ...  & the branches with a link based on commits
-                propertyService.editProperty(
-                        master,
-                        GitBranchConfigurationPropertyType::class.java,
-                        GitBranchConfigurationProperty(
-                                "master",
-                                ConfiguredBuildGitCommitLink(
-                                        commitBuildNameGitCommitLink,
-                                        CommitLinkConfig(true)
-                                ).toServiceConfiguration(),
-                                false, 0
-                        )
-                )
-                propertyService.editProperty(
-                        branch10,
-                        GitBranchConfigurationPropertyType::class.java,
-                        GitBranchConfigurationProperty(
-                                "1.0",
-                                ConfiguredBuildGitCommitLink(
-                                        commitBuildNameGitCommitLink,
-                                        CommitLinkConfig(true)
-                                ).toServiceConfiguration(),
-                                false, 0
-                        )
-                )
-            }
-
-            // Links between issues
-            val issue1 = MockIssue(1, MockIssueStatus.OPEN, "feature")
-            val issue2 = MockIssue(2, MockIssueStatus.OPEN, "feature")
-
-            issue2.withLinks(listOf(issue1))
-            issue1.withLinks(listOf(issue2))
-
-            mockIssueServiceExtension.register(issue1, issue2)
-
-            // Need to force the Git sync first
-            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).sync(Consumer { println(it) })
-
-            // Looks for an issue
-            val info: OntrackGitIssueInfo? = asUserWithView(project).call { gitService.getIssueInfo(master.id, "2") }
-
-            assertNotNull(info) {
-                assertEquals("2", it.issue.key)
-                assertEquals("#2", it.issue.displayKey)
-                val commitInfos = it.commitInfos
-                assertEquals(2, commitInfos.size)
-
-                assertEquals(listOf(branch10.id()), commitInfos[0].branchInfos.map { it.branch.id() })
-                assertEquals(listOf(master.id()), commitInfos[1].branchInfos.map { it.branch.id() })
-            }
-
-        } finally {
-            repo.close()
         }
-
     }
 
 }

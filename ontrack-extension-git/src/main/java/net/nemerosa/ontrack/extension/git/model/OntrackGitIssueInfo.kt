@@ -16,8 +16,8 @@ class OntrackGitIssueInfo(
          */
         val issue: Issue,
         /**
-         * Last commit per branch
+         * Commit information
          */
-        val commitInfos: List<OntrackGitIssueCommitInfo>
+        val commitInfo: OntrackGitCommitInfo?
 )
 

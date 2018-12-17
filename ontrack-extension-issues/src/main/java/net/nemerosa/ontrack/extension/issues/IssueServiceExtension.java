@@ -140,4 +140,13 @@ public interface IssueServiceExtension extends Extension {
     default Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         return Collections.singleton(issue);
     }
+
+    /**
+     * Creates a regular expression to use when looking for this issue in a message.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param issue                     Issue to look for
+     * @return Regular expression
+     */
+    String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
 }

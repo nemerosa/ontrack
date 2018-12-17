@@ -79,6 +79,15 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
     }
 
     @Override
+    public String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        return getConfiguredIssueServices(issueServiceConfiguration)
+                .stream()
+                .findFirst()
+                .map(o -> o.getMessageRegex(issue))
+                .orElse("");
+    }
+
+    @Override
     public Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         return getConfiguredIssueServices(issueServiceConfiguration).stream()
                 .map(

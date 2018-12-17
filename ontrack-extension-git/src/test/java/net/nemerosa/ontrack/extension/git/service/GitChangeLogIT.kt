@@ -4,16 +4,12 @@ import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 /**
  * Integration tests for Git support.
  */
 class GitChangeLogIT : AbstractGitTestSupport() {
-
-    @Autowired
-    private lateinit var gitService: GitService
 
     @Test
     fun `Change log based on commits`() {

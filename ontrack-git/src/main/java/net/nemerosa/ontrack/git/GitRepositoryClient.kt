@@ -177,4 +177,10 @@ interface GitRepositoryClient {
      * @return Result of the search (null if not found)
      */
     fun findCommitForRegex(branch: String, regex: String): RevCommit?
+
+    /**
+     * Scans the repository and returns the first commit (or `null` if not found)
+     * whose message matches the given [regex] regular expression.
+     */
+    fun getLastCommitForExpression(regex: String): String?
 }

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -65,5 +66,10 @@ public class ConfiguredIssueService {
 
     public Collection<? extends Issue> getLinkedIssues(Project project, Issue issue) {
         return issueServiceExtension.getLinkedIssues(project, issueServiceConfiguration, issue);
+    }
+
+    @NotNull
+    public String getMessageRegex(@NotNull Issue issue) {
+        return issueServiceExtension.getMessageRegex(issueServiceConfiguration, issue);
     }
 }

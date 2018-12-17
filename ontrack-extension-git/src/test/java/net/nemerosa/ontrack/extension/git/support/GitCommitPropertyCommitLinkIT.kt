@@ -2,17 +2,12 @@ package net.nemerosa.ontrack.extension.git.support
 
 import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
-import net.nemerosa.ontrack.extension.git.service.GitService
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 
 class GitCommitPropertyCommitLinkIT : AbstractGitTestSupport() {
-
-    @Autowired
-    private lateinit var gitService: GitService
 
     @Test
     fun `Issue search on one branch`() {
