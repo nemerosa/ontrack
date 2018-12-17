@@ -72,11 +72,11 @@ class GitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Issue search between two branches`() {
         createRepo {
-            val commit1 = commit(1, "Commit #2")
+            val commit1 = commit(1, "Commit #2 one")
             git("checkout", "-b", "1.0")
-            val commit2 = commit(2, "Commit #2")
+            val commit2 = commit(2, "Commit #2 two")
             git("checkout", "master")
-            val commit3 = commit(3, "Commit #2")
+            val commit3 = commit(3, "Commit #2 three")
             // Commits index
             mapOf(
                     1 to commit1,
