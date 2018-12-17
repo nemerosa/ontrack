@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.issues.support.MockIssue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
@@ -77,7 +78,11 @@ class GitSearchIT : AbstractGitTestSupport() {
             git("checkout", "master")
             val commit3 = commit(3, "Commit #2")
             // Commits index
-            listOf(commit1, commit2, commit3)
+            mapOf(
+                    1 to commit1,
+                    2 to commit2,
+                    3 to commit3
+            )
         } and { repo, commits ->
             // Creates a project and two branches<
             project {
@@ -87,10 +92,10 @@ class GitSearchIT : AbstractGitTestSupport() {
                         commitAsProperty()
                     }
                     build("1") {
-                        gitCommitProperty(commits[1])
+                        gitCommitProperty(commits.getOrFail(1))
                     }
                     build("3") {
-                        gitCommitProperty(commits[3])
+                        gitCommitProperty(commits.getOrFail(3))
                     }
                 }
                 branch("release-1.0") {
@@ -98,7 +103,7 @@ class GitSearchIT : AbstractGitTestSupport() {
                         commitAsProperty()
                     }
                     build("2") {
-                        gitCommitProperty(commits[2])
+                        gitCommitProperty(commits.getOrFail(2))
                     }
                 }
 

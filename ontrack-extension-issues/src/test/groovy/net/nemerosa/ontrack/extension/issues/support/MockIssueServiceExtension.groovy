@@ -124,7 +124,7 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        def key = issueKey as int
+        def key = getIssueId(issueKey)
         issues.get(key) ?: new MockIssue(
                 key,
                 MockIssueStatus.OPEN,
