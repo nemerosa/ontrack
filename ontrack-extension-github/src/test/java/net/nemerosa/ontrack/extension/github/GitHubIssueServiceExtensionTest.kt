@@ -83,46 +83,6 @@ class GitHubIssueServiceExtensionTest {
     }
 
     @Test
-    fun containsIssueKey_one_in_none() {
-        assertFalse(extension.containsIssueKey(configuration, "12", emptySet()))
-    }
-
-    @Test
-    fun containsIssueKey_one() {
-        assertTrue(extension.containsIssueKey(configuration, "12", setOf("12")))
-    }
-
-    @Test
-    fun containsIssueKey_none_in_one() {
-        assertFalse(extension.containsIssueKey(configuration, "8", setOf("12")))
-    }
-
-    @Test
-    fun containsIssueKey_one_in_two() {
-        assertTrue(extension.containsIssueKey(configuration, "12", setOf("8", "12")))
-    }
-
-    @Test
-    fun containsIssueKey_none_in_two() {
-        assertFalse(extension.containsIssueKey(configuration, "24", setOf("8", "12")))
-    }
-
-    @Test
-    fun containsIssueKey_jira_in_none() {
-        assertFalse(extension.containsIssueKey(configuration, "ITEACH-14", emptySet()))
-    }
-
-    @Test
-    fun containsIssueKey_jira_in_one() {
-        assertFalse(extension.containsIssueKey(configuration, "ITEACH-14", setOf("15")))
-    }
-
-    @Test
-    fun containsIssueKey_jira_in_two() {
-        assertFalse(extension.containsIssueKey(configuration, "ITEACH-14", setOf("15", "22")))
-    }
-
-    @Test
     fun extractIssueKeysFromMessage_none() {
         val keys = extension.extractIssueKeysFromMessage(configuration, "TEST-1 No GitHub issue")
         assertTrue(keys.isEmpty())

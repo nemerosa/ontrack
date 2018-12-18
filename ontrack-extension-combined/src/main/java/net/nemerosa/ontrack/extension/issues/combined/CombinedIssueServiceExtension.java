@@ -159,19 +159,6 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
     }
 
     @Override
-    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        return getConfiguredIssueServices(issueServiceConfiguration).stream()
-                .anyMatch(
-                        configuredIssueService ->
-                                configuredIssueService.getIssueServiceExtension().containsIssueKey(
-                                        configuredIssueService.getIssueServiceConfiguration(),
-                                        key,
-                                        keys
-                                )
-                );
-    }
-
-    @Override
     public List<ExportFormat> exportFormats(IssueServiceConfiguration issueServiceConfiguration) {
         Set<ExportFormat> lists = getConfiguredIssueServices(issueServiceConfiguration).stream()
                 .map(
@@ -180,7 +167,7 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
                                         configuredIssueService.getIssueServiceConfiguration()
                                 )
                 )
-                .map((Function<List<ExportFormat>, HashSet<ExportFormat>>) HashSet::new)
+                .map(HashSet::new)
                 .collect(
                         // ... and gets them all together
                         Collectors.reducing(

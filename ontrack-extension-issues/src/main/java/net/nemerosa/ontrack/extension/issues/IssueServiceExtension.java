@@ -87,17 +87,6 @@ public interface IssueServiceExtension extends Extension {
     Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey);
 
     /**
-     * Checks if an issue key is contained in a set of keys. This set of keys has typically been extracted
-     * using the
-     * {@link #extractIssueKeysFromMessage(net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration, String)}
-     * method.
-     *
-     * @deprecated Should not be used at all.
-     */
-    @Deprecated
-    boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys);
-
-    /**
      * List of supported export formats for the issues.
      *
      * @param issueServiceConfiguration Configuration for the service

@@ -51,11 +51,6 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
         return name;
     }
 
-    @Override
-    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        return keys.contains(key);
-    }
-
     /**
      * Export of both text and HTML by default.
      */

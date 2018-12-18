@@ -94,16 +94,6 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        // Searchable key?
-        if (StringUtils.isNumeric(key) || validIssueToken(key)) {
-            keys.collect { getIssueId(it) }.contains(getIssueId(key))
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
         return Optional.of(
                 new RegexMessageAnnotator(
