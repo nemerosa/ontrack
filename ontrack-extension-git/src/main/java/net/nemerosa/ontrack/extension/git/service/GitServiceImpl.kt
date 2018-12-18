@@ -295,66 +295,11 @@ class GitServiceImpl(
         )
     }
 
-    override fun isPatternFound(branchConfiguration: GitBranchConfiguration, token: String): Boolean {
+    override fun isPatternFound(gitConfiguration: GitConfiguration, token: String): Boolean {
         // Gets the client
-        val client = gitRepositoryClientFactory.getClient(branchConfiguration.configuration.gitRepository)
+        val client = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
         // Scanning
         return client.isPatternFound(token)
-    }
-
-    override fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo? {
-        TODO("This method must be removed")
-    }
-
-    private fun collectIssueCommitInfos(branch: Branch, branchConfiguration: GitBranchConfiguration, issue: Issue): List<OntrackGitIssueCommitInfo> {
-        // Index of commit infos
-        val commitInfos = LinkedHashMap<String, OntrackGitIssueCommitInfo>()
-        // Gets the branch configuration
-        val configuration = branchConfiguration.configuration
-        // Gets the Git client for this project
-        val client = gitRepositoryClientFactory.getClient(configuration.gitRepository)
-        // Issue service
-        val configuredIssueService = configuration.configuredIssueService.orElse(null)
-        if (configuredIssueService != null) {
-            // Regular expression to identify the issue and all its linked issues
-            val allKeys = configuredIssueService.getLinkedIssues(branch.project, issue)
-                    .map { it.displayKey }
-                    .toMutableSet()
-            allKeys.add(issue.displayKey)
-            val regex = allKeys.joinToString("|")
-            // Gets the first commit whose message contains this issue and its linked issues
-            val revCommit = client.findCommitForRegex(branchConfiguration.branch, regex)
-            // If at least one commit
-            if (revCommit != null) {
-                // Commit explained (independent from the branch)
-                val commit = client.toCommit(revCommit)
-                val commitId = commit.id
-                // Gets any existing commit info
-                var commitInfo: OntrackGitIssueCommitInfo? = commitInfos[commitId]
-                // If not defined, creates an entry
-                if (commitInfo == null) {
-                    // UI commit (independent from the branch)
-                    val uiCommit = toUICommit(
-                            configuration.commitLink,
-                            getMessageAnnotators(configuration),
-                            commit
-                    )
-                    // Commit info
-                    commitInfo = OntrackGitIssueCommitInfo.of(uiCommit)
-                    // Indexation
-                    commitInfos[commitId] = commitInfo
-                }
-                // Collects branch info
-                var branchInfo = SCMIssueCommitBranchInfo.of(branch)
-                // Gets the last build for this branch
-                val buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client)
-                branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo)
-                // Adds the info
-                commitInfo!!.add(branchInfo)
-            }
-        }
-        // OK
-        return Lists.newArrayList(commitInfos.values)
     }
 
     override fun lookupCommit(configuration: GitConfiguration, id: String): GitCommit? {

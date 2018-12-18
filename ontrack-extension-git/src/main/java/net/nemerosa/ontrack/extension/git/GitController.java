@@ -355,17 +355,6 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     }
 
     /**
-     * Issue information
-     */
-    @RequestMapping(value = "{branchId}/issue/{issue}", method = RequestMethod.GET)
-    public Resource<OntrackGitIssueInfo> issueInfo(@PathVariable ID branchId, @PathVariable String issue) {
-        return Resource.of(
-                gitService.getIssueInfo(branchId, issue),
-                uri(on(getClass()).issueInfo(branchId, issue))
-        ).withView(Build.class);
-    }
-
-    /**
      * Commit information in a project
      */
     @RequestMapping(value = "{projectId}/commit-info/{commit}", method = RequestMethod.GET)
@@ -373,6 +362,17 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         return Resource.of(
                 gitService.getCommitProjectInfo(projectId, commit),
                 uri(on(getClass()).commitProjectInfo(projectId, commit))
+        ).withView(Build.class);
+    }
+
+    /**
+     * Issue information in a project
+     */
+    @RequestMapping(value = "{projectId}/issue-info/{issue}", method = RequestMethod.GET)
+    public Resource<OntrackGitIssueInfo> issueProjectInfo(@PathVariable ID projectId, @PathVariable String issue) {
+        return Resource.of(
+                gitService.getIssueProjectInfo(projectId, issue),
+                uri(on(getClass()).issueProjectInfo(projectId, issue))
         ).withView(Build.class);
     }
 

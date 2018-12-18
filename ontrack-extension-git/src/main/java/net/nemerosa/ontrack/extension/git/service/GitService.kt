@@ -77,12 +77,6 @@ interface GitService : SCMService {
     fun forEachConfiguredBranch(consumer: BiConsumer<Branch, GitBranchConfiguration>)
 
     /**
-     * Gets information about an issue in a Git-configured branch
-     */
-    @Deprecated("Use getIssueProjectInfo instead")
-    fun getIssueInfo(branchId: ID, key: String): OntrackGitIssueInfo?
-
-    /**
      * Gets information about an issue in a Git-configured project
      *
      * @param projectId ID of the project
@@ -149,9 +143,9 @@ interface GitService : SCMService {
     /**
      * Checks the log history and returns `true` if the token can be found.
      *
-     * @param branchConfiguration Git configuration
+     * @param gitConfiguration Git configuration
      * @param token               Expression to be searched for
      * @return Result of the search
      */
-    fun isPatternFound(branchConfiguration: GitBranchConfiguration, token: String): Boolean
+    fun isPatternFound(gitConfiguration: GitConfiguration, token: String): Boolean
 }

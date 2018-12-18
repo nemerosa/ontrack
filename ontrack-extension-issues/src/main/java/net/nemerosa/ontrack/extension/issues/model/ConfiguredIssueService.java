@@ -44,10 +44,6 @@ public class ConfiguredIssueService {
         return issueServiceExtension.getMessageAnnotator(issueServiceConfiguration);
     }
 
-    /**
-     * @deprecated Do not use
-     */
-    @Deprecated
     public Set<String> extractIssueKeysFromMessage(String message) {
         return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message);
     }
