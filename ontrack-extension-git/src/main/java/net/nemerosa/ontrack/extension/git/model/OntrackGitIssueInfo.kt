@@ -19,5 +19,11 @@ class OntrackGitIssueInfo(
          * Commit information
          */
         val commitInfo: OntrackGitCommitInfo?
-)
+) {
+    fun first() = OntrackGitIssueInfo(
+            issueServiceConfigurationRepresentation,
+            issue,
+            commitInfo?.first()
+    )
+}
 
