@@ -23,6 +23,7 @@ import org.mockito.Mockito.mock
 import java.net.URLEncoder
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -137,7 +138,7 @@ class JIRAServiceExtensionTest {
                 jiraConfiguration(),
                 Collections.emptyList()
         )
-        assertEquals("", link, "The link for no issue is empty" )
+        assertEquals("", link, "The link for no issue is empty")
     }
 
     @Test
@@ -221,6 +222,20 @@ class JIRAServiceExtensionTest {
                 ),
                 issues.values.map { it.key }.toSet()
         )
+    }
+
+    @Test
+    fun `Message regular expression`() {
+        val regex = service.getMessageRegex(jiraConfiguration(), createIssue(120)).toRegex()
+        assertTrue(regex.containsMatchIn("TEST-120"))
+        assertTrue(regex.containsMatchIn("TEST-120 at the beginning"))
+        assertTrue(regex.containsMatchIn("In the TEST-120 middle"))
+        assertTrue(regex.containsMatchIn("In the end TEST-120"))
+        assertTrue(regex.containsMatchIn("TEST-120: with separator"))
+        assertFalse(regex.containsMatchIn("Too many TEST-1200 digits"))
+        assertFalse(regex.containsMatchIn("Too many digits TEST-1200"))
+        assertFalse(regex.containsMatchIn("Wrong XTEST-1200 project"))
+        assertFalse(regex.containsMatchIn("XTEST-1200 Wrong project"))
     }
 
     private fun createLink(i: Int, name: String, relation: String) =
