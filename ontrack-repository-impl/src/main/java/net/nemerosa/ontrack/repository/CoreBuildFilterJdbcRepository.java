@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException;
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
-import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -422,11 +420,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         return structureRepository
                 .getValidationStampByName(branch, validationStampName)
                 .map(Entity::id)
-                .orElseThrow(() -> new ValidationStampNotFoundException(
-                        branch.getProject().getName(),
-                        branch.getName(),
-                        validationStampName
-                ));
+                .orElse(-1);
     }
 
     private Integer findLastBuildWithValidationStamp(int validationStampId, String status) {
