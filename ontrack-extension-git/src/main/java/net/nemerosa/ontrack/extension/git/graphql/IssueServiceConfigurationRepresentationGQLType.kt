@@ -14,6 +14,8 @@ class IssueServiceConfigurationRepresentationGQLType : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return GraphQLObjectType.newObject()
+                .name(typeName)
+                .description("Technical representation of an issue service and its configuration")
                 .stringField("id", "ID of the issue service")
                 .stringField("name", "Name of the issue service")
                 .stringField("serviceId", "Link to the issue service configuration")
