@@ -65,10 +65,28 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     }
 
     /**
+     * Does not return a result when the promotion in since promotion does not exist.
+     */
+    @Test
+    public void since_unknown_promotion_level() {
+        // Builds
+        build(1);
+        build(2);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withSincePromotionLevel("UNKNOWN")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 2, 1);
+    }
+
+    /**
      * Since a not found promotion level
      */
     @Test
-    public void since_promotion_level_not_found() throws Exception {
+    public void since_promotion_level_not_found() {
         // Filter
         BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
                 .withSincePromotionLevel("NOT_FOUND")
@@ -150,6 +168,24 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     }
 
     /**
+     * Does not return a result when the promotion in with promotion does not exist.
+     */
+    @Test
+    public void with_unknown_promotion_level() {
+        // Builds
+        build(1);
+        build(2);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withWithPromotionLevel("UNKNOWN")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        assertTrue("Expecting no result", builds.isEmpty());
+    }
+
+    /**
      * Tests the following sequence:
      * <p>
      * <pre>
@@ -181,6 +217,24 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         List<Build> builds = filter.filterBranchBuilds(branch);
         // Checks the list
         checkList(builds, 5, 4, 2);
+    }
+
+    /**
+     * Does not return a result when the validation stamp in with validation does not exist.
+     */
+    @Test
+    public void with_unknown_validation_stamp() {
+        // Builds
+        build(1);
+        build(2);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withWithValidationStamp("UNKNOWN")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        assertTrue("Expecting no result", builds.isEmpty());
     }
 
     /**
@@ -251,6 +305,24 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         List<Build> builds = filter.filterBranchBuilds(branch);
         // Checks the list
         checkList(builds, 5, 4);
+    }
+
+    /**
+     * Does not return a result when the validation stamp in since validation does not exist.
+     */
+    @Test
+    public void since_unknown_validation_stamp() {
+        // Builds
+        build(1);
+        build(2);
+        // Filter
+        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+                .withSinceValidationStamp("UNKNOWN")
+                .build();
+        // Filtering
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // Checks the list
+        checkList(builds, 2, 1);
     }
 
     /**
@@ -329,14 +401,18 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         checkList(builds, 5, 4);
     }
 
-    @Test(expected = ValidationStampNotFoundException.class)
-    public void with_validation_stamp_not_found() throws Exception {
+    @Test
+    public void with_validation_stamp_not_found() {
+        build(1);
+        build(2);
         // Filter
         BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
                 .withWithValidationStamp("NOT_FOUND")
                 .build();
         // Filtering
-        filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(branch);
+        // No build
+        assertTrue("Expecting no result", builds.isEmpty());
     }
 
     @Test
