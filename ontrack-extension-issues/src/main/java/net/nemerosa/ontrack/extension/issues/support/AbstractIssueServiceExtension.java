@@ -88,7 +88,7 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
     @Override
     public String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         String displayKey = issue.getDisplayKey();
-        return "(?:\\s|^)(" + displayKey + ")(?:\\s|$)";
+        return "(?:\\s|^)(" + displayKey + ")(?:[^\\d]|$)";
     }
 
     protected abstract Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
