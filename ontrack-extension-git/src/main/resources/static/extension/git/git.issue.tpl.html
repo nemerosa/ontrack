@@ -9,6 +9,8 @@
     <div class="row" ng-if="gitIssueInfo">
         <div class="col-md-12">
 
+            <!-- Issue -->
+
             <div class="panel panel-info">
                 <div class="panel-heading">
                     <a href="{{gitIssueInfo.issue.url}}">
@@ -24,19 +26,8 @@
                 </div>
             </div>
 
-            <!-- For each commit -->
-            <div class="row" ng-repeat="issueCommitInfo in ontrackGitIssueInfo.commitInfos">
-                <div class="col-md-12">
-
-                    <!-- Summary for the commit -->
-                    <ot-extension-git-commit-summary ui-commit="issueCommitInfo.uiCommit" title="true">
-
-                        <ot-extension-scm-issue-commit-branch-infos infos="issueCommitInfo.branchInfos"></ot-extension-scm-issue-commit-branch-infos>
-
-                    </ot-extension-git-commit-summary>
-
-                </div>
-            </div>
+            <!-- Commit info -->
+            <ot-extension-git-commit-info ng-if="gitIssueInfo.commitInfo" git-commit-info="gitIssueInfo.commitInfo"></ot-extension-git-commit-info>
 
         </div>
     </div>

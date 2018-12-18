@@ -95,6 +95,13 @@ angular.module('ontrack.extension.git', [
             }
         };
     })
+    .directive('otExtensionGitCommitInfo', () => ({
+        restrict: 'E',
+        templateUrl: 'extension/git/directive.commit.info.tpl.html',
+        scope: {
+            gitCommitInfo: '='
+        }
+    }))
 
     // Sync
 
@@ -232,7 +239,7 @@ angular.module('ontrack.extension.git', [
             otFormService.display({
                 uri: $scope.configurations._create,
                 title: "Git configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [otConfigurationService.testButton($scope.configurations._test)],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
@@ -256,7 +263,7 @@ angular.module('ontrack.extension.git', [
             otFormService.display({
                 uri: configuration._update,
                 title: "Git configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [otConfigurationService.testButton($scope.configurations._test)],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }
@@ -496,7 +503,7 @@ angular.module('ontrack.extension.git', [
                 }
                 // Loads the Git synchronisation information
                 return ot.pageCall($http.get($scope.project._gitSync));
-            }).then(function (gitSyncInfo){
+            }).then(function (gitSyncInfo) {
                 $scope.gitSyncInfo = gitSyncInfo;
             }).finally(function () {
                 $scope.synchronising = false;
