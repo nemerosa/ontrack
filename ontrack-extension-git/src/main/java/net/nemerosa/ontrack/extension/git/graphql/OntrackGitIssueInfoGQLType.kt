@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class OntrackGitIssueInfoGQLType(
-        private val ontrackGitCommitInfoGQLType: OntrackGitCommitInfoGQLType
+        private val ontrackGitCommitInfoGQLType: OntrackGitCommitInfoGQLType,
+        private val issueServiceConfigurationRepresentationGQLType: IssueServiceConfigurationRepresentationGQLType
 ) : GQLType {
     override fun getTypeName(): String =
             OntrackGitIssueInfo::class.java.simpleName
@@ -20,7 +21,12 @@ class OntrackGitIssueInfoGQLType(
             GraphQLObjectType.newObject()
                     .name(typeName)
                     .description("Information about an issue")
-                    // TODO Issue service configuration representation
+                    // Issue service configuration representation
+                    .field {
+                        it.name("issueServiceConfigurationRepresentation")
+                                .description("Issue service associated with the issue")
+                                .type(issueServiceConfigurationRepresentationGQLType.typeRef)
+                    }
                     // TODO Issue
                     // Commit info
                     .field {
