@@ -9,7 +9,7 @@ configurations {
     testArtifacts
 }
 
-task testJar (type: Jar) {
+task testJar(type: Jar) {
     baseName = "${project.name}-test"
     from sourceSets.test.output
 }
