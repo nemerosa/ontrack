@@ -56,9 +56,7 @@ public interface IssueServiceExtension extends Extension {
      * @param issueServiceConfiguration Configuration for the service
      * @param message                   Message to scan
      * @return List of keys (can be empty, never <code>null</code>)
-     * @deprecated Should not be used at all.
      */
-    @Deprecated
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
 
     /**
