@@ -1,3 +1,81 @@
+const gitCommitInfoFragments = `
+    fragment gitCommitInfoFields on OntrackGitCommitInfo {
+      uiCommit {
+        link
+        commit {
+          id
+          author {
+            name
+          }
+          commitTime
+        }
+        fullAnnotatedMessage
+      }
+      firstBuild {
+        branch {
+          id
+          name
+          links {
+            _page
+          }
+        }
+        ...buildFields
+      }
+      branchInfosList {
+        type
+        branchInfoList {
+          branch {
+            id
+            name
+            links {
+              _page
+            }
+          }
+          firstBuild {
+            ...buildFields
+          }
+          promotions {
+            creation {
+              time
+            }
+            promotionLevel {
+              id
+              name
+              description
+              image
+              _image
+              links {
+                _page
+              }
+            }
+            build {
+              ...buildFields
+            }
+          }
+        }
+      }
+    }
+    
+    fragment buildFields on Build {
+      id
+      name
+      creation {
+        time
+      }
+      links {
+        _page
+      }
+      decorations {
+        decorationType
+        error
+        data
+        feature {
+          id
+        }
+      }
+    }
+`;
+
 angular.module('ontrack.extension.git', [
     'ot.service.core',
     'ot.service.configuration',
@@ -63,21 +141,56 @@ angular.module('ontrack.extension.git', [
 
     .config(function ($stateProvider) {
         $stateProvider.state('git-issue', {
-            url: '/extension/git/{branch}/issue/{issue}',
+            url: '/extension/git/{project}/issue/{issue}',
             templateUrl: 'extension/git/git.issue.tpl.html',
             controller: 'GitIssueCtrl'
         });
     })
-    .controller('GitIssueCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
+    .controller('GitIssueCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otGraphqlService) {
+        const view = ot.view();
+        view.title = "";
 
-        var view = ot.view();
+        const query = `
+            query IssueInfo($project: Int!, $issue: String!) {
+              projects(id: $project) {
+                id
+                name
+                gitIssueInfo(token: $issue) {
+                  issueServiceConfigurationRepresentation {
+                    id
+                    name
+                    serviceId
+                  }
+                  issue
+                  commitInfo {
+                    ...gitCommitInfoFields
+                  }
+                }
+              }
+            }
+             ${gitCommitInfoFragments}
+        `;
 
-        ot.call(
-            $http.get(
-                $interpolate('extension/git/{{branch}}/issue/{{issue}}')($stateParams)
-            )).then(function (ontrackGitIssueInfo) {
-                $scope.ontrackGitIssueInfo = ontrackGitIssueInfo;
-            });
+        const queryVariables = {
+            project: $stateParams.project,
+            issue: $stateParams.issue
+        };
+
+        let viewInitialised = false;
+        otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+            $scope.project = data.projects[0];
+            $scope.gitIssueInfo = data.projects[0].gitIssueInfo;
+            if (!viewInitialised) {
+                // View configuration
+                view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
+                // Commands
+                view.commands = [
+                    ot.viewCloseCommand('/project/' + $scope.project.id)
+                ];
+                // OK
+                viewInitialised = true;
+            }
+        });
     })
 
     // Configurations
@@ -170,82 +283,11 @@ angular.module('ontrack.extension.git', [
                 id
                 name
                 gitCommitInfo(commit: $commit) {
-                  uiCommit {
-                    link
-                    commit {
-                      id
-                      author {
-                        name
-                      }
-                      commitTime
-                    }
-                    fullAnnotatedMessage
-                  }
-                  firstBuild {
-                    branch {
-                      id
-                      name
-                      links {
-                        _page
-                      }
-                    }
-                    ...buildFields
-                  }
-                  branchInfosList {
-                    type
-                    branchInfoList {
-                      branch {
-                        id
-                        name
-                        links {
-                          _page
-                        }
-                      }
-                      firstBuild {
-                        ...buildFields
-                      }
-                      promotions {
-                        creation {
-                          time
-                        }
-                        promotionLevel {
-                          id
-                          name
-                          description
-                          image
-                          _image
-                          links {
-                            _page
-                          }
-                        }
-                        build {
-                          ...buildFields
-                        }
-                      }
-                    }
-                  }
+                  ...gitCommitInfoFields
                 }
               }
             }
-            
-            fragment buildFields on Build {
-              id
-              name
-              creation {
-                time
-              }
-              links {
-                _page
-              }
-              decorations {
-                decorationType
-                error
-                data
-                feature {
-                  id
-                }
-              }
-            }
+            ${gitCommitInfoFragments}
         `;
 
         const queryVariables = {
