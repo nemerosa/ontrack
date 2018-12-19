@@ -464,7 +464,7 @@ class GitServiceImpl(
 
         // Getting the very first build in all the branches (promotion of not)
         // The branch it belongs to might very well be disabled
-        val firstBuild = branches.mapNotNull { branch ->
+        val firstBuild = branches.asSequence().mapNotNull { branch ->
             // Gets its Git configuration
             val branchConfiguration = getRequiredBranchConfiguration(branch)
             // Gets the earliest build on this branch that contains this commit
