@@ -25,7 +25,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertFirstBuild("3")
                     assertNoBranchInfos()
                 }
             }
@@ -80,7 +79,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertFirstBuild("3")
                     assertBranchInfos(
                             "Releases" to listOf(
                                     BranchInfoTest(
@@ -150,7 +148,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertFirstBuild("3")
                     assertBranchInfos(
                             "Releases" to listOf(
                                     BranchInfoTest(
@@ -187,7 +184,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertFirstBuild(commits.getOrFail(3))
                     assertNoBranchInfos()
                 }
             }
@@ -213,7 +209,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertFirstBuild(repo.commitLookup("Commit 3"))
                     assertNoBranchInfos()
                 }
             }
@@ -246,7 +241,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 5) {
-                    assertFirstBuild("1.0.1")
                     assertNoBranchInfos()
                 }
             }
@@ -278,7 +272,6 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 5) {
-                    assertFirstBuild("1.0.2")
                     assertNoBranchInfos()
                 }
             }

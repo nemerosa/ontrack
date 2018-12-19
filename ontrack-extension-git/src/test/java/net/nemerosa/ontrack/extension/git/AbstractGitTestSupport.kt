@@ -252,12 +252,6 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
         info.tests()
     }
 
-    protected fun OntrackGitCommitInfo.assertFirstBuild(expectedName: String) {
-        assertNotNull(firstBuild) {
-            assertEquals(expectedName, it.name)
-        }
-    }
-
     protected fun OntrackGitCommitInfo.assertNoBranchInfos() {
         assertTrue(branchInfos.isEmpty(), "No branch infos being found")
     }

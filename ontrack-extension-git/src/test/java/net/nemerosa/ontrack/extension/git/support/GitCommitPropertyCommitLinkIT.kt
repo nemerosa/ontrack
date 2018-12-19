@@ -39,12 +39,6 @@ class GitCommitPropertyCommitLinkIT : AbstractGitTestSupport() {
                             "Commit 4",
                             it.uiCommit.annotatedMessage
                     )
-                    assertNotNull(it.firstBuild) { build ->
-                        assertEquals(
-                                "1.1",
-                                build.name
-                        )
-                    }
                 }
             }
         }
