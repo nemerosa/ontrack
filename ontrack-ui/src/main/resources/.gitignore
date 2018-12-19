@@ -1,4 +1,5 @@
 *.json
 /static
 /application.properties
+/application-dev.properties
 /config
