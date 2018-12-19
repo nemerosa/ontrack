@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.git.branching
 
-import net.nemerosa.ontrack.model.structure.Branch
-
 /**
  * Branching model for a project.
  *
@@ -16,12 +14,10 @@ class BranchingModel(
          * Default branching model to use
          * when no model if defined globally or at
          * project level.
-         *
-         * It defines a unique type, "Releases", mapped
-         * to the `release/.*` regular expression.
          */
         val DEFAULT = BranchingModel(
                 mapOf(
+                        "Development" to "master|gatekeeper|develop",
                         "Releases" to "release/.*"
                 )
         )
@@ -32,24 +28,18 @@ class BranchingModel(
     // TODO Checks the validity of the model (no repetition)
 
     /**
-     * Given this branching model, a list of branches
-     * and a way to get the actual Git branch, returns
-     * an indexed list of branches, sorted from the
-     * oldest to the newest.
+     * Given this branching model, a list of Git branches, returns
+     * an indexed list of Git branches.
      *
-     * @param branches List of branches to index
-     * @param gitBranchAccessor Function to get the Git branch
+     * @param branches List of Git branches to index
      * @return Associates each type with a list of matching
-     * branches, sorted from the oldest to the newest.
+     * branches
      */
     fun groupBranches(
-            branches: List<Branch>,
-            gitBranchAccessor: (Branch) -> String?
-    ): Map<String, List<Branch>> =
+            branches: List<String>
+    ): Map<String, List<String>> =
             patterns.mapValues { (_, regex) ->
-                branches.filter { branch ->
-                    val gitBranch = gitBranchAccessor(branch)
-                    gitBranch != null && regex.toRegex().matches(gitBranch)
-                }.sortedBy { it.id() }
+                val pattern = regex.toRegex()
+                branches.filter { pattern.matches(it) }
             }
 }

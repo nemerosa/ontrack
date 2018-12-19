@@ -455,37 +455,21 @@ class GitServiceImpl(
 
         // Looks for all Git branches for this commit
         val gitBranches = repositoryClient.getBranchesForCommit(commit)
-        // Converts to Ontrack branches (non templates)
-        val branches = gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
-
-        // Index of first build per branch
-        // Used to avoid its recomputation when looking for indexed branch information
-        val firstBuilds = mutableMapOf<Int, Build>()
-
-        // Getting the very first build in all the branches (promotion of not)
-        // The branch it belongs to might very well be disabled
-        val firstBuild = branches.asSequence().mapNotNull { branch ->
-            // Gets its Git configuration
-            val branchConfiguration = getRequiredBranchConfiguration(branch)
-            // Gets the earliest build on this branch that contains this commit
-            val build = getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient)
-            // Indexation
-            if (build != null) {
-                firstBuilds[branch.id()] = build
-            }
-            // OK
-            build
-        }.sortedBy { it.id() }.firstOrNull()
-
         // Sorts the branches according to the branching model
         val indexedBranches = branchingModelService.getBranchingModel(project)
-                .groupBranches(branches) { getBranchConfiguration(it)?.branch }
+                .groupBranches(gitBranches)
+                .mapValues { (_, gitBranches) ->
+                    gitBranches.mapNotNull { findBranchWithGitBranch(project, it)  }
+                }
+                .filterValues { !it.isEmpty() }
 
         // For every indexation group of branches
         val branchInfos = indexedBranches.mapValues { (_, branches) ->
             branches.map { branch ->
-                // Gets the first build for this branch (using index)
-                val firstBuildOnThisBranch = firstBuilds[branch.id()]
+                // Gets its Git configuration
+                val branchConfiguration = getRequiredBranchConfiguration(branch)
+                // Gets the earliest build on this branch that contains this commit
+                val firstBuildOnThisBranch = getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient)
                 // Promotions
                 val promotions: List<PromotionRun> = firstBuildOnThisBranch?.let { build ->
                     structureService.getPromotionLevelListForBranch(branch.id)
@@ -508,7 +492,6 @@ class GitServiceImpl(
         // Result
         return OntrackGitCommitInfo(
                 uiCommit,
-                firstBuild,
                 branchInfos
         )
     }
