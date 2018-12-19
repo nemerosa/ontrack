@@ -334,17 +334,19 @@ class GitRepositoryClientImpl(
     }
 
     override fun isPatternFound(token: String): Boolean {
-        try {
+        // Ignore exceptions, in order to ignore Git configuration errors
+        // In the Git repo is wrongly configured, the token is considered at not found
+        return try {
             val log = git.log()
                     .all()
                     .setRevFilter(MessageRevFilter.create(token))
                     .setMaxCount(1)
             val commits = log.call()
-            return commits.iterator().hasNext()
+            commits.iterator().hasNext()
         } catch (e: GitAPIException) {
-            throw GitRepositoryAPIException(repository.remote, e)
+            false
         } catch (e: IOException) {
-            throw GitRepositoryIOException(repository.remote, e)
+            false
         }
 
     }
