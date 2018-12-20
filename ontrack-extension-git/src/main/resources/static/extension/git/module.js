@@ -11,16 +11,6 @@ const gitCommitInfoFragments = `
         }
         fullAnnotatedMessage
       }
-      firstBuild {
-        branch {
-          id
-          name
-          links {
-            _page
-          }
-        }
-        ...buildFields
-      }
       branchInfosList {
         type
         branchInfoList {
