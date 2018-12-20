@@ -62,9 +62,6 @@ class GitCommitInfoGraphQLIT : AbstractGitTestSupport() {
                                 uiCommit {
                                     annotatedMessage
                                 }
-                                firstBuild {
-                                    name
-                                }
                                 branchInfosList {
                                     type
                                     branchInfoList {
@@ -99,10 +96,30 @@ class GitCommitInfoGraphQLIT : AbstractGitTestSupport() {
                                 "uiCommit" to mapOf(
                                         "annotatedMessage" to "Commit 2"
                                 ),
-                                "firstBuild" to mapOf(
-                                        "name" to "3"
-                                ),
                                 "branchInfosList" to listOf(
+                                        mapOf(
+                                                "type" to "Development",
+                                                "branchInfoList" to listOf(
+                                                        mapOf(
+                                                                "branch" to mapOf(
+                                                                        "name" to "master"
+                                                                ),
+                                                                "firstBuild" to mapOf(
+                                                                        "name" to "3"
+                                                                ),
+                                                                "promotions" to listOf(
+                                                                        mapOf(
+                                                                                "promotionLevel" to mapOf(
+                                                                                        "name" to "SILVER"
+                                                                                ),
+                                                                                "build" to mapOf(
+                                                                                        "name" to "3"
+                                                                                )
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                        ),
                                         mapOf(
                                                 "type" to "Releases",
                                                 "branchInfoList" to listOf(

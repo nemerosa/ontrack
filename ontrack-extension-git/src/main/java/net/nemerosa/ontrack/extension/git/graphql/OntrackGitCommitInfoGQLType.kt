@@ -31,12 +31,6 @@ class OntrackGitCommitInfoGQLType(
                                 .description("Information about the commit itself")
                                 .type(gitUICommitGQLType.typeRef)
                     }
-                    // First build
-                    .field {
-                        it.name("firstBuild")
-                                .description("First build which contains the commit")
-                                .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
-                    }
                     // Branch infos
                     .field {
                         it.name("branchInfosList")

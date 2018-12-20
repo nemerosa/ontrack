@@ -26,7 +26,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
         } and { repo, _ ->
             project {
                 gitProject(repo)
-                branch {
+                branch("master") {
                     gitBranch {
                         buildNameAsCommit(abbreviated = true)
                     }
@@ -42,10 +42,14 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
                     assertEquals("2", gitIssueInfo.issue.key)
                     assertEquals("#2", gitIssueInfo.issue.displayKey)
                     assertNotNull(gitIssueInfo.commitInfo) { gitCommitInfo ->
-//                        assertNotNull(gitCommitInfo.firstBuild) { build ->
-//                            assertEquals(repo.commitLookup("#2 Third commit"), build.name)
-//                        }
-                        assertTrue(gitCommitInfo.branchInfos.isEmpty(), "No branch info")
+                        gitCommitInfo.assertBranchInfos(
+                                "Development" to listOf(
+                                        BranchInfoTest(
+                                                branch = "master",
+                                                firstBuild = repo.commitLookup("#2 Third commit")
+                                        )
+                                )
+                        )
                     }
                 }
             }
@@ -119,10 +123,14 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
                     assertEquals("2", gitIssueInfo.issue.key)
                     assertEquals("#2", gitIssueInfo.issue.displayKey)
                     assertNotNull(gitIssueInfo.commitInfo) { gitCommitInfo ->
-//                        assertNotNull(gitCommitInfo.firstBuild) { build ->
-//                            assertEquals("3", build.name)
-//                        }
-                        assertTrue(gitCommitInfo.branchInfos.isEmpty(), "No branch info")
+                        gitCommitInfo.assertBranchInfos(
+                                "Development" to listOf(
+                                        BranchInfoTest(
+                                                branch = "master",
+                                                firstBuild = "3"
+                                        )
+                                )
+                        )
                     }
                 }
             }

@@ -25,7 +25,14 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertNoBranchInfos()
+                    assertBranchInfos(
+                            "Development" to listOf(
+                                    BranchInfoTest(
+                                            branch = "master",
+                                            firstBuild = "3"
+                                    )
+                            )
+                    )
                 }
             }
         }
@@ -80,6 +87,15 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
                     assertBranchInfos(
+                            "Development" to listOf(
+                                    BranchInfoTest(
+                                            branch = "master",
+                                            firstBuild = "3",
+                                            promotions = listOf(
+                                                    "SILVER" to "3"
+                                            )
+                                    )
+                            ),
                             "Releases" to listOf(
                                     BranchInfoTest(
                                             branch = "release-2.0",
@@ -149,6 +165,15 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
                     assertBranchInfos(
+                            "Development" to listOf(
+                                    BranchInfoTest(
+                                            branch = "master",
+                                            firstBuild = "3",
+                                            promotions = listOf(
+                                                    "SILVER" to "3"
+                                            )
+                                    )
+                            ),
                             "Releases" to listOf(
                                     BranchInfoTest(
                                             branch = "release-2.0",
@@ -184,7 +209,12 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertNoBranchInfos()
+                    "Development" to listOf(
+                            BranchInfoTest(
+                                    branch = "master",
+                                    firstBuild = "3"
+                            )
+                    )
                 }
             }
         }
@@ -209,7 +239,12 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {
-                    assertNoBranchInfos()
+                    "Development" to listOf(
+                            BranchInfoTest(
+                                    branch = "master",
+                                    firstBuild = "3"
+                            )
+                    )
                 }
             }
         }
@@ -241,7 +276,12 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 5) {
-                    assertNoBranchInfos()
+                    "Development" to listOf(
+                            BranchInfoTest(
+                                    branch = "master",
+                                    firstBuild = "3"
+                            )
+                    )
                 }
             }
         }
@@ -272,7 +312,12 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 5) {
-                    assertNoBranchInfos()
+                    "Development" to listOf(
+                            BranchInfoTest(
+                                    branch = "master",
+                                    firstBuild = "3"
+                            )
+                    )
                 }
             }
         }

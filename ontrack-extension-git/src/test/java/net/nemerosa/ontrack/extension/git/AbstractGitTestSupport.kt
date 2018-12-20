@@ -276,7 +276,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
     protected class BranchInfoTest(
             private val branch: String,
             private val firstBuild: String?,
-            private val promotions: List<Pair<String, String>>
+            private val promotions: List<Pair<String, String>> = emptyList()
     ) {
         operator fun invoke(branchInfo: BranchInfo) {
             // Branch
