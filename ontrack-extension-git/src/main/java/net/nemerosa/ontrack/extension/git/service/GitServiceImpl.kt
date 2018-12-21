@@ -415,9 +415,11 @@ class GitServiceImpl(
         // Issue service
         val configuredIssueService: ConfiguredIssueService? = projectConfiguration.configuredIssueService.orElse(null)
         // Gets the details about the issue
-        val issue: Issue? = configuredIssueService?.getIssue(key)
+        val issue: Issue? = logTime("issue-object") {
+            configuredIssueService?.getIssue(key)
+        }
         // If no issue, no info
-        if (issue == null) {
+        if (issue == null || configuredIssueService == null) {
             return null
         } else {
             // Gets a client for this project
@@ -425,7 +427,9 @@ class GitServiceImpl(
             // Regular expression for the issue
             val regex = configuredIssueService.getMessageRegex(issue)
             // Now, get the last commit for this issue
-            val commit = repositoryClient.getLastCommitForExpression(regex)
+            val commit = logTime("issue-commit") {
+                repositoryClient.getLastCommitForExpression(regex)
+            }
             // If commit is found, we collect the commit info
             return if (commit != null) {
                 val commitInfo = getOntrackGitCommitInfo(project, commit)
@@ -454,7 +458,9 @@ class GitServiceImpl(
         val repositoryClient = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
 
         // Gets the commit
-        val commitObject = repositoryClient.getCommitFor(commit) ?: throw GitCommitNotFoundException(commit)
+        val commitObject = logTime("commit-object") {
+            repositoryClient.getCommitFor(commit) ?: throw GitCommitNotFoundException(commit)
+        }
         // Gets the annotated commit
         val messageAnnotators = getMessageAnnotators(projectConfiguration)
         val uiCommit = toUICommit(
