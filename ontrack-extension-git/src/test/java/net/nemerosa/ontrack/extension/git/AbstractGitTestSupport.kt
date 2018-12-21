@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.common.getOrFail
-import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
-import net.nemerosa.ontrack.extension.git.model.BranchInfo
-import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
+import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
@@ -21,6 +18,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NoConfig
 import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
+import java.lang.Thread.sleep
 import java.util.function.Consumer
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -171,6 +169,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             (1..n).associate {
                 val message = "Commit $it"
                 commit(it, message)
+                sleep(50) // Tiny delay to make sure not all builds have the same timestamp
                 val hash = commitLookup(message, false)
                 it to hash
             }
@@ -201,6 +200,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
                 // Any other item
                 else -> throw IllegalArgumentException("Unknown type: $command")
             }
+            sleep(50) // Tiny delay to make sure not all builds have the same timestamp
         }
         return index
     }
@@ -250,10 +250,6 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
         assertEquals("Commit $no", info.uiCommit.annotatedMessage)
         // Tests
         info.tests()
-    }
-
-    protected fun OntrackGitCommitInfo.assertNoBranchInfos() {
-        assertTrue(branchInfos.isEmpty(), "No branch infos being found")
     }
 
     protected fun OntrackGitCommitInfo.assertBranchInfos(
@@ -310,6 +306,9 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             gitCommitProperty(commits.getOrFail(no))
             validations.forEach { validate(it) }
             promotions.forEach { promote(it) }
+            gitService.getCommitForBuild(this)?.let {
+                println("build=$entityDisplayName,commit=${it.shortId},time=${it.commitTime},timestamp=${IndexableGitCommit(it).timestamp}")
+            }
         }
     }
 
