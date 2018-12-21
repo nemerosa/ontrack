@@ -75,9 +75,9 @@ class EntityDataJdbcRepository(
         val length = jsonPath.size
         val jsonCriteria = jsonPath.mapIndexed { index, it ->
             if (index == length - 1) {
-                "->>$it"
+                "->>'$it'"
             } else {
-                "->$it"
+                "->'$it'"
             }
         }.joinToString("")
         val sql = """
@@ -86,6 +86,8 @@ class EntityDataJdbcRepository(
             INNER JOIN ${type.name}S x ON x.ID = e.${type.name}
             WHERE x.${reference.first} = :referenceId
             AND CAST(e.json_value$jsonCriteria AS numeric) >= :value
+            ORDER BY e.${type.name} ASC
+			LIMIT 1
         """
         return getFirstItem(sql, params("referenceId", reference.second).addValue("value", value), Int::class.java)
     }
