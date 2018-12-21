@@ -53,7 +53,8 @@ class GitServiceImpl(
         private val gitConfigurators: Collection<GitConfigurator>,
         private val scmService: SCMUtilsService,
         private val gitRepositoryHelper: GitRepositoryHelper,
-        private val branchingModelService: BranchingModelService
+        private val branchingModelService: BranchingModelService,
+        private val entityDataService: EntityDataService
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
     private val logger = LoggerFactory.getLogger(GitService::class.java)
@@ -809,11 +810,20 @@ class GitServiceImpl(
     }
 
     override fun getCommitForBuild(build: Build): GitCommit? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val store: Optional<IndexableGitCommit> = entityDataService.retrieve(
+                build,
+                "git-commit",
+                IndexableGitCommit::class.java
+        )
+        return store.map { it.commit }.orElse(null)
     }
 
     override fun setCommitForBuild(build: Build, commit: GitCommit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        entityDataService.store(
+                build,
+                "git-commit",
+                IndexableGitCommit(commit)
+        )
     }
 
     private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
