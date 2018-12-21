@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import org.apache.commons.io.FileUtils
 import java.io.File
+import java.lang.Thread.sleep
 
 /**
  * Utility class to deal with a Git repository.
@@ -107,12 +108,13 @@ class GitRepo(val dir: File) : AutoCloseable {
     }
 
     @JvmOverloads
-    fun commit(no: Any, message: String? = null): String {
+    fun commit(no: Any, message: String? = null, pause: Boolean = false): String {
         val fileName = "file$no"
         cmd("touch", fileName)
         git("add", fileName)
         val commitMessage = message ?: "Commit $no"
         git("commit", "-m", commitMessage)
+        if (pause) sleep(1010)
         return commitLookup(commitMessage, false)
     }
 

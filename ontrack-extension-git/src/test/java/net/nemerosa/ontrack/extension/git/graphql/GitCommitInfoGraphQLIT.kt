@@ -11,7 +11,7 @@ class GitCommitInfoGraphQLIT : AbstractGitTestSupport() {
     @Test
     fun `Getting commit info`() {
         createRepo {
-            sequence(
+            sequenceWithPauses(
                     (1..3),
                     "release/2.0",
                     4,

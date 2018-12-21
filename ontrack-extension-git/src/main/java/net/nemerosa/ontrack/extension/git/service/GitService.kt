@@ -180,6 +180,13 @@ interface GitService : SCMService {
     /**
      * Collects and stores the [IndexableGitCommit]s for all builds of a branch.
      */
+    fun collectIndexableGitCommitForBranch(branch: Branch)
+
+    /**
+     * Collects and stores the [IndexableGitCommit]s for all builds of a branch.
+     *
+     * This is the optimized version for jobs running in the background.
+     */
     fun collectIndexableGitCommitForBranch(branch: Branch,
                                            client: GitRepositoryClient,
                                            config: GitBranchConfiguration,

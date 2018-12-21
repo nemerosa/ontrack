@@ -19,9 +19,9 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Issue search on one branch`() {
         createRepo {
-            commit(1, "#1 First commit")
-            commit(2, "#2 Second commit")
-            commit(3, "#2 Third commit")
+            commit(1, "#1 First commit", pause = true)
+            commit(2, "#2 Second commit", pause = true)
+            commit(3, "#2 Third commit", pause = true)
             commit(4, "#1 Fourth commit")
         } and { repo, _ ->
             project {
@@ -33,6 +33,8 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
                     build(repo.commitLookup("#1 First commit"))
                     build(repo.commitLookup("#2 Third commit"))
                     build(repo.commitLookup("#1 Fourth commit"))
+                    // Makes sure to index the branch builds commits
+                    gitService.collectIndexableGitCommitForBranch(this)
                 }
                 // Looks for an issue
                 val info = asUserWithView(this).call {
@@ -76,11 +78,11 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Issue search between two branches`() {
         createRepo {
-            val commit1 = commit(1, "Commit #2 one")
+            val commit1 = commit(1, "Commit #2 one", pause = true)
             git("checkout", "-b", "1.0")
-            val commit2 = commit(2, "Commit #2 two")
+            val commit2 = commit(2, "Commit #2 two", pause = true)
             git("checkout", "master")
-            val commit3 = commit(3, "Commit #2 three")
+            val commit3 = commit(3, "Commit #2 three", pause = true)
             // Commits index
             mapOf(
                     1 to commit1,
