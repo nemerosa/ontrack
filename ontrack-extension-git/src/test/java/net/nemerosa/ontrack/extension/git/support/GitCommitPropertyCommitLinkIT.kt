@@ -9,6 +9,49 @@ import kotlin.test.assertNotNull
 
 class GitCommitPropertyCommitLinkIT : AbstractGitTestSupport() {
 
+    @Test(expected = NoGitCommitPropertyException::class)
+    fun `Commit from build without property`() {
+        withRepo { repo ->
+            project {
+                gitProject(repo)
+                branch {
+                    gitBranch {
+                        commitAsProperty()
+                    }
+                    val link = gitService.getBranchConfiguration(this)!!.buildCommitLink!!
+                    build("1") {
+                        link.getCommitFromBuild(this)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Commit from build with property`() {
+        createRepo {
+            commits(1)
+        } and { repo, commits ->
+            project {
+                gitProject(repo)
+                branch {
+                    gitBranch {
+                        commitAsProperty()
+                    }
+                    val link = gitService.getBranchConfiguration(this)!!.buildCommitLink!!
+                    build("1") {
+                        gitCommitProperty(commits[1]!!)
+                        val commit = link.getCommitFromBuild(this)
+                        assertEquals(
+                                commits[1],
+                                commit
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     @Test
     fun `Issue search on one branch`() {
         createRepo {
