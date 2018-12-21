@@ -9,7 +9,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Commit on one branch with commit property`() {
         createRepo {
-            commits(10)
+            commits(10, pauses = true)
         } and { repo, commits ->
             project {
                 gitProject(repo)
@@ -41,7 +41,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Commit on two branches with commit property`() {
         createRepo {
-            sequence(
+            sequenceWithPauses(
                     (1..3),
                     "release/2.0",
                     4,
@@ -115,7 +115,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Commit on two branches with commit property but one branch is disabled`() {
         createRepo {
-            sequence(
+            sequenceWithPauses(
                     (1..3),
                     "release/2.0",
                     4,
@@ -193,7 +193,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Commit on one branch with long commit id as build name`() {
         createRepo {
-            commits(10)
+            commits(10, pauses = true)
         } and { repo, commits: Map<Int, String> ->
             project {
                 gitProject(repo)
@@ -223,7 +223,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Commit on one branch with short commit id as build name`() {
         createRepo {
-            commits(9)
+            commits(9, pauses = true)
         } and { repo, commits: Map<Int, String> ->
             project {
                 gitProject(repo)
@@ -253,7 +253,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Commit on one branch with tag build name property`() {
         createRepo {
-            sequence(
+            sequenceWithPauses(
                     (1..3),
                     4 to "1.0.0",
                     5,
@@ -290,7 +290,7 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
     @Test
     fun `Commit on one branch with tag pattern build name property`() {
         createRepo {
-            sequence(
+            sequenceWithPauses(
                     (1..3),
                     4 to "1.0.0",
                     5,

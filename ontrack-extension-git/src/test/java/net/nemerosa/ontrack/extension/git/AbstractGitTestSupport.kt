@@ -179,7 +179,19 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
     /**
      * Creates a sequence of commits on different branches.
      */
-    protected fun GitRepo.sequence(vararg commands: Any): Map<Int, String> {
+    protected fun GitRepo.sequence(vararg commands: Any): Map<Int, String> =
+            runSequence(commands.toList(), false)
+
+    /**
+     * Creates a sequence of commits on different branches, pausing after each commit
+     */
+    protected fun GitRepo.sequenceWithPauses(vararg commands: Any): Map<Int, String> =
+            runSequence(commands.toList(), true)
+
+    /**
+     * Creates a sequence of commits on different branches.
+     */
+    private fun GitRepo.runSequence(commands: List<*>, pauses: Boolean): Map<Int, String> {
         val index = mutableMapOf<Int, String>()
         val branches = mutableSetOf("master")
         commands.forEach { command ->
@@ -187,10 +199,14 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
                 // Branch
                 is String -> branch(command, branches)
                 // Single commit
-                is Int -> index[command] = commit(command)
+                is Int -> {
+                    index[command] = commit(command)
+                    if (pauses) sleep(1010)
+                }
                 // Range of commit
                 is IntRange -> command.forEach {
                     index[it] = commit(it)
+                    if (pauses) sleep(1010)
                 }
                 // Commit to tag
                 is Pair<*, *> -> {
@@ -198,6 +214,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
                     val tag = command.second as String
                     index[commit] = commit(commit)
                     tag(tag)
+                    if (pauses) sleep(1010)
                 }
                 // Any other item
                 else -> throw IllegalArgumentException("Unknown type: $command")
