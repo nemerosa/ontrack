@@ -10,14 +10,14 @@ import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.support.NameValue
 import org.springframework.stereotype.Component
 import java.util.function.Function
 
 @Component
 class BranchingModelPropertyType(
         extensionFeature: GitExtensionFeature
-): AbstractPropertyType<BranchingModelProperty>(extensionFeature)
-{
+) : AbstractPropertyType<BranchingModelProperty>(extensionFeature) {
     override fun getName(): String = "Branching Model"
 
     override fun getDescription(): String =
@@ -32,17 +32,20 @@ class BranchingModelPropertyType(
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean =
             true
 
-    override fun getEditionForm(entity: ProjectEntity, value: BranchingModelProperty?): Form =
-            Form.create()
-                    .with(
-                            NamedEntries.of("patterns")
-                                    .label("List of branches")
-                                    .nameLabel("Type")
-                                    .valueLabel("Branches")
-                                    .addText("Add a branch type")
-                                    .help("Regular expressions to associate with branch types")
-                                    .value(value?.patterns)
-    )
+    override fun getEditionForm(entity: ProjectEntity, value: BranchingModelProperty?): Form {
+        val patterns: List<NameValue> = value?.patterns
+                ?: BranchingModel.DEFAULT.patterns.map { (type, regex) -> NameValue(type, regex) }
+        return Form.create()
+                .with(
+                        NamedEntries.of("patterns")
+                                .label("List of branches")
+                                .nameLabel("Type")
+                                .valueLabel("Branches")
+                                .addText("Add a branch type")
+                                .help("Regular expressions to associate with branch types")
+                                .value(patterns)
+                )
+    }
 
     override fun fromClient(node: JsonNode): BranchingModelProperty {
         return fromStorage(node)
