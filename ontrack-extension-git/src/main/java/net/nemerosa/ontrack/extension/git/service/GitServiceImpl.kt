@@ -852,6 +852,25 @@ class GitServiceImpl(
         }
     }
 
+    override fun collectIndexableGitCommitForBuild(build: Build) {
+        val project = build.project
+        val projectConfiguration = getProjectConfiguration(project)
+        if (projectConfiguration != null) {
+            val client = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
+            val branchConfiguration = getBranchConfiguration(build.branch)
+            val buildCommitLink = branchConfiguration?.buildCommitLink
+            if (buildCommitLink != null) {
+                collectIndexableGitCommitForBuild(
+                        build,
+                        client,
+                        buildCommitLink,
+                        true,
+                        JobRunListener.logger(logger)
+                )
+            }
+        }
+    }
+
     private fun collectIndexableGitCommitForBuild(
             build: Build,
             client: GitRepositoryClient,

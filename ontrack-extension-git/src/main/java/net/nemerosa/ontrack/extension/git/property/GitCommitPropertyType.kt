@@ -2,12 +2,14 @@ package net.nemerosa.ontrack.extension.git.property
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
+import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,8 +19,10 @@ import java.util.EnumSet
 import java.util.function.Function
 
 @Component
-class GitCommitPropertyType @Autowired
-constructor(extensionFeature: GitExtensionFeature) : AbstractPropertyType<GitCommitProperty>(extensionFeature) {
+class GitCommitPropertyType(
+        extensionFeature: GitExtensionFeature,
+        private val gitService: GitService
+) : AbstractPropertyType<GitCommitProperty>(extensionFeature) {
 
     override fun getName(): String {
         return "Git commit"
@@ -68,4 +72,12 @@ constructor(extensionFeature: GitExtensionFeature) : AbstractPropertyType<GitCom
         return value
     }
 
+    /**
+     * Makes sure to reindex the build
+     */
+    override fun onPropertyChanged(entity: ProjectEntity, value: GitCommitProperty) {
+        if (entity is Build) {
+            gitService.collectIndexableGitCommitForBuild(entity)
+        }
+    }
 }

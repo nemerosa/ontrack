@@ -185,4 +185,9 @@ interface GitService : SCMService {
                                            config: GitBranchConfiguration,
                                            overrides: Boolean,
                                            listener: JobRunListener)
+
+    /**
+     * Collects and stores the [IndexableGitCommit]s one build.
+     */
+    fun collectIndexableGitCommitForBuild(build: Build)
 }
