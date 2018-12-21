@@ -183,5 +183,6 @@ interface GitService : SCMService {
     fun collectIndexableGitCommitForBranch(branch: Branch,
                                            client: GitRepositoryClient,
                                            config: GitBranchConfiguration,
+                                           overrides: Boolean,
                                            listener: JobRunListener)
 }

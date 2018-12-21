@@ -839,13 +839,14 @@ class GitServiceImpl(
             branch: Branch,
             client: GitRepositoryClient,
             config: GitBranchConfiguration,
+            overrides: Boolean,
             listener: JobRunListener
     ) {
         val buildCommitLink = config.buildCommitLink
         if (buildCommitLink != null) {
             structureService.findBuild(
                     branch.id,
-                    Predicate { build -> collectIndexableGitCommitForBuild(build, client, buildCommitLink, listener) },
+                    Predicate { build -> collectIndexableGitCommitForBuild(build, client, buildCommitLink, overrides, listener) },
                     BuildSortDirection.FROM_NEWEST
             )
         }
@@ -855,6 +856,7 @@ class GitServiceImpl(
             build: Build,
             client: GitRepositoryClient,
             buildCommitLink: ConfiguredBuildGitCommitLink<*>,
+            overrides: Boolean,
             listener: JobRunListener
     ): Boolean = transactionTemplate.execute {
         val commit =
@@ -866,9 +868,12 @@ class GitServiceImpl(
         if (commit != null) {
             listener.message("Indexing $commit for build ${build.entityDisplayName}")
             // Gets the Git information for the commit
-            val commitFor = client.getCommitFor(commit)
-            if (commitFor != null) {
-                setCommitForBuild(build, commitFor)
+            val toSet: Boolean = overrides || getCommitForBuild(build) != null
+            if (toSet) {
+                val commitFor = client.getCommitFor(commit)
+                if (commitFor != null) {
+                    setCommitForBuild(build, commitFor)
+                }
             }
         }
         // Going on

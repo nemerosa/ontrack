@@ -31,44 +31,54 @@ class IndexableGitCommitJob(
                     .filter { project ->
                         gitService.getProjectConfiguration(project) != null
                     }
-                    .map { project ->
-                        createIndexableGitCommitJobRegistration(project)
+                    .flatMap { project ->
+                        sequenceOf(
+                                createIndexableGitCommitJobRegistration(project, overrides = true, schedule = Schedule.NONE),
+                                createIndexableGitCommitJobRegistration(project, overrides = false, schedule = Schedule.EVERY_DAY)
+                        )
                     }
                     .asStream()
         })
     }
 
-    private fun createIndexableGitCommitJobRegistration(project: Project): JobRegistration =
+    private fun createIndexableGitCommitJobRegistration(project: Project, overrides: Boolean, schedule: Schedule): JobRegistration =
             JobRegistration.of(
                     object : Job {
-                        override fun getKey(): JobKey =
-                                GIT_COMMIT_INDEX_JOB.getKey(project.name)
-
-                        override fun getTask() = JobRun { listener ->
-                            collectIndexableGitCommitForProject(project, listener)
+                        override fun getKey(): JobKey = if (overrides) {
+                            GIT_COMMIT_REINDEX_JOB.getKey(project.name)
+                        } else {
+                            GIT_COMMIT_INDEX_JOB.getKey(project.name)
                         }
 
-                        override fun getDescription(): String =
-                                "Indexation of Git commits for project ${project.name}"
+                        override fun getTask() = JobRun { listener ->
+                            collectIndexableGitCommitForProject(project, overrides, listener)
+                        }
+
+                        override fun getDescription(): String = if (overrides) {
+                            "Re-indexation of Git commits for project ${project.name}"
+                        } else {
+                            "Incremental indexation of Git commits for project ${project.name}"
+                        }
 
                         override fun isDisabled(): Boolean = project.isDisabled
 
                     }
-            ).withSchedule(Schedule.NONE)
+            ).withSchedule(schedule)
 
-    private fun collectIndexableGitCommitForProject(project: Project, listener: JobRunListener) {
+    private fun collectIndexableGitCommitForProject(project: Project, overrides: Boolean, listener: JobRunListener) {
         securityService.asAdmin {
             val projectConfiguration = gitService.getProjectConfiguration(project)
             if (projectConfiguration != null) {
                 val client: GitRepositoryClient = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
                 gitService.forEachConfiguredBranchInProject(project) { branch, config ->
-                    gitService.collectIndexableGitCommitForBranch(branch, client, config, listener)
+                    gitService.collectIndexableGitCommitForBranch(branch, client, config, overrides, listener)
                 }
             }
         }
     }
 
     companion object {
+        private val GIT_COMMIT_REINDEX_JOB = GIT_JOB_CATEGORY.getType("git-commit-reindexation").withName("Git commit re-indexation")
         private val GIT_COMMIT_INDEX_JOB = GIT_JOB_CATEGORY.getType("git-commit-indexation").withName("Git commit indexation")
     }
 }
