@@ -869,7 +869,7 @@ class GitServiceImpl(
             }
         }
         // Going on
-        true
+        false
     }
 
     private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
