@@ -524,13 +524,10 @@ class GitServiceImpl(
     }
 
     internal fun getEarliestBuildAfterCommit(commit: GitCommit, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
-        val buildId = entityDataService.findFirstJsonFieldGreaterOrEqual(
-                ProjectEntityType.BUILD,
-                "branchId" to branch.id(),
-                IndexableGitCommit(commit).timestamp,
-                "timestamp"
-        )
-        return buildId?.let { structureService.getBuild(ID.of(it)) }
+        return gitRepositoryHelper.getEarliestBuildAfterCommit(
+                branch,
+                IndexableGitCommit(commit)
+        )?.let { structureService.getBuild(ID.of(it)) }
     }
 
     private fun getDiffUrl(diff: GitDiff, entry: GitDiffEntry, fileChangeLinkFormat: String): String {

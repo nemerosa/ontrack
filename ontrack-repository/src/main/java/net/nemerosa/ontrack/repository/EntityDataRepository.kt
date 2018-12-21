@@ -35,9 +35,4 @@ interface EntityDataRepository {
      */
     fun delete(entity: ProjectEntity, key: String)
 
-    /**
-     * Flexible query based on JSON, to get a first match based on numeric comparison
-     */
-    fun findFirstJsonFieldGreaterOrEqual(type: ProjectEntityType, reference: Pair<String, Int>, value: Long, vararg jsonPath: String): Int?
-
 }

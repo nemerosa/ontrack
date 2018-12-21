@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.common.base.Function
-
-import java.util.Optional
 
 /**
  * This service allows to store and retrieve arbitrary data with some
@@ -68,10 +65,5 @@ interface EntityDataService {
      * Loads some data, processes it and saves it back
      */
     fun <T> withData(entity: ProjectEntity, key: String, type: Class<T>, processFn: (T) -> T)
-
-    /**
-     * Flexible query based on JSON, to get a first match based on numeric comparison
-     */
-    fun findFirstJsonFieldGreaterOrEqual(type: ProjectEntityType, reference: Pair<String, Int>, value: Long, vararg jsonPath: String): Int?
 
 }

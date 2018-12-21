@@ -3,10 +3,8 @@ package net.nemerosa.ontrack.repository
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
-import java.util.*
 import javax.sql.DataSource
 
 @Repository
@@ -71,24 +69,4 @@ class EntityDataJdbcRepository(
         )
     }
 
-    override fun findFirstJsonFieldGreaterOrEqual(type: ProjectEntityType, reference: Pair<String, Int>, value: Long, vararg jsonPath: String): Int? {
-        val length = jsonPath.size
-        val jsonCriteria = jsonPath.mapIndexed { index, it ->
-            if (index == length - 1) {
-                "->>'$it'"
-            } else {
-                "->'$it'"
-            }
-        }.joinToString("")
-        val sql = """
-            SELECT e.${type.name}
-            FROM ENTITY_DATA e
-            INNER JOIN ${type.name}S x ON x.ID = e.${type.name}
-            WHERE x.${reference.first} = :referenceId
-            AND CAST(e.json_value$jsonCriteria AS numeric) >= :value
-            ORDER BY e.${type.name} ASC
-			LIMIT 1
-        """
-        return getFirstItem(sql, params("referenceId", reference.second).addValue("value", value), Int::class.java)
-    }
 }

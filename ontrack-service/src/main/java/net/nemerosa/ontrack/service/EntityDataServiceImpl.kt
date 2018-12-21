@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.EntityDataService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.repository.EntityDataRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -77,7 +76,4 @@ class EntityDataServiceImpl(
         retrieve(entity, key, type)?.let { data -> store(entity, key, processFn(data) as Any) }
     }
 
-    override fun findFirstJsonFieldGreaterOrEqual(type: ProjectEntityType, reference: Pair<String, Int>, value: Long, vararg jsonPath: String): Int? {
-        return repository.findFirstJsonFieldGreaterOrEqual(type, reference, value, *jsonPath)
-    }
 }
