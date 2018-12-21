@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.git.branching
 
+import net.nemerosa.ontrack.model.support.NameValue
+
 /**
  * Branching model for a project.
  *
@@ -9,6 +11,10 @@ package net.nemerosa.ontrack.extension.git.branching
 class BranchingModel(
         val patterns: Map<String, String>
 ) {
+    constructor(patterns: List<NameValue>) : this(
+            patterns.associate { it.name to it.value }
+    )
+
     companion object {
         /**
          * Default branching model to use
@@ -22,10 +28,6 @@ class BranchingModel(
                 )
         )
     }
-
-    // TODO Parsing the model from a text
-    // TODO Rendering the model into a text
-    // TODO Checks the validity of the model (no repetition)
 
     /**
      * Given this branching model, a list of Git branches, returns
