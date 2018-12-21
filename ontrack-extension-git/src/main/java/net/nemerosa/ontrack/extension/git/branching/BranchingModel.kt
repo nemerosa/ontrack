@@ -17,7 +17,7 @@ class BranchingModel(
          */
         val DEFAULT = BranchingModel(
                 mapOf(
-                        "Development" to "master|gatekeeper|develop",
+                        "Development" to "master|gatekeeper|develop|maintenance/.*",
                         "Releases" to "release/.*"
                 )
         )
