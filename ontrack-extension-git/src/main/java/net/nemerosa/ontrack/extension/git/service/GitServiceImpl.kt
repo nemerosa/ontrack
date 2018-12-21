@@ -818,20 +818,18 @@ class GitServiceImpl(
                 .asOptional()
     }
 
-    override fun getCommitForBuild(build: Build): GitCommit? {
-        val store: IndexableGitCommit? = entityDataService.retrieve(
-                build,
-                "git-commit",
-                IndexableGitCommit::class.java
-        )
-        return store?.commit
-    }
+    override fun getCommitForBuild(build: Build): IndexableGitCommit? =
+            entityDataService.retrieve(
+            build,
+            "git-commit",
+            IndexableGitCommit::class.java
+    )
 
-    override fun setCommitForBuild(build: Build, commit: GitCommit) {
+    override fun setCommitForBuild(build: Build, commit: IndexableGitCommit) {
         entityDataService.store(
                 build,
                 "git-commit",
-                IndexableGitCommit(commit)
+                commit
         )
     }
 
@@ -891,7 +889,7 @@ class GitServiceImpl(
             if (toSet) {
                 val commitFor = client.getCommitFor(commit)
                 if (commitFor != null) {
-                    setCommitForBuild(build, commitFor)
+                    setCommitForBuild(build, IndexableGitCommit(commitFor))
                 }
             }
         }

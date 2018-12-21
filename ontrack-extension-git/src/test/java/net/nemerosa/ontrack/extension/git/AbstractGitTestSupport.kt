@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.common.getOrFail
-import net.nemerosa.ontrack.extension.git.model.*
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
+import net.nemerosa.ontrack.extension.git.model.BranchInfo
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
+import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
 import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
@@ -23,7 +26,6 @@ import java.util.function.Consumer
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
@@ -165,12 +167,12 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      * @param n Number of commits to create
      * @return A map where the key in the index, and the value is the commit hash.
      */
-    protected fun GitRepo.commits(n: Int) =
+    protected fun GitRepo.commits(n: Int, pauses: Boolean = false) =
             (1..n).associate {
                 val message = "Commit $it"
                 commit(it, message)
-                sleep(50) // Tiny delay to make sure not all builds have the same timestamp
                 val hash = commitLookup(message, false)
+                if (pauses) sleep(1010)
                 it to hash
             }
 
@@ -200,7 +202,6 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
                 // Any other item
                 else -> throw IllegalArgumentException("Unknown type: $command")
             }
-            sleep(50) // Tiny delay to make sure not all builds have the same timestamp
         }
         return index
     }
@@ -307,7 +308,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             validations.forEach { validate(it) }
             promotions.forEach { promote(it) }
             gitService.getCommitForBuild(this)?.let {
-                println("build=$entityDisplayName,commit=${it.shortId},time=${it.commitTime},timestamp=${IndexableGitCommit(it).timestamp}")
+                println("build=$entityDisplayName,commit=${it.commit.shortId},time=${it.commit.commitTime},timestamp=${it.timestamp}")
             }
         }
     }

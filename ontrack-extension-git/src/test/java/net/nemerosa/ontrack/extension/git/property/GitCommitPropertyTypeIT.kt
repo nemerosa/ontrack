@@ -24,7 +24,7 @@ class GitCommitPropertyTypeIT : AbstractGitTestSupport() {
                         // Checks that we can now get a GitCommit for this build
                         val commit = gitService.getCommitForBuild(this)
                         assertNotNull(commit) {
-                            assertEquals("Commit 1", it.shortMessage)
+                            assertEquals("Commit 1", it.commit.shortMessage)
                         }
                     }
                 }

@@ -167,7 +167,7 @@ interface GitService : SCMService {
      * @param build Build to get the information for
      * @return Commit information or `null` if not found
      */
-    fun getCommitForBuild(build: Build): GitCommit?
+    fun getCommitForBuild(build: Build): IndexableGitCommit?
 
     /**
      * Sets the [GitCommit] information for a build.
@@ -175,7 +175,7 @@ interface GitService : SCMService {
      * @param build Build to set the information for
      * @param commit Commit information
      */
-    fun setCommitForBuild(build: Build, commit: GitCommit)
+    fun setCommitForBuild(build: Build, commit: IndexableGitCommit)
 
     /**
      * Collects and stores the [IndexableGitCommit]s for all builds of a branch.
