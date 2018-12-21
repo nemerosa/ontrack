@@ -46,11 +46,11 @@ class EntityDataJdbcRepository(
         }
     }
 
-    override fun retrieve(entity: ProjectEntity, key: String): Optional<String> {
-        return retrieveJson(entity, key).map { it.asText() }
+    override fun retrieve(entity: ProjectEntity, key: String): String? {
+        return retrieveJson(entity, key)?.asText()
     }
 
-    override fun retrieveJson(entity: ProjectEntity, key: String): Optional<JsonNode> {
+    override fun retrieveJson(entity: ProjectEntity, key: String): JsonNode? {
         return getOptional(
                 String.format(
                         "SELECT JSON_VALUE FROM ENTITY_DATA WHERE %s = :entityId AND NAME = :name",
@@ -58,7 +58,7 @@ class EntityDataJdbcRepository(
                 ),
                 params("entityId", entity.id()).addValue("name", key),
                 String::class.java
-        ).map { this.readJson(it) }
+        ).map { this.readJson(it) }.orElse(null)
     }
 
     override fun delete(entity: ProjectEntity, key: String) {

@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.common.base.Function
 import net.nemerosa.ontrack.json.ObjectMapperFactory
-import net.nemerosa.ontrack.model.exceptions.JsonParsingException
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -12,7 +10,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.repository.EntityDataRepository
 import org.springframework.stereotype.Service
-import java.io.IOException
 import java.util.*
 
 @Service
@@ -42,41 +39,33 @@ class EntityDataServiceImpl(
         repository.store(entity, key, value)
     }
 
-    override fun retrieveBoolean(entity: ProjectEntity, key: String): Optional<Boolean> {
+    override fun retrieveBoolean(entity: ProjectEntity, key: String): Boolean? {
         return retrieve(entity, key) { it == "true" }
     }
 
-    override fun retrieveInteger(entity: ProjectEntity, key: String): Optional<Int> {
+    override fun retrieveInteger(entity: ProjectEntity, key: String): Int? {
         return retrieve(entity, key) { value -> Integer.parseInt(value, 10) }
     }
 
-    override fun retrieve(entity: ProjectEntity, key: String): Optional<String> {
+    override fun retrieve(entity: ProjectEntity, key: String): String? {
         return retrieve(entity, key) { it }
     }
 
-    override fun retrieveJson(entity: ProjectEntity, key: String): Optional<JsonNode> {
-        return retrieve(entity, key) { value ->
-            try {
-                objectMapper.readTree(value)
-            } catch (e: IOException) {
-                throw JsonParsingException(e)
-            }
+    override fun retrieveJson(entity: ProjectEntity, key: String): JsonNode? {
+        return repository.retrieveJson(entity, key)
+    }
+
+    override fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): T? {
+        val json = repository.retrieveJson(entity, key)
+        return json?.let {
+            objectMapper.treeToValue(it, type)
         }
     }
 
-    override fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): Optional<T> {
-        return retrieve<T>(entity, key) { value ->
-            try {
-                objectMapper.readValue<T>(value, type)
-            } catch (e: IOException) {
-                throw JsonParsingException(e)
-            }
-        }
-    }
-
-    protected fun <T> retrieve(entity: ProjectEntity, key: String, parser: (String) -> T): Optional<T> {
+    protected fun <T> retrieve(entity: ProjectEntity, key: String, parser: (String) -> T?): T? {
         securityService.checkProjectFunction(entity, ProjectView::class.java)
-        return repository.retrieve(entity, key).map { parser(it) }
+        val text = repository.retrieve(entity, key)
+        return text?.let(parser)
     }
 
     override fun delete(entity: ProjectEntity, key: String) {
@@ -84,8 +73,8 @@ class EntityDataServiceImpl(
         repository.delete(entity, key)
     }
 
-    override fun <T> withData(entity: ProjectEntity, key: String, type: Class<T>, processFn: Function<T, T>) {
-        retrieve(entity, key, type).ifPresent { data -> store(entity, key, processFn.apply(data) as Any) }
+    override fun <T> withData(entity: ProjectEntity, key: String, type: Class<T>, processFn: (T) -> T) {
+        retrieve(entity, key, type)?.let { data -> store(entity, key, processFn(data) as Any) }
     }
 
     override fun findFirstJsonFieldGreaterOrEqual(type: ProjectEntityType, reference: Pair<String, Int>, value: Long, vararg jsonPath: String): Int? {

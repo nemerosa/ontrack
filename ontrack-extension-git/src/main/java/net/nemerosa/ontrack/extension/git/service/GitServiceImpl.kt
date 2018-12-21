@@ -813,12 +813,12 @@ class GitServiceImpl(
     }
 
     override fun getCommitForBuild(build: Build): GitCommit? {
-        val store: Optional<IndexableGitCommit> = entityDataService.retrieve(
+        val store: IndexableGitCommit? = entityDataService.retrieve(
                 build,
                 "git-commit",
                 IndexableGitCommit::class.java
         )
-        return store.map { it.commit }.orElse(null)
+        return store?.commit
     }
 
     override fun setCommitForBuild(build: Build, commit: GitCommit) {

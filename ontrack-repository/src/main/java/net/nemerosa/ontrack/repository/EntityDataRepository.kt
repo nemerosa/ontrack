@@ -18,7 +18,7 @@ interface EntityDataRepository {
     /**
      * Retrieve
      */
-    fun retrieve(entity: ProjectEntity, key: String): Optional<String>
+    fun retrieve(entity: ProjectEntity, key: String): String?
 
     /**
      * Store JSON
@@ -28,7 +28,7 @@ interface EntityDataRepository {
     /**
      * Retrieve JSON
      */
-    fun retrieveJson(entity: ProjectEntity, key: String): Optional<JsonNode>
+    fun retrieveJson(entity: ProjectEntity, key: String): JsonNode?
 
     /**
      * Delete

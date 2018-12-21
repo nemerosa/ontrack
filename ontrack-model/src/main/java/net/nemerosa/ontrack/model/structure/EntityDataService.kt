@@ -34,27 +34,27 @@ interface EntityDataService {
     /**
      * Retrieves data as boolean
      */
-    fun retrieveBoolean(entity: ProjectEntity, key: String): Optional<Boolean>
+    fun retrieveBoolean(entity: ProjectEntity, key: String): Boolean?
 
     /**
      * Retrieves data as integer
      */
-    fun retrieveInteger(entity: ProjectEntity, key: String): Optional<Int>
+    fun retrieveInteger(entity: ProjectEntity, key: String): Int?
 
     /**
      * Retrieves arbitrary data as string
      */
-    fun retrieve(entity: ProjectEntity, key: String): Optional<String>
+    fun retrieve(entity: ProjectEntity, key: String): String?
 
     /**
      * Retrieves arbitrary data as JSON
      */
-    fun retrieveJson(entity: ProjectEntity, key: String): Optional<JsonNode>
+    fun retrieveJson(entity: ProjectEntity, key: String): JsonNode?
 
     /**
      * Retrieves arbitrary data as JSON
      */
-    fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): Optional<T>
+    fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): T?
 
     /**
      * Deletes data
@@ -67,7 +67,7 @@ interface EntityDataService {
     /**
      * Loads some data, processes it and saves it back
      */
-    fun <T> withData(entity: ProjectEntity, key: String, type: Class<T>, processFn: Function<T, T>)
+    fun <T> withData(entity: ProjectEntity, key: String, type: Class<T>, processFn: (T) -> T)
 
     /**
      * Flexible query based on JSON, to get a first match based on numeric comparison
