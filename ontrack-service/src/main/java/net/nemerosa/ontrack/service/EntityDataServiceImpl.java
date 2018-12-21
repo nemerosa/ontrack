@@ -46,11 +46,9 @@ public class EntityDataServiceImpl implements EntityDataService {
 
     @Override
     public void store(ProjectEntity entity, String key, Object value) {
-        try {
-            store(entity, key, objectMapper.writeValueAsString(value));
-        } catch (JsonProcessingException e) {
-            throw new JsonWritingException(e);
-        }
+        securityService.checkProjectFunction(entity, ProjectConfig.class);
+        JsonNode jsonNode = objectMapper.valueToTree(value);
+        repository.storeJson(entity, key, jsonNode);
     }
 
     @Override
