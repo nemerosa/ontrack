@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
+import net.nemerosa.ontrack.extension.git.support.NoGitCommitPropertyException
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException
@@ -485,7 +486,9 @@ class GitServiceImpl(
                 // Gets its Git configuration
                 val branchConfiguration = getRequiredBranchConfiguration(branch)
                 // Gets the earliest build on this branch that contains this commit
-                val firstBuildOnThisBranch = logTime("earliest-build", listOf("branch" to branch.name)) { getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient) }
+                val firstBuildOnThisBranch = logTime("earliest-build", listOf("branch" to branch.name)) {
+                    getEarliestBuildAfterCommit(commitObject, branch, branchConfiguration, repositoryClient)
+                }
                 // Promotions
                 val promotions: List<PromotionRun> = logTime("earliest-promotion", listOf("branch" to branch.name)) {
                     firstBuildOnThisBranch?.let { build ->
@@ -514,23 +517,13 @@ class GitServiceImpl(
         )
     }
 
-    internal fun getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
-        val configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<*>? = branchConfiguration.buildCommitLink
-        return configuredBuildGitCommitLink?.let {
-            getEarliestBuildAfterCommit(commit, branch, branchConfiguration, client, it)
-        }
-    }
-
-    private fun <T> getEarliestBuildAfterCommit(commit: String, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient, configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<T>): Build? {
-        // Delegates to the build commit link...
-        val buildId = configuredBuildGitCommitLink.link.getEarliestBuildAfterCommit(
-                branch,
-                client,
-                branchConfiguration,
-                configuredBuildGitCommitLink.data,
-                commit
+    internal fun getEarliestBuildAfterCommit(commit: GitCommit, branch: Branch, branchConfiguration: GitBranchConfiguration, client: GitRepositoryClient): Build? {
+        val buildId = entityDataService.findFirstJsonFieldGreaterOrEqual(
+                ProjectEntityType.BUILD,
+                "branchId" to branch.id(),
+                IndexableGitCommit(commit).timestamp,
+                "timestamp"
         )
-        // Loading
         return buildId?.let { structureService.getBuild(ID.of(it)) }
     }
 
@@ -858,21 +851,25 @@ class GitServiceImpl(
             buildCommitLink: ConfiguredBuildGitCommitLink<*>,
             listener: JobRunListener
     ): Boolean = transactionTemplate.execute {
-        val commit = buildCommitLink.getCommitFromBuild(build)
-        val indexedCommit = getCommitForBuild(build)
-        if (indexedCommit != null) {
-            // We reached the last indexation
-            true
-        } else {
-            listener.message("Indexing $commit for build ${build.entityDisplayName}")
-            // Gets the Git information for the commit
-            val commitFor = client.getCommitFor(commit)
-            if (commitFor != null) {
-                setCommitForBuild(build, commitFor)
+        val commit =
+                try {
+                    buildCommitLink.getCommitFromBuild(build)
+                } catch (ex: NoGitCommitPropertyException) {
+                    null
+                }
+        if (commit != null) {
+            val indexedCommit = getCommitForBuild(build)
+            if (indexedCommit == null) {
+                listener.message("Indexing $commit for build ${build.entityDisplayName}")
+                // Gets the Git information for the commit
+                val commitFor = client.getCommitFor(commit)
+                if (commitFor != null) {
+                    setCommitForBuild(build, commitFor)
+                }
             }
-            // Going on
-            false
         }
+        // Going on
+        true
     }
 
     private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
