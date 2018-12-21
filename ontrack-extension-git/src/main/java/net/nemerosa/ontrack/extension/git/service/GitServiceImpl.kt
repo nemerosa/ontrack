@@ -463,6 +463,11 @@ class GitServiceImpl(
                     .filterValues { !it.isEmpty() }
         }
 
+        // Logging of the index
+        indexedBranches.forEach { type, branches: List<Branch> ->
+            logger.debug("git-search-branch-index,type=$type,branches=${branches.joinToString { it.name }}")
+        }
+
         // For every indexation group of branches
         val branchInfos = indexedBranches.mapValues { (_, branches) ->
             branches.map { branch ->
@@ -803,7 +808,7 @@ class GitServiceImpl(
                 .asOptional()
     }
 
-    private fun <T> logTime(key: String, tags: List<Pair<String,*>> = emptyList(), code: () -> T): T {
+    private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
         val start = System.currentTimeMillis()
         val result = code()
         val end = System.currentTimeMillis()
@@ -811,7 +816,7 @@ class GitServiceImpl(
         val tagsString = tags.joinToString("") {
             ",${it.first}=${it.second.toString()}"
         }
-        logger.debug("git-time,key=$key,time-ms=$time$tagsString")
+        logger.debug("git-search-time,key=$key,time-ms=$time$tagsString")
         return result
     }
 
