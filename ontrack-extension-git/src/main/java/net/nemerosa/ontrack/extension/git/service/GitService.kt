@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.model.GitCommit
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
 import java.util.concurrent.Future
@@ -148,4 +149,20 @@ interface GitService : SCMService {
      * @return Result of the search
      */
     fun isPatternFound(gitConfiguration: GitConfiguration, token: String): Boolean
+
+    /**
+     * Gets the [GitCommit] associated to a build
+     *
+     * @param build Build to get the information for
+     * @return Commit information or `null` if not found
+     */
+    fun getCommitForBuild(build: Build): GitCommit?
+
+    /**
+     * Sets the [GitCommit] information for a build.
+     *
+     * @param build Build to set the information for
+     * @param commit Commit information
+     */
+    fun setCommitForBuild(build: Build, commit: GitCommit)
 }

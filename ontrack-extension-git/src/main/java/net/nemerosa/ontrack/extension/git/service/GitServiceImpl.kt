@@ -808,6 +808,14 @@ class GitServiceImpl(
                 .asOptional()
     }
 
+    override fun getCommitForBuild(build: Build): GitCommit? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun setCommitForBuild(build: Build, commit: GitCommit) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
         val start = System.currentTimeMillis()
         val result = code()
