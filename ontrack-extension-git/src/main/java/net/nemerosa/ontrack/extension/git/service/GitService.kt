@@ -4,7 +4,10 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.scm.service.SCMService
+import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.model.GitCommit
+import net.nemerosa.ontrack.job.JobCategory
+import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
@@ -12,6 +15,8 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
+
+val GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git")
 
 interface GitService : SCMService {
 
@@ -76,6 +81,12 @@ interface GitService : SCMService {
      * Loops over each correctly configured branch. Branch template definitions are excluded.
      */
     fun forEachConfiguredBranch(consumer: BiConsumer<Branch, GitBranchConfiguration>)
+
+
+    /**
+     * Loops over each correctly configured branch in a project. Branch template definitions are excluded.
+     */
+    fun forEachConfiguredBranchInProject(project: Project, consumer: (Branch, GitBranchConfiguration) -> Unit)
 
     /**
      * Gets information about an issue in a Git-configured project
@@ -165,4 +176,12 @@ interface GitService : SCMService {
      * @param commit Commit information
      */
     fun setCommitForBuild(build: Build, commit: GitCommit)
+
+    /**
+     * Collects and stores the [IndexableGitCommit]s for all builds of a branch.
+     */
+    fun collectIndexableGitCommitForBranch(branch: Branch,
+                                           client: GitRepositoryClient,
+                                           config: GitBranchConfiguration,
+                                           listener: JobRunListener)
 }

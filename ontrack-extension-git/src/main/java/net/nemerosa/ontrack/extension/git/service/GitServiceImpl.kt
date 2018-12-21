@@ -32,11 +32,14 @@ import net.nemerosa.ontrack.tx.TransactionService
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
+import java.util.function.Predicate
 import java.util.stream.Stream
 
 @Service
@@ -54,10 +57,13 @@ class GitServiceImpl(
         private val scmService: SCMUtilsService,
         private val gitRepositoryHelper: GitRepositoryHelper,
         private val branchingModelService: BranchingModelService,
-        private val entityDataService: EntityDataService
+        private val entityDataService: EntityDataService,
+        transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService), GitService, JobOrchestratorSupplier {
 
     private val logger = LoggerFactory.getLogger(GitService::class.java)
+
+    private val transactionTemplate = TransactionTemplate(transactionManager)
 
     override fun forEachConfiguredProject(consumer: BiConsumer<Project, GitConfiguration>) {
         structureService.projectList
@@ -71,15 +77,19 @@ class GitServiceImpl(
 
     override fun forEachConfiguredBranch(consumer: BiConsumer<Branch, GitBranchConfiguration>) {
         for (project in structureService.projectList) {
-            structureService.getBranchesForProject(project.id)
-                    .filter { branch -> branch.type != BranchType.TEMPLATE_DEFINITION }
-                    .forEach { branch ->
-                        val configuration = getBranchConfiguration(branch)
-                        if (configuration != null) {
-                            consumer.accept(branch, configuration)
-                        }
-                    }
+            forEachConfiguredBranchInProject(project, consumer::accept)
         }
+    }
+
+    override fun forEachConfiguredBranchInProject(project: Project, consumer: (Branch, GitBranchConfiguration) -> Unit) {
+        structureService.getBranchesForProject(project.id)
+                .filter { branch -> branch.type != BranchType.TEMPLATE_DEFINITION }
+                .forEach { branch ->
+                    val configuration = getBranchConfiguration(branch)
+                    if (configuration != null) {
+                        consumer(branch, configuration)
+                    }
+                }
     }
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
@@ -826,6 +836,45 @@ class GitServiceImpl(
         )
     }
 
+    override fun collectIndexableGitCommitForBranch(
+            branch: Branch,
+            client: GitRepositoryClient,
+            config: GitBranchConfiguration,
+            listener: JobRunListener
+    ) {
+        val buildCommitLink = config.buildCommitLink
+        if (buildCommitLink != null) {
+            structureService.findBuild(
+                    branch.id,
+                    Predicate { build -> collectIndexableGitCommitForBuild(build, client, buildCommitLink, listener) },
+                    BuildSortDirection.FROM_NEWEST
+            )
+        }
+    }
+
+    private fun collectIndexableGitCommitForBuild(
+            build: Build,
+            client: GitRepositoryClient,
+            buildCommitLink: ConfiguredBuildGitCommitLink<*>,
+            listener: JobRunListener
+    ): Boolean = transactionTemplate.execute {
+        val commit = buildCommitLink.getCommitFromBuild(build)
+        val indexedCommit = getCommitForBuild(build)
+        if (indexedCommit != null) {
+            // We reached the last indexation
+            true
+        } else {
+            listener.message("Indexing $commit for build ${build.entityDisplayName}")
+            // Gets the Git information for the commit
+            val commitFor = client.getCommitFor(commit)
+            if (commitFor != null) {
+                setCommitForBuild(build, commitFor)
+            }
+            // Going on
+            false
+        }
+    }
+
     private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
         val start = System.currentTimeMillis()
         val result = code()
@@ -839,7 +888,6 @@ class GitServiceImpl(
     }
 
     companion object {
-        private val GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git")
         private val GIT_INDEXATION_JOB = GIT_JOB_CATEGORY.getType("git-indexation").withName("Git indexation")
         private val GIT_BUILD_SYNC_JOB = GIT_JOB_CATEGORY.getType("git-build-sync").withName("Git build synchronisation")
     }
