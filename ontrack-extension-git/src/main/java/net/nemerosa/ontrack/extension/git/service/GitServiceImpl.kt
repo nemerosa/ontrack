@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import com.google.common.collect.Lists
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
@@ -15,7 +14,6 @@ import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
-import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo
 import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService
 import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService
@@ -454,14 +452,16 @@ class GitServiceImpl(
         )
 
         // Looks for all Git branches for this commit
-        val gitBranches = repositoryClient.getBranchesForCommit(commit)
+        val gitBranches = logTime("branches-for-commit") { repositoryClient.getBranchesForCommit(commit) }
         // Sorts the branches according to the branching model
-        val indexedBranches = branchingModelService.getBranchingModel(project)
-                .groupBranches(gitBranches)
-                .mapValues { (_, gitBranches) ->
-                    gitBranches.mapNotNull { findBranchWithGitBranch(project, it)  }
-                }
-                .filterValues { !it.isEmpty() }
+        val indexedBranches = logTime("branch-index") {
+            branchingModelService.getBranchingModel(project)
+                    .groupBranches(gitBranches)
+                    .mapValues { (_, gitBranches) ->
+                        gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
+                    }
+                    .filterValues { !it.isEmpty() }
+        }
 
         // For every indexation group of branches
         val branchInfos = indexedBranches.mapValues { (_, branches) ->
@@ -469,14 +469,16 @@ class GitServiceImpl(
                 // Gets its Git configuration
                 val branchConfiguration = getRequiredBranchConfiguration(branch)
                 // Gets the earliest build on this branch that contains this commit
-                val firstBuildOnThisBranch = getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient)
+                val firstBuildOnThisBranch = logTime("earliest-build", listOf("branch" to branch.name)) { getEarliestBuildAfterCommit(commit, branch, branchConfiguration, repositoryClient) }
                 // Promotions
-                val promotions: List<PromotionRun> = firstBuildOnThisBranch?.let { build ->
-                    structureService.getPromotionLevelListForBranch(branch.id)
-                            .mapNotNull { promotionLevel ->
-                                structureService.getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
-                            }
-                } ?: emptyList()
+                val promotions: List<PromotionRun> = logTime("earliest-promotion", listOf("branch" to branch.name)) {
+                    firstBuildOnThisBranch?.let { build ->
+                        structureService.getPromotionLevelListForBranch(branch.id)
+                                .mapNotNull { promotionLevel ->
+                                    structureService.getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
+                                }
+                    } ?: emptyList()
+                }
                 // Complete branch info
                 BranchInfo(
                         branch,
@@ -799,6 +801,18 @@ class GitServiceImpl(
                     )
                 }
                 .asOptional()
+    }
+
+    private fun <T> logTime(key: String, tags: List<Pair<String,*>> = emptyList(), code: () -> T): T {
+        val start = System.currentTimeMillis()
+        val result = code()
+        val end = System.currentTimeMillis()
+        val time = end - start
+        val tagsString = tags.joinToString("") {
+            ",${it.first}=${it.second.toString()}"
+        }
+        logger.debug("git-time,key=$key,time-ms=$time$tagsString")
+        return result
     }
 
     companion object {
