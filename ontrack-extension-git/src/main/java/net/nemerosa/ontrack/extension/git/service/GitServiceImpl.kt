@@ -864,14 +864,11 @@ class GitServiceImpl(
                     null
                 }
         if (commit != null) {
-            val indexedCommit = getCommitForBuild(build)
-            if (indexedCommit == null) {
-                listener.message("Indexing $commit for build ${build.entityDisplayName}")
-                // Gets the Git information for the commit
-                val commitFor = client.getCommitFor(commit)
-                if (commitFor != null) {
-                    setCommitForBuild(build, commitFor)
-                }
+            listener.message("Indexing $commit for build ${build.entityDisplayName}")
+            // Gets the Git information for the commit
+            val commitFor = client.getCommitFor(commit)
+            if (commitFor != null) {
+                setCommitForBuild(build, commitFor)
             }
         }
         // Going on
