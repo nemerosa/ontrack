@@ -8,6 +8,8 @@ dependencies {
     compile project(':ontrack-ui-graphql')
     compile project(':ontrack-git')
     compile project(':ontrack-tx')
+    compile project(':ontrack-json')
+    compile project(':ontrack-repository-support')
     compile 'org.springframework:spring-tx'
     compile 'commons-io:commons-io'
 

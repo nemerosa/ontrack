@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
-import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.*;
@@ -17,6 +16,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -126,18 +126,22 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
             JsonNode linkNode = node.get("buildCommitLink");
             configuredBuildGitCommitLink = parseBuildCommitLink(linkNode);
         } else {
-            configuredBuildGitCommitLink = TagBuildNameGitCommitLink.DEFAULT;
+            configuredBuildGitCommitLink = null;
         }
-        boolean indexationAvailable = configuredBuildGitCommitLink.getLink() instanceof IndexableBuildGitCommitLink;
+        boolean indexationAvailable = configuredBuildGitCommitLink != null && configuredBuildGitCommitLink.getLink() instanceof IndexableBuildGitCommitLink;
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
-                configuredBuildGitCommitLink.toServiceConfiguration(),
+                configuredBuildGitCommitLink != null ? configuredBuildGitCommitLink.toServiceConfiguration() : null,
                 indexationAvailable && JsonUtils.getBoolean(node, "override", false),
                 indexationAvailable ? JsonUtils.getInt(node, "buildTagInterval", 0) : 0
         );
     }
 
+    @Nullable
     private <T> ConfiguredBuildGitCommitLink<T> parseBuildCommitLink(JsonNode linkNode) {
+        if (linkNode.isNull()) {
+            return null;
+        }
         String linkId = JsonUtils.get(linkNode, "id");
         // Gets the link data
         JsonNode linkDataNode = linkNode.get("data");
@@ -162,18 +166,18 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     public GitBranchConfigurationProperty replaceValue(GitBranchConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitBranchConfigurationProperty(
                 replacementFunction.apply(value.getBranch()),
-                replaceBuildCommitLink(value.getBuildCommitLink(), replacementFunction),
+                value.getBuildCommitLink() != null ? replaceBuildCommitLink(value.getBuildCommitLink(), replacementFunction) : null,
                 value.isOverride(),
                 value.getBuildTagInterval()
         );
     }
 
-    protected <T> ServiceConfiguration replaceBuildCommitLink(ServiceConfiguration configuration, Function<String, String> replacementFunction) {
+    private <T> ServiceConfiguration replaceBuildCommitLink(ServiceConfiguration configuration, Function<String, String> replacementFunction) {
         String linkId = configuration.getId();
         @SuppressWarnings("unchecked")
         BuildGitCommitLink<T> link = (BuildGitCommitLink<T>) buildGitCommitLinkService.getLink(linkId);
         T linkData = link.parseData(configuration.getData());
-        T clonedData = link.clone(linkData, replacementFunction);
+        T clonedData = link.clone(linkData, replacementFunction::apply);
         JsonNode node = link.toJson(clonedData);
         return new ServiceConfiguration(
                 linkId,

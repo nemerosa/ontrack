@@ -96,14 +96,16 @@ class GitChangeLogGraphQLIT extends AbstractQLITSupport {
             }
 
             // Job registration
-            jobOrchestrator.orchestrate(JobRunListener.out())
+            asAdmin().execute {
+                jobOrchestrator.orchestrate(JobRunListener.out())
+            }
 
             // Creates builds for some commits
             asUser().with(project, ProjectEdit).call {
                 [2, 5, 7, 8].each {
                     sleep 100 // Some delay to get correct timestamps in builds
                     def commit = commits[it as String] as String
-                    def buildName = "${it}"
+                    def buildName = "${it}" as String
                     println "Creating build $buildName for commit $commit"
                     def build = doCreateBuild(
                             branch,
@@ -119,7 +121,9 @@ class GitChangeLogGraphQLIT extends AbstractQLITSupport {
             }
 
             // Test
-            testCode(branch)
+            asUserWithView(branch).execute {
+                testCode(branch)
+            }
 
         } finally {
             repo.close()

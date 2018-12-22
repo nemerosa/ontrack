@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,7 +31,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     }
 
     @Override
-    @Cacheable(cacheNames = "properties", key="#typeName + #entityType.name() + #entityId.value")
+    @Cacheable(cacheNames = "properties", key = "#typeName + #entityType.name() + #entityId.value")
     public TProperty loadProperty(String typeName, ProjectEntityType entityType, ID entityId) {
         return getFirstItem(
                 String.format(
@@ -43,7 +44,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     }
 
     @Override
-    @CacheEvict(cacheNames = "properties", key="#typeName + #entityType.name() + #entityId.value")
+    @CacheEvict(cacheNames = "properties", key = "#typeName + #entityType.name() + #entityId.value")
     public void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data, String searchKey) {
         MapSqlParameterSource params = params("type", typeName).addValue("entityId", entityId.getValue());
         // Any previous value?
@@ -80,7 +81,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     }
 
     @Override
-    @CacheEvict(cacheNames = "properties", key="#typeName + #entityType.name() + #entityId.value")
+    @CacheEvict(cacheNames = "properties", key = "#typeName + #entityType.name() + #entityId.value")
     public Ack deleteProperty(String typeName, ProjectEntityType entityType, ID entityId) {
         return Ack.one(
                 getNamedParameterJdbcTemplate().update(
@@ -112,6 +113,28 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
                     return entities;
                 }
         );
+    }
+
+    @Override
+    @Nullable
+    public ID findBuildByBranchAndSearchkey(ID branchId, String typeName, String searchKey) {
+        Integer id = getFirstItem(
+                "SELECT b.ID " +
+                        "FROM PROPERTIES p " +
+                        "INNER JOIN BUILDS b ON p.BUILD = b.ID " +
+                        "WHERE p.TYPE = :type " +
+                        "AND p.SEARCHKEY = :searchKey " +
+                        "AND b.BRANCHID = :branchId",
+                params("type", typeName)
+                        .addValue("searchKey", searchKey)
+                        .addValue("branchId", branchId.getValue()),
+                Integer.class
+        );
+        if (id != null) {
+            return ID.of(id);
+        } else {
+            return null;
+        }
     }
 
     private TProperty toProperty(ResultSet rs) throws SQLException {

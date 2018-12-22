@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -33,9 +33,9 @@ public class SCMUtilsServiceImpl implements SCMUtilsService {
         return changeLogFiles.stream()
                 // Filters on path
                 .filter(changeLogFile -> pathFilter.test(changeLogFile.getPath()))
-                        // Collects the diffs
+                // Collects the diffs
                 .map(diffFn)
-                        // Group together
+                // Group together
                 .collect(Collectors.joining("\n"))
                 ;
     }
@@ -47,15 +47,15 @@ public class SCMUtilsServiceImpl implements SCMUtilsService {
         } else {
             return path -> patterns.stream()
                     .map(pattern ->
-                                    Pattern.compile(
-                                            "^" +
-                                                    pattern
-                                                            .replace("**", "$MULTI$")
-                                                            .replace("*", "$SINGLE$")
-                                                            .replace("$SINGLE$", "[^\\/]+")
-                                                            .replace("$MULTI$", ".*") +
-                                                    "$"
-                                    )
+                            Pattern.compile(
+                                    "^" +
+                                            pattern
+                                                    .replace("**", "$MULTI$")
+                                                    .replace("*", "$SINGLE$")
+                                                    .replace("$SINGLE$", "[^\\/]+")
+                                                    .replace("$MULTI$", ".*") +
+                                            "$"
+                            )
                     ).anyMatch(
                             pattern -> pattern.matcher(path).matches()
                     );
@@ -63,17 +63,16 @@ public class SCMUtilsServiceImpl implements SCMUtilsService {
     }
 
     @Override
-    public SCMIssueCommitBranchInfo getBranchInfo(Optional<Build> buildAfterCommit, SCMIssueCommitBranchInfo branchInfo) {
+    public SCMIssueCommitBranchInfo getBranchInfo(@Nullable Build buildAfterCommit, SCMIssueCommitBranchInfo branchInfo) {
         SCMIssueCommitBranchInfo info = branchInfo;
-        if (buildAfterCommit.isPresent()) {
-            Build build = buildAfterCommit.get();
+        if (buildAfterCommit != null) {
             // Gets the build view
-            BuildView buildView = structureService.getBuildView(build, true);
+            BuildView buildView = structureService.getBuildView(buildAfterCommit, true);
             // Adds it to the list
             info = info.withBuildView(buildView);
             // Collects the promotions for the branch
             info = info.withBranchStatusView(
-                    structureService.getEarliestPromotionsAfterBuild(build)
+                    structureService.getEarliestPromotionsAfterBuild(buildAfterCommit)
             );
         }
         // OK

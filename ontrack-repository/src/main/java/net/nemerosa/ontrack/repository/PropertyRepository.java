@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -24,4 +25,7 @@ public interface PropertyRepository {
     Collection<ProjectEntity> searchByProperty(String typeName,
                                                BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
                                                Predicate<TProperty> predicate);
+
+    @Nullable
+    ID findBuildByBranchAndSearchkey(ID branchId, String typeName, String searchKey);
 }

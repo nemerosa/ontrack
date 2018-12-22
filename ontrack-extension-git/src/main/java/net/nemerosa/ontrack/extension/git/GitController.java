@@ -179,7 +179,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
     public Ack launchBuildSync(@PathVariable ID branchId) {
-        return Ack.validate(gitService.launchBuildSync(branchId, false));
+        return Ack.validate(gitService.launchBuildSync(branchId, false) != null);
     }
 
     /**
@@ -202,20 +202,23 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Gets the configuration for the project
-        return gitService.getProjectConfiguration(project)
-                .flatMap(GitConfiguration::getConfiguredIssueService)
-                .map(configuredIssueService -> Resources.of(
-                        configuredIssueService.getIssueServiceExtension().exportFormats(
-                                configuredIssueService.getIssueServiceConfiguration()
+        GitConfiguration projectConfiguration = gitService.getProjectConfiguration(project);
+        if (projectConfiguration != null) {
+            Optional<ConfiguredIssueService> configuredIssueService = projectConfiguration.getConfiguredIssueService();
+            if (configuredIssueService.isPresent()) {
+                return Resources.of(
+                        configuredIssueService.get().getIssueServiceExtension().exportFormats(
+                                configuredIssueService.get().getIssueServiceConfiguration()
                         ),
                         uri(on(GitController.class).changeLogExportFormats(projectId))
-                ))
-                .orElse(
-                        Resources.of(
-                                Collections.emptyList(),
-                                uri(on(GitController.class).changeLogExportFormats(projectId))
-                        )
                 );
+            }
+        }
+        // Not found
+        return Resources.of(
+                Collections.emptyList(),
+                uri(on(GitController.class).changeLogExportFormats(projectId))
+        );
     }
 
     /**
@@ -228,8 +231,10 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the associated project
         Project project = changeLog.getProject();
         // Gets the configuration for the project
-        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project)
-                .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
+        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
+        if (gitConfiguration == null) {
+            throw new GitProjectNotConfiguredException(project.getId());
+        }
         // Gets the issue service
         Optional<ConfiguredIssueService> optConfiguredIssueService = gitConfiguration.getConfiguredIssueService();
         if (!optConfiguredIssueService.isPresent()) {
@@ -302,11 +307,11 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
             return commits;
         }
         // Loads the commits
-        commits = gitService.getChangeLogCommits(changeLog);
+        GitChangeLogCommits loadedCommits = changeLog.loadCommits(gitService::getChangeLogCommits);
         // Stores in cache
-        logCache.put(uuid, changeLog.withCommits(commits));
+        logCache.put(uuid, changeLog);
         // OK
-        return commits;
+        return loadedCommits;
     }
 
     /**
@@ -350,24 +355,24 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     }
 
     /**
-     * Issue information
+     * Commit information in a project
      */
-    @RequestMapping(value = "{branchId}/issue/{issue}", method = RequestMethod.GET)
-    public Resource<OntrackGitIssueInfo> issueInfo(@PathVariable ID branchId, @PathVariable String issue) {
+    @RequestMapping(value = "{projectId}/commit-info/{commit}", method = RequestMethod.GET)
+    public Resource<OntrackGitCommitInfo> commitProjectInfo(@PathVariable ID projectId, @PathVariable String commit) {
         return Resource.of(
-                gitService.getIssueInfo(branchId, issue),
-                uri(on(getClass()).issueInfo(branchId, issue))
+                gitService.getCommitProjectInfo(projectId, commit),
+                uri(on(getClass()).commitProjectInfo(projectId, commit))
         ).withView(Build.class);
     }
 
     /**
-     * Commit information
+     * Issue information in a project
      */
-    @RequestMapping(value = "{branchId}/commit/{commit}", method = RequestMethod.GET)
-    public Resource<OntrackGitCommitInfo> commitInfo(@PathVariable ID branchId, @PathVariable String commit) {
+    @RequestMapping(value = "{projectId}/issue-info/{issue}", method = RequestMethod.GET)
+    public Resource<OntrackGitIssueInfo> issueProjectInfo(@PathVariable ID projectId, @PathVariable String issue) {
         return Resource.of(
-                gitService.getCommitInfo(branchId, commit),
-                uri(on(getClass()).commitInfo(branchId, commit))
+                gitService.getIssueProjectInfo(projectId, issue),
+                uri(on(getClass()).issueProjectInfo(projectId, issue))
         ).withView(Build.class);
     }
 

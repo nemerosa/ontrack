@@ -20,6 +20,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -236,6 +237,12 @@ public class PropertyServiceImpl implements PropertyService {
                 entityLoader,
                 t -> predicate.test(propertyType.fromStorage(t.getJson()))
         );
+    }
+
+    @Override
+    @Nullable
+    public <T> ID findBuildByBranchAndSearchkey(ID branchId, Class<? extends PropertyType<T>> propertyType, String searchKey) {
+        return propertyRepository.findBuildByBranchAndSearchkey(branchId, propertyType.getName(), searchKey);
     }
 
     @Override

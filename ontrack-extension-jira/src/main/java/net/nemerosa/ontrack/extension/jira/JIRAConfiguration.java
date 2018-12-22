@@ -18,7 +18,8 @@ import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 @Data
 public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfiguration>, IssueServiceConfiguration {
 
-    public static final Pattern ISSUE_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9]*\\-[0-9]+");
+    public static final String ISSUE_PATTERN_REGEX = "([A-Za-z][A-Za-z0-9]*\\-[0-9]+)";
+    public static final Pattern ISSUE_PATTERN = Pattern.compile(ISSUE_PATTERN_REGEX);
 
     private final String name;
     private final String url;

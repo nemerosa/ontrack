@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.issues.support;
 
-import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
@@ -10,6 +9,7 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 
 import java.util.List;
 import java.util.Map;
@@ -51,11 +51,6 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
         return name;
     }
 
-    @Override
-    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        return keys.contains(key);
-    }
-
     /**
      * Export of both text and HTML by default.
      */
@@ -83,6 +78,12 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
                 issueServiceConfiguration,
                 groupedIssues
         );
+    }
+
+    @Override
+    public String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        String displayKey = issue.getDisplayKey();
+        return "(?:\\s|^)(" + displayKey + ")(?:[^\\d]|$)";
     }
 
     protected abstract Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue);

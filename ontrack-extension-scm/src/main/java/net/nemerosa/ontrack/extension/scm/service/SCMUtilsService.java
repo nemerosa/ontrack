@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
 import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 import net.nemerosa.ontrack.model.structure.Build;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -22,5 +23,5 @@ public interface SCMUtilsService {
      * Completes information about a branch by extracting additional
      * information from a build
      */
-    SCMIssueCommitBranchInfo getBranchInfo(Optional<Build> buildAfterCommit, SCMIssueCommitBranchInfo branchInfo);
+    SCMIssueCommitBranchInfo getBranchInfo(@Nullable Build buildAfterCommit, SCMIssueCommitBranchInfo branchInfo);
 }

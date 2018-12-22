@@ -1,9 +1,79 @@
+const gitCommitInfoFragments = `
+    fragment gitCommitInfoFields on OntrackGitCommitInfo {
+      uiCommit {
+        link
+        commit {
+          id
+          author {
+            name
+          }
+          commitTime
+        }
+        fullAnnotatedMessage
+      }
+      branchInfosList {
+        type
+        branchInfoList {
+          branch {
+            id
+            name
+            disabled
+            links {
+              _page
+            }
+          }
+          firstBuild {
+            ...buildFields
+          }
+          promotions {
+            creation {
+              time
+            }
+            promotionLevel {
+              id
+              name
+              description
+              image
+              _image
+              links {
+                _page
+              }
+            }
+            build {
+              ...buildFields
+            }
+          }
+        }
+      }
+    }
+    
+    fragment buildFields on Build {
+      id
+      name
+      creation {
+        time
+      }
+      links {
+        _page
+      }
+      decorations {
+        decorationType
+        error
+        data
+        feature {
+          id
+        }
+      }
+    }
+`;
+
 angular.module('ontrack.extension.git', [
     'ot.service.core',
     'ot.service.configuration',
     'ot.service.form',
     'ot.service.structure',
-    'ot.service.plot'
+    'ot.service.plot',
+    'ot.service.graphql'
 ])
     .directive('otExtensionGitCommitSummary', function () {
         return {
@@ -16,24 +86,13 @@ angular.module('ontrack.extension.git', [
             }
         };
     })
-    .directive('otExtensionGitCommitBuilds', function () {
-        return {
-            restrict: 'E',
-            templateUrl: 'extension/git/directive.commit.builds.tpl.html',
-            scope: {
-                commitInfo: '='
-            }
-        };
-    })
-    .directive('otExtensionGitCommitPromotions', function () {
-        return {
-            restrict: 'E',
-            templateUrl: 'extension/git/directive.commit.promotions.tpl.html',
-            scope: {
-                commitInfo: '='
-            }
-        };
-    })
+    .directive('otExtensionGitCommitInfo', () => ({
+        restrict: 'E',
+        templateUrl: 'extension/git/directive.commit.info.tpl.html',
+        scope: {
+            gitCommitInfo: '='
+        }
+    }))
 
     // Sync
 
@@ -80,21 +139,56 @@ angular.module('ontrack.extension.git', [
 
     .config(function ($stateProvider) {
         $stateProvider.state('git-issue', {
-            url: '/extension/git/{branch}/issue/{issue}',
+            url: '/extension/git/{project}/issue/{issue}',
             templateUrl: 'extension/git/git.issue.tpl.html',
             controller: 'GitIssueCtrl'
         });
     })
-    .controller('GitIssueCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
+    .controller('GitIssueCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otGraphqlService) {
+        const view = ot.view();
+        view.title = "";
 
-        var view = ot.view();
+        const query = `
+            query IssueInfo($project: Int!, $issue: String!) {
+              projects(id: $project) {
+                id
+                name
+                gitIssueInfo(token: $issue) {
+                  issueServiceConfigurationRepresentation {
+                    id
+                    name
+                    serviceId
+                  }
+                  issue
+                  commitInfo {
+                    ...gitCommitInfoFields
+                  }
+                }
+              }
+            }
+             ${gitCommitInfoFragments}
+        `;
 
-        ot.call(
-            $http.get(
-                $interpolate('extension/git/{{branch}}/issue/{{issue}}')($stateParams)
-            )).then(function (ontrackGitIssueInfo) {
-                $scope.ontrackGitIssueInfo = ontrackGitIssueInfo;
-            });
+        const queryVariables = {
+            project: $stateParams.project,
+            issue: $stateParams.issue
+        };
+
+        let viewInitialised = false;
+        otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+            $scope.project = data.projects[0];
+            $scope.gitIssueInfo = data.projects[0].gitIssueInfo;
+            if (!viewInitialised) {
+                // View configuration
+                view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
+                // Commands
+                view.commands = [
+                    ot.viewCloseCommand('/project/' + $scope.project.id)
+                ];
+                // OK
+                viewInitialised = true;
+            }
+        });
     })
 
     // Configurations
@@ -136,7 +230,7 @@ angular.module('ontrack.extension.git', [
             otFormService.display({
                 uri: $scope.configurations._create,
                 title: "Git configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [otConfigurationService.testButton($scope.configurations._test)],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
@@ -160,7 +254,7 @@ angular.module('ontrack.extension.git', [
             otFormService.display({
                 uri: configuration._update,
                 title: "Git configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [otConfigurationService.testButton($scope.configurations._test)],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }
@@ -172,22 +266,49 @@ angular.module('ontrack.extension.git', [
 
     .config(function ($stateProvider) {
         $stateProvider.state('git-commit', {
-            url: '/extension/git/{branch}/commit/{commit}',
+            url: '/extension/git/{project}/commit/{commit}',
             templateUrl: 'extension/git/git.commit.tpl.html',
             controller: 'GitCommitCtrl'
         });
     })
-    .controller('GitCommitCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
+    .controller('GitCommitCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otGraphqlService) {
+        const view = ot.view();
+        view.title = "";
 
-        var view = ot.view();
-        view.title = $interpolate("Commit {{commit}}")($stateParams);
+        const query = `
+            query CommitInfo($project: Int!, $commit: String!) {
+              projects(id: $project) {
+                id
+                name
+                gitCommitInfo(commit: $commit) {
+                  ...gitCommitInfoFields
+                }
+              }
+            }
+            ${gitCommitInfoFragments}
+        `;
 
-        ot.call(
-            $http.get(
-                $interpolate('extension/git/{{branch}}/commit/{{commit}}')($stateParams)
-            )).then(function (ontrackGitCommitInfo) {
-                $scope.ontrackGitCommitInfo = ontrackGitCommitInfo;
-            });
+        const queryVariables = {
+            project: $stateParams.project,
+            commit: $stateParams.commit
+        };
+
+
+        let viewInitialised = false;
+        otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+            $scope.project = data.projects[0];
+            $scope.gitCommitInfo = data.projects[0].gitCommitInfo;
+            if (!viewInitialised) {
+                // View configuration
+                view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
+                // Commands
+                view.commands = [
+                    ot.viewCloseCommand('/project/' + $scope.project.id)
+                ];
+                // OK
+                viewInitialised = true;
+            }
+        });
     })
 
     // Change log
@@ -373,7 +494,7 @@ angular.module('ontrack.extension.git', [
                 }
                 // Loads the Git synchronisation information
                 return ot.pageCall($http.get($scope.project._gitSync));
-            }).then(function (gitSyncInfo){
+            }).then(function (gitSyncInfo) {
                 $scope.gitSyncInfo = gitSyncInfo;
             }).finally(function () {
                 $scope.synchronising = false;

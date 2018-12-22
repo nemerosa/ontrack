@@ -4,7 +4,6 @@
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
-var inject = require('gulp-inject');
 var jshint = require('gulp-jshint');
 var uglify = require('gulp-uglify');
 var templateCache = require('gulp-angular-templatecache');
@@ -12,6 +11,7 @@ var ngAnnotate = require('gulp-ng-annotate');
 var ngFilesort = require('gulp-angular-filesort');
 var debug = require('gulp-debug');
 var minimist = require('minimist');
+var babel = require("gulp-babel");
 
 // Arguments
 
@@ -33,6 +33,7 @@ var jsSources = src + '/**/*.js';
 
 var build = options.target;
 
+var buildConverted = build + '/converted';
 var buildPath = build + '/web';
 var buildTemplates = buildPath + '/templates';
 var buildDist = buildPath + '/dist';
@@ -59,15 +60,35 @@ gulp.task('js:templates', function () {
 gulp.task('js:lint', function () {
     return gulp.src(jsSources)
         .pipe(debug({title: 'lint:'}))
-        .pipe(jshint())
+        .pipe(jshint({esversion: 6}))
         .pipe(jshint.reporter('default'))
+        .pipe(jshint.reporter('fail'))
         ;
+});
+
+/**
+ * Converted files
+ */
+
+gulp.task('js:conversion', ['js:lint'], function () {
+    return gulp.src(jsSources)
+        .pipe(debug({title: 'js:conversion:input'}))
+        .pipe(babel({
+            "presets": [
+                "env"
+            ],
+            "plugins": [
+                "transform-es2015-template-literals"
+            ]
+        }))
+        .pipe(gulp.dest(buildConverted))
+        .pipe(debug({title: 'js:conversion:output'}));
 });
 
 // Sorted and annotated Angular files
 
-gulp.task('js', ['js:lint', 'js:templates'], function () {
-    return gulp.src([buildTemplates + '/*.js', jsSources])
+gulp.task('js', ['js:lint', 'js:templates', 'js:conversion'], function () {
+    return gulp.src([buildTemplates + '/*.js', buildConverted  + '/**/*.js'])
         .pipe(debug({title: 'js:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
