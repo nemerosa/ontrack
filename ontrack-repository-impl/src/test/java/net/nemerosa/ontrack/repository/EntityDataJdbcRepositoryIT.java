@@ -25,7 +25,7 @@ public class EntityDataJdbcRepositoryIT extends AbstractRepositoryTestSupport {
     @Test
     public void save_retrieve_delete_data() {
         String key = "Test 1";
-        assertNotNull(repository.retrieve(project, key));
+        assertNull(repository.retrieve(project, key));
 
         repository.store(project, key, "Value 1");
         assertEquals(repository.retrieve(project, key), "Value 1");
