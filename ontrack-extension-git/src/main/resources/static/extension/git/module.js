@@ -17,6 +17,7 @@ const gitCommitInfoFragments = `
           branch {
             id
             name
+            disabled
             links {
               _page
             }

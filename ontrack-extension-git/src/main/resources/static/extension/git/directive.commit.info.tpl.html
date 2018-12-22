@@ -17,6 +17,7 @@
                     <i class="fa fa-code-fork"></i>
                     <b>Branch</b>
                     <a href="{{branchInfo.branch.links._page}}">{{branchInfo.branch.name}}</a>
+                    <span ng-if="branchInfo.branch.disabled" class="label label-default">Disabled</span>
                     <!-- First build for this branch -->
                     <div class="col-md-12" ng-if="branchInfo.firstBuild">
                         <svg style="vertical-align:center;display: inline;" width="60px" height="20px">
