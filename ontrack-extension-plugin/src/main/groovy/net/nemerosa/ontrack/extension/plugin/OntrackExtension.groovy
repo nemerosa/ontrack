@@ -49,7 +49,7 @@ class OntrackExtension {
             kotlinOptions.jvmTarget = "1.8"
         }
         project.dependencies {
-            compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
+            compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
             compileOnly "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
         }
     }
