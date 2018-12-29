@@ -26,7 +26,7 @@ class GitDownloadIT : AbstractGitTestSupport() {
                     .associate {
                         it to commitLookup("Commit $it")
                     }
-        } and { repo, commit ->
+        } and { repo, _ ->
             // Creates a project and branches
             project {
                 gitProject(repo)

@@ -78,7 +78,7 @@ class GitChangeLogIT : AbstractGitTestSupport() {
                     8 to "v8",
                     9..10
             )
-        } and { repo, commits: Map<Int, String> ->
+        } and { repo, _ ->
             // Creates a project ...
             project project@{
                 gitProject(repo)
