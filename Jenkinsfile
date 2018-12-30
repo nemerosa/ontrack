@@ -207,131 +207,131 @@ docker-compose --project-name local down --volumes
             environment {
                 ONTRACK_VERSION = "${version}"
             }
-//            when {
-//                beforeAgent true
-//                branch 'release/*'
-//            }
+            when {
+                beforeAgent true
+                branch 'release/*'
+            }
             parallel {
-//                // CentOS7
-//                stage('CentOS7') {
-//                    agent {
-//                        dockerfile {
-//                            label "docker"
-//                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-//                        }
-//                    }
-//                    steps {
-//                        unstash name: "rpm"
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//
-//echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//echo "Preparing environment..."
-//DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-//rm -f \${DOCKER_DIR}/*.rpm
-//cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
-//
-//echo "Launching test environment..."
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-//
-//echo "Launching Ontrack in CentOS environment..."
-//CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-//echo "... for container \${CONTAINER}"
-//docker container exec \${CONTAINER} /etc/init.d/ontrack start
-//
-//echo "Launching tests..."
-//docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
-//"""
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//echo "Cleanup..."
-//mkdir -p build
-//cp -r ontrack-acceptance/src/main/compose/build build/centos
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
-//"""
-//                            script {
-//                                def results = junit 'build/centos/*.xml'
-//                                ontrackValidate(
-//                                        project: projectName,
-//                                        branch: branchName,
-//                                        build: version,
-//                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
-//                                        testResults: results,
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//                // Debian
-//                stage('Debian') {
-//                    agent {
-//                        dockerfile {
-//                            label "docker"
-//                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-//                        }
-//                    }
-//                    steps {
-//                        unstash name: "debian"
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//
-//echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//echo "Preparing environment..."
-//DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-//rm -f \${DOCKER_DIR}/*.deb
-//cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
-//
-//echo "Launching test environment..."
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-//
-//echo "Launching Ontrack in Debian environment..."
-//CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
-//echo "... for container \${CONTAINER}"
-//docker container exec \${CONTAINER} /etc/init.d/ontrack start
-//
-//echo "Launching tests..."
-//docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
-//"""
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//echo "Cleanup..."
-//mkdir -p build/debian
-//cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
-//"""
-//                            script {
-//                                def results = junit 'build/debian/*.xml'
-//                                ontrackValidate(
-//                                        project: projectName,
-//                                        branch: branchName,
-//                                        build: version,
-//                                        validationStamp: 'ACCEPTANCE.DEBIAN',
-//                                        testResults: results,
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
+                // CentOS7
+                stage('CentOS7') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
+                    steps {
+                        unstash name: "rpm"
+                        timeout(time: 25, unit: 'MINUTES') {
+                            sh """\
+#!/bin/bash
+set -e
+
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
+echo "Preparing environment..."
+DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+rm -f \${DOCKER_DIR}/*.rpm
+cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
+
+echo "Launching test environment..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+
+echo "Launching Ontrack in CentOS environment..."
+CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
+echo "Launching tests..."
+docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
+"""
+                        }
+                    }
+                    post {
+                        always {
+                            sh """\
+#!/bin/bash
+set -e
+echo "Cleanup..."
+mkdir -p build
+cp -r ontrack-acceptance/src/main/compose/build build/centos
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
+"""
+                            script {
+                                def results = junit 'build/centos/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                        testResults: results,
+                                )
+                            }
+                        }
+                    }
+                }
+                // Debian
+                stage('Debian') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
+                    steps {
+                        unstash name: "debian"
+                        timeout(time: 25, unit: 'MINUTES') {
+                            sh """\
+#!/bin/bash
+set -e
+
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
+echo "Preparing environment..."
+DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
+rm -f \${DOCKER_DIR}/*.deb
+cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
+
+echo "Launching test environment..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+
+echo "Launching Ontrack in Debian environment..."
+CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+echo "... for container \${CONTAINER}"
+docker container exec \${CONTAINER} /etc/init.d/ontrack start
+
+echo "Launching tests..."
+docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
+"""
+                        }
+                    }
+                    post {
+                        always {
+                            sh """\
+#!/bin/bash
+set -e
+echo "Cleanup..."
+mkdir -p build/debian
+cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
+"""
+                            script {
+                                def results = junit 'build/debian/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DEBIAN',
+                                        testResults: results,
+                                )
+                            }
+                        }
+                    }
+                }
                 // Extension tests
                 stage('Local extension tests') {
                     agent {
@@ -382,100 +382,100 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                         }
                     }
                 }
-//                // Digital Ocean
-//                stage('Digital Ocean') {
-//                    agent {
-//                        dockerfile {
-//                            label "docker"
-//                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-//                        }
-//                    }
-//                    environment {
-//                        DROPLET_NAME = "ontrack-acceptance-${version}"
-//                        DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
-//                    }
-//                    steps {
-//                        timeout(time: 60, unit: 'MINUTES') {
-//                            sh '''\
-//#!/bin/bash
-//
-//echo "(*) Cleanup..."
-//rm -rf ontrack-acceptance/src/main/compose/build
-//
-//echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-//docker-machine rm --force ${DROPLET_NAME} > /dev/null
-//
-//# Failing on first error from now on
-//set -e
-//
-//echo "(*) Creating ${DROPLET_NAME} droplet..."
-//docker-machine create \\
-//    --driver=digitalocean \\
-//    --digitalocean-access-token=${DO_TOKEN} \\
-//    --digitalocean-image=docker \\
-//    --digitalocean-region=fra1 \\
-//    --digitalocean-size=1gb \\
-//    --digitalocean-backups=false \\
-//    ${DROPLET_NAME}
-//
-//echo "(*) Gets ${DROPLET_NAME} droplet IP..."
-//DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
-//echo "Droplet IP = ${DROPLET_IP}"
-//
-//echo "(*) Target Ontrack application..."
-//export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
-//
-//echo "(*) Launching the remote Ontrack ecosystem..."
-//eval $(docker-machine env --shell bash ${DROPLET_NAME})
-//echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//docker-compose \\
-//    --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
-//    --project-name ontrack \\
-//    up -d
-//
-//echo "(*) Running the tests..."
-//eval $(docker-machine env --shell bash --unset)
-//echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//docker-compose \\
-//    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-//    --project-name do \\
-//    up --exit-code-from ontrack_acceptance
-//
-//'''
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh '''\
-//#!/bin/bash
-//
-//echo "(*) Copying the test results..."
-//mkdir -p build
-//rm -rf build/do
-//cp -r ontrack-acceptance/src/main/compose/build build/do
-//
-//echo "(*) Removing the test environment..."
-//docker-compose \\
-//    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-//    --project-name do \\
-//    down
-//
-//echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-//docker-machine rm --force ${DROPLET_NAME}
-//'''
-//                            script {
-//                                def results = junit 'build/do/*.xml'
-//                                ontrackValidate(
-//                                        project: projectName,
-//                                        branch: branchName,
-//                                        build: version,
-//                                        validationStamp: 'ACCEPTANCE.DO',
-//                                        testResults: results,
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
+                // Digital Ocean
+                stage('Digital Ocean') {
+                    agent {
+                        dockerfile {
+                            label "docker"
+                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
+                    environment {
+                        DROPLET_NAME = "ontrack-acceptance-${version}"
+                        DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
+                    }
+                    steps {
+                        timeout(time: 60, unit: 'MINUTES') {
+                            sh '''\
+#!/bin/bash
+
+echo "(*) Cleanup..."
+rm -rf ontrack-acceptance/src/main/compose/build
+
+echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
+docker-machine rm --force ${DROPLET_NAME} > /dev/null
+
+# Failing on first error from now on
+set -e
+
+echo "(*) Creating ${DROPLET_NAME} droplet..."
+docker-machine create \\
+    --driver=digitalocean \\
+    --digitalocean-access-token=${DO_TOKEN} \\
+    --digitalocean-image=docker \\
+    --digitalocean-region=fra1 \\
+    --digitalocean-size=1gb \\
+    --digitalocean-backups=false \\
+    ${DROPLET_NAME}
+
+echo "(*) Gets ${DROPLET_NAME} droplet IP..."
+DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
+echo "Droplet IP = ${DROPLET_IP}"
+
+echo "(*) Target Ontrack application..."
+export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
+
+echo "(*) Launching the remote Ontrack ecosystem..."
+eval $(docker-machine env --shell bash ${DROPLET_NAME})
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
+    --project-name ontrack \\
+    up -d
+
+echo "(*) Running the tests..."
+eval $(docker-machine env --shell bash --unset)
+echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
+    --project-name do \\
+    up --exit-code-from ontrack_acceptance
+
+'''
+                        }
+                    }
+                    post {
+                        always {
+                            sh '''\
+#!/bin/bash
+
+echo "(*) Copying the test results..."
+mkdir -p build
+rm -rf build/do
+cp -r ontrack-acceptance/src/main/compose/build build/do
+
+echo "(*) Removing the test environment..."
+docker-compose \\
+    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
+    --project-name do \\
+    down
+
+echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
+docker-machine rm --force ${DROPLET_NAME}
+'''
+                            script {
+                                def results = junit 'build/do/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DO',
+                                        testResults: results,
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
