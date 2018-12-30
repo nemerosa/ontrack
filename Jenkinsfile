@@ -4,7 +4,6 @@ String branchName = ''
 String projectName = 'ontrack'
 
 boolean pr = false
-String production = '3.37'
 
 pipeline {
 
@@ -731,7 +730,7 @@ GITHUB_URI=`git config remote.origin.url`
             }
             when {
                 beforeAgent true
-                branch "release/${production}*"
+                branch "master"
             }
             environment {
                 ONTRACK_VERSION = "${version}"
@@ -771,7 +770,7 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
             }
             when {
                 beforeAgent true
-                branch "release/${production}*"
+                branch "master"
             }
             environment {
                 ONTRACK_VERSION = "${version}"
