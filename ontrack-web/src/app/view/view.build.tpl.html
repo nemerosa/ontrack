@@ -62,6 +62,9 @@
                             <td>
                                 <a href="{{usedBy.links._page}}">{{usedBy.name}}</a>
                             </td>
+                            <td>
+                                <ot-entity-embedded-decorations decorations="usedBy.decorations"></ot-entity-embedded-decorations>
+                            </td>
                             <td class="ot-build-used-by-promotions">
                                 <span ng-repeat="promotionRun in usedBy.promotionRuns">
                                     <ot-entity-image entity="promotionRun.promotionLevel" title="{{promotionRun.promotionLevel.name}}" link="{{promotionRun.promotionLevel.links._page}}"></ot-entity-image>

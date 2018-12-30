@@ -59,6 +59,14 @@ angular.module('ot.view.build', [
                     links {
                       _page
                     }
+                    decorations {
+                      decorationType
+                      error
+                      data
+                      feature {
+                        id
+                      }
+                    }
                     promotionRuns(lastPerLevel: true) {
                       promotionLevel {
                         id
