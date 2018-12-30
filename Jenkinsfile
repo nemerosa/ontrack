@@ -667,9 +667,9 @@ set -e
             }
         }
 
-        // Site
+        // Documentation
 
-        stage('Site') {
+        stage('Documentation') {
             agent {
                 dockerfile {
                     label "docker"
@@ -678,7 +678,6 @@ set -e
             }
             environment {
                 ONTRACK_VERSION = "${version}"
-                GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
             }
             when {
                 beforeAgent true
@@ -699,20 +698,13 @@ unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
 #!/bin/bash
 set -e
 
-GITHUB_URI=`git config remote.origin.url`
-
 ./gradlew \\
     --build-file site.gradle \\
     --info \\
     --profile \\
     --console plain \\
     --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION} \\
-    -PontrackGitHubUri=${GITHUB_URI} \\
-    -PontrackGitHubPages=gh-pages \\
-    -PontrackGitHubUser=${GITHUB_USR} \\
-    -PontrackGitHubPassword=${GITHUB_PSW} \\
-    site
+    sitePrepare
 '''
             }
             post {
@@ -721,7 +713,7 @@ GITHUB_URI=`git config remote.origin.url`
                             project: projectName,
                             branch: branchName,
                             build: version,
-                            validationStamp: 'SITE',
+                            validationStamp: 'DOCUMENTATION',
                             buildResult: currentBuild.result,
                     )
                 }

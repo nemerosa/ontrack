@@ -21,27 +21,27 @@ task siteOntrackLast3Releases(type: OntrackLastReleases) {
 task sitePagesDocJs {
     dependsOn 'siteOntrackLast2Releases'
     dependsOn 'siteOntrackLast3Releases'
-    outputs.file project.file('build/site/pages/javascripts/doc/doc.js')
+    outputs.file project.file('build/site/page/doc.js')
     doLast {
-        project.file('build/site/pages/javascripts/doc').mkdirs()
-        project.file('build/site/pages/javascripts/doc/doc.js').text =
+        project.file('build/site/page').mkdirs()
+        project.file('build/site/page/doc.js').text =
                 "var releases = [${(siteOntrackLast3Releases.releases + siteOntrackLast2Releases.releases).collect { "'${it.name}'" }.join(',')}];"
     }
 }
 
 task sitePagesCopyHtml(type: Copy) {
     from 'publication/html5'
-    into "build/site/pages/release/${ontrackVersion}/doc"
+    into "build/site/release/doc/"
 }
 
 task sitePagesCopyPdf(type: Copy) {
     from 'publication/pdf'
-    into "build/site/pages/release/${ontrackVersion}"
+    into "build/site/release/"
 }
 
 task sitePagesCopyJavadoc(type: Copy) {
     from zipTree('publication/ontrack-javadoc.zip')
-    into "build/site/pages/release/${ontrackVersion}/javadoc"
+    into "build/site/release/javadoc/"
 }
 
 task sitePrepare {
