@@ -733,10 +733,34 @@ GITHUB_URI=`git config remote.origin.url`
                 branch "master"
             }
             environment {
-                ONTRACK_VERSION = "${version}"
                 ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
             }
             steps {
+                script {
+                    // Gets the latest tag
+                    env.ONTRACK_VERSION = sh(
+                            returnStdout: true,
+                            script: 'git describe --tags --abbrev=0'
+                    ).trim()
+                    // Gets the corresponding branch
+                    def result = ontrackGraphQL(
+                            script: '''
+                                query BranchLookup($project: String!, $build: String!) {
+                                  builds(project: $project, buildProjectFilter: {buildExactMatch: true, buildName: $build}) {
+                                    branch {
+                                      name
+                                    }
+                                  }
+                                }
+                            ''',
+                            bindings: [
+                                    'project': projectName,
+                                    'build'  : env.ONTRACK_VERSION as String
+                            ],
+                    )
+                }
+                echo "Deploying ${ONTRACK_VERSION} in production"
+                // Running the deployment
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
                         sshagent(credentials: ['ONTRACK_SSH_KEY']) {
@@ -773,7 +797,6 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
                 branch "master"
             }
             environment {
-                ONTRACK_VERSION = "${version}"
                 ONTRACK_ACCEPTANCE_ADMIN = credentials("ONTRACK_ACCEPTANCE_ADMIN")
             }
             steps {
@@ -814,7 +837,7 @@ docker-compose \\
                         ontrackValidate(
                                 project: projectName,
                                 branch: branchName,
-                                build: version,
+                                build: env.ONTRACK_VERSION,
                                 validationStamp: 'ONTRACK.SMOKE',
                                 testResults: results,
                         )
@@ -824,7 +847,7 @@ docker-compose \\
                     ontrackPromote(
                             project: projectName,
                             branch: branchName,
-                            build: version,
+                            build: env.ONTRACK_VERSION,
                             promotionLevel: 'ONTRACK',
                     )
                 }
