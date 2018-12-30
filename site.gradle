@@ -61,13 +61,13 @@ githubPages {
         from ("build/site/pages/release/${ontrackVersion}") {
             into "release/${ontrackVersion}"
         }
-        from ("build/site/pages/release/${ontrackVersion}") {
-            into "release/latest"
-        }
-        from("build/site/pages/javascripts/doc") {
-            include 'doc.js'
-            into "javascripts/doc"
-        }
+//        from ("build/site/pages/release/${ontrackVersion}") {
+//            into "release/latest"
+//        }
+//        from("build/site/pages/javascripts/doc") {
+//            include 'doc.js'
+//            into "javascripts/doc"
+//        }
     }
 }
 
