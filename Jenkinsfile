@@ -63,6 +63,12 @@ pipeline {
                     args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
                 }
             }
+            when {
+                beforeAgent true
+                not {
+                    branch 'master'
+                }
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -151,6 +157,12 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
                 dockerfile {
                     label "docker"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            when {
+                beforeAgent true
+                not {
+                    branch 'master'
                 }
             }
             environment {
@@ -758,8 +770,9 @@ GITHUB_URI=`git config remote.origin.url`
                                     'build'  : env.ONTRACK_VERSION as String
                             ],
                     )
+                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name.asText()
                 }
-                echo "Deploying ${ONTRACK_VERSION} in production"
+                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
                 // Running the deployment
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
@@ -836,8 +849,8 @@ docker-compose \\
                         def results = junit 'build/production/*.xml'
                         ontrackValidate(
                                 project: projectName,
-                                branch: branchName,
-                                build: env.ONTRACK_VERSION,
+                                branch: env.ONTRACK_BRANCH_NAME as String,
+                                build: env.ONTRACK_VERSION as String,
                                 validationStamp: 'ONTRACK.SMOKE',
                                 testResults: results,
                         )
@@ -846,8 +859,8 @@ docker-compose \\
                 success {
                     ontrackPromote(
                             project: projectName,
-                            branch: branchName,
-                            build: env.ONTRACK_VERSION,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
                             promotionLevel: 'ONTRACK',
                     )
                 }
