@@ -1,0 +1,34 @@
+img.picture {
+	box-shadow: 10px 10px 5px #888888;
+}
+
+div.ontrack-doc {
+	float: right;
+	// border: solid 1px lightgray;
+	padding: 0.5em;
+	margin-left: 1em;
+	margin-bottom: 1em;
+}
+
+.ontrack-doc {
+	font-size: 80%;
+}
+
+.ontrack-doc table {
+	border-collapse: collapse;
+}
+
+.ontrack-doc th {
+	text-transform: uppercase;
+	font-weight: normal;
+	text-align: left;
+	padding: 1em;
+	border: 0;
+	border-bottom: solid 1px lightgray;
+}
+
+.ontrack-doc td {
+	text-align: left;
+	padding: 1em;
+	border: 0;
+}
