@@ -527,10 +527,8 @@ echo "Publishing in Docker Hub..."
 echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
 
 docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION}
-docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:3
 
 docker image push nemerosa/ontrack:${ONTRACK_VERSION}
-docker image push nemerosa/ontrack:3
 '''
                     }
                     post {
@@ -716,7 +714,6 @@ GITHUB_URI=`git config remote.origin.url`
     -PontrackGitHubPassword=${GITHUB_PSW} \\
     site
 '''
-
             }
             post {
                 success {
