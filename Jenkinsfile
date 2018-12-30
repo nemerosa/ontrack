@@ -28,6 +28,7 @@ pipeline {
             agent {
                 dockerfile {
                     label "docker"
+                    dir "jenkins"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -60,6 +61,7 @@ pipeline {
             agent {
                 dockerfile {
                     label "docker"
+                    dir "jenkins"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
                 }
             }
@@ -156,6 +158,7 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             agent {
                 dockerfile {
                     label "docker"
+                    dir "jenkins"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -230,6 +233,7 @@ docker-compose --project-name local down --volumes
                     agent {
                         dockerfile {
                             label "docker"
+                            dir "jenkins"
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -290,6 +294,7 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                     agent {
                         dockerfile {
                             label "docker"
+                            dir "jenkins"
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -350,6 +355,7 @@ docker-compose --project-name debian --file docker-compose-debian.yml down --vol
                     agent {
                         dockerfile {
                             label "docker"
+                            dir "jenkins"
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -400,6 +406,7 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                     agent {
                         dockerfile {
                             label "docker"
+                            dir "jenkins"
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -507,6 +514,7 @@ docker-machine rm --force ${DROPLET_NAME}
                     agent {
                         dockerfile {
                             label "docker"
+                            dir "jenkins"
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -549,6 +557,7 @@ docker image push nemerosa/ontrack:${ONTRACK_VERSION}
                     agent {
                         dockerfile {
                             label "docker"
+                            dir "jenkins"
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -612,6 +621,7 @@ set -e
             agent {
                 dockerfile {
                     label "docker"
+                    dir "jenkins"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -675,11 +685,13 @@ set -e
             agent {
                 dockerfile {
                     label "docker"
+                    dir "jenkins"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
             environment {
                 ONTRACK_VERSION = "${version}"
+                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
             }
             when {
                 beforeAgent true
@@ -694,24 +706,34 @@ set -e
 
                 unstash name: "delivery"
                 sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
+                    unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
+                    unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
+                '''
 
                 sh '''\
-#!/bin/bash
-set -e
+                    ./gradlew \\
+                        --build-file site.gradle \\
+                        --info \\
+                        --profile \\
+                        --console plain \\
+                        --stacktrace \\
+                        sitePrepare
+                '''
 
-./gradlew \\
-    --build-file site.gradle \\
-    --info \\
-    --profile \\
-    --console plain \\
-    --stacktrace \\
-    sitePrepare
-'''
+                sh '''
+                    s3cmd \\
+                        --access_key=${AMS3_DELIVERY_USR} \\
+                        --secret_key=${AMS3_DELIVERY_PSW} \\
+                        --host=ams3.digitaloceanspaces.com \\
+                        --host-bucket=%(bucket)s.ams3.digitaloceanspaces.com \\
+                        put \\
+                        build/site/release/* \\
+                        s3://ams3-delivery-space/ontrack/release/docs/${ONTRACK_VERSION}/ \\
+                        --acl-public \\
+                        --add-header=Cache-Control:max-age=86400 \\
+                        --recursive
+                '''
+
             }
             post {
                 success {
@@ -732,6 +754,7 @@ set -e
             agent {
                 dockerfile {
                     label "docker"
+                    dir "jenkins"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -797,6 +820,7 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
             agent {
                 dockerfile {
                     label "docker"
+                    dir "jenkins"
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }

@@ -8,7 +8,14 @@ RUN apt-get update && apt-get install -y \
     zip \
     rsync \
     graphviz \
+    python-setuptools \
     && rm -rf /var/lib/apt/lists/*
+
+# S3 Cmd line tool
+RUN curl --fail --silent -L https://github.com/s3tools/s3cmd/releases/download/v2.0.2/s3cmd-2.0.2.tar.gz --output s3cmd.tar.gz \
+    && tar -xvzf s3cmd.tar.gz \
+    && cd s3cmd-2.0.2 \
+    && python setup.py install
 
 # Installing Docker
 RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-17.12.0-ce.tgz -O docker.tgz
