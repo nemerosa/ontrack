@@ -4,7 +4,7 @@ String branchName = ''
 String projectName = 'ontrack'
 
 boolean pr = false
-String production = '3.36'
+String production = '3.37'
 
 pipeline {
 
