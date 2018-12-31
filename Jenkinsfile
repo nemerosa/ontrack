@@ -725,7 +725,7 @@ set -e
                         --access_key=${AMS3_DELIVERY_USR} \\
                         --secret_key=${AMS3_DELIVERY_PSW} \\
                         --host=ams3.digitaloceanspaces.com \\
-                        --host-bucket=%(bucket)s.ams3.digitaloceanspaces.com \\
+                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
                         put \\
                         build/site/release/* \\
                         s3://ams3-delivery-space/ontrack/release/docs/${ONTRACK_VERSION}/ \\
