@@ -3,6 +3,8 @@ String gitCommit = ''
 String branchName = ''
 String projectName = 'ontrack'
 
+@Library("ontrack-jenkins-library@master") _
+
 boolean pr = false
 
 pipeline {
@@ -164,9 +166,12 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             }
             when {
                 beforeAgent true
-                not {
-                    branch 'master'
-                }
+                // FIXME Cleanup
+                branch 'xxx'
+                expression { false }
+//                not {
+//                    branch 'master'
+//                }
             }
             environment {
                 ONTRACK_VERSION = "${version}"
@@ -223,7 +228,9 @@ docker-compose --project-name local down --volumes
             }
             when {
                 beforeAgent true
-                branch 'release/*'
+                // FIXME Cleanup
+                branch 'xxx'
+                // branch 'release/*'
             }
             parallel {
                 // CentOS7
@@ -502,7 +509,9 @@ docker-machine rm --force ${DROPLET_NAME}
         stage('Publication') {
             when {
                 beforeAgent true
-                branch 'release/*'
+                // FIXME Cleanup
+                branch 'xxx'
+                // branch 'release/*'
             }
             environment {
                 ONTRACK_VERSION = "${version}"
@@ -631,7 +640,9 @@ set -e
             }
             when {
                 beforeAgent true
-                branch 'release/*'
+                // FIXME Cleanup
+                branch 'xxx'
+                // branch 'release/*'
             }
             steps {
                 echo "Release"
@@ -730,13 +741,48 @@ set -e
 
             }
             post {
-                success {
+                always {
                     ontrackValidate(
                             project: projectName,
                             branch: branchName,
                             build: version,
                             validationStamp: 'DOCUMENTATION',
-                            buildResult: currentBuild.result,
+                    )
+                }
+            }
+        }
+
+        // Merge to master (for latest release only)
+
+        stage('Merge to master') {
+            agent any
+            when {
+                beforeAgent true
+                allOf {
+                    branch "release/3.*"
+                    expression {
+                        ontrackGetLastBranch(project: projectName, pattern: 'release/3\\..*') == branchName
+                    }
+                }
+            }
+            environment {
+                GITHUB_NEMEROSA_JENKINS2 = credentials('GITHUB_NEMEROSA_JENKINS2')
+            }
+            steps {
+                // Merge to master
+                sh '''
+                    git checkout master
+                    git merge $BRANCH_NAME
+                    git push origin master
+                '''
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'MERGE',
                     )
                 }
             }
