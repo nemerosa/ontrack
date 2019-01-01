@@ -165,9 +165,7 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             when {
                 beforeAgent true
                 not {
-                    // FIXME #638 Cleanup
-                    branch 'feature/638-documentation'
-                    // branch 'master'
+                    branch 'master'
                 }
             }
             environment {
@@ -695,11 +693,7 @@ set -e
             }
             when {
                 beforeAgent true
-                // FIXME #638 Cleanup
-                anyOf {
-                    branch 'feature/638-documentation'
-                    branch 'release/*'
-                }
+                branch 'release/*'
             }
             steps {
                 echo "Release"
