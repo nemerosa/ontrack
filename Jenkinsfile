@@ -714,12 +714,12 @@ set -e
 
                 sh '''\
                     ./gradlew \\
-                        --build-file site.gradle \\
+                        --build-file publication.gradle \\
                         --info \\
                         --profile \\
                         --console plain \\
                         --stacktrace \\
-                        sitePrepare
+                        releaseDocPrepare
                 '''
 
                 sh '''
@@ -730,7 +730,7 @@ set -e
                         --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
                         put \\
                         build/site/release/* \\
-                        s3://ams3-delivery-space/ontrack/release/docs/${ONTRACK_VERSION}/ \\
+                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
                         --acl-public \\
                         --add-header=Cache-Control:max-age=86400 \\
                         --recursive

@@ -1,5 +1,5 @@
 let html = "";
-const prefix = "https://ams3-delivery-space.ams3.cdn.digitaloceanspaces.com/ontrack/release/docs/";
+const prefix = "https://ams3-delivery-space.ams3.cdn.digitaloceanspaces.com/ontrack/release/";
 $.each(releases, function (index, release) {
    html += `
       <tr>
@@ -7,9 +7,9 @@ $.each(releases, function (index, release) {
             <a href="https://github.com/nemerosa/ontrack/releases/tag/${release}">${release}</a>
         </td>
         <td>
-            <a href="${prefix}/${release}/doc/index.html">HTML</a>
-             | <a href="${prefix}/${release}/index.pdf">PDF</a>
-             | <a href="${prefix}/${release}/javadoc/index.html">Javadoc</a>
+            <a href="${prefix}/${release}/docs/doc/index.html">HTML</a>
+             | <a href="${prefix}/${release}/docs/index.pdf">PDF</a>
+             | <a href="${prefix}/${release}/docs/javadoc/index.html">Javadoc</a>
         </td>
       </tr>`;
 });

@@ -33,28 +33,6 @@ task sitePagesDocJs {
     }
 }
 
-task sitePagesCopyHtml(type: Copy) {
-    from 'publication/html5'
-    into "build/site/release/doc/"
-}
-
-task sitePagesCopyPdf(type: Copy) {
-    from 'publication/pdf'
-    into "build/site/release/"
-}
-
-task sitePagesCopyJavadoc(type: Copy) {
-    from zipTree('publication/ontrack-javadoc.zip')
-    into "build/site/release/javadoc/"
-}
-
-task sitePrepare {
-    dependsOn 'sitePagesDocJs'
-    dependsOn 'sitePagesCopyHtml'
-    dependsOn 'sitePagesCopyPdf'
-    dependsOn 'sitePagesCopyJavadoc'
-}
-
 prepareGhPages.dependsOn sitePagesDocJs
 
 githubPages {
