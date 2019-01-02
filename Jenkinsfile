@@ -765,9 +765,6 @@ set -e
                     }
                 }
             }
-            environment {
-                GITHUB_NEMEROSA_JENKINS2 = credentials('GITHUB_NEMEROSA_JENKINS2')
-            }
             steps {
                 // Merge to master
                 sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
