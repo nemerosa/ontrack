@@ -761,7 +761,7 @@ set -e
                 allOf {
                     branch "release/3.*"
                     expression {
-                        ontrackGetLastBranch(project: projectName, pattern: 'release/3\\..*') == branchName
+                        ontrackGetLastBranch(project: projectName, pattern: 'release-3\\..*') == branchName
                     }
                 }
             }
