@@ -668,6 +668,14 @@ set -e
 
             }
             post {
+                always {
+                    ontrackValidate(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'GITHUB.RELEASE',
+                    )
+                }
                 success {
                     ontrackPromote(
                             project: projectName,
