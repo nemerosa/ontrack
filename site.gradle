@@ -35,7 +35,7 @@ task sitePagesDocJs {
 
 gitPublish {
     repoUri = project.properties.ontrackGitHubUri
-    branch = 'gh-pages'
+    branch = project.properties.ontrackGitHubPages
     contents {
         from 'ontrack-site/src/main/web'
         from('build/site/page') {

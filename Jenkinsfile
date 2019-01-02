@@ -837,7 +837,9 @@ set -e
                 }
             }
             environment {
-                GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
+                // GitHub OAuth token
+                GRGIT_USER = credentials("JENKINS_GITHUB_TOKEN")
+                GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
             }
             when {
                 beforeAgent true
@@ -845,20 +847,17 @@ set -e
             }
             steps {
                 echo "Getting list of releases and publishing the site..."
-                sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
-                    sh '''\
-                        GITHUB_URI=`git config remote.origin.url`
-                        ./gradlew \\
-                            --build-file site.gradle \\
-                            --info \\
-                            --profile \\
-                            --console plain \\
-                            --stacktrace \\
-                            -PontrackVersion=${ONTRACK_VERSION} \\
-                            -PontrackGitHubUri=${GITHUB_URI} \\
-                            site
-                    '''
-                }
+                sh '''\
+                    ./gradlew \\
+                        --build-file site.gradle \\
+                        --info \\
+                        --profile \\
+                        --console plain \\
+                        --stacktrace \\
+                        -PontrackVersion=${ONTRACK_VERSION} \\
+                        -PontrackGitHubUri=${GITHUB_URI} \\
+                        site
+                '''
             }
             post {
                 always {
