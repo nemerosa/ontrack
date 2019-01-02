@@ -34,6 +34,12 @@ pipeline {
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
+            when {
+                beforeAgent true
+                not {
+                    branch 'master'
+                }
+            }
             steps {
                 script {
                     branchName = ontrackBranchName(BRANCH_NAME)
@@ -818,7 +824,7 @@ set -e
                                     'build'  : env.ONTRACK_VERSION as String
                             ],
                     )
-                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name.asText()
+                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
                 }
                 echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
                 // Running the deployment
