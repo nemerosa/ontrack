@@ -3,7 +3,7 @@ String gitCommit = ''
 String branchName = ''
 String projectName = 'ontrack'
 
-@Library("ontrack-jenkins-library@master") _
+@Library("ontrack-jenkins-library@1.0.0") _
 
 boolean pr = false
 
