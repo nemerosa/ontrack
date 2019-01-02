@@ -166,12 +166,9 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             }
             when {
                 beforeAgent true
-                // FIXME Cleanup
-                branch 'xxx'
-                expression { false }
-//                not {
-//                    branch 'master'
-//                }
+                not {
+                    branch 'master'
+                }
             }
             environment {
                 ONTRACK_VERSION = "${version}"
@@ -228,9 +225,7 @@ docker-compose --project-name local down --volumes
             }
             when {
                 beforeAgent true
-                // FIXME Cleanup
-                branch 'xxx'
-                // branch 'release/*'
+                branch 'release/*'
             }
             parallel {
                 // CentOS7
@@ -509,9 +504,7 @@ docker-machine rm --force ${DROPLET_NAME}
         stage('Publication') {
             when {
                 beforeAgent true
-                // FIXME Cleanup
-                branch 'xxx'
-                // branch 'release/*'
+                branch 'release/*'
             }
             environment {
                 ONTRACK_VERSION = "${version}"
@@ -640,9 +633,7 @@ set -e
             }
             when {
                 beforeAgent true
-                // FIXME Cleanup
-                branch 'xxx'
-                // branch 'release/*'
+                branch 'release/*'
             }
             steps {
                 echo "Release"
