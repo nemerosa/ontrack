@@ -853,20 +853,11 @@ set -e
                         --secret_key=${AMS3_DELIVERY_PSW} \\
                         --host=ams3.digitaloceanspaces.com \\
                         --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-                        rm \\
-                        s3://ams3-delivery-space/ontrack/release/latest/docs/ \\
-                        --recursive
-                '''
-                sh '''
-                    s3cmd \\
-                        --access_key=${AMS3_DELIVERY_USR} \\
-                        --secret_key=${AMS3_DELIVERY_PSW} \\
-                        --host=ams3.digitaloceanspaces.com \\
-                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+                        --recursive \\
+                        --force \\
                         cp \\
                         s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
-                        s3://ams3-delivery-space/ontrack/release/latest/docs/ \\
-                        --recursive
+                        s3://ams3-delivery-space/ontrack/release/latest/docs/
                 '''
             }
             post {
