@@ -829,6 +829,55 @@ set -e
             }
         }
 
+        // Latest documentation
+
+        stage('Latest documentation') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    dir "jenkins"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            when {
+                beforeAgent true
+                branch 'master'
+            }
+            steps {
+                sh '''
+                    s3cmd \\
+                        --access_key=${AMS3_DELIVERY_USR} \\
+                        --secret_key=${AMS3_DELIVERY_PSW} \\
+                        --host=ams3.digitaloceanspaces.com \\
+                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+                        rm \\
+                        s3://ams3-delivery-space/ontrack/release/latest/docs/ \\
+                        --recursive
+                '''
+                sh '''
+                    s3cmd \\
+                        --access_key=${AMS3_DELIVERY_USR} \\
+                        --secret_key=${AMS3_DELIVERY_PSW} \\
+                        --host=ams3.digitaloceanspaces.com \\
+                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+                        cp \\
+                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
+                        s3://ams3-delivery-space/ontrack/release/latest/docs/ \\
+                        --recursive
+                '''
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: projectName,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
+                            validationStamp: 'DOCUMENTATION.LATEST',
+                    )
+                }
+            }
+        }
+
         // Docker latest images
 
         stage('Docker Latest') {
