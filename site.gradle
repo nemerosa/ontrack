@@ -9,7 +9,7 @@
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
 
 plugins {
-    id 'org.ajoberstar.github-pages' version '1.7.2'
+    id 'org.ajoberstar.git-publish' version '2.0.0'
 }
 
 task siteOntrackLast2Releases(type: OntrackLastReleases) {
@@ -33,23 +33,21 @@ task sitePagesDocJs {
     }
 }
 
-prepareGhPages.dependsOn sitePagesDocJs
-
-githubPages {
-    deleteExistingFiles = false
+gitPublish {
     repoUri = project.properties.ontrackGitHubUri
-    credentials.username = project.properties.ontrackGitHubUser
-    credentials.password = project.properties.ontrackGitHubPassword
-    targetBranch = project.properties.ontrackGitHubPages
-    pages {
-        from("ontrack-site/src/main/web")
-        from("build/site.page") {
+    branch = 'gh-pages'
+    contents {
+        from 'ontrack-site/src/main/web'
+        from('build/site/page') {
             include 'doc.js'
-            into "javascripts/doc/"
+            into 'javascripts/doc/'
         }
     }
+    commitMessage = "GitHub pages for version ${ontrackVersion}" as String
 }
 
+gitPublishCopy.dependsOn sitePagesDocJs
+
 task site {
-    dependsOn 'publishGhPages'
+    dependsOn 'gitPublishPush'
 }

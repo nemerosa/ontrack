@@ -1,5 +1,5 @@
 let html = "";
-const prefix = "https://ams3-delivery-space.ams3.cdn.digitaloceanspaces.com/ontrack/release/";
+const prefix = "https://ams3-delivery-space.ams3.cdn.digitaloceanspaces.com/ontrack/release";
 $.each(releases, function (index, release) {
    html += `
       <tr>
