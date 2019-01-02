@@ -770,11 +770,13 @@ set -e
             }
             steps {
                 // Merge to master
-                sh '''
-                    git checkout master
-                    git merge $BRANCH_NAME
-                    git push origin master
-                '''
+                sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
+                    sh '''
+                        git checkout master
+                        git merge $BRANCH_NAME
+                        git push origin master
+                    '''
+                }
             }
             post {
                 always {
