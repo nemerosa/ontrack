@@ -784,9 +784,9 @@ set -e
             }
         }
 
-        // Production
+        // Master setup
 
-        stage('Production') {
+        stage('Master setup') {
             agent {
                 dockerfile {
                     label "docker"
@@ -796,10 +796,7 @@ set -e
             }
             when {
                 beforeAgent true
-                branch "master"
-            }
-            environment {
-                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
+                branch 'master'
             }
             steps {
                 script {
@@ -826,6 +823,75 @@ set -e
                     )
                     env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
                 }
+            }
+        }
+
+        // Site generation
+
+        stage('Site generation') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    dir "jenkins"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            environment {
+                GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
+            }
+            when {
+                beforeAgent true
+                branch 'master'
+            }
+            steps {
+                echo "Getting list of releases and publishing the site..."
+                sh '''\
+                    GITHUB_URI=`git config remote.origin.url`
+                    ./gradlew \\
+                        --build-file site.gradle \\
+                        --info \\
+                        --profile \\
+                        --console plain \\
+                        --stacktrace \\
+                        -PontrackVersion=${ONTRACK_VERSION} \\
+                        -PontrackGitHubUri=${GITHUB_URI} \\
+                        -PontrackGitHubPages=gh-pages \\
+                        -PontrackGitHubUser=${GITHUB_USR} \\
+                        -PontrackGitHubPassword=${GITHUB_PSW} \\
+                        site
+                '''
+
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: projectName,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
+                            validationStamp: 'SITE',
+                    )
+                }
+            }
+        }
+
+        // Production
+
+        stage('Production') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    dir "jenkins"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            when {
+                beforeAgent true
+                branch "master"
+            }
+            environment {
+                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
+            }
+            steps {
                 echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
                 // Running the deployment
                 timeout(time: 15, unit: 'MINUTES') {
