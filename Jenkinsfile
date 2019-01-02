@@ -674,6 +674,14 @@ set -e
 
             }
             post {
+                always {
+                    ontrackValidate(
+                            project: projectName,
+                            branch: branchName,
+                            build: version,
+                            validationStamp: 'GITHUB.RELEASE',
+                    )
+                }
                 success {
                     ontrackPromote(
                             project: projectName,
@@ -766,6 +774,8 @@ set -e
                 // Merge to master
                 sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
                     sh '''
+                        git config --local user.email "jenkins@nemerosa.net"
+                        git config --local user.name "Jenkins"
                         git checkout master
                         git merge $BRANCH_NAME
                         git push origin master
