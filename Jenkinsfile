@@ -843,6 +843,9 @@ set -e
                 beforeAgent true
                 branch 'master'
             }
+            environment {
+                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
+            }
             steps {
                 sh '''
                     s3cmd \\
