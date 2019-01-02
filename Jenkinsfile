@@ -845,22 +845,20 @@ set -e
             }
             steps {
                 echo "Getting list of releases and publishing the site..."
-                sh '''\
-                    GITHUB_URI=`git config remote.origin.url`
-                    ./gradlew \\
-                        --build-file site.gradle \\
-                        --info \\
-                        --profile \\
-                        --console plain \\
-                        --stacktrace \\
-                        -PontrackVersion=${ONTRACK_VERSION} \\
-                        -PontrackGitHubUri=${GITHUB_URI} \\
-                        -PontrackGitHubPages=gh-pages \\
-                        -PontrackGitHubUser=${GITHUB_USR} \\
-                        -PontrackGitHubPassword=${GITHUB_PSW} \\
-                        site
-                '''
-
+                sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
+                    sh '''\
+                        GITHUB_URI=`git config remote.origin.url`
+                        ./gradlew \\
+                            --build-file site.gradle \\
+                            --info \\
+                            --profile \\
+                            --console plain \\
+                            --stacktrace \\
+                            -PontrackVersion=${ONTRACK_VERSION} \\
+                            -PontrackGitHubUri=${GITHUB_URI} \\
+                            site
+                    '''
+                }
             }
             post {
                 always {
