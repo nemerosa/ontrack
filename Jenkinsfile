@@ -805,6 +805,9 @@ set -e
                             returnStdout: true,
                             script: 'git describe --tags --abbrev=0'
                     ).trim()
+                    // Version components
+                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+\.\d.*/)
                     // Gets the corresponding branch
                     def result = ontrackGraphQL(
                             script: '''
@@ -822,6 +825,54 @@ set -e
                             ],
                     )
                     env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
+                }
+            }
+        }
+
+        // Docker latest images
+
+        stage('Docker Latest') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    dir "jenkins"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            when {
+                branch "master"
+            }
+            environment {
+                DOCKER_HUB = credentials("DOCKER_HUB")
+            }
+            steps {
+                sh '''\
+                    echo "Making sure the images are available on this node..."
+                    
+                    echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                    docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
+                    
+                    echo "Tagging..."
+                    
+                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
+                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
+                    
+                    echo "Publishing latest versions in Docker Hub..."
+                    
+                    echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
+                    
+                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
+                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
+                '''
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: projectName,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
+                            validationStamp: 'DOCKER.LATEST',
+                    )
                 }
             }
         }
@@ -987,4 +1038,15 @@ docker-compose \\
 
     }
 
+}
+
+@SuppressWarnings("GrMethodMayBeStatic")
+@NonCPS
+String extractFromVersion(String version, String pattern) {
+    def matcher = (version =~ pattern)
+    if (matcher.matches()) {
+        return matcher.group(1)
+    } else {
+        throw new IllegalAccessException("Version $version does not match pattern: $pattern")
+    }
 }
