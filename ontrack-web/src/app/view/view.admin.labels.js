@@ -16,7 +16,7 @@ angular.module('ot.view.admin.labels', [
         view.description = "Management of labels";
         view.breadcrumbs = ot.homeBreadcrumbs();
 
-        const query = `
+        const query = `{
             labels {
                 id
                 category
@@ -28,7 +28,7 @@ angular.module('ot.view.admin.labels', [
                     name
                 }
             }
-        `;
+        }`;
 
         function loadLabels() {
             otGraphqlService.pageGraphQLCall(query).then(function (data) {
