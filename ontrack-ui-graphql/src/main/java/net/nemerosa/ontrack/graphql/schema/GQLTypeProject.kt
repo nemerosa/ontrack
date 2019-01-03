@@ -9,6 +9,7 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
@@ -17,10 +18,12 @@ import java.util.regex.Pattern
 @Component
 class GQLTypeProject(
         private val structureService: StructureService,
+        private val projectLabelManagementService: ProjectLabelManagementService,
         creation: GQLTypeCreation,
         private val branch: GQLTypeBranch,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
-        private val projectEntityInterface: GQLProjectEntityInterface
+        private val projectEntityInterface: GQLProjectEntityInterface,
+        private val label: GQLTypeLabel
 ) : AbstractGQLProjectEntity<Project>(
         Project::class.java,
         ProjectEntityType.PROJECT,
@@ -53,6 +56,16 @@ class GQLTypeProject(
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
+                // Labels for this project
+                .field {
+                    it.name("labels")
+                            .description("Labels for this project")
+                            .type(stdList(label.typeRef))
+                            .dataFetcher { environment ->
+                                val project: Project = environment.getSource()
+                                projectLabelManagementService.getLabelsForProject(project)
+                            }
+                }
                 // OK
                 .build()
 
