@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
-@RequestMapping("/rest/labels/projects/{projectId")
+@RequestMapping("/rest/labels/projects")
 class ProjectLabelController(
         private val structureService: StructureService,
         private val projectLabelManagementService: ProjectLabelManagementService
 ) : AbstractResourceController() {
 
-    @GetMapping("")
+    @GetMapping("{projectId}")
     fun getLabelsForProject(@PathVariable projectId: Int): Resources<Label> {
         return Resources.of(
                 projectLabelManagementService.getLabelsForProject(
@@ -27,7 +27,7 @@ class ProjectLabelController(
         )
     }
 
-    @PutMapping("")
+    @PutMapping("{projectId}")
     fun setLabelsForProject(@PathVariable projectId: Int, @RequestBody form: ProjectLabelForm): Resources<Label> {
         projectLabelManagementService.associateProjectToLabels(
                 structureService.getProject(ID.of(projectId)),
