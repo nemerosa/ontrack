@@ -62,6 +62,9 @@ angular.module('ot.view.project', [
                   latestBuild: builds(count: 1) {
                     id
                     name
+                    creation {
+                        time
+                    }
                   }
                   promotionLevels {
                     id
