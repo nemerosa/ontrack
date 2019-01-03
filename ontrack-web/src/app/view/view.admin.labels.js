@@ -30,9 +30,13 @@ angular.module('ot.view.admin.labels', [
             }
         }`;
 
+        $scope.loadingLabels = false;
         function loadLabels() {
-            otGraphqlService.pageGraphQLCall(query).then(function (data) {
+            $scope.loadingLabels = true;
+            otGraphqlService.pageGraphQLCall(query).then(data => {
                 $scope.labels = data.labels;
+            }).finally(() => {
+                $scope.loadingLabels = false;
             });
         }
 

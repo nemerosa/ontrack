@@ -1,5 +1,42 @@
 <ot-view>
 
-    Labels
+    <div class="row" ng-show="loadingLabels">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the labels...
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered" ng-hide="loadingLabels">
+        <thead>
+        <tr>
+            <th>Label</th>
+            <th>Description</th>
+            <th>Computed</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="label in labels">
+            <td>
+                <ot-project-label label="label"></ot-project-label>
+            </td>
+            <td>
+                {{label.description}}
+            </td>
+            <td>
+                <span ng-if="label.computedBy" title="{{label.computedBy.id}}">
+                    {{label.computedBy.name}}
+                </span>
+                <span ng-if="!label.computedBy" class="text-muted">No</span>
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 </ot-view>
