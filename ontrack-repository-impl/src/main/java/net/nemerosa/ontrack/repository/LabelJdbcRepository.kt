@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.labels.LabelCategoryNameAlreadyExistException
 import net.nemerosa.ontrack.model.labels.LabelForm
+import net.nemerosa.ontrack.model.labels.LabelIdNotFoundException
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.dao.DuplicateKeyException
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import javax.sql.DataSource
@@ -16,9 +18,9 @@ class LabelJdbcRepository(
     override fun newLabel(form: LabelForm, computedBy: String?): LabelRecord {
         try {
             val id = dbCreate("""
-            INSERT INTO LABEL(category, name, description, color, computed_by)
-            VALUES (:category, :name, :description, :color, :computedBy)
-        """,
+                        INSERT INTO LABEL(category, name, description, color, computed_by)
+                        VALUES (:category, :name, :description, :color, :computedBy)
+                    """,
                     params("computedBy", computedBy)
                             .addValue("category", form.category)
                             .addValue("name", form.name)
@@ -35,6 +37,39 @@ class LabelJdbcRepository(
             )
         } catch (_: DuplicateKeyException) {
             throw LabelCategoryNameAlreadyExistException(form.category, form.name)
+        }
+    }
+
+    override fun updateLabel(labelId: Int, form: LabelForm): LabelRecord {
+        try {
+            namedParameterJdbcTemplate.update("""
+                        UPDATE LABEL
+                        SET category = :category,
+                            name = :name,
+                            description = :description,
+                            color = :color
+                        WHERE id = :id
+                    """,
+                    params("category", form.category)
+                            .addValue("name", form.name)
+                            .addValue("description", form.description)
+                            .addValue("color", form.color)
+                            .addValue("id", labelId)
+            )
+            return getLabel(labelId)
+        } catch (_: DuplicateKeyException) {
+            throw LabelCategoryNameAlreadyExistException(form.category, form.name)
+        }
+    }
+
+    override fun getLabel(labelId: Int): LabelRecord {
+        try {
+            return namedParameterJdbcTemplate.queryForObject(
+                    "SELECT * FROM LABEL WHERE ID = :id",
+                    params("id", labelId)
+            ) { rs, _ -> rsConversion(rs) }
+        } catch (_: EmptyResultDataAccessException) {
+            throw LabelIdNotFoundException(labelId)
         }
     }
 

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.labels
 
 import net.nemerosa.ontrack.model.labels.*
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.repository.LabelRecord
 import net.nemerosa.ontrack.repository.LabelRepository
 import org.springframework.stereotype.Service
@@ -10,14 +11,30 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class LabelManagementServiceImpl(
         private val labelRepository: LabelRepository,
-        private val labelProviderService: LabelProviderService
+        private val labelProviderService: LabelProviderService,
+        private val securityService: SecurityService
 ) : LabelManagementService {
 
     override val labels: List<Label>
         get() = labelRepository.labels.map { it.toLabel() }
 
-    override fun newLabel(form: LabelForm): Label =
-            labelRepository.newLabel(form).toLabel()
+    override fun newLabel(form: LabelForm): Label {
+        securityService.checkGlobalFunction(LabelManagement::class.java)
+        return labelRepository.newLabel(form).toLabel()
+    }
+
+    override fun getLabel(labelId: Int): Label =
+            labelRepository.getLabel(labelId).toLabel()
+
+    override fun updateLabel(labelId: Int, form: LabelForm): Label {
+        securityService.checkGlobalFunction(LabelManagement::class.java)
+        val label = getLabel(labelId)
+        if (label.computedBy != null) {
+            throw LabelNotEditableException(label)
+        } else {
+            return labelRepository.updateLabel(labelId, form).toLabel()
+        }
+    }
 
     private fun LabelRecord.toLabel() =
             Label(

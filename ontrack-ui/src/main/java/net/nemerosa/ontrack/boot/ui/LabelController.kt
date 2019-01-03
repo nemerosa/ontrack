@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelManagementService
+import net.nemerosa.ontrack.model.labels.LabelNotEditableException
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -55,5 +56,31 @@ class LabelController(
     @PostMapping("create")
     fun newLabel(@RequestBody @Valid form: LabelForm): Label =
             labelManagementService.newLabel(form)
+
+    /**
+     * Gets the form to update a label.
+     */
+    @GetMapping("{labelId}/update")
+    fun getUpdateLabelForm(@PathVariable labelId: Int): Form =
+            labelManagementService
+                    .getLabel(labelId)
+                    .let { label ->
+                        if (label.computedBy == null) {
+                            getCreationForm()
+                                    .fill("category", label.category)
+                                    .fill("name", label.name)
+                                    .fill("description", label.description)
+                                    .fill("color", label.color)
+                        } else {
+                            throw LabelNotEditableException(label)
+                        }
+                    }
+
+    /**
+     * Updates a label
+     */
+    @PutMapping("{labelId}/update")
+    fun updateLabel(@PathVariable labelId: Int, @RequestBody @Valid form: LabelForm): Label =
+            labelManagementService.updateLabel(labelId, form)
 
 }
