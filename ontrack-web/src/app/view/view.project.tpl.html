@@ -40,7 +40,7 @@
                     </div>
                     <table class="ot-project-branches">
                         <tbody>
-                        <tr ng-repeat="branch in project.branches | filter:{name: branchNameFilter} | orderBy:'latestBuild[0].creation.time':true"
+                        <tr ng-repeat="branch in project.branches | filter:{name: branchNameFilter} | orderBy:getBranchTime:true"
                             ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
                             <td class="ot-project-branch-name ot-decoration-list"
                                 ng-class="{'ot-entity-disabled': branch.disabled}">

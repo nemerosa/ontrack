@@ -53,6 +53,9 @@ angular.module('ot.view.project', [
                   decorations {
                     ...decorationContent
                   }
+                  creation {
+                    time
+                  }
                   links {
                     _page
                     _enable
@@ -225,6 +228,15 @@ angular.module('ot.view.project', [
 
         // Reload callback available in the scope
         $scope.reloadProject = loadProject;
+
+        // Time to use for sorting branches
+        $scope.getBranchTime = function (branch) {
+            if (branch.latestBuild && branch.latestBuild.length > 0) {
+                return branch.latestBuild[0].creation.time;
+            } else {
+                return branch.creation.time;
+            }
+        };
 
         // Enabling a branch
         $scope.enableBranch = function (branch) {
