@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.labels.ProjectLabelForm
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import javax.sql.DataSource
@@ -66,6 +67,25 @@ class ProjectLabelJdbcRepository(
                 """,
                 params("project", project).addValue("label", label)
         )
+    }
+
+    override fun associateProjectToLabels(project: Int, form: ProjectLabelForm) {
+        // Existing labels
+        val existingLabels = getLabelsForProject(project)
+        // For any new label, saves it
+        form.labels.minus(existingLabels).forEach { label ->
+            namedParameterJdbcTemplate.update(
+                    """
+                        INSERT INTO project_label(PROJECT_ID, LABEL_ID)
+                        VALUES (:project, :label)
+                    """,
+                    params("project", project).addValue("label", label)
+            )
+        }
+        // Deletes any leftover
+        existingLabels.minus(form.labels).forEach { label ->
+            unassociateProjectToLabel(project, label)
+        }
     }
 
 }

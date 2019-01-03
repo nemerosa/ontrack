@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.labels.ProjectLabelForm
+
 interface ProjectLabelRepository {
 
     /**
@@ -23,4 +25,9 @@ interface ProjectLabelRepository {
      * Removes the association between a label and a project
      */
     fun unassociateProjectToLabel(project: Int, label: Int)
+
+    /**
+     * Sets all the labels for a project
+     */
+    fun associateProjectToLabels(project: Int, form: ProjectLabelForm)
 }

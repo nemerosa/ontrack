@@ -27,4 +27,9 @@ interface ProjectLabelManagementService {
      */
     fun unassociateProjectToLabel(project: Project, label: Label)
 
+    /**
+     * Sets all the labels for a project
+     */
+    fun associateProjectToLabels(project: Project, form: ProjectLabelForm)
+
 }

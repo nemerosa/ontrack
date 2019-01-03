@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.service.labels
 
-import net.nemerosa.ontrack.model.labels.Label
-import net.nemerosa.ontrack.model.labels.LabelManagementService
-import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
-import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
+import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -37,5 +34,13 @@ class ProjectLabelManagementServiceImpl(
     override fun unassociateProjectToLabel(project: Project, label: Label) {
         securityService.checkProjectFunction(project, ProjectLabelManagement::class.java)
         projectLabelRepository.unassociateProjectToLabel(project.id(), label.id)
+    }
+
+    override fun associateProjectToLabels(project: Project, form: ProjectLabelForm) {
+        securityService.checkProjectFunction(project, ProjectLabelManagement::class.java)
+        // Checks all labels
+        form.labels.map { labelManagementService.getLabel(it) }
+        // Saves the association
+        projectLabelRepository.associateProjectToLabels(project.id(), form)
     }
 }
