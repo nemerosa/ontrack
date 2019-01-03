@@ -47,6 +47,7 @@ const ontrack = angular.module('ontrack', [
         'ot.view.admin.health',
         'ot.view.admin.extensions',
         'ot.view.admin.jobs',
+        'ot.view.admin.labels',
         'ot.view.admin.log-entries',
         'ot.view.admin.predefined-validation-stamps',
         'ot.view.admin.predefined-promotion-levels'
