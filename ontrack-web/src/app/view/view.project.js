@@ -170,6 +170,13 @@ angular.module('ot.view.project', [
                         }
                     },
                     {
+                        // FIXME Condition for the edition
+                        id: 'labelsProject',
+                        name: "Labels",
+                        cls: 'ot-command-project-labels',
+                        action: editProjectLabels
+                    },
+                    {
                         condition: function () {
                             return $scope.project.links._permissions;
                         },
@@ -262,5 +269,9 @@ angular.module('ot.view.project', [
                 return ot.call($http.delete(branch.links._delete));
             }).then(loadProject);
         };
+
+        // FIXME Editing the project labels
+        function editProjectLabels() {
+        }
     })
 ;
