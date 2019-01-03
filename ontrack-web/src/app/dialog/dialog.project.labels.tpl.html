@@ -1,0 +1,31 @@
+<div class="modal-header">
+    <h3>
+        "{{config.project.name}}" project labels
+    </h3>
+</div>
+<form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
+    <div class="modal-body">
+        <table class="table table-hover">
+            <tbody>
+            <tr ng-repeat="label in data" ng-click="label.selected = !label.selected;">
+                <td width="24">
+                    <span class="fa fa-check ot-command" ng-show="label.selected"></span>
+                </td>
+                <td class="ot-action">
+                    <ot-project-label label="label"></ot-project-label>
+                </td>
+                <td width="24">
+                    <span class="fa fa-close ot-command" ng-show="label.selected"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <div class="ot-alert-{{message.type}} alert-dismissable" ng-show="message">
+            <span>{{message.content}}</span>
+        </div>
+        <button class="btn btn-primary" type="submit" ng-disabled="thisForm.$invalid">OK</button>
+        <button class="btn btn-link" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</form>

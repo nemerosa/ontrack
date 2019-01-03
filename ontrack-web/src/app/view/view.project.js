@@ -3,7 +3,8 @@ angular.module('ot.view.project', [
     'ot.service.core',
     'ot.service.structure',
     'ot.service.copy',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.dialog.project.labels'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('project', {
@@ -12,7 +13,7 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService) {
+    .controller('ProjectCtrl', function ($modal, $scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService) {
         const view = ot.view();
         // Project's id
         const projectId = $stateParams.projectId;
@@ -31,6 +32,17 @@ angular.module('ot.view.project', [
                 decorations {
                   ...decorationContent
                 }
+                labels {
+                  id
+                  category
+                  name
+                  description
+                  color
+                  computedBy {
+                    id
+                    name
+                  }
+                }
                 links {
                   _self
                   _createBranch
@@ -44,6 +56,7 @@ angular.module('ot.view.project', [
                   _extra
                   _events
                   _actions
+                  _labels
                 }
                 branches {
                   id
@@ -170,7 +183,9 @@ angular.module('ot.view.project', [
                         }
                     },
                     {
-                        // FIXME Condition for the edition
+                        condition: function () {
+                            return $scope.project.links._labels;
+                        },
                         id: 'labelsProject',
                         name: "Labels",
                         cls: 'ot-command-project-labels',
@@ -213,7 +228,7 @@ angular.module('ot.view.project', [
                             otAlertService.confirm({
                                 title: "Deleting a project",
                                 message: "Do you really want to delete the project " + $scope.project.name +
-                                " and all its associated data?"
+                                    " and all its associated data?"
                             }).then(function () {
                                 return ot.call($http.delete($scope.project.links._delete));
                             }).then(function () {
@@ -264,14 +279,48 @@ angular.module('ot.view.project', [
             return otAlertService.confirm({
                 title: "Deleting a branch",
                 message: "Do you really want to delete the branch " + branch.name +
-                " and all its associated data?"
+                    " and all its associated data?"
             }).then(function () {
                 return ot.call($http.delete(branch.links._delete));
             }).then(loadProject);
         };
 
-        // FIXME Editing the project labels
         function editProjectLabels() {
+            if ($scope.project.links._labels) {
+                const labelQuery = `{
+                    labels {
+                        id
+                        category
+                        name
+                        description
+                        color
+                        computedBy {
+                            id
+                            name
+                        }
+                    }
+                }`;
+                otGraphqlService.pageGraphQLCall(labelQuery).then(resultLabels => {
+                    return $modal.open({
+                        templateUrl: 'app/dialog/dialog.project.labels.tpl.html',
+                        controller: 'otDialogProjectLabels',
+                        resolve: {
+                            config: function () {
+                                return {
+                                    labels: resultLabels.labels,
+                                    project: $scope.project,
+                                    submit: function (labels) {
+                                        const request = {
+                                            labels: labels
+                                        };
+                                        return ot.call($http.put($scope.project.links._labels, request));
+                                    }
+                                };
+                            }
+                        }
+                    }).result;
+                }).then(loadProject);
+            }
         }
     })
 ;
