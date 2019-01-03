@@ -28,9 +28,9 @@ angular.module('ot.service.info', [
         /**
          * Displaying the version information
          */
-        self.displayVersionInfo = function (versionInfo) {
+        self.displayVersionInfo = function (info) {
             otAlertService.popup({
-                data: versionInfo,
+                data: info,
                 template: 'app/dialog/dialog.versionInfo.tpl.html'
             });
         };
