@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.labels.LabelCategoryNameAlreadyExistException
 import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelIdNotFoundException
@@ -60,6 +61,15 @@ class LabelJdbcRepository(
         } catch (_: DuplicateKeyException) {
             throw LabelCategoryNameAlreadyExistException(form.category, form.name)
         }
+    }
+
+    override fun deleteLabel(labelId: Int): Ack {
+        return Ack.one(
+                namedParameterJdbcTemplate.update(
+                        "DELETE FROM LABEL WHERE ID = :id",
+                        params("id", labelId)
+                )
+        )
     }
 
     override fun getLabel(labelId: Int): LabelRecord {

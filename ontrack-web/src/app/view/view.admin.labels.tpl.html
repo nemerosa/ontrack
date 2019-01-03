@@ -37,6 +37,10 @@
                       title="Update label {{label.category}}:{{label.name}}"
                       ng-if="label.links._update"
                       ng-click="updateLabel(label)"></span>
+                <span class="ot-command ot-command-delete"
+                      title="Delete label {{label.category}}:{{label.name}}"
+                      ng-if="label.links._delete"
+                      ng-click="deleteLabel(label)"></span>
             </td>
         </tr>
         </tbody>

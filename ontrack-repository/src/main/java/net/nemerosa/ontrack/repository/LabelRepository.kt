@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.labels.LabelForm
 
 interface LabelRepository {
@@ -18,6 +19,11 @@ interface LabelRepository {
      * Updates a label
      */
     fun updateLabel(labelId: Int, form: LabelForm): LabelRecord
+
+    /**
+     * Deletes a label
+     */
+    fun deleteLabel(labelId: Int): Ack
 
     /**
      * Gets list of all labels, ordered by category and name

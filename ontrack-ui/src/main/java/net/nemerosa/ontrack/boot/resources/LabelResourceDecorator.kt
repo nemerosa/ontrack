@@ -19,6 +19,11 @@ class LabelResourceDecorator : AbstractLinkResourceDecorator<Label>(Label::class
                             Link.UPDATE,
                             { label, _ -> on(LabelController::class.java).getUpdateLabelForm(label.id) },
                             { label, resourceContext -> label.computedBy == null && resourceContext.isGlobalFunctionGranted(LabelManagement::class.java) }
+                    ),
+                    LinkDefinitions.link<Label>(
+                            Link.DELETE,
+                            { label, _ -> on(LabelController::class.java).deleteLabel(label.id) },
+                            { label, resourceContext -> label.computedBy == null && resourceContext.isGlobalFunctionGranted(LabelManagement::class.java) }
                     )
             )
 }

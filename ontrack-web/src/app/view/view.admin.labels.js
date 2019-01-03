@@ -11,7 +11,7 @@ angular.module('ot.view.admin.labels', [
             controller: 'AdminLabelsCtrl'
         });
     })
-    .controller('AdminLabelsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService) {
+    .controller('AdminLabelsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
         const view = ot.view();
         view.title = "Labels";
         view.description = "Management of labels";
@@ -39,11 +39,13 @@ angular.module('ot.view.admin.labels', [
                 }
                 links {
                     _update
+                    _delete
                 }
             }
         }`;
 
         $scope.loadingLabels = false;
+
         function loadLabels() {
             $scope.loadingLabels = true;
             otGraphqlService.pageGraphQLCall(query).then(data => {
@@ -63,6 +65,16 @@ angular.module('ot.view.admin.labels', [
             if (label.links._update) {
                 otFormService.update(label.links._update, "Update label").then(loadLabels);
             }
+        };
+
+        $scope.deleteLabel = function (label) {
+            otAlertService.confirm({
+                title: "Label deletion",
+                message: "Do you really want to delete this label?"
+            }).then(function () {
+                ot.pageCall($http.delete(label.links._delete)).then(loadLabels);
+            });
+
         };
     })
 ;

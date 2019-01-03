@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.labels
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.repository.LabelRecord
@@ -33,6 +34,16 @@ class LabelManagementServiceImpl(
             throw LabelNotEditableException(label)
         } else {
             return labelRepository.updateLabel(labelId, form).toLabel()
+        }
+    }
+
+    override fun deleteLabel(labelId: Int): Ack {
+        securityService.checkGlobalFunction(LabelManagement::class.java)
+        val label = getLabel(labelId)
+        if (label.computedBy != null) {
+            throw LabelNotEditableException(label)
+        } else {
+            return labelRepository.deleteLabel(labelId)
         }
     }
 

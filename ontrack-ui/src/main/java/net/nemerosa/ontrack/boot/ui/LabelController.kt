@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Color
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
@@ -82,5 +83,12 @@ class LabelController(
     @PutMapping("{labelId}/update")
     fun updateLabel(@PathVariable labelId: Int, @RequestBody @Valid form: LabelForm): Label =
             labelManagementService.updateLabel(labelId, form)
+
+    /**
+     * Deleting a label
+     */
+    @DeleteMapping("{labelId}/delete")
+    fun deleteLabel(@PathVariable labelId: Int): Ack =
+            labelManagementService.deleteLabel(labelId)
 
 }

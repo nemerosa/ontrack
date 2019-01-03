@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.labels
 
+import net.nemerosa.ontrack.model.Ack
+
 interface LabelManagementService {
 
     /**
@@ -23,4 +25,9 @@ interface LabelManagementService {
      * Updates an existing label
      */
     fun updateLabel(labelId: Int, form: LabelForm): Label
+
+    /**
+     * Deletes a label
+     */
+    fun deleteLabel(labelId: Int): Ack
 }
