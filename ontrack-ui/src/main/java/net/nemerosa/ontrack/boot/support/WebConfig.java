@@ -58,6 +58,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/graphql/**");
+        registry.addMapping("/rest/**");
         registry.addMapping("/accounts/**");
         registry.addMapping("/admin/**");
         registry.addMapping("/api/**");

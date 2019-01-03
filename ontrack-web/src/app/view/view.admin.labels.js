@@ -1,6 +1,7 @@
 angular.module('ot.view.admin.labels', [
     'ui.router',
     'ot.service.core',
+    'ot.service.form',
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
@@ -10,11 +11,20 @@ angular.module('ot.view.admin.labels', [
             controller: 'AdminLabelsCtrl'
         });
     })
-    .controller('AdminLabelsCtrl', function ($scope, $http, ot, otGraphqlService) {
+    .controller('AdminLabelsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService) {
         const view = ot.view();
         view.title = "Labels";
         view.description = "Management of labels";
         view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            {
+                id: 'createLabel',
+                name: "Create label",
+                cls: 'ot-command-new',
+                action: createLabel
+            },
+            ot.viewCloseCommand('/home')
+        ];
 
         const query = `{
             labels {
@@ -41,5 +51,9 @@ angular.module('ot.view.admin.labels', [
         }
 
         loadLabels();
+
+        function createLabel() {
+            otFormService.create("/rest/labels/create", "New label").then(loadLabels);
+        }
     })
 ;
