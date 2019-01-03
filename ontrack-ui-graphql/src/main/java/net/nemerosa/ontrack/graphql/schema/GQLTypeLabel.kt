@@ -6,9 +6,15 @@ import net.nemerosa.ontrack.model.labels.Label
 import org.springframework.stereotype.Component
 
 @Component
-class GQLTypeLabel : GQLType {
+class GQLTypeLabel(
+        private val fieldContributors: List<GQLFieldContributor>
+) : GQLType {
     override fun getTypeName(): String = Label::class.java.simpleName
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
-            GraphQLBeanConverter.asObjectType(Label::class.java, cache)
+            GraphQLBeanConverter.asObjectTypeBuilder(Label::class.java, cache, emptySet())
+                    // Links
+                    .fields(Label::class.java.graphQLFieldContributions(fieldContributors))
+                    // OK
+                    .build()
 }

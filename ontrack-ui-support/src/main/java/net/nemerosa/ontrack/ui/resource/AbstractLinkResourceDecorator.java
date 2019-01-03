@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class AbstractLinkResourceDecorator<T extends ProjectEntity> extends AbstractResourceDecorator<T> {
+public abstract class AbstractLinkResourceDecorator<T> extends AbstractResourceDecorator<T> {
 
     private final Supplier<Iterable<LinkDefinition<T>>> linkDefinitions;
 
