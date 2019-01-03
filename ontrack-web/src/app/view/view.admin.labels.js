@@ -37,6 +37,9 @@ angular.module('ot.view.admin.labels', [
                     id
                     name
                 }
+                links {
+                    _update
+                }
             }
         }`;
 
@@ -55,5 +58,11 @@ angular.module('ot.view.admin.labels', [
         function createLabel() {
             otFormService.create("/rest/labels/create", "New label").then(loadLabels);
         }
+
+        $scope.updateLabel = function (label) {
+            if (label.links._update) {
+                otFormService.update(label.links._update, "Update label").then(loadLabels);
+            }
+        };
     })
 ;

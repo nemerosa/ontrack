@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <table class="table table-bordered" ng-hide="loadingLabels">
+    <table class="table table-hover" ng-hide="loadingLabels">
         <thead>
         <tr>
             <th>Label</th>
@@ -33,7 +33,10 @@
                 <span ng-if="!label.computedBy" class="text-muted">No</span>
             </td>
             <td>
-
+                <span class="ot-command ot-command-update"
+                      title="Update label {{label.category}}:{{label.name}}"
+                      ng-if="label.links._update"
+                      ng-click="updateLabel(label)"></span>
             </td>
         </tr>
         </tbody>
