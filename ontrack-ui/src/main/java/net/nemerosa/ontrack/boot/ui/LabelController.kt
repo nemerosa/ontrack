@@ -4,13 +4,18 @@ import net.nemerosa.ontrack.model.form.Color
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.Text
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import net.nemerosa.ontrack.model.labels.Label
+import net.nemerosa.ontrack.model.labels.LabelForm
+import net.nemerosa.ontrack.model.labels.LabelManagementService
+import net.nemerosa.ontrack.ui.controller.AbstractResourceController
+import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/rest/labels")
-class LabelController {
+class LabelController(
+        private val labelManagementService: LabelManagementService
+) : AbstractResourceController() {
 
     /**
      * Creation form for a label
@@ -43,5 +48,12 @@ class LabelController {
                             .help("Color of the label")
                             .value("#000000")
             )
+
+    /**
+     * Creation of a label
+     */
+    @PostMapping("create")
+    fun newLabel(@RequestBody @Valid form: LabelForm): Label =
+            labelManagementService.newLabel(form)
 
 }

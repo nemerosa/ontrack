@@ -1,6 +1,14 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.labels.LabelForm
+
 interface LabelRepository {
+
+    /**
+     * Creation of a new label
+     */
+    fun newLabel(form: LabelForm, computedBy: String? = null): LabelRecord
+
     /**
      * Gets list of all labels, ordered by category and name
      */

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.labels
 
-class Label(
+open class Label(
         val id: Int,
         val category: String?,
         val name: String,
