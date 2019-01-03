@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.resources;
 
 import com.google.common.collect.Iterables;
 import net.nemerosa.ontrack.boot.ui.*;
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagement;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -99,6 +100,12 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
                                 "_favourite",
                                 project -> on(ProjectController.class).favouriteProject(project.getId()),
                                 (project, resourceContext) -> resourceContext.isLogged() && !projectFavouriteService.isProjectFavourite(project)
+                        ),
+                        // Setting the project labels
+                        link(
+                                "_labels",
+                                project -> on(ProjectLabelController.class).getLabelsForProject(project.id()),
+                                (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement.class)
                         ),
                         // Page
                         page()
