@@ -193,8 +193,8 @@ const ontrack = angular.module('ontrack', [
                 });
             };
 
-            $scope.displayVersionInfo = function (versionInfo) {
-                otInfoService.displayVersionInfo(versionInfo);
+            $scope.displayVersionInfo = function (info) {
+                otInfoService.displayVersionInfo(info);
             };
 
             /**
