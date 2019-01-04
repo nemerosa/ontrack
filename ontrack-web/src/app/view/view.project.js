@@ -311,7 +311,8 @@ angular.module('ot.view.project', [
                                     project: $scope.project,
                                     submit: function (labels) {
                                         const request = {
-                                            labels: labels
+                                            labels: labels.filter(it => it.selected)
+                                                .map(it => it.id)
                                         };
                                         return ot.call($http.put($scope.project.links._labels, request));
                                     }
