@@ -60,11 +60,6 @@ public class OntrackConfigProperties {
      */
     private boolean jobLabelProviderEnabled = true;
 
-    /**
-     * Label provider for test
-     */
-    private boolean jobLabelProviderTest = false;
-
     @PostConstruct
     public void log() {
         if (!configurationTest) {

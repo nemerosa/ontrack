@@ -50,9 +50,6 @@ ontrack.config.configuration-test = true
 # Activation of the provided labels collection job
 ontrack.config.job-label-provider-enabled = true
 
-# Provides a test label provider, based on first letter of project
-ontrack.config.job-label-provider-test = false
-
 # Number of threads to use to run the background jobs
 ontrack.config.jobs.pool-size = 10
 
