@@ -5,7 +5,13 @@
 </div>
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
-        <div class="row ot-project-label-selection" ng-repeat="label in data" ng-click="toggleLabel(label)">
+        <input type="text"
+               class="form-control"
+               ng-model="filter.text"
+               placeholder="Filter labels" />
+        <div class="row ot-project-label-selection"
+             ng-repeat="label in data | filter:labelFilterFn"
+             ng-click="toggleLabel(label)">
             <div class="col-md-1">
                 <span class="fa fa-check ot-command" ng-show="label.selected && label.computedBy == null"></span>
                 <span class="fa fa-check text-muted" ng-show="label.selected && label.computedBy != null" title="This label is provided automatically and cannot be selected / unselected manually."></span>

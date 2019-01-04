@@ -14,6 +14,14 @@ angular.module('ot.dialog.project.labels', [
             });
             label.selected = (projectIndex >= 0);
         });
+        // Label filter
+        $scope.filter = {text: ""};
+        $scope.labelFilterFn = function (label) {
+            return labelFilterInternalFn(label.category) || labelFilterInternalFn(label.name);
+        };
+        function labelFilterInternalFn(text) {
+            return !$scope.filter.text || text.toLowerCase().indexOf($scope.filter.text.toLowerCase()) >= 0;
+        }
         // Toggling the label selection
         $scope.toggleLabel = function (label) {
             if (label.computedBy == null) {
