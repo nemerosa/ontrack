@@ -5,10 +5,13 @@ import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelProvider
 import net.nemerosa.ontrack.model.labels.LabelProviderService
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import javax.annotation.PostConstruct
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -16,6 +19,9 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var labelProviderService: LabelProviderService
+
+    @Autowired
+    private lateinit var testCountLabelProvider: TestCountLabelProvider
 
     @Test
     fun `Provided labels for a project`() {
@@ -40,11 +46,45 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Provided labels updates`() {
+        project {
+            // Configuration of the labels
+            testCountLabelProvider.range = 1..3
+            // Collects of labels
+            collectLabels()
+            // Checks the provided labels
+            assertEquals(
+                    listOf("1", "2", "3"),
+                    labels.filter { it.category == "count" }.map { it.name }
+            )
+            // Reconfiguration of the labels
+            testCountLabelProvider.range = 2..5
+            // Collects of labels
+            collectLabels()
+            // Checks the provided labels
+            assertEquals(
+                    listOf("2", "3", "4", "5"),
+                    labels.filter { it.category == "count" }.map { it.name }
+            )
+        }
+    }
+
     @Configuration
-    class LabelProviderServiceITConfig {
+    class LabelProviderServiceITConfig(
+            private val ontrackConfigProperties: OntrackConfigProperties
+    ) {
+
+        @Bean
+        fun testCountLabelProvider(): TestLabelProvider = TestCountLabelProvider()
 
         @Bean
         fun testAbbrevLabelProvider(): TestLabelProvider = TestAbbrevLabelProvider()
+
+        @PostConstruct
+        fun disabling_label_provider_job() {
+            ontrackConfigProperties.isJobLabelProviderEnabled = false
+        }
 
     }
 
@@ -56,7 +96,24 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
 }
 
-abstract class TestLabelProvider : LabelProvider {
+abstract class TestLabelProvider : LabelProvider
+
+class TestCountLabelProvider : TestLabelProvider() {
+
+    var range: IntRange = 1..1
+
+    override val name: String = "Count label"
+
+    override fun getLabelsForProject(project: Project): List<LabelForm> {
+        return range.map { count ->
+            LabelForm(
+                    category = "count",
+                    name = count.toString(),
+                    description = "Count $count",
+                    color = "#00FF00"
+            )
+        }
+    }
 
 }
 

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 import java.util.stream.Stream
 
@@ -17,7 +18,8 @@ import java.util.stream.Stream
 class LabelProviderJob(
         private val securityService: SecurityService,
         private val structureService: StructureService,
-        private val labelProviderService: LabelProviderService
+        private val labelProviderService: LabelProviderService,
+        private val ontrackConfigProperties: OntrackConfigProperties
 ) : JobOrchestratorSupplier {
 
     companion object {
@@ -53,7 +55,7 @@ class LabelProviderJob(
             override fun getDescription(): String =
                     "Collection of automated labels for project ${project.name}"
 
-            override fun isDisabled(): Boolean = project.isDisabled
+            override fun isDisabled(): Boolean = project.isDisabled || !ontrackConfigProperties.isJobLabelProviderEnabled
 
         }
     }
