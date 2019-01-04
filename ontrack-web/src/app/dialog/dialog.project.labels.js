@@ -17,9 +17,12 @@ angular.module('ot.dialog.project.labels', [
         // Label filter
         $scope.filter = {text: ""};
         $scope.labelFilterFn = function (label) {
-            return labelFilterInternalFn(label.category) || labelFilterInternalFn(label.name);
+            return labelFilterUnselectedAutoFn(label) && (labelFilterTextFn(label.category) || labelFilterTextFn(label.name));
         };
-        function labelFilterInternalFn(text) {
+        function labelFilterUnselectedAutoFn(label) {
+            return label.computedBy == null || label.selected;
+        }
+        function labelFilterTextFn(text) {
             return !$scope.filter.text || text.toLowerCase().indexOf($scope.filter.text.toLowerCase()) >= 0;
         }
         // Toggling the label selection
