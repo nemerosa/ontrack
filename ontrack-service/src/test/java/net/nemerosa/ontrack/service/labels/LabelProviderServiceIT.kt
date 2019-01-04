@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.service.labels
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.labels.LabelForm
-import net.nemerosa.ontrack.model.labels.LabelProvider
-import net.nemerosa.ontrack.model.labels.LabelProviderService
+import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -14,6 +12,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import javax.annotation.PostConstruct
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -30,6 +29,7 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
     @Before
     fun setup() {
+        testCountLabelProvider.reset()
         testCustomLabelProvider.reset()
     }
 
@@ -87,8 +87,6 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
             )
         }
     }
-
-    // TODO Providers can steal labels to each other
 
     @Test
     fun `Provided labels updates at global level`() {
@@ -175,6 +173,77 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
         assertEquals(TestCustomLabelProvider::class.qualifiedName, label.computedBy?.id)
     }
 
+    @Test
+    fun `Providers can steal other providers labels`() {
+        // Configuring the custom provider so that it uses the same cat/name than the count provider
+        testCustomLabelProvider.labelCustom = "count"
+        testCustomLabelProvider.labelName = "1"
+        // Project to test with
+        project {
+            // Collecting the labels
+            collectLabels()
+            // Only 1 label with category = count
+            val labels = this.labels.filter { it.category == "count" }
+            assertEquals(1, labels.size)
+            val label = labels[0]
+            assertEquals("count", label.category)
+            assertEquals("1", label.name)
+            assertNotNull(label.computedBy, "Label is computed")
+        }
+    }
+
+    @Test
+    fun `Trying to create a manual label over an automated one is not allowed`() {
+        project {
+            collectLabels()
+            // Assert the automated label is created
+            val createdLabel = asAdmin().call {
+                labelManagementService.labels.find {
+                    it.category == "count"
+                }
+            }
+            assertNotNull(createdLabel) {
+                assertEquals("1", it.name)
+                assertNotNull(it.computedBy)
+            }
+            // Attempting to create manual similar label
+            assertFailsWith<LabelCategoryNameAlreadyExistException> {
+                label(category = "count", name = "1")
+            }
+        }
+    }
+
+    @Test
+    fun `Trying to update a manual label over an automated one is not allowed`() {
+        project {
+            collectLabels()
+            // Assert the automated label is created
+            val createdLabel = asAdmin().call {
+                labelManagementService.labels.find {
+                    it.category == "count"
+                }
+            }
+            assertNotNull(createdLabel) {
+                assertEquals("1", it.name)
+                assertNotNull(it.computedBy)
+            }
+            // Attempting to update manual similar label
+            assertFailsWith<LabelNotEditableException> {
+                asAdmin().execute {
+                    labelManagementService.updateLabel(
+                            createdLabel.id,
+                            LabelForm(
+                                    category = "count",
+                                    name = "1",
+                                    description = "Just a test",
+                                    color = "#FF0000"
+                            )
+                    )
+                }
+            }
+        }
+    }
+
     @Configuration
     class LabelProviderServiceITConfig(
             private val ontrackConfigProperties: OntrackConfigProperties
@@ -221,6 +290,10 @@ class TestCountLabelProvider : TestLabelProvider() {
                     color = "#00FF00"
             )
         }
+    }
+
+    fun reset() {
+        range = 1..1
     }
 
 }
