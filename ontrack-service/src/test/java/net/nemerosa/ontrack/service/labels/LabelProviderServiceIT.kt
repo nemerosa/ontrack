@@ -244,6 +244,31 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Trying to delete a manual label over an automated one is not allowed`() {
+        project {
+            collectLabels()
+            // Assert the automated label is created
+            val createdLabel = asAdmin().call {
+                labelManagementService.labels.find {
+                    it.category == "count"
+                }
+            }
+            assertNotNull(createdLabel) {
+                assertEquals("1", it.name)
+                assertNotNull(it.computedBy)
+            }
+            // Attempting to update manual similar label
+            assertFailsWith<LabelNotEditableException> {
+                asAdmin().execute {
+                    labelManagementService.deleteLabel(
+                            createdLabel.id
+                    )
+                }
+            }
+        }
+    }
+
     @Configuration
     class LabelProviderServiceITConfig(
             private val ontrackConfigProperties: OntrackConfigProperties
