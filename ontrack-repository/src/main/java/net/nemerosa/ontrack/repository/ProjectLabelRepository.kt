@@ -7,7 +7,7 @@ interface ProjectLabelRepository {
     /**
      * Gets the labels for a project
      */
-    fun getLabelsForProject(project: Int): List<Int>
+    fun getLabelsForProject(project: Int): List<LabelRecord>
 
     /**
      * Gets the projects for a label

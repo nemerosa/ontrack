@@ -63,7 +63,6 @@ class LabelProviderServiceImpl(
         }
         // Deleted associations
         val existingAssociations = projectLabelRepository.getLabelsForProject(project.id())
-                .map { labelRepository.getLabel(it) }
                 .filter { it.computedBy == providerId }
         existingAssociations.forEach { association ->
             val existingForm = labels.any {

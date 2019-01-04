@@ -7,10 +7,11 @@ import javax.sql.DataSource
 
 @Repository
 class ProjectLabelJdbcRepository(
+        private val labelRepository: LabelRepository,
         dataSource: DataSource
 ) : AbstractJdbcRepository(dataSource), ProjectLabelRepository {
 
-    override fun getLabelsForProject(project: Int): List<Int> =
+    override fun getLabelsForProject(project: Int): List<LabelRecord> =
             namedParameterJdbcTemplate.queryForList(
                     """
                         SELECT PL.LABEL_ID
@@ -20,8 +21,8 @@ class ProjectLabelJdbcRepository(
                         ORDER BY L.category, L.name
                        """,
                     params("project", project),
-                    Integer::class.java
-            ).map { it.toInt() }
+                    Int::class.java
+            ).map { labelRepository.getLabel(it) }
 
     override fun getProjectsForLabel(label: Int): List<Int> =
             namedParameterJdbcTemplate.queryForList(
@@ -71,7 +72,7 @@ class ProjectLabelJdbcRepository(
 
     override fun associateProjectToLabels(project: Int, form: ProjectLabelForm) {
         // Existing labels
-        val existingLabels = getLabelsForProject(project)
+        val existingLabels = getLabelsForProject(project).map { it.id }
         // For any new label, saves it
         form.labels.minus(existingLabels).forEach { label ->
             namedParameterJdbcTemplate.update(

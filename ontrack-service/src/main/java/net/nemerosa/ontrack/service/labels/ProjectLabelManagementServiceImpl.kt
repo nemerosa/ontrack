@@ -14,12 +14,17 @@ import org.springframework.transaction.annotation.Transactional
 class ProjectLabelManagementServiceImpl(
         private val projectLabelRepository: ProjectLabelRepository,
         private val labelManagementService: LabelManagementService,
+        private val labelProviderService: LabelProviderService,
         private val securityService: SecurityService
 ) : ProjectLabelManagementService {
 
     override fun getLabelsForProject(project: Project): List<Label> =
             projectLabelRepository.getLabelsForProject(project.id())
-                    .map { labelManagementService.getLabel(it) }
+                    .filter { record ->
+                        val computedBy = record.computedBy
+                        computedBy == null || labelProviderService.getLabelProvider(computedBy) != null
+                    }
+                    .map { labelManagementService.getLabel(it.id) }
 
     override fun getProjectsForLabel(label: Label): List<ID> =
             projectLabelRepository.getProjectsForLabel(label.id)

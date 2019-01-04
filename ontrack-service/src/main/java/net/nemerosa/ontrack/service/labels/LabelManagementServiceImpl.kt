@@ -17,7 +17,14 @@ class LabelManagementServiceImpl(
 ) : LabelManagementService {
 
     override val labels: List<Label>
-        get() = labelRepository.labels.map { it.toLabel() }
+        get() = labelRepository.labels
+                .filter { isComputedByOK(it) }
+                .map { it.toLabel() }
+
+    private fun isComputedByOK(record: LabelRecord): Boolean {
+        val computedBy = record.computedBy
+        return computedBy == null || labelProviderService.getLabelProvider(computedBy) != null
+    }
 
     override fun newLabel(form: LabelForm): Label {
         securityService.checkGlobalFunction(LabelManagement::class.java)
