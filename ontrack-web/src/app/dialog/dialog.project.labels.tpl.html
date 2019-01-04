@@ -31,6 +31,10 @@
         <div class="ot-alert-{{message.type}} alert-dismissable" ng-show="message">
             <span>{{message.content}}</span>
         </div>
+        <button class="btn btn-default"
+                type="button"
+                title="Unselected all labels (but keeps the ones which are automatically provided)"
+                ng-click="selectNone()">Select none</button>
         <button class="btn btn-primary" type="submit" ng-disabled="thisForm.$invalid">OK</button>
         <button class="btn btn-link" type="button" ng-click="cancel()">Cancel</button>
     </div>

@@ -28,6 +28,14 @@ angular.module('ot.dialog.project.labels', [
                 label.selected = !label.selected;
             }
         };
+        // Unselecting all (non automated) lavels
+        $scope.selectNone = () => {
+            angular.forEach($scope.data, (label) => {
+                if (label.computedBy == null) {
+                    label.selected = false;
+                }
+            });
+        };
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
