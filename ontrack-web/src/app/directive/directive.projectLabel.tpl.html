@@ -1,4 +1,6 @@
+<!-- Label mode -->
 <span title="{{label.description}}"
+      ng-if="!colorBox || colorBox == 'false'"
       class="ot-project-label"
       ng-style="{
         'background-color': label.color + ' !important;'
@@ -6,5 +8,18 @@
 >
     <span>
         {{label.category}}:{{label.name}}
+    </span>
+</span>
+
+<!-- Color box mode -->
+<span title="{{label.description}}"
+      ng-if="colorBox == 'true'"
+      class="ot-project-label-box">
+    <span class="ot-project-label-box-square"
+          ng-style="{
+            'background-color': label.color + ' !important;'
+          }"></span>
+    <span class="ot-project-label-box-text">
+        <span class="ot-project-label-box-text-category">{{label.category}}</span>:<span class="ot-project-label-box-text-name">{{label.name}}</span>
     </span>
 </span>

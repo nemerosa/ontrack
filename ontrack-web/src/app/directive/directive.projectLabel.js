@@ -6,7 +6,8 @@ angular.module('ot.directive.projectLabel', [
             restrict: 'E',
             templateUrl: 'app/directive/directive.projectLabel.tpl.html',
             scope: {
-                label: '='
+                label: '=',
+                colorBox: '@'
             }
         };
     })
