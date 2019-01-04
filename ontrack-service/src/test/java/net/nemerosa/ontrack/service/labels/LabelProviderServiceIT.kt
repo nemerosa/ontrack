@@ -298,7 +298,9 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
 }
 
-abstract class TestLabelProvider : LabelProvider
+abstract class TestLabelProvider : LabelProvider {
+    override val isEnabled: Boolean = true
+}
 
 class TestCountLabelProvider : TestLabelProvider() {
 

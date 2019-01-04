@@ -12,6 +12,10 @@ class TestLabelProvider(
 ) : LabelProvider {
     override val name: String = "Test"
 
+
+    override val isEnabled: Boolean
+        get() = ontrackConfigProperties.isJobLabelProviderTest
+
     override fun getLabelsForProject(project: Project): List<LabelForm> =
             if (ontrackConfigProperties.isJobLabelProviderTest) {
                 listOf(

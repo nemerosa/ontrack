@@ -23,7 +23,7 @@ class LabelManagementServiceImpl(
 
     private fun isComputedByOK(record: LabelRecord): Boolean {
         val computedBy = record.computedBy
-        return computedBy == null || labelProviderService.getLabelProvider(computedBy) != null
+        return computedBy == null || (labelProviderService.getLabelProvider(computedBy)?.isEnabled ?: false)
     }
 
     override fun newLabel(form: LabelForm): Label {

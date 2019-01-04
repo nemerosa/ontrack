@@ -9,5 +9,7 @@ import org.springframework.stereotype.Service
 class NOPLabelProvider : LabelProvider {
     override val name: String = "NOP"
 
+    override val isEnabled: Boolean = true
+
     override fun getLabelsForProject(project: Project): List<LabelForm> = emptyList()
 }

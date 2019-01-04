@@ -13,6 +13,11 @@ interface LabelProvider {
     val name: String
 
     /**
+     * Is this label provided enabled?
+     */
+    val isEnabled: Boolean
+
+    /**
      * Gets the list of labels for a project
      */
     fun getLabelsForProject(project: Project): List<LabelForm>

@@ -22,7 +22,7 @@ class ProjectLabelManagementServiceImpl(
             projectLabelRepository.getLabelsForProject(project.id())
                     .filter { record ->
                         val computedBy = record.computedBy
-                        computedBy == null || labelProviderService.getLabelProvider(computedBy) != null
+                        computedBy == null || (labelProviderService.getLabelProvider(computedBy)?.isEnabled ?: false)
                     }
                     .map { labelManagementService.getLabel(it.id) }
 
