@@ -5,21 +5,17 @@
 </div>
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
-        <table class="table table-hover">
-            <tbody>
-            <tr ng-repeat="label in data" ng-click="label.selected = !label.selected;">
-                <td width="24">
-                    <span class="fa fa-check ot-command" ng-show="label.selected"></span>
-                </td>
-                <td class="ot-action">
-                    <ot-project-label label="label"></ot-project-label>
-                </td>
-                <td width="24">
-                    <span class="fa fa-close ot-command" ng-show="label.selected"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="row ot-project-label-selection" ng-repeat="label in data" ng-click="label.selected = !label.selected;">
+            <div class="col-md-1">
+                <span class="fa fa-check ot-command" ng-show="label.selected"></span>
+            </div>
+            <div class="col-md-10">
+                <ot-project-label label="label"></ot-project-label>
+            </div>
+            <div class="col-md-1">
+                <span class="fa fa-close ot-command" ng-show="label.selected"></span>
+            </div>
+        </div>
     </div>
     <div class="modal-footer">
         <div class="ot-alert-{{message.type}} alert-dismissable" ng-show="message">
