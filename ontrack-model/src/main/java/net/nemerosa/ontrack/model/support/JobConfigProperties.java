@@ -24,7 +24,7 @@ public class JobConfigProperties {
     /**
      * Using scattering of jobs
      */
-    private boolean scattering = false;
+    private boolean scattering = true;
 
     /**
      * Scattering ratio (must be between 0.0 and 1.0 inclusive).
