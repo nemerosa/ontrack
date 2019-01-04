@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.model.labels
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
-class LabelForm(
+data class LabelForm(
         val category: String?,
         @NotNull(message = "The name is required.")
         val name: String,

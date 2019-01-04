@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.labels
 
+import net.nemerosa.ontrack.model.structure.Project
+
 interface LabelProviderService {
 
     /**
@@ -9,4 +11,9 @@ interface LabelProviderService {
      * @return Label provider or `null` if not found
      */
     fun getLabelProvider(id: String): LabelProvider?
+
+    /**
+     * Collects and saves all labels for this project.
+     */
+    fun collectLabels(project: Project)
 }
