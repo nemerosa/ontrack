@@ -58,6 +58,10 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
                     listOf("1", "2", "3"),
                     labels.filter { it.category == "count" }.map { it.name }
             )
+            assertEquals(
+                    1,
+                    labels.filter { it.computedBy?.name == "Name label" }.size
+            )
             // Reconfiguration of the labels
             testCountLabelProvider.range = 2..5
             // Collects of labels
@@ -66,6 +70,10 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
             assertEquals(
                     listOf("2", "3", "4", "5"),
                     labels.filter { it.category == "count" }.map { it.name }
+            )
+            assertEquals(
+                    1,
+                    labels.filter { it.computedBy?.name == "Name label" }.size
             )
         }
     }
