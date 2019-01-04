@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration
 import javax.annotation.PostConstruct
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
@@ -22,6 +23,14 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var testCountLabelProvider: TestCountLabelProvider
+
+    @Autowired
+    private lateinit var testCustomLabelProvider: TestCustomLabelProvider
+
+    @Before
+    fun setup() {
+        testCustomLabelProvider.labelName = null
+    }
 
     @Test
     fun `Provided labels for a project`() {
@@ -78,6 +87,60 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Overriding manual labels with automated ones without any existing association`() {
+        // Creating a manual label (and random name)
+        val manualLabel = label(category = "custom")
+        // Not computed
+        assertNull(manualLabel.computedBy, "Manual label is not computed")
+        // Configures the custom provider so that it provides the name cat/name
+        testCustomLabelProvider.labelName = manualLabel.name
+        // For a given project
+        project {
+            // Auto collection
+            collectLabels()
+            // Gets the custom labels for this project
+            val labels = this.labels.filter { it.category == "custom" }
+            // Checks that we have 1 label and that it is provided
+            assertEquals(1, labels.size)
+            val label = labels[0]
+            assertEquals(manualLabel.name, label.name)
+            assertEquals(TestCustomLabelProvider::class.qualifiedName, label.computedBy?.id)
+        }
+        // Checks that the manual label is now computed
+        val label = labelManagementService.getLabel(manualLabel.id)
+        assertEquals(manualLabel.name, label.name)
+        assertEquals(TestCustomLabelProvider::class.qualifiedName, label.computedBy?.id)
+    }
+
+    @Test
+    fun `Overriding manual labels with automated ones with existing association`() {
+        // Creating a manual label (and random name)
+        val manualLabel = label(category = "custom")
+        // Not computed
+        assertNull(manualLabel.computedBy, "Manual label is not computed")
+        // Configures the custom provider so that it provides the name cat/name
+        testCustomLabelProvider.labelName = manualLabel.name
+        // For a given project
+        project {
+            // Associates the manual label to this project
+            labels += manualLabel
+            // Auto collection
+            collectLabels()
+            // Gets the custom labels for this project
+            val labels = this.labels.filter { it.category == "custom" }
+            // Checks that we have 1 label and that it is provided
+            assertEquals(1, labels.size)
+            val label = labels[0]
+            assertEquals(manualLabel.name, label.name)
+            assertEquals(TestCustomLabelProvider::class.qualifiedName, label.computedBy?.id)
+        }
+        // Checks that the manual label is now computed
+        val label = labelManagementService.getLabel(manualLabel.id)
+        assertEquals(manualLabel.name, label.name)
+        assertEquals(TestCustomLabelProvider::class.qualifiedName, label.computedBy?.id)
+    }
+
     @Configuration
     class LabelProviderServiceITConfig(
             private val ontrackConfigProperties: OntrackConfigProperties
@@ -88,6 +151,9 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
         @Bean
         fun testAbbrevLabelProvider(): TestLabelProvider = TestAbbrevLabelProvider()
+
+        @Bean
+        fun testCustomLabelProvider(): TestLabelProvider = TestCustomLabelProvider()
 
         @PostConstruct
         fun disabling_label_provider_job() {
@@ -138,6 +204,28 @@ class TestAbbrevLabelProvider : TestLabelProvider() {
                         color = "#FF0000"
                 )
         )
+    }
+
+}
+
+class TestCustomLabelProvider : TestLabelProvider() {
+
+    var labelCustom: String? = "custom"
+    var labelName: String? = null
+
+    override val name: String = "Custom label"
+
+    override fun getLabelsForProject(project: Project): List<LabelForm> {
+        return labelName?.let {
+            listOf(
+                    LabelForm(
+                            category = labelCustom,
+                            name = it,
+                            description = "Custom label for $labelCustom:$it",
+                            color = "#0000FF"
+                    )
+            )
+        } ?: emptyList()
     }
 
 }
