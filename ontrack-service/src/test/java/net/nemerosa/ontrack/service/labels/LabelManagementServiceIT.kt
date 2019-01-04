@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
@@ -120,6 +121,12 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
                     this.labels.map { it.name }
             )
         }
+    }
+
+    @Test
+    @Ignore
+    fun `Associating a list of labels when having auto labels`() {
+        TODO("Creation of auto labels")
     }
 
 }
