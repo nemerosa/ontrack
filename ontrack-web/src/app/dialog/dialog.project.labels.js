@@ -14,6 +14,12 @@ angular.module('ot.dialog.project.labels', [
             });
             label.selected = (projectIndex >= 0);
         });
+        // Toggling the label selection
+        $scope.toggleLabel = function (label) {
+            if (label.computedBy == null) {
+                label.selected = !label.selected;
+            }
+        };
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
