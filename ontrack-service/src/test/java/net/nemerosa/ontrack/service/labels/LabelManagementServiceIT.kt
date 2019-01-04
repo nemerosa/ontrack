@@ -101,4 +101,25 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Associating a list of labels for a project`() {
+        val labels = (1..5).map { label() }
+        project {
+            // Sets some labels for the projects
+            this.labels = labels.subList(0, 3)
+            // Checks the labels of the projects
+            assertEquals(
+                    labels.subList(0, 3).map { it.name },
+                    this.labels.map { it.name }
+            )
+            // Sets other labels for the projects (with some intersection)
+            this.labels = labels.subList(3, 5)
+            // Checks the labels of the projects
+            assertEquals(
+                    labels.subList(3, 5).map { it.name },
+                    this.labels.map { it.name }
+            )
+        }
+    }
+
 }

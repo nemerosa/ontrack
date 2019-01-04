@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.it
 
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
-import net.nemerosa.ontrack.model.labels.Label
-import net.nemerosa.ontrack.model.labels.LabelForm
-import net.nemerosa.ontrack.model.labels.LabelManagement
-import net.nemerosa.ontrack.model.labels.LabelManagementService
+import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -24,6 +21,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var labelManagementService: LabelManagementService
+
+    @Autowired
+    protected lateinit var projectLabelManagementService: ProjectLabelManagementService
 
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
         val configurationTest = ontrackConfigProperties.isConfigurationTest
@@ -204,5 +204,23 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             )
         }
     }
+
+    /**
+     * Sets some labels to a project
+     */
+    var Project.labels: List<Label>
+        get() = asUserWithView(this).call {
+            projectLabelManagementService.getLabelsForProject(this)
+        }
+        set(value) {
+            asUser().with(this, ProjectLabelManagement::class.java).execute {
+                projectLabelManagementService.associateProjectToLabels(
+                        this,
+                        ProjectLabelForm(
+                                value.map { it.id }
+                        )
+                )
+            }
+        }
 
 }
