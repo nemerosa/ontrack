@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.labels.LabelProvider
 import net.nemerosa.ontrack.model.labels.LabelProviderService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +30,7 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
     @Before
     fun setup() {
-        testCustomLabelProvider.labelName = null
+        testCustomLabelProvider.reset()
     }
 
     @Test
@@ -56,7 +57,7 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Provided labels updates`() {
+    fun `Provided labels updates at project level`() {
         project {
             // Configuration of the labels
             testCountLabelProvider.range = 1..3
@@ -84,6 +85,39 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
                     1,
                     labels.filter { it.computedBy?.name == "Name label" }.size
             )
+        }
+    }
+
+    // TODO Providers can steal labels to each other
+
+    @Test
+    fun `Provided labels updates at global level`() {
+        // Enabling the custom labelling (with default description)
+        val name = uid("N")
+        testCustomLabelProvider.labelName = name
+        project {
+            // Collects of labels
+            collectLabels()
+            // Checks the provided custom labels
+            val label = labels.find {
+                it.category == "custom" && it.name == name
+            }
+            assertNotNull(label) {
+                // Default description
+                assertEquals("Custom label for custom:$name", it.description)
+            }
+            // Changing the description
+            testCustomLabelProvider.labelDescription = { _, _ -> "Test description" }
+            // Recollecting the labels
+            collectLabels()
+            // Checks the provided custom labels
+            val newLabel = labels.find {
+                it.category == "custom" && it.name == name
+            }
+            assertNotNull(newLabel) {
+                // Default description
+                assertEquals("Test description", it.description)
+            }
         }
     }
 
@@ -212,8 +246,15 @@ class TestCustomLabelProvider : TestLabelProvider() {
 
     var labelCustom: String? = "custom"
     var labelName: String? = null
+    var labelDescription: (category: String?, name: String) -> String = { category, name -> "Custom label for $category:$name" }
 
     override val name: String = "Custom label"
+
+    fun reset() {
+        labelCustom = "custom"
+        labelName = null
+        labelDescription = { category, name -> "Custom label for $category:$name" }
+    }
 
     override fun getLabelsForProject(project: Project): List<LabelForm> {
         return labelName?.let {
@@ -221,7 +262,7 @@ class TestCustomLabelProvider : TestLabelProvider() {
                     LabelForm(
                             category = labelCustom,
                             name = it,
-                            description = "Custom label for $labelCustom:$it",
+                            description = labelDescription(labelCustom, it),
                             color = "#0000FF"
                     )
             )
