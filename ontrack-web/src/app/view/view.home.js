@@ -22,10 +22,16 @@ angular.module('ot.view.home', [
             // Commands
             commands: []
         };
+
+        // Preloading filter mode
+        $scope.preloadingLabelFilter = true;
+
         // No initial filter
         $scope.projectFilter = {
-            name: ''
+            name: '',
+            label: undefined
         };
+
 
         // Loading the project list
         function loadProjects() {
@@ -122,6 +128,8 @@ angular.module('ot.view.home', [
                 $scope.projectsData = data;
                 $scope.projectFavourites = data.projectFavourites;
 
+                preloadLabelFilter();
+
                 // All branches disabled status computation
                 $scope.projectFavourites.forEach(function (projectFavourite) {
                     projectFavourite.allBranchesDisabled = projectFavourite.branches.length > 0 &&
@@ -204,6 +212,47 @@ angular.module('ot.view.home', [
         $scope.projectFilterClearLabel = () => {
             $scope.projectFilter.label = undefined;
         };
+
+        const LOCATION_KEY = "label";
+        const STORAGE_KEY = "home.label";
+
+        // Management of the location search component in case of label change
+        $scope.$watch('projectFilter.label', function () {
+            if (!$scope.preloadingLabelFilter) {
+                if ($scope.projectFilter.label) {
+                    let labelKey = $scope.formatLabel($scope.projectFilter.label);
+                    $location.search(LOCATION_KEY, labelKey);
+                    localStorage.setItem(STORAGE_KEY, labelKey);
+                } else {
+                    $location.search(LOCATION_KEY, undefined);
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        });
+
+        // Preloading of the label filter
+        function preloadLabelFilter() {
+            // Gets the label key
+            let labelKey = getLabelKeyFromBrowser();
+            // If defined, identifies and sets the filter
+            let label = $scope.projectsData.labels.find(it => {
+                return $scope.formatLabel(it) === labelKey;
+            });
+            if (label) {
+                $scope.projectFilter.label = label;
+            }
+            // Done
+            $scope.preloadingLabelFilter = false;
+        }
+
+        function getLabelKeyFromBrowser() {
+            let key = $location.search().label;
+            if (key) {
+                return key;
+            } else {
+                return localStorage.getItem(STORAGE_KEY);
+            }
+        }
 
         // Filtering the labels for a token
         $scope.typeAheadFilterLabels = (token) => {
