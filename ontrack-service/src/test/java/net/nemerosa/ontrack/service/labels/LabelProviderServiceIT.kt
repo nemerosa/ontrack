@@ -3,14 +3,12 @@ package net.nemerosa.ontrack.service.labels
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import javax.annotation.PostConstruct
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
@@ -270,9 +268,7 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
     }
 
     @Configuration
-    class LabelProviderServiceITConfig(
-            private val ontrackConfigProperties: OntrackConfigProperties
-    ) {
+    class LabelProviderServiceITConfig {
 
         @Bean
         fun testCountLabelProvider(): TestLabelProvider = TestCountLabelProvider()
@@ -282,11 +278,6 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
         @Bean
         fun testCustomLabelProvider(): TestLabelProvider = TestCustomLabelProvider()
-
-        @PostConstruct
-        fun disabling_label_provider_job() {
-            ontrackConfigProperties.isJobLabelProviderEnabled = false
-        }
 
     }
 
