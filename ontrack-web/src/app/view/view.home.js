@@ -186,10 +186,24 @@ angular.module('ot.view.home', [
 
         // Selecting a label
         $scope.projectFilterSelectLabel = (label) => {
-            if (label.category) {
-                $scope.projectFilter.label = `${label.category}:${label.name}`;
+            $scope.projectFilter.label = label;
+        };
+
+        // Filtering the labels for a token
+        $scope.typeAheadFilterLabels = (token) => {
+            return $scope.projectsData.labels.filter(label => {
+                return !token || ($scope.formatLabel(label).toLowerCase().indexOf(token.toLowerCase()) >= 0);
+            });
+        };
+
+        // Formatting a label for a type-ahead
+        $scope.formatLabel = (label) => {
+            if (!label) {
+                return "";
+            } else if (label.category) {
+                return `${label.category}:${label.name}`;
             } else {
-                $scope.projectFilter.label = label.name;
+                return label.name;
             }
         };
 

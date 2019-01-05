@@ -116,6 +116,20 @@
                 </div>
             </div>
             <!-- Name filter -->
+            <script type="text/ng-template" id="projectFilterLabelTypeAheadTemplate.html">
+                <a>
+                    <span title="{{match.model.description}}"
+                          class="ot-project-label-box">
+                        <span class="ot-project-label-box-square"
+                              ng-style="{
+                                'background-color': match.model.color + ' !important;'
+                              }"></span>
+                        <span class="ot-project-label-box-text">
+                            <span bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+                        </span>
+                    </span>
+                </a>
+            </script>
             <div class="row">
                 <div class="col-md-12 ot-home-header">
                     <div class="ot-home-filter input-group col-md-3">
@@ -126,11 +140,12 @@
                         <span class="input-group-addon"><span class="fa fa-search"></span></span>
                     </div>
                     <div class="col-md-3 input-group">
-                        <!--typeahead="target as formatPermissionTarget(target) for target in loadPermissionTargets($viewValue)"-->
-                        <!--typeahead-editable="false"-->
                         <input type="text" class="form-control"
                                placeholder="Label filter"
                                ng-model="projectFilter.label"
+                               typeahead="label as formatLabel(label) for label in typeAheadFilterLabels($viewValue)"
+                               typeahead-editable="false"
+                               typeahead-template-url="projectFilterLabelTypeAheadTemplate.html"
                         />
                         <div class="input-group-btn">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Label <span class="caret"></span></button>
