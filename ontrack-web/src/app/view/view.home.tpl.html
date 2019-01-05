@@ -115,23 +115,10 @@
                     </h4>
                 </div>
             </div>
-            <!-- Name filter -->
-            <script type="text/ng-template" id="projectFilterLabelTypeAheadTemplate.html">
-                <a>
-                    <span title="{{match.model.description}}"
-                          class="ot-project-label-box">
-                        <span class="ot-project-label-box-square"
-                              ng-style="{
-                                'background-color': match.model.color + ' !important;'
-                              }"></span>
-                        <span class="ot-project-label-box-text">
-                            <span bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
-                        </span>
-                    </span>
-                </a>
-            </script>
+            <!-- All project filters -->
             <div class="row">
                 <div class="col-md-12 ot-home-header">
+                    <!-- Name filter -->
                     <div class="ot-home-filter input-group col-md-3">
                         <input class="form-control"
                                type="text"
@@ -139,6 +126,21 @@
                                placeholder="Filter on project names"/>
                         <span class="input-group-addon"><span class="fa fa-search"></span></span>
                     </div>
+                    <!-- Label filter -->
+                    <script type="text/ng-template" id="projectFilterLabelTypeAheadTemplate.html">
+                        <a>
+                            <span title="{{match.model.description}}"
+                                  class="ot-project-label-box">
+                                <span class="ot-project-label-box-square"
+                                      ng-style="{
+                                        'background-color': match.model.color + ' !important;'
+                                      }"></span>
+                                <span class="ot-project-label-box-text">
+                                    <span bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+                                </span>
+                            </span>
+                        </a>
+                    </script>
                     <div class="col-md-3 input-group">
                         <input type="text" class="form-control"
                                placeholder="Label filter"
