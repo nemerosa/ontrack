@@ -9,7 +9,16 @@
         </div>
     </div>
 
-    <table class="table table-hover" ng-hide="loadingLabels">
+    <div class="row" ng-if="labels.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No label has been created yet.
+                Click <a ng-click="createLabel()" class="ot-action">here</a> to create one.
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-hover" ng-hide="loadingLabels" ng-if="labels.length > 0">
         <thead>
         <tr>
             <th>Label</th>

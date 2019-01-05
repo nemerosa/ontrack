@@ -21,7 +21,9 @@ angular.module('ot.view.admin.labels', [
                 id: 'createLabel',
                 name: "Create label",
                 cls: 'ot-command-new',
-                action: createLabel
+                action: () => {
+                    $scope.createLabel();
+                }
             },
             ot.viewCloseCommand('/home')
         ];
@@ -57,9 +59,9 @@ angular.module('ot.view.admin.labels', [
 
         loadLabels();
 
-        function createLabel() {
+        $scope.createLabel = function() {
             otFormService.create("/rest/labels/create", "New label").then(loadLabels);
-        }
+        };
 
         $scope.updateLabel = function (label) {
             if (label.links._update) {
