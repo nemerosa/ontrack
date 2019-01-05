@@ -52,6 +52,17 @@ angular.module('ot.view.home', [
               projects {
                 id
                 name
+                labels {
+                  id
+                  category
+                  name
+                  description
+                  color
+                  computedBy {
+                    id
+                    name
+                  }
+                }
                 links {
                   _favourite
                   _unfavourite
@@ -189,6 +200,11 @@ angular.module('ot.view.home', [
             $scope.projectFilter.label = label;
         };
 
+        // Clearing the label selection
+        $scope.projectFilterClearLabel = () => {
+            $scope.projectFilter.label = undefined;
+        };
+
         // Filtering the labels for a token
         $scope.typeAheadFilterLabels = (token) => {
             return $scope.projectsData.labels.filter(label => {
@@ -205,6 +221,19 @@ angular.module('ot.view.home', [
             } else {
                 return label.name;
             }
+        };
+
+        // Project filter function
+        $scope.projectFilterFn = (project) => {
+            return projectFilterNameFn(project) && projectFilterLabelFn(project);
+        };
+
+        const projectFilterNameFn = project => {
+            return !$scope.projectFilter.name || project.name.toLowerCase().indexOf($scope.projectFilter.name.toLowerCase()) >= 0;
+        };
+
+        const projectFilterLabelFn = project => {
+            return !$scope.projectFilter.label || project.labels.some(it => it.id === $scope.projectFilter.label.id);
         };
 
         // Login procedure

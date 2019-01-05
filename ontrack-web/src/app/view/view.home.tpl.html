@@ -152,6 +152,11 @@
                         <div class="input-group-btn">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Label <span class="caret"></span></button>
                             <ul class="dropdown-menu">
+                                <li class="ot-action">
+                                    <a ng-click="projectFilterClearLabel()">
+                                        <i>Clear</i>
+                                    </a>
+                                </li>
                                 <li class="ot-action" ng-repeat="label in projectsData.labels">
                                     <a ng-click="projectFilterSelectLabel(label)">
                                         <ot-project-label label="label" color-box="true"></ot-project-label>
@@ -165,7 +170,7 @@
             <!-- List of projects -->
             <div class="row">
                 <div class="col-md-3"
-                     ng-repeat="project in projectsData.projects | filter:{name: projectFilter.name}"
+                     ng-repeat="project in projectsData.projects | filter:projectFilterFn"
                      ng-show="showDisabled || !project.disabled">
                     <div class="ot-home-project"
                          ng-class="{'ot-entity-disabled': project.disabled}">
