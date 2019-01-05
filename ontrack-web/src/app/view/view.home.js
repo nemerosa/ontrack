@@ -34,6 +34,21 @@ angular.module('ot.view.home', [
               userRootActions {
                 projectCreate
               }
+              labels {
+                id
+                category
+                name
+                description
+                color
+                computedBy {
+                    id
+                    name
+                }
+                links {
+                    _update
+                    _delete
+                }
+              } 
               projects {
                 id
                 name
@@ -166,6 +181,15 @@ angular.module('ot.view.home', [
         $scope.projectUnfavourite = function (project) {
             if (project.links._unfavourite) {
                 ot.pageCall($http.put(project.links._unfavourite)).then(loadProjects);
+            }
+        };
+
+        // Selecting a label
+        $scope.projectFilterSelectLabel = (label) => {
+            if (label.category) {
+                $scope.projectFilter.label = `${label.category}:${label.name}`;
+            } else {
+                $scope.projectFilter.label = label.name;
             }
         };
 

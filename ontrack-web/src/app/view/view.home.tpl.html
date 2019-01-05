@@ -116,14 +116,32 @@
                 </div>
             </div>
             <!-- Name filter -->
-            <div class="row" ng-if="projectsData.projects.length > 10">
+            <div class="row">
                 <div class="col-md-12 ot-home-header">
-                    <div class="ot-home-filter input-group col-md-4">
+                    <div class="ot-home-filter input-group col-md-3">
                         <input class="form-control"
                                type="text"
                                ng-model="projectFilter.name"
                                placeholder="Filter on project names"/>
                         <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                    </div>
+                    <div class="col-md-3 input-group">
+                        <!--typeahead="target as formatPermissionTarget(target) for target in loadPermissionTargets($viewValue)"-->
+                        <!--typeahead-editable="false"-->
+                        <input type="text" class="form-control"
+                               placeholder="Label filter"
+                               ng-model="projectFilter.label"
+                        />
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Label <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li class="ot-action" ng-repeat="label in projectsData.labels">
+                                    <a ng-click="projectFilterSelectLabel(label)">
+                                        <ot-project-label label="label" color-box="true"></ot-project-label>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
