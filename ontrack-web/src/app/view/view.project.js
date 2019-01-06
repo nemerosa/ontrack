@@ -189,7 +189,9 @@ angular.module('ot.view.project', [
                         id: 'labelsProject',
                         name: "Labels",
                         cls: 'ot-command-project-labels',
-                        action: editProjectLabels
+                        action: () => {
+                            $scope.editProjectLabels();
+                        }
                     },
                     {
                         condition: function () {
@@ -285,7 +287,7 @@ angular.module('ot.view.project', [
             }).then(loadProject);
         };
 
-        function editProjectLabels() {
+        $scope.editProjectLabels = () => {
             if ($scope.project.links._labels) {
                 const labelQuery = `{
                     labels {
@@ -322,6 +324,6 @@ angular.module('ot.view.project', [
                     }).result;
                 }).then(loadProject);
             }
-        }
+        };
     })
 ;
