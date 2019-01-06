@@ -9,7 +9,7 @@
     <span ng-class="{
         'ot-action': action != null
     }" ng-click="onLabelAction()">
-        {{label.category}}:{{label.name}}
+        {{formatLabel(label)}}
     </span>
 </span>
 
@@ -22,6 +22,6 @@
             'background-color': label.color + ' !important;'
           }"></span>
     <span class="ot-project-label-box-text">
-        <span class="ot-project-label-box-text-category">{{label.category}}</span>:<span class="ot-project-label-box-text-name">{{label.name}}</span>
+        <span class="ot-project-label-box-text-category" ng-if="label.category">{{label.category}}:</span><span class="ot-project-label-box-text-name">{{label.name}}</span>
     </span>
 </span>
