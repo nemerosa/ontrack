@@ -4,6 +4,7 @@ angular.module('ot.view.project', [
     'ot.service.structure',
     'ot.service.copy',
     'ot.service.graphql',
+    'ot.service.label',
     'ot.dialog.project.labels'
 ])
     .config(function ($stateProvider) {
@@ -13,7 +14,7 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($modal, $scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService) {
+    .controller('ProjectCtrl', function ($modal, $scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService, otLabelService) {
         const view = ot.view();
         // Project's id
         const projectId = $stateParams.projectId;
@@ -285,6 +286,10 @@ angular.module('ot.view.project', [
             }).then(function () {
                 return ot.call($http.delete(branch.links._delete));
             }).then(loadProject);
+        };
+
+        $scope.projectLabelFilter = (label) => {
+            location.href = '#/home?label=' + otLabelService.formatLabel(label);
         };
 
         $scope.editProjectLabels = () => {

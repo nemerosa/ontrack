@@ -6,7 +6,9 @@
         'background-color': label.color + ' !important;'
       }"
 >
-    <span>
+    <span ng-class="{
+        'ot-action': action != null
+    }" ng-click="onLabelAction()">
         {{label.category}}:{{label.name}}
     </span>
 </span>

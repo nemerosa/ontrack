@@ -29,6 +29,7 @@ const ontrack = angular.module('ontrack', [
         'ot.service.form',
         'ot.service.configuration',
         'ot.service.graphql',
+        'ot.service.label',
         // Views
         'ot.view.api',
         'ot.view.api-doc',

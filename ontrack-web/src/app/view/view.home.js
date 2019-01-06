@@ -3,7 +3,8 @@ angular.module('ot.view.home', [
     'ot.service.structure',
     'ot.service.core',
     'ot.service.user',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.label'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
@@ -12,7 +13,7 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService, otLabelService) {
         const search = $location.search();
         const code = search.code;
         const url = search.url;
@@ -262,15 +263,7 @@ angular.module('ot.view.home', [
         };
 
         // Formatting a label for a type-ahead
-        $scope.formatLabel = (label) => {
-            if (!label) {
-                return "";
-            } else if (label.category) {
-                return `${label.category}:${label.name}`;
-            } else {
-                return label.name;
-            }
-        };
+        $scope.formatLabel = otLabelService.formatLabel;
 
         // Project filter function
         $scope.projectFilterFn = (project) => {
