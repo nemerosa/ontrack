@@ -3,7 +3,8 @@
       ng-if="!colorBox || colorBox == 'false'"
       class="ot-project-label"
       ng-style="{
-        'background-color': label.color + ' !important;'
+        'background-color': label.color + ' !important;',
+        'color': label.foregroundColor + ' !important;'
       }"
 >
     <span ng-class="{
@@ -19,7 +20,8 @@
       class="ot-project-label-box">
     <span class="ot-project-label-box-square"
           ng-style="{
-            'background-color': label.color + ' !important;'
+            'background-color': label.color + ' !important;',
+            'color': label.foregroundColor + ' !important;'
           }"></span>
     <span class="ot-project-label-box-text">
         <span class="ot-project-label-box-text-category" ng-if="label.category">{{label.category}}:</span><span class="ot-project-label-box-text-name">{{label.name}}</span>

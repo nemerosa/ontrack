@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.labels
 
+import net.nemerosa.ontrack.common.RGB_COLOR_REGEX
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
@@ -20,7 +21,7 @@ data class LabelForm(
     fun validate() {
         validate(category, LABEL_REGEX, "category")
         validate(name, LABEL_REGEX, "name")
-        validate(color, LABEL_COLOR, "color")
+        validate(color, RGB_COLOR_REGEX, "color")
     }
 
     private fun validate(value: String?, regex: String, field: String) {
@@ -36,8 +37,3 @@ data class LabelForm(
  * Regular expression to validate a category or a name.
  */
 const val LABEL_REGEX: String = "[A-Za-z0-9.\\-_]+"
-
-/**
- * Regular expression to validate a colour.
- */
-const val LABEL_COLOR: String = "#[a-fA-F0-9]{6}"

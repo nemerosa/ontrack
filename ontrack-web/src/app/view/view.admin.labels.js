@@ -35,6 +35,7 @@ angular.module('ot.view.admin.labels', [
                 name
                 description
                 color
+                foregroundColor
                 computedBy {
                     id
                     name

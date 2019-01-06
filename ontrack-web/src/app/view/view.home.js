@@ -47,6 +47,7 @@ angular.module('ot.view.home', [
                 name
                 description
                 color
+                foregroundColor
                 computedBy {
                     id
                     name
@@ -65,6 +66,7 @@ angular.module('ot.view.home', [
                   name
                   description
                   color
+                  foregroundColor
                   computedBy {
                     id
                     name

@@ -39,6 +39,7 @@ angular.module('ot.view.project', [
                   name
                   description
                   color
+                  foregroundColor
                   computedBy {
                     id
                     name
@@ -301,6 +302,7 @@ angular.module('ot.view.project', [
                         name
                         description
                         color
+                        foregroundColor
                         computedBy {
                             id
                             name
