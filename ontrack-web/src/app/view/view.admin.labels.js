@@ -2,7 +2,8 @@ angular.module('ot.view.admin.labels', [
     'ui.router',
     'ot.service.core',
     'ot.service.form',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.label'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-labels', {
@@ -11,7 +12,7 @@ angular.module('ot.view.admin.labels', [
             controller: 'AdminLabelsCtrl'
         });
     })
-    .controller('AdminLabelsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+    .controller('AdminLabelsCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService, otLabelService) {
         const view = ot.view();
         view.title = "Labels";
         view.description = "Management of labels";
@@ -40,6 +41,9 @@ angular.module('ot.view.admin.labels', [
                     id
                     name
                 }
+                projects {
+                    id
+                }
                 links {
                     _update
                     _delete
@@ -59,6 +63,10 @@ angular.module('ot.view.admin.labels', [
         }
 
         loadLabels();
+
+        $scope.goToLabel = (label) => {
+            location.href = '#/home?label=' + otLabelService.formatLabel(label);
+        };
 
         $scope.createLabel = function() {
             otFormService.create("/rest/labels/create", "New label").then(loadLabels);
