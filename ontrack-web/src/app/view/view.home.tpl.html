@@ -166,9 +166,6 @@
                         </div>
                     </div>
                 </div>
-                <div>
-                    {{projectFilter}}
-                </div>
             </div>
             <!-- List of projects -->
             <div class="row">
@@ -194,6 +191,9 @@
                             {{project.name}}
                         </a>
                         <ot-entity-embedded-decorations decorations="project.decorations"></ot-entity-embedded-decorations>
+                        <span class="ot-project-label-container ot-project-label-container-div">
+                            <ot-project-label label="label" ng-repeat="label in project.labels"></ot-project-label>
+                        </span>
                     </div>
                 </div>
             </div>
