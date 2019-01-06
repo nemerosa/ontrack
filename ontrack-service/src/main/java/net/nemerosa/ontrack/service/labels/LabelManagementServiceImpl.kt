@@ -28,6 +28,7 @@ class LabelManagementServiceImpl(
 
     override fun newLabel(form: LabelForm): Label {
         securityService.checkGlobalFunction(LabelManagement::class.java)
+        form.validate()
         return labelRepository.newLabel(form).toLabel()
     }
 
@@ -36,6 +37,7 @@ class LabelManagementServiceImpl(
 
     override fun updateLabel(labelId: Int, form: LabelForm): Label {
         securityService.checkGlobalFunction(LabelManagement::class.java)
+        form.validate()
         val label = getLabel(labelId)
         if (label.computedBy != null) {
             throw LabelNotEditableException(label)
