@@ -59,6 +59,8 @@ angular.module('ot.view.project', [
                   _events
                   _actions
                   _labels
+                  _labelFromToken
+                  _labelsCreate
                 }
                 branches {
                   id
