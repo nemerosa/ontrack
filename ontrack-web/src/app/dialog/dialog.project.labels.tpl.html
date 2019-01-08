@@ -16,7 +16,9 @@
                        placeholder="Filter labels" />
             </div>
             <div class="col-md-1" ng-if="labelCreation">
-                <button class="btn btn-info" type="button" title="Creates a label for [{{filter.text}}]">
+                <button class="btn btn-info" type="button"
+                        ng-click="createLabelFromToken()"
+                        title="Creates a label for [{{filter.text}}]">
                     <span class="fa fa-plus"></span>
                 </button>
             </div>

@@ -93,7 +93,7 @@ class LabelController(
      *
      * @see [LabelTokenForm]
      */
-    @GetMapping("token")
+    @PostMapping("token")
     fun getFormForToken(@RequestBody input: LabelTokenForm): Form {
         // Parsing
         val label = input.parse()
