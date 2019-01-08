@@ -116,6 +116,12 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
                                 (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement.class)
                                         && resourceContext.isGlobalFunctionGranted(LabelManagement.class)
                         ),
+                        // Creation of a label for the project
+                        link(
+                                "_labelsCreate",
+                                project -> on(LabelController.class).getCreationForm(),
+                                (project, resourceContext) -> resourceContext.isGlobalFunctionGranted(LabelManagement.class)
+                        ),
                         // Page
                         page()
                 ),
