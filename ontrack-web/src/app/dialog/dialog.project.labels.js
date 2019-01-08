@@ -23,7 +23,15 @@ angular.module('ot.dialog.project.labels', [
             return label.computedBy == null || label.selected;
         }
         function labelFilterTextFn(text) {
-            return !$scope.filter.text || text.toLowerCase().indexOf($scope.filter.text.toLowerCase()) >= 0;
+            return !$scope.filter.text || (text && text.toLowerCase().indexOf($scope.filter.text.toLowerCase()) >= 0);
+        }
+        // Watching for filter text change to decide if we allow the creation of a label
+        $scope.labelCreation = false;
+        if ($scope.config.project.links._labelFromToken && $scope.config.project.links._labelsCreate) {
+            $scope.$watch("filter.text", function () {
+                // If there is no match in the labels
+                $scope.labelCreation = !$scope.config.project.labels.some($scope.labelFilterFn);
+            });
         }
         // Toggling the label selection
         $scope.toggleLabel = function (label) {

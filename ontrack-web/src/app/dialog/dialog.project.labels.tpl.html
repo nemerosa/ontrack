@@ -5,10 +5,22 @@
 </div>
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
-        <input type="text"
-               class="form-control"
-               ng-model="filter.text"
-               placeholder="Filter labels" />
+        <div class="row">
+            <div ng-class="{
+                'col-md-12': !labelCreation,
+                'col-md-10': labelCreation
+            }">
+                <input type="text"
+                       class="form-control"
+                       ng-model="filter.text"
+                       placeholder="Filter labels" />
+            </div>
+            <div class="col-md-1" ng-if="labelCreation">
+                <button class="btn btn-info" type="button" title="Creates a label for [{{filter.text}}]">
+                    <span class="fa fa-plus"></span>
+                </button>
+            </div>
+        </div>
         <div class="row ot-project-label-selection"
              ng-repeat="label in data | filter:labelFilterFn"
              ng-click="toggleLabel(label)">
