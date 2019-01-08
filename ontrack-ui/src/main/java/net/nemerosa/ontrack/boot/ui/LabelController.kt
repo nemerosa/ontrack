@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.model.form.Color
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.Text
-import net.nemerosa.ontrack.model.labels.Label
-import net.nemerosa.ontrack.model.labels.LabelForm
-import net.nemerosa.ontrack.model.labels.LabelManagementService
-import net.nemerosa.ontrack.model.labels.LabelNotEditableException
+import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -90,5 +87,24 @@ class LabelController(
     @DeleteMapping("{labelId}/delete")
     fun deleteLabel(@PathVariable labelId: Int): Ack =
             labelManagementService.deleteLabel(labelId)
+
+    /**
+     * Getting the form to create a label from a token.
+     *
+     * @see [LabelTokenForm]
+     */
+    @GetMapping("token")
+    fun getFormForToken(@RequestBody input: LabelTokenForm): Form {
+        // Parsing
+        val label = input.parse()
+        // Creates the form...
+        val form = getCreationForm()
+        // ... and fills it
+        return form
+                .fill("category", label.category)
+                .fill("name", label.name)
+                .fill("description", label.description)
+                .fill("color", label.color)
+    }
 
 }

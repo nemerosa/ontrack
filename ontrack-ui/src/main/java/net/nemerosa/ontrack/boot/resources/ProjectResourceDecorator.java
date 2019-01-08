@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.boot.resources;
 
 import com.google.common.collect.Iterables;
 import net.nemerosa.ontrack.boot.ui.*;
+import net.nemerosa.ontrack.model.labels.LabelManagement;
+import net.nemerosa.ontrack.model.labels.LabelTokenForm;
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -106,6 +108,13 @@ public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Proj
                                 "_labels",
                                 project -> on(ProjectLabelController.class).getLabelsForProject(project.id()),
                                 (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement.class)
+                        ),
+                        // Creating a label from a project and a token
+                        link(
+                                "_labelFromToken",
+                                project -> on(LabelController.class).getFormForToken(new LabelTokenForm("")),
+                                (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement.class)
+                                        && resourceContext.isGlobalFunctionGranted(LabelManagement.class)
                         ),
                         // Page
                         page()
