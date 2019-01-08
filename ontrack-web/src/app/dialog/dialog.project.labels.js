@@ -1,8 +1,9 @@
 angular.module('ot.dialog.project.labels', [
     'ot.service.core',
-    'ot.service.form'
+    'ot.service.form',
+    'ot.service.label'
 ])
-    .controller('otDialogProjectLabels', function ($scope, $modalInstance, $http, config, ot, otFormService) {
+    .controller('otDialogProjectLabels', function ($scope, $modalInstance, $http, config, ot, otFormService, otLabelService) {
         // Inject the configuration into the scope
         $scope.config = config;
         // Preparing the data
@@ -17,7 +18,7 @@ angular.module('ot.dialog.project.labels', [
         // Label filter
         $scope.filter = {text: ""};
         $scope.labelFilterFn = function (label) {
-            return labelFilterUnselectedAutoFn(label) && (labelFilterTextFn(label.category) || labelFilterTextFn(label.name));
+            return labelFilterUnselectedAutoFn(label) && labelFilterTextFn(otLabelService.formatLabel(label));
         };
 
         function labelFilterUnselectedAutoFn(label) {
@@ -54,7 +55,7 @@ angular.module('ot.dialog.project.labels', [
                             let selectedLabel = label;
                             selectedLabel.selected = true;
                             $scope.data.unshift(selectedLabel);
-                            $scope.filter.text = "";
+                            $scope.filter.text = otLabelService.formatLabel(selectedLabel);
                             $scope.labelCreation = false;
                         });
                 }
