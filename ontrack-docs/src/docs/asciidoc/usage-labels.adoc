@@ -82,3 +82,30 @@ of the list.
 image::images/projects-labels-assign-dialog.png[Project label selection dialog,400]
 
 [[projects-labels-management]]
+===== Management of labels
+
+Authorized users can manage the list of labels from
+their user menu.
+
+The label management page allows the user to
+
+* create
+* update
+* delete
+
+labels. In the _Projects_ column, the number of projects
+associated with the label on the line. If greater than zero,
+it is a link to the home page, with the corresponding label
+being selected.
+
+image::images/projects-labels-management.png[Management of labels,600]
+
+The edition dialog for a label looks like:
+
+image::images/projects-labels-management-dialog.png[Label edition dialog,400]
+
+[NOTE]
+====
+The color editor, as of now, relies on the browser default color editor,
+so the rendering might be different from browser to browser.
+====
