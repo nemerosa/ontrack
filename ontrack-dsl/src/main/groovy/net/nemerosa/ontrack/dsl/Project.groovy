@@ -68,5 +68,19 @@ class Project extends AbstractProjectResource {
         ontrack.get(url).resources.collect { new Build(ontrack, it.build) }
     }
 
+    @DSLMethod(count = 3, value = "Assign a label to the project, optionally creating it if requested (and authorized)")
+    void assignLabel(String category, String name, boolean createIfMissing = false) {
+        // Gets the label
+        def label = ontrack.config.getLabel(category, name)
+        if (label == null) {
+            if (createIfMissing) {
+                label = ontrack.config.label(category, name)
+            } else {
+                throw new LabelNotFoundException(category, name)
+            }
+        }
+        // Assigns the label
+
+    }
 
 }

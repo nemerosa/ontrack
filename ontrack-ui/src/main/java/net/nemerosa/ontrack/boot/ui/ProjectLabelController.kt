@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.labels.Label
+import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.labels.ProjectLabelForm
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.ID
@@ -14,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 @RequestMapping("/rest/labels/projects")
 class ProjectLabelController(
         private val structureService: StructureService,
+        private val labelManagementService: LabelManagementService,
         private val projectLabelManagementService: ProjectLabelManagementService
 ) : AbstractResourceController() {
 
@@ -34,6 +37,22 @@ class ProjectLabelController(
                 form
         )
         return getLabelsForProject(projectId)
+    }
+
+    @PutMapping("{projectId}/assign/{labelId")
+    fun associateProjectToLabel(@PathVariable projectId: ID, @PathVariable labelId: Int): Ack {
+        val project = structureService.getProject(projectId)
+        val label = labelManagementService.getLabel(labelId)
+        projectLabelManagementService.associateProjectToLabel(project, label)
+        return Ack.OK
+    }
+
+    @PutMapping("{projectId}/unassign/{labelId")
+    fun unassociateProjectToLabel(@PathVariable projectId: ID, @PathVariable labelId: Int): Ack {
+        val project = structureService.getProject(projectId)
+        val label = labelManagementService.getLabel(labelId)
+        projectLabelManagementService.unassociateProjectToLabel(project, label)
+        return Ack.OK
     }
 
 }

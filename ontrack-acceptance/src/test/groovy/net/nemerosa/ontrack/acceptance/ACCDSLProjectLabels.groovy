@@ -22,7 +22,7 @@ class ACCDSLProjectLabels extends AbstractACCDSL {
 
         // Creating a global label
         def name = uid('L')
-        ontrack.config.label("language:${name}")
+        ontrack.config.label("language", name)
 
         assertTrue(
                 ontrack.config.labels.find { it.category == "language" && it.name == name } != null
@@ -40,14 +40,14 @@ class ACCDSLProjectLabels extends AbstractACCDSL {
     void 'Idempotent creation of labels'() {
         // Creating a global label
         def name = uid('L')
-        ontrack.config.label("language:${name}")
+        ontrack.config.label("language", name)
 
         assertTrue(
                 ontrack.config.labels.find { it.category == "language" && it.name == name } != null
         )
 
         // Creating it again
-        ontrack.config.label("language:${name}")
+        ontrack.config.label("language", name)
 
         assertTrue(
                 ontrack.config.labels.find { it.category == "language" && it.name == name } != null
@@ -61,7 +61,7 @@ class ACCDSLProjectLabels extends AbstractACCDSL {
 
         // Creating a global label
         def name = uid('L')
-        ontrack.config.label("language:${name}")
+        ontrack.config.label("language", name)
 
         // Assign to project
         project.assignLabel("language:${name}")
