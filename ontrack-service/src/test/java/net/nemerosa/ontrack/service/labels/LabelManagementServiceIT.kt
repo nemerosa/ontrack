@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class LabelManagementServiceIT : AbstractDSLTestSupport() {
 
@@ -119,6 +116,53 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
                     labels.subList(3, 5).map { it.name },
                     this.labels.map { it.name }
             )
+        }
+    }
+
+    @Test
+    fun `Looking for labels per category`() {
+        val category = uid("C")
+        (1..5).map { label(category = category, name = "name-$it") }
+        // Other arbitrary labels
+        (1..5).map { label() }
+        // Looking for labels per category
+        val labels = labelManagementService.findLabels(category, null)
+        assertTrue(
+                labels.all {
+                    it.category == category && it.name.matches("name-\\d".toRegex())
+                }
+        )
+    }
+
+    @Test
+    fun `Looking for labels per name only`() {
+        val name = uid("C")
+        (1..5).map { label(category = uid("C"), name = name) }
+        // Other arbitrary labels
+        (1..5).map { label() }
+        // Looking for labels per name
+        val labels = labelManagementService.findLabels(null, name)
+        assertEquals(5, labels.size)
+        assertTrue(
+                labels.all {
+                    it.name == name
+                }
+        )
+    }
+
+    @Test
+    fun `Looking for labels per category and name`() {
+        val category = uid("C")
+        val name = uid("N")
+        label(category = category, name = name)
+        // Other arbitrary labels
+        (1..5).map { label() }
+        // Looking for labels per category and name
+        val labels = labelManagementService.findLabels(category, name)
+        assertEquals(1, labels.size)
+        assertNotNull(labels.firstOrNull()) {
+            assertEquals(category, it.category)
+            assertEquals(name, it.name)
         }
     }
 

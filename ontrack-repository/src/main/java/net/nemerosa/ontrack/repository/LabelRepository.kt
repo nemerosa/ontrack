@@ -46,6 +46,11 @@ interface LabelRepository {
     fun findLabelByCategoryAndNameAndProvider(category: String?, name: String, providerId: String): LabelRecord?
 
     /**
+     * Finds a list of labels using their category and/or name.
+     */
+    fun findLabels(category: String?, name: String?): List<LabelRecord>
+
+    /**
      * Gets list of all labels, ordered by category and name
      */
     val labels: List<LabelRecord>

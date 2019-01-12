@@ -30,4 +30,9 @@ interface LabelManagementService {
      * Deletes a label
      */
     fun deleteLabel(labelId: Int): Ack
+
+    /**
+     * Finds a list of labels using their category and/or name.
+     */
+    fun findLabels(category: String?, name: String?): List<Label>
 }

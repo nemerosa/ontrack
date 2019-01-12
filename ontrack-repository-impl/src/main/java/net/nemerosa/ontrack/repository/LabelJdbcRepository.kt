@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.labels.LabelIdNotFoundException
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import javax.sql.DataSource
@@ -20,6 +21,30 @@ class LabelJdbcRepository(
         return namedParameterJdbcTemplate.query(
                 "SELECT * FROM LABEL WHERE COMPUTED_BY = :computedBy",
                 params("computedBy", providerId)
+        ) { rs, _ -> rsConversion(rs) }
+    }
+
+    override fun findLabels(category: String?, name: String?): List<LabelRecord> {
+        val sql: String
+        val params: MapSqlParameterSource
+        if (category == null) {
+            if (name == null) {
+                sql = "SELECT * FROM LABEL ORDER BY CATEGORY, NAME"
+                params = MapSqlParameterSource()
+            } else {
+                sql = "SELECT * FROM LABEL WHERE NAME = :name ORDER BY CATEGORY, NAME"
+                params = params("name", name)
+            }
+        } else if (name == null) {
+            sql = "SELECT * FROM LABEL WHERE CATEGORY = :category ORDER BY CATEGORY, NAME"
+            params = params("category", category)
+        } else {
+            sql = "SELECT * FROM LABEL WHERE CATEGORY = :category AND NAME = :name ORDER BY CATEGORY, NAME"
+            params = params("category", category).addValue("name", name)
+        }
+        return namedParameterJdbcTemplate.query(
+                sql,
+                params
         ) { rs, _ -> rsConversion(rs) }
     }
 
@@ -50,7 +75,7 @@ class LabelJdbcRepository(
     }
 
     override fun newLabel(form: LabelForm): LabelRecord =
-        newLabel(form, null)
+            newLabel(form, null)
 
     override fun overrideLabel(form: LabelForm, providerId: String): LabelRecord {
         val record = findLabelByCategoryAndName(

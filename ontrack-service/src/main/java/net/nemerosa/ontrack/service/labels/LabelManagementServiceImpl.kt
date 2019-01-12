@@ -21,6 +21,12 @@ class LabelManagementServiceImpl(
                 .filter { isComputedByOK(it) }
                 .map { it.toLabel() }
 
+    override fun findLabels(category: String?, name: String?): List<Label> {
+        return labelRepository.findLabels(category, name)
+                .filter { isComputedByOK(it) }
+                .map { it.toLabel() }
+    }
+
     private fun isComputedByOK(record: LabelRecord): Boolean {
         val computedBy = record.computedBy
         return computedBy == null || (labelProviderService.getLabelProvider(computedBy)?.isEnabled ?: false)

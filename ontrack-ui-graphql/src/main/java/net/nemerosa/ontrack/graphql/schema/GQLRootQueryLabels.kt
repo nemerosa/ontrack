@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.model.labels.LabelManagementService
@@ -18,8 +19,24 @@ class GQLRootQueryLabels(
                     .name("labels")
                     .description("List of all labels")
                     .type(stdList(label.typeRef))
-                    .dataFetcher {
-                        labelManagementService.labels
+                    .argument {
+                        it.name("category")
+                                .description("Category to look for")
+                                .type(GraphQLString)
+                    }
+                    .argument {
+                        it.name("name")
+                                .description("Name to look for")
+                                .type(GraphQLString)
+                    }
+                    .dataFetcher { environment ->
+                        val category: String? = environment.getArgument("category")
+                        val name: String? = environment.getArgument("name")
+                        if (category != null || name != null) {
+                            labelManagementService.findLabels(category, name)
+                        } else {
+                            labelManagementService.labels
+                        }
                     }
                     .build()
 }
