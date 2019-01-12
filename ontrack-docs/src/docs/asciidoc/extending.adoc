@@ -398,3 +398,5 @@ include::extending-security.adoc[]
 include::extending-encryption.adoc[]
 
 include::extension-free-text-annotations.adoc[]
+
+include::extension-label-provider.adoc[]

@@ -119,3 +119,22 @@ image::images/projects-labels-assign-creation.png[Creation of label from assignm
 Once the label is created, it's selected and filtered by default:
 
 image::images/projects-labels-assign-creation-done.png[After creation,400]
+
+[[projects-labels-auto]]
+===== Automation of labels
+
+Some labels can be created and assigned automatically using
+the concept of the "label providers".
+
+As-of now, there is no label provider in the core Ontrack
+application and they must be made available through
+extensions.
+
+[NOTE]
+====
+The main thing to remember about automatically assigned labels
+is that they cannot be edited, not deleted, not unselected.
+====
+
+To create a label provider, you have to create an <<extending,extension>>:
+see <<extension-label-provider>>.
