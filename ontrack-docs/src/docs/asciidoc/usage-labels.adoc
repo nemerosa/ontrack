@@ -109,3 +109,13 @@ image::images/projects-labels-management-dialog.png[Label edition dialog,400]
 The color editor, as of now, relies on the browser default color editor,
 so the rendering might be different from browser to browser.
 ====
+
+If authorised, the creation of a label is also available from the project
+label assignment dialog. If the filter being typed does not match any label,
+a button appears which allows the creation of the new label:
+
+image::images/projects-labels-assign-creation.png[Creation of label from assignment dialog,400]
+
+Once the label is created, it's selected and filtered by default:
+
+image::images/projects-labels-assign-creation-done.png[After creation,400]
