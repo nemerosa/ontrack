@@ -39,7 +39,7 @@ class ProjectLabelController(
         return getLabelsForProject(projectId)
     }
 
-    @PutMapping("{projectId}/assign/{labelId")
+    @PutMapping("{projectId}/assign/{labelId}")
     fun associateProjectToLabel(@PathVariable projectId: ID, @PathVariable labelId: Int): Ack {
         val project = structureService.getProject(projectId)
         val label = labelManagementService.getLabel(labelId)
@@ -47,7 +47,7 @@ class ProjectLabelController(
         return Ack.OK
     }
 
-    @PutMapping("{projectId}/unassign/{labelId")
+    @PutMapping("{projectId}/unassign/{labelId}")
     fun unassociateProjectToLabel(@PathVariable projectId: ID, @PathVariable labelId: Int): Ack {
         val project = structureService.getProject(projectId)
         val label = labelManagementService.getLabel(labelId)

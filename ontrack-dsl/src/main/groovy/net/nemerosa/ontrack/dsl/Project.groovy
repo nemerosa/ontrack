@@ -80,7 +80,24 @@ class Project extends AbstractProjectResource {
             }
         }
         // Assigns the label
+        ontrack.put("/rest/labels/projects/${id}/assign/${label.id}", [:])
+    }
 
+    @DSLMethod(count = 2, value = "Unassign a label from a project")
+    void unassignLabel(String category, String name) {
+        // Gets the label
+        def label = ontrack.config.getLabel(category, name)
+        if (label != null) {
+            // Unassigns the label
+            ontrack.put("/rest/labels/projects/${id}/unassign/${label.id}", [:])
+        }
+    }
+
+    @DSLMethod("Gets the labels for this project")
+    List<Label> getLabels() {
+        return ontrack.get(link("labels")).resources.collect {
+            new Label(ontrack, it)
+        }
     }
 
 }

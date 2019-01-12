@@ -309,7 +309,7 @@ class Config {
                 ''',
                 [
                         category: category,
-                        name: name
+                        name    : name
                 ]
         )
         def labels = result.data.labels
@@ -321,6 +321,30 @@ class Config {
     }
 
     /**
+     * Gets the list of labels
+     */
+    @DSLMethod("Gets the list of labels")
+    List<Label> getLabels() {
+        def result = ontrack.graphQLQuery(
+                '''
+                    query AllLabels {
+                        labels {
+                            id
+                            category
+                            name
+                            description
+                            color
+                        }
+                    }
+                ''',
+                [:]
+        )
+        return result.data.labels.collect {
+            new Label(ontrack, it)
+        }
+    }
+
+    /**
      * Creating a label
      */
     @DSLMethod(count = 4, value = "Creates or updates a label")
@@ -328,19 +352,19 @@ class Config {
         // Gets the existing label
         Label existing = getLabel(category, name)
         if (existing) {
-            def result = ontrack.put("rest/labels/${existing.id}/create", [
-                    category: category,
-                    name: name,
+            def result = ontrack.put("rest/labels/${existing.id}/update", [
+                    category   : category,
+                    name       : name,
                     description: description,
-                    color: color
+                    color      : color
             ])
             return new Label(ontrack, result)
         } else {
             def result = ontrack.post("rest/labels/create", [
-                    category: category,
-                    name: name,
+                    category   : category,
+                    name       : name,
                     description: description,
-                    color: color
+                    color      : color
             ])
             return new Label(ontrack, result)
         }

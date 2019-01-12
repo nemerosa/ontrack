@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.SearchResult
-import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.junit.Test
 
-import static junit.framework.Assert.assertTrue
 import static net.nemerosa.ontrack.test.TestUtils.uid
 import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertTrue
 
 /**
  * Acceptance tests for the project labels
@@ -29,7 +27,7 @@ class ACCDSLProjectLabels extends AbstractACCDSL {
         )
 
         // Assign to project
-        project.assignLabel("language:${name}")
+        project.assignLabel("language", name)
 
         assertTrue(
                 project.labels.find { it.category == "language" && it.name == name } != null
@@ -64,14 +62,14 @@ class ACCDSLProjectLabels extends AbstractACCDSL {
         ontrack.config.label("language", name)
 
         // Assign to project
-        project.assignLabel("language:${name}")
+        project.assignLabel("language", name)
 
         assertTrue(
                 project.labels.find { it.category == "language" && it.name == name } != null
         )
 
         // Unassigning from project
-        project.unassignLabel("language:${name}")
+        project.unassignLabel("language", name)
 
         assertFalse(
                 project.labels.find { it.category == "language" && it.name == name } != null
@@ -87,7 +85,7 @@ class ACCDSLProjectLabels extends AbstractACCDSL {
         def name = uid('L')
 
         // Assign a new label to project, creating it at the same time
-        project.assignLabel("language:${name}", true)
+        project.assignLabel("language", name, true)
 
         assertTrue(
                 ontrack.config.labels.find { it.category == "language" && it.name == name } != null
