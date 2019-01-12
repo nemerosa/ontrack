@@ -1,0 +1,63 @@
+[[projects-labels]]
+==== Project labels
+
+Projects can be associated with labels. This allows to classify them.
+
+Labels are defined by:
+
+* an optional category
+* a name (unique within the category)
+* an optional description
+* a color (always given using the form `#RRGGBB`, for example black
+  is `#000000`)
+
+[[projects-labels-usage]]
+===== Using the labels
+
+Project labels are displayed in the home page, in the list of projects:
+
+image::images/projects-labels-home.png[Project filter on home page,300]
+
+They also appear in the project page, under the project's name:
+
+image::images/projects-labels-title.png[Project filter on project page,500]
+
+In the home page, projects can be filtered using labels. Several options
+are available.
+
+You can type parts of the label in the _Label_ filter box
+at the top of the project list. This displays a list
+of matching labels from which you can select an actual label:
+
+image::images/projects-labels-filter-text-list.png[Label filter text selection,300]
+
+Once the item is selected, the list of projects is filtered
+accordingly:
+
+image::images/projects-labels-applied.png[Label filter applied,500]
+
+You can also select the label directly from the _Label_ dropdown:
+
+image::images/projects-labels-filter-combo.png[Label in combo box,200]
+
+Finally, from the home page or from the project page, clicking on a label
+will select this label as a filter.
+
+[NOTE]
+====
+The selected filter is stored at browser level and is therefore
+preselected the next time you go to the home page.
+
+You can clear the selected label by either:
+
+* emptying the _Label_ text box
+* select _Clear_ in the _Label_ dropdown
+
+Note that upon a label selection, this selection appears
+also in the URL of your browser and can be used as a permalink
+to this filter.
+====
+
+[[projects-labels-assignment]]
+
+[[projects-labels-management]]

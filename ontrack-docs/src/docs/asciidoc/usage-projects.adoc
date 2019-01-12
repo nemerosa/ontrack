@@ -1,2 +1,4 @@
 [[projects]]
 === Managing projects
+
+include::usage-labels.adoc[]
