@@ -59,5 +59,26 @@ to this filter.
 ====
 
 [[projects-labels-assignment]]
+===== Assigning labels to a project
+
+Only some users are allowed to assign labels to projects.
+
+NOTE: See <<security>> for list of available roles.
+
+If the user is authorized to assign labels to a project, a pencil icon
+appears close to the list of labels and the _Labels_ command is available
+in the page menu. Both commands perform the same operation.
+
+image::images/projects-labels-assign-commands.png[Project label assignment commands,600]
+
+Those commands display a dialog which allows the selection (and unselection)
+of labels among a list. When exiting the dialog through the _OK_ button,
+the selection of labels is applied to the project and the project page
+is reloaded.
+
+The list of available labels can be filtered using the text box at the top
+of the list.
+
+image::images/projects-labels-assign-dialog.png[Project label selection dialog,400]
 
 [[projects-labels-management]]
