@@ -44,4 +44,8 @@ class BranchingModel(
                 val pattern = regex.toRegex()
                 branches.filter { pattern.matches(it) }
             }
+
+    fun matches(branchName: String): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
