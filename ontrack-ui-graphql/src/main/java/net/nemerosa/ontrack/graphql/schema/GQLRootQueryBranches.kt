@@ -69,7 +69,7 @@ class GQLRootQueryBranches(
             if (id != null) {
                 checkArgList(environment, "id")
                 listOf(structureService.getBranch(ID.of(id)))
-            } else if (isNotBlank(projectName) || isNotBlank(name) || propertyFilterArg != null) {
+            } else if ((favourite != null && favourite) || isNotBlank(projectName) || isNotBlank(name) || propertyFilterArg != null) {
 
                 // Project filter
                 var projectFilter: (Project) -> Boolean = { true }
