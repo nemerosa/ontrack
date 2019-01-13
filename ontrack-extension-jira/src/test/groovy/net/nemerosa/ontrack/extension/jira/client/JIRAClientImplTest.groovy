@@ -28,7 +28,7 @@ class JIRAClientImplTest {
     @Test
     void toIssue() {
         // Configuration to test with
-        JIRAConfiguration config = new JIRAConfiguration("Test", "http://host", "user", "secret");
+        JIRAConfiguration config = new JIRAConfiguration("Test", "http://jira", "user", "secret");
         // Issue to parse
         JsonNode node = new ObjectMapper().readTree(getClass().getResource("/issue.json"));
         // Parsing the issue
@@ -47,7 +47,7 @@ class JIRAClientImplTest {
     @Test
     void 'toIssue with one inward link'() {
         // Configuration to test with
-        JIRAConfiguration config = new JIRAConfiguration("Test", "http://host", "user", "secret");
+        JIRAConfiguration config = new JIRAConfiguration("Test", "http://jira", "user", "secret");
         // Issue to parse
         JsonNode node = new ObjectMapper().readTree(getClass().getResource("/issue-link-inward.json"));
         // Parsing the issue
@@ -64,7 +64,7 @@ class JIRAClientImplTest {
         assert issue.links == [
                 new JIRALink(
                         'PRJ-900',
-                        'https://jira/browse/PRJ-10702',
+                        'http://jira/browse/PRJ-900',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'is blocked by'
@@ -75,7 +75,7 @@ class JIRAClientImplTest {
     @Test
     void 'toIssue with one outward link'() {
         // Configuration to test with
-        JIRAConfiguration config = new JIRAConfiguration("Test", "http://host", "user", "secret");
+        JIRAConfiguration config = new JIRAConfiguration("Test", "http://jira", "user", "secret");
         // Issue to parse
         JsonNode node = new ObjectMapper().readTree(getClass().getResource("/issue-link-outward.json"));
         // Parsing the issue
@@ -92,7 +92,7 @@ class JIRAClientImplTest {
         assert issue.links == [
                 new JIRALink(
                         'PRJ-900',
-                        'https://jira/browse/PRJ-900',
+                        'http://jira/browse/PRJ-900',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'blocks'
@@ -103,7 +103,7 @@ class JIRAClientImplTest {
     @Test
     void 'toIssue with two links'() {
         // Configuration to test with
-        JIRAConfiguration config = new JIRAConfiguration("Test", "http://host", "user", "secret");
+        JIRAConfiguration config = new JIRAConfiguration("Test", "http://jira", "user", "secret");
         // Issue to parse
         JsonNode node = new ObjectMapper().readTree(getClass().getResource("/issue-link-both.json"));
         // Parsing the issue
@@ -120,14 +120,14 @@ class JIRAClientImplTest {
         assert issue.links == [
                 new JIRALink(
                         'PRJ-900',
-                        'https://jira/browse/PRJ-900',
+                        'http://jira/browse/PRJ-900',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'blocks'
                 ),
                 new JIRALink(
                         'PRJ-901',
-                        'https://jira/browse/PRJ-901',
+                        'http://jira/browse/PRJ-901',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'is blocked by'
