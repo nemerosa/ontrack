@@ -62,7 +62,7 @@ angular.module('ot.view.project', [
                   _labelFromToken
                   _labelsCreate
                 }
-                branches {
+                favouriteBranches: branches(favourite: true) {
                   id
                   name
                   disabled
@@ -78,6 +78,8 @@ angular.module('ot.view.project', [
                     _enable
                     _disable
                     _delete
+                    _unfavourite
+                    _favourite
                   }
                   latestBuild: builds(count: 1) {
                     id
@@ -97,6 +99,26 @@ angular.module('ot.view.project', [
                         name
                       }
                     }
+                  }
+                }
+                branches {
+                  id
+                  name
+                  disabled
+                  type
+                  decorations {
+                    ...decorationContent
+                  }
+                  creation {
+                    time
+                  }
+                  links {
+                    _page
+                    _enable
+                    _disable
+                    _delete
+                    _unfavourite
+                    _favourite
                   }
                 }
               }
