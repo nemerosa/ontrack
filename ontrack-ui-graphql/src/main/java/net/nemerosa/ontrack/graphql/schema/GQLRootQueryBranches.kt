@@ -64,7 +64,7 @@ class GQLRootQueryBranches(
             val projectName: String? = environment.getArgument("project")
             val name: String? = environment.getArgument("name")
             val favourite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
-            val propertyFilterArg: GQLInputPropertyFilter? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
+            val propertyFilterArg: Any? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
             // Per ID
             if (id != null) {
                 checkArgList(environment, "id")
