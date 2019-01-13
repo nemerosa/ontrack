@@ -64,7 +64,7 @@ class JIRAClientImplTest {
         assert issue.links == [
                 new JIRALink(
                         'PRJ-900',
-                        'https://jira/rest/api/2/issue/10702',
+                        'https://jira/browse/PRJ-10702',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'is blocked by'
@@ -92,7 +92,7 @@ class JIRAClientImplTest {
         assert issue.links == [
                 new JIRALink(
                         'PRJ-900',
-                        'https://jira/rest/api/2/issue/10702',
+                        'https://jira/browse/PRJ-900',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'blocks'
@@ -120,14 +120,14 @@ class JIRAClientImplTest {
         assert issue.links == [
                 new JIRALink(
                         'PRJ-900',
-                        'https://jira/rest/api/2/issue/10702',
+                        'https://jira/browse/PRJ-900',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'blocks'
                 ),
                 new JIRALink(
                         'PRJ-901',
-                        'https://jira/rest/api/2/issue/10703',
+                        'https://jira/browse/PRJ-901',
                         new JIRAStatus('Open', 'http://jira/images/icons/statuses/open.png'),
                         'Blocks',
                         'is blocked by'
