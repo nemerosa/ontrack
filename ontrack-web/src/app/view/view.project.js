@@ -288,6 +288,20 @@ angular.module('ot.view.project', [
             }
         };
 
+        // Sets a branch as favourite
+        $scope.branchFavourite = function (branch) {
+            if (branch.links._favourite) {
+                ot.pageCall($http.put(branch.links._favourite)).then(loadProject);
+            }
+        };
+
+        // Unsets a branch as favourite
+        $scope.branchUnfavourite = function (branch) {
+            if (branch.links._unfavourite) {
+                ot.pageCall($http.put(branch.links._unfavourite)).then(loadProject);
+            }
+        };
+
         // Enabling a branch
         $scope.enableBranch = function (branch) {
             if (branch.links._enable) {
