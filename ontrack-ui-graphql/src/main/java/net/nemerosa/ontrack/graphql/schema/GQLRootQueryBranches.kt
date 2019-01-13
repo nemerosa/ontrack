@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLInt
-import graphql.Scalars.GraphQLString
+import graphql.Scalars.*
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition
@@ -9,19 +8,19 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.checkArgList
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
+
+const val GRAPHQL_BRANCHES_FAVORITE_ARG = "favourite"
 
 @Component
 class GQLRootQueryBranches(
         private val structureService: StructureService,
         private val branch: GQLTypeBranch,
-        private val propertyFilter: GQLInputPropertyFilter
+        private val propertyFilter: GQLInputPropertyFilter,
+        private val branchFavouriteService: BranchFavouriteService
 ) : GQLRootQuery {
 
     override fun getFieldDefinition(): GraphQLFieldDefinition {
@@ -49,6 +48,11 @@ class GQLRootQueryBranches(
                                 .type(GraphQLString)
                                 .build()
                 )
+                .argument {
+                    it.name(GRAPHQL_BRANCHES_FAVORITE_ARG)
+                            .description("Keeps only branches listed as favourute")
+                            .type(GraphQLBoolean)
+                }
                 .argument(propertyFilter.asArgument())
                 .dataFetcher(branchFetcher())
                 .build()
@@ -59,6 +63,7 @@ class GQLRootQueryBranches(
             val id: Int? = environment.getArgument("id")
             val projectName: String? = environment.getArgument("project")
             val name: String? = environment.getArgument("name")
+            val favourite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
             val propertyFilterArg: GQLInputPropertyFilter? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
             // Per ID
             if (id != null) {
@@ -77,6 +82,9 @@ class GQLRootQueryBranches(
                 if (isNotBlank(name)) {
                     val pattern = Pattern.compile(name)
                     branchFilter = branchFilter.and { b -> pattern.matcher(b.name).matches() }
+                }
+                if (favourite != null && favourite) {
+                    branchFilter = branchFilter and { branchFavouriteService.isBranchFavourite(it) }
                 }
 
                 // Property filter?
