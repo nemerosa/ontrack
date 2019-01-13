@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLArgument.newArgument
@@ -23,7 +24,8 @@ class GQLTypeProject(
         private val branch: GQLTypeBranch,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val projectEntityInterface: GQLProjectEntityInterface,
-        private val label: GQLTypeLabel
+        private val label: GQLTypeLabel,
+        private val branchFavouriteService: BranchFavouriteService
 ) : AbstractGQLProjectEntity<Project>(
         Project::class.java,
         ProjectEntityType.PROJECT,
@@ -53,6 +55,11 @@ class GQLTypeProject(
                                                 .type(GraphQLString)
                                                 .build()
                                 )
+                                .argument {
+                                    it.name(GRAPHQL_BRANCHES_FAVORITE_ARG)
+                                            .description("Gets only favorite branches")
+                                            .type(GraphQLBoolean)
+                                }
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
@@ -76,6 +83,7 @@ class GQLTypeProject(
             val source = environment.getSource<Any>()
             if (source is Project) {
                 val name: String? = environment.getArgument<String>("name")
+                val favorite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
                 // Combined filter
                 var filter: (Branch) -> Boolean = { true }
                 // Name criteria
@@ -83,6 +91,11 @@ class GQLTypeProject(
                     val nameFilter = Pattern.compile(name)
                     filter = filter.and { branch -> nameFilter.matcher(branch.name).matches() }
                 }
+                // Favourite
+                if (favorite != null && favorite) {
+                    filter = filter and { branchFavouriteService.isBranchFavourite(it) }
+                }
+                // Result
                 structureService
                         .getBranchesForProject(source.id)
                         .filter(filter)
