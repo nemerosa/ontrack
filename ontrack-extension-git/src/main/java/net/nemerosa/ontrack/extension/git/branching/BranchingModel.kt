@@ -45,7 +45,12 @@ class BranchingModel(
                 branches.filter { pattern.matches(it) }
             }
 
+    /**
+     * Checks if the given branch matches at least one pattern in the model.
+     */
     fun matches(branchName: String): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return patterns.values.any {
+            it.toRegex().matches(branchName)
+        }
     }
 }

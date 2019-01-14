@@ -14,7 +14,7 @@ class BranchModelMatcherServiceImpl(
     override fun getBranchModelMatcher(project: Project): BranchModelMatcher? {
         return branchModelMatcherProviders
                 .mapNotNull { it.getBranchModelMatcher(project) }
-                .reduce { acc, m -> acc and m }
+                .fold(null as BranchModelMatcher?) { acc, m -> m and acc }
     }
 
 }
