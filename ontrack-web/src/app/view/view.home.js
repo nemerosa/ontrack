@@ -135,7 +135,7 @@ angular.module('ot.view.home', [
                 links {
                   _unfavourite
                 }
-                branches {
+                branches(useModel: true) {
                   id
                   name
                   type
