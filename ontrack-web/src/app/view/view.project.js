@@ -19,7 +19,9 @@ angular.module('ot.view.project', [
         // Project's id
         const projectId = $stateParams.projectId;
         // Initial name filter
-        $scope.branchNameFilter = '';
+        $scope.branchFilter = {
+            name: ""
+        };
 
         // Loading the project and its whole information
         function loadProject() {
