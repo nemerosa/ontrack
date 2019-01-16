@@ -120,3 +120,40 @@ build.validateWithData(
 ----
 
 NOTE: The actual validation data type is taken from the validation stamp.
+
+[[validation-runs-data-metrics]]
+===== Run data metrics
+
+While the validation run data is available from Ontrack, it can also be exported to
+other databases.
+
+As of today, only InfluxDB is supported.
+
+[NOTE]
+====
+InfluxDB connector must be enabled - see <<monitoring-metrics-influxdb>>.
+====
+
+In order to export Ontrack validation as points into an InfluxDB database,
+following elements must be configured:
+
+|===
+| Property | Environment variable | Default | Description
+
+| `ontrack.influxdb.validation-data`
+| `ONTRACK_INFLUXDB_VALIDATION_DATA`
+| `true`
+| If `true`, the validation run data is exported to InfluxDB (`true` by default)
+
+|===
+
+Each point contains the following information:
+
+* name: `ontrack_value_validation_data`
+* tag `project` - name of the project
+* tag `branch` - name of the branch
+* tag `build` - name of the build
+* tag `validation` - name of the validation
+* tag `status` - status of the validation
+* tag `type` - FQCN of the <<extending-validation-data,validation data type>>
+* field values depend on the type of data

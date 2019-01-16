@@ -168,4 +168,4 @@ When an InfluxDB connector is correctly set, some Ontrack information
 is automatically sent to create timed values:
 
 * <<run-info-export-influxdb,run info>>
-* validation run data
+* <<validation-runs-data-metrics,validation run data>>
