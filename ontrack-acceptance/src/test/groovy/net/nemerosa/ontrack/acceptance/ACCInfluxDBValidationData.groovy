@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.TestSummary
 import org.influxdb.InfluxDBFactory
 import org.influxdb.annotation.Column
@@ -13,6 +14,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 /**
  * Checks that validation run data is sent to InfluxDB
  */
+@AcceptanceTestSuite
 class ACCInfluxDBValidationData extends AcceptanceTestClient {
 
     @Test
