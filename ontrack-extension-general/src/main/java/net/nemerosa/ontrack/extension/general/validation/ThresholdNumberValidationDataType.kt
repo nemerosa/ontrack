@@ -44,4 +44,7 @@ class ThresholdNumberValidationDataType(
 
     override val displayName = "Numeric data"
 
+    override fun getMetrics(data: Int): Map<String, *>? {
+        return mapOf("value" to data)
+    }
 }

@@ -51,4 +51,11 @@ class FractionValidationDataType(
             }
 
     override val displayName = "Fraction"
+
+    override fun getMetrics(data: FractionValidationData): Map<String, *>? {
+        return mapOf(
+                "numerator" to data.numerator,
+                "denominator" to data.denominator
+        )
+    }
 }

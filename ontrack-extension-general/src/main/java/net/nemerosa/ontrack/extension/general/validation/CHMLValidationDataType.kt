@@ -129,6 +129,15 @@ class CHMLValidationDataType(
                     }
                 }
             }
+
+    override fun getMetrics(data: CHMLValidationDataTypeData): Map<String, *>? {
+        return mapOf(
+                "critical" to (data.levels[CHML.CRITICAL] ?: 0),
+                "high" to (data.levels[CHML.HIGH] ?: 0),
+                "medium" to (data.levels[CHML.MEDIUM] ?: 0),
+                "low" to (data.levels[CHML.LOW] ?: 0)
+        )
+    }
 }
 
 data class CHMLValidationDataTypeData(

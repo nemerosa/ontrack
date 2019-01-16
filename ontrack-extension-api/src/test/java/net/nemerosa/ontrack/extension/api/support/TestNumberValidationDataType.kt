@@ -93,4 +93,8 @@ class TestNumberValidationDataType(
             }
 
     override val displayName = "Number with threshold"
+
+    override fun getMetrics(data: Int): Map<String, *>? {
+        return mapOf("value" to data)
+    }
 }
