@@ -57,11 +57,9 @@ As of today, only InfluxDB is supported.
 [[run-info-export-influxdb]]
 ==== Exporting the run info to InfluxDB
 
-[WARNING]
+[NOTE]
 ====
-This is an experimental feature. In the future, especially when migrating
-to Spring Boot 2.0, the configuration might change. The feature is very likely
-to stay though.
+InfluxDB connector must be enabled - see <<monitoring-metrics-influxdb>>.
 ====
 
 In order to export Ontrack run info as points into an InfluxDB database,
@@ -69,42 +67,6 @@ following elements must be configured:
 
 |===
 | Property | Environment variable | Default | Description
-
-| `ontrack.influxdb.enabled`
-| `ONTRACK_INFLUXDB_ENABLED`
-| `false`
-| Enables the export of run info to InfluxDB
-
-| `ontrack.influxdb.uri`
-| `ONTRACK_INFLUXDB_URI`
-| "http://localhost:8086"
-| URI of the InfluxDB database
-
-| `ontrack.influxdb.username`
-| `ONTRACK_INFLUXDB_USERNAME`
-| "root"
-| User name to connect to the InfluxDB database
-
-| `ontrack.influxdb.password`
-| `ONTRACK_INFLUXDB_PASSWORD`
-| "root"
-| Password to connect to the InfluxDB database
-
-| `ontrack.influxdb.db`
-| `ONTRACK_INFLUXDB_DB`
-| "ontrack"
-| Name of the InfluxDB database
-
-| `ontrack.influxdb.create`
-| `ONTRACK_INFLUXDB_CREATE`
-| `true`
-| If `true`, the database is created at startup
-
-| `ontrack.influxdb.ssl.host-check`
-| `ONTRACK_INFLUXDB_SSL_HOST_CHECK`
-| `true`
-| If `false`, disables host checking for certificates. *This should not be
-  used for a production system!*
 
 | `ontrack.influxdb.run-info`
 | `ONTRACK_INFLUXDB_RUN_INFO`

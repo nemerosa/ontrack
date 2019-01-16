@@ -104,3 +104,68 @@ Run information:
   and `status` tags.
 
 More details at <<run-info>>.
+
+[[monitoring-metrics-influxdb]]
+===== InfluxDB metrics
+
+[WARNING]
+====
+This is an experimental feature. In the future, especially when migrating
+to Spring Boot 2.0, the configuration might change. The feature is very likely
+to stay though.
+====
+
+The InfluxDB <<extending,extension>> is shipped by default with Ontrack
+but is activated only if some properties are correctly set:
+
+|===
+| Property | Environment variable | Default | Description
+
+| `ontrack.influxdb.enabled`
+| `ONTRACK_INFLUXDB_ENABLED`
+| `false`
+| Enables the export of run info to InfluxDB
+
+| `ontrack.influxdb.uri`
+| `ONTRACK_INFLUXDB_URI`
+| "http://localhost:8086"
+| URI of the InfluxDB database
+|===
+
+Optionally, the following properties can also be set:
+
+|===
+| Property | Environment variable | Default | Description
+
+| `ontrack.influxdb.username`
+| `ONTRACK_INFLUXDB_USERNAME`
+| "root"
+| User name to connect to the InfluxDB database
+
+| `ontrack.influxdb.password`
+| `ONTRACK_INFLUXDB_PASSWORD`
+| "root"
+| Password to connect to the InfluxDB database
+
+| `ontrack.influxdb.db`
+| `ONTRACK_INFLUXDB_DB`
+| "ontrack"
+| Name of the InfluxDB database
+
+| `ontrack.influxdb.create`
+| `ONTRACK_INFLUXDB_CREATE`
+| `true`
+| If `true`, the database is created at startup
+
+| `ontrack.influxdb.ssl.host-check`
+| `ONTRACK_INFLUXDB_SSL_HOST_CHECK`
+| `true`
+| If `false`, disables host checking for certificates. *This should not be
+  used for a production system!*
+|===
+
+When an InfluxDB connector is correctly set, some Ontrack information
+is automatically sent to create timed values:
+
+* <<run-info-export-influxdb,run info>>
+* validation run data
