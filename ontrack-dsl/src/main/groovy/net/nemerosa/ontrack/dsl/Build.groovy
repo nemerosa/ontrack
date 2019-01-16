@@ -143,6 +143,19 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod(count = 4, value = """Associates some test results with the validation.""")
+    ValidationRun validateWithTestSummary(String validationStamp, TestSummary testSummary, String status = null) {
+        return validateWithData(
+                validationStamp, [
+                passed : testSummary.passed,
+                skipped: testSummary.skipped,
+                failed : testSummary.failed,
+        ],
+                'net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType',
+                status
+        )
+    }
+
     @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {
