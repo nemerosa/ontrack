@@ -156,4 +156,16 @@ class ValidationStamp extends AbstractProjectResource {
                 ]
         )
     }
+
+    @DSLMethod(value = "Sets the data type for this validation stamp to 'TestSummary'.", count = 1)
+    def setTestSummaryDataType(
+            boolean warningIfSkipped = false
+    ) {
+        setDataType(
+                "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType",
+                [
+                        warningIfSkipped: warningIfSkipped,
+                ]
+        )
+    }
 }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.influxdb.InfluxDBFactory
 import org.influxdb.annotation.Column
 import org.influxdb.annotation.Measurement
@@ -9,6 +10,7 @@ import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
+@AcceptanceTestSuite
 class ACCInfluxDBRunInfo extends AcceptanceTestClient {
 
     @Test

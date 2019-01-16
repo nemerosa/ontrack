@@ -82,6 +82,17 @@ class TestSummaryValidationDataType(
 
     override fun computeStatus(config: TestSummaryValidationConfig?, data: TestSummaryValidationData): ValidationRunStatusID? {
         return config?.computeStatus(data)
+
+
+    }
+
+    override fun getMetrics(data: TestSummaryValidationData): Map<String, *>? {
+        return mapOf(
+                "passed" to data.passed,
+                "skipped" to data.skipped,
+                "failed" to data.failed,
+                "total" to data.total
+        )
     }
 
 }

@@ -17,9 +17,9 @@ import org.springframework.stereotype.Component
  * Data
  */
 data class TestValidationData(
-        val critical: Int,
-        val high: Int,
-        val medium: Int
+        val critical: Int = 0,
+        val high: Int = 0,
+        val medium: Int = 0
 )
 
 /**
@@ -91,4 +91,11 @@ class TestValidationDataType(
 
     override val displayName = "Test validation data"
 
+    override fun getMetrics(data: TestValidationData): Map<String, *>? {
+        return mapOf(
+                "critical" to data.critical,
+                "high" to data.high,
+                "medium" to data.medium
+        )
+    }
 }
