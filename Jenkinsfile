@@ -108,7 +108,6 @@ git clean -xfd
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx4096m \\
     --stacktrace \\
-    --info \\
     --profile \\
     --parallel \\
     --console plain
