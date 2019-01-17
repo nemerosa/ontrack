@@ -1096,7 +1096,6 @@ class StructureServiceImpl(
         eventPostService.post(eventFactory.newValidationRun(newValidationRun))
         // Metrics
         publishValidationRunMetrics(newValidationRun)
-        extensionManager.getExtensions(ValidationRunMetricsExtension::class.java).forEach { it.onValidationRun(newValidationRun) }
         // Saves the properties
         for ((propertyTypeName, propertyData) in validationRunRequest.properties) {
             propertyService.editProperty(
