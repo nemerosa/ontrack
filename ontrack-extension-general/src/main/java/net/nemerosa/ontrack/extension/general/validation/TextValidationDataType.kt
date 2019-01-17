@@ -47,4 +47,6 @@ class TextValidationDataType(
     }
 
     override val displayName = "Free text"
+
+    override fun getMetrics(data: String): Map<String, *>? = null
 }

@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
+import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
@@ -26,6 +27,7 @@ import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.apache.commons.lang3.Validate
+import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,6 +54,8 @@ class StructureServiceImpl(
         private val decorationService: DecorationService,
         private val projectFavouriteService: ProjectFavouriteService
 ) : StructureService {
+
+    private val logger = LoggerFactory.getLogger(StructureService::class.java)
 
     override val projectStatusViews: List<ProjectStatusView>
         get() = projectList
@@ -1090,6 +1094,8 @@ class StructureServiceImpl(
         val newValidationRun = structureRepository.newValidationRun(validationRun) { validationRunStatusService.getValidationRunStatus(it) }
         // Event
         eventPostService.post(eventFactory.newValidationRun(newValidationRun))
+        // Metrics
+        publishValidationRunMetrics(newValidationRun)
         // Saves the properties
         for ((propertyTypeName, propertyData) in validationRunRequest.properties) {
             propertyService.editProperty(
@@ -1100,6 +1106,14 @@ class StructureServiceImpl(
         }
         // OK
         return newValidationRun
+    }
+
+    private fun publishValidationRunMetrics(validationRun: ValidationRun) {
+        try {
+            extensionManager.getExtensions(ValidationRunMetricsExtension::class.java).forEach { it.onValidationRun(validationRun) }
+        } catch (ex: Exception) {
+            logger.error("Cannot publish metrics for ${validationRun.entityDisplayName}", ex)
+        }
     }
 
     override fun getValidationRun(validationRunId: ID): ValidationRun {
