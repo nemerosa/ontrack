@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.model.structure.BranchModelMatcher
-import net.nemerosa.ontrack.model.structure.BranchModelMatcherProvider
-import net.nemerosa.ontrack.model.structure.BranchModelMatcherService
-import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
