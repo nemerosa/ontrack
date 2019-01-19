@@ -616,68 +616,6 @@ set -e
                 }
             }
         }
-
-        // Site
-
-        stage('Site') {
-            agent {
-                dockerfile {
-                    label "docker"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
-            environment {
-                ONTRACK_VERSION = "${version}"
-                GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
-            }
-            when {
-                branch 'release/*'
-            }
-            steps {
-                echo "Release"
-
-                unstash name: "delivery"
-                sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
-
-                sh '''\
-#!/bin/bash
-set -e
-
-GITHUB_URI=`git config remote.origin.url`
-
-./gradlew \\
-    --build-file site.gradle \\
-    --info \\
-    --profile \\
-    --console plain \\
-    --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION} \\
-    -PontrackGitHubUri=${GITHUB_URI} \\
-    -PontrackGitHubPages=gh-pages \\
-    -PontrackGitHubUser=${GITHUB_USR} \\
-    -PontrackGitHubPassword=${GITHUB_PSW} \\
-    site
-'''
-
-            }
-            post {
-                success {
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'SITE',
-                            buildResult: currentBuild.result,
-                    )
-                }
-            }
-        }
-
     }
 
 }
