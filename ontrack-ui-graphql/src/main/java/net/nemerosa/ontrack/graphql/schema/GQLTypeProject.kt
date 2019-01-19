@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLArgument.newArgument
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component
 import java.util.*
 import java.util.regex.Pattern
 
+const val GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG = "useModel"
+
 @Component
 class GQLTypeProject(
         private val structureService: StructureService,
@@ -23,7 +26,9 @@ class GQLTypeProject(
         private val branch: GQLTypeBranch,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val projectEntityInterface: GQLProjectEntityInterface,
-        private val label: GQLTypeLabel
+        private val label: GQLTypeLabel,
+        private val branchFavouriteService: BranchFavouriteService,
+        private val branchModelMatcherService: BranchModelMatcherService
 ) : AbstractGQLProjectEntity<Project>(
         Project::class.java,
         ProjectEntityType.PROJECT,
@@ -53,6 +58,16 @@ class GQLTypeProject(
                                                 .type(GraphQLString)
                                                 .build()
                                 )
+                                .argument {
+                                    it.name(GRAPHQL_BRANCHES_FAVORITE_ARG)
+                                            .description("Gets only favorite branches")
+                                            .type(GraphQLBoolean)
+                                }
+                                .argument {
+                                    it.name(GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG)
+                                            .description("If set to true, filter on branch matching the project's branching model")
+                                            .type(GraphQLBoolean)
+                                }
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
@@ -76,6 +91,8 @@ class GQLTypeProject(
             val source = environment.getSource<Any>()
             if (source is Project) {
                 val name: String? = environment.getArgument<String>("name")
+                val favorite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
+                val useModel: Boolean? = environment.getArgument(GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG)
                 // Combined filter
                 var filter: (Branch) -> Boolean = { true }
                 // Name criteria
@@ -83,6 +100,18 @@ class GQLTypeProject(
                     val nameFilter = Pattern.compile(name)
                     filter = filter.and { branch -> nameFilter.matcher(branch.name).matches() }
                 }
+                // Favourite
+                if (favorite != null && favorite) {
+                    filter = filter and { branchFavouriteService.isBranchFavourite(it) }
+                }
+                // Matching the branching model
+                if (useModel != null && useModel) {
+                    val branchModelMatcher = branchModelMatcherService.getBranchModelMatcher(source)
+                    if (branchModelMatcher != null) {
+                        filter = filter and { branchModelMatcher.matches(it) }
+                    }
+                }
+                // Result
                 structureService
                         .getBranchesForProject(source.id)
                         .filter(filter)

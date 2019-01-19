@@ -1,4 +1,6 @@
 [[projects]]
 === Managing projects
 
+include::usage-project-favorites.adoc[]
+
 include::usage-labels.adoc[]

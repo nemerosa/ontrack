@@ -44,4 +44,13 @@ class BranchingModel(
                 val pattern = regex.toRegex()
                 branches.filter { pattern.matches(it) }
             }
+
+    /**
+     * Checks if the given branch matches at least one pattern in the model.
+     */
+    fun matches(branchName: String): Boolean {
+        return patterns.values.any {
+            it.toRegex().matches(branchName)
+        }
+    }
 }

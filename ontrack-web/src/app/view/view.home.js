@@ -56,7 +56,52 @@ angular.module('ot.view.home', [
                     _update
                     _delete
                 }
-              } 
+              }
+              favouriteBranches: branches(favourite: true) {
+                project {
+                  name
+                  links {
+                    _page
+                  }
+                }
+                id
+                name
+                disabled
+                type
+                decorations {
+                  ...decorationContent
+                }
+                creation {
+                  time
+                }
+                links {
+                  _page
+                  _enable
+                  _disable
+                  _delete
+                  _unfavourite
+                  _favourite
+                }
+                latestBuild: builds(count: 1) {
+                  id
+                  name
+                  creation {
+                      time
+                  }
+                }
+                promotionLevels {
+                  id
+                  name
+                  image
+                  _image
+                  promotionRuns(first: 1) {
+                    build {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
               projects {
                 id
                 name
@@ -90,7 +135,7 @@ angular.module('ot.view.home', [
                 links {
                   _unfavourite
                 }
-                branches {
+                branches(useModel: true) {
                   id
                   name
                   type
@@ -130,6 +175,7 @@ angular.module('ot.view.home', [
 
                 $scope.projectsData = data;
                 $scope.projectFavourites = data.projectFavourites;
+                $scope.favouriteBranches = data.favouriteBranches;
 
                 preloadLabelFilter();
 
@@ -203,6 +249,20 @@ angular.module('ot.view.home', [
         $scope.projectUnfavourite = function (project) {
             if (project.links._unfavourite) {
                 ot.pageCall($http.put(project.links._unfavourite)).then(loadProjects);
+            }
+        };
+
+        // Sets a branch as favourite
+        $scope.branchFavourite = function (branch) {
+            if (branch.links._favourite) {
+                ot.pageCall($http.put(branch.links._favourite)).then(loadProjects);
+            }
+        };
+
+        // Unsets a branch as favourite
+        $scope.branchUnfavourite = function (branch) {
+            if (branch.links._unfavourite) {
+                ot.pageCall($http.put(branch.links._unfavourite)).then(loadProjects);
             }
         };
 
