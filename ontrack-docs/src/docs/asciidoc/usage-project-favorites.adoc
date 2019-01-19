@@ -41,3 +41,9 @@ Note that you also unselect a project as favorite from the list of
 favorite projects:
 
 image::images/project-favorite-unselection.png[Project favorite unselection,600]
+
+[NOTE]
+====
+Branches of a project can also be selected as favorite - see
+<<branches-favorites>>.
+====
