@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +24,11 @@ import java.util.function.Predicate;
 
 @Repository
 public class PropertyJdbcRepository extends AbstractJdbcRepository implements PropertyRepository {
+
+    /**
+     * Maximum length for the search key
+     */
+    private static final int SEARCH_KEY_MAX_WIDTH = 600;
 
     @Autowired
     public PropertyJdbcRepository(DataSource dataSource) {
@@ -58,7 +64,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         // Data parameters
         params
                 .addValue("json", writeJson(data))
-                .addValue("searchKey", searchKey);
+                .addValue("searchKey", StringUtils.truncate(searchKey, SEARCH_KEY_MAX_WIDTH));
         // Update
         if (propertyId != null) {
             getNamedParameterJdbcTemplate().update(
