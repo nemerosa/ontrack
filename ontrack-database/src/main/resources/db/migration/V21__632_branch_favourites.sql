@@ -1,4 +1,4 @@
--- 20. Branch favourites (#632)
+-- 21. Branch favourites (#632)
 
 CREATE TABLE BRANCH_FAVOURITES (
   ID        SERIAL  NOT NULL,
