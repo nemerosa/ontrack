@@ -440,21 +440,24 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         );
         MapSqlParameterSource params = params("branchId", branch.id())
                 .addValue("propertyType", propertyTypeName);
-        // Gets the property type
-        PropertyType<?> propertyType = propertyTypeAccessor.apply(propertyTypeName);
-        // Gets the search arguments
-        PropertySearchArguments searchArguments = propertyType.getSearchArguments(propertyValue);
-        // If defined use them
-        if (searchArguments != null && searchArguments.isDefined()) {
-            prepareQueryForPropertyValue(
-                    searchArguments,
-                    tables,
-                    criteria,
-                    params
-            );
-        } else {
-            // No match
-            return null;
+
+        if (StringUtils.isNotBlank(propertyValue)) {
+            // Gets the property type
+            PropertyType<?> propertyType = propertyTypeAccessor.apply(propertyTypeName);
+            // Gets the search arguments for a property value
+            PropertySearchArguments searchArguments = propertyType.getSearchArguments(propertyValue);
+            // If defined use them
+            if (searchArguments != null && searchArguments.isDefined()) {
+                prepareQueryForPropertyValue(
+                        searchArguments,
+                        tables,
+                        criteria,
+                        params
+                );
+            } else {
+                // No match
+                return null;
+            }
         }
 
         // Build ID

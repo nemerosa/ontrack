@@ -711,7 +711,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         // Filter
         BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
                 .withWithProperty(TestSimplePropertyType.class.getName())
-                .withWithPropertyValue("an.*")
+                .withWithPropertyValue("an")
                 .build();
         // Filtering
         List<Build> builds = filter.filterBranchBuilds(branch);
@@ -767,7 +767,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         // Filter
         BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
                 .withSinceProperty(TestSimplePropertyType.class.getName())
-                .withSincePropertyValue("an.*")
+                .withSincePropertyValue("an")
                 .build();
         // Filtering
         List<Build> builds = filter.filterBranchBuilds(branch);
