@@ -12,9 +12,6 @@ import kotlin.test.assertNull
 
 class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
 
-    @Autowired
-    private lateinit var buildFilterService: BuildFilterService
-
     @Test
     fun `Filter validation for since promotion field`() {
         project {

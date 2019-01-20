@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.*
@@ -84,10 +85,60 @@ class MetaInfoPropertyType(
                             MetaInfoPropertyItem(
                                     item.name,
                                     replacementFunction.apply(item.value),
-                                    replacementFunction.apply(item.link),
-                                    replacementFunction.apply(item.category)
+                                    item.link?.apply { replacementFunction.apply(this) },
+                                    item.category?.apply { replacementFunction.apply(this) }
                             )
                         }
         )
+    }
+
+    override fun getSearchArguments(token: String): PropertySearchArguments? {
+        val name: String?
+        val value: String?
+        if (token.indexOf(":") >= 1) {
+            name = token.substringBefore(":").trim()
+            value = token.substringAfter(":").trimStart()
+        } else {
+            name = null
+            value = token
+        }
+        return if (name.isNullOrBlank()) {
+            if (value.isNullOrBlank()) {
+                // Empty
+                null
+            } else {
+                // Value only
+                PropertySearchArguments(
+                        jsonContext = "jsonb_array_elements(json->'items') as item",
+                        jsonCriteria = "item->>'value' like :value",
+                        criteriaParams = mapOf(
+                                "value" to value.toValuePattern()
+                        )
+                )
+            }
+        } else if (value.isNullOrBlank()) {
+            // Name only
+            PropertySearchArguments(
+                    jsonContext = "jsonb_array_elements(json->'items') as item",
+                    jsonCriteria = "item->>'name' = :name",
+                    criteriaParams = mapOf(
+                            "name" to name
+                    )
+            )
+        } else {
+            // Name & value
+            PropertySearchArguments(
+                    jsonContext = "jsonb_array_elements(pp.json->'items') as item",
+                    jsonCriteria = "item->>'name' = :name and item->>'value' like :value",
+                    criteriaParams = mapOf(
+                            "name" to name,
+                            "value" to value.toValuePattern()
+                    )
+            )
+        }
+    }
+
+    private fun String.toValuePattern(): String {
+        return this.replace("*", "%")
     }
 }
