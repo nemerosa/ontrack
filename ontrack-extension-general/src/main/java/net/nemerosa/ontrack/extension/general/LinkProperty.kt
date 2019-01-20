@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.support.NameValue
 
-class LinkProperty(
+data class LinkProperty(
         val links: List<NameValue>
 ) {
 
