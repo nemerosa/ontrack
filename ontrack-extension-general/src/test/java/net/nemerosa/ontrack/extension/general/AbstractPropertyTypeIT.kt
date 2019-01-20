@@ -6,6 +6,14 @@ import net.nemerosa.ontrack.model.structure.PropertyType
 
 abstract class AbstractPropertyTypeIT : AbstractDSLTestSupport() {
 
+    protected fun ProjectEntity.message(text: String, type: MessageType = MessageType.INFO) {
+        setProperty(
+                this,
+                MessagePropertyType::class.java,
+                MessageProperty(type, text)
+        )
+    }
+
     protected final inline fun <P, reified T : PropertyType<P>> ProjectEntity.setProperty(p: P) {
         setProperty(
                 this,
