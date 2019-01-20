@@ -6,6 +6,18 @@ import net.nemerosa.ontrack.model.structure.PropertyType
 
 abstract class AbstractPropertyTypeIT : AbstractDSLTestSupport() {
 
+    protected fun ProjectEntity.metaInfo(vararg data: Pair<String, String>) {
+        setProperty(
+                this,
+                MetaInfoPropertyType::class.java,
+                MetaInfoProperty(
+                        data.map {
+                            MetaInfoPropertyItem(it.first, it.second, null, null)
+                        }
+                )
+        )
+    }
+
     protected fun ProjectEntity.release(name: String) {
         setProperty(
                 this,

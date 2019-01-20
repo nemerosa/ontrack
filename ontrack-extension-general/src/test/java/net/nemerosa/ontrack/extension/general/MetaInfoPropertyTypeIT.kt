@@ -60,30 +60,52 @@ class MetaInfoPropertyTypeIT : AbstractPropertyTypeIT() {
                 build {}
                 build {}
                 val b1 = build {
-                    setProperty<MetaInfoProperty, MetaInfoPropertyType>(
-                            MetaInfoProperty(
-                                    listOf(
-                                            MetaInfoPropertyItem("java", "1.7", "", ""),
-                                            MetaInfoPropertyItem("boot", "1.5", "", ""),
-                                            MetaInfoPropertyItem("version", "2.0", "", "")
-                                    )
-                            )
+                    metaInfo(
+                            "java" to "1.7",
+                            "boot" to "1.5",
+                            "version" to "2.0"
                     )
                 }
                 val b2 = build {
-                    setProperty<MetaInfoProperty, MetaInfoPropertyType>(
-                            MetaInfoProperty(
-                                    listOf(
-                                            MetaInfoPropertyItem("java", "1.8", "", ""),
-                                            MetaInfoPropertyItem("kotlin", "1.2", "", ""),
-                                            MetaInfoPropertyItem("boot", "1.5", "", ""),
-                                            MetaInfoPropertyItem("version", "2.1", "", "")
-                                    )
-                            )
+                    metaInfo(
+                            "java" to "1.8",
+                            "kotlin" to "1.2",
+                            "boot" to "1.5",
+                            "version" to "2.1"
                     )
                 }
 
                 this@branch.test(b1, b2)
+            }
+        }
+    }
+
+    @Test
+    fun `Since meta info`() {
+        project {
+            branch branch@{
+                build {}
+                build {}
+                val build1 = build {
+                    metaInfo(
+                            "java" to "1.7"
+                    )
+                }
+                val build2 = build {}
+                val build3 = build {
+                    metaInfo(
+                            "java" to "1.8"
+                    )
+                }
+
+                assertBuildSearch {
+                    it.withSinceProperty(MetaInfoPropertyType::class.java.name)
+                } returns build3
+
+                assertBuildSearch {
+                    it.withSinceProperty(MetaInfoPropertyType::class.java.name)
+                            .withSincePropertyValue("1.7")
+                } returns listOf(build3, build2, build1)
             }
         }
     }
