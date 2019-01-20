@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.general;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Memo;
@@ -10,9 +11,11 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Describable;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
@@ -98,6 +101,16 @@ public class MessagePropertyType extends AbstractPropertyType<MessageProperty> {
         return new MessageProperty(
                 value.getType(),
                 replacementFunction.apply(value.getText())
+        );
+    }
+
+    @Nullable
+    @Override
+    public PropertySearchArguments getSearchArguments(String token) {
+        return new PropertySearchArguments(
+                null,
+                "pp.json->>'text' like :text",
+                ImmutableMap.of("text", "%" + token + "%")
         );
     }
 }
