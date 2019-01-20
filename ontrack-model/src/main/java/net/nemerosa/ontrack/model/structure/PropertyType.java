@@ -101,9 +101,13 @@ public interface PropertyType<T> extends Extension {
      *
      * @param value Value to index
      * @return Index value
+     *
+     * @deprecated The search key is no longer used and will be deleted in next release
      */
     @Deprecated
-    String getSearchKey(T value);
+    default String getSearchKey(T value) {
+        return "";
+    }
 
     /**
      * Replaces a value by another one by transforming each string of the value into another one.
