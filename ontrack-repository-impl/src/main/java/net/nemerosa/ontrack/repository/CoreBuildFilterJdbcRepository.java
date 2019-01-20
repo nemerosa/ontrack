@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -157,7 +156,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
                 PropertySearchArguments searchArguments = propertyType.getSearchArguments(withPropertyValue);
                 // If defined use them
                 if (searchArguments != null && searchArguments.isDefined()) {
-                    prepareQueryForPropertyValue(
+                    PropertyJdbcRepository.prepareQueryForPropertyValue(
                             searchArguments,
                             tables,
                             criteria,
@@ -409,25 +408,6 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         return loadBuilds(sql.toString(), params);
     }
 
-    private void prepareQueryForPropertyValue(
-            PropertySearchArguments searchArguments,
-            StringBuilder tables,
-            StringBuilder criteria,
-            MapSqlParameterSource params
-    ) {
-        if (StringUtils.isNotBlank(searchArguments.getJsonContext())) {
-            tables.append(format(" LEFT JOIN %s on true", searchArguments.getJsonContext()));
-        }
-        if (StringUtils.isNotBlank(searchArguments.getJsonCriteria())) {
-            criteria.append(format(" AND %s", searchArguments.getJsonCriteria()));
-            if (searchArguments.getCriteriaParams() != null) {
-                for (Map.Entry<String, ?> entry : searchArguments.getCriteriaParams().entrySet()) {
-                    params.addValue(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
     private Integer findLastBuildWithPropertyValue(Branch branch, String propertyTypeName, String propertyValue, Function<String, PropertyType<?>> propertyTypeAccessor) {
         // SQL
         StringBuilder tables = new StringBuilder("SELECT B.ID " +
@@ -448,7 +428,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
             PropertySearchArguments searchArguments = propertyType.getSearchArguments(propertyValue);
             // If defined use them
             if (searchArguments != null && searchArguments.isDefined()) {
-                prepareQueryForPropertyValue(
+                PropertyJdbcRepository.prepareQueryForPropertyValue(
                         searchArguments,
                         tables,
                         criteria,
