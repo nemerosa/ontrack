@@ -2,9 +2,21 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.PropertyType
+import net.nemerosa.ontrack.model.support.NameValue
 
 abstract class AbstractPropertyTypeIT : AbstractDSLTestSupport() {
+
+    protected fun ProjectEntity.links(vararg data: Pair<String, String>) {
+        setProperty(
+                this,
+                LinkPropertyType::class.java,
+                LinkProperty(
+                        data.map {
+                            NameValue(it.first, it.second)
+                        }
+                )
+        )
+    }
 
     protected fun ProjectEntity.metaInfo(vararg data: Pair<String, String>) {
         setProperty(
@@ -31,14 +43,6 @@ abstract class AbstractPropertyTypeIT : AbstractDSLTestSupport() {
                 this,
                 MessagePropertyType::class.java,
                 MessageProperty(type, text)
-        )
-    }
-
-    protected final inline fun <P, reified T : PropertyType<P>> ProjectEntity.setProperty(p: P) {
-        setProperty(
-                this,
-                T::class.java,
-                p
         )
     }
 
