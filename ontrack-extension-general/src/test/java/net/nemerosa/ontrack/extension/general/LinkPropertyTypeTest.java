@@ -40,9 +40,9 @@ public class LinkPropertyTypeTest {
 
     @Test
     public void replacement() {
-        LinkProperty property = LinkProperty.of("test", "http://wiki/P1");
+        LinkProperty property = LinkProperty.Companion.of("test", "http://wiki/P1");
         assertEquals(
-                LinkProperty.of("test", "http://wiki/P2"),
+                LinkProperty.Companion.of("test", "http://wiki/P2"),
                 type.replaceValue(property, s -> s.replaceAll("P1", "P2"))
         );
     }

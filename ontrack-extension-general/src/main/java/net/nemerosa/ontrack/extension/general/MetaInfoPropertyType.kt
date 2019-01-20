@@ -109,7 +109,7 @@ class MetaInfoPropertyType(
             } else {
                 // Value only
                 PropertySearchArguments(
-                        jsonContext = "jsonb_array_elements(json->'items') as item",
+                        jsonContext = "jsonb_array_elements(pp.json->'items') as item",
                         jsonCriteria = "item->>'value' like :value",
                         criteriaParams = mapOf(
                                 "value" to value.toValuePattern()
@@ -119,7 +119,7 @@ class MetaInfoPropertyType(
         } else if (value.isNullOrBlank()) {
             // Name only
             PropertySearchArguments(
-                    jsonContext = "jsonb_array_elements(json->'items') as item",
+                    jsonContext = "jsonb_array_elements(pp.json->'items') as item",
                     jsonCriteria = "item->>'name' = :name",
                     criteriaParams = mapOf(
                             "name" to name
