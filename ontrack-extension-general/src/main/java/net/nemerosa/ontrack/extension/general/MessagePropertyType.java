@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.Describable;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -112,5 +113,10 @@ public class MessagePropertyType extends AbstractPropertyType<MessageProperty> {
                 "pp.json->>'text' like :text",
                 ImmutableMap.of("text", "%" + token + "%")
         );
+    }
+
+    @Override
+    public boolean containsValue(MessageProperty value, String propertyValue) {
+        return StringUtils.containsIgnoreCase(value.getText(), propertyValue);
     }
 }
