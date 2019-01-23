@@ -255,10 +255,9 @@ class Migration(
                         "  BUILD INTEGER, " +
                         "  PROMOTION_RUN INTEGER, " +
                         "  VALIDATION_RUN INTEGER, " +
-                        "  SEARCHKEY CHARACTER VARYING(200), " +
                         "  JSON JSONB " +
                         ");",
-                "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON::JSONB"
+                "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "JSON::JSONB"
         )
     }
 
