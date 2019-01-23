@@ -34,7 +34,7 @@ class GitRepositoryJdbcHelper(dataSource: DataSource) : AbstractJdbcRepository(d
                 """SELECT b.ID FROM PROPERTIES p
                         INNER JOIN BRANCHES b ON b.ID = p.BRANCH
                         WHERE p.TYPE = :type
-                        AND p.SEARCHKEY = :branch
+                        AND p.JSON->>'branch' = :branch
                         AND b.PROJECTID = :project
                         """,
                 params("type", GitBranchConfigurationPropertyType::class.java.name)
