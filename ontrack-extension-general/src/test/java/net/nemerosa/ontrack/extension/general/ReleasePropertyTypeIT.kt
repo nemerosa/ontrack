@@ -5,6 +5,21 @@ import org.junit.Test
 class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
 
     @Test
+    fun `Case insensitive search on release property`() {
+        project {
+            branch branch@{
+                val build = build {
+                    release("Release one")
+                }
+                assertBuildSearch {
+                    it.withWithProperty(ReleasePropertyType::class.java.name)
+                            .withWithPropertyValue("ONE")
+                } returns build
+            }
+        }
+    }
+
+    @Test
     fun `Search on release property`() {
         project {
             branch branch@{

@@ -67,7 +67,7 @@ class LinkPropertyType(
     override fun getSearchArguments(token: String): PropertySearchArguments? {
         return PropertySearchArguments(
                 jsonContext = "jsonb_array_elements(pp.json->'links') as link",
-                jsonCriteria = "link->>'value' like :value",
+                jsonCriteria = "link->>'value' ilike :value",
                 criteriaParams = mapOf(
                         "value" to "%$token%"
                 )

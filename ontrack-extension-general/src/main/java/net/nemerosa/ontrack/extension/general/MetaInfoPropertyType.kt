@@ -110,7 +110,7 @@ class MetaInfoPropertyType(
                 // Value only
                 PropertySearchArguments(
                         jsonContext = "jsonb_array_elements(pp.json->'items') as item",
-                        jsonCriteria = "item->>'value' like :value",
+                        jsonCriteria = "item->>'value' ilike :value",
                         criteriaParams = mapOf(
                                 "value" to value.toValuePattern()
                         )
@@ -129,7 +129,7 @@ class MetaInfoPropertyType(
             // Name & value
             PropertySearchArguments(
                     jsonContext = "jsonb_array_elements(pp.json->'items') as item",
-                    jsonCriteria = "item->>'name' = :name and item->>'value' like :value",
+                    jsonCriteria = "item->>'name' = :name and item->>'value' ilike :value",
                     criteriaParams = mapOf(
                             "name" to name,
                             "value" to value.toValuePattern()

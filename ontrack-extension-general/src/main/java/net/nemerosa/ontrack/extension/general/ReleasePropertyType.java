@@ -99,7 +99,7 @@ public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
         if (StringUtils.isNotBlank(token) && token.length() > 1) {
             return new PropertySearchArguments(
                     null,
-                    "pp.json->>'name' like :token",
+                    "pp.json->>'name' ilike :token",
                     ImmutableMap.of("token", "%" + token + "%")
             );
         } else {

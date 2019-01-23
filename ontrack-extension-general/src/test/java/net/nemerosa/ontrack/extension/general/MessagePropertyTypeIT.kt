@@ -23,6 +23,23 @@ class MessagePropertyTypeIT : AbstractPropertyTypeIT() {
     }
 
     @Test
+    fun `Case insensitive Search based on message property`() {
+        project {
+            branch branch@{
+                build {}
+                build {}
+                val build = build {
+                    message("Message one")
+                }
+                assertBuildSearch {
+                    it.withWithProperty(MessagePropertyType::class.java.name)
+                            .withWithPropertyValue("ONE")
+                } returns build
+            }
+        }
+    }
+
+    @Test
     fun `Search based on message property`() {
         val prefix = uid("M")
         project {

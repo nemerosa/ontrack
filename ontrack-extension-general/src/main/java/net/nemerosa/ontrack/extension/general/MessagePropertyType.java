@@ -110,7 +110,7 @@ public class MessagePropertyType extends AbstractPropertyType<MessageProperty> {
     public PropertySearchArguments getSearchArguments(String token) {
         return new PropertySearchArguments(
                 null,
-                "pp.json->>'text' like :text",
+                "pp.json->>'text' ilike :text",
                 ImmutableMap.of("text", "%" + token + "%")
         );
     }
