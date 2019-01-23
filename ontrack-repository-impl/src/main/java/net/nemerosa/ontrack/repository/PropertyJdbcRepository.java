@@ -35,7 +35,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         super(dataSource);
     }
 
-    public static void prepareQueryForPropertyValue(
+    static void prepareQueryForPropertyValue(
             PropertySearchArguments searchArguments,
             StringBuilder tables,
             StringBuilder criteria,
@@ -147,7 +147,6 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         );
         StringBuilder criteria = new StringBuilder(
                 "WHERE p.TYPE = :type " +
-                        "AND p.SEARCHKEY = :searchKey " +
                         "AND b.BRANCHID = :branchId"
         );
         MapSqlParameterSource params = params("type", typeName)
