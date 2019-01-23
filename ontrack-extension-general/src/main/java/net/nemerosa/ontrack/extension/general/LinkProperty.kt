@@ -15,5 +15,12 @@ data class LinkProperty(
                     )
             )
         }
+
+        fun of(vararg entries: Pair<String, String>): LinkProperty =
+                LinkProperty(
+                        entries.map {
+                            NameValue(it.first, it.second)
+                        }
+                )
     }
 }

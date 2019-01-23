@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import net.nemerosa.ontrack.model.support.NameValue
+import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.function.Function
@@ -72,4 +73,11 @@ class LinkPropertyType(
                 )
         )
     }
+
+    override fun containsValue(value: LinkProperty, propertyValue: String): Boolean =
+            value.links.map {
+                it.value
+            }.any {
+                StringUtils.containsIgnoreCase(it, propertyValue)
+            }
 }
