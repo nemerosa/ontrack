@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -94,5 +95,10 @@ public class TestSimplePropertyType extends AbstractPropertyType<TestSimplePrope
                         "value", "%" + token + "%"
                 )
         );
+    }
+
+    @Override
+    public boolean containsValue(TestSimpleProperty value, String propertyValue) {
+        return StringUtils.containsIgnoreCase(value.getValue(), propertyValue);
     }
 }
