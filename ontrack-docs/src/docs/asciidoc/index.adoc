@@ -10,7 +10,8 @@ Damien Coraboeuf
 :sectanchors:
 // ========================================================
 :ontrack-version: current
-:spring-boot-version: 1.5.8.RELEASE
+:spring-boot-version: 1.5.18.RELEASE
+:spring-version: 4.3.22.RELEASE
 // ========================================================
 
 include::installation.adoc[]
