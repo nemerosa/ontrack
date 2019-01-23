@@ -88,6 +88,11 @@ public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
         return value;
     }
 
+    @Override
+    public boolean containsValue(ReleaseProperty value, String propertyValue) {
+        return StringUtils.containsIgnoreCase(value.getName(), propertyValue);
+    }
+
     @Nullable
     @Override
     public PropertySearchArguments getSearchArguments(String token) {
