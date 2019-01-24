@@ -267,7 +267,7 @@ class ACCDSL extends AbstractACCDSL {
         def runs = ontrack.build(branch.project, branch.name, '2').promotionRuns
         def run = runs.get(0)
         def deleteLink = run.link('delete')
-        assert deleteLink == "${baseURL}/structure/promotionRuns/${run.id}" as String
+        assert deleteLink == "/structure/promotionRuns/${run.id}" as String
     }
 
     @Test
@@ -1057,8 +1057,8 @@ class ACCDSL extends AbstractACCDSL {
         def build1 = ontrack.build(project, 'test', '1')
         def build2 = ontrack.build(project, 'test', '2')
 
-        def result1 = ["Build ${project}/test/1" as String, "name -> ${value}1" as String, "${baseURL}/#/build/${build1.id}" as String]
-        def result2 = ["Build ${project}/test/2" as String, "name -> ${value}2" as String, "${baseURL}/#/build/${build2.id}" as String]
+        def result1 = ["Build ${project}/test/1" as String, "name -> ${value}1" as String, "/#/build/${build1.id}" as String]
+        def result2 = ["Build ${project}/test/2" as String, "name -> ${value}2" as String, "/#/build/${build2.id}" as String]
 
         assert ontrack.search("name:${value}1").collect { [it.title, it.description, it.page] } == [
                 result1

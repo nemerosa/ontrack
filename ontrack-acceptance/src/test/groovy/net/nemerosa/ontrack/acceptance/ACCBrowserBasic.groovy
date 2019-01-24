@@ -135,7 +135,7 @@ class ACCBrowserBasic extends AcceptanceTestClient {
                 // Gets the link of the page
                 def link = apiPage.apiLink
                 // Checks the link
-                assert link == "${browser.configuration.baseUrl}/structure/projects/${id}"
+                assert link == "/structure/projects/${id}"
             }
         }
     }
