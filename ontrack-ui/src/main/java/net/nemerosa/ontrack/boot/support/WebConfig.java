@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.boot.support;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +15,13 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
+
+    private final Logger logger = LoggerFactory.getLogger(WebConfig.class);
 
     @Autowired
     private URIBuilder uriBuilder;
@@ -26,6 +31,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Autowired
     private List<ResourceModule> resourceModules;
+
+    /**
+     * Logging
+     */
+    @PostConstruct
+    public void log() {
+        logger.info("[web] URI builder = " + uriBuilder.getClass().getName());
+    }
 
     /**
      * Uses the HTTP header for content negociation.
