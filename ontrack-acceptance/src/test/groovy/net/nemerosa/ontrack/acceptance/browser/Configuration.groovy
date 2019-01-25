@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceRunContext
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.firefox.FirefoxProfile
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
@@ -184,7 +185,9 @@ class Configuration {
             FirefoxProfile profile = new FirefoxProfile()
             profile.setPreference("webdriver.log.browser.file", new File(loggingDir, "browser.log").getAbsolutePath())
             profile.setPreference("webdriver.log.browser.level", "all")
-            return new FirefoxDriver(profile)
+            FirefoxOptions options = new FirefoxOptions()
+            options.setProfile(profile)
+            return new FirefoxDriver(options)
         }
     }
 
