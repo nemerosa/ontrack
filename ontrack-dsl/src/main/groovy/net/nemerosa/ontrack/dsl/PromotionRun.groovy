@@ -26,9 +26,4 @@ class PromotionRun extends AbstractProjectResource {
     def getPromotionLevel() {
         node.promotionLevel
     }
-
-    @DSLMethod("Gets the associated promotion level name")
-    def getPromotionLevelName() {
-        node.promotionLevel.name.asText()
-    }
 }

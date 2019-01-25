@@ -659,10 +659,10 @@ class StructureServiceImpl(
         return promotionLevel
     }
 
-    override fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String): PromotionLevel {
+    override fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String?): PromotionLevel {
         if (promotionLevelId != null) {
             return getPromotionLevel(ID.of(promotionLevelId))
-        } else {
+        } else if (promotionLevelName != null) {
             var oPromotionLevel = findPromotionLevelByName(
                     branch.project.name,
                     branch.name,
@@ -691,6 +691,8 @@ class StructureServiceImpl(
                         promotionLevelName
                 )
             }
+        } else {
+            throw PromotionRunRequestException()
         }
     }
 

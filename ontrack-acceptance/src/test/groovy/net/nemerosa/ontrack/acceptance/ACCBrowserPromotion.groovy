@@ -42,7 +42,7 @@ class ACCBrowserPromotion extends AcceptanceTestClient {
         // Checks that the build is actually promoted
         def actualBuild = ontrack.build(projectName, "master", "1")
         def run = actualBuild.promotionRuns.find {
-            it.promotionLevelN$ == "PLATINUM"
+            it.promotionLevel.name == "PLATINUM"
         }
         assert run != null: "Build is promoted"
     }
