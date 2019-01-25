@@ -8,7 +8,7 @@ data class PromotionRunRequest
 constructor(
         val promotionLevelId: Int?,
         val promotionLevelName: String?,
-        val dateTime: LocalDateTime,
+        val dateTime: LocalDateTime?,
         val description: String?,
         val properties: List<PropertyCreationRequest> = emptyList()
 )
