@@ -162,7 +162,7 @@ interface StructureService {
 
     fun newPromotionLevelFromPredefined(branch: Branch, predefinedPromotionLevel: PredefinedPromotionLevel): PromotionLevel
 
-    fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String): PromotionLevel
+    fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String?): PromotionLevel
 
     // Promotion runs
 

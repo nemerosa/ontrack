@@ -24,7 +24,7 @@
           ng-readonly="field.readOnly"></textarea>
 
 <!-- Type selection -->
-<select ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
+<select id="{{field.name}}" ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
         ng-required="field.required"
         ng-options="item[field.itemId] as item[field.itemName] for item in field.items">
     <option value="">&nbsp;</option>
