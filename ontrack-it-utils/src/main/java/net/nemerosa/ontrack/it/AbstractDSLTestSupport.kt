@@ -1,6 +1,10 @@
 package net.nemerosa.ontrack.it
 
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.buildfilter.StandardFilterProviderDataBuilder
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
+import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -9,6 +13,7 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.reflect.KClass
+import kotlin.test.assertEquals
 
 abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
@@ -17,6 +22,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var ontrackConfigProperties: OntrackConfigProperties
+
+    @Autowired
+    protected lateinit var labelManagementService: LabelManagementService
+
+    @Autowired
+    protected lateinit var projectLabelManagementService: ProjectLabelManagementService
+
+    @Autowired
+    protected lateinit var buildFilterService: BuildFilterService
 
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
         val configurationTest = ontrackConfigProperties.isConfigurationTest
@@ -178,6 +192,64 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                             status,
                             description
                     )
+            )
+        }
+    }
+
+    /**
+     * Creates a label
+     */
+    fun label(category: String? = uid("C"), name: String = uid("N")): Label {
+        return asUser().with(LabelManagement::class.java).call {
+            labelManagementService.newLabel(
+                    LabelForm(
+                            category = category,
+                            name = name,
+                            description = null,
+                            color = "#FF0000"
+                    )
+            )
+        }
+    }
+
+    /**
+     * Sets some labels to a project
+     */
+    var Project.labels: List<Label>
+        get() = asUserWithView(this).call {
+            projectLabelManagementService.getLabelsForProject(this)
+        }
+        set(value) {
+            asUser().with(this, ProjectLabelManagement::class.java).execute {
+                projectLabelManagementService.associateProjectToLabels(
+                        this,
+                        ProjectLabelForm(
+                                value.map { it.id }
+                        )
+                )
+            }
+        }
+
+    protected fun Branch.assertBuildSearch(filterBuilder: (StandardFilterProviderDataBuilder) -> Unit): BuildSearchAssertion {
+        val data = buildFilterService.standardFilterProviderData(10)
+        filterBuilder(data)
+        val filter = data.build()
+        return BuildSearchAssertion(this, filter)
+    }
+
+    protected class BuildSearchAssertion(
+            private val branch: Branch,
+            private val filter: BuildFilterProviderData<*>
+    ) {
+        infix fun returns(expected: Build) {
+            returns(listOf(expected))
+        }
+
+        infix fun returns(expected: List<Build>) {
+            val results = filter.filterBranchBuilds(branch)
+            assertEquals(
+                    expected.map { it.id },
+                    results.map { it.id }
             )
         }
     }

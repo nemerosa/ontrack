@@ -5,7 +5,9 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,8 +21,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+
+import static java.lang.String.format;
 
 @Repository
 public class PropertyJdbcRepository extends AbstractJdbcRepository implements PropertyRepository {
@@ -28,6 +33,25 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     @Autowired
     public PropertyJdbcRepository(DataSource dataSource) {
         super(dataSource);
+    }
+
+    static void prepareQueryForPropertyValue(
+            PropertySearchArguments searchArguments,
+            StringBuilder tables,
+            StringBuilder criteria,
+            MapSqlParameterSource params
+    ) {
+        if (StringUtils.isNotBlank(searchArguments.getJsonContext())) {
+            tables.append(format(" LEFT JOIN %s on true", searchArguments.getJsonContext()));
+        }
+        if (StringUtils.isNotBlank(searchArguments.getJsonCriteria())) {
+            criteria.append(format(" AND %s", searchArguments.getJsonCriteria()));
+            if (searchArguments.getCriteriaParams() != null) {
+                for (Map.Entry<String, ?> entry : searchArguments.getCriteriaParams().entrySet()) {
+                    params.addValue(entry.getKey(), entry.getValue());
+                }
+            }
+        }
     }
 
     @Override
@@ -45,7 +69,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
 
     @Override
     @CacheEvict(cacheNames = "properties", key = "#typeName + #entityType.name() + #entityId.value")
-    public void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data, String searchKey) {
+    public void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data) {
         MapSqlParameterSource params = params("type", typeName).addValue("entityId", entityId.getValue());
         // Any previous value?
         Integer propertyId = getFirstItem(
@@ -57,13 +81,11 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
                 Integer.class
         );
         // Data parameters
-        params
-                .addValue("json", writeJson(data))
-                .addValue("searchKey", searchKey);
+        params.addValue("json", writeJson(data));
         // Update
         if (propertyId != null) {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE PROPERTIES SET JSON = CAST(:json AS JSONB), SEARCHKEY = :searchKey WHERE ID = :id",
+                    "UPDATE PROPERTIES SET JSON = CAST(:json AS JSONB) WHERE ID = :id",
                     params.addValue("id", propertyId)
             );
         }
@@ -71,8 +93,8 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         else {
             getNamedParameterJdbcTemplate().update(
                     String.format(
-                            "INSERT INTO PROPERTIES(TYPE, %s, SEARCHKEY, JSON) " +
-                                    "VALUES(:type, :entityId, :searchKey, CAST(:json AS JSONB))",
+                            "INSERT INTO PROPERTIES(TYPE, %s, JSON) " +
+                                    "VALUES(:type, :entityId, CAST(:json AS JSONB))",
                             entityType.name()
                     ),
                     params
@@ -117,17 +139,30 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
 
     @Override
     @Nullable
-    public ID findBuildByBranchAndSearchkey(ID branchId, String typeName, String searchKey) {
-        Integer id = getFirstItem(
+    public ID findBuildByBranchAndSearchkey(ID branchId, String typeName, PropertySearchArguments searchArguments) {
+        StringBuilder tables = new StringBuilder(
                 "SELECT b.ID " +
                         "FROM PROPERTIES p " +
-                        "INNER JOIN BUILDS b ON p.BUILD = b.ID " +
-                        "WHERE p.TYPE = :type " +
-                        "AND p.SEARCHKEY = :searchKey " +
-                        "AND b.BRANCHID = :branchId",
-                params("type", typeName)
-                        .addValue("searchKey", searchKey)
-                        .addValue("branchId", branchId.getValue()),
+                        "INNER JOIN BUILDS b ON p.BUILD = b.ID "
+        );
+        StringBuilder criteria = new StringBuilder(
+                "WHERE p.TYPE = :type " +
+                        "AND b.BRANCHID = :branchId"
+        );
+        MapSqlParameterSource params = params("type", typeName)
+                .addValue("branchId", branchId.getValue());
+        if (searchArguments != null) {
+            prepareQueryForPropertyValue(
+                    searchArguments,
+                    tables,
+                    criteria,
+                    params
+            );
+        }
+        String sql = tables + " " + criteria;
+        Integer id = getFirstItem(
+                sql,
+                params,
                 Integer.class
         );
         if (id != null) {
@@ -139,13 +174,12 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
 
     private TProperty toProperty(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        String searchKey = rs.getString("searchKey");
         String typeName = rs.getString("type");
         // Detects the entity
         ProjectEntityType entityType = null;
         ID entityId = null;
         for (ProjectEntityType candidate : ProjectEntityType.values()) {
-            Integer candidateId = rs.getInt(candidate.name());
+            int candidateId = rs.getInt(candidate.name());
             if (!rs.wasNull()) {
                 entityType = candidate;
                 entityId = ID.of(candidateId);
@@ -155,9 +189,8 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         if (entityType == null || !ID.isDefined(entityId)) {
             throw new IllegalStateException(
                     String.format(
-                            "Could not find any entity for property %s with key %s (id = %d)",
+                            "Could not find any entity for property %s with id = %d",
                             typeName,
-                            searchKey,
                             id
                     )
             );
@@ -167,7 +200,6 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
                 typeName,
                 entityType,
                 entityId,
-                searchKey,
                 readJson(rs, "json")
         );
     }

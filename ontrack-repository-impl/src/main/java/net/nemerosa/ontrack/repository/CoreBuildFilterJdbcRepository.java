@@ -13,8 +13,10 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Repository
@@ -50,7 +52,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
      * </pre>
      */
     @Override
-    public List<Build> standardFilter(Branch branch, StandardBuildFilterData data) {
+    public List<Build> standardFilter(Branch branch, StandardBuildFilterData data, Function<String, PropertyType<?>> propertyTypeAccessor) {
         // Query root
         StringBuilder tables = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B ");
         // Criterias
@@ -148,8 +150,22 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
             // withPropertyValue
             String withPropertyValue = data.getWithPropertyValue();
             if (StringUtils.isNotBlank(withPropertyValue)) {
-                criteria.append(" AND PP.SEARCHKEY ~ :withPropertyValue");
-                params.addValue("withPropertyValue", withPropertyValue);
+                // Gets the property type
+                PropertyType<?> propertyType = propertyTypeAccessor.apply(withProperty);
+                // Gets the search arguments
+                PropertySearchArguments searchArguments = propertyType.getSearchArguments(withPropertyValue);
+                // If defined use them
+                if (searchArguments != null && searchArguments.isDefined()) {
+                    PropertyJdbcRepository.prepareQueryForPropertyValue(
+                            searchArguments,
+                            tables,
+                            criteria,
+                            params
+                    );
+                } else {
+                    // No match
+                    return Collections.emptyList();
+                }
             }
         }
 
@@ -157,7 +173,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         String sinceProperty = data.getSinceProperty();
         if (StringUtils.isNotBlank(sinceProperty)) {
             String sincePropertyValue = data.getSincePropertyValue();
-            Integer id = findLastBuildWithPropertyValue(branch, sinceProperty, sincePropertyValue);
+            Integer id = findLastBuildWithPropertyValue(branch, sinceProperty, sincePropertyValue, propertyTypeAccessor);
             if (id != null) {
                 if (sinceBuildId == null) {
                     sinceBuildId = id;
@@ -242,7 +258,7 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         }
 
         // Final SQL
-        String sql = String.format(
+        String sql = format(
                 "%s %s ORDER BY B.ID DESC LIMIT :count",
                 tables,
                 criteria);
@@ -392,25 +408,46 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
         return loadBuilds(sql.toString(), params);
     }
 
-    private Integer findLastBuildWithPropertyValue(Branch branch, String propertyType, String propertyValue) {
+    private Integer findLastBuildWithPropertyValue(Branch branch, String propertyTypeName, String propertyValue, Function<String, PropertyType<?>> propertyTypeAccessor) {
         // SQL
-        StringBuilder sql = new StringBuilder("SELECT B.ID " +
+        StringBuilder tables = new StringBuilder("SELECT B.ID " +
                 "FROM BUILDS B " +
-                "LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID " +
+                "LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID "
+        );
+        StringBuilder criteria = new StringBuilder(
                 "WHERE B.BRANCHID = :branchId " +
-                "AND PP.TYPE = :propertyType ");
+                        "AND PP.TYPE = :propertyType "
+        );
         MapSqlParameterSource params = params("branchId", branch.id())
-                .addValue("propertyType", propertyType);
-        // Property value
+                .addValue("propertyType", propertyTypeName);
+
         if (StringUtils.isNotBlank(propertyValue)) {
-            sql.append(" AND PP.SEARCHKEY ~ :propertyValue");
-            params.addValue("propertyValue", propertyValue);
+            // Gets the property type
+            PropertyType<?> propertyType = propertyTypeAccessor.apply(propertyTypeName);
+            // Gets the search arguments for a property value
+            PropertySearchArguments searchArguments = propertyType.getSearchArguments(propertyValue);
+            // If defined use them
+            if (searchArguments != null && searchArguments.isDefined()) {
+                PropertyJdbcRepository.prepareQueryForPropertyValue(
+                        searchArguments,
+                        tables,
+                        criteria,
+                        params
+                );
+            } else {
+                // No match
+                return null;
+            }
         }
-        // Ordering
-        sql.append(" ORDER BY B.ID DESC LIMIT 1");
+
         // Build ID
+        String sql = tables + " " +
+                criteria + "" +
+                " ORDER BY B.ID DESC LIMIT 1";
+
+        // Runs the query
         return getFirstItem(
-                sql.toString(),
+                sql,
                 params,
                 Integer.class
         );

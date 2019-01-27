@@ -21,6 +21,8 @@ image::images/project-page-branch-management.png[Branch commands,600]
 This allows you to have a quick access to the management of the branches in a
 project. Only the deletion of a branch will prompt you about your decision.
 
+include::usage-branches-favorites.adoc[]
+
 ==== Branch templating
 
 In a context where branches are numerous, because the workflow you're working

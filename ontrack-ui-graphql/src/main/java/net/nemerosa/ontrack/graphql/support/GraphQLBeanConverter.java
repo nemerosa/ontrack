@@ -54,6 +54,10 @@ public class GraphQLBeanConverter {
     }
 
     public static GraphQLObjectType asObjectType(Class<?> type, GQLTypeCache cache, Set<String> exclusions) {
+        return asObjectTypeBuilder(type, cache, exclusions).build();
+    }
+
+    public static GraphQLObjectType.Builder asObjectTypeBuilder(Class<?> type, GQLTypeCache cache, Set<String> exclusions) {
         GraphQLObjectType.Builder builder = GraphQLObjectType.newObject()
                 .name(type.getSimpleName());
         // Actual exclusions
@@ -104,7 +108,7 @@ public class GraphQLBeanConverter {
             }
         }
         // OK
-        return builder.build();
+        return builder;
     }
 
     public static GraphQLScalarType getScalarType(Class<?> type) {

@@ -34,7 +34,7 @@ class StandardBuildFilterProvider(
         return coreBuildFilterRepository.standardFilter(
                 branch,
                 data
-        )
+        ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
     }
 
     override fun isPredefined(): Boolean {

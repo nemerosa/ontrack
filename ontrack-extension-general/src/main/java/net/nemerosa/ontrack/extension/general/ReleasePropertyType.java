@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.general;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
@@ -8,9 +9,12 @@ import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -82,5 +86,24 @@ public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
     @Override
     public ReleaseProperty replaceValue(ReleaseProperty value, Function<String, String> replacementFunction) {
         return value;
+    }
+
+    @Override
+    public boolean containsValue(ReleaseProperty value, String propertyValue) {
+        return StringUtils.containsIgnoreCase(value.getName(), propertyValue);
+    }
+
+    @Nullable
+    @Override
+    public PropertySearchArguments getSearchArguments(String token) {
+        if (StringUtils.isNotBlank(token) && token.length() > 1) {
+            return new PropertySearchArguments(
+                    null,
+                    "pp.json->>'name' ilike :token",
+                    ImmutableMap.of("token", "%" + token + "%")
+            );
+        } else {
+            return null;
+        }
     }
 }

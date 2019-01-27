@@ -31,6 +31,7 @@ public class CoreResourceModuleTest {
     private SecurityService securityService;
     private StructureService structureService;
     private ProjectFavouriteService projectFavouriteService;
+    private BranchFavouriteService branchFavouriteService;
 
     @Before
     public void before() {
@@ -38,13 +39,14 @@ public class CoreResourceModuleTest {
         structureService = mock(StructureService.class);
         ResourceDecorationContributorService resourceDecorationContributorService = mock(ResourceDecorationContributorService.class);
         projectFavouriteService = mock(ProjectFavouriteService.class);
+        branchFavouriteService = mock(BranchFavouriteService.class);
         mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
                 Collections.singletonList(
                         new DefaultResourceModule(
                                 Arrays.asList(
                                         new ConnectedAccountResourceDecorator(),
                                         new ProjectResourceDecorator(resourceDecorationContributorService, projectFavouriteService),
-                                        new BranchResourceDecorator(resourceDecorationContributorService, structureService),
+                                        new BranchResourceDecorator(resourceDecorationContributorService, structureService, branchFavouriteService),
                                         new PromotionLevelResourceDecorator(),
                                         new ValidationStampResourceDecorator(),
                                         new BuildResourceDecorator(resourceDecorationContributorService),

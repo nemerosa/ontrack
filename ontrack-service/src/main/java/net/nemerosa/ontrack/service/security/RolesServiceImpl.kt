@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.labels.LabelManagement
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.support.StartupService
 import org.springframework.beans.factory.annotation.Autowired
@@ -123,6 +125,7 @@ constructor(
         projectManagerFunctions.add(BranchCreate::class.java)
         projectManagerFunctions.add(BranchEdit::class.java)
         projectManagerFunctions.add(BranchDelete::class.java)
+        projectManagerFunctions.add(ProjectLabelManagement::class.java)
         register(Roles.PROJECT_MANAGER, "Project manager",
                 "The project manager can promote existing builds, manage the validation stamps, " + "manage the shared build filters, manage the branches and edit some properties.",
                 projectManagerFunctions
@@ -136,7 +139,7 @@ constructor(
 
         // Project roles contributions
         roleContributors.forEach { roleContributor ->
-            roleContributor.getProjectRoles().forEach { roleDefinition ->
+            roleContributor.projectRoles.forEach { roleDefinition ->
                 if (Roles.PROJECT_ROLES.contains(roleDefinition.id)) {
                     // Totally illegal - stopping everything
                     throw IllegalStateException("An existing project role cannot be overridden: " + roleDefinition.id)
@@ -157,7 +160,7 @@ constructor(
         val functions = LinkedHashSet(projectFunctions)
         // Contributions
         roleContributors.forEach { roleContributor ->
-            roleContributor.getProjectFunctionContributionsForProjectRoles()[id]?.forEach { fn ->
+            roleContributor.projectFunctionContributionsForProjectRoles[id]?.forEach { fn ->
                 // Checks if the role is predefined
                 if (Roles.PROJECT_ROLES.contains(id)) {
                     // Checks the function as non core
@@ -185,7 +188,7 @@ constructor(
     }
 
     private fun register(projectRole: ProjectRole) {
-        projectRoles.put(projectRole.id, projectRole)
+        projectRoles[projectRole.id] = projectRole
 
     }
 
@@ -197,13 +200,13 @@ constructor(
                 "An administrator is allowed to do everything in the application.",
                 (globalFunctions +
                         roleContributors.flatMap {
-                            it.globalFunctionContributionsForGlobalRoles.values.flatMap { it }
+                            it.globalFunctionContributionsForGlobalRoles.values.flatten()
                         }
                         ).distinct(),
                 (projectFunctions +
                         roleContributors.flatMap {
-                            it.projectFunctionContributionsForGlobalRoles.values.flatMap { it } +
-                                    it.projectFunctionContributionsForProjectRoles.values.flatMap { it }
+                            it.projectFunctionContributionsForGlobalRoles.values.flatten() +
+                                    it.projectFunctionContributionsForProjectRoles.values.flatten()
                         }
                         ).distinct()
         )
@@ -211,8 +214,11 @@ constructor(
         // Creator
         register(Roles.GLOBAL_CREATOR, "Creator",
                 "A creator is allowed to create new projects and to configure it. Once done, its rights on the " + "project are revoked immediately.",
-                listOf<Class<out GlobalFunction>>(ProjectCreation::class.java),
-                Arrays.asList<Class<out ProjectFunction>>(
+                listOf(
+                        ProjectCreation::class.java,
+                        LabelManagement::class.java
+                ),
+                listOf(
                         // Structure creation functions only
                         ProjectConfig::class.java,
                         BranchCreate::class.java,
@@ -335,7 +341,7 @@ constructor(
         // Global functions and contributions
         val gfns = LinkedHashSet(globalFunctions)
         roleContributors.forEach { roleContributor ->
-            roleContributor.getGlobalFunctionContributionsForGlobalRoles()[id]?.forEach { fn ->
+            roleContributor.globalFunctionContributionsForGlobalRoles[id]?.forEach { fn ->
                 if (Roles.GLOBAL_ROLES.contains(id)) {
                     checkFunctionForContribution(fn)
                 }
@@ -345,7 +351,7 @@ constructor(
         // Project functions
         val pfns = LinkedHashSet(projectFunctions)
         roleContributors.forEach { roleContributor ->
-            roleContributor.getProjectFunctionContributionsForGlobalRoles()[id]?.forEach { fn ->
+            roleContributor.projectFunctionContributionsForGlobalRoles[id]?.forEach { fn ->
                 if (Roles.GLOBAL_ROLES.contains(id)) {
                     checkFunctionForContribution(fn)
                 }
@@ -363,6 +369,6 @@ constructor(
     }
 
     private fun register(role: GlobalRole) {
-        globalRoles.put(role.id, role)
+        globalRoles[role.id] = role
     }
 }

@@ -3,7 +3,8 @@ angular.module('ot.view.home', [
     'ot.service.structure',
     'ot.service.core',
     'ot.service.user',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.label'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
@@ -12,7 +13,7 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otGraphqlService, otStructureService, otNotificationService, otUserService, otLabelService) {
         const search = $location.search();
         const code = search.code;
         const url = search.url;
@@ -22,10 +23,16 @@ angular.module('ot.view.home', [
             // Commands
             commands: []
         };
+
+        // Preloading filter mode
+        $scope.preloadingLabelFilter = true;
+
         // No initial filter
         $scope.projectFilter = {
-            name: ''
+            name: '',
+            label: undefined
         };
+
 
         // Loading the project list
         function loadProjects() {
@@ -34,9 +41,82 @@ angular.module('ot.view.home', [
               userRootActions {
                 projectCreate
               }
+              labels {
+                id
+                category
+                name
+                description
+                color
+                foregroundColor
+                computedBy {
+                    id
+                    name
+                }
+                links {
+                    _update
+                    _delete
+                }
+              }
+              favouriteBranches: branches(favourite: true) {
+                project {
+                  name
+                  links {
+                    _page
+                  }
+                }
+                id
+                name
+                disabled
+                type
+                decorations {
+                  ...decorationContent
+                }
+                creation {
+                  time
+                }
+                links {
+                  _page
+                  _enable
+                  _disable
+                  _delete
+                  _unfavourite
+                  _favourite
+                }
+                latestBuild: builds(count: 1) {
+                  id
+                  name
+                  creation {
+                      time
+                  }
+                }
+                promotionLevels {
+                  id
+                  name
+                  image
+                  _image
+                  promotionRuns(first: 1) {
+                    build {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
               projects {
                 id
                 name
+                labels {
+                  id
+                  category
+                  name
+                  description
+                  color
+                  foregroundColor
+                  computedBy {
+                    id
+                    name
+                  }
+                }
                 links {
                   _favourite
                   _unfavourite
@@ -55,7 +135,7 @@ angular.module('ot.view.home', [
                 links {
                   _unfavourite
                 }
-                branches {
+                branches(useModel: true) {
                   id
                   name
                   type
@@ -95,6 +175,9 @@ angular.module('ot.view.home', [
 
                 $scope.projectsData = data;
                 $scope.projectFavourites = data.projectFavourites;
+                $scope.favouriteBranches = data.favouriteBranches;
+
+                preloadLabelFilter();
 
                 // All branches disabled status computation
                 $scope.projectFavourites.forEach(function (projectFavourite) {
@@ -167,6 +250,94 @@ angular.module('ot.view.home', [
             if (project.links._unfavourite) {
                 ot.pageCall($http.put(project.links._unfavourite)).then(loadProjects);
             }
+        };
+
+        // Sets a branch as favourite
+        $scope.branchFavourite = function (branch) {
+            if (branch.links._favourite) {
+                ot.pageCall($http.put(branch.links._favourite)).then(loadProjects);
+            }
+        };
+
+        // Unsets a branch as favourite
+        $scope.branchUnfavourite = function (branch) {
+            if (branch.links._unfavourite) {
+                ot.pageCall($http.put(branch.links._unfavourite)).then(loadProjects);
+            }
+        };
+
+        // Selecting a label
+        $scope.projectFilterSelectLabel = (label) => {
+            $scope.projectFilter.label = label;
+        };
+
+        // Clearing the label selection
+        $scope.projectFilterClearLabel = () => {
+            $scope.projectFilter.label = undefined;
+        };
+
+        const LOCATION_KEY = "label";
+        const STORAGE_KEY = "home.label";
+
+        // Management of the location search component in case of label change
+        $scope.$watch('projectFilter.label', function () {
+            if (!$scope.preloadingLabelFilter) {
+                if ($scope.projectFilter.label) {
+                    let labelKey = $scope.formatLabel($scope.projectFilter.label);
+                    $location.search(LOCATION_KEY, labelKey);
+                    localStorage.setItem(STORAGE_KEY, labelKey);
+                } else {
+                    $location.search(LOCATION_KEY, undefined);
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        });
+
+        // Preloading of the label filter
+        function preloadLabelFilter() {
+            // Gets the label key
+            let labelKey = getLabelKeyFromBrowser();
+            // If defined, identifies and sets the filter
+            let label = $scope.projectsData.labels.find(it => {
+                return $scope.formatLabel(it) === labelKey;
+            });
+            if (label) {
+                $scope.projectFilter.label = label;
+            }
+            // Done
+            $scope.preloadingLabelFilter = false;
+        }
+
+        function getLabelKeyFromBrowser() {
+            let key = $location.search().label;
+            if (key) {
+                return key;
+            } else {
+                return localStorage.getItem(STORAGE_KEY);
+            }
+        }
+
+        // Filtering the labels for a token
+        $scope.typeAheadFilterLabels = (token) => {
+            return $scope.projectsData.labels.filter(label => {
+                return !token || ($scope.formatLabel(label).toLowerCase().indexOf(token.toLowerCase()) >= 0);
+            });
+        };
+
+        // Formatting a label for a type-ahead
+        $scope.formatLabel = otLabelService.formatLabel;
+
+        // Project filter function
+        $scope.projectFilterFn = (project) => {
+            return projectFilterNameFn(project) && projectFilterLabelFn(project);
+        };
+
+        const projectFilterNameFn = project => {
+            return !$scope.projectFilter.name || project.name.toLowerCase().indexOf($scope.projectFilter.name.toLowerCase()) >= 0;
+        };
+
+        const projectFilterLabelFn = project => {
+            return !$scope.projectFilter.label || project.labels.some(it => it.id === $scope.projectFilter.label.id);
         };
 
         // Login procedure

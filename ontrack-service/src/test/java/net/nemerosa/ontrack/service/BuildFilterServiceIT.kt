@@ -15,9 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired
 class BuildFilterServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
-    private lateinit var buildFilterService: BuildFilterService
-
-    @Autowired
     private lateinit var copyService: CopyService
 
     @Test

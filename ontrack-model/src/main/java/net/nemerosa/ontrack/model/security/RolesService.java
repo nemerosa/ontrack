@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.labels.LabelManagement;
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagement;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +27,8 @@ public interface RolesService {
             GlobalSettings.class,
             AccountManagement.class,
             AccountGroupManagement.class,
-            ProjectList.class
+            ProjectList.class,
+            LabelManagement.class
     );
 
     /**
@@ -61,7 +65,8 @@ public interface RolesService {
             ValidationRunCreate.class,
             ValidationRunStatusChange.class,
             PromotionRunCreate.class,
-            PromotionRunDelete.class
+            PromotionRunDelete.class,
+            ProjectLabelManagement.class
     );
 
     /**

@@ -170,15 +170,12 @@ public class PropertyServiceImpl implements PropertyService {
         }
         // Gets the JSON for the storage
         JsonNode storage = propertyType.forStorage(value);
-        // Search key
-        String searchKey = propertyType.getSearchKey(value);
         // Stores the property
         propertyRepository.saveProperty(
                 propertyType.getClass().getName(),
                 entity.getProjectEntityType(),
                 entity.getId(),
-                storage,
-                searchKey
+                storage
         );
         // Property change event
         eventPostService.post(eventFactory.propertyChange(entity, propertyType));
@@ -242,7 +239,15 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     @Nullable
     public <T> ID findBuildByBranchAndSearchkey(ID branchId, Class<? extends PropertyType<T>> propertyType, String searchKey) {
-        return propertyRepository.findBuildByBranchAndSearchkey(branchId, propertyType.getName(), searchKey);
+        // Gets the property type by name
+        PropertyType<T> actualPropertyType = getPropertyTypeByName(propertyType.getName());
+        // Gets the search arguments
+        PropertySearchArguments searchArguments = actualPropertyType.getSearchArguments(searchKey);
+        if (searchArguments != null) {
+            return propertyRepository.findBuildByBranchAndSearchkey(branchId, propertyType.getName(), searchArguments);
+        } else {
+            return null;
+        }
     }
 
     @Override

@@ -289,4 +289,84 @@ class Config {
     def setLdapSettings(LDAPSettings settings) {
         ontrack.put('settings/ldap', settings)
     }
+
+    /**
+     * Gets an existing label
+     */
+    @DSLMethod(count = 2, value = "Gets an existing label or returns null")
+    Label getLabel(String category, String name) {
+        def result = ontrack.graphQLQuery(
+                '''
+                    query LabelSearch($category:String,$name:String) {
+                        labels(category: $category, name: $name) {
+                            id
+                            category
+                            name
+                            description
+                            color
+                        }
+                    }
+                ''',
+                [
+                        category: category,
+                        name    : name
+                ]
+        )
+        def labels = result.data.labels
+        if (labels.size > 0) {
+            return new Label(ontrack, labels.first())
+        } else {
+            return null
+        }
+    }
+
+    /**
+     * Gets the list of labels
+     */
+    @DSLMethod("Gets the list of labels")
+    List<Label> getLabels() {
+        def result = ontrack.graphQLQuery(
+                '''
+                    query AllLabels {
+                        labels {
+                            id
+                            category
+                            name
+                            description
+                            color
+                        }
+                    }
+                ''',
+                [:]
+        )
+        return result.data.labels.collect {
+            new Label(ontrack, it)
+        }
+    }
+
+    /**
+     * Creating a label
+     */
+    @DSLMethod(count = 4, value = "Creates or updates a label")
+    Label label(String category, String name, String description = "", String color = "#000000") {
+        // Gets the existing label
+        Label existing = getLabel(category, name)
+        if (existing) {
+            def result = ontrack.put("rest/labels/${existing.id}/update", [
+                    category   : category,
+                    name       : name,
+                    description: description,
+                    color      : color
+            ])
+            return new Label(ontrack, result)
+        } else {
+            def result = ontrack.post("rest/labels/create", [
+                    category   : category,
+                    name       : name,
+                    description: description,
+                    color      : color
+            ])
+            return new Label(ontrack, result)
+        }
+    }
 }

@@ -18,8 +18,8 @@ public class LinkDefinitions {
         return (T e, ResourceContext resourceContext) -> resourceContext.isGlobalFunctionGranted(globalFn);
     }
 
-    public static <T extends ProjectEntity> LinkDefinition<T> link(String name, BiFunction<T, ResourceContext, Object> linkFn,
-                                                                   BiPredicate<T, ResourceContext> checkFn) {
+    public static <T> LinkDefinition<T> link(String name, BiFunction<T, ResourceContext, Object> linkFn,
+                                             BiPredicate<T, ResourceContext> checkFn) {
         return new SimpleLinkDefinition<>(
                 name,
                 linkFn,
