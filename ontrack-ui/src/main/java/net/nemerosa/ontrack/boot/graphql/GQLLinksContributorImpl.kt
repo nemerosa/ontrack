@@ -23,8 +23,9 @@ class GQLLinksContributorImpl(
     override fun getFields(type: Class<*>): List<GraphQLFieldDefinition> {
         val definitions = mutableListOf<GraphQLFieldDefinition>()
         // Links
-        val linkNames = decorators
+        val typeDecorators = decorators
                 .filter { decorator -> decorator.appliesFor(type) }
+        val linkNames = typeDecorators
                 .flatMap { decorator -> decorator.linkNames }
                 .distinct()
         if (!linkNames.isEmpty()) {
@@ -47,7 +48,7 @@ class GQLLinksContributorImpl(
                                             )
                                             .build()
                             )
-                            .dataFetcher(typeLinksFetcher(type))
+                            .dataFetcher(typeLinksFetcher(typeDecorators))
                             .build()
             )
         }
@@ -55,17 +56,13 @@ class GQLLinksContributorImpl(
         return definitions
     }
 
-    private fun typeLinksFetcher(type: Class<*>): DataFetcher<*> {
+    private fun typeLinksFetcher(typeDecorators: List<ResourceDecorator<*>>): DataFetcher<*> {
         return DataFetcher<Any> { environment ->
             val source = environment.getSource<Any>()
-            if (type.isInstance(source)) {
-                for (decorator in decorators) {
-                    if (decorator.appliesFor(type)) {
-                        return@DataFetcher getLinks<Any>(decorator, source)
-                    }
-                }
+            for (decorator in typeDecorators) {
+                return@DataFetcher getLinks<Any>(decorator, source)
             }
-            return@DataFetcher emptyMap<Any, Any>()
+            emptyMap<Any, Any>()
         }
     }
 
