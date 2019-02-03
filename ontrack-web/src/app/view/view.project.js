@@ -114,6 +114,11 @@ angular.module('ot.view.project', [
                   creation {
                     time
                   }
+                  latestBuild: builds(count: 1) {
+                    creation {
+                        time
+                    }
+                  }
                   links {
                     _page
                     _enable
