@@ -7,6 +7,8 @@ String projectName = 'ontrack'
 
 boolean pr = false
 
+String buildImageVersion = "nemerosa/ontrack-build:1.0.0"
+
 pipeline {
 
     agent none
@@ -28,10 +30,8 @@ pipeline {
 
         stage('Setup') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                docker {
+                    image buildImageVersion
                 }
             }
             when {
@@ -67,9 +67,8 @@ pipeline {
 
         stage('Build') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
+                docker {
+                    image buildImageVersion
                     args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
                 }
             }
@@ -164,9 +163,8 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
 
         stage('Local acceptance tests') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
+                docker {
+                    image buildImageVersion
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -237,9 +235,8 @@ docker-compose --project-name local down --volumes
                 // CentOS7
                 stage('CentOS7') {
                     agent {
-                        dockerfile {
-                            label "docker"
-                            dir "jenkins"
+                        docker {
+                            image buildImageVersion
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -298,9 +295,8 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                 // Debian
                 stage('Debian') {
                     agent {
-                        dockerfile {
-                            label "docker"
-                            dir "jenkins"
+                        docker {
+                            image buildImageVersion
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -359,9 +355,8 @@ docker-compose --project-name debian --file docker-compose-debian.yml down --vol
                 // Extension tests
                 stage('Local extension tests') {
                     agent {
-                        dockerfile {
-                            label "docker"
-                            dir "jenkins"
+                        docker {
+                            image buildImageVersion
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -410,9 +405,8 @@ docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
                 // Digital Ocean
                 stage('Digital Ocean') {
                     agent {
-                        dockerfile {
-                            label "docker"
-                            dir "jenkins"
+                        docker {
+                            image buildImageVersion
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -518,9 +512,8 @@ docker-machine rm --force ${DROPLET_NAME}
             parallel {
                 stage('Docker Hub') {
                     agent {
-                        dockerfile {
-                            label "docker"
-                            dir "jenkins"
+                        docker {
+                            image buildImageVersion
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -561,9 +554,8 @@ docker image push nemerosa/ontrack:${ONTRACK_VERSION}
                 }
                 stage('Maven publication') {
                     agent {
-                        dockerfile {
-                            label "docker"
-                            dir "jenkins"
+                        docker {
+                            image buildImageVersion
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -625,9 +617,8 @@ set -e
 
         stage('Release') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
+                docker {
+                    image buildImageVersion
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -697,9 +688,8 @@ set -e
 
         stage('Documentation') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
+                docker {
+                    image buildImageVersion
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -797,13 +787,7 @@ set -e
         // Master setup
 
         stage('Master setup') {
-            agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
+            agent any
             when {
                 beforeAgent true
                 branch 'master'
@@ -843,10 +827,8 @@ set -e
 
         stage('Latest documentation') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                docker {
+                    image buildImageVersion
                 }
             }
             when {
@@ -886,9 +868,8 @@ set -e
 
         stage('Docker Latest') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
+                docker {
+                    image buildImageVersion
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
@@ -934,10 +915,8 @@ set -e
 
         stage('Site generation') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                docker {
+                    image buildImageVersion
                 }
             }
             environment {
@@ -979,10 +958,8 @@ set -e
 
         stage('Production') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                docker {
+                    image buildImageVersion
                 }
             }
             when {
@@ -1021,9 +998,8 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
 
         stage('Production tests') {
             agent {
-                dockerfile {
-                    label "docker"
-                    dir "jenkins"
+                docker {
+                    image buildImageVersion
                     args "--volume /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
