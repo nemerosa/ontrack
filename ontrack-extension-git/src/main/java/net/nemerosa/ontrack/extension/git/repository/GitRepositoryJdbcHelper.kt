@@ -17,6 +17,7 @@ class GitRepositoryJdbcHelper(dataSource: DataSource) : AbstractJdbcRepository(d
             FROM ENTITY_DATA e
             INNER JOIN BUILDS x ON x.ID = e.BUILD
             WHERE x.BRANCHID = :branchId
+            AND e.NAME = 'git-commit'
             AND (CAST(e.json_value->>'timestamp' AS numeric) >= :timestamp)
             ORDER BY e.BUILD ASC
 			LIMIT 1
