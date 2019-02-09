@@ -198,6 +198,7 @@ docker-compose --project-name local up --exit-code-from ontrack_acceptance
 #!/bin/bash
 set -e
 echo "Cleanup..."
+rm -rf build/acceptance
 mkdir -p build
 cp -r ontrack-acceptance/src/main/compose/build build/acceptance
 cd ontrack-acceptance/src/main/compose

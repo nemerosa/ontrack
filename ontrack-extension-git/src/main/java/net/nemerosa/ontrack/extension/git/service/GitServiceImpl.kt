@@ -830,7 +830,7 @@ class GitServiceImpl(
         )
     }
 
-    override fun collectIndexableGitCommitForBranch(branch: Branch) {
+    override fun collectIndexableGitCommitForBranch(branch: Branch, overrides: Boolean) {
         val project = branch.project
         val projectConfiguration = getProjectConfiguration(project)
         if (projectConfiguration != null) {
@@ -841,7 +841,7 @@ class GitServiceImpl(
                         branch,
                         client,
                         branchConfiguration,
-                        true,
+                        overrides,
                         JobRunListener.logger(logger)
                 )
             }
@@ -900,7 +900,7 @@ class GitServiceImpl(
         if (commit != null) {
             listener.message("Indexing $commit for build ${build.entityDisplayName}")
             // Gets the Git information for the commit
-            val toSet: Boolean = overrides || getCommitForBuild(build) != null
+            val toSet: Boolean = overrides || getCommitForBuild(build) == null
             if (toSet) {
                 val commitFor = client.getCommitFor(commit)
                 if (commitFor != null) {
