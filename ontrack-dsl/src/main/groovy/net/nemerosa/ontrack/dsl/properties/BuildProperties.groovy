@@ -28,7 +28,7 @@ class BuildProperties extends ProjectEntityProperties {
 
     @DSLMethod("Gets the Jenkins build property.")
     def getJenkinsBuild() {
-        property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType')
+        property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType', false)
     }
 
     @DSLMethod
@@ -41,9 +41,9 @@ class BuildProperties extends ProjectEntityProperties {
         )
     }
 
-    @DSLMethod(see = "label")
+    @DSLMethod(see = "label", value = "Gets any label attached to the build. Returns null if none is attached.")
     def getLabel() {
-        property('net.nemerosa.ontrack.extension.general.ReleasePropertyType').name
+        property('net.nemerosa.ontrack.extension.general.ReleasePropertyType', false)?.name
     }
 
     /**
@@ -58,7 +58,7 @@ class BuildProperties extends ProjectEntityProperties {
 
     @DSLMethod("Gets the Git commit associated to this build.")
     def getGitCommit() {
-        property('net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType').commit
+        property('net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType', false)?.commit
     }
 
 }
