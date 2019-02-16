@@ -1,11 +1,11 @@
-package net.nemerosa.ontrack.ui.support;
+package net.nemerosa.ontrack.model.annotations;
 
 import java.lang.annotation.*;
 
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface API {
+public @interface APIMethod {
 
     String value();
 
