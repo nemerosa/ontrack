@@ -33,7 +33,7 @@ public class GQLInputPropertyFilter implements GQLInputType<PropertyFilter> {
 
     @Override
     public GraphQLInputType createInputType() {
-        return GraphQLBeanConverter.asInputType(PropertyFilter.class);
+        return GraphQLBeanConverter.INSTANCE.asInputType(PropertyFilter.class);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class GQLInputPropertyFilter implements GQLInputType<PropertyFilter> {
         if (argument == null) {
             return null;
         } else {
-            return GraphQLBeanConverter.asObject(argument, PropertyFilter.class);
+            return GraphQLBeanConverter.INSTANCE.asObject(argument, PropertyFilter.class);
         }
     }
 

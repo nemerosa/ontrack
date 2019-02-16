@@ -16,7 +16,7 @@ public class GQLInputBuildSearchForm implements GQLInputType<BuildSearchForm> {
 
     @Override
     public GraphQLInputType createInputType() {
-        return GraphQLBeanConverter.asInputType(BuildSearchForm.class);
+        return GraphQLBeanConverter.INSTANCE.asInputType(BuildSearchForm.class);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class GQLInputBuildSearchForm implements GQLInputType<BuildSearchForm> {
         if (argument == null) {
             return new BuildSearchForm().withMaximumCount(10);
         } else {
-            return GraphQLBeanConverter.asObject(argument, BuildSearchForm.class);
+            return GraphQLBeanConverter.INSTANCE.asObject(argument, BuildSearchForm.class);
         }
     }
 
