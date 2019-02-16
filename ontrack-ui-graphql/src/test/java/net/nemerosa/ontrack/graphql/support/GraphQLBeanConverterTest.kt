@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class GraphQLBeanConverterTest {
 
@@ -28,6 +29,18 @@ class GraphQLBeanConverterTest {
                 ),
                 fields
         )
+    }
+
+    @Test
+    fun `Description from annotation`() {
+        val type = GraphQLBeanConverter.asObjectType(Person::class.java, cache)
+        assertEquals("Person", type.name)
+        assertNotNull(type.fieldDefinitions.find { it.name == "name" }) {
+            assertEquals("Full name", it.description)
+        }
+        assertNotNull(type.fieldDefinitions.find { it.name == "address" }) {
+            assertEquals("Full postal address", it.description)
+        }
     }
 
     @Test

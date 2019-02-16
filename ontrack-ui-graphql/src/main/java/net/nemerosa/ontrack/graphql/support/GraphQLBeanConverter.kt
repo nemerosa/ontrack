@@ -8,8 +8,13 @@ import graphql.schema.GraphQLInputType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import org.apache.commons.lang3.reflect.FieldUtils
 import org.springframework.beans.BeanUtils
+import java.beans.PropertyDescriptor
+import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
 import java.time.LocalDateTime
 import java.util.*
 
@@ -26,7 +31,7 @@ object GraphQLBeanConverter {
         for (descriptor in BeanUtils.getPropertyDescriptors(type)) {
             if (descriptor.readMethod != null) {
                 val name = descriptor.name
-                val description = descriptor.shortDescription
+                val description = getDescription(type, descriptor)
                 val scalarType = getScalarType(descriptor.propertyType)
                 if (scalarType != null) {
                     builder = builder.field { field ->
@@ -40,6 +45,24 @@ object GraphQLBeanConverter {
         }
         // OK
         return builder.build()
+    }
+
+    private fun getDescription(type: Class<*>, descriptor: PropertyDescriptor): String? {
+        val readMethod: Method? = descriptor.readMethod
+        if (readMethod != null) {
+            val annotation: APIDescription? = readMethod.getAnnotation(APIDescription::class.java)
+            if (annotation != null) {
+                return annotation.value
+            }
+        }
+        val field: Field? = FieldUtils.getField(type, descriptor.name, true)
+        if (field != null) {
+            val annotation = field.getAnnotation(APIDescription::class.java)
+            if (annotation != null) {
+                return annotation.value
+            }
+        }
+        return descriptor.shortDescription
     }
 
     @JvmOverloads
@@ -61,7 +84,7 @@ object GraphQLBeanConverter {
                 val name = descriptor.name
                 // Excludes some names by defaults
                 if (!actualExclusions.contains(name)) {
-                    val description = descriptor.shortDescription
+                    val description = getDescription(type, descriptor)
                     val propertyType = descriptor.propertyType
                     val scalarType = getScalarType(propertyType)
                     if (scalarType != null) {
