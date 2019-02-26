@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.boot.ui.ValidationStampFilterController
-import net.nemerosa.ontrack.model.security.GlobalSettings
-import net.nemerosa.ontrack.model.security.ProjectConfig
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
 import net.nemerosa.ontrack.model.structure.ValidationStampFilterScope
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator
@@ -18,8 +17,8 @@ class ValidationStampFilterResourceDecorator : AbstractResourceDecorator<Validat
     override fun links(resource: ValidationStampFilter, resourceContext: ResourceContext): List<Link> {
         // Scope of the validation stamp filter
         val canUpdate: Boolean = when {
-            resource.project != null -> resourceContext.isProjectFunctionGranted(resource.project, ProjectConfig::class.java)
-            resource.branch != null -> resourceContext.isProjectFunctionGranted(resource.branch, ProjectConfig::class.java)
+            resource.project != null -> resourceContext.isProjectFunctionGranted(resource.project, ValidationStampFilterMgt::class.java)
+            resource.branch != null -> resourceContext.isProjectFunctionGranted(resource.branch, ValidationStampFilterCreate::class.java)
             else -> resourceContext.isGlobalFunctionGranted(GlobalSettings::class.java)
         }
         // Links
@@ -40,7 +39,7 @@ class ValidationStampFilterResourceDecorator : AbstractResourceDecorator<Validat
                 .link(
                         "_shareAtProject",
                         on(ValidationStampFilterController::class.java).shareValidationStampFilterAtProject(resource.id),
-                        resource.scope == ValidationStampFilterScope.BRANCH && canUpdate
+                        resource.scope == ValidationStampFilterScope.BRANCH && resourceContext.isProjectFunctionGranted(resource.branch, ValidationStampFilterShare::class.java)
                 )
                 // Share at global level
                 .link(
