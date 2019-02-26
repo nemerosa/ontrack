@@ -209,9 +209,9 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
         return new ValidationStampFilter(
                 id(rs),
                 rs.getString("NAME"),
+                loadVsNames(rs.getString("VSNAMES")),
                 projectLoader.apply(rs.getObject("PROJECT", Integer.class)),
-                branchLoader.apply(rs.getObject("BRANCH", Integer.class)),
-                loadVsNames(rs.getString("VSNAMES"))
+                branchLoader.apply(rs.getObject("BRANCH", Integer.class))
         );
     }
 
