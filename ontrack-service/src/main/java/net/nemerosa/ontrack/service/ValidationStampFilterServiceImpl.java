@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import com.google.common.collect.ImmutableList;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.ProjectConfig;
-import net.nemerosa.ontrack.model.security.ProjectView;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter;
 import net.nemerosa.ontrack.repository.ValidationStampFilterRepository;
@@ -104,9 +101,9 @@ public class ValidationStampFilterServiceImpl implements ValidationStampFilterSe
 
     private void checkUpdateAuthorisations(ValidationStampFilter filter) {
         if (filter.getProject() != null) {
-            securityService.checkProjectFunction(filter.getProject(), ProjectConfig.class);
+            securityService.checkProjectFunction(filter.getProject(), ValidationStampFilterMgt.class);
         } else if (filter.getBranch() != null) {
-            securityService.checkProjectFunction(filter.getBranch(), ProjectConfig.class);
+            securityService.checkProjectFunction(filter.getBranch(), ValidationStampFilterCreate.class);
         } else {
             securityService.checkGlobalFunction(GlobalSettings.class);
         }
@@ -114,7 +111,7 @@ public class ValidationStampFilterServiceImpl implements ValidationStampFilterSe
 
     @Override
     public ValidationStampFilter shareValidationStampFilter(ValidationStampFilter filter, Project project) {
-        securityService.checkProjectFunction(project, ProjectConfig.class);
+        securityService.checkProjectFunction(project, ValidationStampFilterShare.class);
         return repository.shareValidationStampFilter(filter, project);
     }
 
