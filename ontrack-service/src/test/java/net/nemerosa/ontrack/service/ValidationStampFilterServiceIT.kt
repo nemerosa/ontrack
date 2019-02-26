@@ -17,6 +17,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
 import java.util.*
 
 class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
@@ -621,6 +622,318 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
         // Gets filters for the project
         val filters = asUserWithView(branch).call { filterService.getProjectValidationStampFilters(branch.project, false) }
         assertTrue("Project has no longer any filter", filters.isEmpty())
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when no right`() {
+        asUserWithView(branch).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when only management right`() {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when only share right`() {
+        asUser().with(branch, ValidationStampFilterShare::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when only create right`() {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a global filter`() {
+        asUser().with(GlobalSettings::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a project filter when no right`() {
+        asUserWithView(branch).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a project filter when only create right`() {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a project filter when only share right`() {
+        asUser().with(branch, ValidationStampFilterShare::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a project filter`() {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a branch filter when no right`() {
+        asUserWithView(branch).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a branch filter when share right`() {
+        asUser().with(branch, ValidationStampFilterShare::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a branch filter when mgt right`() {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a branch filter`() {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a project filter when no right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUserWithView(branch).execute {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a project filter when only create right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test
+    fun `Can share a project filter when mgt right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test
+    fun `Can share a project filter when share right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterShare::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when no right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUserWithView(branch).execute {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when only mgt right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when only share right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterShare::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when only create right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
     }
 
     @Test
