@@ -66,7 +66,10 @@ public interface RolesService {
             ValidationRunStatusChange.class,
             PromotionRunCreate.class,
             PromotionRunDelete.class,
-            ProjectLabelManagement.class
+            ProjectLabelManagement.class,
+            ValidationStampFilterCreate.class,
+            ValidationStampFilterShare.class,
+            ValidationStampFilterMgt.class
     );
 
     /**

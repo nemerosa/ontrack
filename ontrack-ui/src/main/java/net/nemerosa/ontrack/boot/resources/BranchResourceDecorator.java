@@ -82,7 +82,7 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
                         link(
                                 "_validationStampFilterCreate",
                                 branch -> on(ValidationStampFilterController.class).getBranchValidationStampFilterForm(branch.getId()),
-                                withProjectFn(ProjectConfig.class)
+                                withProjectFn(ValidationStampFilterCreate.class)
                         ),
                         // All branches for the same project
                         link(

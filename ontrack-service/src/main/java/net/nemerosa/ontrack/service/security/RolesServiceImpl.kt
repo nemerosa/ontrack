@@ -89,7 +89,8 @@ constructor(
                 "A participant in a project is allowed to change statuses in validation runs.",
                 Arrays.asList(
                         ProjectView::class.java,
-                        ValidationRunStatusChange::class.java
+                        ValidationRunStatusChange::class.java,
+                        ValidationStampFilterCreate::class.java
                 )
         )
 
@@ -99,7 +100,10 @@ constructor(
                 ValidationStampEdit::class.java,
                 ValidationStampDelete::class.java,
                 ValidationRunCreate::class.java,
-                ValidationRunStatusChange::class.java
+                ValidationRunStatusChange::class.java,
+                ValidationStampFilterCreate::class.java,
+                ValidationStampFilterShare::class.java,
+                ValidationStampFilterMgt::class.java
         )
         register(Roles.PROJECT_VALIDATION_MANAGER, "Validation manager",
                 "The validation manager can manage the validation stamps.",
