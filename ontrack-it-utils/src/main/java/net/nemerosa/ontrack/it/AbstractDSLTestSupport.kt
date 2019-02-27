@@ -47,6 +47,14 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         asAccount(account).execute(code)
     }
 
+    /**
+     * Kotlin friendly account role execution
+     */
+    fun asAccountWithGlobalRole(role: String, code: () -> Unit) {
+        val account = doCreateAccountWithGlobalRole(role)
+        asAccount(account).execute(code)
+    }
+
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
         val configurationTest = ontrackConfigProperties.isConfigurationTest
         ontrackConfigProperties.isConfigurationTest = false

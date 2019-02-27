@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.ResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator
 import org.junit.Before
-import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 abstract class AbstractResourceDecoratorTestSupport : AbstractDSLTestSupport() {
 
@@ -21,18 +21,21 @@ abstract class AbstractResourceDecoratorTestSupport : AbstractDSLTestSupport() {
         )
     }
 
-    protected fun <T> T.decorate(decorator: ResourceDecorator<T>, code: List<Link>.() -> Unit): List<Link> =
-            decorator.links(this, resourceContext).apply(code)
+    protected fun <T> T.decorate(decorator: ResourceDecorator<T>, code: List<Link>.() -> Unit): List<Link> {
+        val links = decorator.links(this, resourceContext)
+        links.code()
+        return links
+    }
 
     protected fun List<Link>.assertLinkPresent(name: String) {
-        assertNotNull(
+        assertTrue(
                 any { link -> link.name == name },
                 "Link with name $name is present"
         )
     }
 
     protected fun List<Link>.assertLinkNotPresent(name: String) {
-        assertNotNull(
+        assertTrue(
                 none { link -> link.name == name },
                 "Link with name $name is not present"
         )
