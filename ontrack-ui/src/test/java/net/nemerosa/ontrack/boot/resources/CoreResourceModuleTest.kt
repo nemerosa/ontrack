@@ -1,92 +1,75 @@
-package net.nemerosa.ontrack.boot.resources;
+package net.nemerosa.ontrack.boot.resources
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
-import net.nemerosa.ontrack.ui.resource.*;
-import org.junit.Before;
-import org.junit.Test;
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.ui.controller.MockURIBuilder
+import net.nemerosa.ontrack.ui.resource.*
+import org.junit.Before
+import org.junit.Test
 
-import java.io.IOException;
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException
+import java.net.URI
+import java.time.LocalDateTime
+import java.util.Arrays
 
-import static net.nemerosa.ontrack.json.JsonUtils.array;
-import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
-import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import net.nemerosa.ontrack.json.JsonUtils.array
+import net.nemerosa.ontrack.json.JsonUtils.`object`
+import net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE
+import net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT
+import org.junit.Assert.assertEquals
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
-public class CoreResourceModuleTest {
+class CoreResourceModuleTest {
 
-    private ResourceObjectMapper mapper;
-    private SecurityService securityService;
-    private StructureService structureService;
-    private ProjectFavouriteService projectFavouriteService;
-    private BranchFavouriteService branchFavouriteService;
+    private var mapper: ResourceObjectMapper? = null
+    private var securityService: SecurityService? = null
+    private var structureService: StructureService? = null
+    private var projectFavouriteService: ProjectFavouriteService? = null
+    private var branchFavouriteService: BranchFavouriteService? = null
 
     @Before
-    public void before() {
-        securityService = mock(SecurityService.class);
-        structureService = mock(StructureService.class);
-        ResourceDecorationContributorService resourceDecorationContributorService = mock(ResourceDecorationContributorService.class);
-        projectFavouriteService = mock(ProjectFavouriteService.class);
-        branchFavouriteService = mock(BranchFavouriteService.class);
-        mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                Collections.singletonList(
-                        new DefaultResourceModule(
-                                Arrays.asList(
-                                        new ConnectedAccountResourceDecorator(),
-                                        new ProjectResourceDecorator(resourceDecorationContributorService, projectFavouriteService),
-                                        new BranchResourceDecorator(resourceDecorationContributorService, structureService, branchFavouriteService),
-                                        new PromotionLevelResourceDecorator(),
-                                        new ValidationStampResourceDecorator(),
-                                        new BuildResourceDecorator(resourceDecorationContributorService),
-                                        new PromotionRunResourceDecorator(),
-                                        new ValidationRunResourceDecorator(),
-                                        new BuildFilterResourceDecorator(),
-                                        new AccountResourceDecorator(),
-                                        new AccountGroupResourceDecorator(),
-                                        new GlobalPermissionResourceDecorator(),
-                                        new ProjectPermissionResourceDecorator(),
-                                        new JobStatusResourceDecorator(),
-                                        new PredefinedValidationStampResourceDecorator()
-                                )
+    fun before() {
+        securityService = mock(SecurityService::class.java)
+        structureService = mock(StructureService::class.java)
+        val resourceDecorationContributorService = mock(ResourceDecorationContributorService::class.java)
+        projectFavouriteService = mock(ProjectFavouriteService::class.java)
+        branchFavouriteService = mock(BranchFavouriteService::class.java)
+        mapper = ResourceObjectMapperFactory().resourceObjectMapper(
+                listOf<ResourceModule>(DefaultResourceModule(
+                        listOf(
+                                ConnectedAccountResourceDecorator(),
+                                ProjectResourceDecorator(resourceDecorationContributorService, projectFavouriteService),
+                                BranchResourceDecorator(resourceDecorationContributorService, structureService, branchFavouriteService),
+                                PromotionLevelResourceDecorator(),
+                                ValidationStampResourceDecorator(),
+                                BuildResourceDecorator(resourceDecorationContributorService),
+                                PromotionRunResourceDecorator(),
+                                ValidationRunResourceDecorator(),
+                                BuildFilterResourceDecorator(),
+                                AccountResourceDecorator(),
+                                AccountGroupResourceDecorator(),
+                                GlobalPermissionResourceDecorator(),
+                                ProjectPermissionResourceDecorator(),
+                                JobStatusResourceDecorator(),
+                                PredefinedValidationStampResourceDecorator()
                         )
-                ),
-                new DefaultResourceContext(new MockURIBuilder(), securityService)
-        );
-    }
-
-    public static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
-        assertEquals(
-                mapper.getObjectMapper().writeValueAsString(expectedJson),
-                mapper.write(o)
-        );
-    }
-
-    public static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o, Class<?> view) throws JsonProcessingException {
-        assertEquals(
-                mapper.getObjectMapper().writeValueAsString(expectedJson),
-                mapper.write(o, view)
-        );
+                )),
+                DefaultResourceContext(MockURIBuilder(), securityService)
+        )
     }
 
     @Test
-    public void project_granted_for_update() throws JsonProcessingException {
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE);
-        when(securityService.isProjectFunctionGranted(1, ProjectEdit.class)).thenReturn(true);
+    @Throws(JsonProcessingException::class)
+    fun project_granted_for_update() {
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
+        `when`(securityService!!.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
@@ -107,17 +90,18 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
-        );
+        )
     }
 
     @Test
-    public void project_not_favourite() throws JsonProcessingException {
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        when(securityService.isLogged()).thenReturn(true);
+    @Throws(JsonProcessingException::class)
+    fun project_not_favourite() {
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isLogged).thenReturn(true)
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
@@ -137,16 +121,17 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
-        );
+        )
     }
 
     @Test
-    public void project_no_favourite_link_if_not_logged() throws JsonProcessingException {
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
+    @Throws(JsonProcessingException::class)
+    fun project_no_favourite_link_if_not_logged() {
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
@@ -165,18 +150,19 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
-        );
+        )
     }
 
     @Test
-    public void project_favourite() throws JsonProcessingException {
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        when(securityService.isLogged()).thenReturn(true);
-        when(projectFavouriteService.isProjectFavourite(p)).thenReturn(true);
+    @Throws(JsonProcessingException::class)
+    fun project_favourite() {
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isLogged).thenReturn(true)
+        `when`(projectFavouriteService!!.isProjectFavourite(p)).thenReturn(true)
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
@@ -196,17 +182,18 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
-        );
+        )
     }
 
     @Test
-    public void project_granted_for_update_and_disabled() throws JsonProcessingException {
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withDisabled(true)
-                .withSignature(SIGNATURE);
-        when(securityService.isProjectFunctionGranted(1, ProjectEdit.class)).thenReturn(true);
+    @Throws(JsonProcessingException::class)
+    fun project_granted_for_update_and_disabled() {
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withDisabled(true)
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
@@ -227,27 +214,28 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
-        );
+        )
     }
 
     @Test
-    public void branch_no_build_granted_for_template_definition() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun branch_no_build_granted_for_template_definition() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        when(securityService.isProjectFunctionGranted(1, BranchTemplateMgt.class)).thenReturn(true);
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isProjectFunctionGranted(1, BranchTemplateMgt::class.java)).thenReturn(true)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "CLASSIC")
-                        .with("project", object()
+                        .with("project", `object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
@@ -288,27 +276,28 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
-        );
+        )
     }
 
     @Test
-    public void branch_instance_for_template_definition() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun branch_instance_for_template_definition() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
                 .withType(BranchType.TEMPLATE_INSTANCE)
-                .withSignature(SIGNATURE);
-        when(securityService.isProjectFunctionGranted(1, BranchTemplateMgt.class)).thenReturn(true);
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isProjectFunctionGranted(1, BranchTemplateMgt::class.java)).thenReturn(true)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "TEMPLATE_INSTANCE")
-                        .with("project", object()
+                        .with("project", `object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
@@ -350,28 +339,29 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
-        );
+        )
     }
 
     @Test
-    public void branch_with_builds_for_template_definition() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun branch_with_builds_for_template_definition() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        when(structureService.getBuildCount(b)).thenReturn(1);
-        when(securityService.isProjectFunctionGranted(1, BranchTemplateMgt.class)).thenReturn(true);
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        `when`(structureService!!.getBuildCount(b)).thenReturn(1)
+        `when`(securityService!!.isProjectFunctionGranted(1, BranchTemplateMgt::class.java)).thenReturn(true)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "CLASSIC")
-                        .with("project", object()
+                        .with("project", `object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
@@ -411,28 +401,29 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
-        );
+        )
     }
 
     @Test
-    public void branch_definition_granted() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun branch_definition_granted() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
                 .withType(BranchType.TEMPLATE_DEFINITION)
-                .withSignature(SIGNATURE);
-        when(securityService.isProjectFunctionGranted(1, BranchTemplateMgt.class)).thenReturn(true);
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isProjectFunctionGranted(1, BranchTemplateMgt::class.java)).thenReturn(true)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "TEMPLATE_DEFINITION")
-                        .with("project", object()
+                        .with("project", `object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
@@ -474,28 +465,29 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
-        );
+        )
     }
 
     @Test
-    public void branch_sync_granted_for_controller() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun branch_sync_granted_for_controller() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
                 .withType(BranchType.TEMPLATE_DEFINITION)
-                .withSignature(SIGNATURE);
-        when(securityService.isProjectFunctionGranted(1, BranchTemplateSync.class)).thenReturn(true);
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isProjectFunctionGranted(1, BranchTemplateSync::class.java)).thenReturn(true)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "TEMPLATE_DEFINITION")
-                        .with("project", object()
+                        .with("project", `object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
@@ -536,28 +528,29 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
-        );
+        )
     }
 
     @Test
-    public void branch_definition_not_granted() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun branch_definition_not_granted() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
                 .withType(BranchType.TEMPLATE_DEFINITION)
-                .withSignature(SIGNATURE);
-        when(securityService.isProjectFunctionGranted(1, BranchTemplateMgt.class)).thenReturn(false);
+                .withSignature(SIGNATURE)
+        `when`(securityService!!.isProjectFunctionGranted(1, BranchTemplateMgt::class.java)).thenReturn(false)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "TEMPLATE_DEFINITION")
-                        .with("project", object()
+                        .with("project", `object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
@@ -596,24 +589,25 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
-        );
+        )
     }
 
     @Test
-    public void branch_no_grant() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun branch_no_grant() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE);
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "CLASSIC")
-                        .with("project", object()
+                        .with("project", `object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Project")
@@ -652,35 +646,36 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
-        );
+        )
     }
 
     @Test
-    public void build_view() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun build_view() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE);
-        LocalDateTime signatureTime = LocalDateTime.of(2015, 6, 17, 11, 41);
-        Build build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of(signatureTime, "test")).withId(ID.of(1));
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val signatureTime = LocalDateTime.of(2015, 6, 17, 11, 41)
+        val build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of(signatureTime, "test")).withId(ID.of(1))
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "1")
                         .with("description", "Build 1")
-                        .with("signature", object()
+                        .with("signature", `object`()
                                 .with("time", "2015-06-17T11:41:00Z")
-                                .with("user", object().with("name", "test").end())
+                                .with("user", `object`().with("name", "test").end())
                                 .end()
                         )
-                        .with("branch", object()
+                        .with("branch", `object`()
                                 .with("id", 1)
                                 .with("name", "B")
                                 .with("description", "Branch")
                                 .with("disabled", false)
                                 .with("type", "CLASSIC")
-                                .with("project", object()
+                                .with("project", `object`()
                                         .with("id", 1)
                                         .with("name", "P")
                                         .with("description", "Project")
@@ -737,16 +732,17 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:BUILD:1")
                         .end(),
                 build
-        );
+        )
     }
 
     @Test
-    public void project_not_granted_for_update() throws JsonProcessingException {
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
+    @Throws(JsonProcessingException::class)
+    fun project_not_granted_for_update() {
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+                .withSignature(SIGNATURE)
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
@@ -765,19 +761,20 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
-        );
+        )
     }
 
     @Test
-    public void promotion_level_image_link_and_ignored_branch() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun promotion_level_image_link_and_ignored_branch() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE);
-        PromotionLevel pl = PromotionLevel.of(b, new NameDescription("PL", "Promotion level")).withId(ID.of(1)).withSignature(SIGNATURE);
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val pl = PromotionLevel.of(b, NameDescription("PL", "Promotion level")).withId(ID.of(1)).withSignature(SIGNATURE)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "PL")
                         .with("description", "Promotion level")
@@ -794,32 +791,33 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROMOTION_LEVEL:1")
                         .end(),
                 pl,
-                Branch.class
-        );
+                Branch::class.java
+        )
     }
 
     @Test
-    public void promotion_level_image_link_and_include_branch() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun promotion_level_image_link_and_include_branch() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE);
-        PromotionLevel pl = PromotionLevel.of(b, new NameDescription("PL", "Promotion level"))
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1)).withSignature(SIGNATURE)
+        val pl = PromotionLevel.of(b, NameDescription("PL", "Promotion level"))
                 .withId(ID.of(1))
-                .withSignature(SIGNATURE);
+                .withSignature(SIGNATURE)
         // Serialization
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 1)
                         .with("name", "PL")
                         .with("description", "Promotion level")
-                        .with("branch", object()
+                        .with("branch", `object`()
                                 .with("id", 1)
                                 .with("name", "B")
                                 .with("description", "Branch")
                                 .with("disabled", false)
                                 .with("type", "CLASSIC")
-                                .with("project", object()
+                                .with("project", `object`()
                                         .with("id", 1)
                                         .with("name", "P")
                                         .with("description", "Project")
@@ -869,27 +867,28 @@ public class CoreResourceModuleTest {
                         .with("_page", "urn:test:#:entity:PROMOTION_LEVEL:1")
                         .end(),
                 pl
-        );
+        )
     }
 
     @Test
-    public void resource_collection_with_filtering() throws JsonProcessingException {
-        Project project = Project.of(new NameDescription("PRJ", "Project")).withId(ID.of(1));
-        List<Branch> branches = Arrays.asList(
-                Branch.of(project, new NameDescription("B1", "Branch 1")).withId(ID.of(1)).withSignature(SIGNATURE),
-                Branch.of(project, new NameDescription("B2", "Branch 2")).withId(ID.of(2)).withSignature(SIGNATURE)
-        );
-        Resources<Branch> resourceCollection = Resources.of(
+    @Throws(JsonProcessingException::class)
+    fun resource_collection_with_filtering() {
+        val project = Project.of(NameDescription("PRJ", "Project")).withId(ID.of(1))
+        val branches = Arrays.asList(
+                Branch.of(project, NameDescription("B1", "Branch 1")).withId(ID.of(1)).withSignature(SIGNATURE),
+                Branch.of(project, NameDescription("B2", "Branch 2")).withId(ID.of(2)).withSignature(SIGNATURE)
+        )
+        val resourceCollection = Resources.of(
                 branches,
                 URI.create("urn:branch")
-        );
+        )
 
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("_self", "urn:branch")
                         .with("resources", array()
-                                .with(object()
+                                .with(`object`()
                                         .with("id", 1)
                                         .with("name", "B1")
                                         .with("description", "Branch 1")
@@ -914,7 +913,7 @@ public class CoreResourceModuleTest {
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
                                         .with("_page", "urn:test:#:entity:BRANCH:1")
                                         .end())
-                                .with(object()
+                                .with(`object`()
                                         .with("id", 2)
                                         .with("name", "B2")
                                         .with("description", "Branch 2")
@@ -942,14 +941,15 @@ public class CoreResourceModuleTest {
                                 .end())
                         .end(),
                 resourceCollection
-        );
+        )
     }
 
     @Test
-    public void account_group_links() throws JsonProcessingException {
+    @Throws(JsonProcessingException::class)
+    fun account_group_links() {
         assertResourceJson(
-                mapper,
-                object()
+                mapper!!,
+                `object`()
                         .with("id", 0)
                         .with("name", "Admins")
                         .with("description", "Administrators")
@@ -958,24 +958,44 @@ public class CoreResourceModuleTest {
                         .with("_delete", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#deleteGroup:0")
                         .end(),
                 AccountGroup.of("Admins", "Administrators")
-        );
+        )
     }
 
     @Test
-    public void promotion_run_delete_granted() throws IOException {
+    @Throws(IOException::class)
+    fun promotion_run_delete_granted() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1)).withType(BranchType.TEMPLATE_DEFINITION);
-        PromotionLevel pl = PromotionLevel.of(b, NameDescription.nd("PL", "Promotion Level")).withId(ID.of(1));
-        Build build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of("test")).withId(ID.of(1));
-        PromotionRun run = PromotionRun.of(build, pl, Signature.of("test"), "Run").withId(ID.of(1));
+        val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1)).withType(BranchType.TEMPLATE_DEFINITION)
+        val pl = PromotionLevel.of(b, NameDescription.nd("PL", "Promotion Level")).withId(ID.of(1))
+        val build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of("test")).withId(ID.of(1))
+        val run = PromotionRun.of(build, pl, Signature.of("test"), "Run").withId(ID.of(1))
         // Security
-        when(securityService.isProjectFunctionGranted(1, PromotionRunDelete.class)).thenReturn(true);
+        `when`(securityService!!.isProjectFunctionGranted(1, PromotionRunDelete::class.java)).thenReturn(true)
         // Serialization
-        JsonNode node = mapper.getObjectMapper().readTree(mapper.write(run));
+        val node = mapper!!.objectMapper.readTree(mapper!!.write(run))
         // Checks the _delete link is present
-        String delete = JsonUtils.get(node, "_delete");
-        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.PromotionRunController#deletePromotionRun:1", delete);
+        val delete = JsonUtils.get(node, "_delete")
+        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.PromotionRunController#deletePromotionRun:1", delete)
+    }
+
+    companion object {
+
+        @Throws(JsonProcessingException::class)
+        fun assertResourceJson(mapper: ResourceObjectMapper, expectedJson: JsonNode, o: Any) {
+            assertEquals(
+                    mapper.objectMapper.writeValueAsString(expectedJson),
+                    mapper.write(o)
+            )
+        }
+
+        @Throws(JsonProcessingException::class)
+        fun assertResourceJson(mapper: ResourceObjectMapper, expectedJson: JsonNode, o: Any, view: Class<*>) {
+            assertEquals(
+                    mapper.objectMapper.writeValueAsString(expectedJson),
+                    mapper.write(o, view)
+            )
+        }
     }
 
 }
