@@ -32,6 +32,21 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     @Autowired
     protected lateinit var buildFilterService: BuildFilterService
 
+    /**
+     * Kotlin friendly
+     */
+    fun asUserWithView(vararg entities: ProjectEntity, code: () -> Unit) {
+        asUserWithView(*entities).execute(code)
+    }
+
+    /**
+     * Kotlin friendly account role execution
+     */
+    fun ProjectEntity.asAccountWithProjectRole(role: String, code: () -> Unit) {
+        val account = doCreateAccountWithProjectRole(project, role)
+        asAccount(account).execute(code)
+    }
+
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
         val configurationTest = ontrackConfigProperties.isConfigurationTest
         ontrackConfigProperties.isConfigurationTest = false
