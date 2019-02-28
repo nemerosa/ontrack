@@ -36,8 +36,11 @@ image::images/vsf-clear.png[Clear the validation stamp filter,250px]
 [[branches-validation-stamp-filters-editing]]
 ===== Editing filters
 
-WARNING: Only authorized users are allowed to edit the validation stamp filters
-for a branch.
+[WARNING]
+====
+Only authorized users are allowed to edit the validation stamp filters
+for a branch. See <<branches-validation-stamp-filters-acl>> for more details.
+====
 
 A validation stamp filter is defined by:
 
@@ -128,7 +131,7 @@ NOTE: A confirmation will be asked before the deletion actually occurs.
 A filter is created by default at branch level and is only visible when the
 associated branch is displayed.
 
-An authorized user can:
+An <<branches-validation-stamp-filters-acl,authorized user>> can:
 
 * share the filter at project level - in this case, the filter is
 available for all the branches of the project
@@ -153,3 +156,23 @@ image::images/vsf-share-project.png[Share project,250px]
 To share a filter at global level, click on the share icon:
 
 image::images/vsf-share-global.png[Share global,250px]
+
+[[branches-validation-stamp-filters-acl]]
+===== Authorisations
+
+According to the <<security,role>> of the authenticated used, following actions
+are possible:
+
+|===
+| Scope | Action | Participant | Validation stamp manager | Project manager/owner | Administrator
+
+| Branch | Create | Yes | Yes | Yes | Yes
+| Branch | Edit | Yes | Yes | Yes | Yes
+| Branch | Delete | Yes | Yes | Yes | Yes
+| Branch | Share to project | No | Yes | Yes | Yes
+| Project | Edit | No | Yes | Yes | Yes
+| Project | Delete | No | Yes | Yes | Yes
+| Project | Share to global | No | No | No | Yes
+| Global | Edit | No | No | No | Yes
+| Global | Delete | No | No | No | Yes
+|===
