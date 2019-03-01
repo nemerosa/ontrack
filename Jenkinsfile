@@ -439,7 +439,6 @@ echo "(*) Creating ${DROPLET_NAME} droplet..."
 docker-machine create \\
     --driver=digitalocean \\
     --digitalocean-access-token=${DO_TOKEN} \\
-    --digitalocean-image=docker-18-04 \\
     --digitalocean-region=ams3 \\
     --digitalocean-size=1gb \\
     --digitalocean-backups=false \\
