@@ -261,7 +261,8 @@ configure(coreProjects) {
     // Integration tests
     task integrationTest(type: Test, dependsOn: 'test') {
         include '**/*IT.class'
-        jvmArgs '-Xmx512m'
+        minHeapSize = "512m"
+        maxHeapSize = "1024m"
         reports {
             html.enabled = false
         }
