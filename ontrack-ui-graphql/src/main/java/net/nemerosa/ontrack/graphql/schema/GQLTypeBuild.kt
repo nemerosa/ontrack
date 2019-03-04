@@ -174,11 +174,42 @@ constructor(
                                 fieldName = "usedBy",
                                 fieldDescription = "List of builds using this one.",
                                 itemType = this,
-                                itemPaginatedListProvider = { _, build, offset, size ->
+                                arguments = listOf(
+                                        GraphQLArgument.newArgument()
+                                                .name("project")
+                                                .description("Keeps only links targeted from this project")
+                                                .type(GraphQLString)
+                                                .build(),
+                                        GraphQLArgument.newArgument()
+                                                .name("branch")
+                                                .description("Keeps only links targeted from this branch. `project` argument is also required.")
+                                                .type(GraphQLString)
+                                                .build()
+                                ),
+                                itemPaginatedListProvider = { environment, build, offset, size ->
+                                    val projectName: String? = environment.getArgument("project")
+                                    val branchName: String? = environment.getArgument("branch")
+                                    val filter: (Build) -> Boolean
+                                    if (branchName != null) {
+                                        if (projectName == null) {
+                                            throw IllegalArgumentException("`project` is required")
+                                        } else {
+                                            filter = {
+                                                it.branch.project.name == projectName && it.branch.name == branchName
+                                            }
+                                        }
+                                    } else if (projectName != null) {
+                                        filter = {
+                                            it.branch.project.name == projectName
+                                        }
+                                    } else {
+                                        filter = { true }
+                                    }
                                     structureService.getBuildsUsing(
                                             build,
                                             offset,
-                                            size
+                                            size,
+                                            filter
                                     )
                                 }
                         )

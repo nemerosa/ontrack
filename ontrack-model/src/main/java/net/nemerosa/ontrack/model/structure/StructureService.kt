@@ -108,9 +108,10 @@ interface StructureService {
      * @param build  Source build
      * @param offset Offset for pagination
      * @param size   Page size for pagination
+     * @param filter Optional filter on the builds
      * @return List of builds which use the given one
      */
-    fun getBuildsUsing(build: Build, offset: Int, size: Int): PaginatedList<Build>
+    fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
 
     @Deprecated("Use {@link #getBuildsUsing(Build, int, int)} instead")

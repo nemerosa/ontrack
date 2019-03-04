@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.model.structure.Build
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -87,6 +88,130 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Filtered build origin links`() {
+        // Target build
+        val build = project<Build> {
+            branch<Build> {
+                build()
+            }
+        }
+        // Reference project with two builds to reference from
+        val ref1 = project {
+            branch("maintenance") {
+                build("1.0") {
+                    linkTo(build.project, build.name)
+                }
+            }
+            branch("master") {
+                build("2.0") {
+                    linkTo(build.project, build.name)
+                }
+            }
+        }
+        // Other reference project with one build
+        val ref2 = project {
+            branch("master") {
+                build("3.0") {
+                    linkTo(build.project, build.name)
+                }
+            }
+        }
+
+        build.apply {
+            // No filter, all of them
+            run("""{
+                        builds(id: $id) {
+                            usedBy {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("1.0", "2.0", "3.0"),
+                        this
+                )
+            }
+            // No filter, first one only
+            run("""{
+                        builds(id: $id) {
+                            usedBy(size: 1) {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("3.0"),
+                        this
+                )
+            }
+            // Project restriction, all of them
+            run("""{
+                        builds(id: $id) {
+                            usedBy(project: "${ref1.name}") {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("1.0", "2.0"),
+                        this
+                )
+            }
+            // Project restriction, first one
+            run("""{
+                        builds(id: $id) {
+                            usedBy(project: "${ref1.name}", size: 1) {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("2.0"),
+                        this
+                )
+            }
+            // Branch restriction
+            run("""{
+                        builds(id: $id) {
+                            usedBy(project: "${ref1.name}", branch: "master") {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("2.0"),
+                        this
+                )
             }
         }
     }
