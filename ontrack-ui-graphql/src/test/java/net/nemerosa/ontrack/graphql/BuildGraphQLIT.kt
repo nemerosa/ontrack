@@ -114,7 +114,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             }
         }
         // Other reference project with one build
-        val ref2 = project {
+        project {
             branch("master") {
                 build("3.0") {
                     linkTo(build.project, build.name)
