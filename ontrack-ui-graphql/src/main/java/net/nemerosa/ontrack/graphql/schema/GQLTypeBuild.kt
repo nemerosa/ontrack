@@ -155,6 +155,16 @@ constructor(
                     f.name("uses")
                             .description("List of builds being used by this one.")
                             .type(stdList(GraphQLTypeReference(BUILD)))
+                            .argument {
+                                it.name("project")
+                                        .description("Keeps only links targeted to this project")
+                                        .type(GraphQLString)
+                            }
+                            .argument {
+                                it.name("branch")
+                                        .description("Keeps only links targeted to this branch. `project` argument is also required.")
+                                        .type(GraphQLString)
+                            }
                             .dataFetcher(buildBeingUsedFetcher())
                 }
                 // Build links - "usedBy" direction, with pagination
@@ -236,27 +246,43 @@ constructor(
     }
 
     private fun buildBeingUsedFetcher(): DataFetcher<List<Build>> {
-        return fetcher(
-                Build::class.java,
-                { _, build -> structureService.getBuildLinksFrom(build) }
-        )
+        return DataFetcher { environment ->
+            val build: Build = environment.getSource()
+            val links = structureService.getBuildLinksFrom(build)
+            val projectName: String? = environment.getArgument("project")
+            val branchName: String? = environment.getArgument("branch")
+            if (branchName != null) {
+                if (projectName == null) {
+                    throw IllegalArgumentException("`project` is required")
+                } else {
+                    links.filter { link ->
+                        link.branch.project.name == projectName && link.branch.name == branchName
+                    }
+                }
+            } else if (projectName != null) {
+                links.filter { link ->
+                    link.branch.project.name == projectName
+                }
+            } else {
+                links
+            }
+        }
     }
 
     private fun buildLinkedFetcher(): DataFetcher<List<Build>> {
         return fetcher(
-                Build::class.java,
-                { environment, build ->
-                    val direction: String = GraphqlUtils.getStringArgument(environment, "direction")
-                            .orElse("TO")
-                    when (direction) {
-                        "TO" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
-                        "FROM" -> getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
-                        "BOTH" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to") +
-                                getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
-                        else -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
-                    }
-                }
-        )
+                Build::class.java
+        ) { environment, build ->
+            val direction: String = GraphqlUtils.getStringArgument(environment, "direction")
+                    .orElse("TO")
+            when (direction) {
+                "TO" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
+                "FROM" -> getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
+                "BOTH" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to") +
+                        getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
+                else -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
+            }
+        }
     }
 
     private fun getLinkedBuilds(builds: List<Build>, direction: String) =

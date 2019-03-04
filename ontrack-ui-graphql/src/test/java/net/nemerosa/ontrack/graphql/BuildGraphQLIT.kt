@@ -10,6 +10,86 @@ import kotlin.test.assertTrue
  */
 class BuildGraphQLIT : AbstractQLKTITSupport() {
 
+    @Test
+    fun `Filtered build links`() {
+        // Reference project with two builds to reference
+        val ref1 = project {
+            branch("maintenance") {
+                build("1.0")
+            }
+            branch("master") {
+                build("2.0")
+            }
+        }
+        // Other reference project with one build
+        val ref2 = project {
+            branch("master") {
+                build("3.0")
+            }
+        }
+        // Parent build
+        project {
+            branch {
+                build {
+                    // Links to all the builds above
+                    linkTo(ref1, "1.0")
+                    linkTo(ref1, "2.0")
+                    linkTo(ref2, "3.0")
+
+                    // No filter
+                    run("""{
+                        builds(id: $id) {
+                            uses {
+                                name
+                            }
+                        }
+                    }"""
+                    ).run {
+                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                    }.run {
+                        assertEquals(
+                                setOf("1.0", "2.0", "3.0"),
+                                this
+                        )
+                    }
+
+                    // Filter by project
+                    run("""{
+                        builds(id: $id) {
+                            uses(project: "${ref1.name}") {
+                                name
+                            }
+                        }
+                    }"""
+                    ).run {
+                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                    }.run {
+                        assertEquals(
+                                setOf("1.0", "2.0"),
+                                this
+                        )
+                    }
+
+                    // Filter by branch
+                    run("""{
+                        builds(id: $id) {
+                            uses(project: "${ref1.name}", branch: "master") {
+                                name
+                            }
+                        }
+                    }"""
+                    ).run {
+                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                    }.run {
+                        assertEquals(
+                                setOf("2.0"),
+                                this
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `Build links are empty by default`() {
