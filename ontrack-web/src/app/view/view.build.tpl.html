@@ -19,7 +19,7 @@
                 <div class="panel-body" ng-if="build.promotionRuns.length == 0">
                     No promotion yet.
                 </div>
-                <table class="table table-hover">
+                <table class="table table-hover" ng-if="build.promotionRuns.length > 0">
                     <tbody>
                     <tr ng-repeat="promotionRun in build.promotionRuns">
                         <td>
@@ -51,7 +51,7 @@
                 <div class="panel-body" ng-if="build.usedBy.pageInfo.currentSize == 0">
                     This build is not marked as being used by another build.
                 </div>
-                <table class="table table-hover">
+                <table class="table table-hover" ng-if="build.usedBy.pageInfo.currentSize > 0">
                     <tbody>
                     <tr ng-repeat="usedBy in build.usedBy.pageItems">
                         <td>
@@ -73,7 +73,7 @@
                         </td>
                     </tr>
                     </tbody>
-                    <tfoot>
+                    <tfoot ng-if="build.usedBy.pageInfo.previousPage || build.usedBy.pageInfo.nextPage">
                     <tr>
                         <td colspan="4">
                             <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.previousPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.previousPage)">
@@ -145,7 +145,7 @@
                         </td>
                     </tr>
                     </tbody>
-                    <tfoot>
+                    <tfoot ng-if="build.validationRunsPaginated.pageInfo.previousPage || build.validationRunsPaginated.pageInfo.nextPage">
                     <tr>
                         <td colspan="4">
                             <button class="btn btn-default" type="button" ng-show="build.validationRunsPaginated.pageInfo.previousPage" ng-click="navigateValidationRuns(build.validationRunsPaginated.pageInfo.previousPage)">
