@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.settings
 
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.MultiStrings
 import net.nemerosa.ontrack.model.labels.MainBuildLinksConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
@@ -34,6 +35,12 @@ class MainBuildLinksSettingsManager(
     }
 
     override fun getSettingsForm(settings: MainBuildLinksConfig?): Form {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Form.create()
+                .with(
+                        MultiStrings.of("labels")
+                                .help("List of project labels identifying the build links to keep in decorations.")
+                                .label("Project labels")
+                                .value(settings?.labels ?: emptyList<String>())
+                )
     }
 }
