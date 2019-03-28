@@ -8,4 +8,8 @@ package net.nemerosa.ontrack.model.labels
  */
 class MainBuildLinksConfig(
         val labels: List<String>
-)
+) {
+    fun merge(o: MainBuildLinksConfig) = MainBuildLinksConfig(
+            (labels + o.labels).distinct()
+    )
+}
