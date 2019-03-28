@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -31,6 +33,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var buildFilterService: BuildFilterService
+
+    @Autowired
+    protected lateinit var settingsManagerService: SettingsManagerService
+
+    @Autowired
+    protected lateinit var settingsService: CachedSettingsService
 
     /**
      * Kotlin friendly
@@ -252,6 +260,46 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 )
             }
         }
+
+    /**
+     * Saving current settings, runs some code and restores the format settings
+     */
+    private inline fun <reified T> withSettings(code: () -> Unit) {
+        val settings: T = settingsService.getCachedSettings(T::class.java)
+        try {
+            // Runs the code
+            code()
+        } finally {
+            // Restores the initial settings
+            asAdmin().execute {
+                settingsManagerService.saveSettings(settings)
+            }
+        }
+    }
+
+    /**
+     * Saving current "main build links" settings, runs some code and restores the format settings
+     */
+    protected fun withMainBuildLinksSettings(code: () -> Unit) = withSettings<MainBuildLinksConfig>(code)
+
+    /**
+     * Settings "main build links" settings
+     */
+    protected fun setMainBuildLinksSettings(vararg labels: String) {
+        asAdmin().execute {
+            settingsManagerService.saveSettings(
+                    MainBuildLinksConfig(
+                            labels.toList()
+                    )
+            )
+        }
+    }
+
+    /**
+     * Getting "main build links" settings
+     */
+    protected val mainBuildLinksSettings: List<String>
+        get() = settingsService.getCachedSettings(MainBuildLinksConfig::class.java).labels
 
     protected fun Branch.assertBuildSearch(filterBuilder: (StandardFilterProviderDataBuilder) -> Unit): BuildSearchAssertion {
         val data = buildFilterService.standardFilterProviderData(10)
