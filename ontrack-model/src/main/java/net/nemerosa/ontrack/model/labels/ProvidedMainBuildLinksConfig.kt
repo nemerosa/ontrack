@@ -13,7 +13,26 @@ class ProvidedMainBuildLinksConfig(
         val order: Int,
         val override: Boolean
 ) {
+    fun mergeInto(existing: ProvidedMainBuildLinksConfig): ProvidedMainBuildLinksConfig =
+            if (override) {
+                this
+            } else {
+                ProvidedMainBuildLinksConfig(
+                        labels = (existing.labels + labels).distinct(),
+                        order = order,
+                        override = false
+                )
+            }
+
+    fun toMainBuildLinksConfig() = MainBuildLinksConfig(
+            labels = labels
+    )
+
     companion object {
+        /**
+         * Hint for a system configuration
+         */
+        private const val SYSTEM = 0
         /**
          * Hint for a global configuration
          */
@@ -22,5 +41,13 @@ class ProvidedMainBuildLinksConfig(
          * Hint for a project configuration
          */
         const val PROJECT = 100
+        /**
+         * Empty configuration
+         */
+        val empty = ProvidedMainBuildLinksConfig(
+                labels = emptyList(),
+                order = SYSTEM,
+                override = false
+        )
     }
 }
