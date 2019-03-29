@@ -9,6 +9,6 @@ import net.nemerosa.ontrack.model.structure.Project
  */
 interface MainBuildLinksProvider {
 
-    fun getMainBuildLinksConfig(project: Project): MainBuildLinksConfig
+    fun getMainBuildLinksConfig(project: Project): ProvidedMainBuildLinksConfig
 
 }
