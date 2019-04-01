@@ -16,8 +16,9 @@ class MainBuildLinksSettingsProvider(
     override fun getSettings(): MainBuildLinksConfig {
         return MainBuildLinksConfig(
                 settingsRepository
-                        .getString(MainBuildLinksConfig::class.java, "labels", "")
-                        .split("|")
+                        .getString(MainBuildLinksConfig::class.java, "labels", null)
+                        ?.split("|")
+                        ?: emptyList()
         )
     }
 
