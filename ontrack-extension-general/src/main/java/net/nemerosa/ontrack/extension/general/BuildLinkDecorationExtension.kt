@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.extension.api.DecorationExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.labels.MainBuildLinksFilterService
+import net.nemerosa.ontrack.model.labels.MainBuildLinksService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import org.springframework.stereotype.Component
@@ -12,13 +14,22 @@ class BuildLinkDecorationExtension(
         extensionFeature: GeneralExtensionFeature,
         private val structureService: StructureService,
         private val uriBuilder: URIBuilder,
-        private val propertyService: PropertyService
+        private val propertyService: PropertyService,
+        private val mainBuildLinksService: MainBuildLinksService,
+        private val mainBuildLinksFilterService: MainBuildLinksFilterService
 ) : AbstractExtension(extensionFeature), DecorationExtension<BuildLinkDecoration> {
 
     override fun getScope() = EnumSet.of(ProjectEntityType.BUILD)
 
     override fun getDecorations(entity: ProjectEntity): List<Decoration<BuildLinkDecoration>> {
+        // Gets the main build links of the source project
+        val labels = mainBuildLinksService.getMainBuildLinksConfig(entity.project).labels
+        // Gets the links from
         return structureService.getBuildLinksFrom(entity as Build)
+                // Filters on the labels
+                .filter { target ->
+                    mainBuildLinksFilterService.isMainBuidLink(target, labels)
+                }
                 .map { getDecoration(it) }
     }
 

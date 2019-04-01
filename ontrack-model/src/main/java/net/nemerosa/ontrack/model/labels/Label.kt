@@ -14,4 +14,13 @@ open class Label(
      * Foreground colour
      */
     val foregroundColor: String get() = color.toRGBColor().toBlackOrWhite().toString()
+
+    /**
+     * Representation
+     */
+    fun getDisplay() = if (category != null) {
+        "$category:$name"
+    } else {
+        name
+    }
 }
