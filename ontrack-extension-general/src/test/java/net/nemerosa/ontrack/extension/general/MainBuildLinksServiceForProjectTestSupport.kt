@@ -1,17 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.labels.MainBuildLinksService
-import net.nemerosa.ontrack.model.structure.Project
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class MainBuildLinksServiceForProjectIT : AbstractDSLTestSupport() {
-
-
-    @Autowired
-    private lateinit var mainBuildLinksService: MainBuildLinksService
+class MainBuildLinksServiceForProjectTestSupport : AbstractGeneralExtensionTestSupport() {
 
     @Test
     fun `Only project settings`() {
@@ -77,17 +69,4 @@ class MainBuildLinksServiceForProjectIT : AbstractDSLTestSupport() {
         }
     }
 
-    private fun Project.setMainBuildLinksProperty(
-            labels: List<String>,
-            overrideGlobal: Boolean = false
-    ) {
-        setProperty(
-                this,
-                MainBuildLinksProjectPropertyType::class.java,
-                MainBuildLinksProjectProperty(
-                        labels,
-                        overrideGlobal
-                )
-        )
-    }
 }

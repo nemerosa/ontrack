@@ -205,6 +205,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 project.id,
                 BuildSearchForm().withBuildExactMatch(true).withBuildName(buildName)
         ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
+        linkTo(build)
+    }
+
+    fun Build.linkTo(build: Build) {
         structureService.addBuildLink(
                 this,
                 build
