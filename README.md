@@ -16,14 +16,14 @@ directions!
 ![Ontrack builds](doc/readme/ontrack-builds.png)
 
 Track your changes using
-[logs](https://static.nemerosa.net/ontrack/release/latest/doc/index.html#changelogs)
+[logs](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#changelogs)
 between builds/releases:
 
 ![Ontrack Git Commits](doc/readme/ontrack-git-commits.png)
 
-([Git](https://static.nemerosa.net/ontrack/release/latest/doc/index.html#usage-git)
+([Git](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#usage-git)
 and
-[Subversion](https://static.nemerosa.net/ontrack/release/latest/doc/index.html#usage-subversion)
+[Subversion](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#usage-subversion)
 are supported)
 
 Issue change logs are of course available:
@@ -31,15 +31,15 @@ Issue change logs are of course available:
 ![Ontrack GitHub Changelog](doc/readme/ontrack-github-changelog.png)
 
 Ontrack can communicate with many tools:
-[GitHub](https://static.nemerosa.net/ontrack/release/latest/doc/index.html#usage-github),
-[BitBucket](https://static.nemerosa.net/ontrack/release/latest/doc/index.html#usage-bitbucket),
+[GitHub](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#usage-github),
+[BitBucket](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#usage-bitbucket),
 JIRA, Jenkins, Artifactory.
 
 And if this is not enough, you can add your own
-[extensions](https://static.nemerosa.net/ontrack/release/latest/doc/index.html#extending).
+[extensions](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#extending).
 
 Full documentation available in the
-[Ontrack web site](https://static.nemerosa.net/ontrack/release/latest/doc/index.html) or as
-[PDF](https://static.nemerosa.net/ontrack/release/latest/index.pdf).
+[Ontrack web site](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html) or as
+[PDF](https://static.nemerosa.net/ontrack/release/latest/docs/index.pdf).
 
-[Contributions](https://static.nemerosa.net/ontrack/release/latest/doc/index.html#contributing) are welcome!
+[Contributions](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#contributing) are welcome!
