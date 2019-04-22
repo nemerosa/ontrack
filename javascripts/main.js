@@ -1,6 +1,6 @@
 let html = "";
 const latestRelease = releases[0];
-const prefix = "https://ams3-delivery-space.ams3.cdn.digitaloceanspaces.com/ontrack/release";
+const prefix = "https://static.nemerosa.net/ontrack/release";
 
 html += `
       <tr>
