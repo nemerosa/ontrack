@@ -91,7 +91,7 @@ class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestSupport() {
                         assertEquals(1, decorations.size)
                         val decoration = decorations[0]
                         val list = decoration.data
-                        assertEquals("", list.extraLink?.toString(), "Extra link")
+                        assertEquals("urn:test:#:entity:BUILD:$id", list.extraLink?.toString(), "Extra link")
                         assertEquals(
                                 setOf(
                                         ref1.name
