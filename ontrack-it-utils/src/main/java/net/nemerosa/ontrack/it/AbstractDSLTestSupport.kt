@@ -236,7 +236,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     fun label(category: String? = uid("C"), name: String = uid("N")): Label {
         return asUser().with(LabelManagement::class.java).call {
-            labelManagementService.newLabel(
+            val labels = labelManagementService.findLabels(category, name)
+            val existingLabel = labels.firstOrNull()
+            existingLabel ?: labelManagementService.newLabel(
                     LabelForm(
                             category = category,
                             name = name,
@@ -270,14 +272,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     private inline fun <reified T> withSettings(code: () -> Unit) {
         val settings: T = settingsService.getCachedSettings(T::class.java)
-        try {
-            // Runs the code
-            code()
-        } finally {
-            // Restores the initial settings
-            asAdmin().execute {
-                settingsManagerService.saveSettings(settings)
-            }
+        // Runs the code
+        code()
+        // Restores the initial settings (only in case of success)
+        asAdmin().execute {
+            settingsManagerService.saveSettings(settings)
         }
     }
 

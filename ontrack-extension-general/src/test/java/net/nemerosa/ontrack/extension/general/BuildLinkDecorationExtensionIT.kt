@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -26,16 +27,18 @@ class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestSupport() {
 
     @Test
     fun `Only main links`() {
+        val labelCategory = uid("c")
+        val labelName = uid("n")
         withMainBuildLinksSettings {
-            setMainBuildLinksSettings("type:product")
+            setMainBuildLinksSettings("$labelCategory:$labelName")
             val ref1 = project<Build> {
-                labels = listOf(label("type", "product"), label("something", "else"))
+                labels = listOf(label(labelCategory, labelName), label("something", "else"))
                 branch<Build> {
                     build()
                 }
             }
             val ref2 = project<Build> {
-                labels = listOf(label("type", "product"))
+                labels = listOf(label(labelCategory, labelName))
                 branch<Build> {
                     build()
                 }
