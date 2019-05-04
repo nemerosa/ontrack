@@ -37,18 +37,23 @@ class BuildLinkDecorationExtension(
         } else {
             null
         }
-        // Decoration items for the main links
-        val decorations = mainLinks.map { getDecoration(it) }
-        // Global decoration
-        return listOf(
-                Decoration.of(
-                        this,
-                        BuildLinkDecorationList(
-                                decorations,
-                                extraLink
-                        )
-                )
-        )
+        // No main links, no extra link ==> no decoration at all
+        if (mainLinks.isEmpty() && extraLink == null) {
+            return emptyList()
+        } else {
+            // Decoration items for the main links
+            val decorations = mainLinks.map { getDecoration(it) }
+            // Global decoration
+            return listOf(
+                    Decoration.of(
+                            this,
+                            BuildLinkDecorationList(
+                                    decorations,
+                                    extraLink
+                            )
+                    )
+            )
+        }
     }
 
     protected fun getDecoration(build: Build): BuildLinkDecoration {
