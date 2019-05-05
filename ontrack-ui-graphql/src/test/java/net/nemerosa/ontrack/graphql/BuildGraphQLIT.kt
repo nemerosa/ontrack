@@ -391,6 +391,54 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Build using dependencies`() {
+        val dep1 = project<Build> {
+            branch<Build> {
+                val pl = promotionLevel("IRON")
+                build {
+                    promote(pl)
+                }
+            }
+        }
+        val dep2 = project<Build> {
+            branch<Build> {
+                build()
+            }
+        }
+        // Source build
+        project {
+            branch {
+                build {
+                    // Creates links
+                    linkTo(dep1)
+                    linkTo(dep2)
+                    // Looks for dependencies
+                    val data = asUser().withView(this).call {
+                        run("""
+                            {
+                                builds(id: $id) {
+                                    name
+                                    using {
+                                        pageItems {
+                                            id
+                                        }
+                                    }
+                                }
+                            }
+                        """.trimIndent())
+                    }
+                    // Dependencies Ids
+                    val dependencies = data["builds"][0]["using"]["pageItems"].map { it["id"].asInt() }
+                    assertEquals(
+                            setOf(dep1.id(), dep2.id()),
+                            dependencies.toSet()
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Promotion runs when promotion does not exist`() {
         // Creates a build
         val build = doCreateBuild()
