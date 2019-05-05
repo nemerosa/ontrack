@@ -28,7 +28,7 @@ class BuildLinkDecorationExtension(
         val links = structureService.getBuildLinksFrom(entity as Build)
         // Main links
         val mainLinks = links.filter { target ->
-            mainBuildLinksFilterService.isMainBuidLink(target, labels)
+            labels.isEmpty() || mainBuildLinksFilterService.isMainBuidLink(target, labels)
         }
         // Checks if there are extra links (besides the main ones)
         val extraLinks = links.size > 0 && (links.size > mainLinks.size)
