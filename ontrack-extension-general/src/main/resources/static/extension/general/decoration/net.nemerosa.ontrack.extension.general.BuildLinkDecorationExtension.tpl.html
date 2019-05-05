@@ -11,3 +11,9 @@
         <img ng-if="promotion.imageLink" ng-src="{{promotion.imageLink}}" class="ot-icon" title="{{promotion.name}}"/>
     </span>
 </span>
+<!-- Extra link -->
+<span class="ot-decoration-border" ng-if="decoration.data.extraLink">
+    <a href="{{decoration.data.extraLink}}" title="Displays all links of this build">
+        <img src="extension/general/decoration/net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension/link.png"/>
+    </a>
+</span>

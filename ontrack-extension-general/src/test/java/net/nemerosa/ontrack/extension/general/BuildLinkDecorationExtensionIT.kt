@@ -146,6 +146,44 @@ class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestSupport() {
     }
 
     @Test
+    fun `Main links and extra links for project without label`() {
+        withMainBuildLinksSettings {
+            setMainBuildLinksSettings("type:product")
+            val ref1 = project<Build> {
+                labels = listOf(label("type", "product"), label("something", "else"))
+                branch<Build> {
+                    build()
+                }
+            }
+            val ref2 = project<Build> {
+                // No label
+                branch<Build> {
+                    build()
+                }
+            }
+            project {
+                branch {
+                    build {
+                        linkTo(ref1)
+                        linkTo(ref2)
+                        val decorations = extension.getDecorations(this)
+                        assertEquals(1, decorations.size)
+                        val decoration = decorations[0]
+                        val list = decoration.data
+                        assertEquals("urn:test:#:entity:BUILD:$id", list.extraLink?.toString(), "Extra link")
+                        assertEquals(
+                                setOf(
+                                        ref1.name
+                                ),
+                                list.decorations.map { it.build }.toSet()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `No main link`() {
         withMainBuildLinksSettings {
             setMainBuildLinksSettings("type:product")
