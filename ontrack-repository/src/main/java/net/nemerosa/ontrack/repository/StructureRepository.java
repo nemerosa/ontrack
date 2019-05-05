@@ -88,7 +88,16 @@ public interface StructureRepository {
 
     void deleteBuildLink(ID fromBuildId, ID toBuildId);
 
+    @Deprecated
     List<Build> getBuildLinksFrom(ID buildId);
+
+    /**
+     * Gets the builds used by the given one.
+     *
+     * @param build Source build
+     * @return List of builds used by the given one
+     */
+    List<Build> getBuildsUsedBy(Build build);
 
     /**
      * Gets the builds which use the given one.

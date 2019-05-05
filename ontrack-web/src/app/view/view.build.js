@@ -21,43 +21,41 @@ angular.module('ot.view.build', [
             };
             // GraphQL query
             const query = `
-            query Build($buildId: Int!, $usedByOffset: Int!, $validationRunsOffset: Int!) {
-              builds(id: $buildId) {
-                id
-                name
-                description
-                creation {
-                  user
-                  time
-                }
-                branch {
-                  id
-                  name
-                  project {
+                query Build($buildId: Int!, $usedByOffset: Int!, $validationRunsOffset: Int!) {
+                  builds(id: $buildId) {
                     id
                     name
-                  }
-                }
-                usedBy(offset: $usedByOffset, size: 10) {
-                  pageInfo {
-                    ...pageInfoContent
-                  }
-                  pageItems {
-                    name
+                    description
+                    creation {
+                      user
+                      time
+                    }
                     branch {
+                      id
                       name
-                      links {
-                        _page
-                      }
                       project {
+                        id
                         name
-                        links {
-                          _page
-                        }
                       }
                     }
-                    links {
-                      _page
+                    using {
+                      pageInfo {
+                        ...pageInfoContent
+                      }
+                      pageItems {
+                        ...buildLinkContent
+                      }
+                    }
+                    usedBy(offset: $usedByOffset, size: 10) {
+                      pageInfo {
+                        ...pageInfoContent
+                      }
+                      pageItems {
+                        ...buildLinkContent
+                      }
+                    }
+                    runInfo {
+                      ...runInfoContent
                     }
                     decorations {
                       decorationType
@@ -67,148 +65,162 @@ angular.module('ot.view.build', [
                         id
                       }
                     }
-                    promotionRuns(lastPerLevel: true) {
-                      promotionLevel {
-                        id
-                        name
-                        image
-                        _image
-                        links {
-                          _page
-                        }
-                      }
-                    }
-                  }
-                }
-                runInfo {
-                  ...runInfoContent
-                }
-                decorations {
-                  decorationType
-                  error
-                  data
-                  feature {
-                    id
-                  }
-                }
-                links {
-                  _self
-                  _buildLinks
-                  _promote
-                  _validate
-                  _update
-                  _delete
-                  _actions
-                  _next
-                  _previous
-                  _changeLogPage
-                  _properties
-                  _events
-                  _extra
-                }
-                promotionRuns {
-                  description
-                  creation {
-                    user
-                    time
-                  }
-                  links {
-                    _delete
-                  }
-                  promotionLevel {
-                    id
-                    name
-                    _image
-                    image
                     links {
-                      _page
+                      _self
+                      _buildLinks
+                      _promote
+                      _validate
+                      _update
+                      _delete
+                      _actions
+                      _next
+                      _previous
+                      _changeLogPage
+                      _properties
+                      _events
+                      _extra
                     }
-                  }
-                }
-                validationRunsPaginated(offset: $validationRunsOffset, size: 10) {
-                  pageInfo {
-                    ...pageInfoContent
-                  }
-                  pageItems {
-                      id
-                      runOrder
+                    promotionRuns {
+                      description
                       creation {
                         user
                         time
                       }
-                      data {
-                        descriptor {
-                          id
-                          feature {
-                            id
-                          }
-                        }
-                        data
-                      }
-                      validationRunStatuses {
-                        statusID {
-                          id
-                          name
-                        }
-                        creation {
-                          user
-                          time
-                        }
-                        description
-                        annotatedDescription
-                      }
-                      runInfo {
-                        ...runInfoContent
-                      }
                       links {
-                        _page
+                        _delete
                       }
-                      validationStamp {
+                      promotionLevel {
                         id
                         name
-                        image
                         _image
-                        dataType {
-                          descriptor {
-                            id
-                            displayName
-                            feature {
-                              id
-                            }
-                          }
-                          config
-                        }
+                        image
                         links {
                           _page
                         }
                       }
+                    }
+                    validationRunsPaginated(offset: $validationRunsOffset, size: 10) {
+                      pageInfo {
+                        ...pageInfoContent
+                      }
+                      pageItems {
+                        id
+                        runOrder
+                        creation {
+                          user
+                          time
+                        }
+                        data {
+                          descriptor {
+                            id
+                            feature {
+                              id
+                            }
+                          }
+                          data
+                        }
+                        validationRunStatuses {
+                          statusID {
+                            id
+                            name
+                          }
+                          creation {
+                            user
+                            time
+                          }
+                          description
+                          annotatedDescription
+                        }
+                        runInfo {
+                          ...runInfoContent
+                        }
+                        links {
+                          _page
+                        }
+                        validationStamp {
+                          id
+                          name
+                          image
+                          _image
+                          dataType {
+                            descriptor {
+                              id
+                              displayName
+                              feature {
+                                id
+                              }
+                            }
+                            config
+                          }
+                          links {
+                            _page
+                          }
+                        }
+                      }
+                    }
                   }
                 }
-              }
-            }
-            
-            fragment pageInfoContent on PageInfo {
-              totalSize
-              currentOffset
-              currentSize
-              previousPage {
-                offset
-                size
-              }
-              nextPage {
-                offset
-                size
-              }
-            }
-            
-            fragment runInfoContent on RunInfo {
-              sourceType
-              sourceUri
-              triggerType
-              triggerData
-              runTime
-            }
-        `;
+                
+                fragment buildLinkContent on Build {
+                  name
+                  branch {
+                    name
+                    links {
+                      _page
+                    }
+                    project {
+                      name
+                      links {
+                        _page
+                      }
+                    }
+                  }
+                  links {
+                    _page
+                  }
+                  decorations {
+                    decorationType
+                    error
+                    data
+                    feature {
+                      id
+                    }
+                  }
+                  promotionRuns(lastPerLevel: true) {
+                    promotionLevel {
+                      id
+                      name
+                      image
+                      _image
+                      links {
+                        _page
+                      }
+                    }
+                  }
+                }
+                
+                fragment pageInfoContent on PageInfo {
+                  totalSize
+                  currentOffset
+                  currentSize
+                  previousPage {
+                    offset
+                    size
+                  }
+                  nextPage {
+                    offset
+                    size
+                  }
+                }
+                
+                fragment runInfoContent on RunInfo {
+                  sourceType
+                  sourceUri
+                  triggerType
+                  triggerData
+                  runTime
+                }
+            `;
 
             // Loads the build
             function loadBuild() {

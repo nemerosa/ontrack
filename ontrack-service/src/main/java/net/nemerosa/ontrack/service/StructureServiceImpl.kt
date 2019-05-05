@@ -450,6 +450,15 @@ class StructureServiceImpl(
                 .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
     }
 
+    override fun getBuildsUsedBy(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean): PaginatedList<Build> {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        // Gets the complete list, filtered by ACL
+        val list = structureRepository.getBuildsUsedBy(build)
+                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
+        // OK
+        return PaginatedList.create(list.filter(filter), offset, size)
+    }
+
     override fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean): PaginatedList<Build> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         // Gets the complete list, filtered by ACL
