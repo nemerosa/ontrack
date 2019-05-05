@@ -16,12 +16,13 @@ angular.module('ot.view.build', [
             // Build's id
             const queryParams = {
                 buildId: $stateParams.buildId,
+                usingOffset: 0,
                 usedByOffset: 0,
                 validationRunsOffset: 0
             };
             // GraphQL query
             const query = `
-                query Build($buildId: Int!, $usedByOffset: Int!, $validationRunsOffset: Int!) {
+                query Build($buildId: Int!, $usingOffset: Int!, $usedByOffset: Int!, $validationRunsOffset: Int!) {
                   builds(id: $buildId) {
                     id
                     name
@@ -38,7 +39,7 @@ angular.module('ot.view.build', [
                         name
                       }
                     }
-                    using {
+                    using(offset: $usingOffset, size: 10) {
                       pageInfo {
                         ...pageInfoContent
                       }
@@ -361,6 +362,12 @@ angular.module('ot.view.build', [
             // Navigating the validation runs
             $scope.navigateValidationRuns = function (pageRequest) {
                 queryParams.validationRunsOffset = pageRequest.offset;
+                loadBuild();
+            };
+
+            // Navigating the "using" section
+            $scope.navigateUsing = function (pageRequest) {
+                queryParams.usingOffset = pageRequest.offset;
                 loadBuild();
             };
 
