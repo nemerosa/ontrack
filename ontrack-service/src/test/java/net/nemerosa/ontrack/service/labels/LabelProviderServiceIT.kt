@@ -206,7 +206,7 @@ class LabelProviderServiceIT : AbstractDSLTestSupport() {
             }
             // Attempting to create manual similar label
             assertFailsWith<LabelCategoryNameAlreadyExistException> {
-                label(category = "count", name = "1")
+                label(category = "count", name = "1", checkForExisting = false)
             }
         }
     }

@@ -234,18 +234,29 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Creates a label
      */
-    fun label(category: String? = uid("C"), name: String = uid("N")): Label {
+    fun label(category: String? = uid("C"), name: String = uid("N"), checkForExisting: Boolean = true): Label {
         return asUser().with(LabelManagement::class.java).call {
-            val labels = labelManagementService.findLabels(category, name)
-            val existingLabel = labels.firstOrNull()
-            existingLabel ?: labelManagementService.newLabel(
+            if (checkForExisting) {
+                val labels = labelManagementService.findLabels(category, name)
+                val existingLabel = labels.firstOrNull()
+                existingLabel ?: labelManagementService.newLabel(
+                        LabelForm(
+                                category = category,
+                                name = name,
+                                description = null,
+                                color = "#FF0000"
+                        )
+                )
+            } else {
+                labelManagementService.newLabel(
                     LabelForm(
                             category = category,
                             name = name,
                             description = null,
                             color = "#FF0000"
                     )
-            )
+                )
+            }
         }
     }
 
