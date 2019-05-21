@@ -546,7 +546,7 @@ class StructureServiceImpl(
         // Creation
         val newPromotionLevel = rawNewPromotionLevel(promotionLevel)
         // Checking if there is an associated predefined promotion level
-        securityService.asAdmin {
+        return securityService.callAsAdmin {
             val predefined: PredefinedPromotionLevel? = securityService.callAsAdmin {
                 predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
             }.orElse(null)
@@ -563,11 +563,11 @@ class StructureServiceImpl(
                     )
                 }
                 // Reloading
-                return getPromotionLevel(newPromotionLevel.id)
+                getPromotionLevel(newPromotionLevel.id)
+            } else {
+                newPromotionLevel
             }
         }
-        // OK
-        return newPromotionLevel
     }
 
     private fun rawNewPromotionLevel(promotionLevel: PromotionLevel): PromotionLevel {
