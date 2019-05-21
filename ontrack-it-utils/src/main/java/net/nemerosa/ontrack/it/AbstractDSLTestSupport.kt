@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.it
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.buildfilter.StandardFilterProviderDataBuilder
@@ -8,8 +9,10 @@ import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
+import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.reflect.KClass
@@ -31,6 +34,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var buildFilterService: BuildFilterService
+
+    @Autowired
+    protected lateinit var predefinedPromotionLevelService: PredefinedPromotionLevelService
 
     /**
      * Kotlin friendly
@@ -252,6 +258,26 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 )
             }
         }
+
+    /**
+     * Creation of a predefined promotion level
+     */
+    protected fun predefinedPromotionLevel(name: String, description: String = "", image: Boolean = false) {
+        asAdmin().call {
+            val ppl = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                    PredefinedPromotionLevel.of(
+                            NameDescription.nd(name, description)
+                    )
+            )
+            if (image) {
+                val document = Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
+                predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
+                        ppl.id,
+                        document
+                )
+            }
+        }
+    }
 
     protected fun Branch.assertBuildSearch(filterBuilder: (StandardFilterProviderDataBuilder) -> Unit): BuildSearchAssertion {
         val data = buildFilterService.standardFilterProviderData(10)
