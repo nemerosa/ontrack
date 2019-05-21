@@ -543,6 +543,34 @@ class StructureServiceImpl(
     }
 
     override fun newPromotionLevel(promotionLevel: PromotionLevel): PromotionLevel {
+        // Creation
+        val newPromotionLevel = rawNewPromotionLevel(promotionLevel)
+        // Checking if there is an associated predefined promotion level
+        securityService.asAdmin {
+            val predefined: PredefinedPromotionLevel? = securityService.callAsAdmin {
+                predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
+            }.orElse(null)
+            if (predefined != null) {
+                // Description
+                if (promotionLevel.description.isNullOrBlank()) {
+                    savePromotionLevel(newPromotionLevel.withDescription(predefined.description))
+                }
+                // Image
+                if (predefined.image != null && predefined.image) {
+                    setPromotionLevelImage(
+                            newPromotionLevel.id,
+                            predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefined.id)
+                    )
+                }
+                // Reloading
+                return getPromotionLevel(newPromotionLevel.id)
+            }
+        }
+        // OK
+        return newPromotionLevel
+    }
+
+    private fun rawNewPromotionLevel(promotionLevel: PromotionLevel): PromotionLevel {
         // Validation
         isEntityNew(promotionLevel, "Promotion level must be new")
         isEntityDefined(promotionLevel.branch, "Branch must be defined")
@@ -622,7 +650,7 @@ class StructureServiceImpl(
     }
 
     override fun newPromotionLevelFromPredefined(branch: Branch, predefinedPromotionLevel: PredefinedPromotionLevel): PromotionLevel {
-        val promotionLevel = newPromotionLevel(
+        val promotionLevel = rawNewPromotionLevel(
                 PromotionLevel.of(
                         branch,
                         NameDescription.nd(predefinedPromotionLevel.name, predefinedPromotionLevel.description)
