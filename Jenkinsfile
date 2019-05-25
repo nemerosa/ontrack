@@ -222,6 +222,61 @@ docker-compose --project-name local down --volumes
             }
         }
 
+        stage('Local extension tests') {
+            agent {
+                dockerfile {
+                    label "docker"
+                    dir "jenkins"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            environment {
+                ONTRACK_VERSION = "${version}"
+            }
+            steps {
+                timeout(time: 25, unit: 'MINUTES') {
+                    // Cleanup
+                    sh """\
+rm -rf ontrack-acceptance/src/main/compose/build
+"""
+                    // Launches the tests
+                    sh """\
+#!/bin/bash
+set -e
+
+echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+
+echo "Launching tests..."
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
+"""
+                }
+            }
+            post {
+                always {
+                    sh """\
+echo "Cleanup..."
+mkdir -p build
+rm -rf build/extension
+cp -r ontrack-acceptance/src/main/compose/build build/extension
+cd ontrack-acceptance/src/main/compose
+docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
+"""
+                    script {
+                        def results = junit 'build/extension/*.xml'
+                        ontrackValidate(
+                                project: projectName,
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'EXTENSIONS',
+                                testResults: results,
+                        )
+                    }
+                }
+            }
+        }
+
+
         // We stop here for pull requests and feature branches
 
         // OS tests + DO tests in parallel
@@ -351,57 +406,6 @@ docker-compose --project-name debian --file docker-compose-debian.yml down --vol
                                         branch: branchName,
                                         build: version,
                                         validationStamp: 'ACCEPTANCE.DEBIAN',
-                                        testResults: results,
-                                )
-                            }
-                        }
-                    }
-                }
-                // Extension tests
-                stage('Local extension tests') {
-                    agent {
-                        dockerfile {
-                            label "docker"
-                            dir "jenkins"
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
-                    steps {
-                        timeout(time: 25, unit: 'MINUTES') {
-                            // Cleanup
-                            sh """\
-rm -rf ontrack-acceptance/src/main/compose/build
-"""
-                            // Launches the tests
-                            sh """\
-#!/bin/bash
-set -e
-
-echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-
-echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
-"""
-                        }
-                    }
-                    post {
-                        always {
-                            sh """\
-echo "Cleanup..."
-mkdir -p build
-rm -rf build/extension
-cp -r ontrack-acceptance/src/main/compose/build build/extension
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
-"""
-                            script {
-                                def results = junit 'build/extension/*.xml'
-                                ontrackValidate(
-                                        project: projectName,
-                                        branch: branchName,
-                                        build: version,
-                                        validationStamp: 'EXTENSIONS',
                                         testResults: results,
                                 )
                             }

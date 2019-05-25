@@ -5,8 +5,8 @@
         </ot-noentry>
         <div ng-repeat="property in valueProperties">
             <div class="col-md-12">
-                <div class="ot-property-panel" title="{{property.typeDescriptor.description}}">
-                    <div class="panel-heading">
+                <div class="ot-property-panel" title="{{property.typeDescriptor.description}}" id="{{property.typeDescriptor.typeName}}">
+                    <div class="panel-heading" id="{{property.typeDescriptor.typeName}}.heading">
                         <img ng-src="extension/{{property.typeDescriptor.feature.id}}/property/{{property.typeDescriptor.typeName}}.png" class="ot-icon"/>
                         {{property.typeDescriptor.name}}
                         <p class="pull-right" ng-if="property.editable">
@@ -14,7 +14,7 @@
                             <span class="ot-command ot-command-delete" title="Delete the property" ng-click="deleteProperty(property)"></span>
                         </p>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body" id="{{property.typeDescriptor.typeName}}.template">
                         <ng-include src="getTemplatePath(property)"></ng-include>
                     </div>
                 </div>

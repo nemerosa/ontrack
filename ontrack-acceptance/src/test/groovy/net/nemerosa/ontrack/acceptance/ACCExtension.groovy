@@ -64,4 +64,10 @@ class ACCExtension extends AbstractACCDSL {
         }
     }
 
+    @Test
+    void 'Property resources available'() {
+        ontrack.download("extension/test/property/net.nemerosa.ontrack.extension.test.TestPropertyType.png")
+        ontrack.download("extension/test/property/net.nemerosa.ontrack.extension.test.TestPropertyType.tpl.html")
+    }
+
 }
