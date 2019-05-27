@@ -4,57 +4,50 @@ import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.support.StartupService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 /**
  * Management of the roles and functions.
+ *
+ * @property roleContributors Role contributors
  */
 @Service
 @Transactional
-class RolesServiceImpl @Autowired
-constructor(
-        /**
-         * Role contributors
-         */
+class RolesServiceImpl(
         private val roleContributors: List<RoleContributor>
 ) : RolesService, StartupService {
 
     /**
      * Index of global roles
      */
-    private val globalRoles = LinkedHashMap<String, GlobalRole>()
+    private val globalRolesIndex = LinkedHashMap<String, GlobalRole>()
 
     /**
      * Index of project roles
      */
-    private val projectRoles = LinkedHashMap<String, ProjectRole>()
+    private val projectRolesIndex = LinkedHashMap<String, ProjectRole>()
 
-    override fun getGlobalRoles(): List<GlobalRole> {
-        return ArrayList(globalRoles.values)
-    }
+    override val globalRoles: List<GlobalRole>
+        get() = globalRolesIndex.values.toList()
 
     override fun getGlobalRole(id: String): Optional<GlobalRole> {
-        return Optional.ofNullable(globalRoles[id])
+        return Optional.ofNullable(globalRolesIndex[id])
     }
 
-    override fun getProjectRoles(): List<ProjectRole> {
-        return ArrayList(projectRoles.values)
-    }
+    override val projectRoles: List<ProjectRole>
+        get() = projectRolesIndex.values.toList()
 
     override fun getProjectRole(id: String): Optional<ProjectRole> {
-        return Optional.ofNullable(projectRoles[id])
+        return Optional.ofNullable(projectRolesIndex[id])
     }
 
-    override fun getGlobalFunctions(): List<Class<out GlobalFunction>> {
-        return RolesService.defaultGlobalFunctions
-    }
+    override val globalFunctions: List<Class<out GlobalFunction>>
+        get() = RolesService.defaultGlobalFunctions
 
-    override fun getProjectFunctions(): List<Class<out ProjectFunction>> {
-        return RolesService.defaultProjectFunctions
-    }
+    override val projectFunctions: List<Class<out ProjectFunction>>
+        get() = RolesService.defaultProjectFunctions
 
     override fun getProjectRoleAssociation(project: Int, roleId: String): Optional<ProjectRoleAssociation> {
         return getProjectRole(roleId).map { role -> ProjectRoleAssociation(project, role) }
@@ -192,7 +185,7 @@ constructor(
     }
 
     private fun register(projectRole: ProjectRole) {
-        projectRoles[projectRole.id] = projectRole
+        projectRolesIndex[projectRole.id] = projectRole
 
     }
 
@@ -317,7 +310,7 @@ constructor(
         if (parent == null) {
             return null
         } else if (Roles.PROJECT_ROLES.contains(parent)) {
-            val parentRole = projectRoles[parent]
+            val parentRole = projectRolesIndex[parent]
             if (parentRole != null) {
                 return parentRole
             }
@@ -329,7 +322,7 @@ constructor(
         if (parent == null) {
             return null
         } else if (Roles.GLOBAL_ROLES.contains(parent)) {
-            val parentRole = globalRoles[parent]
+            val parentRole = globalRolesIndex[parent]
             if (parentRole != null) {
                 return parentRole
             }
@@ -387,6 +380,6 @@ constructor(
     }
 
     private fun register(role: GlobalRole) {
-        globalRoles[role.id] = role
+        globalRolesIndex[role.id] = role
     }
 }
