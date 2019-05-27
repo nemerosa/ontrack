@@ -51,6 +51,8 @@ A **CONTROLLER** can, on all projects, create builds, promote and validate
 them, synchronize branches with their template. It is suited for a basic CI
 need when the Ontrack structure already exists and does not need to be created.
 
+A **GLOBAL VALIDATION MANAGER** can manage validation stamps across all projects.
+
 A **READ_ONLY** can view all projects, but cannot perform any action on them.
 
 The global roles can only be assigned by an _administrator_, in the _Account
