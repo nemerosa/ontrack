@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.exceptions.PredefinedValidationStampNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.ValidationStampBulkUpdate
 import net.nemerosa.ontrack.model.security.ValidationStampEdit
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -121,7 +122,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
         }
 
         // Bulk update
-        asUser().with(GlobalSettings::class.java).call {
+        asUser().with(ValidationStampBulkUpdate::class.java).call {
             structureService.bulkUpdateValidationStamps(vs1.id)
         }
 
@@ -165,7 +166,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
         }
 
         // Bulk update
-        asUser().with(GlobalSettings::class.java).call {
+        asUser().with(ValidationStampBulkUpdate::class.java).call {
             structureService.bulkUpdateValidationStamps(vs1.id)
         }
 
@@ -196,7 +197,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
         val vs3 = doCreateValidationStamp(branch3, NameDescription.nd(vs2Name, ""), testNumberValidationDataType.config(30))
 
         // Bulk update
-        asUser().with(GlobalSettings::class.java).call {
+        asUser().with(ValidationStampBulkUpdate::class.java).call {
             structureService.bulkUpdateValidationStamps(vs1.id)
         }
 
@@ -259,7 +260,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
         }
 
         // Bulk update
-        asUser().with(GlobalSettings::class.java).call {
+        asUser().with(ValidationStampBulkUpdate::class.java).call {
             structureService.bulkUpdateValidationStamps(vs1.id)
         }
 
