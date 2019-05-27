@@ -984,7 +984,7 @@ class StructureServiceImpl(
 
     override fun bulkUpdateValidationStamps(validationStampId: ID): Ack {
         // Checks access
-        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        securityService.checkGlobalFunction(ValidationStampBulkUpdate::class.java)
         // As admin
         securityService.asAdmin {
             val validationStamp = getValidationStamp(validationStampId)

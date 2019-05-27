@@ -272,6 +272,20 @@ constructor(
                 )
         )
 
+        // Global validation manager
+        register(Roles.GLOBAL_VALIDATION_MANAGER, "Global validation manager",
+                "A global validation manager can manage the validation stamps across all projects.",
+                listOf(
+                        ValidationStampBulkUpdate::class.java
+                ),
+                listOf(
+                        ProjectView::class.java,
+                        ValidationStampCreate::class.java,
+                        ValidationStampEdit::class.java,
+                        ValidationStampDelete::class.java
+                )
+        )
+
         // Read only on all projects
         register(Roles.GLOBAL_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all projects",
