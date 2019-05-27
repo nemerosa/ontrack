@@ -801,6 +801,34 @@ class StructureServiceImpl(
     }
 
     override fun newValidationStamp(validationStamp: ValidationStamp): ValidationStamp {
+        // Raw creation
+        val newValidationStamp = rawNewValidationStamp(validationStamp)
+        // Checking if there is an associated predefined validation stamp
+        return securityService.callAsAdmin {
+            val predefined: PredefinedValidationStamp? = securityService.callAsAdmin {
+                predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name)
+            }.orElse(null)
+            if (predefined != null) {
+                // Description
+                if (validationStamp.description.isNullOrBlank()) {
+                    saveValidationStamp(newValidationStamp.withDescription(predefined.description))
+                }
+                // Image
+                if (predefined.image != null && predefined.image) {
+                    setValidationStampImage(
+                            newValidationStamp.id,
+                            predefinedValidationStampService.getPredefinedValidationStampImage(predefined.id)
+                    )
+                }
+                // Reloading
+                getValidationStamp(newValidationStamp.id)
+            } else {
+                newValidationStamp
+            }
+        }
+    }
+
+    private fun rawNewValidationStamp(validationStamp: ValidationStamp): ValidationStamp {
         // Validation
         isEntityNew(validationStamp, "Validation stamp must be new")
         isEntityDefined(validationStamp.branch, "Branch must be defined")
@@ -1057,7 +1085,7 @@ class StructureServiceImpl(
     }
 
     override fun newValidationStampFromPredefined(branch: Branch, stamp: PredefinedValidationStamp): ValidationStamp {
-        val validationStamp = newValidationStamp(
+        val validationStamp = rawNewValidationStamp(
                 ValidationStamp.of(
                         branch,
                         NameDescription.nd(stamp.name, stamp.description)
