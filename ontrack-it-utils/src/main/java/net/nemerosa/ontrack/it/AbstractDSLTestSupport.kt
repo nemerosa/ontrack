@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils
@@ -37,6 +38,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var predefinedPromotionLevelService: PredefinedPromotionLevelService
+
+    @Autowired
+    protected lateinit var predefinedValidationStampService: PredefinedValidationStampService
 
     /**
      * Kotlin friendly
@@ -273,6 +277,26 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 val document = Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
                 predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
                         ppl.id,
+                        document
+                )
+            }
+        }
+    }
+
+    /**
+     * Creation of a predefined validation stamp
+     */
+    protected fun predefinedValidationStamp(name: String, description: String = "", image: Boolean = false) {
+        asAdmin().call {
+            val pps = predefinedValidationStampService.newPredefinedValidationStamp(
+                    PredefinedValidationStamp.of(
+                            NameDescription.nd(name, description)
+                    )
+            )
+            if (image) {
+                val document = Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
+                predefinedValidationStampService.setPredefinedValidationStampImage(
+                        pps.id,
                         document
                 )
             }
