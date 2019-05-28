@@ -114,7 +114,14 @@ class EventFactoryImplTest {
     fun newPromotionRun() {
         val e = factory.newPromotionRun(promotionRun())
         assertEquals("user", e.signature.user.name)
-        assertEquals(e.entities.size, 4)
+        assertEntities(
+                e,
+                ProjectEntityType.PROJECT,
+                ProjectEntityType.BRANCH,
+                ProjectEntityType.BUILD,
+                ProjectEntityType.PROMOTION_LEVEL,
+                ProjectEntityType.PROMOTION_RUN
+        )
         assertEquals("Build 1 has been promoted to COPPER for branch B in P.", e.renderText())
         assertEquals("""Build <a href="#/build/100">1</a> has been promoted to <a href="#/promotionLevel/100">COPPER</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""", e.render(testRenderer))
     }
@@ -123,7 +130,14 @@ class EventFactoryImplTest {
     fun deletePromotionRun() {
         val e = factory.deletePromotionRun(promotionRun())
         assertNull(e.signature)
-        assertEquals(e.entities.size, 4)
+        assertEntities(
+                e,
+                ProjectEntityType.PROJECT,
+                ProjectEntityType.BRANCH,
+                ProjectEntityType.BUILD,
+                ProjectEntityType.PROMOTION_LEVEL,
+                ProjectEntityType.PROMOTION_RUN
+        )
         assertEquals("Promotion COPPER of build 1 has been deleted for branch B in P.", e.renderText())
     }
 
@@ -227,6 +241,17 @@ class EventFactoryImplTest {
                 """<i class="$valueKey">${value.value}</i>"""
 
         private fun link(name: String, uri: String): String = """<a href="#/$uri">$name</a>"""
+    }
+
+    private fun assertEntities(e: Event, vararg types: ProjectEntityType) {
+        assertEquals(
+                types.toSet(),
+                e.entities.map { it.key }.toSet()
+        )
+        assertEquals(
+                types.toSet(),
+                e.entities.map { it.value.projectEntityType }.toSet()
+        )
     }
 
 }
