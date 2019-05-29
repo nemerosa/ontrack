@@ -179,5 +179,8 @@ image and the same description.
 A <<validation-stamps-auto-predefined,predefined validation stamp>> will
 also be updated or created.
 
-NOTE: any <<validation-stamps-data,validation data configuration>> is also
+NOTE: In order to perform a bulk update, you must be an administrator or
+      been granted the <<security-roles-global,global validation manager>> role.
+
+NOTE: Any <<validation-stamps-data,validation data configuration>> is also
 part of the bulk update.

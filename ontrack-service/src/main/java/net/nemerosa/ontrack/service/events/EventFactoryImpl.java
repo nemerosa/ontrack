@@ -209,6 +209,7 @@ public class EventFactoryImpl implements EventFactory {
         return Event.of(DELETE_PROMOTION_RUN)
                 .withBranch(promotionRun.getBuild().getBranch())
                 .with(promotionRun.getBuild())
+                .with(promotionRun)
                 .with(promotionRun.getPromotionLevel())
                 .get();
     }

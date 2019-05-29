@@ -150,7 +150,7 @@ public final class Event {
         }
 
         public EventBuilder withPromotionRun(PromotionRun promotionRun) {
-            return withBuild(promotionRun.getBuild()).with(promotionRun.getPromotionLevel()).with(promotionRun.getSignature());
+            return withBuild(promotionRun.getBuild()).with(promotionRun).with(promotionRun.getPromotionLevel()).with(promotionRun.getSignature());
         }
 
         public EventBuilder withValidationRun(ValidationRun validationRun) {
