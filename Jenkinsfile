@@ -223,6 +223,12 @@ docker-compose --project-name local down --volumes
         }
 
         stage('Local extension tests') {
+            when {
+                not {
+                    branch "master"
+                }
+                beforeAgent true
+            }
             agent {
                 dockerfile {
                     label "docker"
