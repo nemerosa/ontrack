@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
@@ -261,7 +260,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             no: Int,
             tests: OntrackGitCommitInfo.() -> Unit
     ) {
-        val commit = commits.getOrFail(no)
+        val commit = commits.getValue(no)
         val info = gitService.getCommitProjectInfo(project.id, commit)
         // Commit message & hash
         assertEquals(commit, info.uiCommit.id)
@@ -321,7 +320,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             promotions: List<PromotionLevel> = emptyList()
     ) {
         build(no.toString()) {
-            gitCommitProperty(commits.getOrFail(no))
+            gitCommitProperty(commits.getValue(no))
             validations.forEach { validate(it) }
             promotions.forEach { promote(it) }
             gitService.getCommitForBuild(this)?.let {

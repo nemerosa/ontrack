@@ -155,6 +155,7 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("uuid", "uuid")
                         .with("_commits", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogCommits:uuid")
                         .with("_issues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogIssues:uuid")
+                        .with("_issuesIds", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogIssuesIds:uuid")
                         .with("_files", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogFiles:uuid")
                         .with("_changeLogFileFilters", "urn:test:net.nemerosa.ontrack.extension.scm.SCMController#getChangeLogFileFilters:1")
                         .with("_diff", "urn:test:net.nemerosa.ontrack.extension.git.GitController#diff:")

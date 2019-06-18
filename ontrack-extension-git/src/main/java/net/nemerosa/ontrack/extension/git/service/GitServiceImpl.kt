@@ -240,6 +240,30 @@ class GitServiceImpl(
                 ?: throw GitBranchNotConfiguredException(build.branch.id)
     }
 
+    override fun getChangeLogIssuesIds(changeLog: GitChangeLog): List<String> {
+        // Commits must have been loaded first
+        val commits: GitChangeLogCommits = changeLog.loadCommits {
+            getChangeLogCommits(it)
+        }
+        // In a transaction
+        transactionService.start().use { _ ->
+            // Configuration
+            val configuration = getRequiredProjectConfiguration(changeLog.project)
+            // Issue service
+            val configuredIssueService = configuration.configuredIssueService.orElse(null)
+                    ?: throw IssueServiceNotConfiguredException()
+            // Set of issues
+            val issueKeys = TreeSet<String>()
+            // For all commits in this commit log
+            for (gitUICommit in commits.log.commits) {
+                val keys = configuredIssueService.extractIssueKeysFromMessage(gitUICommit.commit.fullMessage)
+                issueKeys += keys
+            }
+            // OK
+            return issueKeys.toList()
+        }
+    }
+
     override fun getChangeLogIssues(changeLog: GitChangeLog): GitChangeLogIssues {
         // Commits must have been loaded first
         val commits: GitChangeLogCommits = changeLog.loadCommits {
