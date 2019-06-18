@@ -50,7 +50,7 @@ class GitChangeLogIT : AbstractGitTestSupport() {
                         val issues = gitService.getChangeLogIssuesIds(changeLog)
                         // Checks the issues
                         assertEquals(
-                                listOf("#1", "#2"),
+                                listOf("1", "2"),
                                 issues
                         )
                     }
