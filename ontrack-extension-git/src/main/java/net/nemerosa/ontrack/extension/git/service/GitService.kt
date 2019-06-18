@@ -63,6 +63,11 @@ interface GitService : SCMService {
     fun getChangeLogCommits(changeLog: GitChangeLog): GitChangeLogCommits
 
     /**
+     * Change log issues IDs
+     */
+    fun getChangeLogIssuesIds(changeLog: GitChangeLog): List<String>
+
+    /**
      * Change log issues
      */
     fun getChangeLogIssues(changeLog: GitChangeLog): GitChangeLogIssues
