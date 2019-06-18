@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.structure.Branch
 import org.junit.Test
@@ -26,7 +25,7 @@ class GitChangeLogGraphQLIT : AbstractGitTestSupport() {
                     // Creates builds for some commits
                     listOf(2, 5, 7, 8).forEach { no ->
                         build(no.toString()) {
-                            gitCommitProperty(commits.getOrFail(no))
+                            gitCommitProperty(commits.getValue(no))
                         }
                     }
 

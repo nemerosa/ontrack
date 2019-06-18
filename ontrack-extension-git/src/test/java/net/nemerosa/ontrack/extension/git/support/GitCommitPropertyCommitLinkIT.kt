@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.support
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -65,13 +64,13 @@ class GitCommitPropertyCommitLinkIT : AbstractGitTestSupport() {
                     }
                     mapOf("1.0" to 3, "1.1" to 6).forEach { name, commitIndex ->
                         build(name) {
-                            gitCommitProperty(commits.getOrFail(commitIndex))
+                            gitCommitProperty(commits.getValue(commitIndex))
                         }
                     }
                 }
                 // Gets commit info
                 val commitInfo = asUserWithView(this).call {
-                    gitService.getCommitProjectInfo(id, commits.getOrFail(4))
+                    gitService.getCommitProjectInfo(id, commits.getValue(4))
                 }
                 assertNotNull(commitInfo) {
                     assertEquals(

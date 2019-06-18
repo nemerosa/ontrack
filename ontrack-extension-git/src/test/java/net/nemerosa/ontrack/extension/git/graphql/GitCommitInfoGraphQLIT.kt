@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.graphql
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.test.TestUtils
@@ -86,7 +85,7 @@ class GitCommitInfoGraphQLIT : AbstractGitTestSupport() {
                     }
                 """, mapOf(
                         "project" to name,
-                        "commit" to commits.getOrFail(2)
+                        "commit" to commits.getValue(2)
                 ))
                 val project = data["projects"][0]
                 val gitCommitInfo = project["gitCommitInfo"]

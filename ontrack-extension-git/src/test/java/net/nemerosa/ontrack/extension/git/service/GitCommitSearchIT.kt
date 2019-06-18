@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import org.junit.Test
 
@@ -202,10 +201,10 @@ class GitCommitSearchIT : AbstractGitTestSupport() {
                         buildNameAsCommit(abbreviated = false)
                     }
                     // Creates some builds on this branch
-                    build(commits.getOrFail(1))
-                    build(commits.getOrFail(3))
-                    build(commits.getOrFail(5))
-                    build(commits.getOrFail(9))
+                    build(commits.getValue(1))
+                    build(commits.getValue(3))
+                    build(commits.getValue(5))
+                    build(commits.getValue(9))
                 }
                 // Tests for commit 2
                 commitInfoTest(this, commits, 2) {

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import org.junit.Test
@@ -74,22 +73,22 @@ class GitChangeLogIT : AbstractGitTestSupport() {
                         buildNameAsCommit(abbreviated = false)
                     }
                     // Creates builds for some commits
-                    build(commits.getOrFail(2))
-                    build(commits.getOrFail(5))
-                    build(commits.getOrFail(7))
-                    build(commits.getOrFail(8))
+                    build(commits.getValue(2))
+                    build(commits.getValue(5))
+                    build(commits.getValue(7))
+                    build(commits.getValue(8))
 
                     // Getting the change log between build 5 and 7
                     asUserWithView(this@branch).execute {
                         val buildFrom = structureService.findBuildByName(
                                 this@project.name,
                                 this@branch.name,
-                                commits.getOrFail(5)
+                                commits.getValue(5)
                         ).get()
                         val buildTo = structureService.findBuildByName(
                                 this@project.name,
                                 this@branch.name,
-                                commits.getOrFail(7)
+                                commits.getValue(7)
                         ).get()
                         val buildDiffRequest = BuildDiffRequest(
                                 buildFrom.id,
