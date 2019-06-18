@@ -17,5 +17,6 @@ fun <T> T?.asOptional(): Optional<T> = Optional.ofNullable(this)
 /**
  * Gets a required key from a map.
  */
+@Deprecated("Use [getValue] instead.", replaceWith = ReplaceWith("getValue"))
 fun <K, V> Map<K, V>.getOrFail(key: K): V =
         get(key) ?: throw IllegalArgumentException("Cannot find key $key")

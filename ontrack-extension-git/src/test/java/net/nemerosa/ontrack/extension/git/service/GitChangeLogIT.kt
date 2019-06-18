@@ -12,6 +12,54 @@ import kotlin.test.assertEquals
 class GitChangeLogIT : AbstractGitTestSupport() {
 
     @Test
+    fun `Change log issues IDs`() {
+        createRepo {
+            mapOf(
+                    1 to commit(1, "#1 Issue 1"),
+                    2 to commit(2, "#2 Issue 2"),
+                    3 to commit(3, "#1 Also issue 1"),
+                    4 to commit(4, "No issue"),
+                    5 to commit(5, "#1 #2 Both issues")
+            )
+        } and { repo, commits: Map<Int, String> ->
+            // Creates a project for this repo
+            project {
+                gitProject(repo)
+                // ...  & the branch with a link based on commit properties
+                branch {
+                    gitBranch {
+                        commitAsProperty()
+                    }
+                    // Creates builds for the commits
+                    val builds = (1..5).associate {
+                        it to build(name = it.toString()) {
+                            gitCommitProperty(commits.getValue(it))
+                        }
+                    }
+                    // Getting the change log between 1 and 5
+                    asUserWithView(this) {
+                        // Lower build
+                        val buildFrom = builds.getValue(1)
+                        val buildTo = builds.getValue(5)
+                        val buildDiffRequest = BuildDiffRequest(
+                                buildFrom.id,
+                                buildTo.id
+                        )
+                        val changeLog = gitService.changeLog(buildDiffRequest)
+                        // Gets the issues IDs
+                        val issues = gitService.getChangeLogIssuesIds(changeLog)
+                        // Checks the issues
+                        assertEquals(
+                                listOf("#1", "#2"),
+                                issues
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Change log based on commits`() {
         createRepo {
             // Creates a Git repository with 10 commits
