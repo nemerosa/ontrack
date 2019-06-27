@@ -14,7 +14,7 @@ import java.util.function.Predicate
  */
 interface PropertyRepository {
 
-    fun loadProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): TProperty
+    fun loadProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): TProperty?
 
     fun saveProperty(typeName: String, entityType: ProjectEntityType, entityId: ID, data: JsonNode)
 

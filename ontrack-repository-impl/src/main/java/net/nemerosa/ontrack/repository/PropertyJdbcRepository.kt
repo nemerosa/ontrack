@@ -27,7 +27,7 @@ class PropertyJdbcRepository @Autowired
 constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), PropertyRepository {
 
     @Cacheable(cacheNames = ["properties"], key = "#typeName + #entityType.name() + #entityId.value")
-    override fun loadProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): TProperty {
+    override fun loadProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): TProperty? {
         return getFirstItem(
                 String.format(
                         "SELECT * FROM PROPERTIES WHERE TYPE = :type AND %s = :entityId",
