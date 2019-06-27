@@ -23,13 +23,13 @@ class CacheConfigIT : AbstractServiceTestSupport() {
         )
         // Gets the raw property
         val p = propertyRepository.loadProperty(
-                TestPropertyType::class.qualifiedName,
+                TestPropertyType::class.java.name,
                 project.projectEntityType,
                 project.id
         )
         // Gets it a second time
         val p2 = propertyRepository.loadProperty(
-                TestPropertyType::class.qualifiedName,
+                TestPropertyType::class.java.name,
                 project.projectEntityType,
                 project.id
         )
