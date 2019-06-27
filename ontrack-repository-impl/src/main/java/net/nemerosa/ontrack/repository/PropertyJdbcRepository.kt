@@ -100,7 +100,7 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
         }
     }
 
-    override fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments): ID? {
+    override fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments?): ID? {
         val tables = StringBuilder(
                 "SELECT b.ID " +
                         "FROM PROPERTIES p " +
@@ -130,6 +130,27 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
         } else {
             null
         }
+    }
+
+    override fun findByEntityTypeAndSearchkey(entityType: ProjectEntityType, typeName: String, searchArguments: PropertySearchArguments?): List<ID> {
+        val entityColumn: String = entityType.displayName
+        val tables = StringBuilder("SELECT pp.$entityColumn FROM PROPERTIES pp ")
+        val criteria = StringBuilder("WHERE pp.TYPE = :type AND pp.$entityColumn IS NOT NULL ")
+        val params = params("type", typeName)
+        if (searchArguments != null) {
+            prepareQueryForPropertyValue(
+                    searchArguments,
+                    tables,
+                    criteria,
+                    params
+            )
+        }
+        val sql = "$tables $criteria"
+        return namedParameterJdbcTemplate.queryForList(
+                sql,
+                params,
+                Int::class.java
+        ).map { id -> ID.of(id) }
     }
 
     @Throws(SQLException::class)

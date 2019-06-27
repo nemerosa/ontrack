@@ -34,8 +34,16 @@ class ReleaseSearchExtensionIT : AbstractDSLTestSupport() {
                 assertEquals(1, results.size)
                 val result = results.first()
                 assertEquals(
-                        "",
+                        "Build ${build.entityDisplayName} having version/label/release $uniqueLabel",
+                        result.description
+                )
+                assertEquals(
+                        "urn:test:entity:BUILD:${build.id}",
                         result.uri.toString()
+                )
+                assertEquals(
+                        "urn:test:#:entity:BUILD:${build.id}",
+                        result.page.toString()
                 )
             }
         }

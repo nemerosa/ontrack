@@ -25,5 +25,7 @@ interface PropertyRepository {
                          predicate: Predicate<TProperty>
     ): Collection<ProjectEntity>
 
-    fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments): ID?
+    fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments?): ID?
+
+    fun findByEntityTypeAndSearchkey(entityType: ProjectEntityType, typeName: String, searchArguments: PropertySearchArguments?): List<ID>
 }

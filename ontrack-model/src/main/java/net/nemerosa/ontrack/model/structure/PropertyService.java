@@ -95,7 +95,7 @@ public interface PropertyService {
     /**
      * Deletes the value of a property.
      *
-     * @param entity Type of the entity to edit
+     * @param entity           Type of the entity to edit
      * @param propertyTypeName Fully qualified name of the property to delete
      */
     Ack deleteProperty(ProjectEntity entity, String propertyTypeName);
@@ -103,7 +103,7 @@ public interface PropertyService {
     /**
      * Deletes the value of a property.
      *
-     * @param entity Type of the entity to edit
+     * @param entity       Type of the entity to edit
      * @param propertyType Class of the property to delete
      */
     default <T> Ack deleteProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyType) {
@@ -124,6 +124,11 @@ public interface PropertyService {
      */
     @Nullable
     <T> ID findBuildByBranchAndSearchkey(ID branchId, Class<? extends PropertyType<T>> propertyType, String searchKey);
+
+    /**
+     * Finds a list of entities based on their type, a property and a search key.
+     */
+    <T> List<ID> findByEntityTypeAndSearchkey(ProjectEntityType entityType, Class<? extends PropertyType<T>> propertyType, String searchKey);
 
     /**
      * Tests if a property is defined.
