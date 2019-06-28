@@ -47,7 +47,7 @@ public class OTHttpClientBuilder {
     private String username;
     private String password;
     private OTHttpClientLogger clientLogger = logger::debug;
-    private int timeoutSeconds = 30;
+    private int timeoutSeconds = 5 * 60;
 
     protected OTHttpClientBuilder(String url, boolean disableSsl) {
         try {
