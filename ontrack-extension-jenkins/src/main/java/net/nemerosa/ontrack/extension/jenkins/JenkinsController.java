@@ -81,7 +81,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return JenkinsConfiguration.form();
+        return JenkinsConfiguration.Companion.form();
     }
 
     /**
