@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import java.util.function.Function
 
-class JenkinsConfiguration(
+open class JenkinsConfiguration(
         private val name: String,
         val url: String,
         private val user: String?,
