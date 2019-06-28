@@ -7,6 +7,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -46,6 +47,7 @@ public class OTHttpClientBuilder {
     private String username;
     private String password;
     private OTHttpClientLogger clientLogger = logger::debug;
+    private int timeoutSeconds = 30;
 
     protected OTHttpClientBuilder(String url, boolean disableSsl) {
         try {
@@ -70,6 +72,11 @@ public class OTHttpClientBuilder {
     public OTHttpClientBuilder withCredentials(String username, String password) {
         this.username = username;
         this.password = password;
+        return this;
+    }
+
+    public OTHttpClientBuilder withTimeoutSeconds(int timeoutSeconds) {
+        this.timeoutSeconds = timeoutSeconds;
         return this;
     }
 
@@ -135,9 +142,16 @@ public class OTHttpClientBuilder {
                 .register("https", sslSocketFactory)
                 .build();
 
+        // Timeout settings
+        RequestConfig.Builder requestConfig = RequestConfig.custom();
+        requestConfig.setConnectTimeout(timeoutSeconds * 1000);
+        requestConfig.setConnectionRequestTimeout(timeoutSeconds * 1000);
+        requestConfig.setSocketTimeout(timeoutSeconds * 1000);
+
         Supplier<CloseableHttpClient> httpClientSupplier = () -> {
             // Defaults
             HttpClientBuilder builder = HttpClientBuilder.create()
+                    .setDefaultRequestConfig(requestConfig.build())
                     .setConnectionManager(new PoolingHttpClientConnectionManager(registry));
 
             // OK
