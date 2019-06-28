@@ -10,6 +10,6 @@ class JenkinsConfigurationProperties {
     /**
      * Default timeout to connect to Jenkins, in seconds
      */
-    var timeout: Int = 60
+    var timeout: Int = 30
 
 }
