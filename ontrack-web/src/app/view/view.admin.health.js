@@ -24,6 +24,14 @@ angular.module('ot.view.admin.health', [
             });
         }
 
+        // Show errors
+        $scope.showError = function (config) {
+            config.errorShown = true;
+        };
+        $scope.showDetails = function (config) {
+            config.detailsShown = true;
+        };
+
         // Initialisation
         loadHealth();
 
