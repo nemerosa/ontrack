@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
@@ -247,6 +248,19 @@ public class PropertyServiceImpl implements PropertyService {
             return propertyRepository.findBuildByBranchAndSearchkey(branchId, propertyType.getName(), searchArguments);
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public <T> List<ID> findByEntityTypeAndSearchkey(ProjectEntityType entityType, Class<? extends PropertyType<T>> propertyType, String searchKey) {
+        // Gets the property type by name
+        PropertyType<T> actualPropertyType = getPropertyTypeByName(propertyType.getName());
+        // Gets the search arguments
+        PropertySearchArguments searchArguments = actualPropertyType.getSearchArguments(searchKey);
+        if (searchArguments != null) {
+            return propertyRepository.findByEntityTypeAndSearchkey(entityType, propertyType.getName(), searchArguments);
+        } else {
+            return Collections.emptyList();
         }
     }
 
