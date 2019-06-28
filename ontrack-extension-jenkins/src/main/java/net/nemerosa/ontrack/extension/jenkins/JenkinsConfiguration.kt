@@ -21,6 +21,13 @@ open class JenkinsConfiguration(
 
     override fun getPassword(): String? = password
 
+    override fun equals(other: Any?): Boolean =
+            other is JenkinsConfiguration &&
+                    other.name == name &&
+                    other.url == url &&
+                    other.name == name &&
+                    other.password == password
+
     override fun obfuscate(): JenkinsConfiguration {
         return JenkinsConfiguration(
                 name,
