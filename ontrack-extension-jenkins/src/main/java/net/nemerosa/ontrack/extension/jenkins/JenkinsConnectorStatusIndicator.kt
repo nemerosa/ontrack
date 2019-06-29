@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.support.ConnectorStatus
 import org.springframework.stereotype.Component
 
 @Component
-class JenkinsHealthIndicator(
+class JenkinsConnectorStatusIndicator(
         configurationService: ConfigurationService<JenkinsConfiguration>,
         securityService: SecurityService,
         private val jenkinsClientFactory: JenkinsClientFactory
