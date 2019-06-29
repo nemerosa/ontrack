@@ -39,7 +39,7 @@ class SVNRepository(
     companion object {
 
         @JvmStatic
-        fun of(id: Int, configuration: SVNConfiguration, configuredIssueService: ConfiguredIssueService): SVNRepository {
+        fun of(id: Int, configuration: SVNConfiguration, configuredIssueService: ConfiguredIssueService?): SVNRepository {
             return SVNRepository(id, configuration, configuredIssueService)
         }
     }
