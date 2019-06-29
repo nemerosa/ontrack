@@ -17,7 +17,7 @@ import java.util.function.Function
 /**
  * Configuration for accessing a GitLab application.
  */
-class GitLabConfiguration
+open class GitLabConfiguration
 @ConstructorProperties("name", "url", "user", "password", "ignoreSslCertificate")
 constructor(
         private val name: String,

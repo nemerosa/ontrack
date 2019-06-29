@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration
 import net.nemerosa.ontrack.extension.support.ConfigurationConnectorStatusIndicator
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationService
+import net.nemerosa.ontrack.model.support.Connector
 import net.nemerosa.ontrack.model.support.ConnectorDescription
 import org.springframework.stereotype.Component
 
@@ -19,13 +20,14 @@ class GitLabConnectorStatusIndicator(
         private val gitLabClientFactory: OntrackGitLabClientFactory
 ) : ConfigurationConnectorStatusIndicator<GitLabConfiguration>(configurationService, securityService) {
 
+    override val type: String = "gitlab"
+
     override fun connect(config: GitLabConfiguration) {
         gitLabClientFactory.create(config).repositories
     }
 
     override fun connectorDescription(config: GitLabConfiguration) = ConnectorDescription(
-            type = "gitlab",
-            name = config.name,
+            connector = Connector(type, config.name),
             connection = config.url
     )
 }

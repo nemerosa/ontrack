@@ -22,7 +22,7 @@ import java.util.function.Function
  * @property password User password
  * @property oauth2Token OAuth2 token
  */
-class GitHubEngineConfiguration
+open class GitHubEngineConfiguration
 @ConstructorProperties("name", "url", "user", "password", "oauth2Token")
 constructor(
         private val name: String,

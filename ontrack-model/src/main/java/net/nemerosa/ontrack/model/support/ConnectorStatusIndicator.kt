@@ -6,6 +6,11 @@ package net.nemerosa.ontrack.model.support
 interface ConnectorStatusIndicator {
 
     /**
+     * ID
+     */
+    val type: String
+
+    /**
      * Computes a list of statuses
      */
     val statuses: List<ConnectorStatus>

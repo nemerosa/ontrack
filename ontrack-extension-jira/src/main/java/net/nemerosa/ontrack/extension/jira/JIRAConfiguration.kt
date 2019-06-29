@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils
 import java.util.function.Function
 import java.util.regex.Pattern
 
-class JIRAConfiguration(
+open class JIRAConfiguration(
         private val name: String,
         val url: String,
         private val user: String?,

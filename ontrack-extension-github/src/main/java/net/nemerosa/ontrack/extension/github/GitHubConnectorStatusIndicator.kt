@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.support.ConfigurationConnectorStatusIndicator
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationService
+import net.nemerosa.ontrack.model.support.Connector
 import net.nemerosa.ontrack.model.support.ConnectorDescription
 import org.springframework.stereotype.Component
 
@@ -19,13 +20,14 @@ class GitHubConnectorStatusIndicator(
         private val gitHubClientFactory: OntrackGitHubClientFactory
 ) : ConfigurationConnectorStatusIndicator<GitHubEngineConfiguration>(configurationService, securityService) {
 
+    override val type: String = "github"
+
     override fun connect(config: GitHubEngineConfiguration) {
         gitHubClientFactory.create(config).repositories
     }
 
     override fun connectorDescription(config: GitHubEngineConfiguration) = ConnectorDescription(
-            type = "github",
-            name = config.name,
+            connector = Connector(type, config.name),
             connection = config.url
     )
 }

@@ -1,14 +1,12 @@
 package net.nemerosa.ontrack.service.support
 
-import net.nemerosa.ontrack.model.support.ConnectorStatus
-import net.nemerosa.ontrack.model.support.ConnectorStatusIndicator
 import org.springframework.boot.actuate.endpoint.Endpoint
 import org.springframework.stereotype.Component
 
 @Component
 class ConnectorStatusEndpoint(
-        private val connectorStatusIndicators: List<ConnectorStatusIndicator>
-) : Endpoint<List<ConnectorStatus>> {
+        private val connectorStatusJob: ConnectorStatusJob
+) : Endpoint<List<CollectedConnectorStatus>> {
 
     override fun isEnabled(): Boolean = true
 
@@ -16,11 +14,9 @@ class ConnectorStatusEndpoint(
 
     override fun getId(): String = "connectors"
 
-    override fun invoke(): List<ConnectorStatus> =
-            connectorStatusIndicators.flatMap {
-                it.statuses
-            }.sortedBy {
-                it.description.connector
+    override fun invoke(): List<CollectedConnectorStatus> =
+            connectorStatusJob.statuses.values.flatten().sortedBy {
+                it.status.description.connector
             }
 
 }

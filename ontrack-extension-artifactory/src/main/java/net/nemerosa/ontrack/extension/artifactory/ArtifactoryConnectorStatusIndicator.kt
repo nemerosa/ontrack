@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfi
 import net.nemerosa.ontrack.extension.support.ConfigurationConnectorStatusIndicator
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationService
+import net.nemerosa.ontrack.model.support.Connector
 import net.nemerosa.ontrack.model.support.ConnectorDescription
 import org.springframework.stereotype.Component
 
@@ -15,13 +16,14 @@ class ArtifactoryConnectorStatusIndicator(
         private val clientFactory: ArtifactoryClientFactory
 ) : ConfigurationConnectorStatusIndicator<ArtifactoryConfiguration>(configurationService, securityService) {
 
+    override val type: String = "artifactory"
+
     override fun connect(config: ArtifactoryConfiguration) {
         clientFactory.getClient(config).buildNames
     }
 
     override fun connectorDescription(config: ArtifactoryConfiguration) = ConnectorDescription(
-            type = "artifactory",
-            name = config.name,
+            connector = Connector(type, config.name),
             connection = config.url
     )
 

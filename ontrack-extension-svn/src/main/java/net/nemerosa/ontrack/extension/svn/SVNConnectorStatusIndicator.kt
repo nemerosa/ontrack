@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.svn.service.SVNService
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationService
+import net.nemerosa.ontrack.model.support.Connector
 import net.nemerosa.ontrack.model.support.ConnectorDescription
 import net.nemerosa.ontrack.tx.TransactionService
 import org.springframework.stereotype.Component
@@ -20,6 +21,8 @@ class SVNConnectorStatusIndicator(
         private val svnClient: SVNClient
 ) : ConfigurationConnectorStatusIndicator<SVNConfiguration>(configurationService, securityService) {
 
+    override val type: String = "svn"
+
     /**
      * Gets the latest revision
      */
@@ -32,8 +35,7 @@ class SVNConnectorStatusIndicator(
     }
 
     override fun connectorDescription(config: SVNConfiguration) = ConnectorDescription(
-            type = "svn",
-            name = config.name,
+            connector = Connector(type, config.name),
             connection = config.url
     )
 }
