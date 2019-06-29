@@ -53,7 +53,7 @@ class GitLabFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
                 gitLabConfigurationService.newConfiguration(
                         GitLabConfiguration(
                                 gitConfigurationName,
-                                null,
+                                "https://gitlab.com",
                                 null,
                                 null,
                                 false

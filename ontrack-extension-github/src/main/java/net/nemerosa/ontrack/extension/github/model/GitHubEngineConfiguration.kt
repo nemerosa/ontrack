@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPassword
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
-import org.apache.commons.lang3.StringUtils
 import java.beans.ConstructorProperties
 import java.lang.String.format
 import java.util.*
@@ -27,7 +26,7 @@ class GitHubEngineConfiguration
 @ConstructorProperties("name", "url", "user", "password", "oauth2Token")
 constructor(
         private val name: String,
-        url: String,
+        url: String?,
         private val user: String?,
         private val password: String?,
         val oauth2Token: String?
@@ -45,7 +44,7 @@ constructor(
     val url: String
 
     init {
-        this.url = if (StringUtils.isBlank(url)) GITHUB_COM else url
+        this.url = if (url.isNullOrBlank()) GITHUB_COM else url
     }
 
     @JsonIgnore
