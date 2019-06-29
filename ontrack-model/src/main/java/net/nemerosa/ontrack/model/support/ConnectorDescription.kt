@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.model.support
 
-data class ConnectorDescription(
-        val type: String,
-        val name: String,
+class ConnectorDescription(
+        val connector: Connector,
         val connection: String
 )
