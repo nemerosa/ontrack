@@ -27,6 +27,7 @@ class JenkinsHealthIndicator(
 
     private fun connectorDescription(config: JenkinsConfiguration) = ConnectorDescription(
             type = "jenkins",
-            name = "${config.name} (${config.url})"
+            name = config.name,
+            connection = config.url
     )
 }
