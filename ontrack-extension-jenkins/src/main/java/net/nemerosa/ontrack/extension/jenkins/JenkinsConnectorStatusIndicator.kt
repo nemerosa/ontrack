@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.support.ConfigurationConnectorStatusIndica
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationService
 import net.nemerosa.ontrack.model.support.ConnectorDescription
-import net.nemerosa.ontrack.model.support.ConnectorStatus
 import org.springframework.stereotype.Component
 
 @Component
@@ -15,17 +14,11 @@ class JenkinsConnectorStatusIndicator(
         private val jenkinsClientFactory: JenkinsClientFactory
 ) : ConfigurationConnectorStatusIndicator<JenkinsConfiguration>(configurationService, securityService) {
 
-    override fun getConnectorStatus(config: JenkinsConfiguration): ConnectorStatus {
-        return try {
-            jenkinsClientFactory.getClient(config).info
-            ConnectorStatus.ok(connectorDescription(config))
-        } catch (ex: Exception) {
-            ConnectorStatus.error(connectorDescription(config), ex)
-        }
-
+    override fun connect(config: JenkinsConfiguration) {
+        jenkinsClientFactory.getClient(config).info
     }
 
-    private fun connectorDescription(config: JenkinsConfiguration) = ConnectorDescription(
+    override fun connectorDescription(config: JenkinsConfiguration) = ConnectorDescription(
             type = "jenkins",
             name = config.name,
             connection = config.url
