@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support
 
+import net.nemerosa.ontrack.model.support.ConnectorGlobalStatus
 import org.springframework.boot.actuate.endpoint.Endpoint
 import org.springframework.stereotype.Component
 

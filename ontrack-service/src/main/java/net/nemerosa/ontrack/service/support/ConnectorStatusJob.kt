@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.service.support
 
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
+import net.nemerosa.ontrack.model.support.CollectedConnectorStatus
+import net.nemerosa.ontrack.model.support.ConnectorGlobalStatus
+import net.nemerosa.ontrack.model.support.ConnectorGlobalStatusService
 import net.nemerosa.ontrack.model.support.ConnectorStatusIndicator
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
@@ -10,13 +13,20 @@ import java.util.stream.Stream
 @Component
 class ConnectorStatusJob(
         private val connectorStatusIndicators: List<ConnectorStatusIndicator>
-) : JobOrchestratorSupplier {
+) : JobOrchestratorSupplier, ConnectorGlobalStatusService {
 
-    val statuses = ConcurrentHashMap<String, List<CollectedConnectorStatus>>()
+    internal val statuses = ConcurrentHashMap<String, List<CollectedConnectorStatus>>()
 
     companion object {
         val CONNECTOR_STATUS_JOB = JobCategory.CORE.getType("connector-status").withName("Connector status collection")
     }
+
+    override val globalStatus: ConnectorGlobalStatus
+        get() = ConnectorGlobalStatus(
+                statuses.values.flatten().sortedBy {
+                    it.status.description.connector
+                }
+        )
 
     override fun collectJobRegistrations(): Stream<JobRegistration> =
             connectorStatusIndicators.map {

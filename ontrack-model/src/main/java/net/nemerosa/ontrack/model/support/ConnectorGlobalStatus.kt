@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.service.support
+package net.nemerosa.ontrack.model.support
 
-import net.nemerosa.ontrack.model.support.ConnectorStatusType
 import kotlin.math.roundToInt
 
 class ConnectorGlobalStatus(
