@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 @Component
 class ConnectorStatusEndpoint(
         private val connectorStatusJob: ConnectorStatusJob
-) : Endpoint<List<CollectedConnectorStatus>> {
+) : Endpoint<ConnectorGlobalStatus> {
 
     override fun isEnabled(): Boolean = true
 
@@ -14,9 +14,10 @@ class ConnectorStatusEndpoint(
 
     override fun getId(): String = "connectors"
 
-    override fun invoke(): List<CollectedConnectorStatus> =
+    override fun invoke() = ConnectorGlobalStatus(
             connectorStatusJob.statuses.values.flatten().sortedBy {
                 it.status.description.connector
             }
+    )
 
 }

@@ -4,8 +4,6 @@ enum class ConnectorStatusType {
 
     UP,
 
-    DOWN,
-
-    UNKNOWN
+    DOWN
 
 }
