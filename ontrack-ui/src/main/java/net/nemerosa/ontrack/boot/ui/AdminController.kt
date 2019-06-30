@@ -37,13 +37,16 @@ constructor(
      * Gets the health status
      */
     @GetMapping("status")
-    fun getStatus(): Resource<AdminStatus> = Resource.of(
-            AdminStatus(
-                    health = healthEndpoint.invoke(),
-                    connectors = connectorGlobalStatusService.globalStatus
-            ),
-            uri(on(javaClass).getStatus())
-    )
+    fun getStatus(): Resource<AdminStatus> {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        return Resource.of(
+                AdminStatus(
+                        health = healthEndpoint.invoke(),
+                        connectors = connectorGlobalStatusService.globalStatus
+                ),
+                uri(on(javaClass).getStatus())
+        )
+    }
 
     /**
      * Gets the list of application log entries
