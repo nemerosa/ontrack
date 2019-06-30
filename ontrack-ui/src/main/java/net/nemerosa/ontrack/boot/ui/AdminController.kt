@@ -37,8 +37,11 @@ constructor(
      * Gets the health status
      */
     @GetMapping("status")
-    fun getStatus(): Resource<ConnectorGlobalStatus> = Resource.of(
-            connectorGlobalStatusService.globalStatus,
+    fun getStatus(): Resource<AdminStatus> = Resource.of(
+            AdminStatus(
+                    health = healthEndpoint.invoke(),
+                    connectors = connectorGlobalStatusService.globalStatus
+            ),
             uri(on(javaClass).getStatus())
     )
 

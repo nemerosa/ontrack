@@ -17,20 +17,17 @@ angular.module('ot.view.admin.health', [
             ot.viewCloseCommand('/home')
         ];
 
+        $scope.loadingStatus = false;
+
         // Loads the statuses
         function loadHealth() {
-            ot.call($http.get('admin/status')).then(function (health) {
-                $scope.health = health;
+            $scope.loadingStatus = true;
+            ot.call($http.get('admin/status')).then(status => {
+                $scope.status = status;
+            }).finally(() => {
+                $scope.loadingStatus = false;
             });
         }
-
-        // Show errors
-        $scope.showError = function (config) {
-            config.errorShown = true;
-        };
-        $scope.showDetails = function (config) {
-            config.detailsShown = true;
-        };
 
         // Initialisation
         loadHealth();
