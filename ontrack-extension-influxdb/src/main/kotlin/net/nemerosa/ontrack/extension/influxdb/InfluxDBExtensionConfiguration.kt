@@ -49,6 +49,11 @@ class InfluxDBExtensionConfiguration(
 
     @Bean
     @ConditionalOnBean(InfluxDB::class)
+    fun influxDBExtensionHealthIndicator(influxDB: InfluxDB) = InfluxDBExtensionHealthIndicator(influxDB)
+
+
+    @Bean
+    @ConditionalOnBean(InfluxDB::class)
     @ConditionalOnProperty(prefix = INFLUXDB_EXTENSION_PROPERTIES_PREFIX, name = ["run-info"], havingValue = "true", matchIfMissing = true)
     fun influxDBRunInfoListener(influxDB: InfluxDB) = InfluxDBRunInfoListener(influxDB)
 
