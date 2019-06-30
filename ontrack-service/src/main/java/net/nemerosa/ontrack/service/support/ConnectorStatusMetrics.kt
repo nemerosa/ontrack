@@ -2,19 +2,20 @@ package net.nemerosa.ontrack.service.support
 
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
-import io.micrometer.core.instrument.binder.MeterBinder
 import net.nemerosa.ontrack.model.support.CollectedConnectorStatus
 import net.nemerosa.ontrack.model.support.ConnectorStatusIndicator
 import net.nemerosa.ontrack.model.support.ConnectorStatusType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import javax.annotation.PostConstruct
 
 @Component
 @Transactional(readOnly = true)
 class ConnectorStatusMetrics(
         private val connectorStatusIndicator: List<ConnectorStatusIndicator>,
-        private val connectorStatusJob: ConnectorStatusJob
-) : MeterBinder {
+        private val connectorStatusJob: ConnectorStatusJob,
+        private val registry: MeterRegistry
+) {
 
     private fun MeterRegistry.register(
             name: String,
@@ -36,7 +37,8 @@ class ConnectorStatusMetrics(
         }
     }
 
-    override fun bindTo(registry: MeterRegistry) {
+    @PostConstruct
+    fun bindTo() {
         connectorStatusIndicator.forEach { indicator ->
 
             val gauge = { job: ConnectorStatusJob -> job.statuses[indicator.type] }
