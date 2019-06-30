@@ -54,7 +54,54 @@
                 </table>
             </div>
         </div>
+    </div>
+    <div class="row">
         <!-- Connectors -->
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <ot-health-status value="status.connectors"></ot-health-status>
+                    Connectors
+                    {{status.connectors.percent}}&nbsp;%
+                    ({{status.connectors.upCount}}/{{status.connectors.count}})
+                </div>
+                <table class="table ot-admin-console-status">
+                    <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Connection</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                        <th>Error</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="collected in status.connectors.statuses">
+                        <td>
+                            {{collected.status.description.connector.type}}
+                        </td>
+                        <td>
+                            {{collected.status.description.connector.name}}
+                        </td>
+                        <td>
+                            {{collected.status.description.connection}}
+                        </td>
+                        <td>
+                            <span class="fa fa-circle ot-health-status-{{collected.status.type}}">&nbsp;{{collected.status.type}}</span>
+                        </td>
+                        <td>
+                            {{collected.time | date:'mediumDate' }}
+                            {{collected.time | date:'shortTime' }}
+                        </td>
+                        <td>
+                            {{collected.status.error}}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 </ot-view>
