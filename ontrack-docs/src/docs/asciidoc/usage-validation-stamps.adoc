@@ -28,6 +28,7 @@ There is a list of predefined data types:
 * Number (with or without threshold)
 * Fraction (with or without threshold)
 * Percentage (with or without threshold)
+* Metrics (arbitrary map of names to floating point numbers)
 
 NOTE: You can create your own <<extending-validation-data,validation data types>>.
 
@@ -72,6 +73,9 @@ branch.validationStamp("Percentage data") {
 }
 branch.validationStamp("Fraction data") {
     setFractionDataType(100, 90, true)
+}
+branch.validationStamp("Metrics data") {
+    setMetricsDataType()
 }
 ----
 

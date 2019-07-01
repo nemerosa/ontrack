@@ -107,6 +107,10 @@ build.validateWithCHML("CHML data", 1, 10, 100, 1000)
 build.validateWithNumber("Number data", 80)
 build.validateWithPercentage("Percentage data", 57)
 build.validateWithFraction("Fraction data", 99, 100)
+build.validateWithMetrics("Metrics data", [
+    "js.bundle" to 1500.56,
+    "js.error" to 111
+])
 ----
 
 For a custom validation data type, you can use:

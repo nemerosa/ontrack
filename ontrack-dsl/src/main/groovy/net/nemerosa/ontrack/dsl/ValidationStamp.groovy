@@ -91,6 +91,14 @@ class ValidationStamp extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod("Sets the data type for this validation stamp to 'metrics'.")
+    def setMetricsDataType() {
+        setDataType(
+                "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
+                [:]
+        )
+    }
+
     @DSLMethod("Sets the data type for this validation stamp to 'CHML' (number of critical / high / medium / low issues).")
     def setCHMLDataType(
             String warningLevel,
