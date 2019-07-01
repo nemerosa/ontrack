@@ -9,6 +9,10 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated Must be replaced by {@link ConfigurationConnectorStatusIndicator}
+ */
+@Deprecated
 public abstract class ConfigurationHealthIndicator<T extends UserPasswordConfiguration> implements HealthIndicator {
 
     private final ConfigurationService<T> configurationService;
@@ -25,13 +29,13 @@ public abstract class ConfigurationHealthIndicator<T extends UserPasswordConfigu
     public Health health() {
         return healthAggregator.aggregate(
                 securityService.asAdmin(() ->
-                                configurationService.getConfigurations().stream()
-                                        .collect(
-                                                Collectors.toMap(
-                                                        UserPasswordConfiguration::getName,
-                                                        this::getHealth
-                                                )
+                        configurationService.getConfigurations().stream()
+                                .collect(
+                                        Collectors.toMap(
+                                                UserPasswordConfiguration::getName,
+                                                this::getHealth
                                         )
+                                )
                 )
         );
     }

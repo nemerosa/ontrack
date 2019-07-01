@@ -7,25 +7,18 @@ import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter
-import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.model.support.Page
+import net.nemerosa.ontrack.model.support.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Pagination
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.actuate.endpoint.HealthEndpoint
-import org.springframework.boot.actuate.health.Health
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import org.springframework.web.util.UriComponentsBuilder
-import java.net.URI
 import javax.validation.Valid
-import kotlin.reflect.full.memberProperties
 
 @RestController
 @RequestMapping("/admin")
@@ -35,6 +28,7 @@ constructor(
         private val jobScheduler: JobScheduler,
         private val applicationLogService: ApplicationLogService,
         private val healthEndpoint: HealthEndpoint,
+        private val connectorGlobalStatusService: ConnectorGlobalStatusService,
         private val securityService: SecurityService,
         private val encryptionService: EncryptionService
 ) : AbstractResourceController() {
@@ -43,10 +37,16 @@ constructor(
      * Gets the health status
      */
     @GetMapping("status")
-    fun getStatus(): Resource<Health> = Resource.of(
-            healthEndpoint.invoke(),
-            uri(on(javaClass).getStatus())
-    )
+    fun getStatus(): Resource<AdminStatus> {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        return Resource.of(
+                AdminStatus(
+                        health = healthEndpoint.invoke(),
+                        connectors = connectorGlobalStatusService.globalStatus
+                ),
+                uri(on(javaClass).getStatus())
+        )
+    }
 
     /**
      * Gets the list of application log entries
