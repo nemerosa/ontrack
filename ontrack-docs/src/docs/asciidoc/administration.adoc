@@ -8,3 +8,5 @@ include::ldap.adoc[]
 include::admin-console.adoc[]
 
 include::admin-log-entries.adoc[]
+
+include::admin-status.adoc[]
