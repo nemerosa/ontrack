@@ -67,6 +67,32 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
     }
 
     @Test
+    void 'Validation run with metrics'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setMetricsDataType()
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithMetrics("VS", [
+                "js.bundle": 1500.56d,
+                "js.error" : 150d,
+        ], "PASSED")
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType"
+        assert run.data.data == [
+                metrics: [
+                        "js.bundle": 1500.56d,
+                        "js.error" : 150d,
+                ]
+        ]
+    }
+
+    @Test
     void 'Validation run with CHML'() {
         def projectName = uid("P")
         // Validation stamp data type
