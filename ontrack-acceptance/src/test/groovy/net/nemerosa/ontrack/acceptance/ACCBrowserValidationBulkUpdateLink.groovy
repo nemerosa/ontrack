@@ -7,6 +7,7 @@ import org.junit.Before
 import org.junit.Test
 
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.login
+import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
@@ -40,10 +41,24 @@ class ACCBrowserValidationBulkUpdateLink extends AcceptanceTestClient {
     }
 
     @Test
-    void 'Validation a build with data from the branch overview'() {
+    void 'Validation bulk update accessible to global validation manager'() {
         browser { browser ->
             // Logs in
             login(browser, username, password, username)
+            // Goes to the validation stamp page
+            ValidationStampPage vsPage = goTo(ValidationStampPage, [id: vs.id])
+            // Checks the "Bulk update" command
+            def bulkUpdate = vsPage.bulkUpdateCommand
+            assert bulkUpdate != null && bulkUpdate.isDisplayed(): "Bulk update command is present"
+        }
+
+    }
+
+    @Test
+    void 'Validation bulk update accessible to administrator'() {
+        browser { browser ->
+            // Logs in
+            loginAsAdmin(browser)
             // Goes to the validation stamp page
             ValidationStampPage vsPage = goTo(ValidationStampPage, [id: vs.id])
             // Checks the "Bulk update" command
