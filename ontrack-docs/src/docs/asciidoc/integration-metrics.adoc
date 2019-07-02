@@ -88,7 +88,7 @@ Information about individual jobs:
 
 [NOTE]
 ====
-They all have the following tags:
+Job metrics have the following tags:
 
 * `job-category` - category of the job
 * `job-type` - type of the job
@@ -104,6 +104,19 @@ Run information:
   and `status` tags.
 
 More details at <<run-info>>.
+
+Information about connectors (Jenkins, JIRA, Git, etc.):
+
+* `ontrack_connector_count` (gauge) - number of connectors
+* `ontrack_connector_up` (gauge) - number of UP connectors
+* `ontrack_connector_down` (gauge) - number of DOWN connectors
+
+[NOTE]
+====
+Connector metrics have the following tags:
+
+* `type` - type of connector (like `jenkins`, `jira`, ...)
+====
 
 [[monitoring-metrics-influxdb]]
 ===== InfluxDB metrics

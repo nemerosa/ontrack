@@ -55,6 +55,16 @@ class ChangeLog extends AbstractResource {
         }
     }
 
+    @DSLMethod("List of issues IDs in the change log.")
+    List<String> getIssuesIds() {
+        String url = optionalLink('issuesIds')
+        if (url) {
+            return ontrack.get(url) as List<String>
+        } else {
+            return []
+        }
+    }
+
     String exportIssues(IssueChangeLogExportRequest request = new IssueChangeLogExportRequest()) {
         return ontrack.text(
                 query(

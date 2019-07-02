@@ -212,7 +212,7 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
                 .with(sourceBranch.projectId(), ProjectView::class.java)
                 .with(targetBranch.projectId(), BranchEdit::class.java)
                 .call {
-                    copyService!!.copy(
+                    copyService.copy(
                             targetBranch,
                             BranchCopyRequest(
                                     sourceBranch.id,

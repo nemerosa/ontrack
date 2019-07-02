@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import org.junit.Test
@@ -43,7 +42,7 @@ class GitCommitIndexationIT : AbstractGitTestSupport() {
                     }!!
 
                     // Setting the property
-                    build.gitCommitProperty(commits.getOrFail(6))
+                    build.gitCommitProperty(commits.getValue(6))
 
                     // Checks it's not set
                     commitForBuild = gitService.getCommitForBuild(build)

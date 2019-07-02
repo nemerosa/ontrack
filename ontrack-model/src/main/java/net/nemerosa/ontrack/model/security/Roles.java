@@ -52,12 +52,17 @@ public interface Roles {
     String GLOBAL_AUTOMATION = "AUTOMATION";
     String GLOBAL_CONTROLLER = "CONTROLLER";
     String GLOBAL_READ_ONLY = "READ_ONLY";
+    /**
+     * The global validation manager can manage the validation stamps across all projects.
+     */
+    String GLOBAL_VALIDATION_MANAGER = "GLOBAL_VALIDATION_MANAGER";
 
     Set<String> GLOBAL_ROLES = ImmutableSet.of(
             GLOBAL_ADMINISTRATOR,
             GLOBAL_CREATOR,
             GLOBAL_AUTOMATION,
             GLOBAL_CONTROLLER,
-            GLOBAL_READ_ONLY
+            GLOBAL_READ_ONLY,
+            GLOBAL_VALIDATION_MANAGER
     );
 }

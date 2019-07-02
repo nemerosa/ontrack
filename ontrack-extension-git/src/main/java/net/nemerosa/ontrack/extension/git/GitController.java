@@ -335,6 +335,17 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     }
 
     /**
+     * Change log issues Ids
+     */
+    @RequestMapping(value = "changelog/{uuid}/issuesIds", method = RequestMethod.GET)
+    public List<String> changeLogIssuesIds(@PathVariable String uuid) {
+        // Gets the change log
+        GitChangeLog changeLog = getChangeLog(uuid);
+        // Gets the issues IDs
+        return gitService.getChangeLogIssuesIds(changeLog);
+    }
+
+    /**
      * Change log files
      */
     @RequestMapping(value = "changelog/{uuid}/files", method = RequestMethod.GET)

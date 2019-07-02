@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
@@ -126,12 +125,12 @@ index 3be9c81..6ad36e5 100644
                     }
                     // Creates the builds for the commits
                     (1..3).forEach {
-                        build(commits.getOrFail(it))
+                        build(commits.getValue(it))
                     }
                     // Getting the change log between build 1 and 3
                     val changeLog = asUserWithView(this).call {
-                        val from = structureService.findBuildByName(project.name, name, commits.getOrFail(1)).get()
-                        val to = structureService.findBuildByName(project.name, name, commits.getOrFail(3)).get()
+                        val from = structureService.findBuildByName(project.name, name, commits.getValue(1)).get()
+                        val to = structureService.findBuildByName(project.name, name, commits.getValue(3)).get()
                         val buildDiffRequest = BuildDiffRequest(from.id, to.id)
                         gitService.changeLog(buildDiffRequest)
                     }

@@ -4,7 +4,9 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNotFoundException
 import net.nemerosa.ontrack.model.security.GlobalSettings
-import net.nemerosa.ontrack.model.security.ProjectConfig
+import net.nemerosa.ontrack.model.security.ValidationStampFilterCreate
+import net.nemerosa.ontrack.model.security.ValidationStampFilterMgt
+import net.nemerosa.ontrack.model.security.ValidationStampFilterShare
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
@@ -15,6 +17,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
 import java.util.*
 
 class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
@@ -75,226 +78,224 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun new_global_filter() {
         asUser().with(GlobalSettings::class.java).execute {
             val filter = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            vsNames = listOf("CI")
+                    )
             )
             assertTrue(filter.id.isSet)
         }
     }
 
     @Test(expected = ValidationStampFilterNameAlreadyDefinedException::class)
-    @Throws(Exception::class)
     fun new_global_filter_with_existing_name() {
         asUser().with(GlobalSettings::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            vsNames = listOf("CI")
+                    )
             )
             // Creates another filter with the same name
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .vsNames(listOf("OTHER"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            vsNames = listOf("OTHER")
+                    )
             )
         }
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun new_filter_with_both_project_and_branch() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .project(branch.project)
-                            .branch(branch)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            project = branch.project,
+                            branch = branch,
+                            vsNames = listOf("CI")
+                    )
             )
         }
     }
 
     @Test
-    @Throws(Exception::class)
     fun new_project_filter() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             val filter = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .project(branch.project)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            project = branch.project,
+                            vsNames = listOf("CI")
+                    )
             )
             assertTrue(filter.id.isSet)
         }
     }
 
     @Test(expected = ValidationStampFilterNameAlreadyDefinedException::class)
-    @Throws(Exception::class)
     fun new_project_filter_with_existing_name() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .project(branch.project)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            project = branch.project,
+                            vsNames = listOf("CI")
+                    )
             )
             // Creates another filter with the same name
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .project(branch.project)
-                            .vsNames(listOf("OTHER"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            project = branch.project,
+                            vsNames = listOf("OTHER")
+                    )
             )
         }
     }
 
     @Test
-    @Throws(Exception::class)
     fun new_project_filter_with_same_name_than_global() {
-        asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).execute {
+        asUser().with(GlobalSettings::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            vsNames = listOf("CI")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             val filter = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .project(branch.project)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            project = branch.project,
+                            vsNames = listOf("CI")
+                    )
             )
             assertTrue(filter.id.isSet)
         }
     }
 
     @Test
-    @Throws(Exception::class)
     fun new_branch_filter() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
             val filter = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .branch(branch)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            branch = branch,
+                            vsNames = listOf("CI")
+                    )
             )
             assertTrue(filter.id.isSet)
         }
     }
 
     @Test(expected = ValidationStampFilterNameAlreadyDefinedException::class)
-    @Throws(Exception::class)
     fun new_branch_filter_with_existing_name() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .branch(branch)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            branch = branch,
+                            vsNames = listOf("CI")
+                    )
             )
             // Creates another filter with the same name
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .branch(branch)
-                            .vsNames(listOf("OTHER"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            branch = branch,
+                            vsNames = listOf("OTHER")
+                    )
             )
         }
     }
 
     @Test
-    @Throws(Exception::class)
     fun new_branch_filter_with_same_name_than_global() {
-        asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).execute {
+        asUser().with(GlobalSettings::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            vsNames = listOf("CI")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
             val filter = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .branch(branch)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            branch = branch,
+                            vsNames = listOf("CI")
+                    )
             )
             assertTrue(filter.id.isSet)
         }
     }
 
     @Test
-    @Throws(Exception::class)
     fun new_branch_filter_with_same_name_than_project() {
-        asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .project(branch.project)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            project = branch.project,
+                            vsNames = listOf("CI")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
             val filter = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name("My filter")
-                            .branch(branch)
-                            .vsNames(listOf("CI"))
-                            .build()
+                    ValidationStampFilter(
+                            name = "My filter",
+                            branch = branch,
+                            vsNames = listOf("CI")
+                    )
             )
             assertTrue(filter.id.isSet)
         }
     }
 
-    @Throws(Exception::class)
     private fun createFilters(): String {
-        return asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).call {
-            val name = uid("F")
+        val name = uid("F")
+        asUser().with(GlobalSettings::class.java).call {
             // Global
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .vsNames(listOf("GLOBAL"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            vsNames = listOf("GLOBAL")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).call {
             // Project
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .project(branch.project)
-                            .vsNames(listOf("PROJECT"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            project = branch.project,
+                            vsNames = listOf("PROJECT")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).call {
             // Branch
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .branch(branch)
-                            .vsNames(listOf("BRANCH"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            branch = branch,
+                            vsNames = listOf("BRANCH")
+                    )
             )
-            // OK
-            name
         }
+        // OK
+        return name
     }
 
     @Test
-    @Throws(Exception::class)
     fun global_filters() {
         val name = createFilters()
         asUser().with(GlobalSettings::class.java).execute {
@@ -307,7 +308,6 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun project_filters_only() {
         val name = createFilters()
         val list = asUser().withView(branch).call {
@@ -320,7 +320,6 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun project_filters_include_all() {
         val name = createFilters()
         val list = asUser().withView(branch).call {
@@ -333,7 +332,6 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun branch_filters_only() {
         val name = createFilters()
         val list = asUser().withView(branch).call {
@@ -346,7 +344,6 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun branch_filters_include_all() {
         val name = createFilters()
         val list = asUser().withView(branch).call {
@@ -359,15 +356,14 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun by_name_global_only() {
         val name = uid("F")
         asUser().with(GlobalSettings::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .vsNames(listOf("GLOBAL"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            vsNames = listOf("GLOBAL")
+                    )
             )
         }
         val f = asUser().withView(branch).call { filterService.getValidationStampFilterByName(branch, name).orElse(null) }
@@ -377,22 +373,23 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun by_name_global_and_project() {
         val name = uid("F")
-        asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).execute {
+        asUser().with(GlobalSettings::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .vsNames(listOf("GLOBAL"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            vsNames = listOf("GLOBAL")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .project(branch.project)
-                            .vsNames(listOf("PROJECT"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            project = branch.project,
+                            vsNames = listOf("PROJECT")
+                    )
             )
         }
         val f = asUser().withView(branch).call { filterService.getValidationStampFilterByName(branch, name).orElse(null) }
@@ -402,29 +399,32 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun by_name_branch() {
         val name = uid("F")
-        asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).execute {
+        asUser().with(GlobalSettings::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .vsNames(listOf("GLOBAL"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            vsNames = listOf("GLOBAL")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .project(branch.project)
-                            .vsNames(listOf("PROJECT"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            project = branch.project,
+                            vsNames = listOf("PROJECT")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
             filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(name)
-                            .branch(branch)
-                            .vsNames(listOf("BRANCH"))
-                            .build()
+                    ValidationStampFilter(
+                            name = name,
+                            branch = branch,
+                            vsNames = listOf("BRANCH")
+                    )
             )
         }
         val f = asUser().withView(branch).call { filterService.getValidationStampFilterByName(branch, name).orElse(null) }
@@ -434,7 +434,6 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun by_name_none() {
         createFilters()
         val f = asUser().withView(branch).call { filterService.getValidationStampFilterByName(branch, uid("FX")).orElse(null) }
@@ -442,14 +441,13 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun save_global() {
         asUser().with(GlobalSettings::class.java).execute {
             var f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .vsNames(listOf("GLOBAL"))
-                            .build()
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
             )
             filterService.saveValidationStampFilter(f.withVsNames(Arrays.asList("GLOBAL", "ONTRACK")))
             f = filterService.getValidationStampFilter(f.id)
@@ -458,15 +456,14 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun save_project() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             var f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .project(branch.project)
-                            .vsNames(listOf("PROJECT"))
-                            .build()
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            project = branch.project,
+                            vsNames = listOf("PROJECT")
+                    )
             )
             filterService.saveValidationStampFilter(f.withVsNames(Arrays.asList("PROJECT", "ONTRACK")))
             f = filterService.getValidationStampFilter(f.id)
@@ -475,15 +472,14 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun save_branch() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
             var f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .branch(branch)
-                            .vsNames(listOf("BRANCH"))
-                            .build()
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            branch = branch,
+                            vsNames = listOf("BRANCH")
+                    )
             )
             filterService.saveValidationStampFilter(f.withVsNames(Arrays.asList("BRANCH", "ONTRACK")))
             f = filterService.getValidationStampFilter(f.id)
@@ -492,14 +488,13 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun delete() {
         asUser().with(GlobalSettings::class.java).execute {
             val f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .vsNames(listOf("GLOBAL"))
-                            .build()
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
             )
             filterService.deleteValidationStampFilter(f)
             // Checks it is gone
@@ -513,16 +508,17 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun share_from_branch_to_project() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
-            val f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .branch(branch)
-                            .vsNames(listOf("CI"))
-                            .build()
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            branch = branch,
+                            vsNames = listOf("CI")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterShare::class.java).execute {
             val f2 = filterService.shareValidationStampFilter(f, branch.project)
             assertTrue(f.id() == f2.id())
             assertNotNull(f2.project)
@@ -531,16 +527,17 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun share_from_branch_to_global() {
-        asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).execute {
-            val f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .branch(branch)
-                            .vsNames(listOf("CI"))
-                            .build()
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            branch = branch,
+                            vsNames = listOf("CI")
+                    )
             )
+        }
+        asUser().with(GlobalSettings::class.java).execute {
             val f2 = filterService.shareValidationStampFilter(f)
             assertTrue(f.id() == f2.id())
             assertNull(f2.project)
@@ -549,16 +546,17 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun share_from_project_to_global() {
-        asUser().with(GlobalSettings::class.java).with(branch, ProjectConfig::class.java).execute {
-            val f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .project(branch.project)
-                            .vsNames(listOf("CI"))
-                            .build()
+        val f = asUser().with(branch, ValidationStampFilterMgt::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            project = branch.project,
+                            vsNames = listOf("CI")
+                    )
             )
+        }
+        asUser().with(GlobalSettings::class.java).execute {
             val f2 = filterService.shareValidationStampFilter(f)
             assertTrue(f.id() == f2.id())
             assertNull(f2.project)
@@ -567,87 +565,385 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun sharing_from_branch_to_project_remove_branch_filter() {
-        asUser().with(branch, ProjectConfig::class.java).execute {
-            val f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .branch(branch)
-                            .vsNames(listOf("BRANCH"))
-                            .build()
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            branch = branch,
+                            vsNames = listOf("BRANCH")
+                    )
             )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
             // Shares at project level
             filterService.shareValidationStampFilter(f, branch.project)
-            // Gets filters for the branch
-            val filters = filterService.getBranchValidationStampFilters(branch, false)
-            assertTrue("Branch has no longer any filter", filters.isEmpty())
         }
+        // Gets filters for the branch
+        val filters = asUserWithView(branch).call { filterService.getBranchValidationStampFilters(branch, false) }
+        assertTrue("Branch has no longer any filter", filters.isEmpty())
     }
 
     @Test
-    @Throws(Exception::class)
     fun sharing_from_branch_to_global_remove_branch_filter() {
-        asUser().with(branch, ProjectConfig::class.java).with(GlobalSettings::class.java).execute {
-            val f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .branch(branch)
-                            .vsNames(listOf("BRANCH"))
-                            .build()
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            branch = branch,
+                            vsNames = listOf("BRANCH")
+                    )
             )
-            // Shares at global level
-            filterService.shareValidationStampFilter(f)
-            // Gets filters for the branch
-            val filters = filterService.getBranchValidationStampFilters(branch, false)
-            assertTrue("Branch has no longer any filter", filters.isEmpty())
         }
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun sharing_from_project_to_global_remove_project_filter() {
-        asUser().with(branch, ProjectConfig::class.java).with(GlobalSettings::class.java).execute {
-            val f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .project(branch.project)
-                            .vsNames(listOf("PROJECT"))
-                            .build()
-            )
-            // Shares at global level
-            filterService.shareValidationStampFilter(f)
-            // Gets filters for the project
-            val filters = filterService.getProjectValidationStampFilters(branch.project, false)
-            assertTrue("Project has no longer any filter", filters.isEmpty())
-        }
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun null_patterns() {
         asUser().with(GlobalSettings::class.java).execute {
-            var f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .vsNames(null)
-                            .build()
+            // Shares at global level
+            filterService.shareValidationStampFilter(f)
+        }
+        // Gets filters for the branch
+        val filters = asUserWithView(branch).call { filterService.getBranchValidationStampFilters(branch, false) }
+        assertTrue("Branch has no longer any filter", filters.isEmpty())
+    }
+
+    @Test
+    fun sharing_from_project_to_global_remove_project_filter() {
+        val f = asUser().with(branch, ValidationStampFilterMgt::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            project = branch.project,
+                            vsNames = listOf("PROJECT")
+                    )
             )
-            f = filterService.getValidationStampFilter(f.id)
-            assertNotNull(f.vsNames)
-            assertTrue(f.vsNames.isEmpty())
+        }
+        asUser().with(GlobalSettings::class.java).execute {
+            // Shares at global level
+            filterService.shareValidationStampFilter(f)
+        }
+        // Gets filters for the project
+        val filters = asUserWithView(branch).call { filterService.getProjectValidationStampFilters(branch.project, false) }
+        assertTrue("Project has no longer any filter", filters.isEmpty())
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when no right`() {
+        asUserWithView(branch).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when only management right`() {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when only share right`() {
+        asUser().with(branch, ValidationStampFilterShare::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a global filter when only create right`() {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
         }
     }
 
     @Test
-    @Throws(Exception::class)
+    fun `Can create a global filter`() {
+        asUser().with(GlobalSettings::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("GLOBAL")
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a project filter when no right`() {
+        asUserWithView(branch).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a project filter when only create right`() {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a project filter when only share right`() {
+        asUser().with(branch, ValidationStampFilterShare::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a project filter`() {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            project = branch.project
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot create a branch filter when no right`() {
+        asUserWithView(branch).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a branch filter when share right`() {
+        asUser().with(branch, ValidationStampFilterShare::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a branch filter when mgt right`() {
+        asUser().with(branch, ValidationStampFilterMgt::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun `Can create a branch filter`() {
+        asUser().with(branch, ValidationStampFilterCreate::class.java).execute {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a project filter when no right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUserWithView(branch).execute {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a project filter when only create right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test
+    fun `Can share a project filter when mgt right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test
+    fun `Can share a project filter when share right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterShare::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f,
+                    branch.project
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when no right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUserWithView(branch).execute {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when only mgt right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterMgt::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when only share right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterShare::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
+    }
+
+    @Test(expected = AccessDeniedException::class)
+    fun `Cannot share a global filter when only create right`() {
+        val f = asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.newValidationStampFilter(
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = listOf("PROJECT"),
+                            branch = branch
+                    )
+            )
+        }
+        asUser().with(branch, ValidationStampFilterCreate::class.java).call {
+            filterService.shareValidationStampFilter(
+                    f
+            )
+        }
+    }
+
+    @Test
     fun empty_patterns() {
         asUser().with(GlobalSettings::class.java).execute {
             var f = filterService.newValidationStampFilter(
-                    ValidationStampFilter.builder()
-                            .name(uid("F"))
-                            .vsNames(emptyList())
-                            .build()
+                    ValidationStampFilter(
+                            name = uid("F"),
+                            vsNames = emptyList()
+                    )
             )
             f = filterService.getValidationStampFilter(f.id)
             assertNotNull(f.vsNames)
@@ -663,12 +959,12 @@ class ValidationStampFilterServiceIT : AbstractDSLTestSupport() {
             branch: Branch? = null,
             vsNames: List<String>
     ) = filterService.newValidationStampFilter(
-            ValidationStampFilter.builder()
-                    .name(name)
-                    .project(project)
-                    .branch(branch)
-                    .vsNames(vsNames)
-                    .build()
+            ValidationStampFilter(
+                    name = name,
+                    project = project,
+                    branch = branch,
+                    vsNames = vsNames
+            )
     )
 
 }

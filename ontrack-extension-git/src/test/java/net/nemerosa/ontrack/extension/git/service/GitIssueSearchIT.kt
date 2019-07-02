@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.getOrFail
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.issues.support.MockIssue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
@@ -98,10 +97,10 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
                         commitAsProperty()
                     }
                     build("1") {
-                        gitCommitProperty(commits.getOrFail(1))
+                        gitCommitProperty(commits.getValue(1))
                     }
                     build("3") {
-                        gitCommitProperty(commits.getOrFail(3))
+                        gitCommitProperty(commits.getValue(3))
                     }
                 }
                 branch("release-1.0") {
@@ -109,7 +108,7 @@ class GitIssueSearchIT : AbstractGitTestSupport() {
                         commitAsProperty()
                     }
                     build("2") {
-                        gitCommitProperty(commits.getOrFail(2))
+                        gitCommitProperty(commits.getValue(2))
                     }
                 }
 

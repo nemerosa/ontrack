@@ -156,6 +156,23 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod(count = 3, value = """Associates some arbitrary metrics with the validation.""")
+    ValidationRun validateWithMetrics(String validationStamp, Map<String, Double> metrics, String status = null) {
+        return validateWithData(
+                validationStamp,
+                [
+                        metrics: metrics.collect { name, value ->
+                            [
+                                    name : name,
+                                    value: value,
+                            ]
+                        }
+                ],
+                'net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType',
+                status
+        )
+    }
+
     @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {

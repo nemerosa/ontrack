@@ -18,9 +18,6 @@ import kotlin.test.assertNotNull
 class ValidationRunWithAutoStampIT : AbstractDSLTestSupport() {
 
     @Autowired
-    private lateinit var predefinedValidationStampService: PredefinedValidationStampService
-
-    @Autowired
     private lateinit var fractionValidationDataType: FractionValidationDataType
 
     @Test
