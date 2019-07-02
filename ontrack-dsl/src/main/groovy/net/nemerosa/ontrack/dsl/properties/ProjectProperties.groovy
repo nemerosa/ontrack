@@ -201,4 +201,29 @@ class ProjectProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType')
     }
 
+    /**
+     * Main build links properties
+     */
+
+    @DSLMethod("Sets the options for displaying the builds being used by the builds of this project.")
+    void setMainBuildLinks(MainBuildLinks mainBuildLinks) {
+        property("net.nemerosa.ontrack.extension.general.MainBuildLinksProjectPropertyType", [
+                labels        : mainBuildLinks.labels,
+                overrideGlobal: mainBuildLinks.overrideGlobal,
+        ])
+    }
+
+    @DSLMethod("Gets the options for displaying the builds being used by the builds of this project.")
+    MainBuildLinks getMainBuildLinks() {
+        try {
+            def property = property("net.nemerosa.ontrack.extension.general.MainBuildLinksProjectPropertyType")
+            return new MainBuildLinks(
+                    property.labels,
+                    property.overrideGlobal
+            )
+        } catch (PropertyNotFoundException ignored) {
+            return null
+        }
+    }
+
 }

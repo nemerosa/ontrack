@@ -100,7 +100,19 @@ interface StructureService {
 
     fun deleteBuildLink(fromBuild: Build, toBuild: Build)
 
+    @Deprecated("Use getBuildsUsedBy instead")
     fun getBuildLinksFrom(build: Build): List<Build>
+
+    /**
+     * Gets the builds used by the given one.
+     *
+     * @param build  Source build
+     * @param offset Offset for pagination
+     * @param size   Page size for pagination
+     * @param filter Optional filter on the builds
+     * @return List of builds which are used by the given one
+     */
+    fun getBuildsUsedBy(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
      * Gets the builds which use the given one.
@@ -114,7 +126,7 @@ interface StructureService {
     fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
 
-    @Deprecated("Use {@link #getBuildsUsing(Build, int, int)} instead")
+    @Deprecated("Use getBuildsUsing instead")
     fun getBuildLinksTo(build: Build): List<Build>
 
     fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build>

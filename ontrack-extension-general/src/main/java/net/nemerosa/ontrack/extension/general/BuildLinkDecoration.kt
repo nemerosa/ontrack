@@ -5,6 +5,15 @@ import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import java.net.URI
 
+/**
+ * List of build links, plus an indicator (link to the build page)
+ * showing if there is extra links.
+ */
+class BuildLinkDecorationList(
+        val decorations: List<BuildLinkDecoration>,
+        val extraLink: URI?
+)
+
 class BuildLinkDecoration(
         val project: String,
         val build: String,

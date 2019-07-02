@@ -369,4 +369,21 @@ class Config {
             return new Label(ontrack, result)
         }
     }
+
+    /**
+     * Main build links settings
+     */
+
+    @DSLMethod("Gets the main build links settings")
+    List<String> getMainBuildLinks() {
+        def json = ontrack.get('settings/main-build-links').data
+        return json.labels as List<String>
+    }
+
+    @DSLMethod("Sets the main build links settings")
+    void setMainBuildLinks(List<String> labels) {
+        ontrack.put('settings/main-build-links', [
+                labels: labels
+        ])
+    }
 }

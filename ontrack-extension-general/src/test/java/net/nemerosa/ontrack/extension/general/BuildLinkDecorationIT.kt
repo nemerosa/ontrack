@@ -3,10 +3,15 @@ package net.nemerosa.ontrack.extension.general
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+/**
+ * In this test, we assume the source project is part of the main labels (see [MainBuildLinksProjectPropertyType])
+ * and that it is always displayed.
+ */
 class BuildLinkDecorationIT : AbstractDSLTestSupport() {
 
     private val targetBuildName = "2"
@@ -74,21 +79,26 @@ class BuildLinkDecorationIT : AbstractDSLTestSupport() {
             label: String?,
             expectedLabel: String
     ) {
-        project target@{
-            if (useLabel != null) {
-                buildLinkDisplaysOptions(useLabel)
-            }
-            branch {
-                build("2") {
-                    if (label != null) {
-                        label(label)
-                    }
+        val projectLabel = uid("L")
+        withMainBuildLinksSettings {
+            setMainBuildLinksSettings(projectLabel)
+            project target@{
+                labels = listOf(label(category = null, name = projectLabel))
+                if (useLabel != null) {
+                    buildLinkDisplaysOptions(useLabel)
                 }
-                project {
-                    branch {
-                        build("1") {
-                            linkTo(this@target, "2")
-                            checkLabel(expectedLabel)
+                branch {
+                    build("2") {
+                        if (label != null) {
+                            label(label)
+                        }
+                    }
+                    project {
+                        branch {
+                            build("1") {
+                                linkTo(this@target, "2")
+                                checkLabel(expectedLabel)
+                            }
                         }
                     }
                 }
@@ -115,7 +125,9 @@ class BuildLinkDecorationIT : AbstractDSLTestSupport() {
     private fun Build.checkLabel(expectedLabel: String) {
         val decorations = buildLinkDecorationExtension.getDecorations(this)
         assertEquals(1, decorations.size)
-        val decoration: BuildLinkDecoration = decorations[0].data
+        val mainDecorations = decorations[0].data.decorations
+        assertEquals(1, mainDecorations.size)
+        val decoration = mainDecorations[0]
         assertEquals(expectedLabel, decoration.label, "Build $name decoration's label is expected to be $expectedLabel")
     }
 

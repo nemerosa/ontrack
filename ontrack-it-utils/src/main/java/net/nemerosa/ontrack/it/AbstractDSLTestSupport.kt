@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
@@ -35,6 +37,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var buildFilterService: BuildFilterService
+
+    @Autowired
+    protected lateinit var settingsManagerService: SettingsManagerService
+
+    @Autowired
+    protected lateinit var settingsService: CachedSettingsService
 
     @Autowired
     protected lateinit var predefinedPromotionLevelService: PredefinedPromotionLevelService
@@ -207,6 +215,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 project.id,
                 BuildSearchForm().withBuildExactMatch(true).withBuildName(buildName)
         ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
+        linkTo(build)
+    }
+
+    fun Build.linkTo(build: Build) {
         structureService.addBuildLink(
                 this,
                 build
@@ -232,16 +244,29 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Creates a label
      */
-    fun label(category: String? = uid("C"), name: String = uid("N")): Label {
+    fun label(category: String? = uid("C"), name: String = uid("N"), checkForExisting: Boolean = true): Label {
         return asUser().with(LabelManagement::class.java).call {
-            labelManagementService.newLabel(
+            if (checkForExisting) {
+                val labels = labelManagementService.findLabels(category, name)
+                val existingLabel = labels.firstOrNull()
+                existingLabel ?: labelManagementService.newLabel(
+                        LabelForm(
+                                category = category,
+                                name = name,
+                                description = null,
+                                color = "#FF0000"
+                        )
+                )
+            } else {
+                labelManagementService.newLabel(
                     LabelForm(
                             category = category,
                             name = name,
                             description = null,
                             color = "#FF0000"
                     )
-            )
+                )
+            }
         }
     }
 
@@ -302,6 +327,43 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             }
         }
     }
+
+    /**
+     * Saving current settings, runs some code and restores the format settings
+     */
+    private inline fun <reified T> withSettings(code: () -> Unit) {
+        val settings: T = settingsService.getCachedSettings(T::class.java)
+        // Runs the code
+        code()
+        // Restores the initial settings (only in case of success)
+        asAdmin().execute {
+            settingsManagerService.saveSettings(settings)
+        }
+    }
+
+    /**
+     * Saving current "main build links" settings, runs some code and restores the format settings
+     */
+    protected fun withMainBuildLinksSettings(code: () -> Unit) = withSettings<MainBuildLinksConfig>(code)
+
+    /**
+     * Settings "main build links" settings
+     */
+    protected fun setMainBuildLinksSettings(vararg labels: String) {
+        asAdmin().execute {
+            settingsManagerService.saveSettings(
+                    MainBuildLinksConfig(
+                            labels.toList()
+                    )
+            )
+        }
+    }
+
+    /**
+     * Getting "main build links" settings
+     */
+    protected val mainBuildLinksSettings: List<String>
+        get() = settingsService.getCachedSettings(MainBuildLinksConfig::class.java).labels
 
     protected fun Branch.assertBuildSearch(filterBuilder: (StandardFilterProviderDataBuilder) -> Unit): BuildSearchAssertion {
         val data = buildFilterService.standardFilterProviderData(10)

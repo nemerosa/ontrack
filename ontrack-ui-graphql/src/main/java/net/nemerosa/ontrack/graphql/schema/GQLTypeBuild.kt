@@ -131,7 +131,7 @@ constructor(
                 // Build links
                 .field { f ->
                     f.name("linkedBuilds")
-                            .deprecate("Use `uses` and `usedBy` fields instead.")
+                            .deprecate("Use `using` and `usedBy` fields instead.")
                             .description("Builds this build is linked to")
                             .argument { a ->
                                 a.name("direction")
@@ -153,6 +153,7 @@ constructor(
                 // Build links - "uses" direction, no pagination needed
                 .field { f ->
                     f.name("uses")
+                            .deprecate("Use `using` field instead.")
                             .description("List of builds being used by this one.")
                             .type(stdList(GraphQLTypeReference(BUILD)))
                             .argument {
@@ -167,6 +168,53 @@ constructor(
                             }
                             .dataFetcher(buildBeingUsedFetcher())
                 }
+                // Build links - "using" direction, with pagination
+                .field(
+                        paginatedListFactory.createPaginatedField<Build, Build>(
+                                cache = cache,
+                                fieldName = "using",
+                                fieldDescription = "List of builds being used by this one.",
+                                itemType = this,
+                                arguments = listOf(
+                                        GraphQLArgument.newArgument()
+                                                .name("project")
+                                                .description("Keeps only links targeted from this project")
+                                                .type(GraphQLString)
+                                                .build(),
+                                        GraphQLArgument.newArgument()
+                                                .name("branch")
+                                                .description("Keeps only links targeted from this branch. `project` argument is also required.")
+                                                .type(GraphQLString)
+                                                .build()
+                                ),
+                                itemPaginatedListProvider = { environment, build, offset, size ->
+                                    val projectName: String? = environment.getArgument("project")
+                                    val branchName: String? = environment.getArgument("branch")
+                                    val filter: (Build) -> Boolean
+                                    if (branchName != null) {
+                                        if (projectName == null) {
+                                            throw IllegalArgumentException("`project` is required")
+                                        } else {
+                                            filter = {
+                                                it.branch.project.name == projectName && it.branch.name == branchName
+                                            }
+                                        }
+                                    } else if (projectName != null) {
+                                        filter = {
+                                            it.branch.project.name == projectName
+                                        }
+                                    } else {
+                                        filter = { true }
+                                    }
+                                    structureService.getBuildsUsedBy(
+                                            build,
+                                            offset,
+                                            size,
+                                            filter
+                                    )
+                                }
+                        )
+                )
                 // Build links - "usedBy" direction, with pagination
                 .field(
                         paginatedListFactory.createPaginatedField<Build, Build>(

@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.dialogs.PromotionRunDialog
 import net.nemerosa.ontrack.acceptance.browser.dialogs.ValidationRunDialog
+import org.openqa.selenium.By
+import org.openqa.selenium.WebElement
 
 class BuildPage extends AbstractHeaderPage {
 
@@ -30,4 +32,17 @@ class BuildPage extends AbstractHeaderPage {
         PromotionRunDialog dialog = new PromotionRunDialog(browser).waitFor()
         return dialog
     }
+
+    WebElement getUsingBuildLink(String buildName) {
+        return $(By.linkText(buildName))
+    }
+
+    WebElement getUsingPreviousButton() {
+        return $("#build-using-previous")
+    }
+
+    WebElement getUsingNextButton() {
+        return $("#build-using-next")
+    }
+
 }
