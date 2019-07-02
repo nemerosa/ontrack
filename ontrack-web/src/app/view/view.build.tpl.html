@@ -75,15 +75,15 @@
                         <tfoot>
                         <tr>
                             <td colspan="4">
-                                <button class="btn btn-default" type="button" ng-show="build.using.pageInfo.previousPage" ng-click="navigateUsing(build.using.pageInfo.previousPage)">
+                                <button id="build-using-previous" class="btn btn-default" type="button" ng-show="build.using.pageInfo.previousPage" ng-click="navigateUsing(build.using.pageInfo.previousPage)">
                                     <span class="fa fa-step-backward"></span>
-                                    Newest
+                                    Previous
                                 </button>
                             </td>
                             <td colspan="4" style="text-align: right;">
-                                <button class="btn btn-default" type="button" ng-show="build.using.pageInfo.nextPage" ng-click="navigateUsing(build.using.pageInfo.nextPage)">
+                                <button id="build-using-next" class="btn btn-default" type="button" ng-show="build.using.pageInfo.nextPage" ng-click="navigateUsing(build.using.pageInfo.nextPage)">
                                     <span class="fa fa-step-forward"></span>
-                                    Oldest
+                                    Next
                                 </button>
                             </td>
                         </tr>
@@ -125,13 +125,13 @@
                             <td colspan="4">
                                 <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.previousPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.previousPage)">
                                     <span class="fa fa-step-backward"></span>
-                                    Newest
+                                    Previous
                                 </button>
                             </td>
                             <td colspan="4" style="text-align: right;">
                                 <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.nextPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.nextPage)">
                                     <span class="fa fa-step-forward"></span>
-                                    Oldest
+                                    Next
                                 </button>
                             </td>
                         </tr>
