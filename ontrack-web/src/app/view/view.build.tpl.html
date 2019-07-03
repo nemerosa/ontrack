@@ -44,100 +44,100 @@
                 </table>
             </div>
             <!-- Using... -->
-            <div class="row">
-                <div class="col-md-12">
-                    <ot-section-title>Using</ot-section-title>
-                    <div class="ot-description" ng-if="build.using.pageInfo.currentSize == 0">
-                        This build does not use another build.
-                    </div>
-                    <table class="table table-condensed table-hover">
-                        <tbody>
-                        <tr ng-repeat="dependency in build.using.pageItems">
-                            <td>
-                                <a href="{{dependency.branch.project.links._page}}">{{dependency.branch.project.name}}</a>
-                            </td>
-                            <td>
-                                <a href="{{dependency.branch.links._page}}">{{dependency.branch.name}}</a>
-                            </td>
-                            <td>
-                                <a href="{{dependency.links._page}}">{{dependency.name}}</a>
-                            </td>
-                            <td>
-                                <ot-entity-embedded-decorations decorations="dependency.decorations"></ot-entity-embedded-decorations>
-                            </td>
-                            <td class="ot-build-used-by-promotions">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Using</h3>
+                </div>
+                <div class="panel-body" ng-if="build.using.pageInfo.currentSize == 0">
+                    This build does not use another build.
+                </div>
+                <table class="table table-hover" ng-if="build.using.pageInfo.currentSize > 0">
+                    <tbody>
+                    <tr ng-repeat="dependency in build.using.pageItems">
+                        <td>
+                            <a href="{{dependency.branch.project.links._page}}">{{dependency.branch.project.name}}</a>
+                        </td>
+                        <td>
+                            <a href="{{dependency.branch.links._page}}">{{dependency.branch.name}}</a>
+                        </td>
+                        <td>
+                            <a href="{{dependency.links._page}}">{{dependency.name}}</a>
+                        </td>
+                        <td>
+                            <ot-entity-embedded-decorations decorations="dependency.decorations"></ot-entity-embedded-decorations>
+                        </td>
+                        <td class="ot-build-used-by-promotions">
                                 <span ng-repeat="promotionRun in dependency.promotionRuns">
                                     <ot-entity-image entity="promotionRun.promotionLevel" title="{{promotionRun.promotionLevel.name}}" link="{{promotionRun.promotionLevel.links._page}}"></ot-entity-image>
                                 </span>
-                            </td>
-                        </tr>
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td colspan="4">
-                                <button id="build-using-previous" class="btn btn-default" type="button" ng-show="build.using.pageInfo.previousPage" ng-click="navigateUsing(build.using.pageInfo.previousPage)">
-                                    <span class="fa fa-step-backward"></span>
-                                    Previous
-                                </button>
-                            </td>
-                            <td colspan="4" style="text-align: right;">
-                                <button id="build-using-next" class="btn btn-default" type="button" ng-show="build.using.pageInfo.nextPage" ng-click="navigateUsing(build.using.pageInfo.nextPage)">
-                                    <span class="fa fa-step-forward"></span>
-                                    Next
-                                </button>
-                            </td>
-                        </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot ng-show="build.using.pageInfo.previousPage || build.using.pageInfo.nextPage">
+                    <tr>
+                        <td colspan="4">
+                            <button id="build-using-previous" class="btn btn-default" type="button" ng-show="build.using.pageInfo.previousPage" ng-click="navigateUsing(build.using.pageInfo.previousPage)">
+                                <span class="fa fa-step-backward"></span>
+                                Previous
+                            </button>
+                        </td>
+                        <td colspan="4" style="text-align: right;">
+                            <button id="build-using-next" class="btn btn-default" type="button" ng-show="build.using.pageInfo.nextPage" ng-click="navigateUsing(build.using.pageInfo.nextPage)">
+                                <span class="fa fa-step-forward"></span>
+                                Next
+                            </button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
             </div>
             <!-- Used by... -->
-            <div class="row">
-                <div class="col-md-12">
-                    <ot-section-title>Used by</ot-section-title>
-                    <div class="ot-description" ng-if="build.usedBy.pageInfo.currentSize == 0">
-                        This build is not marked as being used by another build.
-                    </div>
-                    <table class="table table-condensed table-hover">
-                        <tbody>
-                        <tr ng-repeat="usedBy in build.usedBy.pageItems">
-                            <td>
-                                <a href="{{usedBy.branch.project.links._page}}">{{usedBy.branch.project.name}}</a>
-                            </td>
-                            <td>
-                                <a href="{{usedBy.branch.links._page}}">{{usedBy.branch.name}}</a>
-                            </td>
-                            <td>
-                                <a href="{{usedBy.links._page}}">{{usedBy.name}}</a>
-                            </td>
-                            <td>
-                                <ot-entity-embedded-decorations decorations="usedBy.decorations"></ot-entity-embedded-decorations>
-                            </td>
-                            <td class="ot-build-used-by-promotions">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Used by</h3>
+                </div>
+                <div class="panel-body" ng-if="build.usedBy.pageInfo.currentSize == 0">
+                    This build is not marked as being used by another build.
+                </div>
+                <table class="table table-hover" ng-if="build.usedBy.pageInfo.currentSize > 0">
+                    <tbody>
+                    <tr ng-repeat="usedBy in build.usedBy.pageItems">
+                        <td>
+                            <a href="{{usedBy.branch.project.links._page}}">{{usedBy.branch.project.name}}</a>
+                        </td>
+                        <td>
+                            <a href="{{usedBy.branch.links._page}}">{{usedBy.branch.name}}</a>
+                        </td>
+                        <td>
+                            <a href="{{usedBy.links._page}}">{{usedBy.name}}</a>
+                        </td>
+                        <td>
+                            <ot-entity-embedded-decorations decorations="usedBy.decorations"></ot-entity-embedded-decorations>
+                        </td>
+                        <td class="ot-build-used-by-promotions">
                                 <span ng-repeat="promotionRun in usedBy.promotionRuns">
                                     <ot-entity-image entity="promotionRun.promotionLevel" title="{{promotionRun.promotionLevel.name}}" link="{{promotionRun.promotionLevel.links._page}}"></ot-entity-image>
                                 </span>
-                            </td>
-                        </tr>
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td colspan="4">
-                                <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.previousPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.previousPage)">
-                                    <span class="fa fa-step-backward"></span>
-                                    Previous
-                                </button>
-                            </td>
-                            <td colspan="4" style="text-align: right;">
-                                <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.nextPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.nextPage)">
-                                    <span class="fa fa-step-forward"></span>
-                                    Next
-                                </button>
-                            </td>
-                        </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot ng-show="build.usedBy.pageInfo.previousPage || build.usedBy.pageInfo.nextPage">
+                    <tr>
+                        <td colspan="4">
+                            <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.previousPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.previousPage)">
+                                <span class="fa fa-step-backward"></span>
+                                Previous
+                            </button>
+                        </td>
+                        <td colspan="4" style="text-align: right;">
+                            <button class="btn btn-default" type="button" ng-show="build.usedBy.pageInfo.nextPage" ng-click="navigateUsedBy(build.usedBy.pageInfo.nextPage)">
+                                <span class="fa fa-step-forward"></span>
+                                Next
+                            </button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
             </div>
             <!-- Validations -->
             <div class="panel panel-default">
