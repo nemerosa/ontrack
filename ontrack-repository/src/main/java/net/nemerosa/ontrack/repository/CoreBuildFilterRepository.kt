@@ -1,24 +1,23 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.PropertyType;
-import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.PropertyType
+import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
+import java.util.Optional
+import java.util.function.Function
 
 /**
  * Standard filter query.
  */
-public interface CoreBuildFilterRepository {
+interface CoreBuildFilterRepository {
 
-    List<Build> standardFilter(Branch branch, StandardBuildFilterData data, Function<String, PropertyType<?>> propertyTypeAccessor);
+    fun standardFilter(branch: Branch, data: StandardBuildFilterData, propertyTypeAccessor: (String) -> PropertyType<*>): List<Build>
 
-    List<Build> nameFilter(Branch branch, String fromBuild, String toBuild, String withPromotionLevel, int count);
+    fun nameFilter(branch: Branch, fromBuild: String?, toBuild: String?, withPromotionLevel: String?, count: Int): List<Build>
 
-    Optional<Build> lastBuild(Branch branch, String sinceBuild, String withPromotionLevel);
+    fun lastBuild(branch: Branch, sinceBuild: String?, withPromotionLevel: String?): Optional<Build>
 
-    List<Build> between(Branch branch, String from, String to);
+    fun between(branch: Branch, from: String?, to: String?): List<Build>
+
 }

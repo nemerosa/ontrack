@@ -1,125 +1,112 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.stereotype.Repository;
+import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.stereotype.Repository
 
-import javax.sql.DataSource;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import javax.sql.DataSource
+import java.util.Optional
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import java.lang.String.format
+import org.apache.commons.lang3.StringUtils.isNotBlank
+import kotlin.math.max
 
 @Repository
-public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implements CoreBuildFilterRepository {
-
-    private final StructureRepository structureRepository;
-
-    @Autowired
-    public CoreBuildFilterJdbcRepository(DataSource dataSource, StructureRepository structureRepository) {
-        super(dataSource);
-        this.structureRepository = structureRepository;
-    }
+class CoreBuildFilterJdbcRepository @Autowired
+constructor(dataSource: DataSource, private val structureRepository: StructureRepository) : AbstractJdbcRepository(dataSource), CoreBuildFilterRepository {
 
     /**
      * The fat join query (dreaming of Neo4J) defines the following columns:
-     * <p>
-     * <pre>
-     *     B (BUILDS)
-     *     PR (PROMOTION_RUNS)
-     *     PL (PROMOTION_LEVELS)
-     *     S (last validation run status)
-     *          VALIDATIONSTAMPID
-     *          VALIDATIONRUNSTATUSID
-     *     PP (PROPERTIES)
-     *     BDFROM (builds linked from)
-     *     BRFROM (branches linked from)
-     *     PJFROM (projects linked from)
-     *     PLFROM (promotions linked from)
-     *     BDTO (builds linked to)
-     *     BRTO (branches linked to)
-     *     PJTO (projects linked to)
-     *     PLTO (promotions linked to)
-     * </pre>
+     *
+     * ```
+     * B (BUILDS)
+     * PR (PROMOTION_RUNS)
+     * PL (PROMOTION_LEVELS)
+     * S (last validation run status)
+     * VALIDATIONSTAMPID
+     * VALIDATIONRUNSTATUSID
+     * PP (PROPERTIES)
+     * BDFROM (builds linked from)
+     * BRFROM (branches linked from)
+     * PJFROM (projects linked from)
+     * PLFROM (promotions linked from)
+     * BDTO (builds linked to)
+     * BRTO (branches linked to)
+     * PJTO (projects linked to)
+     * PLTO (promotions linked to)
+     * ```
      */
-    @Override
-    public List<Build> standardFilter(Branch branch, StandardBuildFilterData data, Function<String, PropertyType<?>> propertyTypeAccessor) {
+    override fun standardFilter(branch: Branch, data: StandardBuildFilterData, propertyTypeAccessor: (String) -> PropertyType<*>): List<Build> {
         // Query root
-        StringBuilder tables = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B ");
+        val tables = StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B ")
         // Criterias
-        StringBuilder criteria = new StringBuilder(" WHERE B.BRANCHID = :branch");
+        val criteria = StringBuilder(" WHERE B.BRANCHID = :branch")
 
         // Parameters
-        MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
-        Integer sinceBuildId = null;
+        val params = MapSqlParameterSource("branch", branch.id())
+        var sinceBuildId: Int? = null
 
         // sincePromotionLevel
-        String sincePromotionLevel = data.getSincePromotionLevel();
-        if (StringUtils.isNotBlank(sincePromotionLevel)) {
+        val sincePromotionLevel = data.sincePromotionLevel
+        if (isNotBlank(sincePromotionLevel)) {
             // Gets the promotion level ID
-            int promotionLevelId = structureRepository
+            val promotionLevelId = structureRepository
                     .getPromotionLevelByName(branch, sincePromotionLevel)
-                    .map(Entity::id)
-                    .orElse(-1);
+                    .map { it.id() }
+                    .orElse(-1)
             // Gets the last build having this promotion level
-            Integer id = findLastBuildWithPromotionLevel(promotionLevelId);
+            val id = findLastBuildWithPromotionLevel(promotionLevelId)
             if (id != null) {
-                sinceBuildId = id;
+                sinceBuildId = id
             }
         }
 
         // withPromotionLevel
-        String withPromotionLevel = data.getWithPromotionLevel();
-        if (StringUtils.isNotBlank(withPromotionLevel)) {
+        val withPromotionLevel = data.withPromotionLevel
+        if (isNotBlank(withPromotionLevel)) {
             tables.append(
-                    " LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
-                            " LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID");
-            criteria.append(" AND PL.NAME = :withPromotionLevel");
-            params.addValue("withPromotionLevel", withPromotionLevel);
+                    " LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" + " LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID")
+            criteria.append(" AND PL.NAME = :withPromotionLevel")
+            params.addValue("withPromotionLevel", withPromotionLevel)
         }
 
         // afterDate
-        LocalDate afterDate = data.getAfterDate();
+        val afterDate = data.afterDate
         if (afterDate != null) {
-            criteria.append(" AND B.CREATION >= :afterDate");
-            params.addValue("afterDate", dateTimeForDB(afterDate.atTime(0, 0)));
+            criteria.append(" AND B.CREATION >= :afterDate")
+            params.addValue("afterDate", dateTimeForDB(afterDate.atTime(0, 0)))
         }
 
         // beforeDate
-        LocalDate beforeDate = data.getBeforeDate();
+        val beforeDate = data.beforeDate
         if (beforeDate != null) {
-            criteria.append(" AND B.CREATION <= :beforeDate");
-            params.addValue("beforeDate", dateTimeForDB(beforeDate.atTime(23, 59, 59)));
+            criteria.append(" AND B.CREATION <= :beforeDate")
+            params.addValue("beforeDate", dateTimeForDB(beforeDate.atTime(23, 59, 59)))
         }
 
         // sinceValidationStamp
-        String sinceValidationStamp = data.getSinceValidationStamp();
-        if (StringUtils.isNotBlank(sinceValidationStamp)) {
+        val sinceValidationStamp = data.sinceValidationStamp
+        if (isNotBlank(sinceValidationStamp)) {
             // Gets the validation stamp ID
-            int validationStampId = getValidationStampId(branch, sinceValidationStamp);
+            val validationStampId = getValidationStampId(branch, sinceValidationStamp)!!
             // Gets the last build having this validation stamp and the validation status
-            Integer id = findLastBuildWithValidationStamp(validationStampId, data.getSinceValidationStampStatus());
+            val id = findLastBuildWithValidationStamp(validationStampId, data.sinceValidationStampStatus)
             if (id != null) {
-                if (sinceBuildId == null) {
-                    sinceBuildId = id;
+                sinceBuildId = if (sinceBuildId == null) {
+                    id
                 } else {
-                    sinceBuildId = Math.max(sinceBuildId, id);
+                    max(sinceBuildId, id)
                 }
             }
         }
 
         // withValidationStamp
-        String withValidationStamp = data.getWithValidationStamp();
-        if (StringUtils.isNotBlank(withValidationStamp)) {
+        val withValidationStamp = data.withValidationStamp
+        if (isNotBlank(withValidationStamp)) {
             tables.append(
                     "  LEFT JOIN (" +
                             " SELECT R.BUILDID,  R.VALIDATIONSTAMPID, VRS.VALIDATIONRUNSTATUSID " +
@@ -127,367 +114,358 @@ public class CoreBuildFilterJdbcRepository extends AbstractJdbcRepository implem
                             " INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = R.ID ORDER BY ID DESC LIMIT 1)" +
                             " AND R.ID = (SELECT MAX(ID) FROM VALIDATION_RUNS WHERE BUILDID = R.BUILDID AND VALIDATIONSTAMPID = R.VALIDATIONSTAMPID)" +
                             " ) S ON S.BUILDID = B.ID"
-            );
+            )
             // Gets the validation stamp ID
-            int validationStampId = getValidationStampId(branch, withValidationStamp);
-            criteria.append(" AND (S.VALIDATIONSTAMPID = :validationStampId");
-            params.addValue("validationStampId", validationStampId);
+            val validationStampId = getValidationStampId(branch, withValidationStamp)!!
+            criteria.append(" AND (S.VALIDATIONSTAMPID = :validationStampId")
+            params.addValue("validationStampId", validationStampId)
             // withValidationStampStatus
-            String withValidationStampStatus = data.getWithValidationStampStatus();
-            if (StringUtils.isNotBlank(withValidationStampStatus)) {
-                criteria.append(" AND S.VALIDATIONRUNSTATUSID = :withValidationStampStatus");
-                params.addValue("withValidationStampStatus", withValidationStampStatus);
+            val withValidationStampStatus = data.withValidationStampStatus
+            if (isNotBlank(withValidationStampStatus)) {
+                criteria.append(" AND S.VALIDATIONRUNSTATUSID = :withValidationStampStatus")
+                params.addValue("withValidationStampStatus", withValidationStampStatus)
             }
-            criteria.append(")");
+            criteria.append(")")
         }
 
         // withProperty
-        String withProperty = data.getWithProperty();
-        if (StringUtils.isNotBlank(withProperty)) {
-            tables.append(" LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID");
-            criteria.append(" AND PP.TYPE = :withProperty");
-            params.addValue("withProperty", withProperty);
+        val withProperty = data.withProperty
+        if (isNotBlank(withProperty)) {
+            tables.append(" LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID")
+            criteria.append(" AND PP.TYPE = :withProperty")
+            params.addValue("withProperty", withProperty)
             // withPropertyValue
-            String withPropertyValue = data.getWithPropertyValue();
-            if (StringUtils.isNotBlank(withPropertyValue)) {
+            val withPropertyValue = data.withPropertyValue
+            if (isNotBlank(withPropertyValue)) {
                 // Gets the property type
-                PropertyType<?> propertyType = propertyTypeAccessor.apply(withProperty);
+                val propertyType = propertyTypeAccessor(withProperty)
                 // Gets the search arguments
-                PropertySearchArguments searchArguments = propertyType.getSearchArguments(withPropertyValue);
+                val searchArguments = propertyType.getSearchArguments(withPropertyValue)
                 // If defined use them
-                if (searchArguments != null && searchArguments.isDefined()) {
+                if (searchArguments != null && searchArguments.isDefined) {
                     PropertyJdbcRepository.prepareQueryForPropertyValue(
                             searchArguments,
                             tables,
                             criteria,
                             params
-                    );
+                    )
                 } else {
                     // No match
-                    return Collections.emptyList();
+                    return emptyList()
                 }
             }
         }
 
         // sinceProperty
-        String sinceProperty = data.getSinceProperty();
-        if (StringUtils.isNotBlank(sinceProperty)) {
-            String sincePropertyValue = data.getSincePropertyValue();
-            Integer id = findLastBuildWithPropertyValue(branch, sinceProperty, sincePropertyValue, propertyTypeAccessor);
+        val sinceProperty = data.sinceProperty
+        if (isNotBlank(sinceProperty)) {
+            val sincePropertyValue = data.sincePropertyValue
+            val id = findLastBuildWithPropertyValue(branch, sinceProperty, sincePropertyValue, propertyTypeAccessor)
             if (id != null) {
-                if (sinceBuildId == null) {
-                    sinceBuildId = id;
+                sinceBuildId = if (sinceBuildId == null) {
+                    id
                 } else {
-                    sinceBuildId = Math.max(sinceBuildId, id);
+                    max(sinceBuildId, id)
                 }
             }
         }
 
         // linkedFrom
-        String linkedFrom = data.getLinkedFrom();
+        val linkedFrom = data.linkedFrom
         if (isNotBlank(linkedFrom)) {
             tables.append(
                     " LEFT JOIN BUILD_LINKS BLFROM ON BLFROM.TARGETBUILDID = B.ID" +
                             " LEFT JOIN BUILDS BDFROM ON BDFROM.ID = BLFROM.BUILDID" +
                             " LEFT JOIN BRANCHES BRFROM ON BRFROM.ID = BDFROM.BRANCHID" +
                             " LEFT JOIN PROJECTS PJFROM ON PJFROM.ID = BRFROM.PROJECTID"
-            );
-            String project = StringUtils.substringBefore(linkedFrom, ":");
-            criteria.append(" AND PJFROM.NAME = :fromProject");
-            params.addValue("fromProject", project);
-            String buildPattern = StringUtils.substringAfter(linkedFrom, ":");
-            if (StringUtils.isNotBlank(buildPattern)) {
+            )
+            val project = StringUtils.substringBefore(linkedFrom, ":")
+            criteria.append(" AND PJFROM.NAME = :fromProject")
+            params.addValue("fromProject", project)
+            val buildPattern = StringUtils.substringAfter(linkedFrom, ":")
+            if (isNotBlank(buildPattern)) {
                 if (StringUtils.contains(buildPattern, "*")) {
-                    criteria.append(" AND BDFROM.NAME LIKE :buildFrom");
-                    params.addValue("buildFrom", StringUtils.replace(buildPattern, "*", "%"));
+                    criteria.append(" AND BDFROM.NAME LIKE :buildFrom")
+                    params.addValue("buildFrom", StringUtils.replace(buildPattern, "*", "%"))
                 } else {
-                    criteria.append(" AND BDFROM.NAME = :buildFrom");
-                    params.addValue("buildFrom", buildPattern);
+                    criteria.append(" AND BDFROM.NAME = :buildFrom")
+                    params.addValue("buildFrom", buildPattern)
                 }
             }
             // linkedFromPromotion
-            String linkedFromPromotion = data.getLinkedFromPromotion();
-            if (StringUtils.isNotBlank(linkedFromPromotion)) {
+            val linkedFromPromotion = data.linkedFromPromotion
+            if (isNotBlank(linkedFromPromotion)) {
                 tables.append(
-                        " LEFT JOIN PROMOTION_RUNS PRFROM ON PRFROM.BUILDID = BDFROM.ID" +
-                                " LEFT JOIN PROMOTION_LEVELS PLFROM ON PLFROM.ID = PRFROM.PROMOTIONLEVELID"
-                );
-                criteria.append(" AND PLFROM.NAME = :linkedFromPromotion");
-                params.addValue("linkedFromPromotion", linkedFromPromotion);
+                        " LEFT JOIN PROMOTION_RUNS PRFROM ON PRFROM.BUILDID = BDFROM.ID" + " LEFT JOIN PROMOTION_LEVELS PLFROM ON PLFROM.ID = PRFROM.PROMOTIONLEVELID"
+                )
+                criteria.append(" AND PLFROM.NAME = :linkedFromPromotion")
+                params.addValue("linkedFromPromotion", linkedFromPromotion)
             }
         }
 
         // linkedTo
-        String linkedTo = data.getLinkedTo();
+        val linkedTo = data.linkedTo
         if (isNotBlank(linkedTo)) {
             tables.append(
                     " LEFT JOIN BUILD_LINKS BLTO ON BLTO.BUILDID = B.ID" +
                             " LEFT JOIN BUILDS BDTO ON BDTO.ID = BLTO.TARGETBUILDID" +
                             " LEFT JOIN BRANCHES BRTO ON BRTO.ID = BDTO.BRANCHID" +
                             " LEFT JOIN PROJECTS PJTO ON PJTO.ID = BRTO.PROJECTID"
-            );
-            String project = StringUtils.substringBefore(linkedTo, ":");
-            criteria.append(" AND PJTO.NAME = :toProject");
-            params.addValue("toProject", project);
-            String buildPattern = StringUtils.substringAfter(linkedTo, ":");
-            if (StringUtils.isNotBlank(buildPattern)) {
+            )
+            val project = StringUtils.substringBefore(linkedTo, ":")
+            criteria.append(" AND PJTO.NAME = :toProject")
+            params.addValue("toProject", project)
+            val buildPattern = StringUtils.substringAfter(linkedTo, ":")
+            if (isNotBlank(buildPattern)) {
                 if (StringUtils.contains(buildPattern, "*")) {
-                    criteria.append(" AND BDTO.NAME LIKE :buildTo");
-                    params.addValue("buildTo", StringUtils.replace(buildPattern, "*", "%"));
+                    criteria.append(" AND BDTO.NAME LIKE :buildTo")
+                    params.addValue("buildTo", StringUtils.replace(buildPattern, "*", "%"))
                 } else {
-                    criteria.append(" AND BDTO.NAME = :buildTo");
-                    params.addValue("buildTo", buildPattern);
+                    criteria.append(" AND BDTO.NAME = :buildTo")
+                    params.addValue("buildTo", buildPattern)
                 }
             }
             // linkedToPromotion
-            String linkedToPromotion = data.getLinkedToPromotion();
-            if (StringUtils.isNotBlank(linkedToPromotion)) {
+            val linkedToPromotion = data.linkedToPromotion
+            if (isNotBlank(linkedToPromotion)) {
                 tables.append(
-                        " LEFT JOIN PROMOTION_RUNS PRTO ON PRTO.BUILDID = BDTO.ID" +
-                                " LEFT JOIN PROMOTION_LEVELS PLTO ON PLTO.ID = PRTO.PROMOTIONLEVELID"
-                );
-                criteria.append(" AND PLTO.NAME = :linkedToPromotion");
-                params.addValue("linkedToPromotion", linkedToPromotion);
+                        " LEFT JOIN PROMOTION_RUNS PRTO ON PRTO.BUILDID = BDTO.ID" + " LEFT JOIN PROMOTION_LEVELS PLTO ON PLTO.ID = PRTO.PROMOTIONLEVELID"
+                )
+                criteria.append(" AND PLTO.NAME = :linkedToPromotion")
+                params.addValue("linkedToPromotion", linkedToPromotion)
             }
         }
 
         // Since build?
         if (sinceBuildId != null) {
-            criteria.append(" AND B.ID >= :sinceBuildId");
-            params.addValue("sinceBuildId", sinceBuildId);
+            criteria.append(" AND B.ID >= :sinceBuildId")
+            params.addValue("sinceBuildId", sinceBuildId)
         }
 
         // Final SQL
-        String sql = format(
+        val sql = format(
                 "%s %s ORDER BY B.ID DESC LIMIT :count",
                 tables,
-                criteria);
-        params.addValue("count", data.getCount());
+                criteria)
+        params.addValue("count", data.count)
 
         // Running the query
-        return loadBuilds(sql, params);
+        return loadBuilds(sql, params)
     }
 
-    private List<Build> loadBuilds(String sql, MapSqlParameterSource params) {
-        return getNamedParameterJdbcTemplate()
+    private fun loadBuilds(sql: String, params: MapSqlParameterSource): List<Build> {
+        return namedParameterJdbcTemplate
                 .queryForList(
                         sql,
                         params,
-                        Integer.class
+                        Int::class.java
                 )
-                .stream()
-                .map(id -> structureRepository.getBuild(ID.of(id)))
-                .collect(Collectors.toList());
+                .map { id -> structureRepository.getBuild(ID.of(id)) }
     }
 
-    @Override
-    public List<Build> nameFilter(Branch branch, String fromBuild, String toBuild, String withPromotionLevel, int count) {
+    override fun nameFilter(branch: Branch, fromBuild: String?, toBuild: String?, withPromotionLevel: String?, count: Int): List<Build> {
         // Query root
-        StringBuilder sql = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
+        val sql = StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
                 "                LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
                 "                LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID" +
                 // Branch criteria
-                "                WHERE B.BRANCHID = :branch");
+                "                WHERE B.BRANCHID = :branch")
 
         // Parameters
-        MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
+        val params = MapSqlParameterSource("branch", branch.id())
 
         // From build
-        Optional<Integer> fromBuildId = lastBuild(branch, fromBuild, null)
-                .map(Entity::id);
-        if (!fromBuildId.isPresent()) {
-            return Collections.emptyList();
+        val fromBuildId = lastBuild(branch, fromBuild, null)
+                .map { it.id() }
+        if (!fromBuildId.isPresent) {
+            return emptyList()
         }
-        sql.append(" AND B.ID >= :fromBuildId");
-        params.addValue("fromBuildId", fromBuildId.get());
+        sql.append(" AND B.ID >= :fromBuildId")
+        params.addValue("fromBuildId", fromBuildId.get())
 
         // To build
-        if (StringUtils.isNotBlank(toBuild)) {
-            Optional<Integer> toBuildId = lastBuild(branch, toBuild, null).map(Entity::id);
-            if (toBuildId.isPresent()) {
-                sql.append(" AND B.ID <= :toBuildId");
-                params.addValue("toBuildId", toBuildId.get());
+        if (isNotBlank(toBuild)) {
+            val toBuildId = lastBuild(branch, toBuild, null).map { it.id() }
+            if (toBuildId.isPresent) {
+                sql.append(" AND B.ID <= :toBuildId")
+                params.addValue("toBuildId", toBuildId.get())
             }
         }
 
         // With promotion
-        if (StringUtils.isNotBlank(withPromotionLevel)) {
-            sql.append(" AND PL.NAME = :withPromotionLevel");
-            params.addValue("withPromotionLevel", withPromotionLevel);
+        if (isNotBlank(withPromotionLevel)) {
+            sql.append(" AND PL.NAME = :withPromotionLevel")
+            params.addValue("withPromotionLevel", withPromotionLevel)
         }
 
         // Ordering
-        sql.append(" ORDER BY B.ID DESC");
+        sql.append(" ORDER BY B.ID DESC")
         // Limit
-        sql.append(" LIMIT :count");
-        params.addValue("count", count);
+        sql.append(" LIMIT :count")
+        params.addValue("count", count)
 
         // Running the query
-        return loadBuilds(sql.toString(), params);
+        return loadBuilds(sql.toString(), params)
     }
 
-    @Override
-    public Optional<Build> lastBuild(Branch branch, String sinceBuild, String withPromotionLevel) {
+    override fun lastBuild(branch: Branch, sinceBuild: String?, withPromotionLevel: String?): Optional<Build> {
         // Query root
-        StringBuilder sql = new StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
+        val sql = StringBuilder("SELECT DISTINCT(B.ID) FROM BUILDS B" +
                 "                LEFT JOIN PROMOTION_RUNS PR ON PR.BUILDID = B.ID" +
                 "                LEFT JOIN PROMOTION_LEVELS PL ON PL.ID = PR.PROMOTIONLEVELID" +
                 // Branch criteria
-                "                WHERE B.BRANCHID = :branch");
+                "                WHERE B.BRANCHID = :branch")
 
         // Parameters
-        MapSqlParameterSource params = new MapSqlParameterSource("branch", branch.id());
+        val params = MapSqlParameterSource("branch", branch.id())
 
         // Since build
         if (StringUtils.contains(sinceBuild, "*")) {
-            sql.append(" AND B.NAME LIKE :buildName");
-            params.addValue("buildName", StringUtils.replace(sinceBuild, "*", "%"));
+            sql.append(" AND B.NAME LIKE :buildName")
+            params.addValue("buildName", StringUtils.replace(sinceBuild, "*", "%"))
         } else {
-            sql.append(" AND B.NAME = :buildName");
-            params.addValue("buildName", sinceBuild);
+            sql.append(" AND B.NAME = :buildName")
+            params.addValue("buildName", sinceBuild)
         }
 
         // With promotion
-        if (StringUtils.isNotBlank(withPromotionLevel)) {
-            sql.append(" AND PL.NAME = :withPromotionLevel");
-            params.addValue("withPromotionLevel", withPromotionLevel);
+        if (isNotBlank(withPromotionLevel)) {
+            sql.append(" AND PL.NAME = :withPromotionLevel")
+            params.addValue("withPromotionLevel", withPromotionLevel)
         }
 
         // Ordering
-        sql.append(" ORDER BY B.ID DESC");
+        sql.append(" ORDER BY B.ID DESC")
         // Limit
-        sql.append(" LIMIT 1");
+        sql.append(" LIMIT 1")
 
         // Running the query
         return loadBuilds(sql.toString(), params)
                 .stream()
-                .findFirst();
+                .findFirst()
     }
 
-    @Override
-    public List<Build> between(Branch branch, String from, String to) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT ID FROM BUILDS WHERE " +
-                        "BRANCHID = :branchId "
-        );
-        MapSqlParameterSource params = params("branchId", branch.id());
-        Integer fromId;
-        Integer toId = null;
+    override fun between(branch: Branch, from: String?, to: String?): List<Build> {
+        val sql = StringBuilder(
+                "SELECT ID FROM BUILDS WHERE " + "BRANCHID = :branchId "
+        )
+        val params = params("branchId", branch.id())
+        var fromId: Int?
+        var toId: Int? = null
 
         // From build
-        fromId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), from)
-                .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), from))
-                .id();
+        fromId = structureRepository.getBuildByName(branch.project.name, branch.name, from)
+                .orElseThrow { BuildNotFoundException(branch.project.name, branch.name, from) }
+                .id()
 
         // To build
-        if (StringUtils.isNotBlank(to)) {
-            toId = structureRepository.getBuildByName(branch.getProject().getName(), branch.getName(), to)
-                    .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), to))
-                    .id();
+        if (isNotBlank(to)) {
+            toId = structureRepository.getBuildByName(branch.project.name, branch.name, to)
+                    .orElseThrow { BuildNotFoundException(branch.project.name, branch.name, to) }
+                    .id()
         }
 
         if (toId != null) {
             if (toId < fromId) {
-                int i = toId;
-                toId = fromId;
-                fromId = i;
+                val i = toId
+                toId = fromId
+                fromId = i
             }
         }
 
-        sql.append(" AND ID >= :fromId");
-        params.addValue("fromId", fromId);
+        sql.append(" AND ID >= :fromId")
+        params.addValue("fromId", fromId)
         if (toId != null) {
-            sql.append(" AND ID <= :toId");
-            params.addValue("toId", toId);
+            sql.append(" AND ID <= :toId")
+            params.addValue("toId", toId)
         }
 
         // Ordering
-        sql.append(" ORDER BY ID DESC");
+        sql.append(" ORDER BY ID DESC")
 
         // Query
-        return loadBuilds(sql.toString(), params);
+        return loadBuilds(sql.toString(), params)
     }
 
-    private Integer findLastBuildWithPropertyValue(Branch branch, String propertyTypeName, String propertyValue, Function<String, PropertyType<?>> propertyTypeAccessor) {
+    private fun findLastBuildWithPropertyValue(branch: Branch, propertyTypeName: String, propertyValue: String?, propertyTypeAccessor: (String) -> PropertyType<*>): Int? {
         // SQL
-        StringBuilder tables = new StringBuilder("SELECT B.ID " +
+        val tables = StringBuilder("SELECT B.ID " +
                 "FROM BUILDS B " +
                 "LEFT JOIN PROPERTIES PP ON PP.BUILD = B.ID "
-        );
-        StringBuilder criteria = new StringBuilder(
-                "WHERE B.BRANCHID = :branchId " +
-                        "AND PP.TYPE = :propertyType "
-        );
-        MapSqlParameterSource params = params("branchId", branch.id())
-                .addValue("propertyType", propertyTypeName);
+        )
+        val criteria = StringBuilder(
+                "WHERE B.BRANCHID = :branchId " + "AND PP.TYPE = :propertyType "
+        )
+        val params = params("branchId", branch.id())
+                .addValue("propertyType", propertyTypeName)
 
-        if (StringUtils.isNotBlank(propertyValue)) {
+        if (isNotBlank(propertyValue)) {
             // Gets the property type
-            PropertyType<?> propertyType = propertyTypeAccessor.apply(propertyTypeName);
+            val propertyType = propertyTypeAccessor(propertyTypeName)
             // Gets the search arguments for a property value
-            PropertySearchArguments searchArguments = propertyType.getSearchArguments(propertyValue);
+            val searchArguments = propertyType.getSearchArguments(propertyValue)
             // If defined use them
-            if (searchArguments != null && searchArguments.isDefined()) {
+            if (searchArguments != null && searchArguments.isDefined) {
                 PropertyJdbcRepository.prepareQueryForPropertyValue(
                         searchArguments,
                         tables,
                         criteria,
                         params
-                );
+                )
             } else {
                 // No match
-                return null;
+                return null
             }
         }
 
         // Build ID
-        String sql = tables + " " +
+        val sql = tables.toString() + " " +
                 criteria + "" +
-                " ORDER BY B.ID DESC LIMIT 1";
+                " ORDER BY B.ID DESC LIMIT 1"
 
         // Runs the query
         return getFirstItem(
                 sql,
                 params,
-                Integer.class
-        );
+                Int::class.java
+        )
     }
 
-    private Integer getValidationStampId(Branch branch, String validationStampName) {
+    private fun getValidationStampId(branch: Branch, validationStampName: String): Int? {
         return structureRepository
                 .getValidationStampByName(branch, validationStampName)
-                .map(Entity::id)
-                .orElse(-1);
+                .map { it.id() }
+                .orElse(-1)
     }
 
-    private Integer findLastBuildWithValidationStamp(int validationStampId, String status) {
-        StringBuilder sql = new StringBuilder(
+    private fun findLastBuildWithValidationStamp(validationStampId: Int, status: String?): Int? {
+        val sql = StringBuilder(
                 "SELECT VR.BUILDID FROM VALIDATION_RUN_STATUSES VRS\n" +
                         "INNER JOIN VALIDATION_RUNS VR ON VR.ID = VRS.VALIDATIONRUNID\n" +
                         "WHERE VR.VALIDATIONSTAMPID = :validationStampId\n"
-        );
+        )
         // Parameters
-        MapSqlParameterSource params = params("validationStampId", validationStampId);
+        val params = params("validationStampId", validationStampId)
         // Status criteria
-        if (StringUtils.isNotBlank(status)) {
-            sql.append("AND VRS.VALIDATIONRUNSTATUSID = :status\n");
-            params.addValue("status", status);
+        if (isNotBlank(status)) {
+            sql.append("AND VRS.VALIDATIONRUNSTATUSID = :status\n")
+            params.addValue("status", status)
         }
         // Order & limit
-        sql.append("ORDER BY VR.BUILDID DESC LIMIT 1\n");
+        sql.append("ORDER BY VR.BUILDID DESC LIMIT 1\n")
         // Build ID
         return getFirstItem(
                 sql.toString(),
                 params,
-                Integer.class
-        );
+                Int::class.java
+        )
     }
 
-    private Integer findLastBuildWithPromotionLevel(int promotionLevelId) {
+    private fun findLastBuildWithPromotionLevel(promotionLevelId: Int): Int? {
         return getFirstItem(
                 "SELECT BUILDID FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY BUILDID DESC LIMIT 1",
                 params("promotionLevelId", promotionLevelId),
-                Integer.class
-        );
+                Int::class.java
+        )
     }
 }
