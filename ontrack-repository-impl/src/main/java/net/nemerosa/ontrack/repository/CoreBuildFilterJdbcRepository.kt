@@ -353,16 +353,23 @@ constructor(dataSource: DataSource, private val structureRepository: StructureRe
         var fromId: Int?
         var toId: Int? = null
 
-        // From build
-        fromId = structureRepository.getBuildByName(branch.project.name, branch.name, from)
-                .orElseThrow { BuildNotFoundException(branch.project.name, branch.name, from) }
-                .id()
+        try {
 
-        // To build
-        if (isNotBlank(to)) {
-            toId = structureRepository.getBuildByName(branch.project.name, branch.name, to)
-                    .orElseThrow { BuildNotFoundException(branch.project.name, branch.name, to) }
+            // From build
+            fromId = structureRepository.getBuildByName(branch.project.name, branch.name, from)
+                    .orElseThrow { BuildNotFoundException(branch.project.name, branch.name, from) }
                     .id()
+
+            // To build
+            if (isNotBlank(to)) {
+                toId = structureRepository.getBuildByName(branch.project.name, branch.name, to)
+                        .orElseThrow { BuildNotFoundException(branch.project.name, branch.name, to) }
+                        .id()
+            }
+
+        } catch (ex: BuildNotFoundException) {
+            // If one of the boundaries is not found, returns an empty list
+            return emptyList()
         }
 
         if (toId != null) {

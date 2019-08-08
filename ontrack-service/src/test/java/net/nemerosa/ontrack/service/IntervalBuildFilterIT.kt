@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import org.junit.Test
+import kotlin.test.assertTrue
 
 class IntervalBuildFilterIT : AbstractBuildFilterIT() {
 
@@ -13,15 +14,17 @@ class IntervalBuildFilterIT : AbstractBuildFilterIT() {
         )
     }
 
-    @Test(expected = BuildNotFoundException::class)
+    @Test
     fun from_does_not_exist() {
-        filter(BuildIntervalFilterData("xxx", null)).filterBranchBuilds(branch)
+        val builds = filter(BuildIntervalFilterData("xxx", null)).filterBranchBuilds(branch)
+        assertTrue(builds.isEmpty(), "No build is returned")
     }
 
-    @Test(expected = BuildNotFoundException::class)
+    @Test
     fun to_does_not_exist() {
         build("1.0.0")
-        filter(BuildIntervalFilterData("1.0.0", "xxx")).filterBranchBuilds(branch)
+        val builds = filter(BuildIntervalFilterData("1.0.0", "xxx")).filterBranchBuilds(branch)
+        assertTrue(builds.isEmpty(), "No build is returned")
     }
 
     @Test
