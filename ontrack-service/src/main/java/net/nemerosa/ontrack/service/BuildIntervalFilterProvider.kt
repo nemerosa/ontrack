@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.service
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -15,7 +17,8 @@ import java.util.*
 @Component
 @Transactional
 class BuildIntervalFilterProvider(
-        private val filterRepository: CoreBuildFilterRepository
+        private val filterRepository: CoreBuildFilterRepository,
+        private val structureService: StructureService
 ) : AbstractBuildFilterProvider<BuildIntervalFilterData>() {
 
     override fun getType(): String = BuildIntervalFilterProvider::class.java.name
@@ -46,6 +49,24 @@ class BuildIntervalFilterProvider(
     override fun filterBranchBuilds(branch: Branch, data: BuildIntervalFilterData): List<Build> {
         return filterRepository.between(branch, data.from, data.to)
     }
+
+    override fun validateData(branch: Branch, data: BuildIntervalFilterData): String? {
+        return validateBuild(branch, data.from) ?: validateBuild(branch, data.to)
+    }
+
+    private fun validateBuild(branch: Branch, name: String?): String? =
+            name?.let {
+                val build = structureService.findBuildByName(
+                        branch.project.name,
+                        branch.name,
+                        it
+                ).getOrNull()
+                if (build != null) {
+                    null
+                } else {
+                    """Build "$name" does not exist for "${branch.entityDisplayName}"."""
+                }
+            }
 
     override fun parse(data: JsonNode): Optional<BuildIntervalFilterData> {
         return Optional.of(
