@@ -196,9 +196,8 @@ class ACCDSL extends AbstractACCDSL {
     @Test
     void 'Filter interval - not existing'() {
         Branch branch = createBuildsAndPromotions()
-        validationError("Build not found: ${branch.project}/${branch.name}/4") {
-            branch.intervalFilter from: '2', to: '4'
-        }
+        def results = branch.intervalFilter from: '2', to: '4'
+        assert results.isEmpty() : "No build is returned"
     }
 
     @Test
