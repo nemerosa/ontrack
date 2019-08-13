@@ -52,7 +52,8 @@ class StructureServiceImpl(
         private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
         private val predefinedValidationStampService: PredefinedValidationStampService,
         private val decorationService: DecorationService,
-        private val projectFavouriteService: ProjectFavouriteService
+        private val projectFavouriteService: ProjectFavouriteService,
+        private val promotionRunCheckService: PromotionRunCheckService
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -754,6 +755,8 @@ class StructureServiceImpl(
                 "Promotion for a promotion level can be done only on the same branch than the build.")
         // Checks the authorization
         securityService.checkProjectFunction(promotionRun.build.branch.project.id(), PromotionRunCreate::class.java)
+        // Checks the preconditions for the creation of the promotion run
+        promotionRunCheckService.checkPromotionRunCreation(promotionRun)
         // If the promotion run's time is not defined, takes the current date
         val promotionRunToSave: PromotionRun
         val time = promotionRun.signature.time
