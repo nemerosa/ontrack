@@ -29,6 +29,31 @@ IMPORTANT: A validation stamp defined in the list is _always_ taken into account
 auto promotion, whatever the values for the `include` and `exclude` regular
 promotions.
 
+[[promotion-levels-checks]]
+==== Promotion checks
+
+By default, a build can be promoted to any promotion independently
+of any other constraint.
+
+In particular, promotions are ordered and a build can be promoted to a given
+promotion without the previous ones being granted.
+
+If this "lax" behavior is not correct, you can configure this in several ways:
+
+* globally, by activating the settings for "Previous promotion condition"
+* at project, branch or even promotion level level, by setting and activating
+the "Previous promotion condition" property
+
+The order of priority of this check is as follows:
+
+* promotion level "Previous promotion condition" property (takes precedence on a branch setup)
+* branch "Previous promotion condition" property (takes precedence on a project setup)
+* project "Previous promotion condition" property (takes precedence on global settings)
+* Global "Previous promotion condition" settings
+
+NOTE: This check on previous promotions is built-in in Ontrack but other
+could be added by creating <<extending-promotion-checks,extensions>>.
+
 [[promotion-levels-auto-creation]]
 ==== Auto creation
 
