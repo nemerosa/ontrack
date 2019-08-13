@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
  * [PromotionRunCheckExtension] based on the [PreviousPromotionConditionPropertyType] property value.
  */
 @Component
-class PreviousPromotionConditionPropertyCheckExtension(
+class PreviousPromotionConditionCheckExtension(
         private val structureService: StructureService,
         private val propertyService: PropertyService,
         extensionFeature: GeneralExtensionFeature
