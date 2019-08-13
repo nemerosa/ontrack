@@ -83,6 +83,7 @@ class RolesServiceImpl(
                 Arrays.asList(
                         ProjectView::class.java,
                         ValidationRunStatusChange::class.java,
+                        ValidationRunStatusCommentEditOwn::class.java,
                         ValidationStampFilterCreate::class.java
                 )
         )
@@ -94,6 +95,7 @@ class RolesServiceImpl(
                 ValidationStampDelete::class.java,
                 ValidationRunCreate::class.java,
                 ValidationRunStatusChange::class.java,
+                ValidationRunStatusCommentEdit::class.java,
                 ValidationStampFilterCreate::class.java,
                 ValidationStampFilterShare::class.java,
                 ValidationStampFilterMgt::class.java
