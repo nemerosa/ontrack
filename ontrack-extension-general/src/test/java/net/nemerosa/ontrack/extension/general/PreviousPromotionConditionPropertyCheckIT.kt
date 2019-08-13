@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import org.junit.Test
 import kotlin.test.assertFailsWith
@@ -16,6 +17,55 @@ class PreviousPromotionConditionPropertyCheckIT : AbstractGeneralExtensionTestSu
                     build {
                         promote(pl1)
                         promote(pl2)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion no check at settings level`() {
+        withPreviousPromotionGlobalCondition(false) {
+            project {
+                branch {
+                    val pl1 = promotionLevel()
+                    val pl2 = promotionLevel()
+                    build {
+                        promote(pl1)
+                        promote(pl2)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion check at settings level with build promoted`() {
+        withPreviousPromotionGlobalCondition(true) {
+            project {
+                branch {
+                    val pl1 = promotionLevel()
+                    val pl2 = promotionLevel()
+                    build {
+                        promote(pl1)
+                        promote(pl2)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion check at settings level with build not promoted`() {
+        withPreviousPromotionGlobalCondition(true) {
+            project {
+                branch {
+                    promotionLevel()
+                    val pl2 = promotionLevel()
+                    build {
+                        assertFailsWith<PreviousPromotionRequiredGlobalException> {
+                            promote(pl2)
+                        }
                     }
                 }
             }
@@ -242,8 +292,22 @@ class PreviousPromotionConditionPropertyCheckIT : AbstractGeneralExtensionTestSu
         )
     }
 
-    private fun withPreviousPromotionGlobalCondition(static: Boolean = false, settings: Boolean = false, code: () -> Unit) {
-        code()
+    private fun withPreviousPromotionGlobalCondition(settings: Boolean = false, code: () -> Unit) {
+        val previous = settingsService.getCachedSettings(PreviousPromotionConditionSettings::class.java)
+        try {
+            asUser().with(GlobalSettings::class.java).execute {
+                settingsManagerService.saveSettings(
+                        PreviousPromotionConditionSettings(
+                                previousPromotionRequired = settings
+                        )
+                )
+            }
+            code()
+        } finally {
+            asUser().with(GlobalSettings::class.java).execute {
+                settingsManagerService.saveSettings(previous)
+            }
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.extension.api.PromotionRunCheckExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Component
 class PreviousPromotionConditionCheckExtension(
         private val structureService: StructureService,
         private val propertyService: PropertyService,
-        extensionFeature: GeneralExtensionFeature
+        extensionFeature: GeneralExtensionFeature,
+        private val cachedSettingsService: CachedSettingsService
 ) : AbstractExtension(extensionFeature), PromotionRunCheckExtension {
 
     override fun checkPromotionRunCreation(promotionRun: PromotionRun) {
@@ -38,7 +40,27 @@ class PreviousPromotionConditionCheckExtension(
                         && checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch)
                         // ... then project
                         && checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch.project)
+                        // ... then settings
+                        && checkPreviousPromotionConditionSettings(previousPromotion, promotion)
             }
+        }
+    }
+
+    /**
+     * Returns `false` if the condition has been checked explicitly OK and that there is no need to check further.
+     */
+    private fun checkPreviousPromotionConditionSettings(
+            previousPromotion: PromotionLevel,
+            promotion: PromotionLevel
+    ): Boolean {
+        val settings = cachedSettingsService.getCachedSettings(PreviousPromotionConditionSettings::class.java)
+        return if (settings.previousPromotionRequired) {
+            throw PreviousPromotionRequiredGlobalException(
+                    previousPromotion,
+                    promotion
+            )
+        } else {
+            false // No need to check further
         }
     }
 
