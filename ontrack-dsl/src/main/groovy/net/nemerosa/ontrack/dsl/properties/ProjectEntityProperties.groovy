@@ -143,4 +143,21 @@ class ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType')
     }
 
+    /**
+     * Previous promotion condition
+     */
+
+    @DSLMethod
+    Boolean getPreviousPromotionRequired() {
+        def value = property('net.nemerosa.ontrack.extension.general.PreviousPromotionConditionPropertyType', false)
+        return value ? value.previousPromotionRequired as boolean : null
+    }
+
+    @DSLMethod
+    void setPreviousPromotionRequired(boolean previousPromotionRequired) {
+        property('net.nemerosa.ontrack.extension.general.PreviousPromotionConditionPropertyType', [
+                previousPromotionRequired: previousPromotionRequired,
+        ])
+    }
+
 }

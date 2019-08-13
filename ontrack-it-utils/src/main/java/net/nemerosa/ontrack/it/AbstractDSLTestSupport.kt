@@ -109,8 +109,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return branch.init()
     }
 
-    fun Branch.promotionLevel(name: String = uid("P")): PromotionLevel =
-            doCreatePromotionLevel(this, NameDescription.nd(name, ""))
+    fun Branch.promotionLevel(name: String = uid("P"), init: PromotionLevel.() -> Unit = {}): PromotionLevel =
+            doCreatePromotionLevel(this, NameDescription.nd(name, "")).apply {
+                init()
+            }
 
     /**
      * Creates and returns a validation stamp

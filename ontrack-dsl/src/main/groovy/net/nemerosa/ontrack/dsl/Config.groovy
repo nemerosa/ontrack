@@ -386,4 +386,21 @@ class Config {
                 labels: labels
         ])
     }
+
+    /**
+     * Previous promotion condition
+     */
+
+    @DSLMethod("Gets the previous promotion condition settings")
+    boolean getPreviousPromotionRequired() {
+        def json = ontrack.get('settings/previous-promotion-condition')
+        return json.previousPromotionRequired as boolean
+    }
+
+    @DSLMethod("Sets the previous promotion condition settings")
+    void setPreviousPromotionRequired(boolean previousPromotionRequired) {
+        ontrack.put('settings/previous-promotion-condition', [
+                previousPromotionRequired: previousPromotionRequired
+        ])
+    }
 }

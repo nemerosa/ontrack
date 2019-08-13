@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfigRule;
 import net.nemerosa.ontrack.client.*;
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -107,6 +108,18 @@ public abstract class AcceptanceSupport {
             assertEquals(
                     expectedMessage,
                     error.path("message").asText()
+            );
+        }
+    }
+
+    protected void assertFailsWithMessage(String message, Runnable task) {
+        try {
+            task.run();
+            fail("The call should have failed with a message exception.");
+        } catch (OTMessageClientException ex) {
+            assertEquals(
+                    message,
+                    ex.getMessage()
             );
         }
     }
