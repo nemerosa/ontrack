@@ -73,6 +73,40 @@ class PreviousPromotionConditionPropertyCheckIT : AbstractGeneralExtensionTestSu
     }
 
     @Test
+    fun `Promotion check at settings level overridden to true at project level`() {
+        withPreviousPromotionGlobalCondition(false) {
+            project {
+                previousPromotionCondition(true)
+                branch {
+                    promotionLevel()
+                    val pl2 = promotionLevel()
+                    build {
+                        assertFailsWith<PreviousPromotionRequiredException> {
+                            promote(pl2)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion check at settings level overridden to false at project level`() {
+        withPreviousPromotionGlobalCondition(true) {
+            project {
+                previousPromotionCondition(false)
+                branch {
+                    promotionLevel()
+                    val pl2 = promotionLevel()
+                    build {
+                        promote(pl2)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Promotion no check at promotion level`() {
         withPreviousPromotionGlobalCondition {
             project {
