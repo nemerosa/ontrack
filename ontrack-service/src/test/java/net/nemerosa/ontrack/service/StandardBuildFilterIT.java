@@ -24,7 +24,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     @Test
     public void default_filter() {
         range(1, 20).forEach(this::build);
-        List<Build> builds = buildFilterService.defaultFilterProviderData().filterBranchBuilds(branch);
+        List<Build> builds = getBuildFilterService().defaultFilterProviderData().filterBranchBuilds(getBranch());
         assertEquals(10, builds.size());
         assertEquals("20", builds.get(0).getName());
         assertEquals("11", builds.get(9).getName());
@@ -52,14 +52,14 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         build(3);
-        build(4).withPromotion(copper);
-        build(5).withPromotion(bronze);
+        build(4).withPromotion(getCopper());
+        build(5).withPromotion(getBronze());
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSincePromotionLevel("COPPER")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -73,11 +73,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSincePromotionLevel("UNKNOWN")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 2, 1);
     }
@@ -88,11 +88,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     @Test
     public void since_promotion_level_not_found() {
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSincePromotionLevel("NOT_FOUND")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // No build being returned
         assertTrue("No build returned on promotion level not found", builds.isEmpty());
     }
@@ -118,17 +118,17 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     public void with_since_promotion_level() throws Exception {
         // Builds
         build(1);
-        build(2).withPromotion(copper);
+        build(2).withPromotion(getCopper());
         build(3);
-        build(4).withPromotion(copper);
-        build(5).withPromotion(copper).withPromotion(bronze);
+        build(4).withPromotion(getCopper());
+        build(5).withPromotion(getCopper()).withPromotion(getBronze());
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSincePromotionLevel("BRONZE")
                 .withWithPromotionLevel("COPPER")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5);
     }
@@ -153,16 +153,16 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     public void with_promotion_level() throws Exception {
         // Builds
         build(1);
-        build(2).withPromotion(copper);
+        build(2).withPromotion(getCopper());
         build(3);
-        build(4).withPromotion(copper);
-        build(5).withPromotion(copper).withPromotion(bronze);
+        build(4).withPromotion(getCopper());
+        build(5).withPromotion(getCopper()).withPromotion(getBronze());
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithPromotionLevel("COPPER")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4, 2);
     }
@@ -176,11 +176,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithPromotionLevel("UNKNOWN")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         assertTrue("Expecting no result", builds.isEmpty());
     }
@@ -205,16 +205,16 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     public void with_validation_stamp() throws Exception {
         // Builds
         build(1);
-        build(2).withValidation(publication, ValidationRunStatusID.STATUS_PASSED);
+        build(2).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED);
         build(3);
-        build(4).withValidation(publication, ValidationRunStatusID.STATUS_PASSED).withValidation(production, ValidationRunStatusID.STATUS_PASSED);
-        build(5).withValidation(publication, ValidationRunStatusID.STATUS_FAILED);
+        build(4).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED).withValidation(getProduction(), ValidationRunStatusID.STATUS_PASSED);
+        build(5).withValidation(getPublication(), ValidationRunStatusID.STATUS_FAILED);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithValidationStamp("PUBLICATION")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4, 2);
     }
@@ -228,11 +228,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithValidationStamp("UNKNOWN")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         assertTrue("Expecting no result", builds.isEmpty());
     }
@@ -258,17 +258,17 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     public void with_validation_stamp_status() throws Exception {
         // Builds
         build(1);
-        build(2).withValidation(publication, ValidationRunStatusID.STATUS_PASSED);
+        build(2).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED);
         build(3);
-        build(4).withValidation(publication, ValidationRunStatusID.STATUS_PASSED).withValidation(production, ValidationRunStatusID.STATUS_PASSED);
-        build(5).withValidation(publication, ValidationRunStatusID.STATUS_FAILED);
+        build(4).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED).withValidation(getProduction(), ValidationRunStatusID.STATUS_PASSED);
+        build(5).withValidation(getPublication(), ValidationRunStatusID.STATUS_FAILED);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithValidationStamp("PUBLICATION")
                 .withWithValidationStampStatus("PASSED")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4, 2);
     }
@@ -293,16 +293,16 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     public void since_validation_stamp() throws Exception {
         // Builds
         build(1);
-        build(2).withValidation(publication, ValidationRunStatusID.STATUS_PASSED);
+        build(2).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED);
         build(3);
-        build(4).withValidation(publication, ValidationRunStatusID.STATUS_PASSED).withValidation(production, ValidationRunStatusID.STATUS_PASSED);
-        build(5).withValidation(publication, ValidationRunStatusID.STATUS_FAILED);
+        build(4).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED).withValidation(getProduction(), ValidationRunStatusID.STATUS_PASSED);
+        build(5).withValidation(getPublication(), ValidationRunStatusID.STATUS_FAILED);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSinceValidationStamp("PRODUCTION")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -316,11 +316,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSinceValidationStamp("UNKNOWN")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 2, 1);
     }
@@ -346,17 +346,17 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     public void since_validation_stamp_status() throws Exception {
         // Builds
         build(1);
-        build(2).withValidation(publication, ValidationRunStatusID.STATUS_PASSED);
+        build(2).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED);
         build(3);
-        build(4).withValidation(publication, ValidationRunStatusID.STATUS_PASSED).withValidation(production, ValidationRunStatusID.STATUS_PASSED);
-        build(5).withValidation(publication, ValidationRunStatusID.STATUS_FAILED);
+        build(4).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED).withValidation(getProduction(), ValidationRunStatusID.STATUS_PASSED);
+        build(5).withValidation(getPublication(), ValidationRunStatusID.STATUS_FAILED);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSinceValidationStamp("PUBLICATION")
                 .withSinceValidationStampStatus("FAILED")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5);
     }
@@ -382,21 +382,21 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
     public void since_validation_stamp_and_since_promotion_level() throws Exception {
         // Builds
         build(1);
-        build(2).withValidation(publication, ValidationRunStatusID.STATUS_PASSED)
-                .withPromotion(copper)
-                .withPromotion(bronze);
+        build(2).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED)
+                .withPromotion(getCopper())
+                .withPromotion(getBronze());
         build(3);
-        build(4).withValidation(publication, ValidationRunStatusID.STATUS_PASSED)
-                .withValidation(production, ValidationRunStatusID.STATUS_PASSED)
-                .withPromotion(copper);
-        build(5).withValidation(publication, ValidationRunStatusID.STATUS_FAILED);
+        build(4).withValidation(getPublication(), ValidationRunStatusID.STATUS_PASSED)
+                .withValidation(getProduction(), ValidationRunStatusID.STATUS_PASSED)
+                .withPromotion(getCopper());
+        build(5).withValidation(getPublication(), ValidationRunStatusID.STATUS_FAILED);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSinceValidationStamp("PRODUCTION")
                 .withSincePromotionLevel("BRONZE")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -406,11 +406,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithValidationStamp("NOT_FOUND")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // No build
         assertTrue("Expecting no result", builds.isEmpty());
     }
@@ -424,11 +424,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4, LocalDateTime.of(2014, 7, 17, 7, 0, 0));
         build(5, LocalDateTime.of(2014, 7, 18, 17, 0, 0));
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withAfterDate(LocalDate.of(2014, 7, 16))
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4, 3);
     }
@@ -442,11 +442,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4, LocalDateTime.of(2014, 7, 17, 7, 0, 0));
         build(5, LocalDateTime.of(2014, 7, 18, 17, 0, 0));
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withBeforeDate(LocalDate.of(2014, 7, 16))
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 3, 2, 1);
     }
@@ -460,12 +460,12 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4, LocalDateTime.of(2014, 7, 17, 7, 0, 0));
         build(5, LocalDateTime.of(2014, 7, 18, 17, 0, 0));
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withBeforeDate(LocalDate.of(2014, 7, 17))
                 .withAfterDate(LocalDate.of(2014, 7, 15))
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4, 3, 2);
     }
@@ -482,11 +482,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedFrom(otherBuild2);
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedFrom(otherBranch.getProject().getName())
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4, 2);
     }
@@ -512,12 +512,12 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedFrom(otherBuild2);
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedFrom(otherBranch.getProject().getName())
                 .withLinkedFromPromotion("PRODUCTION")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4);
     }
@@ -535,7 +535,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedFrom(otherBuild2);
         build(5).linkedFrom(otherBuild3);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedFrom(
                         String.format(
                                 "%s:2.0",
@@ -544,7 +544,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
                 )
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4);
     }
@@ -562,7 +562,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedFrom(otherBuild2);
         build(5).linkedFrom(otherBuild3);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedFrom(
                         String.format(
                                 "%s:2.*",
@@ -571,7 +571,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
                 )
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -588,11 +588,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedTo(otherBuild2);
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedTo(otherBranch.getProject().getName())
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4, 2);
     }
@@ -618,12 +618,12 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedTo(otherBuild2);
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedTo(otherBranch.getProject().getName())
                 .withLinkedToPromotion("PRODUCTION")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4);
     }
@@ -641,7 +641,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedTo(otherBuild2);
         build(5).linkedTo(otherBuild3);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedTo(
                         String.format(
                                 "%s:2.0",
@@ -650,7 +650,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
                 )
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4);
     }
@@ -668,7 +668,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).linkedTo(otherBuild2);
         build(5).linkedTo(otherBuild3);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withLinkedTo(
                         String.format(
                                 "%s:2.*",
@@ -677,7 +677,7 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
                 )
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -691,11 +691,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withProperty("an apple");
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithProperty(TestSimplePropertyType.class.getName())
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4, 2);
     }
@@ -709,12 +709,12 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withProperty("an apple");
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithProperty(TestSimplePropertyType.class.getName())
                 .withWithPropertyValue("an")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 4, 2);
     }
@@ -728,12 +728,12 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withProperty("an apple");
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withWithProperty(TestSimplePropertyType.class.getName())
                 .withWithPropertyValue("ananas")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 2);
     }
@@ -747,11 +747,11 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withProperty("an apple");
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSinceProperty(TestSimplePropertyType.class.getName())
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -765,12 +765,12 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withProperty("an apple");
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSinceProperty(TestSimplePropertyType.class.getName())
                 .withSincePropertyValue("an")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -784,12 +784,12 @@ public class StandardBuildFilterIT extends AbstractBuildFilterIT {
         build(4).withProperty("an apple");
         build(5);
         // Filter
-        BuildFilterProviderData<?> filter = buildFilterService.standardFilterProviderData(5)
+        BuildFilterProviderData<?> filter = getBuildFilterService().standardFilterProviderData(5)
                 .withSinceProperty(TestSimplePropertyType.class.getName())
                 .withSincePropertyValue("ananas")
                 .build();
         // Filtering
-        List<Build> builds = filter.filterBranchBuilds(branch);
+        List<Build> builds = filter.filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, 5, 4, 3, 2);
     }
