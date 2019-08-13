@@ -1,16 +1,19 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.extension.api.PromotionRunCheckExtension
+import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
 /**
- * [PromotionRunCheck] based on the [PreviousPromotionConditionPropertyType] property value.
+ * [PromotionRunCheckExtension] based on the [PreviousPromotionConditionPropertyType] property value.
  */
 @Component
-class PreviousPromotionConditionPropertyCheck(
+class PreviousPromotionConditionPropertyCheckExtension(
         private val structureService: StructureService,
-        private val propertyService: PropertyService
-) : PromotionRunCheck {
+        private val propertyService: PropertyService,
+        extensionFeature: GeneralExtensionFeature
+) : AbstractExtension(extensionFeature), PromotionRunCheckExtension {
 
     override fun checkPromotionRunCreation(promotionRun: PromotionRun) {
         // Promotion to grant
