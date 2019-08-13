@@ -32,25 +32,37 @@ class PreviousPromotionConditionPropertyCheckExtension(
             // If previous promotion NOT granted, we have to check the properties
             // If not, this does not matter
             if (!previousPromotionGranted) {
+                // Promotion level first...
                 checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel)
-                checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch)
-                checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch.project)
+                        // ... then branch
+                        && checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch)
+                        // ... then project
+                        && checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch.project)
             }
         }
     }
 
+    /**
+     * Returns `false` if the condition has been checked explicitly OK and that there is no need to check further.
+     */
     private fun checkPreviousPromotionConditionProperty(
             previousPromotion: PromotionLevel,
             promotion: PromotionLevel,
             entity: ProjectEntity
-    ) {
+    ): Boolean {
         val property: PreviousPromotionConditionProperty? = propertyService.getProperty(entity, PreviousPromotionConditionPropertyType::class.java).value
-        if (property != null && property.previousPromotionRequired) {
-            throw PreviousPromotionRequiredException(
-                    previousPromotion,
-                    promotion,
-                    entity
-            )
+        return if (property != null) {
+            if (property.previousPromotionRequired) {
+                throw PreviousPromotionRequiredException(
+                        previousPromotion,
+                        promotion,
+                        entity
+                )
+            } else {
+                false // No need to check further
+            }
+        } else {
+            true // Could not check at this level, need to go on
         }
     }
 
