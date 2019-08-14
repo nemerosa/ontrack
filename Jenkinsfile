@@ -421,6 +421,10 @@ docker-compose --project-name debian --file docker-compose-debian.yml down --vol
                             args "--volume /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
+                    when {
+                        // FIXME #683 Disabled until fixed
+                        expression { false }
+                    }
                     environment {
                         DROPLET_NAME = "ontrack-acceptance-${version}"
                         DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
