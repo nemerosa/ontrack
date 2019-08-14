@@ -234,7 +234,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         asUser().with(this, ValidationRunStatusChange::class.java).execute {
             structureService.newValidationRunStatus(
                     this,
-                    ValidationRunStatus.of(
+                    ValidationRunStatus(
+                            ID.NONE,
                             Signature.of("test"),
                             status,
                             description

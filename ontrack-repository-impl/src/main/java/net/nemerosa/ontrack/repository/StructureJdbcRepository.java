@@ -1126,7 +1126,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         List<ValidationRunStatus> statuses = getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = :validationRunId ORDER BY CREATION DESC",
                 params("validationRunId", id),
-                (rs1, rowNum) -> ValidationRunStatus.of(
+                (rs1, rowNum) -> new ValidationRunStatus(
+                        id(rs),
                         readSignature(rs1),
                         validationRunStatusService.apply(rs1.getString("validationRunStatusId")),
                         rs1.getString("description")

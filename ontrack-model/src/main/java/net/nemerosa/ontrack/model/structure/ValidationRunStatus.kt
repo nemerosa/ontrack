@@ -3,21 +3,13 @@ package net.nemerosa.ontrack.model.structure
 import com.fasterxml.jackson.annotation.JsonProperty
 
 class ValidationRunStatus(
+        private val id: ID,
         val signature: Signature,
         val statusID: ValidationRunStatusID,
         val description: String?
-) {
+) : Entity {
 
-    companion object {
-        @JvmStatic
-        fun of(signature: Signature, validationRunStatusID: ValidationRunStatusID, description: String): ValidationRunStatus {
-            return ValidationRunStatus(
-                    signature,
-                    validationRunStatusID,
-                    description
-            )
-        }
-    }
+    override fun getId(): ID = id
 
     @JsonProperty("passed")
     val isPassed: Boolean = statusID.isPassed

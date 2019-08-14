@@ -158,7 +158,8 @@ constructor(
         // Gets the current run
         val run = structureService.getValidationRun(validationRunId)
         // Gets the new validation run status
-        val runStatus = ValidationRunStatus.of(
+        val runStatus = ValidationRunStatus(
+                ID.NONE,
                 securityService.currentSignature,
                 validationRunStatusService.getValidationRunStatus(request.validationRunStatusId),
                 request.description

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.validation.ValidationUtils
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
@@ -1238,6 +1239,7 @@ class StructureServiceImpl(
     override fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun {
         // Entity check
         Entity.isEntityDefined(validationRun, "Validation run must be defined")
+        isEntityNew(runStatus, "Validation run status must not have any defined ID.")
         // Security check
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ValidationRunStatusChange::class.java)
         // Transition check
