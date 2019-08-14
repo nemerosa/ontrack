@@ -49,4 +49,17 @@ class ValidationRunStatusID(
         return ValidationRunStatusID(id, name, isRoot, isPassed, dependencies)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ValidationRunStatusID) return false
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
 }
