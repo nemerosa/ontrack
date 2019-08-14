@@ -57,20 +57,27 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         asUserWithView(*entities).execute(code)
     }
 
+    fun <T> ProjectEntity.asUserWithView(code: () -> T): T = asUserWithView(this).call(code)
+
+    /**
+     * Kotlin friendly anonymous execution
+     */
+    fun <T> asAnonymous(code: () -> T): T = asAnonymous().call(code)
+
     /**
      * Kotlin friendly account role execution
      */
-    fun ProjectEntity.asAccountWithProjectRole(role: String, code: () -> Unit) {
+    fun <T> ProjectEntity.asAccountWithProjectRole(role: String, code: () -> T): T {
         val account = doCreateAccountWithProjectRole(project, role)
-        asAccount(account).execute(code)
+        return asAccount(account).call(code)
     }
 
     /**
      * Kotlin friendly account role execution
      */
-    fun asAccountWithGlobalRole(role: String, code: () -> Unit) {
+    fun <T> asAccountWithGlobalRole(role: String, code: () -> T): T {
         val account = doCreateAccountWithGlobalRole(role)
-        asAccount(account).execute(code)
+        return asAccount(account).call(code)
     }
 
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
