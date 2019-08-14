@@ -1107,6 +1107,19 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         return validationRun.add(runStatus);
     }
 
+    @NotNull
+    @Override
+    public ValidationRun getParentValidationRun(@NotNull ID validationRunStatusId, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        // Gets the run ID
+        int runId = getFirstItem(
+                "SELECT VALIDATIONRUNID FROM VALIDATION_RUN_STATUSES WHERE ID = :id",
+                params("id", validationRunStatusId.get()),
+                Integer.class
+        );
+        // Loads the run
+        return getValidationRun(ID.of(runId), validationRunStatusService);
+    }
+
     @Nullable
     @Override
     public ValidationRunStatus getValidationRunStatus(ID id, Function<String, ValidationRunStatusID> validationRunStatusService) {

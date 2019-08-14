@@ -170,26 +170,6 @@ constructor(
     }
 
     /**
-     * Edition of a validation run status comment
-     */
-    @PostMapping("validationRuns/{validationRunId}/status/{id}/comment")
-    fun validationRunStatusEditComment(
-            @PathVariable validationRunId: ID,
-            @PathVariable id: ID,
-            @RequestBody request: ValidationRunStatusCommentRequest
-    ): ValidationRun {
-        // Gets the current run
-        val run = structureService.getValidationRun(validationRunId)
-        // Edits the comment
-        return structureService.saveValidationRunStatusComment(
-                run,
-                id,
-                request.comment
-        )
-    }
-
-
-    /**
      * List of validation runs for a validation stamp
      */
     @GetMapping("validationStamps/{validationStampId}/validationRuns")

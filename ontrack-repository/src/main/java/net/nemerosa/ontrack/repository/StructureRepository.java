@@ -254,11 +254,21 @@ public interface StructureRepository {
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 
+
+    /**
+     * Gets the parent validation run for a given validation run status ID
+     */
+    @NotNull
+    ValidationRun getParentValidationRun(@NotNull ID validationRunStatusId, Function<String, ValidationRunStatusID> validationRunStatusService);
+
     /**
      * Loads a validation run status
      */
     @Nullable
     ValidationRunStatus getValidationRunStatus(ID id, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    /**
+     * Saves a comment for a run status
+     */
     void saveValidationRunStatusComment(@NotNull ValidationRunStatus runStatus, @NotNull String comment);
 }

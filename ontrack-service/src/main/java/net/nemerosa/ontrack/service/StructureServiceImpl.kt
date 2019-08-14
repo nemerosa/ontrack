@@ -1252,6 +1252,17 @@ class StructureServiceImpl(
         return newValidationRun
     }
 
+    override fun getParentValidationRun(validationRunStatusId: ID): ValidationRun {
+        // Gets the validation run
+        val run = structureRepository.getParentValidationRun(validationRunStatusId) {
+            validationRunStatusService.getValidationRunStatus(it)
+        }
+        // Checks access rights
+        securityService.checkProjectFunction(run, ProjectView::class.java)
+        // OK
+        return run
+    }
+
     override fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun {
         // Checks
         isEntityDefined(run, "Validation run must be defined")
