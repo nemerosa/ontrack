@@ -312,6 +312,11 @@ interface StructureService {
     fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun
 
     /**
+     * Checks if the validation run status comment is editable by the current user
+     */
+    fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean
+
+    /**
      * Gets the total number of validation runs for a build and a validation stamp
      *
      * @param buildId           ID of the build

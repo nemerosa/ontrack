@@ -1263,6 +1263,32 @@ class StructureServiceImpl(
         return run
     }
 
+    override fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean {
+        // Loads the parent
+        val run = getParentValidationRun(validationRunStatus)
+        // Checks the edit right
+        return if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEdit::class.java)) {
+            true
+        }
+        // If not, check the current user vs. the creator of the comment
+        else if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEditOwn::class.java)) {
+            // Loads the status
+            val status = structureRepository.getValidationRunStatus(validationRunStatus) {
+                validationRunStatusService.getValidationRunStatus(it)
+            }
+            // Gets the status's author
+            val statusAuthor = status?.signature?.user?.name
+            // Gets the current user name
+            val currentUserName = securityService.currentSignature?.user?.name
+            // Compare both
+            statusAuthor != null && statusAuthor == currentUserName
+        }
+        // No right at all
+        else {
+            false
+        }
+    }
+
     override fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun {
         // Checks
         isEntityDefined(run, "Validation run must be defined")
