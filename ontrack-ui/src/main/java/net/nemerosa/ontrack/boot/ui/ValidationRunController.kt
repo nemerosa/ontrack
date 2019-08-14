@@ -116,7 +116,8 @@ constructor(
             )
             // Gets the data type ID if any
             // First, the data type in the request, and if not specified, the type of the validation stamp
-            val typeId: String? = validationRunRequestForm.validationStampData.type ?: validationStamp.dataType?.descriptor?.id
+            val typeId: String? = validationRunRequestForm.validationStampData.type
+                    ?: validationStamp.dataType?.descriptor?.id
             // If no type, ignore the data
             return typeId?.run {
                 // Gets the actual type
@@ -167,6 +168,26 @@ constructor(
         // Updates the validation run
         return structureService.newValidationRunStatus(run, runStatus)
     }
+
+    /**
+     * Edition of a validation run status comment
+     */
+    @PostMapping("validationRuns/{validationRunId}/status/{id}/comment")
+    fun validationRunStatusEditComment(
+            @PathVariable validationRunId: ID,
+            @PathVariable id: ID,
+            @RequestBody request: ValidationRunStatusCommentRequest
+    ): ValidationRun {
+        // Gets the current run
+        val run = structureService.getValidationRun(validationRunId)
+        // Edits the comment
+        return structureService.saveValidationRunStatusComment(
+                run,
+                id,
+                request.comment
+        )
+    }
+
 
     /**
      * List of validation runs for a validation stamp

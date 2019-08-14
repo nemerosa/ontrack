@@ -1252,6 +1252,26 @@ class StructureServiceImpl(
         return newValidationRun
     }
 
+    override fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun {
+        // Checks
+        isEntityDefined(run, "Validation run must be defined")
+        // Loading the status
+        val runStatus = structureRepository.getValidationRunStatus(runStatusId) { validationRunStatusService.getValidationRunStatus(it) }
+                ?: throw IllegalStateException("Could not find validation run status with id = $runStatusId")
+        // Checks the parent run
+        val parentOK = run.validationRunStatuses.any { it.id() == runStatus.id() }
+        if (!parentOK) {
+            throw IllegalStateException("Cannot edit a validation run status without a proper reference to its parent run.")
+        }
+        // FIXME Security checks
+        // Saving the new comment
+        structureRepository.saveValidationRunStatusComment(runStatus, comment)
+        // Event
+        eventPostService.post(eventFactory.updateValidationRunStatusComment(run))
+        // Reloading the run
+        return getValidationRun(run.id)
+    }
+
     override fun getValidationRunsCountForBuildAndValidationStamp(buildId: ID, validationStampId: ID): Int {
         return structureRepository.getValidationRunsCountForBuildAndValidationStamp(buildId, validationStampId)
     }
