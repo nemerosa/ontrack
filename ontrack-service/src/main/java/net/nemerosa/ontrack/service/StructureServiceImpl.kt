@@ -1248,8 +1248,8 @@ class StructureServiceImpl(
         val newValidationRun = structureRepository.newValidationRunStatus(validationRun, runStatus)
         // Event
         eventPostService.post(eventFactory.newValidationRunStatus(newValidationRun))
-        // OK
-        return newValidationRun
+        // OK, reloading to get IDs correct
+        return getValidationRun(validationRun.id)
     }
 
     override fun getParentValidationRun(validationRunStatusId: ID): ValidationRun {
