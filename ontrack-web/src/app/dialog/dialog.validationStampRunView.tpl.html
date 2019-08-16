@@ -48,7 +48,9 @@
                         <span>{{validationRunStatus.creation.time | date:'shortTime' }}</span>
                     </span>
                 </p>
-                <p ng-if="validationRunStatus.description" class="ot-description" ng-bind-html="validationRunStatus.annotatedDescription"></p>
+                <p>
+                    <ot-validation-run-status-comment status="validationRunStatus"></ot-validation-run-status-comment>
+                </p>
             </li>
         </ul>
         <div class="panel-body" ng-if="validationRun.runInfo">
