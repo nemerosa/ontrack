@@ -302,6 +302,14 @@ interface StructureService {
     fun getParentValidationRun(validationRunStatusId: ID): ValidationRun
 
     /**
+     * Gets a validation run status using its ID.
+     *
+     * @param id ID of the validation run status
+     * @return Validation run status
+     */
+    fun getValidationRunStatus(id: ID): ValidationRunStatus
+
+    /**
      * Edits a validation run status comment.
      *
      * @param run Parent validation run

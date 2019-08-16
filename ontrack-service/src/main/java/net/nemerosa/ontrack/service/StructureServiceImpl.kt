@@ -1263,6 +1263,12 @@ class StructureServiceImpl(
         return run
     }
 
+    override fun getValidationRunStatus(id: ID): ValidationRunStatus {
+        return structureRepository.getValidationRunStatus(id) {
+            validationRunStatusService.getValidationRunStatus(it)
+        } ?: throw IllegalStateException("Cannot find validation run status with ID = $id")
+    }
+
     override fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean {
         // Loads the parent
         val run = getParentValidationRun(validationRunStatus)

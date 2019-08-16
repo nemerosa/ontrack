@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationRun
@@ -21,10 +22,17 @@ class ValidationRunStatusController(
     fun getValidationRunStatusEditCommentForm(
             @PathVariable validationRunStatusId: ID
     ): Form {
-        TODO("getValidationRunStatusEditCommentForm")
+        val status = structureService.getValidationRunStatus(validationRunStatusId)
+        return Form.create()
+                .with(
+                        Memo.of("comment")
+                                .label("Comment")
+                                .help("Comment for this validation run status")
+                                .value(status.description)
+                )
     }
 
-    @PostMapping("{validationRunStatusId}/comment")
+    @PutMapping("{validationRunStatusId}/comment")
     fun validationRunStatusEditComment(
             @PathVariable validationRunStatusId: ID,
             @RequestBody request: ValidationRunStatusCommentRequest
