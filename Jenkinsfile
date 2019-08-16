@@ -814,9 +814,13 @@ set -e
                             returnStdout: true,
                             script: 'git describe --tags --abbrev=0'
                     ).trim()
+                    // Trace
+                    echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
                     // Version components
                     env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)\.\d.*/)
                     env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+\.\d.*/)
+                    echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
+                    echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
                     // Gets the corresponding branch
                     def result = ontrackGraphQL(
                             script: '''
@@ -834,6 +838,8 @@ set -e
                             ],
                     )
                     env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
+                    // Trace
+                    echo "ONTRACK_BRANCH_NAME=${env.ONTRACK_BRANCH_NAME}"
                 }
             }
         }
