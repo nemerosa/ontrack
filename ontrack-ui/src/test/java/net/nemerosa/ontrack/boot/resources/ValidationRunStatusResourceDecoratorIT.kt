@@ -94,7 +94,7 @@ class ValidationRunStatusResourceDecoratorIT : AbstractResourceDecoratorTestSupp
                         this@project.asAccountWithProjectRole(Roles.PROJECT_PARTICIPANT) {
                             // Cannot use `validate` here since we want to use the current user
                             // This also needs to be a change, not a creation
-                            val status = run.validationStatus(
+                            val status = run.validationStatusWithCurrentUser(
                                     ValidationRunStatusID.STATUS_INVESTIGATING,
                                     "My comment"
                             ).lastStatus

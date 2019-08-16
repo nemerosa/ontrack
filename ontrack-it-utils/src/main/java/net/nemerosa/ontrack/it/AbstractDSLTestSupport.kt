@@ -254,8 +254,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Change of status for a validation run
      */
-    fun ValidationRun.validationStatusWithCurrentUser(status: ValidationRunStatusID, description: String) {
-            structureService.newValidationRunStatus(
+    fun ValidationRun.validationStatusWithCurrentUser(status: ValidationRunStatusID, description: String): ValidationRun {
+            return structureService.newValidationRunStatus(
                     this,
                     ValidationRunStatus(
                             ID.NONE,
