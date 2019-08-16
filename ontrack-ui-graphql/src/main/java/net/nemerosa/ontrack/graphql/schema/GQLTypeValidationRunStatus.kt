@@ -62,7 +62,7 @@ constructor(
                             )
                 }
                 // Links
-                .fields(Label::class.java.graphQLFieldContributions(fieldContributors))
+                .fields(ValidationRunStatus::class.java.graphQLFieldContributions(fieldContributors))
                 // OK
                 .build()
 

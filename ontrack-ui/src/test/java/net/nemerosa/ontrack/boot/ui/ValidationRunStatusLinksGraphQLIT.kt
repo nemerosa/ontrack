@@ -1,10 +1,11 @@
-package net.nemerosa.ontrack.graphql
+package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class ValidationRunStatusGraphQLIT : AbstractQLKTITSupport() {
+class ValidationRunStatusLinksGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Comment edition link for authorized user`() {
