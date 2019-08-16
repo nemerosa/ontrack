@@ -121,6 +121,7 @@ angular.module('ot.view.build', [
                           data
                         }
                         validationRunStatuses {
+                          id
                           statusID {
                             id
                             name
@@ -131,6 +132,9 @@ angular.module('ot.view.build', [
                           }
                           description
                           annotatedDescription
+                          links {
+                            _comment
+                          }
                         }
                         runInfo {
                           ...runInfoContent
