@@ -35,7 +35,7 @@ class ValidationRunStatusLinksGraphQLIT : AbstractQLKTITSupport() {
                                 json["id"].intValue()
                         )
                         assertEquals(
-                                "",
+                                "urn:test:net.nemerosa.ontrack.boot.ui.ValidationRunStatusController#getValidationRunStatusEditCommentForm:${status.id}",
                                 json["links"]["_comment"].textValue()
                         )
                     }

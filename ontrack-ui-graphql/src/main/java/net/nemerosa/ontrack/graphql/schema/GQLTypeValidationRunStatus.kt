@@ -1,17 +1,18 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
+import graphql.Scalars.GraphQLInt
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
-import net.nemerosa.ontrack.graphql.support.idField
-import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
+import net.nemerosa.ontrack.ui.resource.ResourceDecoratorDelegate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -31,7 +32,14 @@ constructor(
         return newObject()
                 .name(VALIDATION_RUN_STATUS)
                 // ID
-                .idField()
+                .field {
+                    it.name("id")
+                            .type(GraphQLNonNull(GraphQLInt))
+                            .dataFetcher { environment ->
+                                val data = environment.getSource<Data>()
+                                data.delegate.id()
+                            }
+                }
                 // Creation
                 .field {
                     it.name("creation")
@@ -88,9 +96,11 @@ constructor(
     class Data(
             val validationRun: ValidationRun,
             val delegate: ValidationRunStatus
-    ) {
+    ) : ResourceDecoratorDelegate {
         val statusID: ValidationRunStatusID get() = delegate.statusID
         val description: String? get() = delegate.description
+
+        override fun getLinkDelegate(): Any = delegate
     }
 
 }

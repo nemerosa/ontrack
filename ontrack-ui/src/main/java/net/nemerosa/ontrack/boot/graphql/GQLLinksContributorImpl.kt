@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator
+import net.nemerosa.ontrack.ui.resource.ResourceDecoratorDelegate
 import org.springframework.stereotype.Component
 
 @Component
@@ -28,7 +29,7 @@ class GQLLinksContributorImpl(
         val linkNames = typeDecorators
                 .flatMap { decorator -> decorator.linkNames }
                 .distinct()
-        if (!linkNames.isEmpty()) {
+        if (linkNames.isNotEmpty()) {
             definitions.add(
                     newFieldDefinition()
                             .name("links")
@@ -70,7 +71,11 @@ class GQLLinksContributorImpl(
         @Suppress("UNCHECKED_CAST")
         val resourceDecorator = decorator as ResourceDecorator<T>
         @Suppress("UNCHECKED_CAST")
-        val t = source as T
+        val t: T = if (source is ResourceDecoratorDelegate) {
+            source.getLinkDelegate()
+        } else {
+            source
+        } as T
         return resourceDecorator.links(
                 t,
                 createResourceContext()
