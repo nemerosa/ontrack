@@ -169,13 +169,16 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun Build.validate(
             validationStamp: ValidationStamp,
             validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
-            description: String? = null
+            description: String? = null,
+            code: ValidationRun.() -> Unit = {}
     ): ValidationRun {
         return this.validateWithData<Any>(
                 validationStampName = validationStamp.name,
                 validationRunStatusID = validationRunStatusID,
                 description = description
-        )
+        ).apply {
+            code()
+        }
     }
 
     /**

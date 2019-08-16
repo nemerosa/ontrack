@@ -5,6 +5,8 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.idField
+import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component
 class GQLTypeValidationRunStatus
 @Autowired
 constructor(
+        private val fieldContributors: List<GQLFieldContributor>,
         private val validationRunStatusID: GQLTypeValidationRunStatusID,
         private val creation: GQLTypeCreation,
         private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
@@ -27,6 +30,8 @@ constructor(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()
                 .name(VALIDATION_RUN_STATUS)
+                // ID
+                .idField()
                 // Creation
                 .field {
                     it.name("creation")
@@ -56,6 +61,8 @@ constructor(
                                     }
                             )
                 }
+                // Links
+                .fields(Label::class.java.graphQLFieldContributions(fieldContributors))
                 // OK
                 .build()
 
