@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.model.security.Roles
+import net.nemerosa.ontrack.model.structure.ValidationRunRequest
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -88,10 +89,15 @@ class ValidationRunStatusResourceDecoratorIT : AbstractResourceDecoratorTestSupp
             branch {
                 val vs = validationStamp()
                 build {
+                    val run = validate(vs, ValidationRunStatusID.STATUS_FAILED) // First validation
                     withGrantViewToAll {
                         this@project.asAccountWithProjectRole(Roles.PROJECT_PARTICIPANT) {
-                            val run = validate(vs, ValidationRunStatusID.STATUS_FAILED, "My comment")
-                            val status = run.lastStatus
+                            // Cannot use `validate` here since we want to use the current user
+                            // This also needs to be a change, not a creation
+                            val status = run.validationStatus(
+                                    ValidationRunStatusID.STATUS_INVESTIGATING,
+                                    "My comment"
+                            ).lastStatus
                             status.decorate(validationRunStatusResourceDecorator) {
                                 assertLinkPresent("_comment")
                             }
@@ -103,15 +109,13 @@ class ValidationRunStatusResourceDecoratorIT : AbstractResourceDecoratorTestSupp
     }
 
     @Test
-    fun `Not editable comment by same user if not participant`() {
+    fun `Not editable comment by any user`() {
         project project@{
             branch {
                 val vs = validationStamp()
                 build {
-                    val status = this@project.asAccountWithProjectRole(Roles.PROJECT_PARTICIPANT) {
-                        val run = validate(vs, ValidationRunStatusID.STATUS_FAILED, "My comment")
-                        run.lastStatus
-                    }
+                    val run = validate(vs, ValidationRunStatusID.STATUS_FAILED, "My comment")
+                    val status = run.lastStatus
                     withGrantViewToAll {
                         asUserWithView {
                             status.decorate(validationRunStatusResourceDecorator) {
@@ -130,10 +134,8 @@ class ValidationRunStatusResourceDecoratorIT : AbstractResourceDecoratorTestSupp
             branch {
                 val vs = validationStamp()
                 build {
-                    val status = this@project.asAccountWithProjectRole(Roles.PROJECT_PARTICIPANT) {
-                        val run = validate(vs, ValidationRunStatusID.STATUS_FAILED, "My comment")
-                        run.lastStatus
-                    }
+                    val run = validate(vs, ValidationRunStatusID.STATUS_FAILED, "My comment")
+                    val status = run.lastStatus
                     withGrantViewToAll {
                         asAnonymous {
                             status.decorate(validationRunStatusResourceDecorator) {

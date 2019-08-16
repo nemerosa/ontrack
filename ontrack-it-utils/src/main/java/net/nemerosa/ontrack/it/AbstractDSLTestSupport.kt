@@ -237,8 +237,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Change of status for a validation run
      */
-    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String) {
-        asUser().with(this, ValidationRunStatusChange::class.java).execute {
+    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String): ValidationRun {
+        return asUser().with(this, ValidationRunStatusChange::class.java).call {
             structureService.newValidationRunStatus(
                     this,
                     ValidationRunStatus(
@@ -249,6 +249,21 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                     )
             )
         }
+    }
+
+    /**
+     * Change of status for a validation run
+     */
+    fun ValidationRun.validationStatusWithCurrentUser(status: ValidationRunStatusID, description: String) {
+            structureService.newValidationRunStatus(
+                    this,
+                    ValidationRunStatus(
+                            ID.NONE,
+                            securityService.currentSignature,
+                            status,
+                            description
+                    )
+            )
     }
 
     /**
