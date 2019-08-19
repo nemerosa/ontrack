@@ -102,7 +102,8 @@ class ValidationRunIT : AbstractDSLTestSupport() {
                     asUser().with(branch, ValidationRunStatusChange::class.java).execute {
                         structureService.newValidationRunStatus(
                                 run,
-                                ValidationRunStatus.of(
+                                ValidationRunStatus(
+                                        ID.NONE,
                                         Signature.of("test"),
                                         ValidationRunStatusID.STATUS_DEFECTIVE,
                                         "This is a defect"

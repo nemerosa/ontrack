@@ -83,6 +83,7 @@ class RolesServiceImpl(
                 Arrays.asList(
                         ProjectView::class.java,
                         ValidationRunStatusChange::class.java,
+                        ValidationRunStatusCommentEditOwn::class.java,
                         ValidationStampFilterCreate::class.java
                 )
         )
@@ -94,6 +95,7 @@ class RolesServiceImpl(
                 ValidationStampDelete::class.java,
                 ValidationRunCreate::class.java,
                 ValidationRunStatusChange::class.java,
+                ValidationRunStatusCommentEdit::class.java,
                 ValidationStampFilterCreate::class.java,
                 ValidationStampFilterShare::class.java,
                 ValidationStampFilterMgt::class.java
@@ -267,7 +269,7 @@ class RolesServiceImpl(
 
         // Global validation manager
         register(Roles.GLOBAL_VALIDATION_MANAGER, "Global validation manager",
-                "A global validation manager can manage the validation stamps across all projects.",
+                "A global validation manager can manage the validation stamps across all projects and edit validation run comments.",
                 listOf(
                         ValidationStampBulkUpdate::class.java
                 ),
@@ -275,7 +277,8 @@ class RolesServiceImpl(
                         ProjectView::class.java,
                         ValidationStampCreate::class.java,
                         ValidationStampEdit::class.java,
-                        ValidationStampDelete::class.java
+                        ValidationStampDelete::class.java,
+                        ValidationRunStatusCommentEdit::class.java
                 )
         )
 

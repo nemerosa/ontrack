@@ -34,8 +34,18 @@ a failure in under investigation).
 [[validation-run-status]]
 ==== Validation run status
 
+[[validation-run-status-comment]]
+==== Validation run status comment edition
+
+Authorized users can edit the description entered for a validation run status:
+
+image::images/validation-run-status-comment.png[Edition of comment,400]
+
+Administrators, project owners & managers, global & project validation managers can edit
+any comment. The author of a validation run status change can edit her own comment.
+
 [[validation-run-status-hyperlink]]
-===== Hyperlinks in descriptions
+==== Hyperlinks in descriptions
 
 The free text which is entered as description for
 the validation run statuses can be automatically extended

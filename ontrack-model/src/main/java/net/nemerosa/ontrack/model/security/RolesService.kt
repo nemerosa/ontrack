@@ -103,6 +103,8 @@ interface RolesService {
                 BuildDelete::class.java,
                 ValidationRunCreate::class.java,
                 ValidationRunStatusChange::class.java,
+                ValidationRunStatusCommentEditOwn::class.java,
+                ValidationRunStatusCommentEdit::class.java,
                 PromotionRunCreate::class.java,
                 PromotionRunDelete::class.java,
                 ProjectLabelManagement::class.java,

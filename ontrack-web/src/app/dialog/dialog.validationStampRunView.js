@@ -71,6 +71,7 @@ angular.module('ot.dialog.validationStampRunView', [
                               runTime
                             }
                             validationRunStatuses {
+                              id
                               creation {
                                 user
                                 time
@@ -80,6 +81,9 @@ angular.module('ot.dialog.validationStampRunView', [
                               statusID {
                                 id
                                 name
+                              }
+                              links {
+                                _comment
                               }
                             }
                             links {

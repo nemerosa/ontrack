@@ -57,20 +57,27 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         asUserWithView(*entities).execute(code)
     }
 
+    fun <T> ProjectEntity.asUserWithView(code: () -> T): T = asUserWithView(this).call(code)
+
+    /**
+     * Kotlin friendly anonymous execution
+     */
+    fun <T> asAnonymous(code: () -> T): T = asAnonymous().call(code)
+
     /**
      * Kotlin friendly account role execution
      */
-    fun ProjectEntity.asAccountWithProjectRole(role: String, code: () -> Unit) {
+    fun <T> ProjectEntity.asAccountWithProjectRole(role: String, code: () -> T): T {
         val account = doCreateAccountWithProjectRole(project, role)
-        asAccount(account).execute(code)
+        return asAccount(account).call(code)
     }
 
     /**
      * Kotlin friendly account role execution
      */
-    fun asAccountWithGlobalRole(role: String, code: () -> Unit) {
+    fun <T> asAccountWithGlobalRole(role: String, code: () -> T): T {
         val account = doCreateAccountWithGlobalRole(role)
-        asAccount(account).execute(code)
+        return asAccount(account).call(code)
     }
 
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
@@ -162,13 +169,16 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun Build.validate(
             validationStamp: ValidationStamp,
             validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
-            description: String? = null
+            description: String? = null,
+            code: ValidationRun.() -> Unit = {}
     ): ValidationRun {
         return this.validateWithData<Any>(
                 validationStampName = validationStamp.name,
                 validationRunStatusID = validationRunStatusID,
                 description = description
-        )
+        ).apply {
+            code()
+        }
     }
 
     /**
@@ -230,17 +240,33 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Change of status for a validation run
      */
-    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String) {
-        asUser().with(this, ValidationRunStatusChange::class.java).execute {
+    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String): ValidationRun {
+        return asUser().with(this, ValidationRunStatusChange::class.java).call {
             structureService.newValidationRunStatus(
                     this,
-                    ValidationRunStatus.of(
+                    ValidationRunStatus(
+                            ID.NONE,
                             Signature.of("test"),
                             status,
                             description
                     )
             )
         }
+    }
+
+    /**
+     * Change of status for a validation run
+     */
+    fun ValidationRun.validationStatusWithCurrentUser(status: ValidationRunStatusID, description: String): ValidationRun {
+            return structureService.newValidationRunStatus(
+                    this,
+                    ValidationRunStatus(
+                            ID.NONE,
+                            securityService.currentSignature,
+                            status,
+                            description
+                    )
+            )
     }
 
     /**
