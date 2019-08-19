@@ -119,7 +119,8 @@ public class ValidationRun implements RunnableEntity {
             ValidationRunStatusID validationRunStatusID,
             String description) {
         List<ValidationRunStatus> statuses = Collections.singletonList(
-                ValidationRunStatus.of(
+                new ValidationRunStatus(
+                        ID.NONE,
                         signature,
                         validationRunStatusID,
                         description

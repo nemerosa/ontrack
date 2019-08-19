@@ -2,19 +2,44 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate
+import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PromotionLevel
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
  * This class supersedes [StructureServiceIT], which cannot be replaced as yet.
  */
 class StructureServiceNewIT : AbstractDSLTestSupport() {
+
+    @Test
+    fun `Validation run status comment not editable by default`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    validate(vs, ValidationRunStatusID.STATUS_FAILED)
+                    // Second validation with comment
+                    val run = asUser().with(this, ValidationRunStatusChange::class.java).call {
+                        validate(vs, ValidationRunStatusID.STATUS_INVESTIGATING, "First comment")
+                    }
+                    val statusId = run.lastStatus.id
+                    // Not editable by anonymous user
+                    asAnonymous().execute {
+                        val editable = structureService.isValidationRunStatusCommentEditable(statusId)
+                        assertFalse(editable, "Status comment by default not editable")
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     fun `New promotion level based on a predefined promotion level with description and image`() {

@@ -297,6 +297,34 @@ interface StructureService {
     fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun
 
     /**
+     * Gets the parent validation run for a given validation run status ID
+     */
+    fun getParentValidationRun(validationRunStatusId: ID): ValidationRun
+
+    /**
+     * Gets a validation run status using its ID.
+     *
+     * @param id ID of the validation run status
+     * @return Validation run status
+     */
+    fun getValidationRunStatus(id: ID): ValidationRunStatus
+
+    /**
+     * Edits a validation run status comment.
+     *
+     * @param run Parent validation run
+     * @param runStatusId ID of the specific run status to edit
+     * @param comment New comment
+     * @return Updated validation run
+     */
+    fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun
+
+    /**
+     * Checks if the validation run status comment is editable by the current user
+     */
+    fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean
+
+    /**
      * Gets the total number of validation runs for a build and a validation stamp
      *
      * @param buildId           ID of the build

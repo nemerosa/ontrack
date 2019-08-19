@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
+import graphql.Scalars.GraphQLInt
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
@@ -10,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
+import net.nemerosa.ontrack.ui.resource.ResourceDecoratorDelegate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Component
 class GQLTypeValidationRunStatus
 @Autowired
 constructor(
+        private val fieldContributors: List<GQLFieldContributor>,
         private val validationRunStatusID: GQLTypeValidationRunStatusID,
         private val creation: GQLTypeCreation,
         private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
@@ -27,6 +31,15 @@ constructor(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return newObject()
                 .name(VALIDATION_RUN_STATUS)
+                // ID
+                .field {
+                    it.name("id")
+                            .type(GraphQLNonNull(GraphQLInt))
+                            .dataFetcher { environment ->
+                                val data = environment.getSource<Data>()
+                                data.delegate.id()
+                            }
+                }
                 // Creation
                 .field {
                     it.name("creation")
@@ -56,6 +69,8 @@ constructor(
                                     }
                             )
                 }
+                // Links
+                .fields(ValidationRunStatus::class.java.graphQLFieldContributions(fieldContributors))
                 // OK
                 .build()
 
@@ -81,9 +96,11 @@ constructor(
     class Data(
             val validationRun: ValidationRun,
             val delegate: ValidationRunStatus
-    ) {
+    ) : ResourceDecoratorDelegate {
         val statusID: ValidationRunStatusID get() = delegate.statusID
         val description: String? get() = delegate.description
+
+        override fun getLinkDelegate(): Any = delegate
     }
 
 }

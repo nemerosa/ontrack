@@ -19,6 +19,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.validationDataTypeConfig',
         'ot.directive.validationDataTypeDecoration',
         'ot.directive.projectLabel',
+        'ot.directive.validationRunStatusComment',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services

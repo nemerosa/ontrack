@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.validation.ValidationUtils
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
@@ -1238,6 +1239,7 @@ class StructureServiceImpl(
     override fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun {
         // Entity check
         Entity.isEntityDefined(validationRun, "Validation run must be defined")
+        isEntityNew(runStatus, "Validation run status must not have any defined ID.")
         // Security check
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ValidationRunStatusChange::class.java)
         // Transition check
@@ -1246,8 +1248,71 @@ class StructureServiceImpl(
         val newValidationRun = structureRepository.newValidationRunStatus(validationRun, runStatus)
         // Event
         eventPostService.post(eventFactory.newValidationRunStatus(newValidationRun))
+        // OK, reloading to get IDs correct
+        return getValidationRun(validationRun.id)
+    }
+
+    override fun getParentValidationRun(validationRunStatusId: ID): ValidationRun {
+        // Gets the validation run
+        val run = structureRepository.getParentValidationRun(validationRunStatusId) {
+            validationRunStatusService.getValidationRunStatus(it)
+        }
+        // Checks access rights
+        securityService.checkProjectFunction(run, ProjectView::class.java)
         // OK
-        return newValidationRun
+        return run
+    }
+
+    override fun getValidationRunStatus(id: ID): ValidationRunStatus {
+        return structureRepository.getValidationRunStatus(id) {
+            validationRunStatusService.getValidationRunStatus(it)
+        } ?: throw IllegalStateException("Cannot find validation run status with ID = $id")
+    }
+
+    override fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean {
+        // Loads the parent
+        val run = getParentValidationRun(validationRunStatus)
+        // Checks the edit right
+        return if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEdit::class.java)) {
+            true
+        }
+        // If not, check the current user vs. the creator of the comment
+        else if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEditOwn::class.java)) {
+            // Loads the status
+            val status = structureRepository.getValidationRunStatus(validationRunStatus) {
+                validationRunStatusService.getValidationRunStatus(it)
+            }
+            // Gets the status's author
+            val statusAuthor = status?.signature?.user?.name
+            // Gets the current user name
+            val currentUserName = securityService.currentSignature?.user?.name
+            // Compare both
+            statusAuthor != null && statusAuthor == currentUserName
+        }
+        // No right at all
+        else {
+            false
+        }
+    }
+
+    override fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun {
+        // Checks
+        isEntityDefined(run, "Validation run must be defined")
+        // Loading the status
+        val runStatus = structureRepository.getValidationRunStatus(runStatusId) { validationRunStatusService.getValidationRunStatus(it) }
+                ?: throw IllegalStateException("Could not find validation run status with id = $runStatusId")
+        // Checks the parent run
+        val parentOK = run.validationRunStatuses.any { it.id() == runStatus.id() }
+        if (!parentOK) {
+            throw IllegalStateException("Cannot edit a validation run status without a proper reference to its parent run.")
+        }
+        // FIXME Security checks
+        // Saving the new comment
+        structureRepository.saveValidationRunStatusComment(runStatus, comment)
+        // Event
+        eventPostService.post(eventFactory.updateValidationRunStatusComment(run))
+        // Reloading the run
+        return getValidationRun(run.id)
     }
 
     override fun getValidationRunsCountForBuildAndValidationStamp(buildId: ID, validationStampId: ID): Int {

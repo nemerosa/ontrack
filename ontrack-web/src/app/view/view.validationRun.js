@@ -61,6 +61,7 @@ angular.module('ot.view.validationRun', [
                       data
                     }
                     validationRunStatuses {
+                      id
                       statusID {
                         id
                         name
@@ -71,6 +72,9 @@ angular.module('ot.view.validationRun', [
                       }
                       description
                       annotatedDescription
+                      links {
+                        _comment
+                      }
                     }
                     links {
                         _self

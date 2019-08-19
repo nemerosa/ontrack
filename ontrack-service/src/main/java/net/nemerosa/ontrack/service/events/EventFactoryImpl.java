@@ -54,6 +54,7 @@ public class EventFactoryImpl implements EventFactory {
 
         register(NEW_VALIDATION_RUN);
         register(NEW_VALIDATION_RUN_STATUS);
+        register(UPDATE_VALIDATION_RUN_STATUS_COMMENT);
 
         register(PROPERTY_CHANGE);
         register(PROPERTY_DELETE);
@@ -264,6 +265,13 @@ public class EventFactoryImpl implements EventFactory {
         return Event.of(NEW_VALIDATION_RUN_STATUS)
                 .withValidationRun(validationRun)
                 .withValidationRunStatus(validationRun.getLastStatus().getStatusID())
+                .get();
+    }
+
+    @Override
+    public Event updateValidationRunStatusComment(ValidationRun validationRun) {
+        return Event.of(UPDATE_VALIDATION_RUN_STATUS_COMMENT)
+                .withValidationRun(validationRun)
                 .get();
     }
 
