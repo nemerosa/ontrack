@@ -24,7 +24,9 @@
                 <ot-validation-run-status status="validationRunStatus"></ot-validation-run-status>
                 {{validationRunStatus.statusID.name}}
             </td>
-            <td ng-bind-html="validationRunStatus.annotatedDescription">
+            <td>
+                <ot-validation-run-status-comment status="validationRunStatus"></ot-validation-run-status-comment>
+            </td>
             </td>
             <td>
                 <ot-signature value="{time: validationRunStatus.creation.time, user: {name: validationRunStatus.creation.user}}" user="true" time="true"></ot-signature>
