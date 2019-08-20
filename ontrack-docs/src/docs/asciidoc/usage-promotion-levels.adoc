@@ -38,7 +38,23 @@ of any other constraint.
 In particular, promotions are ordered and a build can be promoted to a given
 promotion without the previous ones being granted.
 
-If this "lax" behavior is not correct, you can configure this in several ways:
+If this "lax" behavior is not correct, you can configure this in several ways, using
+_promotion checks_.
+
+NOTE: This check on previous promotions is built-in in Ontrack but other
+could be added by creating <<extending-promotion-checks,extensions>>.
+
+[[promotion-levels-checks-previous]]
+===== Previous promotion check
+
+One check is to make sure that a promotion is granted _only_ if the previous
+one is granted. For example, if we have BRONZE -> SILVER -> GOLD as promotions for
+a branch:
+
+* SILVER could not be promoted if IRON is not
+* GOLD could not be promoted if SILVER is not
+
+You can activate this behaviour:
 
 * globally, by activating the settings for "Previous promotion condition"
 * at project, branch or even promotion level level, by setting and activating
@@ -51,8 +67,19 @@ The order of priority of this check is as follows:
 * project "Previous promotion condition" property (takes precedence on global settings)
 * Global "Previous promotion condition" settings
 
-NOTE: This check on previous promotions is built-in in Ontrack but other
-could be added by creating <<extending-promotion-checks,extensions>>.
+[[promotion-levels-checks-dependencues]]
+===== Previous dependencies check
+
+You can also define a set of dependencies to a promotion, like
+a list of promotions which must be granted before a promotion
+is itself granted.
+
+For example, if we have IRON -> BRONZE -> SILVER -> GOLD as promotions for
+a branch, we could decide that GOLD _cannot_ be promoted if either BRONZE or
+SILVER is missing.
+
+You can activate this behaviour by setting the "Promotion dependencies"
+property on a promotion level, and selecting the dependencies it depends on.
 
 [[promotion-levels-auto-creation]]
 ==== Auto creation
