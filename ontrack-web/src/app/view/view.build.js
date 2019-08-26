@@ -15,7 +15,7 @@ angular.module('ot.view.build', [
             const view = ot.view();
             // Build's id
             const queryParams = {
-                buildId: $stateParams.buildId,
+                buildId: Number($stateParams.buildId),
                 usingOffset: 0,
                 usedByOffset: 0,
                 validationRunsOffset: 0
