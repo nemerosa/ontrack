@@ -17,6 +17,10 @@ class BuildPage extends AbstractHeaderPage {
         "index.html#/build/${parameters.id}"
     }
 
+    String getViewTitle() {
+        $("#build-page-title").text
+    }
+
     ValidationRunDialog validate() {
         def validateCommand = $('#validate')
         browser.waitUntil { validateCommand.displayed }
