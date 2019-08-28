@@ -1,20 +1,19 @@
-package net.nemerosa.ontrack.extension.issues.export;
+package net.nemerosa.ontrack.extension.issues.export
 
-import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.model.Issue
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 
-import java.util.List;
-import java.util.Map;
+interface IssueExportService {
 
-public interface IssueExportService {
+    val exportFormat: ExportFormat
 
-    String NO_GROUP = "";
+    fun export(
+            issueServiceExtension: IssueServiceExtension,
+            issueServiceConfiguration: IssueServiceConfiguration,
+            groupedIssues: Map<String, List<Issue>>): ExportedIssues
 
-    ExportFormat getExportFormat();
-
-    ExportedIssues export(
-            IssueServiceExtension issueServiceExtension,
-            IssueServiceConfiguration issueServiceConfiguration,
-            Map<String, List<Issue>> groupedIssues);
+    companion object {
+        const val NO_GROUP = ""
+    }
 }
