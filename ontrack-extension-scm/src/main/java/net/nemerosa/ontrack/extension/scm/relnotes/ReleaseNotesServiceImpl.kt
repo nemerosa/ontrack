@@ -4,6 +4,9 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
+import net.nemerosa.ontrack.extension.issues.export.IssueExportService
+import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
+import net.nemerosa.ontrack.extension.issues.export.SectionType
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
@@ -20,13 +23,36 @@ class ReleaseNotesServiceImpl(
         private val extensionManager: ExtensionManager,
         private val structureService: StructureService,
         private val scmService: SCMService,
-        private val buildFilterService: BuildFilterService
+        private val buildFilterService: BuildFilterService,
+        private val issueExportServiceFactory: IssueExportServiceFactory
 ) : ReleaseNotesService {
 
     override fun exportProjectReleaseNotes(project: Project, request: ReleaseNotesRequest): Document {
         // Structured release notes
         val releaseNotes = getProjectReleaseNotes(project, request)
-        TODO("Call IssueExportService#exportSection in a recursive way")
+        // Gets the export service
+        val exportService: IssueExportService = issueExportServiceFactory.getIssueExportService(request.format)
+        // Exporting
+        return exportService.concatSections(
+                releaseNotes.groups.map { group ->
+                    exportService.exportSection(
+                            group.title,
+                            SectionType.TITLE,
+                            exportService.concatSections(
+                                    group.versions.map { version ->
+                                        exportService.exportSection(
+                                                title = version.build.name, // TODO Build label service
+                                                sectionType = SectionType.HEADING,
+                                                content = Document(
+                                                        exportService.exportFormat.type,
+                                                        version.notes.toByteArray()
+                                                )
+                                        )
+                                    }
+                            )
+                    )
+                }
+        )
     }
 
     override fun getProjectReleaseNotes(project: Project, request: ReleaseNotesRequest): ReleaseNotes {
