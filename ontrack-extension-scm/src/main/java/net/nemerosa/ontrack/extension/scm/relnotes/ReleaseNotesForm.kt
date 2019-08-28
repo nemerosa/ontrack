@@ -14,6 +14,8 @@ class ReleaseNotesForm {
 
     var promotion: String? = null
 
+    var format = "text"
+
 }
 
 class ReleaseNotesBranchOrderingMissingException : InputException("Branch ordering is required.")

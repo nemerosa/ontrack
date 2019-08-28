@@ -2,8 +2,7 @@ package net.nemerosa.ontrack.extension.scm.relnotes
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssues
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
@@ -64,8 +63,17 @@ class ReleaseNotesServiceImpl(
         val changeLogs = builds.mapIndexed { index, build ->
             if (index != builds.lastIndex) {
                 val nextBuild = builds[index + 1]
+                // Change log request
+                val changeLogRequest = IssueChangeLogExportRequest().apply {
+                    format = request.format
+                    grouping = request.issueGrouping
+                    exclude = request.issueExclude
+                    altGroup = request.issueAltGroup
+                    from = build.id
+                    to = nextBuild.id
+                }
                 // Gets the change log
-                val changeLog = generation.changeLog<SCMChangeLogIssue>(build, nextBuild)
+                val changeLog = generation.changeLog(changeLogRequest)
                 // Association
                 changeLog?.run { BuildChangeLog(build, this) }
             } else {
@@ -74,12 +82,24 @@ class ReleaseNotesServiceImpl(
         }.filterNotNull()
         // TODO Grouping at branch level
         // OK
-        TODO("Returns the complete release notes")
+        return ReleaseNotes(
+                listOf(
+                        ReleaseNotesGroup(
+                                "TODO Grouping",
+                                changeLogs.map { buildChangeLog ->
+                                    ReleaseNotesVersion(
+                                            buildChangeLog.build,
+                                            buildChangeLog.changeLog
+                                    )
+                                }
+                        )
+                )
+        )
     }
 
     private class BuildChangeLog(
             val build: Build,
-            val changeLog: SCMChangeLogIssues<*>
+            val changeLog: String
     )
 
 }

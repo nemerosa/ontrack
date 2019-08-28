@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.relnotes
 
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssues
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.model.extension.Extension
-import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 
 /**
@@ -19,6 +17,6 @@ interface ReleaseNotesGenerationExtension : Extension {
     /**
      * Change log between two builds
      */
-    fun <T : SCMChangeLogIssue> changeLog(from: Build, to: Build): SCMChangeLogIssues<T>?
+    fun changeLog(changeLogRequest: IssueChangeLogExportRequest): String?
 
 }

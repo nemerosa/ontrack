@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
+// TODO Text rendering of the complete change log, using specified format
+
 @RestController
 @API("Release notes")
 @RequestMapping("/extension/scm/release-notes")
@@ -35,7 +37,8 @@ class ReleaseNotesController(
                     // TODO Configuration in form
                     issueGrouping = "",
                     issueExclude = "",
-                    issueAltGroup = "Other"
+                    issueAltGroup = "Other",
+                    format = "text"
             )
         }
         // Loads the project

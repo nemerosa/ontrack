@@ -8,6 +8,7 @@ class ReleaseNotesRequest(
         val branchOrdering: String,
         val buildLimit: Int,
         var promotion: String,
+        val format: String,
         val issueGrouping: String,
         val issueExclude: String,
         val issueAltGroup: String
