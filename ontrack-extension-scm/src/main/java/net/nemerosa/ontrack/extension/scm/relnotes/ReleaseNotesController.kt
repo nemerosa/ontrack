@@ -34,11 +34,10 @@ class ReleaseNotesController(
                     branchOrdering = branchOrdering ?: throw ReleaseNotesBranchOrderingMissingException(),
                     buildLimit = buildLimit,
                     promotion = promotion ?: throw ReleaseNotesPromotionMissingException(),
-                    // TODO Configuration in form
-                    issueGrouping = "",
-                    issueExclude = "",
-                    issueAltGroup = "Other",
-                    format = "text"
+                    issueGrouping = issueGrouping,
+                    issueExclude = issueExclude,
+                    issueAltGroup = issueAltGroup,
+                    format = format
             )
         }
         // Loads the project

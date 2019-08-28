@@ -16,6 +16,10 @@ class ReleaseNotesForm {
 
     var format = "text"
 
+    var issueGrouping: String = ""
+    var issueExclude: String = ""
+    var issueAltGroup: String = "Other"
+
 }
 
 class ReleaseNotesBranchOrderingMissingException : InputException("Branch ordering is required.")
