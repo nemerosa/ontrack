@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.relnotes
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
@@ -21,6 +22,12 @@ class ReleaseNotesServiceImpl(
         private val scmService: SCMService,
         private val buildFilterService: BuildFilterService
 ) : ReleaseNotesService {
+
+    override fun exportProjectReleaseNotes(project: Project, request: ReleaseNotesRequest): Document {
+        // Structured release notes
+        val releaseNotes = getProjectReleaseNotes(project, request)
+        TODO("Call IssueExportService#exportSection in a recursive way")
+    }
 
     override fun getProjectReleaseNotes(project: Project, request: ReleaseNotesRequest): ReleaseNotes {
         // Gets all the generation extensions
