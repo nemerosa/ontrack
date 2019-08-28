@@ -833,7 +833,8 @@ class GitServiceImpl(
                     SCMPathInfo(
                             "git",
                             it.configuration.remote,
-                            it.branch, null
+                            it.branch,
+                            null
                     )
                 }
                 .asOptional()

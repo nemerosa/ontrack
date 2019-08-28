@@ -1,13 +1,8 @@
-package net.nemerosa.ontrack.extension.scm.model;
+package net.nemerosa.ontrack.extension.scm.model
 
-import lombok.Data;
-
-@Data
-public class SCMPathInfo {
-
-    private final String type;
-    private final String url;
-    private final String branch;
-    private final String commit;
-
-}
+data class SCMPathInfo(
+        val type: String,
+        val url: String,
+        val branch: String,
+        val commit: String?
+)
