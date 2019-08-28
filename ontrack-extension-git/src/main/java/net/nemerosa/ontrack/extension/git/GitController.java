@@ -6,14 +6,13 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.git.model.*;
+import net.nemerosa.ontrack.extension.git.relnotes.GitReleaseNotesGenerationService;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
@@ -43,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -56,6 +54,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     private final GitConfigurationService configurationService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
+    private final GitReleaseNotesGenerationService gitReleaseNotesGenerationService;
 
     private final Cache<String, GitChangeLog> logCache;
 
@@ -65,13 +64,16 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                          GitService gitService,
                          GitConfigurationService configurationService,
                          IssueServiceRegistry issueServiceRegistry,
-                         SecurityService securityService) {
+                         SecurityService securityService,
+                         GitReleaseNotesGenerationService gitReleaseNotesGenerationService
+    ) {
         super(feature);
         this.structureService = structureService;
         this.gitService = gitService;
         this.configurationService = configurationService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
+        this.gitReleaseNotesGenerationService = gitReleaseNotesGenerationService;
         // Cache
         logCache = CacheBuilder.newBuilder()
                 .maximumSize(20)
@@ -227,41 +229,19 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     @RequestMapping(value = "changelog/export", method = RequestMethod.GET)
     public ResponseEntity<String> changeLog(IssueChangeLogExportRequest request) {
         // Gets the change log
-        GitChangeLog changeLog = gitService.changeLog(request);
-        // Gets the associated project
-        Project project = changeLog.getProject();
-        // Gets the configuration for the project
-        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
-        if (gitConfiguration == null) {
-            throw new GitProjectNotConfiguredException(project.getId());
-        }
-        // Gets the issue service
-        Optional<ConfiguredIssueService> optConfiguredIssueService = gitConfiguration.getConfiguredIssueService();
-        if (!optConfiguredIssueService.isPresent()) {
+        ExportedIssues exportedChangeLogIssues = gitReleaseNotesGenerationService.changeLog(request);
+        if (exportedChangeLogIssues == null) {
             return new ResponseEntity<>(
                     "The branch is not configured for issues",
                     HttpStatus.NO_CONTENT
             );
+        } else {
+            // Content type
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat() + "; charset=utf-8");
+            // Body and headers
+            return new ResponseEntity<>(exportedChangeLogIssues.getContent(), responseHeaders, HttpStatus.OK);
         }
-        ConfiguredIssueService configuredIssueService = optConfiguredIssueService.get();
-        // Gets the issue change log
-        GitChangeLogIssues changeLogIssues = gitService.getChangeLogIssues(changeLog);
-        // List of issues
-        List<Issue> issues = changeLogIssues.getList().stream()
-                .map(SCMChangeLogIssue::getIssue)
-                .collect(Collectors.toList());
-        // Exports the change log using the given format
-        ExportedIssues exportedChangeLogIssues = configuredIssueService.getIssueServiceExtension()
-                .exportIssues(
-                        configuredIssueService.getIssueServiceConfiguration(),
-                        issues,
-                        request
-                );
-        // Content type
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat() + "; charset=utf-8");
-        // Body and headers
-        return new ResponseEntity<>(exportedChangeLogIssues.getContent(), responseHeaders, HttpStatus.OK);
     }
 
     private GitChangeLog getChangeLog(String uuid) {
