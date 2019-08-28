@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.scm.relnotes
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.ExtensionManager
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssues
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
@@ -58,11 +60,26 @@ class ReleaseNotesServiceImpl(
                 }
             }
         }
-        // TODO For each build, get the change log since the previous one in the list
-
+        // For each build, get the change log since the previous one in the list
+        val changeLogs = builds.mapIndexed { index, build ->
+            if (index != builds.lastIndex) {
+                val nextBuild = builds[index + 1]
+                // Gets the change log
+                val changeLog = generation.changeLog<SCMChangeLogIssue>(build, nextBuild)
+                // Association
+                changeLog?.run { BuildChangeLog(build, this) }
+            } else {
+                null
+            }
+        }.filterNotNull()
         // TODO Grouping at branch level
         // OK
         TODO("Returns the complete release notes")
     }
+
+    private class BuildChangeLog(
+            val build: Build,
+            val changeLog: SCMChangeLogIssues<*>
+    )
 
 }
