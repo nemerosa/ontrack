@@ -5,10 +5,8 @@ import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 
 abstract class AbstractTextIssueExportService(
-        private val exportFormat: ExportFormat
+        override val exportFormat: ExportFormat
 ) : IssueExportService {
-
-    override fun getExportFormat(): ExportFormat = exportFormat
 
     override fun export(issueServiceExtension: IssueServiceExtension, issueServiceConfiguration: IssueServiceConfiguration, groupedIssues: Map<String, List<Issue>>): ExportedIssues {
         val s = StringBuilder()
