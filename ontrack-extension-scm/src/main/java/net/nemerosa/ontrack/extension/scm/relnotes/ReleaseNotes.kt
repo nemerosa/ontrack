@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.relnotes
+package net.nemerosa.ontrack.extension.scm.relnotes
 
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.support.MessageAnnotation
@@ -14,6 +14,11 @@ class ReleaseNotesGroup(
 
 class ReleaseNotesVersion(
         val build: Build,
+        val itemGroups: List<ReleaseNotesItemGroup>
+)
+
+class ReleaseNotesItemGroup(
+        val title: String,
         val items: List<ReleaseNotesItem>
 )
 

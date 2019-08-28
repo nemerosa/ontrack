@@ -1,10 +1,7 @@
-package net.nemerosa.ontrack.boot.ui
+package net.nemerosa.ontrack.extension.scm.relnotes
 
 import net.nemerosa.ontrack.model.annotations.API
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.relnotes.ReleaseNotes
-import net.nemerosa.ontrack.model.relnotes.ReleaseNotesRequest
-import net.nemerosa.ontrack.model.relnotes.ReleaseNotesService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
@@ -17,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 @RestController
 @API("Release notes")
-@RequestMapping("/rest/release-notes")
+@RequestMapping("/extension/scm/release-notes")
 class ReleaseNotesController(
         private val structureService: StructureService,
         private val releaseNotesService: ReleaseNotesService
@@ -33,8 +30,12 @@ class ReleaseNotesController(
                     branchPattern = branchPattern,
                     branchGrouping = branchGrouping,
                     branchOrdering = branchOrdering ?: throw ReleaseNotesBranchOrderingMissingException(),
-                    branchLimit = branchLimit,
-                    promotion = promotion ?: throw ReleaseNotesPromotionMissingException()
+                    buildLimit = buildLimit,
+                    promotion = promotion ?: throw ReleaseNotesPromotionMissingException(),
+                    // TODO Configuration in form
+                    issueGrouping = "",
+                    issueExclude = "",
+                    issueAltGroup = "Other"
             )
         }
         // Loads the project

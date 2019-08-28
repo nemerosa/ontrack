@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.ui
+package net.nemerosa.ontrack.extension.scm.relnotes
 
 import net.nemerosa.ontrack.model.exceptions.InputException
 
@@ -8,7 +8,7 @@ class ReleaseNotesForm {
 
     var branchGrouping = ""
 
-    var branchLimit = 10
+    var buildLimit = 10
 
     var branchOrdering: String? = null
 
