@@ -23,4 +23,20 @@ class MarkdownIssueExportService : AbstractTextIssueExportService(ExportFormat.M
 
         }
     }
+
+    override fun exportSectionAsText(title: String, sectionType: SectionType, content: String): String =
+            when (sectionType) {
+                SectionType.TITLE -> """
+                    $title
+                    ${"=".repeat(title.length)}
+                    
+                    $content
+                    """.trimIndent()
+                SectionType.HEADING -> """
+                    ## $title
+                    
+                    $content
+                """.trimIndent()
+            }
+
 }
