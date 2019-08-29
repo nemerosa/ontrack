@@ -23,23 +23,6 @@ class TextIssueExportService : AbstractTextIssueExportService(ExportFormat.TEXT)
         }
     }
 
-    @Suppress("DuplicatedCode")
     override fun exportSectionAsText(title: String?, sectionType: SectionType, content: String): String =
-            if (title != null) {
-                when (sectionType) {
-                    SectionType.TITLE -> """
-                        $title
-                        ${"=".repeat(title.length)}
-                        
-                        $content
-                        """.trimIndent()
-                    SectionType.HEADING -> """
-                        ## $title
-                        
-                        $content
-                        """.trimIndent()
-                }
-            } else {
-                content
-            }
+            MarkdownIssueExportService.sectionAsText(title, sectionType, content)
 }

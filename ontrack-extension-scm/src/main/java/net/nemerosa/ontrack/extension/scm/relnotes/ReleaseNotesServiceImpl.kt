@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.export.IssueExportService
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
-import net.nemerosa.ontrack.extension.issues.export.SectionType
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
@@ -33,26 +32,7 @@ class ReleaseNotesServiceImpl(
         // Gets the export service
         val exportService: IssueExportService = issueExportServiceFactory.getIssueExportService(request.format)
         // Exporting
-        return exportService.concatSections(
-                releaseNotes.groups.map { group ->
-                    exportService.exportSection(
-                            group.title,
-                            SectionType.TITLE,
-                            exportService.concatSections(
-                                    group.versions.map { version ->
-                                        exportService.exportSection(
-                                                title = version.build.name, // TODO Build label service
-                                                sectionType = SectionType.HEADING,
-                                                content = Document(
-                                                        exportService.exportFormat.type,
-                                                        version.notes.toByteArray()
-                                                )
-                                        )
-                                    }
-                            )
-                    )
-                }
-        )
+        return exportService.exportReleaseNotes(releaseNotes)
     }
 
     override fun getProjectReleaseNotes(project: Project, request: ReleaseNotesRequest): ReleaseNotes {

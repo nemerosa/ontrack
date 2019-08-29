@@ -28,7 +28,7 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                         issueAltGroup = "Misc."
                 ),
                 expectedReleaseNotes = """
-                    ## 2.0.0
+                    ## 2.0.2
                     
                     * #5 Issue #5
                     * #7 Issue #7
@@ -41,7 +41,7 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
 
                     * #3 Issue #3
 
-                    # 1.0.2
+                    ## 1.0.2
                     
                     * #2 Issue #2
                     """.trimIndent()
@@ -67,7 +67,7 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                     Release 2
                     =========
                     
-                    ## 2.0.0
+                    ## 2.0.2
 
                     Features:
                     
@@ -88,7 +88,7 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
 
                     * #3 Issue #3
 
-                    # 1.0.2
+                    ## 1.0.2
 
                     Fixes:
                     
@@ -205,10 +205,10 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                     request
             )
             assertEquals("text/plain", notes.type)
-            val actualNotes = notes.content.toString(Charsets.UTF_8)
+            val actualNotes = notes.content.toString(Charsets.UTF_8).trimIndent()
             assertEquals(
-                    expectedReleaseNotes,
-                    actualNotes
+                    expectedReleaseNotes.trim(),
+                    actualNotes.trim()
             )
         }
     }

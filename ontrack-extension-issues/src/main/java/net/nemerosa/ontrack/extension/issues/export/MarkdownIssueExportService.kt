@@ -24,24 +24,28 @@ class MarkdownIssueExportService : AbstractTextIssueExportService(ExportFormat.M
         }
     }
 
-    @Suppress("DuplicatedCode")
     override fun exportSectionAsText(title: String?, sectionType: SectionType, content: String): String =
+            sectionAsText(title, sectionType, content)
+
+    companion object {
+        fun sectionAsText(title: String?, sectionType: SectionType, content: String): String {
+            val s = StringBuilder()
             if (title != null) {
                 when (sectionType) {
-                    SectionType.TITLE -> """
-                        $title
-                        ${"=".repeat(title.length)}
-                        
-                        $content
-                        """.trimIndent()
-                    SectionType.HEADING -> """
-                        ## $title
-                        
-                        $content
-                        """.trimIndent()
+                    SectionType.TITLE -> {
+                        s.append("$title\n")
+                        s.append("=".repeat(title.length)).append("\n")
+                        s.append("\n")
+                    }
+                    SectionType.HEADING -> {
+                        s.append("## $title\n")
+                        s.append("\n")
+                    }
                 }
-            } else {
-                content
             }
+            s.append(content)
+            return s.toString()
+        }
+    }
 
 }

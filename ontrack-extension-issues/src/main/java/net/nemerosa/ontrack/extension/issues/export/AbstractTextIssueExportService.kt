@@ -42,6 +42,5 @@ abstract class AbstractTextIssueExportService(
     abstract fun exportSectionAsText(title: String?, sectionType: SectionType, content: String): String
 
 
-    open fun concatText(sections: Collection<String>): String =
-            sections.joinToString("\n\n")
+    open fun concatText(sections: Collection<String>): String = sections.joinToString("")
 }
