@@ -8,7 +8,10 @@ import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.git.support.*
+import net.nemerosa.ontrack.extension.issues.support.MockIssue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
@@ -51,6 +54,26 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var jobOrchestrator: JobOrchestrator
+
+    @Autowired
+    protected lateinit var mockIssueServiceExtension: MockIssueServiceExtension
+
+    /**
+     * Registers a mock issue
+     */
+    protected fun mockIssue(
+            id: Int,
+            closed: Boolean = false,
+            type: String = "bug"
+    ) {
+        mockIssueServiceExtension.register(
+                MockIssue(
+                        id,
+                        if (closed) MockIssueStatus.CLOSED else MockIssueStatus.OPEN,
+                        type
+                )
+        )
+    }
 
     /**
      * Creates and saves a Git configuration
@@ -201,6 +224,12 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
     protected infix fun Int.with(message: String) = CommitMessage(this, message)
 
     /**
+     * Branch creation
+     */
+    class BranchCreation(val from: String, val to: String)
+    protected infix fun String.from(from:String) = BranchCreation(from, this)
+
+    /**
      * Creates a sequence of commits on different branches.
      */
     private fun GitRepo.runSequence(commands: List<*>, pauses: Boolean): Map<Int, String> {
@@ -210,6 +239,11 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             when (command) {
                 // Branch
                 is String -> branch(command, branches)
+                // Branch creation
+                is BranchCreation -> {
+                    git("checkout", command.from)
+                    branch(command.to, branches)
+                }
                 // Single commit
                 is Int -> {
                     index[command] = commit(command)

@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.relnotes
 
-// TODO
-
+/**
+ * @property issueGrouping See [net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest.grouping]
+ */
 class ReleaseNotesRequest(
         val branchPattern: String,
         val branchGrouping: String,

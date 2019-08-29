@@ -21,7 +21,7 @@ abstract class AbstractTextIssueExportService(
         } else {
             Document(
                     exportFormat.type,
-                    exportSectionAsText(title, sectionType, content.content.toString()).toByteArray()
+                    exportSectionAsText(title, sectionType, content.content.toString(Charsets.UTF_8)).toByteArray()
             )
         }
     }
@@ -32,7 +32,7 @@ abstract class AbstractTextIssueExportService(
         } else {
             Document(
                     exportFormat.type,
-                    concatText(sections.map { it.content.toString() }).toByteArray()
+                    concatText(sections.map { it.content.toString(Charsets.UTF_8) }).toByteArray()
             )
         }
     }

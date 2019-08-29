@@ -12,9 +12,6 @@ import kotlin.test.assertTrue
 
 class GitIssueSearchIT : AbstractGitTestSupport() {
 
-    @Autowired
-    private lateinit var mockIssueServiceExtension: MockIssueServiceExtension
-
     @Test
     fun `Issue search on one branch`() {
         createRepo {
