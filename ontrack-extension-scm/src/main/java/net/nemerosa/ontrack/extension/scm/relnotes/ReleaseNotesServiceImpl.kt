@@ -112,22 +112,51 @@ class ReleaseNotesServiceImpl(
             } else {
                 null
             }
-        }.filterNotNull()
-        // TODO Grouping at branch level
-        // OK
-        return ReleaseNotes(
-                listOf(
+        }.filterNotNull().map { buildChangeLog ->
+            ReleaseNotesVersion(
+                    buildChangeLog.build,
+                    buildChangeLog.changeLog
+            )
+        }
+        // Grouping at branch level
+        return if (request.branchGrouping.isBlank()) {
+            // No grouping
+            ReleaseNotes(
+                    listOf(
+                            ReleaseNotesGroup(
+                                    null,
+                                    changeLogs
+                            )
+                    )
+            )
+        } else {
+            val groupRegex = request.branchGrouping.toRegex()
+            ReleaseNotes(
+                    changeLogs.groupBy { version ->
+                        val versionBranch = version.build.branch
+                        // Path
+                        val path = scmService.getSCMPathInfo(versionBranch).orElse(null)?.branch!!
+                        // Parsing
+                        val m = groupRegex.matchEntire(path)
+                                ?: throw ReleaseNotesBranchGroupingMismatchException(
+                                        request.branchGrouping,
+                                        versionBranch,
+                                        path
+                                )
+                        if (m.groupValues.isEmpty()) {
+                            throw ReleaseNotesBranchGroupingFormatException(request.branchGrouping)
+                        } else {
+                            m.groupValues[0]
+                        }
+                    }.map { (name, versions) ->
+                        val groupTitle = String.format(request.branchGroupFormat, name)
                         ReleaseNotesGroup(
-                                "TODO Grouping",
-                                changeLogs.map { buildChangeLog ->
-                                    ReleaseNotesVersion(
-                                            buildChangeLog.build,
-                                            buildChangeLog.changeLog
-                                    )
-                                }
+                                groupTitle,
+                                versions
                         )
-                )
-        )
+                    }
+            )
+        }
     }
 
     private class BuildChangeLog(

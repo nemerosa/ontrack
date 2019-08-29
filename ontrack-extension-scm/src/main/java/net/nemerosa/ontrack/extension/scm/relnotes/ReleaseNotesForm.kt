@@ -8,6 +8,8 @@ class ReleaseNotesForm {
 
     var branchGrouping = ""
 
+    var branchGroupFormat = "Release %s"
+
     var buildLimit = 10
 
     var branchOrdering: String? = null

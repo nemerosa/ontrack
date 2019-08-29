@@ -15,7 +15,7 @@ abstract class AbstractTextIssueExportService(
         return ExportedIssues(exportFormat.type, s.toString())
     }
 
-    override fun exportSection(title: String, sectionType: SectionType, content: Document): Document {
+    override fun exportSection(title: String?, sectionType: SectionType, content: Document): Document {
         return if (content.type != exportFormat.type) {
             throw ExportFormatIncompatibleException()
         } else {
@@ -39,7 +39,7 @@ abstract class AbstractTextIssueExportService(
 
     abstract fun exportAsText(issueServiceExtension: IssueServiceExtension, issueServiceConfiguration: IssueServiceConfiguration, groupedIssues: Map<String, List<Issue>>, s: StringBuilder)
 
-    abstract fun exportSectionAsText(title: String, sectionType: SectionType, content: String): String
+    abstract fun exportSectionAsText(title: String?, sectionType: SectionType, content: String): String
 
 
     open fun concatText(sections: Collection<String>): String =

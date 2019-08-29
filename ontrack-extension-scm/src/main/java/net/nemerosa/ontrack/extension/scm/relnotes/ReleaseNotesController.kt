@@ -62,6 +62,7 @@ class ReleaseNotesController(
         ReleaseNotesRequest(
                 branchPattern = branchPattern,
                 branchGrouping = branchGrouping,
+                branchGroupFormat = branchGroupFormat,
                 branchOrdering = branchOrdering ?: throw ReleaseNotesBranchOrderingMissingException(),
                 buildLimit = buildLimit,
                 promotion = promotion ?: throw ReleaseNotesPromotionMissingException(),

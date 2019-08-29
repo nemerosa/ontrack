@@ -18,6 +18,7 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                 request = ReleaseNotesRequest(
                         branchPattern = "release/.*",
                         branchGrouping = "",
+                        branchGroupFormat = "Release %s",
                         branchOrdering = "",
                         buildLimit = 10,
                         promotion = "PLATINUM",
@@ -53,6 +54,7 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                 request = ReleaseNotesRequest(
                         branchPattern = "release/.*",
                         branchGrouping = "release/(\\d+).*",
+                        branchGroupFormat = "Release %s",
                         branchOrdering = "",
                         buildLimit = 10,
                         promotion = "PLATINUM",

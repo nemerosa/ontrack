@@ -6,6 +6,7 @@ package net.nemerosa.ontrack.extension.scm.relnotes
 class ReleaseNotesRequest(
         val branchPattern: String,
         val branchGrouping: String,
+        val branchGroupFormat: String,
         val branchOrdering: String,
         val buildLimit: Int,
         var promotion: String,

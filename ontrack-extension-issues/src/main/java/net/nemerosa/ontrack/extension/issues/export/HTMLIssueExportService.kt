@@ -31,14 +31,14 @@ class HTMLIssueExportService : AbstractTextIssueExportService(ExportFormat.HTML)
         }
     }
 
-    override fun exportSectionAsText(title: String, sectionType: SectionType, content: String): String {
+    override fun exportSectionAsText(title: String?, sectionType: SectionType, content: String): String {
         val className = when (sectionType) {
             SectionType.TITLE -> "ontrack-issue-title"
             SectionType.HEADING -> "ontrack-issue-heading"
         }
         return """
             <section class="$className">
-                <hgroup><h1>$title</h1></hgroup>
+                ${ title?.let { "<hgroup><h1>$title</h1></hgroup>" } ?: ""}
                 <div>$content</div>
             </section>
         """.trimIndent()

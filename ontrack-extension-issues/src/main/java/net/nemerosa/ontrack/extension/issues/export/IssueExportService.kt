@@ -15,7 +15,7 @@ interface IssueExportService {
             groupedIssues: Map<String, List<Issue>>): ExportedIssues
 
     fun exportSection(
-            title: String,
+            title: String?,
             sectionType: SectionType,
             content: Document
     ): Document

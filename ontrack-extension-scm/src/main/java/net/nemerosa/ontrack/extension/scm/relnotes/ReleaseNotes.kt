@@ -7,7 +7,7 @@ class ReleaseNotes(
 )
 
 class ReleaseNotesGroup(
-        val title: String,
+        val title: String?,
         val versions: List<ReleaseNotesVersion>
 )
 
