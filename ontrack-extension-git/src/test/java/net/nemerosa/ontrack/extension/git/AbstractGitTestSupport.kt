@@ -188,6 +188,19 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             runSequence(commands.toList(), true)
 
     /**
+     * Commit index associated with a commit message
+     */
+    class CommitMessage(
+            val index: Int,
+            val message: String
+    )
+
+    /**
+     * Creating a commit index associated with a commit message
+     */
+    protected infix fun Int.with(message: String) = CommitMessage(this, message)
+
+    /**
      * Creates a sequence of commits on different branches.
      */
     private fun GitRepo.runSequence(commands: List<*>, pauses: Boolean): Map<Int, String> {
@@ -200,6 +213,11 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
                 // Single commit
                 is Int -> {
                     index[command] = commit(command)
+                    if (pauses) sleep(1010)
+                }
+                // Commit w/ message
+                is CommitMessage -> {
+                    index[command.index] = commit(command.index, command.message)
                     if (pauses) sleep(1010)
                 }
                 // Range of commit
