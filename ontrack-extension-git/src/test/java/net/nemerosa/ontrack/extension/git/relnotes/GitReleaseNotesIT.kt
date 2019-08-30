@@ -69,7 +69,7 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                     
                     ## 2.0.2
 
-                    Features:
+                    Features
                     
                     * #5 Issue #5
                     
@@ -78,19 +78,19 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
 
                     ## 1.1.1
 
-                    Enhancements:
+                    Enhancements
                     
                     * #4 Issue #4
 
                     ## 1.1.0
 
-                    Fixes:
+                    Fixes
 
                     * #3 Issue #3
 
                     ## 1.0.2
 
-                    Fixes:
+                    Fixes
                     
                     * #2 Issue #2
                     """.trimIndent()

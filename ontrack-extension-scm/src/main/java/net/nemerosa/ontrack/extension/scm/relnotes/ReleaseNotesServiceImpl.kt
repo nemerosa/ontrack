@@ -126,7 +126,7 @@ class ReleaseNotesServiceImpl(
                         if (m.groupValues.isEmpty()) {
                             throw ReleaseNotesBranchGroupingFormatException(request.branchGrouping)
                         } else {
-                            m.groupValues[0]
+                            m.groupValues[1]
                         }
                     }.map { (name, versions) ->
                         val groupTitle = String.format(request.branchGroupFormat, name)
