@@ -53,24 +53,21 @@ class ReleaseNotesServiceImpl(
                         branchRegex.matches(path)
                     } ?: false
                 }
-        // TODO Ordering of the branches
+                // TODO Ordering of the branches
+                .sortedByDescending { it.id() }
         // Getting all the builds of a given promotion (up to the limit)
         val builds = mutableListOf<Build>()
         branchLoop@ for (branch in branches) {
             // Gets all builds having a given promotion
-            val branchBuilds = buildFilterService.standardFilterProviderData(request.buildLimit)
+            val branchBuilds: List<Build> = buildFilterService.standardFilterProviderData(request.buildLimit)
                     .withWithPromotionLevel(request.promotion)
                     .build()
                     .filterBranchBuilds(branch)
+                    // +1 needed because we might need the last build in the branch in order to generate the change log
+                    // See the "pruning" operation later on
+                    .take(request.buildLimit + 1)
             // Filling the results
-            for (build in branchBuilds) {
-                if (builds.size < request.buildLimit) {
-                    builds += build
-                } else {
-                    // Limit reached, exiting the loop
-                    break@branchLoop
-                }
-            }
+            builds += branchBuilds
         }
         // For each build, get the change log since the previous one in the list
         val changeLogs = builds.mapIndexed { index, build ->
