@@ -20,7 +20,6 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                         branchGrouping = "",
                         branchGroupFormat = "Release %s",
                         branchOrdering = "",
-                        branchLimit = 10,
                         buildLimit = 10,
                         promotion = "PLATINUM",
                         format = "text",
@@ -50,39 +49,13 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
     }
 
     @Test
-    fun `Change log with only one branch`() {
+    fun `Change log with one build`() {
         mainScenario(
                 request = ReleaseNotesRequest(
                         branchPattern = "release/.*",
                         branchGrouping = "",
                         branchGroupFormat = "Release %s",
                         branchOrdering = "",
-                        branchLimit = 1,
-                        buildLimit = 10,
-                        promotion = "PLATINUM",
-                        format = "text",
-                        issueGrouping = "",
-                        issueExclude = "",
-                        issueAltGroup = "Misc."
-                ),
-                expectedReleaseNotes = """
-                    ## 2.0.2
-                    
-                    * #5 Issue #5
-                    * #7 Issue #7
-                    """.trimIndent()
-        )
-    }
-
-    @Test
-    fun `Change log with one build per branch`() {
-        mainScenario(
-                request = ReleaseNotesRequest(
-                        branchPattern = "release/.*",
-                        branchGrouping = "",
-                        branchGroupFormat = "Release %s",
-                        branchOrdering = "",
-                        branchLimit = 10,
                         buildLimit = 1,
                         promotion = "PLATINUM",
                         format = "text",
@@ -95,14 +68,6 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                     
                     * #5 Issue #5
                     * #7 Issue #7
-
-                    ## 1.1.1
-                    
-                    * #4 Issue #4
-
-                    ## 1.0.2
-                    
-                    * #2 Issue #2
                     """.trimIndent()
         )
     }
@@ -115,7 +80,6 @@ class GitReleaseNotesIT : AbstractGitTestSupport() {
                         branchGrouping = "release/(\\d+).*",
                         branchGroupFormat = "Release %s",
                         branchOrdering = "",
-                        branchLimit = 10,
                         buildLimit = 10,
                         promotion = "PLATINUM",
                         format = "text",
