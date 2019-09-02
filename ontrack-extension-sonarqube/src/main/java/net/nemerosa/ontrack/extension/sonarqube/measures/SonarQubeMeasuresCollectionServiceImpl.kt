@@ -3,13 +3,15 @@ package net.nemerosa.ontrack.extension.sonarqube.measures
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.EntityDataService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
 class SonarQubeMeasuresCollectionServiceImpl(
-        private val clientFactory: SonarQubeClientFactory
+        private val clientFactory: SonarQubeClientFactory,
+        private val entityDataService: EntityDataService
 ) : SonarQubeMeasuresCollectionService {
 
     override fun collect(build: Build, property: SonarQubeProperty) {
@@ -24,7 +26,21 @@ class SonarQubeMeasuresCollectionServiceImpl(
         val measures: Map<String, Double?>? = client.getMeasuresForVersion(property.key, version, metrics)
         // TODO Metrics
         // TODO Metrics for conversion issues
-        // TODO Storage of metrics for build (using a service)
+        // Safe measures
+        if (measures != null) {
+            val safeMeasures = mutableMapOf<String, Double>()
+            measures.forEach { (name, value) ->
+                if (value != null) {
+                    safeMeasures[name] = value
+                }
+            }
+            // Storage of metrics for build
+            entityDataService.store(
+                    build,
+                    SonarQubeMeasures::class.java.name,
+                    SonarQubeMeasures(safeMeasures)
+            )
+        }
     }
 
 }
