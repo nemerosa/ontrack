@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.sonarqube.configuration
 
+import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
@@ -17,7 +18,8 @@ class SonarQubeConfigurationServiceImpl(
         encryptionService: EncryptionService,
         eventPostService: EventPostService,
         eventFactory: EventFactory,
-        ontrackConfigProperties: OntrackConfigProperties
+        ontrackConfigProperties: OntrackConfigProperties,
+        private val sonarQubeClientFactory: SonarQubeClientFactory
 ) : AbstractConfigurationService<SonarQubeConfiguration>(
         SonarQubeConfiguration::class.java,
         configurationRepository,
@@ -29,7 +31,10 @@ class SonarQubeConfigurationServiceImpl(
 ), SonarQubeConfigurationService {
 
     override fun validate(configuration: SonarQubeConfiguration): ConnectionResult {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // Gets a client
+        val client = sonarQubeClientFactory.getClient(configuration)
+        // FIXME Tests the connection
+        return ConnectionResult.ok()
     }
 
 }
