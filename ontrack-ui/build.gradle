@@ -44,6 +44,7 @@ dependencies {
     runtime project(':ontrack-extension-stale')
     runtime project(':ontrack-extension-vault')
     runtime project(':ontrack-extension-influxdb')
+    runtime project(':ontrack-extension-sonarqube')
 }
 
 /**
