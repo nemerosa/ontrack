@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.sonarqube.measures
 
+import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Service
@@ -7,10 +8,23 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class SonarQubeMeasuresCollectionServiceImpl: SonarQubeMeasuresCollectionService {
+class SonarQubeMeasuresCollectionServiceImpl(
+        private val clientFactory: SonarQubeClientFactory
+) : SonarQubeMeasuresCollectionService {
 
     override fun collect(build: Build, property: SonarQubeProperty) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // Client
+        val client = clientFactory.getClient(property.configuration)
+        // TODO Name of the build
+        val version: String = build.name
+        // List of metrics to collect
+        // TODO Configurable list of metrics
+        val metrics: List<String> = listOf("coverage")
+        // Getting the measures
+        val measures: Map<String, Double?>? = client.getMeasuresForVersion(property.key, version, metrics)
+        // TODO Metrics
+        // TODO Metrics for conversion issues
+        // TODO Storage of metrics for build (using a service)
     }
 
 }
