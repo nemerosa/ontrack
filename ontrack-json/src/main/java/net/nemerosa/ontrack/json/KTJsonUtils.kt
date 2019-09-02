@@ -15,6 +15,11 @@ fun <T> T?.toJson(): JsonNode? =
         JsonUtils.format(this)
 
 /**
+ * Non-null JSON transformation
+ */
+fun <T> T.asJson(): JsonNode = JsonUtils.format(this)!!
+
+/**
  * Parses any node into an object.
  */
 inline fun <reified T> JsonNode.parse(): T =
