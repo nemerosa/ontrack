@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.sonarqube.configuration
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import java.util.function.Function
@@ -7,7 +8,7 @@ import java.util.function.Function
 class SonarQubeConfiguration(
         private val name: String,
         val url: String,
-        val token: String
+        private val password: String
 ) : UserPasswordConfiguration<SonarQubeConfiguration> {
 
     override fun getName(): String = name
@@ -15,12 +16,13 @@ class SonarQubeConfiguration(
     /**
      * Not used
      */
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     override fun getUser(): String? = null
 
     /**
      * The token
      */
-    override fun getPassword(): String? = token
+    override fun getPassword(): String? = password
 
     override fun withPassword(password: String?) = SonarQubeConfiguration(
             name,
@@ -31,7 +33,7 @@ class SonarQubeConfiguration(
     override fun clone(targetConfigurationName: String, replacementFunction: Function<String, String>) = SonarQubeConfiguration(
             targetConfigurationName,
             url,
-            token
+            password
     )
 
     override fun getDescriptor() = ConfigurationDescriptor(

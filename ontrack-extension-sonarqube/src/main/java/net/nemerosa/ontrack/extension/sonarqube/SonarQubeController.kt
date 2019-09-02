@@ -81,7 +81,7 @@ class SonarQubeController(
                                 .label("URL")
                                 .help("URL to the SonarQube instance."))
                 .with(
-                        Password.of("token")
+                        Password.of("password")
                                 .label("Token")
                                 .length(80)
                 )
@@ -120,7 +120,7 @@ class SonarQubeController(
             getConfigurationForm()
                     .with(Form.defaultNameField().readOnly().value(name))
                     .fill("url", url)
-                    .fill("token", "")
+                    .fill("password", "")
         }
     }
 
