@@ -33,8 +33,17 @@ class SonarQubeConfigurationServiceImpl(
     override fun validate(configuration: SonarQubeConfiguration): ConnectionResult {
         // Gets a client
         val client = sonarQubeClientFactory.getClient(configuration)
-        // FIXME Tests the connection
-        return ConnectionResult.ok()
+        // Tests the connection by getting the version
+        return try {
+            client.serverVersion
+            val health = client.systemHealth
+            when (health) {
+                "GREEN" -> ConnectionResult.ok()
+                else -> ConnectionResult.error("SonarQube health: $health")
+            }
+        } catch (ex: Exception) {
+            ConnectionResult.error(ex.message)
+        }
     }
 
 }

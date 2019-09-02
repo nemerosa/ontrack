@@ -9,7 +9,7 @@ import java.util.function.Function
 open class SonarQubeConfiguration(
         private val name: String,
         val url: String,
-        private val password: String
+        private val password: String?
 ) : UserPasswordConfiguration<SonarQubeConfiguration> {
 
     override fun getName(): String = name
