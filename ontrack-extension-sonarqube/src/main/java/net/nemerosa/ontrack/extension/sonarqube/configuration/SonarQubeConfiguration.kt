@@ -5,7 +5,8 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import java.util.function.Function
 
-class SonarQubeConfiguration(
+// TODO #532 Using `open` as a workaround
+open class SonarQubeConfiguration(
         private val name: String,
         val url: String,
         private val password: String
