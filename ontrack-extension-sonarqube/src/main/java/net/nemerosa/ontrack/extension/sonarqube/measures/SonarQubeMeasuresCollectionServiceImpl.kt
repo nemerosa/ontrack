@@ -19,7 +19,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
         val version: String = build.name
         // List of metrics to collect
         // TODO Configurable list of metrics
-        val metrics: List<String> = listOf("coverage")
+        val metrics: List<String> = listOf("coverage", "branch_coverage")
         // Getting the measures
         val measures: Map<String, Double?>? = client.getMeasuresForVersion(property.key, version, metrics)
         // TODO Metrics
