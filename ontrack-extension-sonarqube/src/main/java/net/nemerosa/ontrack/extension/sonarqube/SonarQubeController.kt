@@ -53,7 +53,7 @@ class SonarQubeController(
     /**
      * Test for a configuration
      */
-    @GetMapping("configurations/test")
+    @PostMapping("configurations/test")
     fun testConfiguration(@RequestBody configuration: SonarQubeConfiguration?): ConnectionResult {
         return configurationService.test(configuration)
     }
@@ -90,7 +90,7 @@ class SonarQubeController(
     /**
      * Creating a configuration
      */
-    @GetMapping("configurations/create")
+    @PostMapping("configurations/create")
     fun newConfiguration(@RequestBody configuration: SonarQubeConfiguration): SonarQubeConfiguration =
             configurationService.newConfiguration(configuration)
 
@@ -104,7 +104,7 @@ class SonarQubeController(
     /**
      * Deleting one configuration
      */
-    @GetMapping("configurations/{name:.*}")
+    @DeleteMapping("configurations/{name:.*}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteConfiguration(@PathVariable name: String): Ack {
         configurationService.deleteConfiguration(name)
@@ -127,7 +127,7 @@ class SonarQubeController(
     /**
      * Updating one configuration
      */
-    @GetMapping("configurations/{name:.*}/update")
+    @PutMapping("configurations/{name:.*}/update")
     fun updateConfiguration(@PathVariable name: String, @RequestBody configuration: SonarQubeConfiguration): SonarQubeConfiguration {
         configurationService.updateConfiguration(name, configuration)
         return getConfiguration(name)
