@@ -6,5 +6,5 @@ import net.nemerosa.ontrack.model.structure.Build
 interface SonarQubeMeasuresCollectionService {
 
     fun collect(build: Build, property: SonarQubeProperty)
-    
+
 }

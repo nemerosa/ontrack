@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.sonarqube
 
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
+import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresCollectionService
+import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
+import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
@@ -9,7 +12,11 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.ui.resource.Link
@@ -24,7 +31,10 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 class SonarQubeController(
         feature: SonarQubeExtensionFeature,
         private val securityService: SecurityService,
-        private val configurationService: SonarQubeConfigurationService
+        private val configurationService: SonarQubeConfigurationService,
+        private val structureService: StructureService,
+        private val propertyService: PropertyService,
+        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
 ) : AbstractExtensionController<SonarQubeExtensionFeature>(feature) {
 
     @GetMapping("")
@@ -35,6 +45,21 @@ class SonarQubeController(
                 uri(on(javaClass).description)
         )
                 .with("configurations", uri(on(javaClass).getConfigurations()), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
+    }
+
+    /**
+     * Collecting measures for a build
+     */
+    @PutMapping("/build/{buildId}/measures")
+    fun collectBuildMeasures(@PathVariable buildId: ID): Ack {
+        val build = structureService.getBuild(buildId)
+        val property: SonarQubeProperty? = propertyService.getProperty(build.project, SonarQubePropertyType::class.java).value
+        if (property != null && securityService.isProjectFunctionGranted(build, ProjectEdit::class.java)) {
+            sonarQubeMeasuresCollectionService.collect(build, property)
+            return Ack.OK
+        } else {
+            return Ack.NOK
+        }
     }
 
     /**

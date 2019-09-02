@@ -20,7 +20,12 @@ class SonarQubeClientImpl(
 
         val analysis: Analysis? = paginateUntil(
                 ProjectAnalysisSearch::class.java,
-                uri = { page -> "/api/project_analyses/search?project=${key.encode()}&category=VERSION&p=$page" },
+                uri = { page ->
+                    "/api/project_analyses/search?project={project}&category=VERSION&p={page}" to mapOf(
+                            "project" to key,
+                            "page" to page
+                    )
+                },
                 search = { result ->
                     result.analyses.find { analysis ->
                         analysis.events.any { event -> event.name == version }
@@ -33,8 +38,13 @@ class SonarQubeClientImpl(
             val timestamp = analysis.date
             // History measures
             val measures: MeasureSearchHistory = restTemplate.getForObject(
-                    "/api/measures/search_history?component=${key.encode()}&metrics=${metrics.joinToString(",").encode()}&from=${timestamp.encode()}&to=${timestamp.encode()}",
-                    MeasureSearchHistory::class.java
+                    "/api/measures/search_history?component={component}&metrics={metrics}&from={timestamp}&to={timestamp}",
+                    MeasureSearchHistory::class.java,
+                    mapOf(
+                            "component" to key,
+                            "metrics" to metrics.joinToString(","),
+                            "timestamp" to timestamp
+                    )
             )
             // Converts to measures
             return measures.measures.associate { measure ->
@@ -63,7 +73,7 @@ class SonarQubeClientImpl(
 
     private fun <T, R : PagedResult> paginateUntil(
             resultType: Class<R>,
-            uri: (page: Int) -> String,
+            uri: (page: Int) -> Pair<String, Map<String, Any>>,
             search: (result: R) -> T?
     ): T? {
         var page = 1
@@ -72,7 +82,7 @@ class SonarQubeClientImpl(
             // URI to call
             val url = uri(page++)
             // Getting the page
-            val pageResult: R = restTemplate.getForObject(url, resultType)
+            val pageResult: R = restTemplate.getForObject(url.first, resultType, url.second)
             // Empty results?
             if (pageResult.isEmpty) {
                 return null
@@ -80,8 +90,8 @@ class SonarQubeClientImpl(
             // Gets a result in there
             result = search(pageResult)
         }
-        // Nothing found
-        return null
+        // Result
+        return result
     }
 
     private fun String.encode() = URLEncoder.encode(this, "UTF-8")
