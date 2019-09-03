@@ -14,6 +14,8 @@ class ReleaseNotesForm {
 
     var branchOrdering: String? = null
 
+    var branchOrderingParameter: String? = null
+
     var promotion: String? = null
 
     var format = "text"
