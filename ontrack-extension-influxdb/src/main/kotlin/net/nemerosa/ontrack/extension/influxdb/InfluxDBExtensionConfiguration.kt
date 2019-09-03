@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.influxdb
 
+import net.nemerosa.ontrack.extension.influxdb.metrics.InfluxDBMetricsExportExtension
 import net.nemerosa.ontrack.extension.influxdb.runinfo.InfluxDBRunInfoListener
 import net.nemerosa.ontrack.extension.influxdb.validation.data.InfluxDBValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.structure.ValidationDataTypeService
@@ -51,6 +52,16 @@ class InfluxDBExtensionConfiguration(
     @ConditionalOnBean(InfluxDB::class)
     fun influxDBExtensionHealthIndicator(influxDB: InfluxDB) = InfluxDBExtensionHealthIndicator(influxDB)
 
+    @Bean
+    @ConditionalOnBean(InfluxDB::class)
+    @ConditionalOnProperty(prefix = INFLUXDB_EXTENSION_PROPERTIES_PREFIX, name = ["run-info"], havingValue = "true", matchIfMissing = true)
+    fun influxDBMetricsExportExtension(
+            influxDBExtensionFeature: InfluxDBExtensionFeature,
+            influxDB: InfluxDB
+    ) = InfluxDBMetricsExportExtension(
+            influxDBExtensionFeature,
+            influxDB
+    )
 
     @Bean
     @ConditionalOnBean(InfluxDB::class)
