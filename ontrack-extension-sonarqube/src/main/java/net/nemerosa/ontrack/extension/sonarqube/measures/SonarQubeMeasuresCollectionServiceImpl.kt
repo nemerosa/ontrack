@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.sonarqube.measures
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
 import net.nemerosa.ontrack.model.structure.EntityDataService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -11,14 +12,15 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class SonarQubeMeasuresCollectionServiceImpl(
         private val clientFactory: SonarQubeClientFactory,
-        private val entityDataService: EntityDataService
+        private val entityDataService: EntityDataService,
+        private val buildDisplayNameService: BuildDisplayNameService
 ) : SonarQubeMeasuresCollectionService {
 
     override fun collect(build: Build, property: SonarQubeProperty) {
         // Client
         val client = clientFactory.getClient(property.configuration)
-        // TODO Name of the build
-        val version: String = build.name
+        // Name of the build
+        val version: String = buildDisplayNameService.getBuildDisplayName(build)
         // List of metrics to collect
         // TODO Configurable list of metrics
         val metrics: List<String> = listOf("coverage", "branch_coverage")
