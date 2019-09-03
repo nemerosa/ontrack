@@ -14,9 +14,9 @@ class BuildLinkDecorationExtension(
         extensionFeature: GeneralExtensionFeature,
         private val structureService: StructureService,
         private val uriBuilder: URIBuilder,
-        private val propertyService: PropertyService,
         private val mainBuildLinksService: MainBuildLinksService,
-        private val mainBuildLinksFilterService: MainBuildLinksFilterService
+        private val mainBuildLinksFilterService: MainBuildLinksFilterService,
+        private val buildDisplayNameService: BuildDisplayNameService
 ) : AbstractExtension(extensionFeature), DecorationExtension<BuildLinkDecorationList> {
 
     override fun getScope(): EnumSet<ProjectEntityType> = EnumSet.of(ProjectEntityType.BUILD)
@@ -31,7 +31,7 @@ class BuildLinkDecorationExtension(
             labels.isEmpty() || mainBuildLinksFilterService.isMainBuidLink(target, labels)
         }
         // Checks if there are extra links (besides the main ones)
-        val extraLinks = links.size > 0 && (links.size > mainLinks.size)
+        val extraLinks = links.isNotEmpty() && (links.size > mainLinks.size)
         val extraLink = if (extraLinks) {
             uriBuilder.getEntityPage(entity)
         } else {
@@ -60,9 +60,7 @@ class BuildLinkDecorationExtension(
         // Gets the list of promotion runs for this build
         val promotionRuns = structureService.getLastPromotionRunsForBuild(build.id)
         // Gets the label to use for the decoration
-        val displayProperty: BuildLinkDisplayProperty? = propertyService.getProperty(build.project, BuildLinkDisplayPropertyType::class.java).value
-        val labelProperty: ReleaseProperty? = propertyService.getProperty(build, ReleasePropertyType::class.java).value
-        val label = displayProperty.getLabel(build, labelProperty)
+        val label = buildDisplayNameService.getBuildDisplayName(build)
         // Decoration
         return build.asBuildLinkDecoration(uriBuilder, promotionRuns, label)
     }
