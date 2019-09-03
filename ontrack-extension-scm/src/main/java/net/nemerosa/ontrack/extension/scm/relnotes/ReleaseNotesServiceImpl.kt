@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.export.IssueExportService
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
-import net.nemerosa.ontrack.extension.scm.service.SCMService
+import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 class ReleaseNotesServiceImpl(
         private val extensionManager: ExtensionManager,
         private val structureService: StructureService,
-        private val scmService: SCMService,
+        private val scmServiceProvider: SCMServiceDetector,
         private val buildFilterService: BuildFilterService,
         private val issueExportServiceFactory: IssueExportServiceFactory
 ) : ReleaseNotesService {
@@ -49,7 +49,10 @@ class ReleaseNotesServiceImpl(
         val branchRegex = request.branchPattern.toRegex()
         val branches = structureService.getBranchesForProject(project.id)
                 .filter { branch ->
-                    scmService.getSCMPathInfo(branch).getOrNull()?.branch?.let { path ->
+                    scmServiceProvider.getScmService(branch)
+                            .getOrNull()
+                            ?.getSCMPathInfo(branch)
+                            ?.getOrNull()?.branch?.let { path ->
                         branchRegex.matches(path)
                     } ?: false
                 }
@@ -120,7 +123,10 @@ class ReleaseNotesServiceImpl(
                     changeLogs.groupBy { version ->
                         val versionBranch = version.build.branch
                         // Path
-                        val path = scmService.getSCMPathInfo(versionBranch).orElse(null)?.branch!!
+                        val path = scmServiceProvider
+                                .getScmService(versionBranch)
+                                .getOrNull()
+                                ?.getSCMPathInfo(versionBranch)?.orElse(null)?.branch!!
                         // Parsing
                         val m = groupRegex.matchEntire(path)
                                 ?: throw ReleaseNotesBranchGroupingMismatchException(
