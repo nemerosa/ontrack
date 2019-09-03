@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.sonarqube.measures
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
+import net.nemerosa.ontrack.model.metrics.measure
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
 import net.nemerosa.ontrack.model.structure.EntityDataService
@@ -15,7 +17,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
         private val clientFactory: SonarQubeClientFactory,
         private val entityDataService: EntityDataService,
         private val buildDisplayNameService: BuildDisplayNameService,
-        private val metricsExportService: MetricsExportService
+        private val metricsExportService: MetricsExportService,
+        private val meterRegistry: MeterRegistry
 ) : SonarQubeMeasuresCollectionService {
 
     override fun collect(build: Build, property: SonarQubeProperty) {
@@ -27,8 +30,20 @@ class SonarQubeMeasuresCollectionServiceImpl(
         // TODO Configurable list of metrics
         val metrics: List<String> = listOf("coverage", "branch_coverage")
         // Getting the measures
-        val measures: Map<String, Double?>? = client.getMeasuresForVersion(property.key, version, metrics)
-        // TODO Metrics for conversion issues
+        val measures: Map<String, Double?>? = meterRegistry.measure(
+                started = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_STARTED_COUNT,
+                success = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_SUCCESS_COUNT,
+                error = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_ERROR_COUNT,
+                time = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_TIME,
+                tags = mapOf(
+                        "project" to build.project.name,
+                        "branch" to build.branch.name,
+                        "build" to build.name,
+                        "uri" to property.configuration.url
+                )
+        ) {
+            client.getMeasuresForVersion(property.key, version, metrics)
+        }
         // Safe measures
         if (measures != null) {
             val safeMeasures = mutableMapOf<String, Double>()
