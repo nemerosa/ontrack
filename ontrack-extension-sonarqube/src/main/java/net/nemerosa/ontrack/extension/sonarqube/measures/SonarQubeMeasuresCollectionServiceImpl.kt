@@ -97,7 +97,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
                         ),
                         fields = mapOf(
                                 "value" to value
-                        )
+                        ),
+                        timestamp = build.signature.time
                 )
             }
             // Storage of metrics for build
