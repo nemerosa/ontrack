@@ -10,4 +10,12 @@ interface SonarQubeMeasuresCollectionService {
 
     fun collect(build: Build, property: SonarQubeProperty)
 
+    /**
+     * Gets the SonarQube measures for a build.
+     *
+     * @param build Build to get the measures for
+     * @return Existing measures or `null` if not found
+     */
+    fun getMeasures(build: Build): SonarQubeMeasures?
+
 }

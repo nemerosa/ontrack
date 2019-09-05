@@ -110,4 +110,9 @@ class SonarQubeMeasuresCollectionServiceImpl(
         }
     }
 
+    override fun getMeasures(build: Build): SonarQubeMeasures? = entityDataService.retrieve(
+            build,
+            SonarQubeMeasures::class.java.name,
+            SonarQubeMeasures::class.java
+    )
 }
