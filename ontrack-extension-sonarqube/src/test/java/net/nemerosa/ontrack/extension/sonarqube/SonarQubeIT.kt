@@ -6,11 +6,13 @@ import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class SonarQubeIT : AbstractDSLTestSupport() {
 
@@ -54,15 +56,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
         withDisabledConfigurationTest {
             // Creates a configuration
             val name = uid("S")
-            val configuration = asUserWith<GlobalSettings, SonarQubeConfiguration> {
-                sonarQubeConfigurationService.newConfiguration(
-                        SonarQubeConfiguration(
-                                name,
-                                "https://sonarqube.nemerosa.net",
-                                "my-ultra-secret-token"
-                        )
-                )
-            }
+            val configuration = createSonarQubeConfiguration(name)
             project {
                 // Property
                 setProperty(this, SonarQubePropertyType::class.java,
@@ -82,6 +76,50 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 }
             }
         }
+    }
+
+    @Test
+    fun `Project property deleted when configuration is deleted`() {
+        withDisabledConfigurationTest {
+            val configuration = createSonarQubeConfiguration()
+            project {
+                // Sets the property
+                setSonarQubeProperty(configuration, "my:key")
+                // Deleting the configuration
+                asAdmin {
+                    sonarQubeConfigurationService.deleteConfiguration(configuration.name)
+                }
+                // Gets the property of the project
+                val property: SonarQubeProperty? = getProperty(this, SonarQubePropertyType::class.java)
+                assertNull(property, "Project property has been removed")
+            }
+        }
+    }
+
+    /**
+     * Creating a new configuration
+     */
+    fun createSonarQubeConfiguration(name: String = uid("S")) =
+            asUserWith<GlobalSettings, SonarQubeConfiguration> {
+                sonarQubeConfigurationService.newConfiguration(
+                        SonarQubeConfiguration(
+                                name,
+                                "https://sonarqube.nemerosa.net",
+                                "my-ultra-secret-token"
+                        )
+                )
+            }
+
+    /**
+     * Sets a project property
+     */
+    fun Project.setSonarQubeProperty(configuration: SonarQubeConfiguration, key: String) {
+        setProperty(this, SonarQubePropertyType::class.java,
+                SonarQubeProperty(
+                        configuration,
+                        key
+                )
+        )
     }
 
 }

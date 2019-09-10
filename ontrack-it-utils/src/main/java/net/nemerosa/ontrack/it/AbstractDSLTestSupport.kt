@@ -74,6 +74,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun <T> asAnonymous(code: () -> T): T = asAnonymous().call(code)
 
     /**
+     * Kotlin friendly admin execution
+     */
+    fun <T> asAdmin(code: () -> T): T = asAdmin().call(code)
+
+    /**
      * Kotlin friendly account role execution
      */
     fun <T> ProjectEntity.asAccountWithProjectRole(role: String, code: () -> T): T {

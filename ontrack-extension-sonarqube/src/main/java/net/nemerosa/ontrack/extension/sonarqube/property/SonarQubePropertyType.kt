@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.sonarqube.property
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
+import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.asJson
@@ -12,6 +13,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
 import java.util.function.Function
 
@@ -19,7 +21,7 @@ import java.util.function.Function
 class SonarQubePropertyType(
         extensionFeature: SonarQubeExtensionFeature,
         private val configurationService: SonarQubeConfigurationService
-) : AbstractPropertyType<SonarQubeProperty>(extensionFeature) {
+) : AbstractPropertyType<SonarQubeProperty>(extensionFeature), ConfigurationPropertyType<SonarQubeConfiguration, SonarQubeProperty> {
 
     override fun getName(): String = "SonarQube"
 
