@@ -6,7 +6,8 @@ import java.net.URLEncoder
 
 class SonarQubeProperty(
         private val configuration: SonarQubeConfiguration,
-        val key: String
+        val key: String,
+        val validationStamp: String
 ) : ConfigurationProperty<SonarQubeConfiguration> {
     override fun getConfiguration(): SonarQubeConfiguration = configuration
 

@@ -50,6 +50,12 @@ class SonarQubePropertyType(
                                 .help("Key of the project in SonarQube")
                                 .value(value?.key)
                 )
+                .with(
+                        Text.of("validationStamp")
+                                .label("Validation stamp")
+                                .help("Validation stamp to listen to for collecting SionarQube metrics on validation run")
+                                .value(value?.validationStamp ?: "sonarqube")
+                )
     }
 
     override fun fromClient(node: JsonNode): SonarQubeProperty = fromStorage(node)
@@ -61,18 +67,21 @@ class SonarQubePropertyType(
         // OK
         return SonarQubeProperty(
                 configuration,
-                node.path("key").asText()
+                node.path("key").asText(),
+                node.path("validationStamp").asText()
         )
     }
 
     override fun forStorage(value: SonarQubeProperty): JsonNode =
             mapOf(
                     "configuration" to value.configuration.name,
-                    "key" to value.key
+                    "key" to value.key,
+                    "validationStamp" to value.validationStamp
             ).asJson()
 
     override fun replaceValue(value: SonarQubeProperty, replacementFunction: Function<String, String>) = SonarQubeProperty(
             configurationService.replaceConfiguration(value.configuration, replacementFunction),
-            replacementFunction.apply(value.key)
+            replacementFunction.apply(value.key),
+            replacementFunction.apply(value.validationStamp)
     )
 }

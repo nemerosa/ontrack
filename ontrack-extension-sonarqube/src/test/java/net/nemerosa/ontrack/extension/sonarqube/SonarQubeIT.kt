@@ -62,7 +62,8 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 setProperty(this, SonarQubePropertyType::class.java,
                         SonarQubeProperty(
                                 configuration,
-                                "my:key"
+                                "my:key",
+                                "sonarqube"
                         )
                 )
                 // Gets the property back
@@ -113,11 +114,12 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Sets a project property
      */
-    fun Project.setSonarQubeProperty(configuration: SonarQubeConfiguration, key: String) {
+    fun Project.setSonarQubeProperty(configuration: SonarQubeConfiguration, key: String, stamp: String = "sonarqube") {
         setProperty(this, SonarQubePropertyType::class.java,
                 SonarQubeProperty(
                         configuration,
-                        key
+                        key,
+                        stamp
                 )
         )
     }

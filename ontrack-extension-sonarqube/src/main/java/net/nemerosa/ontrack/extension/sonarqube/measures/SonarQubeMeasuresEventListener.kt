@@ -27,8 +27,7 @@ class SonarQubeMeasuresEventListener(
                 // Gets the validation stamp
                 val stamp: ValidationStamp = event.getEntity(ProjectEntityType.VALIDATION_STAMP)
                 // Checks the validation stamp
-                // TODO Configuration of the validation stamp at property level
-                if (stamp.name == "sonarqube") {
+                if (stamp.name == property.validationStamp) {
                     // Launching the collection of metrics
                     sonarQubeMeasuresCollectionService.collect(build, property)
                 }
