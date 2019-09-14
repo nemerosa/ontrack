@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportService
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.ordering.BranchOrderingService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -23,7 +24,8 @@ class ReleaseNotesServiceImpl(
         private val structureService: StructureService,
         private val scmServiceProvider: SCMServiceDetector,
         private val buildFilterService: BuildFilterService,
-        private val issueExportServiceFactory: IssueExportServiceFactory
+        private val issueExportServiceFactory: IssueExportServiceFactory,
+        private val branchOrderingService: BranchOrderingService
 ) : ReleaseNotesService {
 
     override fun exportProjectReleaseNotes(project: Project, request: ReleaseNotesRequest): Document {
@@ -43,6 +45,11 @@ class ReleaseNotesServiceImpl(
                 extensionManager.getExtensions(ReleaseNotesGenerationExtension::class.java)
                         .firstOrNull { it.appliesForProject(project) }
                         ?: throw ReleaseNotesGenerationExtensionMissingException(project.name)
+        // Gets the branch ordering service
+        val ordering = branchOrderingService.getBranchOrdering(request.branchOrdering)
+                ?: throw ReleaseNotesServiceBranchOrderingNotFoundException(request.branchOrdering)
+        // Gets the branch order to use
+        val order = ordering.getComparator(request.branchOrderingParameter)
         // Gets all the branches of this project
         // gets the path definition for this branch (ex. Git branch)
         // and filters them based on the request branch pattern
@@ -56,8 +63,8 @@ class ReleaseNotesServiceImpl(
                         branchRegex.matches(path)
                     } ?: false
                 }
-                // TODO Ordering of the branches
-                .sortedByDescending { it.id() }
+                // Ordering of the branches
+                .sortedWith(order)
         // Getting all the builds of a given promotion (up to the limit)
         val builds = mutableListOf<Build>()
         branchLoop@ for (branch in branches) {
