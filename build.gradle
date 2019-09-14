@@ -317,7 +317,12 @@ task codeCoverageReport(type: JacocoReport) {
 
 codeCoverageReport.dependsOn {
     javaProjects*.test
-    javaProjects*.integrationTest
+}
+
+javaProjects.each { javaProject ->
+    if (javaProject.tasks.findByName("integrationTest")) {
+        codeCoverageReport.dependsOn(javaProject.integrationTest)
+    }
 }
 
 /**
