@@ -19,7 +19,7 @@ class VersionBranchOrdering : BranchOrdering {
     override fun getComparator(param: String?): Comparator<Branch> {
         return if (param != null && param.isNotBlank()) {
             val regex = param.toRegex()
-            compareBy { it.getVersion(regex) }
+            compareByDescending { it.getVersion(regex) }
         } else {
             throw IllegalArgumentException("`param` argument for the version branch ordering is required.")
         }
