@@ -119,6 +119,10 @@ configure(javaProjects) {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
 
+    // Jacoco coverage
+
+    apply plugin: 'jacoco'
+
     // Javadoc
 
     if (documentationProfile) {
@@ -288,6 +292,31 @@ configure(coreProjects) {
         }
     }
 
+}
+
+/**
+ * Code coverage report
+ */
+
+apply plugin: 'jacoco'
+
+task codeCoverageReport(type: JacocoReport) {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    javaProjects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled true
+        xml.destination "${buildDir}/reports/jacoco/report.xml"
+        html.enabled false
+        csv.enabled false
+    }
+}
+
+codeCoverageReport.dependsOn {
+    javaProjects*.test
 }
 
 /**

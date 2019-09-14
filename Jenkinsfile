@@ -78,6 +78,9 @@ pipeline {
                     branch 'master'
                 }
             }
+            environment {
+                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -100,6 +103,7 @@ git clean -xfd
     test \\
     build \\
     integrationTest \\
+    codeCoverageReport \\
     publishToMavenLocal \\
     osPackages \\
     dockerLatest \\
@@ -111,6 +115,7 @@ git clean -xfd
     --parallel \\
     --console plain
 '''
+                sh ''' curl -s https://codecov.io/bash | bash '''
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
