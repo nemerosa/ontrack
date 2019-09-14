@@ -12,7 +12,7 @@ class ReleaseNotesForm {
 
     var buildLimit = 10
 
-    var branchOrdering: String? = null
+    var branchOrdering: String = "id"
 
     var branchOrderingParameter: String? = null
 
@@ -25,7 +25,5 @@ class ReleaseNotesForm {
     var issueAltGroup: String = "Other"
 
 }
-
-class ReleaseNotesBranchOrderingMissingException : InputException("Branch ordering is required.")
 
 class ReleaseNotesPromotionMissingException : InputException("Promotion is required.")

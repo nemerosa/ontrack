@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
-// TODO Text rendering of the complete change log, using specified format
-
 @RestController
 @API("Release notes")
 @RequestMapping("/extension/scm/release-notes")
@@ -63,7 +61,7 @@ class ReleaseNotesController(
                 branchPattern = branchPattern,
                 branchGrouping = branchGrouping,
                 branchGroupFormat = branchGroupFormat,
-                branchOrdering = branchOrdering ?: throw ReleaseNotesBranchOrderingMissingException(),
+                branchOrdering = branchOrdering,
                 branchOrderingParameter = branchOrderingParameter,
                 buildLimit = buildLimit,
                 promotion = promotion ?: throw ReleaseNotesPromotionMissingException(),
