@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+import java.util.concurrent.Callable
 
 @RestController
 @API("Release notes")
@@ -24,36 +25,37 @@ class ReleaseNotesController(
         private val releaseNotesService: ReleaseNotesService
 ) : AbstractResourceController() {
 
-    // TODO Async collection of release notes
     @APIDescription("Structured release notes for a project")
     @GetMapping("project/{projectId}")
-    fun getProjectReleaseNotes(@PathVariable projectId: ID, form: ReleaseNotesForm): Resource<ReleaseNotes> {
-        // Converts to a request
-        val request = toRequest(form)
-        // Loads the project
-        val project = structureService.getProject(projectId)
-        // Gets the release notes
-        val releaseNotes = releaseNotesService.getProjectReleaseNotes(project, request)
-        // Returns the resource
-        return Resource.of(
-                releaseNotes,
-                uri(on(this::class.java).getProjectReleaseNotes(projectId, form))
-        )
+    fun getProjectReleaseNotes(@PathVariable projectId: ID, form: ReleaseNotesForm): Callable<Resource<ReleaseNotes>> {
+        return Callable {
+            // Converts to a request
+            val request = toRequest(form)
+            // Loads the project
+            val project = structureService.getProject(projectId)
+            // Gets the release notes
+            val releaseNotes = releaseNotesService.getProjectReleaseNotes(project, request)
+            // Returns the resource
+            Resource.of(
+                    releaseNotes,
+                    uri(on(this::class.java).getProjectReleaseNotes(projectId, form))
+            )
+        }
     }
 
-    // TODO Async collection of release notes
     @APIDescription("Text release notes for a project")
     @GetMapping("project/{projectId}/export")
-    fun exportProjectReleaseNotes(@PathVariable projectId: ID, form: ReleaseNotesForm): HttpEntity<String> {
-        // Converts to a request
-        val request = toRequest(form)
-        // Loads the project
-        val project = structureService.getProject(projectId)
-        // Gets the release notes
-        val releaseNotes: Document = releaseNotesService.exportProjectReleaseNotes(project, request)
-        // Returns the resource
-        return ResponseEntity.ok().contentType(MediaType(releaseNotes.type)).body(releaseNotes.content.toString())
-
+    fun exportProjectReleaseNotes(@PathVariable projectId: ID, form: ReleaseNotesForm): Callable<HttpEntity<String>> {
+        return Callable {
+            // Converts to a request
+            val request = toRequest(form)
+            // Loads the project
+            val project = structureService.getProject(projectId)
+            // Gets the release notes
+            val releaseNotes: Document = releaseNotesService.exportProjectReleaseNotes(project, request)
+            // Returns the resource
+            ResponseEntity.ok().contentType(MediaType(releaseNotes.type)).body(releaseNotes.content.toString())
+        }
     }
 
     private fun toRequest(form: ReleaseNotesForm): ReleaseNotesRequest = form.run {
