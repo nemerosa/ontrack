@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.ordering
 
 import net.nemerosa.ontrack.common.Version
+import net.nemerosa.ontrack.common.toVersion
 import net.nemerosa.ontrack.model.ordering.BranchOrdering
 import net.nemerosa.ontrack.model.structure.Branch
 import org.springframework.stereotype.Component
@@ -17,15 +18,30 @@ class VersionBranchOrdering : BranchOrdering {
 
     override fun getComparator(param: String?): Comparator<Branch> {
         return if (param != null && param.isNotBlank()) {
-            compareBy { it.getVersion(param) }
+            val regex = param.toRegex()
+            compareBy { it.getVersion(regex) }
         } else {
             throw IllegalArgumentException("`param` argument for the version branch ordering is required.")
         }
     }
 
-    private fun Branch.getVersion(param: String): Comparable<*> {
+    private fun Branch.getVersion(regex: Regex): Comparable<*> {
         // Path to use for the branch
         // TODO ... SCM path?
-        val path = name
+        val path: String = name
+        // Extracts a version from the path
+        val matcher = regex.matchEntire(path)
+        if (matcher != null && matcher.groupValues.size >= 2) {
+            // Getting the first group
+            val token = matcher.groupValues[1]
+            // Converting to a version
+            val version = token.toVersion()
+            // ... and using it if not null
+            if (version != null) {
+                return version
+            }
+        }
+        // Name as default
+        return name
     }
 }
