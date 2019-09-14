@@ -317,6 +317,7 @@ task codeCoverageReport(type: JacocoReport) {
 
 codeCoverageReport.dependsOn {
     javaProjects*.test
+    javaProjects*.integrationTest
 }
 
 /**
