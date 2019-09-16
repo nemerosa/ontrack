@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.metrics.measure
@@ -34,26 +35,34 @@ class SonarQubeMeasuresCollectionServiceImpl(
         // Gets the SonarQube property of the project
         val property = propertyService.getProperty(project, SonarQubePropertyType::class.java).value
         if (property != null) {
+            // List of metrics to collect
+            // Configurable list of metrics
+            val metrics: List<String> = getListOfMetrics(property)
             // For all project branches
             structureService.getBranchesForProject(project.id)
                     // ... filter branches according to the model matcher
                     .filter { branch -> matches(branch, property) }
                     // ... scans the branch
-                    .forEach { collect(it, property, logger) }
+                    .forEach { collect(it, property, metrics, logger) }
         }
     }
 
-    private fun collect(branch: Branch, property: SonarQubeProperty, logger: (String) -> Unit) {
+    private fun collect(branch: Branch, property: SonarQubeProperty, metrics: List<String>, logger: (String) -> Unit) {
         // Logging
         logger("Getting SonarQube measures for ${branch.entityDisplayName}")
-        // Loops over all builds and launch the collection
-        structureService.forEachBuild(branch, BuildSortDirection.FROM_NEWEST) { build ->
-            // Logging
-            logger("Getting SonarQube measures for ${build.entityDisplayName}")
-            // Processing
-            collect(build, property)
-            // Going on
-            true
+        // Gets the validation stamp for this branch
+        val vs = structureService.getValidationStampListForBranch(branch.id)
+                .find { it.name == property.validationStamp }
+        if (vs != null) {
+            // Loops over all builds and launch the collection
+            structureService.forEachBuild(branch, BuildSortDirection.FROM_NEWEST) { build ->
+                // Logging
+                logger("Getting SonarQube measures for ${build.entityDisplayName}")
+                // Processing
+                doCollect(build, property, metrics, vs)
+                // Going on
+                true
+            }
         }
     }
 
@@ -79,14 +88,32 @@ class SonarQubeMeasuresCollectionServiceImpl(
 
     private fun getBranchPath(branch: Branch): String = branchDisplayNameService.getBranchDisplayName(branch)
 
-    override fun collect(build: Build, property: SonarQubeProperty) {
+    override fun collect(build: Build, property: SonarQubeProperty): Ack {
+        // Gets the validation stamp for this branch
+        val vs = structureService.getValidationStampListForBranch(build.branch.id)
+                .find { it.name == property.validationStamp }
+        // Collection for this build, only if there is a validation stamp being defined
+        return if (vs != null) {
+            doCollect(build, property, getListOfMetrics(property), vs)
+        } else {
+            Ack.NOK
+        }
+    }
+
+    private fun doCollect(build: Build, property: SonarQubeProperty, metrics: List<String>, validationStamp: ValidationStamp): Ack {
+        // Gets the validation runs for this build and the validation stamp
+        val passed = structureService.getValidationRunsForBuildAndValidationStamp(
+                buildId = build.id,
+                validationStampId = validationStamp.id,
+                offset = 0,
+                count = 1
+        ).any { it.isPassed }
+        // If not passed, we don't want to go further
+        if (!passed) return Ack.NOK
         // Client
         val client = clientFactory.getClient(property.configuration)
         // Name of the build
         val version: String = buildDisplayNameService.getBuildDisplayName(build)
-        // List of metrics to collect
-        // Configurable list of metrics
-        val metrics: List<String> = getListOfMetrics(property)
         // Getting the measures
         val metricTags = mapOf(
                 "project" to build.project.name,
@@ -142,6 +169,10 @@ class SonarQubeMeasuresCollectionServiceImpl(
                         SonarQubeMeasures(safeMeasures)
                 )
             }
+            // OK
+            return Ack.OK
+        } else {
+            return Ack.NOK
         }
     }
 

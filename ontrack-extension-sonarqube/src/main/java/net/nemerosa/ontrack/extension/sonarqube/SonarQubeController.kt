@@ -57,7 +57,6 @@ class SonarQubeController(
         return if (property != null && securityService.isProjectFunctionGranted(build, ProjectEdit::class.java)) {
             return if (sonarQubeMeasuresCollectionService.matches(build, property)) {
                 sonarQubeMeasuresCollectionService.collect(build, property)
-                Ack.OK
             } else {
                 Ack.NOK
             }
