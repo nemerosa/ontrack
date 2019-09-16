@@ -8,4 +8,6 @@ object SonarQubeMetrics {
     const val METRIC_ONTRACK_SONARQUBE_COLLECTION_TIME = "ontrack_sonarqube_collection_time"
     const val METRIC_ONTRACK_SONARQUBE_COLLECTION_NONE_COUNT = "ontrack_sonarqube_collection_none"
 
+    const val METRIC_ONTRACK_SONARQUBE_MEASURE = "ontrack_sonarqube_measure"
+
 }

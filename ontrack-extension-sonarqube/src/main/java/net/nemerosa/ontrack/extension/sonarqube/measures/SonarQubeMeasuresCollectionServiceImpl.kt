@@ -120,7 +120,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
             // Metrics
             safeMeasures.forEach { (name, value) ->
                 metricsExportService.exportMetrics(
-                        "ontrack_sonarqube_measure",
+                        SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_MEASURE,
                         tags = mapOf(
                                 "project" to build.project.name,
                                 "branch" to build.branch.name,

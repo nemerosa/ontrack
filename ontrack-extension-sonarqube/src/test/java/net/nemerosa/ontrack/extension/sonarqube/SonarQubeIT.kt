@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.sonarqube
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
@@ -18,7 +15,9 @@ import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettin
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
@@ -39,18 +38,40 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
 
+    @Autowired
+    private lateinit var metricsExportService: MetricsExportService
+
     @Test
     fun `Launching the collection on validation run`() {
+        val returnedMeasures = mapOf(
+                "measure-1" to 12.3,
+                "measure-2" to 45.0
+        )
         testCollectionWithListener(
                 actualMeasures = mapOf(
                         "measure-1" to 12.3,
                         "measure-2" to 45.0
                 ),
-                returnedMeasures = mapOf(
-                        "measure-1" to 12.3,
-                        "measure-2" to 45.0
+                returnedMeasures = returnedMeasures
+        ) { build ->
+            // Checks that metrics are exported
+            returnedMeasures.forEach { (name, value) ->
+                verify(metricsExportService).exportMetrics(
+                        metric = eq("ontrack_sonarqube_measure"),
+                        tags = eq(mapOf(
+                                "project" to build.project.name,
+                                "branch" to build.branch.name,
+                                "build" to build.name,
+                                "version" to "1.0.0",
+                                "metric" to name
+                        )),
+                        fields = eq(mapOf(
+                                "value" to value
+                        )),
+                        timestamp = any()
                 )
-        )
+            }
+        }
     }
 
     @Test
@@ -89,7 +110,8 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             buildName: String = "1.0.0",
             buildLabel: String? = null,
             actualMeasures: Map<String, Double>,
-            returnedMeasures: Map<String, Double>
+            returnedMeasures: Map<String, Double>,
+            code: (Build) -> Unit = {}
     ) {
         withSonarQubeSettings {
             val key = uid("p")
@@ -128,6 +150,8 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                                     it.measures
                             )
                         }
+                        // Additional checks
+                        code(this)
                     }
                 }
             }
@@ -318,6 +342,13 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     @Configuration
     @Profile(RunProfile.UNIT_TEST)
     class SonarQubeITConfiguration {
+
+        /**
+         * Export of metrics
+         */
+        @Bean
+        @Primary
+        fun metricsExportService() = mock<MetricsExportService>()
 
         /**
          * Client mock
