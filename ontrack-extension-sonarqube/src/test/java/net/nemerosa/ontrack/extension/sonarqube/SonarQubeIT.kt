@@ -260,6 +260,104 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Project using all branches`() {
+        withDisabledConfigurationTest {
+            withSonarQubeSettings {
+                val key = uid("p")
+                withConfiguredProject(key) {
+                    val build1 = branch<Build>("release-1.0") {
+                        val vs = validationStamp("sonarqube")
+                        build("1.0.0") {
+                            validate(vs)
+                        }
+                    }
+                    val build2 = branch<Build>("feature-test") {
+                        val vs = validationStamp("sonarqube")
+                        build("abdcefg") {
+                            validate(vs)
+                        }
+                    }
+                    // Setting the configuration of the project now, builds are still not scanned
+                    mockSonarQubeMeasures(key, "1.0.0",
+                            "measure-1" to 1.0,
+                            "measure-2" to 1.1
+                    )
+                    mockSonarQubeMeasures(key, "abdcefg",
+                            "measure-1" to 2.0,
+                            "measure-2" to 2.1
+                    )
+                    // Scanning of the project
+                    sonarQubeMeasuresCollectionService.collect(this) { println(it) }
+                    // Checks the measures attached to the builds
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 1.0,
+                                        "measure-2" to 1.1
+                                ),
+                                it.measures
+                        )
+                    }
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 2.0,
+                                        "measure-2" to 2.1
+                                ),
+                                it.measures
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Project using branch pattern`() {
+        withDisabledConfigurationTest {
+            withSonarQubeSettings {
+                val key = uid("p")
+                withConfiguredProject(key, branchPattern = "release-.*") {
+                    val build1 = branch<Build>("release-1.0") {
+                        val vs = validationStamp("sonarqube")
+                        build("1.0.0") {
+                            validate(vs)
+                        }
+                    }
+                    val build2 = branch<Build>("feature-test") {
+                        val vs = validationStamp("sonarqube")
+                        build("abdcefg") {
+                            validate(vs)
+                        }
+                    }
+                    // Setting the configuration of the project now, builds are still not scanned
+                    mockSonarQubeMeasures(key, "1.0.0",
+                            "measure-1" to 1.0,
+                            "measure-2" to 1.1
+                    )
+                    mockSonarQubeMeasures(key, "abdcefg",
+                            "measure-1" to 2.0,
+                            "measure-2" to 2.1
+                    )
+                    // Scanning of the project
+                    sonarQubeMeasuresCollectionService.collect(this) { println(it) }
+                    // Checks the measures attached to the builds
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 1.0,
+                                        "measure-2" to 1.1
+                                ),
+                                it.measures
+                        )
+                    }
+                    assertNull(sonarQubeMeasuresCollectionService.getMeasures(build2))
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Adding a new SonarQube configuration`() {
         withDisabledConfigurationTest {
             val name = uid("S")
@@ -367,7 +465,8 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             key: String,
             stamp: String = "sonarqube",
             measures: List<String> = emptyList(),
-            override: Boolean = false
+            override: Boolean = false,
+            branchPattern: String? = null
     ) {
         setProperty(this, SonarQubePropertyType::class.java,
                 SonarQubeProperty(
@@ -377,7 +476,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         measures = measures,
                         override = override,
                         branchModel = false,
-                        branchPattern = null
+                        branchPattern = branchPattern
                 )
         )
     }
@@ -416,6 +515,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             stamp: String = "sonarqube",
             measures: List<String> = emptyList(),
             override: Boolean = false,
+            branchPattern: String? = null,
             code: Project.() -> Unit
     ) {
         withDisabledConfigurationTest {
@@ -426,7 +526,8 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         key = key,
                         stamp = stamp,
                         measures = measures,
-                        override = override
+                        override = override,
+                        branchPattern = branchPattern
                 )
                 code()
             }
