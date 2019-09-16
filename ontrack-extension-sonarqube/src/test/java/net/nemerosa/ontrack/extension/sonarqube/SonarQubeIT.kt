@@ -22,6 +22,7 @@ import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
@@ -352,6 +353,136 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         )
                     }
                     assertNull(sonarQubeMeasuresCollectionService.getMeasures(build2))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Builds require a validation`() {
+        withDisabledConfigurationTest {
+            withSonarQubeSettings {
+                val key = uid("p")
+                withConfiguredProject(key) {
+                    val build1 = branch<Build>("release-1.0") {
+                        validationStamp("sonarqube")
+                        build("1.0.0") // No validation for this one
+                    }
+                    val build2 = branch<Build>("feature-test") {
+                        val vs = validationStamp("sonarqube")
+                        build("abdcefg") {
+                            validate(vs)
+                        }
+                    }
+                    // Setting the configuration of the project now, builds are still not scanned
+                    mockSonarQubeMeasures(key, "1.0.0",
+                            "measure-1" to 1.0,
+                            "measure-2" to 1.1
+                    )
+                    mockSonarQubeMeasures(key, "abdcefg",
+                            "measure-1" to 2.0,
+                            "measure-2" to 2.1
+                    )
+                    // Scanning of the project
+                    sonarQubeMeasuresCollectionService.collect(this) { println(it) }
+                    // Checks the measures attached to the builds
+                    assertNull(sonarQubeMeasuresCollectionService.getMeasures(build1))
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 2.0,
+                                        "measure-2" to 2.1
+                                ),
+                                it.measures
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Builds require a passed validation`() {
+        withDisabledConfigurationTest {
+            withSonarQubeSettings {
+                val key = uid("p")
+                withConfiguredProject(key) {
+                    val build1 = branch<Build>("release-1.0") {
+                        val vs = validationStamp("sonarqube")
+                        build("1.0.0") {
+                            validate(vs, ValidationRunStatusID.STATUS_FAILED)
+                        }
+                    }
+                    val build2 = branch<Build>("feature-test") {
+                        val vs = validationStamp("sonarqube")
+                        build("abdcefg") {
+                            validate(vs)
+                        }
+                    }
+                    // Setting the configuration of the project now, builds are still not scanned
+                    mockSonarQubeMeasures(key, "1.0.0",
+                            "measure-1" to 1.0,
+                            "measure-2" to 1.1
+                    )
+                    mockSonarQubeMeasures(key, "abdcefg",
+                            "measure-1" to 2.0,
+                            "measure-2" to 2.1
+                    )
+                    // Scanning of the project
+                    sonarQubeMeasuresCollectionService.collect(this) { println(it) }
+                    // Checks the measures attached to the builds
+                    assertNull(sonarQubeMeasuresCollectionService.getMeasures(build1))
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 2.0,
+                                        "measure-2" to 2.1
+                                ),
+                                it.measures
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Branches require a validation`() {
+        withDisabledConfigurationTest {
+            withSonarQubeSettings {
+                val key = uid("p")
+                withConfiguredProject(key) {
+                    val build1 = branch<Build>("release-1.0") {
+                        build("1.0.0") // No validation for this one
+                    }
+                    val build2 = branch<Build>("feature-test") {
+                        val vs = validationStamp("sonarqube")
+                        build("abdcefg") {
+                            validate(vs)
+                        }
+                    }
+                    // Setting the configuration of the project now, builds are still not scanned
+                    mockSonarQubeMeasures(key, "1.0.0",
+                            "measure-1" to 1.0,
+                            "measure-2" to 1.1
+                    )
+                    mockSonarQubeMeasures(key, "abdcefg",
+                            "measure-1" to 2.0,
+                            "measure-2" to 2.1
+                    )
+                    // Scanning of the project
+                    sonarQubeMeasuresCollectionService.collect(this) { println(it) }
+                    // Checks the measures attached to the builds
+                    assertNull(sonarQubeMeasuresCollectionService.getMeasures(build1))
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 2.0,
+                                        "measure-2" to 2.1
+                                ),
+                                it.measures
+                        )
+                    }
                 }
             }
         }
