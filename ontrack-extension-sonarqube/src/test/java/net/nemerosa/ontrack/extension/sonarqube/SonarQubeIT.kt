@@ -1,5 +1,12 @@
 package net.nemerosa.ontrack.extension.sonarqube
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClient
+import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresCollectionService
@@ -12,6 +19,10 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -27,6 +38,13 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     @Test
     fun `Launching the collection on validation run`() {
         withSonarQubeSettings {
+            // Mocking the measures
+            mockSonarQubeMeasures(
+                    "project:key",
+                    "1.0.0",
+                    "measure-1" to 12.3,
+                    "measure-2" to 45.0
+            )
             withConfiguredProject {
                 branch {
                     val vs = validationStamp("sonarqube")
@@ -138,7 +156,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Creating a new configuration
      */
-    fun createSonarQubeConfiguration(name: String = uid("S")) =
+    private fun createSonarQubeConfiguration(name: String = uid("S")) =
             asUserWith<GlobalSettings, SonarQubeConfiguration> {
                 sonarQubeConfigurationService.newConfiguration(
                         SonarQubeConfiguration(
@@ -152,7 +170,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Sets a project property
      */
-    fun Project.setSonarQubeProperty(configuration: SonarQubeConfiguration, key: String, stamp: String = "sonarqube") {
+    private fun Project.setSonarQubeProperty(configuration: SonarQubeConfiguration, key: String, stamp: String = "sonarqube") {
         setProperty(this, SonarQubePropertyType::class.java,
                 SonarQubeProperty(
                         configuration = configuration,
@@ -169,7 +187,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Testing with some SonarQube measures
      */
-    fun withSonarQubeSettings(
+    private fun withSonarQubeSettings(
             measures: List<String> = listOf("measure-1", "measure-2"),
             disabled: Boolean = false,
             code: () -> Unit
@@ -195,7 +213,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Testing with a project configured for SonarQube
      */
-    fun withConfiguredProject(key: String = "project:key", stamp: String = "sonarqube", code: Project.() -> Unit) {
+    private fun withConfiguredProject(key: String = "project:key", stamp: String = "sonarqube", code: Project.() -> Unit) {
         withDisabledConfigurationTest {
             val config = createSonarQubeConfiguration()
             project {
@@ -203,6 +221,54 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 code()
             }
         }
+    }
+
+    private fun mockSonarQubeMeasures(key: String, version: String, vararg measures: Pair<String, Double>) {
+        whenever(client.getMeasuresForVersion(
+                eq(key),
+                eq(version),
+                any()
+        )).then { invocation ->
+            // List of desired measures
+            @Suppress("UNCHECKED_CAST")
+            val measureList: List<String> = invocation.arguments[2] as List<String>
+            // Map of measures
+            val index = measures.toMap()
+            // Results
+            val result = mutableMapOf<String, Double?>()
+            // Collect all results
+            measureList.forEach { measure ->
+                result[measure] = index[measure]
+            }
+            // OK
+            result
+        }
+    }
+
+    @Autowired
+    private lateinit var client: SonarQubeClient
+
+    @Configuration
+    @Profile(RunProfile.UNIT_TEST)
+    class SonarQubeITConfiguration {
+
+        /**
+         * Client mock
+         */
+        @Bean
+        fun sonarQubeClient() = mock<SonarQubeClient>()
+
+        /**
+         * Factory
+         */
+        @Bean
+        @Primary
+        fun sonarQubeClientFactory(client: SonarQubeClient) = object : SonarQubeClientFactory {
+            override fun getClient(configuration: SonarQubeConfiguration): SonarQubeClient {
+                return client
+            }
+        }
+
     }
 
 }

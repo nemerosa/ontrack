@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.metrics.measure
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
@@ -24,7 +26,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
         private val structureService: StructureService,
         private val propertyService: PropertyService,
         private val branchModelMatcherService: BranchModelMatcherService,
-        private val cachedSettingsService: CachedSettingsService
+        private val cachedSettingsService: CachedSettingsService,
+        private val securityService: SecurityService
 ) : SonarQubeMeasuresCollectionService {
 
     override fun collect(project: Project, logger: (String) -> Unit) {
@@ -132,11 +135,13 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 )
             }
             // Storage of metrics for build
-            entityDataService.store(
-                    build,
-                    SonarQubeMeasures::class.java.name,
-                    SonarQubeMeasures(safeMeasures)
-            )
+            securityService.callAsAdmin {
+                entityDataService.store(
+                        build,
+                        SonarQubeMeasures::class.java.name,
+                        SonarQubeMeasures(safeMeasures)
+                )
+            }
         }
     }
 
