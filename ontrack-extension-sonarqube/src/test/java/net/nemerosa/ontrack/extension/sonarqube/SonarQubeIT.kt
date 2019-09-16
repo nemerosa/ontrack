@@ -107,6 +107,21 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Launching the collection on validation run can be disabled at global level`() {
+        testCollectionWithListener(
+                globalDisabled = true,
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                ),
+                returnedMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                )
+        )
+    }
+
+    @Test
     fun `Launching the collection on validation run with global settings`() {
         testCollectionWithListener(
                 globalMeasures = listOf("measure-2"),
@@ -183,6 +198,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
 
     private fun testCollectionWithListener(
             globalMeasures: List<String> = listOf("measure-1", "measure-2"),
+            globalDisabled: Boolean = false,
             validationStamp: String = "sonarqube",
             projectMeasures: List<String> = emptyList(),
             projectOverride: Boolean = false,
@@ -191,10 +207,10 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             buildName: String = "1.0.0",
             buildLabel: String? = null,
             actualMeasures: Map<String, Double>,
-            returnedMeasures: Map<String, Double>,
+            returnedMeasures: Map<String, Double>?,
             code: (Build) -> Unit = {}
     ) {
-        withSonarQubeSettings(measures = globalMeasures) {
+        withSonarQubeSettings(measures = globalMeasures, disabled = globalDisabled) {
             val key = uid("p")
             // Mocking the measures
             mockSonarQubeMeasures(
@@ -225,11 +241,15 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         validate(vs)
                         // Checks that some SonarQube metrics are attached to this build
                         val measures = sonarQubeMeasuresCollectionService.getMeasures(this)
-                        assertNotNull(measures) {
-                            assertEquals(
-                                    returnedMeasures,
-                                    it.measures
-                            )
+                        if (returnedMeasures != null) {
+                            assertNotNull(measures) {
+                                assertEquals(
+                                        returnedMeasures,
+                                        it.measures
+                                )
+                            }
+                        } else {
+                            assertNull(measures, "No measure is expected to be returned")
                         }
                         // Additional checks
                         code(this)
