@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.sonarqube
 
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
@@ -10,7 +11,9 @@ import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClient
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
+import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasures
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresCollectionService
+import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresInformationExtension
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
@@ -20,6 +23,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -40,6 +44,9 @@ class SonarQubeIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var metricsExportService: MetricsExportService
+
+    @Autowired
+    private lateinit var informationExtension: SonarQubeMeasuresInformationExtension
 
     @Test
     fun `Launching the collection on validation run`() {
@@ -70,6 +77,16 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         )),
                         timestamp = any()
                 )
+            }
+            // Checks the entity information
+            val information = informationExtension.getInformation(build).getOrNull()
+            assertNotNull(information) {
+                assertIs<SonarQubeMeasures>(it.data) { q ->
+                    assertEquals(
+                            returnedMeasures,
+                            q.measures
+                    )
+                }
             }
         }
     }
