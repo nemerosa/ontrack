@@ -38,14 +38,15 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     @Test
     fun `Launching the collection on validation run`() {
         withSonarQubeSettings {
+            val key = uid("p")
             // Mocking the measures
             mockSonarQubeMeasures(
-                    "project:key",
+                    key,
                     "1.0.0",
                     "measure-1" to 12.3,
                     "measure-2" to 45.0
             )
-            withConfiguredProject {
+            withConfiguredProject(key) {
                 branch {
                     val vs = validationStamp("sonarqube")
                     build("1.0.0") {
@@ -57,6 +58,37 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                                     mapOf(
                                             "measure-1" to 12.3,
                                             "measure-2" to 45.0
+                                    ),
+                                    it.measures
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Launching the collection on validation run with missing measures`() {
+        withSonarQubeSettings {
+            val key = uid("p")
+            // Mocking the measures
+            mockSonarQubeMeasures(
+                    key,
+                    "1.0.0",
+                    "measure-1" to 12.3
+            )
+            withConfiguredProject(key) {
+                branch {
+                    val vs = validationStamp("sonarqube")
+                    build("1.0.0") {
+                        validate(vs)
+                        // Checks that some SonarQube metrics are attached to this build
+                        val measures = sonarQubeMeasuresCollectionService.getMeasures(this)
+                        assertNotNull(measures) {
+                            assertEquals(
+                                    mapOf(
+                                            "measure-1" to 12.3
                                     ),
                                     it.measures
                             )
@@ -213,7 +245,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Testing with a project configured for SonarQube
      */
-    private fun withConfiguredProject(key: String = "project:key", stamp: String = "sonarqube", code: Project.() -> Unit) {
+    private fun withConfiguredProject(key: String, stamp: String = "sonarqube", code: Project.() -> Unit) {
         withDisabledConfigurationTest {
             val config = createSonarQubeConfiguration()
             project {
