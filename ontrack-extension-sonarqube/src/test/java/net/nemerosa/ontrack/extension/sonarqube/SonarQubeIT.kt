@@ -92,6 +92,21 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Launching the collection on validation run using a non default validation stamp`() {
+        testCollectionWithListener(
+                validationStamp = "sonar-qube",
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                ),
+                returnedMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                )
+        )
+    }
+
+    @Test
     fun `Launching the collection on validation run using build label`() {
         testCollectionWithListener(
                 useLabel = true,
