@@ -13,7 +13,9 @@ class SonarQubeMeasuresSettingsProvider(
             measures = settingsRepository
                     .getString(SonarQubeMeasuresSettings::class.java, "measures", null)
                     ?.split("|")
-                    ?: SonarQubeMeasuresSettings.DEFAULT_MEASURES
+                    ?: SonarQubeMeasuresSettings.DEFAULT_MEASURES,
+            disabled = settingsRepository
+                    .getBoolean(SonarQubeMeasuresSettings::class.java, "disabled", false)
     )
 
     override fun getSettingsClass(): Class<SonarQubeMeasuresSettings> =

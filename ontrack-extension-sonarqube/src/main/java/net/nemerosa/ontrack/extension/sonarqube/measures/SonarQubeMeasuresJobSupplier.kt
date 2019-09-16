@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -19,7 +20,8 @@ class SonarQubeMeasuresJobSupplier(
         private val securityService: SecurityService,
         private val structureService: StructureService,
         private val propertyService: PropertyService,
-        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
+        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService,
+        private val cachedSettingsService: CachedSettingsService
 ) : JobOrchestratorSupplier {
 
     private val SONARQUBE_COLLECTION_JOB = SonarQubeExtensionFeature.SONARQUBE_JOB_CATEGORY.getType("sonarqube-collection").withName("Collection of SonarQube measures")
@@ -48,7 +50,8 @@ class SonarQubeMeasuresJobSupplier(
                         override fun getDescription(): String =
                                 "Collection of SonarQube measures for project ${project.name}"
 
-                        override fun isDisabled(): Boolean = project.isDisabled
+                        override fun isDisabled(): Boolean = project.isDisabled ||
+                                cachedSettingsService.getCachedSettings(SonarQubeMeasuresSettings::class.java).disabled
 
                     }
             ).withSchedule(Schedule.NONE)

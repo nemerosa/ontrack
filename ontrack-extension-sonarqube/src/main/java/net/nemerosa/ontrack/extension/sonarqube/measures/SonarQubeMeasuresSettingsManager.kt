@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.sonarqube.measures
 
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.MultiStrings
+import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -30,6 +31,11 @@ class SonarQubeMeasuresSettingsManager(
                     "measures",
                     settings.measures.joinToString("|")
             )
+            settingsRepository.setBoolean(
+                    SonarQubeMeasuresSettings::class.java,
+                    "disabled",
+                    settings.disabled
+            )
         }
     }
 
@@ -40,6 +46,12 @@ class SonarQubeMeasuresSettingsManager(
                                 .help("List of SonarQube measures to export by default.")
                                 .label("Measures")
                                 .value(settings?.measures ?: SonarQubeMeasuresSettings.DEFAULT_MEASURES)
+                )
+                .with(
+                        YesNo.of("disabled")
+                                .help("Check to disable the collection of SonarQube measures")
+                                .label("Disable collection")
+                                .value(settings?.disabled ?: false)
                 )
     }
 }

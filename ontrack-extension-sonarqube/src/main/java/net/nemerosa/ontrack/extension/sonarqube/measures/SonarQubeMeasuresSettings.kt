@@ -8,7 +8,8 @@ import net.nemerosa.ontrack.extension.sonarqube.SonarQubeMeasuresList
  * @property measures List of measures to collect
  */
 class SonarQubeMeasuresSettings(
-        override val measures: List<String>
+        override val measures: List<String>,
+        val disabled: Boolean
 ) : SonarQubeMeasuresList {
 
     companion object {
