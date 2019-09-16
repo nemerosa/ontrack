@@ -75,7 +75,8 @@ class SonarQubePropertyTypeTest {
                 key = "project:key",
                 validationStamp = "sonarqube",
                 measures = listOf("measure-1", "measure-2"),
-                override = false
+                override = false,
+                branchPattern = null
         )
         // For storage
         val stored = type.forStorage(item)
@@ -98,7 +99,8 @@ class SonarQubePropertyTypeTest {
                 key = "project:key",
                 validationStamp = "sonarqube",
                 measures = emptyList(),
-                override = false
+                override = false,
+                branchPattern = null
         )
         // For storage
         val stored = type.forStorage(item)

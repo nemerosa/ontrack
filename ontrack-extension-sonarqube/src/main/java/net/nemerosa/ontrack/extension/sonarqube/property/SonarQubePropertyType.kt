@@ -66,6 +66,12 @@ class SonarQubePropertyType(
                                 .label("Override")
                                 .value(value?.override ?: false)
                 )
+                .with(
+                        Text.of("branchPattern")
+                                .help("Regular expression to filter the branch to collect the SonarQube measures.")
+                                .label("Branch pattern")
+                                .value(value?.branchPattern ?: "")
+                )
     }
 
     override fun fromClient(node: JsonNode): SonarQubeProperty = fromStorage(node)
@@ -80,7 +86,8 @@ class SonarQubePropertyType(
                 node.path("key").asText(),
                 node.path("validationStamp").asText(),
                 node.path("measures").map { it.asText() },
-                node.path("override").asBoolean()
+                node.path("override").asBoolean(),
+                node.path("branchPattern").asText()
         )
     }
 
@@ -90,7 +97,8 @@ class SonarQubePropertyType(
                     "key" to value.key,
                     "validationStamp" to value.validationStamp,
                     "measures" to value.measures,
-                    "override" to value.override
+                    "override" to value.override,
+                    "branchPattern" to value.branchPattern
             ).asJson()
 
     override fun replaceValue(value: SonarQubeProperty, replacementFunction: Function<String, String>) = SonarQubeProperty(
@@ -98,6 +106,7 @@ class SonarQubePropertyType(
             replacementFunction.apply(value.key),
             replacementFunction.apply(value.validationStamp),
             value.measures,
-            value.override
+            value.override,
+            value.branchPattern
     )
 }
