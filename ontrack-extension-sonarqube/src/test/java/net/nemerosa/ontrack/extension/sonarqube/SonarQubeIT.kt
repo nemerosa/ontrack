@@ -66,6 +66,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                                 "sonarqube",
                                 emptyList(),
                                 false,
+                                false,
                                 null
                         )
                 )
@@ -124,6 +125,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         key,
                         stamp,
                         emptyList(),
+                        false,
                         false,
                         null
                 )

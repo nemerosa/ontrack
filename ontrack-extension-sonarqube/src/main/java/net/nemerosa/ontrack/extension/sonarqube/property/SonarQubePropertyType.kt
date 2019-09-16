@@ -67,8 +67,14 @@ class SonarQubePropertyType(
                                 .value(value?.override ?: false)
                 )
                 .with(
+                        YesNo.of("branchModel")
+                                .help("Use the project branch model to filter the branches where to collect the SonarQube measures.")
+                                .label("Use branch model")
+                                .value(value?.branchModel ?: false)
+                )
+                .with(
                         Text.of("branchPattern")
-                                .help("Regular expression to filter the branch to collect the SonarQube measures.")
+                                .help("Regular expression to filter the branch where to collect the SonarQube measures.")
                                 .label("Branch pattern")
                                 .value(value?.branchPattern ?: "")
                 )
@@ -87,6 +93,7 @@ class SonarQubePropertyType(
                 node.path("validationStamp").asText(),
                 node.path("measures").map { it.asText() },
                 node.path("override").asBoolean(),
+                node.path("branchModel").asBoolean(),
                 node.path("branchPattern").asText()
         )
     }
@@ -98,6 +105,7 @@ class SonarQubePropertyType(
                     "validationStamp" to value.validationStamp,
                     "measures" to value.measures,
                     "override" to value.override,
+                    "branchModel" to value.branchModel,
                     "branchPattern" to value.branchPattern
             ).asJson()
 
@@ -107,6 +115,7 @@ class SonarQubePropertyType(
             replacementFunction.apply(value.validationStamp),
             value.measures,
             value.override,
+            value.branchModel,
             value.branchPattern
     )
 }

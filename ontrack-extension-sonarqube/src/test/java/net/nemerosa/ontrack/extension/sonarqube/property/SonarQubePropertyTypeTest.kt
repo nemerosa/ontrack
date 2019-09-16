@@ -76,6 +76,7 @@ class SonarQubePropertyTypeTest {
                 validationStamp = "sonarqube",
                 measures = listOf("measure-1", "measure-2"),
                 override = false,
+                branchModel = false,
                 branchPattern = null
         )
         // For storage
@@ -100,6 +101,7 @@ class SonarQubePropertyTypeTest {
                 validationStamp = "sonarqube",
                 measures = emptyList(),
                 override = false,
+                branchModel = false,
                 branchPattern = null
         )
         // For storage

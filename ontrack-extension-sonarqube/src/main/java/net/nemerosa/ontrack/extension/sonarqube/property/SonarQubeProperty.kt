@@ -11,6 +11,7 @@ class SonarQubeProperty(
         val validationStamp: String,
         override val measures: List<String>,
         val override: Boolean,
+        val branchModel: Boolean,
         val branchPattern: String?
 ) : ConfigurationProperty<SonarQubeConfiguration>, SonarQubeMeasuresList {
     override fun getConfiguration(): SonarQubeConfiguration = configuration
