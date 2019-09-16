@@ -37,7 +37,9 @@ class SonarQubePropertyTypeTest {
                 "key" to "project:key",
                 "validationStamp" to "sonarqube",
                 "measures" to listOf("measure-1", "measure-2"),
-                "override" to true
+                "override" to true,
+                "branchModel" to true,
+                "branchPattern" to "master|develop"
         ).asJson()
         val parsed = type.fromClient(client)
         assertEquals("conf-name", parsed.configuration.name)
@@ -47,6 +49,8 @@ class SonarQubePropertyTypeTest {
         assertEquals("sonarqube", parsed.validationStamp)
         assertEquals(listOf("measure-1", "measure-2"), parsed.measures)
         assertEquals(true, parsed.override)
+        assertEquals(true, parsed.branchModel)
+        assertEquals("master|develop", parsed.branchPattern)
     }
 
     @Test
@@ -91,6 +95,8 @@ class SonarQubePropertyTypeTest {
         assertEquals("sonarqube", retrieved.validationStamp)
         assertEquals(listOf("measure-1", "measure-2"), retrieved.measures)
         assertEquals(false, retrieved.override)
+        assertEquals(false, retrieved.branchModel)
+        assertEquals(null, retrieved.branchPattern)
     }
 
     @Test
@@ -101,8 +107,8 @@ class SonarQubePropertyTypeTest {
                 validationStamp = "sonarqube",
                 measures = emptyList(),
                 override = false,
-                branchModel = false,
-                branchPattern = null
+                branchModel = true,
+                branchPattern = "master|develop"
         )
         // For storage
         val stored = type.forStorage(item)
@@ -116,6 +122,8 @@ class SonarQubePropertyTypeTest {
         assertEquals("sonarqube", retrieved.validationStamp)
         assertEquals(emptyList(), retrieved.measures)
         assertEquals(false, retrieved.override)
+        assertEquals(true, retrieved.branchModel)
+        assertEquals("master|develop", retrieved.branchPattern)
     }
 
 }

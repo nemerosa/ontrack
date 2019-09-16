@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
+import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.ProjectConfig
@@ -94,7 +95,7 @@ class SonarQubePropertyType(
                 node.path("measures").map { it.asText() },
                 node.path("override").asBoolean(),
                 node.path("branchModel").asBoolean(),
-                node.path("branchPattern").asText()
+                JsonUtils.get(node, "branchPattern", null)
         )
     }
 

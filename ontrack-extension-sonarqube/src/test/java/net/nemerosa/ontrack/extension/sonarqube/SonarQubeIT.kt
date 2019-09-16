@@ -64,10 +64,10 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                                 configuration,
                                 "my:key",
                                 "sonarqube",
-                                emptyList(),
+                                listOf("measure-1"),
                                 false,
-                                false,
-                                null
+                                true,
+                                "master|develop"
                         )
                 )
                 // Gets the property back
@@ -78,6 +78,10 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                     assertEquals("my-ultra-secret-token", it.configuration.password)
                     assertEquals("my:key", it.key)
                     assertEquals("https://sonarqube.nemerosa.net/dashboard?id=my%3Akey", it.projectUrl)
+                    assertEquals(listOf("measure-1"), it.measures)
+                    assertEquals(false, it.override)
+                    assertEquals(true, it.branchModel)
+                    assertEquals("master|develop", it.branchPattern)
                 }
             }
         }
