@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.sonarqube.measures
 
+import net.nemerosa.ontrack.extension.sonarqube.SonarQubeMeasuresList
+
 /**
  * List of measures to collect, configured globally.
  *

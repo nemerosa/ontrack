@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.sonarqube.measures
+package net.nemerosa.ontrack.extension.sonarqube
 
 /**
  * List of measures to collect.

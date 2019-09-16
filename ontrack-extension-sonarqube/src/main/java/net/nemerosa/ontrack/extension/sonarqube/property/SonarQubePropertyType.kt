@@ -6,9 +6,7 @@ import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigura
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Selection
-import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -56,6 +54,18 @@ class SonarQubePropertyType(
                                 .help("Validation stamp to listen to for collecting SionarQube metrics on validation run")
                                 .value(value?.validationStamp ?: "sonarqube")
                 )
+                .with(
+                        MultiStrings.of("measures")
+                                .help("List of SonarQube measures to export.")
+                                .label("Measures")
+                                .value(value?.measures ?: emptyList<String>())
+                )
+                .with(
+                        YesNo.of("override")
+                                .help("Overriding the global settings for the list of SonarQube measures to export.")
+                                .label("Override")
+                                .value(value?.override ?: false)
+                )
     }
 
     override fun fromClient(node: JsonNode): SonarQubeProperty = fromStorage(node)
@@ -68,7 +78,9 @@ class SonarQubePropertyType(
         return SonarQubeProperty(
                 configuration,
                 node.path("key").asText(),
-                node.path("validationStamp").asText()
+                node.path("validationStamp").asText(),
+                node.path("measures").map { it.asText() },
+                node.path("override").asBoolean()
         )
     }
 
@@ -76,12 +88,16 @@ class SonarQubePropertyType(
             mapOf(
                     "configuration" to value.configuration.name,
                     "key" to value.key,
-                    "validationStamp" to value.validationStamp
+                    "validationStamp" to value.validationStamp,
+                    "measures" to value.measures,
+                    "override" to value.override
             ).asJson()
 
     override fun replaceValue(value: SonarQubeProperty, replacementFunction: Function<String, String>) = SonarQubeProperty(
             configurationService.replaceConfiguration(value.configuration, replacementFunction),
             replacementFunction.apply(value.key),
-            replacementFunction.apply(value.validationStamp)
+            replacementFunction.apply(value.validationStamp),
+            value.measures,
+            value.override
     )
 }

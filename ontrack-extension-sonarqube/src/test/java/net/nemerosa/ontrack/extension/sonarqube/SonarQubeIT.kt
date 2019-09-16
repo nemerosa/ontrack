@@ -63,7 +63,9 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         SonarQubeProperty(
                                 configuration,
                                 "my:key",
-                                "sonarqube"
+                                "sonarqube",
+                                emptyList(),
+                                false
                         )
                 )
                 // Gets the property back
@@ -119,7 +121,9 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 SonarQubeProperty(
                         configuration,
                         key,
-                        stamp
+                        stamp,
+                        emptyList(),
+                        false
                 )
         )
     }
