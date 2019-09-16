@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.metrics.measure
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,7 +21,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
         private val meterRegistry: MeterRegistry,
         private val structureService: StructureService,
         private val propertyService: PropertyService,
-        private val branchModelMatcherService: BranchModelMatcherService
+        private val branchModelMatcherService: BranchModelMatcherService,
+        private val cachedSettingsService: CachedSettingsService
 ) : SonarQubeMeasuresCollectionService {
 
     override fun collect(project: Project, logger: (String) -> Unit) {
@@ -59,8 +61,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
         // Name of the build
         val version: String = buildDisplayNameService.getBuildDisplayName(build)
         // List of metrics to collect
-        // TODO Configurable list of metrics
-        val metrics: List<String> = listOf("coverage", "branch_coverage")
+        // Configurable list of metrics
+        val metrics: List<String> = getListOfMetrics(property)
         // Getting the measures
         val measures: Map<String, Double?>? = meterRegistry.measure(
                 started = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_STARTED_COUNT,
@@ -107,6 +109,15 @@ class SonarQubeMeasuresCollectionServiceImpl(
                     SonarQubeMeasures::class.java.name,
                     SonarQubeMeasures(safeMeasures)
             )
+        }
+    }
+
+    private fun getListOfMetrics(property: SonarQubeProperty): List<String> {
+        return if (property.override) {
+            property.measures
+        } else {
+            val settings = cachedSettingsService.getCachedSettings(SonarQubeMeasuresSettings::class.java)
+            (settings.measures.toSet() + property.measures).toList()
         }
     }
 
