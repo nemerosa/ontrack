@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
+import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.metrics.measure
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
@@ -64,17 +65,18 @@ class SonarQubeMeasuresCollectionServiceImpl(
         // Configurable list of metrics
         val metrics: List<String> = getListOfMetrics(property)
         // Getting the measures
+        val metricTags = mapOf(
+                "project" to build.project.name,
+                "branch" to build.branch.name,
+                "build" to build.name,
+                "uri" to property.configuration.url
+        )
         val measures: Map<String, Double?>? = meterRegistry.measure(
                 started = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_STARTED_COUNT,
                 success = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_SUCCESS_COUNT,
                 error = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_ERROR_COUNT,
                 time = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_TIME,
-                tags = mapOf(
-                        "project" to build.project.name,
-                        "branch" to build.branch.name,
-                        "build" to build.name,
-                        "uri" to property.configuration.url
-                )
+                tags = metricTags
         ) {
             client.getMeasuresForVersion(property.key, version, metrics)
         }
@@ -84,6 +86,12 @@ class SonarQubeMeasuresCollectionServiceImpl(
             measures.forEach { (name, value) ->
                 if (value != null) {
                     safeMeasures[name] = value
+                } else {
+                    // No metric collected
+                    meterRegistry.increment(
+                            SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_NONE_COUNT,
+                            *(metricTags + ("measure" to name)).toList().toTypedArray()
+                    )
                 }
             }
             // Metrics
