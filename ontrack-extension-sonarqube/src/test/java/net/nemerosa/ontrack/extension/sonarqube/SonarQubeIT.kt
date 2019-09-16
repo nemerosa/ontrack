@@ -5,6 +5,10 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
+import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClient
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
@@ -50,6 +54,51 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 branch {
                     val vs = validationStamp("sonarqube")
                     build("1.0.0") {
+                        validate(vs)
+                        // Checks that some SonarQube metrics are attached to this build
+                        val measures = sonarQubeMeasuresCollectionService.getMeasures(this)
+                        assertNotNull(measures) {
+                            assertEquals(
+                                    mapOf(
+                                            "measure-1" to 12.3,
+                                            "measure-2" to 45.0
+                                    ),
+                                    it.measures
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Launching the collection on validation run using build label`() {
+        withSonarQubeSettings {
+            val key = uid("p")
+            // Mocking the measures
+            mockSonarQubeMeasures(
+                    key,
+                    "1.0.0", // Using the label here
+                    "measure-1" to 12.3,
+                    "measure-2" to 45.0
+            )
+            withConfiguredProject(key) {
+                setProperty(
+                        this,
+                        BuildLinkDisplayPropertyType::class.java,
+                        BuildLinkDisplayProperty(true)
+                )
+                branch {
+                    val vs = validationStamp("sonarqube")
+                    build("release-1.0.0") {
+                        // Label for the build
+                        setProperty(
+                                this,
+                                ReleasePropertyType::class.java,
+                                ReleaseProperty("1.0.0")
+                        )
+                        // Validation (which triggers the collection)
                         validate(vs)
                         // Checks that some SonarQube metrics are attached to this build
                         val measures = sonarQubeMeasuresCollectionService.getMeasures(this)
