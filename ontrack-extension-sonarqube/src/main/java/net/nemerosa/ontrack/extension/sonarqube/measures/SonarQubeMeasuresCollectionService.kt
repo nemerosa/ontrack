@@ -8,6 +8,11 @@ interface SonarQubeMeasuresCollectionService {
 
     fun collect(project: Project, logger: (String) -> Unit)
 
+    /**
+     * Checks if the [build] is eligible for SonarQube collection.
+     */
+    fun matches(build: Build, property: SonarQubeProperty): Boolean
+
     fun collect(build: Build, property: SonarQubeProperty)
 
     /**

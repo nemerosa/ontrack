@@ -30,13 +30,10 @@ class SonarQubeMeasuresCollectionServiceImpl(
         // Gets the SonarQube property of the project
         val property = propertyService.getProperty(project, SonarQubePropertyType::class.java).value
         if (property != null) {
-            // Gets the model match for the branch
-            val branchModelMatcher = branchModelMatcherService.getBranchModelMatcher(project)
             // For all project branches
             structureService.getBranchesForProject(project.id)
                     // ... filter branches according to the model matcher
-                    .filter { branch -> branchModelMatcher?.matches(branch) ?: true }
-                    // ... TODO or a filter as property level
+                    .filter { branch -> matches(branch, property) }
                     // ... scans the branch
                     .forEach { collect(it, property, logger) }
         }
@@ -54,6 +51,31 @@ class SonarQubeMeasuresCollectionServiceImpl(
             // Going on
             true
         }
+    }
+
+    override fun matches(build: Build, property: SonarQubeProperty): Boolean {
+        return matches(build.branch, property)
+    }
+
+    private fun matches(branch: Branch, property: SonarQubeProperty): Boolean {
+        val path: String = getBranchPath(branch)
+        return matchesPattern(path, property.branchPattern) || (
+                property.branchModel && matchesModel(branch)
+                )
+    }
+
+    private fun matchesModel(branch: Branch): Boolean {
+        val matcher = branchModelMatcherService.getBranchModelMatcher(branch.project)
+        return matcher?.matches(branch) ?: true
+    }
+
+    private fun matchesPattern(path: String, branchPattern: String?): Boolean {
+        return branchPattern.isNullOrBlank() || branchPattern.toRegex().matches(path)
+    }
+
+    private fun getBranchPath(branch: Branch): String {
+        // FIXME Use the branch path service
+        return branch.name
     }
 
     override fun collect(build: Build, property: SonarQubeProperty) {

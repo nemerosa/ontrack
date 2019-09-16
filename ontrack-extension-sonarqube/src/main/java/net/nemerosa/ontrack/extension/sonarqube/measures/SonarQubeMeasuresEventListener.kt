@@ -28,8 +28,11 @@ class SonarQubeMeasuresEventListener(
                 val stamp: ValidationStamp = event.getEntity(ProjectEntityType.VALIDATION_STAMP)
                 // Checks the validation stamp
                 if (stamp.name == property.validationStamp) {
-                    // Launching the collection of metrics
-                    sonarQubeMeasuresCollectionService.collect(build, property)
+                    // Filtering on the branch
+                    if (sonarQubeMeasuresCollectionService.matches(build, property)) {
+                        // Launching the collection of metrics
+                        sonarQubeMeasuresCollectionService.collect(build, property)
+                    }
                 }
             }
         }
