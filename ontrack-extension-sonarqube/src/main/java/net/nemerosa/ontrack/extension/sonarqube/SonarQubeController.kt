@@ -54,11 +54,15 @@ class SonarQubeController(
     fun collectBuildMeasures(@PathVariable buildId: ID): Ack {
         val build = structureService.getBuild(buildId)
         val property: SonarQubeProperty? = propertyService.getProperty(build.project, SonarQubePropertyType::class.java).value
-        if (property != null && securityService.isProjectFunctionGranted(build, ProjectEdit::class.java)) {
-            sonarQubeMeasuresCollectionService.collect(build, property)
-            return Ack.OK
+        return if (property != null && securityService.isProjectFunctionGranted(build, ProjectEdit::class.java)) {
+            return if (sonarQubeMeasuresCollectionService.matches(build, property)) {
+                sonarQubeMeasuresCollectionService.collect(build, property)
+                Ack.OK
+            } else {
+                Ack.NOK
+            }
         } else {
-            return Ack.NOK
+            Ack.NOK
         }
     }
 
