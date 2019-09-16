@@ -75,6 +75,7 @@ class SonarQubePropertyType(
                 )
                 .with(
                         Text.of("branchPattern")
+                                .optional()
                                 .help("Regular expression to filter the branch where to collect the SonarQube measures.")
                                 .label("Branch pattern")
                                 .value(value?.branchPattern ?: "")
