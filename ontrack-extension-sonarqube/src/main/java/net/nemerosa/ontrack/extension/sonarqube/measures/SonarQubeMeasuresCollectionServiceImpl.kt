@@ -18,6 +18,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
         private val clientFactory: SonarQubeClientFactory,
         private val entityDataService: EntityDataService,
         private val buildDisplayNameService: BuildDisplayNameService,
+        private val branchDisplayNameService: BranchDisplayNameService,
         private val metricsExportService: MetricsExportService,
         private val meterRegistry: MeterRegistry,
         private val structureService: StructureService,
@@ -73,10 +74,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
         return branchPattern.isNullOrBlank() || branchPattern.toRegex().matches(path)
     }
 
-    private fun getBranchPath(branch: Branch): String {
-        // FIXME Use the branch path service
-        return branch.name
-    }
+    private fun getBranchPath(branch: Branch): String = branchDisplayNameService.getBranchDisplayName(branch)
 
     override fun collect(build: Build, property: SonarQubeProperty) {
         // Client
