@@ -41,104 +41,90 @@ class SonarQubeIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Launching the collection on validation run`() {
-        withSonarQubeSettings {
-            val key = uid("p")
-            // Mocking the measures
-            mockSonarQubeMeasures(
-                    key,
-                    "1.0.0",
-                    "measure-1" to 12.3,
-                    "measure-2" to 45.0
-            )
-            withConfiguredProject(key) {
-                branch {
-                    val vs = validationStamp("sonarqube")
-                    build("1.0.0") {
-                        validate(vs)
-                        // Checks that some SonarQube metrics are attached to this build
-                        val measures = sonarQubeMeasuresCollectionService.getMeasures(this)
-                        assertNotNull(measures) {
-                            assertEquals(
-                                    mapOf(
-                                            "measure-1" to 12.3,
-                                            "measure-2" to 45.0
-                                    ),
-                                    it.measures
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        testCollectionWithListener(
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                ),
+                returnedMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                )
+        )
     }
 
     @Test
     fun `Launching the collection on validation run using build label`() {
-        withSonarQubeSettings {
-            val key = uid("p")
-            // Mocking the measures
-            mockSonarQubeMeasures(
-                    key,
-                    "1.0.0", // Using the label here
-                    "measure-1" to 12.3,
-                    "measure-2" to 45.0
-            )
-            withConfiguredProject(key) {
-                setProperty(
-                        this,
-                        BuildLinkDisplayPropertyType::class.java,
-                        BuildLinkDisplayProperty(true)
+        testCollectionWithListener(
+                useLabel = true,
+                buildName = "release-1.0.0",
+                buildLabel = "1.0.0",
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                ),
+                returnedMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
                 )
-                branch {
-                    val vs = validationStamp("sonarqube")
-                    build("release-1.0.0") {
-                        // Label for the build
-                        setProperty(
-                                this,
-                                ReleasePropertyType::class.java,
-                                ReleaseProperty("1.0.0")
-                        )
-                        // Validation (which triggers the collection)
-                        validate(vs)
-                        // Checks that some SonarQube metrics are attached to this build
-                        val measures = sonarQubeMeasuresCollectionService.getMeasures(this)
-                        assertNotNull(measures) {
-                            assertEquals(
-                                    mapOf(
-                                            "measure-1" to 12.3,
-                                            "measure-2" to 45.0
-                                    ),
-                                    it.measures
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        )
     }
 
     @Test
     fun `Launching the collection on validation run with missing measures`() {
+        testCollectionWithListener(
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3
+                ),
+                returnedMeasures = mapOf(
+                        "measure-1" to 12.3
+                )
+        )
+    }
+
+    private fun testCollectionWithListener(
+            validationStamp: String = "sonarqube",
+            useLabel: Boolean = false,
+            buildVersion: String = "1.0.0",
+            buildName: String = "1.0.0",
+            buildLabel: String? = null,
+            actualMeasures: Map<String, Double>,
+            returnedMeasures: Map<String, Double>
+    ) {
         withSonarQubeSettings {
             val key = uid("p")
             // Mocking the measures
             mockSonarQubeMeasures(
                     key,
-                    "1.0.0",
-                    "measure-1" to 12.3
+                    buildVersion,
+                    *actualMeasures.toList().toTypedArray()
             )
-            withConfiguredProject(key) {
+            withConfiguredProject(key = key, stamp = validationStamp) {
+                if (useLabel) {
+                    setProperty(
+                            this,
+                            BuildLinkDisplayPropertyType::class.java,
+                            BuildLinkDisplayProperty(true)
+                    )
+                }
                 branch {
-                    val vs = validationStamp("sonarqube")
-                    build("1.0.0") {
+                    val vs = validationStamp(validationStamp)
+                    build(buildName) {
+                        // Label for the build
+                        if (buildLabel != null) {
+                            setProperty(
+                                    this,
+                                    ReleasePropertyType::class.java,
+                                    ReleaseProperty(buildLabel)
+                            )
+                        }
+                        // Validates to launch the collection
                         validate(vs)
                         // Checks that some SonarQube metrics are attached to this build
                         val measures = sonarQubeMeasuresCollectionService.getMeasures(this)
                         assertNotNull(measures) {
                             assertEquals(
-                                    mapOf(
-                                            "measure-1" to 12.3
-                                    ),
+                                    returnedMeasures,
                                     it.measures
                             )
                         }
