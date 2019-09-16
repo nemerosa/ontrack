@@ -107,6 +107,52 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Launching the collection on validation run with global settings`() {
+        testCollectionWithListener(
+                globalMeasures = listOf("measure-2"),
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                ),
+                returnedMeasures = mapOf(
+                        "measure-2" to 45.0
+                )
+        )
+    }
+
+    @Test
+    fun `Launching the collection on validation run with global settings completed by project`() {
+        testCollectionWithListener(
+                globalMeasures = listOf("measure-2"),
+                projectMeasures = listOf("measure-1"),
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                ),
+                returnedMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                )
+        )
+    }
+
+    @Test
+    fun `Launching the collection on validation run with global settings overridden by project`() {
+        testCollectionWithListener(
+                globalMeasures = listOf("measure-2"),
+                projectMeasures = listOf("measure-1"),
+                projectOverride = true,
+                actualMeasures = mapOf(
+                        "measure-1" to 12.3,
+                        "measure-2" to 45.0
+                ),
+                returnedMeasures = mapOf(
+                        "measure-1" to 12.3
+                )
+        )
+    }
+
+    @Test
     fun `Launching the collection on validation run using build label`() {
         testCollectionWithListener(
                 useLabel = true,
@@ -136,7 +182,10 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     private fun testCollectionWithListener(
+            globalMeasures: List<String> = listOf("measure-1", "measure-2"),
             validationStamp: String = "sonarqube",
+            projectMeasures: List<String> = emptyList(),
+            projectOverride: Boolean = false,
             useLabel: Boolean = false,
             buildVersion: String = "1.0.0",
             buildName: String = "1.0.0",
@@ -145,7 +194,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             returnedMeasures: Map<String, Double>,
             code: (Build) -> Unit = {}
     ) {
-        withSonarQubeSettings {
+        withSonarQubeSettings(measures = globalMeasures) {
             val key = uid("p")
             // Mocking the measures
             mockSonarQubeMeasures(
@@ -153,7 +202,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                     buildVersion,
                     *actualMeasures.toList().toTypedArray()
             )
-            withConfiguredProject(key = key, stamp = validationStamp) {
+            withConfiguredProject(key = key, stamp = validationStamp, measures = projectMeasures, override = projectOverride) {
                 if (useLabel) {
                     setProperty(
                             this,
@@ -293,14 +342,20 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Sets a project property
      */
-    private fun Project.setSonarQubeProperty(configuration: SonarQubeConfiguration, key: String, stamp: String = "sonarqube") {
+    private fun Project.setSonarQubeProperty(
+            configuration: SonarQubeConfiguration,
+            key: String,
+            stamp: String = "sonarqube",
+            measures: List<String> = emptyList(),
+            override: Boolean = false
+    ) {
         setProperty(this, SonarQubePropertyType::class.java,
                 SonarQubeProperty(
                         configuration = configuration,
                         key = key,
                         validationStamp = stamp,
-                        measures = emptyList(),
-                        override = false,
+                        measures = measures,
+                        override = override,
                         branchModel = false,
                         branchPattern = null
                 )
@@ -336,11 +391,23 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     /**
      * Testing with a project configured for SonarQube
      */
-    private fun withConfiguredProject(key: String, stamp: String = "sonarqube", code: Project.() -> Unit) {
+    private fun withConfiguredProject(
+            key: String,
+            stamp: String = "sonarqube",
+            measures: List<String> = emptyList(),
+            override: Boolean = false,
+            code: Project.() -> Unit
+    ) {
         withDisabledConfigurationTest {
             val config = createSonarQubeConfiguration()
             project {
-                setSonarQubeProperty(config, key, stamp)
+                setSonarQubeProperty(
+                        configuration = config,
+                        key = key,
+                        stamp = stamp,
+                        measures = measures,
+                        override = override
+                )
                 code()
             }
         }
