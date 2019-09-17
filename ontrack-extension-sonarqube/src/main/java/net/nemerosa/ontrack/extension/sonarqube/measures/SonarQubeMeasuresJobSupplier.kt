@@ -24,7 +24,9 @@ class SonarQubeMeasuresJobSupplier(
         private val cachedSettingsService: CachedSettingsService
 ) : JobOrchestratorSupplier {
 
-    private val SONARQUBE_COLLECTION_JOB = SonarQubeExtensionFeature.SONARQUBE_JOB_CATEGORY.getType("sonarqube-collection").withName("Collection of SonarQube measures")
+    companion object {
+        private val SONARQUBE_COLLECTION_JOB = SonarQubeExtensionFeature.SONARQUBE_JOB_CATEGORY.getType("sonarqube-collection").withName("Collection of SonarQube measures")
+    }
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
         return structureService.projectList
