@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -90,6 +91,14 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 }
             }
         }
+    }
+
+    @Test
+    fun `Launching the collection on validation run without any measure`() {
+        testCollectionWithListener(
+                actualMeasures = null,
+                returnedMeasures = null
+        )
     }
 
     @Test
@@ -207,18 +216,20 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             buildVersion: String = "1.0.0",
             buildName: String = "1.0.0",
             buildLabel: String? = null,
-            actualMeasures: Map<String, Double>,
+            actualMeasures: Map<String, Double>?,
             returnedMeasures: Map<String, Double>?,
             code: (Build) -> Unit = {}
     ) {
         withSonarQubeSettings(measures = globalMeasures, disabled = globalDisabled) {
             val key = uid("p")
             // Mocking the measures
-            mockSonarQubeMeasures(
-                    key,
-                    buildVersion,
-                    *actualMeasures.toList().toTypedArray()
-            )
+            if (actualMeasures != null) {
+                mockSonarQubeMeasures(
+                        key,
+                        buildVersion,
+                        *actualMeasures.toList().toTypedArray()
+                )
+            }
             withConfiguredProject(key = key, stamp = validationStamp, measures = projectMeasures, override = projectOverride) {
                 if (useLabel) {
                     setProperty(
@@ -254,6 +265,26 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         }
                         // Additional checks
                         code(this)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Collecting a build measures without a validation stamp`() {
+        withDisabledConfigurationTest {
+            withSonarQubeSettings {
+                val key = uid("p")
+                withConfiguredProject(key) {
+                    branch {
+                        build {
+                            val ack = sonarQubeMeasuresCollectionService.collect(
+                                    this,
+                                    getProperty(project, SonarQubePropertyType::class.java)
+                            )
+                            assertFalse(ack.isSuccess, "Nothing was collected")
+                        }
                     }
                 }
             }

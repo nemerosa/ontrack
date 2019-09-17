@@ -131,7 +131,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
             client.getMeasuresForVersion(property.key, version, metrics)
         }
         // Safe measures
-        if (measures != null) {
+        if (!measures.isNullOrEmpty()) {
             val safeMeasures = mutableMapOf<String, Double>()
             measures.forEach { (name, value) ->
                 if (value != null) {
