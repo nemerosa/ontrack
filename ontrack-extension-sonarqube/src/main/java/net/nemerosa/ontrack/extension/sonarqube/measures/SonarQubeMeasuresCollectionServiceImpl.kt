@@ -72,9 +72,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
 
     private fun matches(branch: Branch, property: SonarQubeProperty): Boolean {
         val path: String = getBranchPath(branch)
-        return matchesPattern(path, property.branchPattern) || (
-                property.branchModel && matchesModel(branch)
-                )
+        return matchesPattern(path, property.branchPattern) && (!property.branchModel || matchesModel(branch))
     }
 
     private fun matchesModel(branch: Branch): Boolean {

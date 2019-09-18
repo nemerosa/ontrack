@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.sonarqube
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.api.support.TestBranchModelMatcherProvider
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
@@ -390,6 +391,55 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Project using branch model`() {
+        withDisabledConfigurationTest {
+            withSonarQubeSettings {
+                val key = uid("p")
+                withConfiguredProject(key, branchModel = true) {
+
+                    // Registers the project as having a branching model
+                    testBranchModelMatcherProvider.projects += name
+
+                    val build1 = branch<Build>("release-1.0") {
+                        val vs = validationStamp("sonarqube")
+                        build("1.0.0") {
+                            validate(vs)
+                        }
+                    }
+                    val build2 = branch<Build>("feature-test") {
+                        val vs = validationStamp("sonarqube")
+                        build("abdcefg") {
+                            validate(vs)
+                        }
+                    }
+                    // Setting the configuration of the project now, builds are still not scanned
+                    mockSonarQubeMeasures(key, "1.0.0",
+                            "measure-1" to 1.0,
+                            "measure-2" to 1.1
+                    )
+                    mockSonarQubeMeasures(key, "abdcefg",
+                            "measure-1" to 2.0,
+                            "measure-2" to 2.1
+                    )
+                    // Scanning of the project
+                    sonarQubeMeasuresCollectionService.collect(this) { println(it) }
+                    // Checks the measures attached to the builds
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 1.0,
+                                        "measure-2" to 1.1
+                                ),
+                                it.measures
+                        )
+                    }
+                    assertNull(sonarQubeMeasuresCollectionService.getMeasures(build2))
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Builds require a validation`() {
         withDisabledConfigurationTest {
             withSonarQubeSettings {
@@ -628,6 +678,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             stamp: String = "sonarqube",
             measures: List<String> = emptyList(),
             override: Boolean = false,
+            branchModel: Boolean = false,
             branchPattern: String? = null
     ) {
         setProperty(this, SonarQubePropertyType::class.java,
@@ -637,7 +688,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         validationStamp = stamp,
                         measures = measures,
                         override = override,
-                        branchModel = false,
+                        branchModel = branchModel,
                         branchPattern = branchPattern
                 )
         )
@@ -677,6 +728,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             stamp: String = "sonarqube",
             measures: List<String> = emptyList(),
             override: Boolean = false,
+            branchModel: Boolean = false,
             branchPattern: String? = null,
             code: Project.() -> Unit
     ) {
@@ -689,6 +741,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         stamp = stamp,
                         measures = measures,
                         override = override,
+                        branchModel = branchModel,
                         branchPattern = branchPattern
                 )
                 code()
@@ -721,6 +774,9 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var client: SonarQubeClient
 
+    @Autowired
+    private lateinit var testBranchModelMatcherProvider: TestBranchModelMatcherProvider
+
     @Configuration
     @Profile(RunProfile.UNIT_TEST)
     class SonarQubeITConfiguration {
@@ -748,6 +804,12 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 return client
             }
         }
+
+        /**
+         * Model matcher
+         */
+        @Bean
+        fun testBranchModelMatcherProvider() = TestBranchModelMatcherProvider()
 
     }
 
