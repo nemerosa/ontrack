@@ -8,6 +8,7 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testCompile 'org.codehaus.groovy:groovy-all'
     testCompile(project(":ontrack-extension-general"))
+    testCompile project(':ontrack-model').sourceSets.test.output
 
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
