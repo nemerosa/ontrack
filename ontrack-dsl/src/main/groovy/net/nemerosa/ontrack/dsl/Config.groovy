@@ -403,4 +403,24 @@ class Config {
                 previousPromotionRequired: previousPromotionRequired
         ])
     }
+
+    /**
+     * SonarQube extension
+     */
+
+    @DSLMethod(value = "Creates or updates a SonarQube configuration.", count = 4)
+    def sonarQube(String name, String url, String user = '', String password = '') {
+        ontrack.post(
+                'extension/sonarqube/configurations/create', [
+                name    : name,
+                url     : url,
+                user    : user,
+                password: password
+        ])
+    }
+
+    @DSLMethod("Gets the list of SonarQube configuration ids")
+    List<String> getSonarQube() {
+        ontrack.get('extension/sonarqube/configurations/descriptors').resources.collect { it.id }
+    }
 }
