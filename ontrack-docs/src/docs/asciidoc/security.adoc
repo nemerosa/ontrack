@@ -51,6 +51,8 @@ A **CONTROLLER** can, on all projects, create builds, promote and validate
 them, synchronize branches with their template. It is suited for a basic CI
 need when the Ontrack structure already exists and does not need to be created.
 
+A **GLOBAL VALIDATION MANAGER** can manage validation stamps across all projects.
+
 A **READ_ONLY** can view all projects, but cannot perform any action on them.
 
 The global roles can only be assigned by an _administrator_, in the _Account
@@ -85,8 +87,8 @@ A project **PROMOTER** can create and delete promotion runs, can change the
 validation runs statuses.
 
 A project **PROJECT_MANAGER** cumulates the functions of a PROMOTER and of a
-VALIDATION_MANAGER. He can additional manage branches (creation / edition / deletion) and the common
-build filters.
+VALIDATION_MANAGER. He can additionally manage branches (creation / edition / deletion) and the common
+build filters. He can also assign <<usage-labels,labels>> to the project.
 
 A project **READ_ONLY** user can view this project, but cannot perform any action on it.
 

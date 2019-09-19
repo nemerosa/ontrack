@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -33,7 +34,7 @@ public class ConfiguredIssueService {
     }
 
     public IssueServiceConfigurationRepresentation getIssueServiceConfigurationRepresentation() {
-        return IssueServiceConfigurationRepresentation.of(
+        return IssueServiceConfigurationRepresentation.Companion.of(
                 issueServiceExtension,
                 issueServiceConfiguration
         );
@@ -47,15 +48,16 @@ public class ConfiguredIssueService {
         return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message);
     }
 
-    public boolean containsIssueKey(String key, Set<String> keys) {
-        return issueServiceExtension.containsIssueKey(issueServiceConfiguration, key, keys);
-    }
-
     public Optional<String> getIssueId(String token) {
         return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
     }
 
     public Collection<? extends Issue> getLinkedIssues(Project project, Issue issue) {
         return issueServiceExtension.getLinkedIssues(project, issueServiceConfiguration, issue);
+    }
+
+    @NotNull
+    public String getMessageRegex(@NotNull Issue issue) {
+        return issueServiceExtension.getMessageRegex(issueServiceConfiguration, issue);
     }
 }

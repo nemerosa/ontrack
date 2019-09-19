@@ -1,8 +1,8 @@
 <ot-view>
     <div class="row">
         <div class="col-md-12 ot-view-title">
-            <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}">
-                {{validationStamp.name}}
+            <ot-entity-image entity="validationRun.validationStamp" link="#/validationStamp/{{validationRun.validationStamp.id}}">
+                {{validationRun.validationStamp.name}}
             </ot-entity-image> run #{{validationRun.runOrder}}
         </div>
     </div>
@@ -25,10 +25,10 @@
                 {{validationRunStatus.statusID.name}}
             </td>
             <td>
-                {{validationRunStatus.description}}
+                <ot-validation-run-status-comment status="validationRunStatus"></ot-validation-run-status-comment>
             </td>
             <td>
-                <ot-signature value="validationRunStatus.signature" user="true" time="true"></ot-signature>
+                <ot-signature value="{time: validationRunStatus.creation.time, user: {name: validationRunStatus.creation.user}}" user="true" time="true"></ot-signature>
             </td>
             <td>
                 <button ng-if="validationRun._validationRunStatusChange && $first"
@@ -45,7 +45,7 @@
             <ot-section-title>Properties</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
-                    <ot-entity-properties entity="validationRun"></ot-entity-properties>
+                    <ot-entity-properties entity="{_properties: validationRun.links._properties}"></ot-entity-properties>
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
             <ot-section-title>Extra information</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
-                    <ot-entity-extra entity="validationRun"></ot-entity-extra>
+                    <ot-entity-extra entity="{_extra: validationRun.links._extra}"></ot-entity-extra>
                 </div>
             </div>
         </div>

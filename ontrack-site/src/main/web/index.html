@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <link rel="stylesheet" type="text/css" href="stylesheets/ontrack.css" media="screen">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Ontrack by nemerosa</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Ontrack</h1>
+          <h2>Continuous delivery monitoring</h2>
+        </header>
+
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/nemerosa/ontrack" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+           <div class="ontrack-doc">
+             <table>
+                <thead>
+                   <tr>
+                      <th>Release</th>
+                      <th>Documentation</th>
+                   </tr>
+                </thead>
+                <tbody id="ontrack-doc-body">
+                   <tr>
+                      <td colspan="2">Loading...</td>
+                   </tr>
+                </tbody>
+             </table>
+           </div>
+          <p>ontrack will allow you to monitor and control the state of your continuous delivery pipeline, for all your projects and all their branches.</p>
+
+		  <p>By qualifying the builds with <em>promotion levels</em> and <em>validation stamps</em>, ontrack will help you assert the quality of your applications.</p>
+
+		  <p>
+			  <img class="picture" src="images/ontrack-builds.png" />
+		  </p>
+
+		  <p>Integrating with your CI engine, your ticketing system and your SCM, ontrack will allow you to check the content of your builds by accessing the change logs, by asserting the promotion level for a given issue, and many other possibilities.</p>
+
+<p>You can go even further by using ontrack in turn to drive your pipeline, since its REST API can be used to get the builds with the desired quality.</p>
+
+<h2><a name="search" class="anchor" href="#search"><span class="octicon octicon-link"></span></a>Promotion search</h2>
+
+<p>ontrack helps you when you ask your continuous delivery pipeline questions such as: "Where is my issue fixed? Has it already gone to QA?"</p>
+
+<p>Just type the issue's key in the search box, and get the information about it.</p>
+
+<p><img class="picture" src="images/ontrack-issue-info.png" /></p>
+
+<p>With the search box in ontrack, you can look for projects, branches, builds, issues and commits.</p>
+
+<h2><a name="changelogs" class="anchor" href="#changelogs"><span class="octicon octicon-link"></span></a>Change logs</h2>
+
+<p>In order to manage change logs, ontrack can access to SCM like:</p>
+
+<ul>
+<li>Subversion</li>
+<li>Git</li>
+</ul>
+
+Change logs for Git are supported:
+
+<p>
+	<img class="picture" src="images/ontrack-git-commits.png" />
+</p>
+
+<p>Supported ticketing systems for the change logs and the searches are:</p>
+
+<ul>
+<li>JIRA</li>
+</ul>
+<p><img class="picture" src="images/ontrack-jira-changelog.png" /></p>
+
+<ul>
+<li>GitHub</li>
+</ul>
+<p><img class="picture" src="images/ontrack-github-changelog.png" /></p>
+
+<p>Promotion of builds can be driven from:</p>
+
+<ul>
+<li>Jenkins - the promotions and validation stamps are triggered using a Jenkins plug-in for ontrack</li>
+<li>Artifactory - the promotions are read from Artifactory using the release status of the builds</li>
+</ul><p>Integration with Jenkins is also present in ontrack by showing the status of the different jobs in the associated branches, promotions or validation stamps.</p>
+
+<p>ontrack itself is managed by ontrack at <a href="https://ontrack.nemerosa.net">https://ontrack.nemerosa.net</a>.</p>
+
+<h2>
+<a name="development" class="anchor" href="#development"><span class="octicon octicon-link"></span></a>Development</h2>
+
+<p>ontrack is an open-source project, maintained by <a href="http://nemerosa.com">Nemerosa</a> on GitHub.</p>
+        </section>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/nemerosa/ontrack" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <footer>
+          Ontrack is maintained by <a href="https://github.com/nemerosa">nemerosa</a><br>
+        </footer>
+
+
+      </div>
+    </div>
+    <script src="javascripts/jquery-3.1.0.min.js"></script>
+    <script src="javascripts/doc/doc.js"></script>
+    <script src="javascripts/main.js"></script>
+  </body>
+</html>

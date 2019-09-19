@@ -61,4 +61,14 @@ public final class Time {
     public static LocalDateTime from(long epochMillis) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneOffset.UTC);
     }
+
+    /**
+     * Converts a date/time to Epoch time in milliseconds.
+     *
+     * @param time Epoch time in milliseconds
+     * @return UTC local date time
+     */
+    public static long toEpochMillis(LocalDateTime time) {
+        return time.toInstant(ZoneOffset.UTC).toEpochMilli();
+    }
 }

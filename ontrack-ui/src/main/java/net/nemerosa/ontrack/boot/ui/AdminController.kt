@@ -7,10 +7,7 @@ import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter
-import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.model.support.Page
+import net.nemerosa.ontrack.model.support.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Pagination
 import net.nemerosa.ontrack.ui.resource.Resources
@@ -28,6 +25,7 @@ class AdminController
 constructor(
         private val jobScheduler: JobScheduler,
         private val applicationLogService: ApplicationLogService,
+        private val connectorGlobalStatusService: ConnectorGlobalStatusService,
         private val securityService: SecurityService,
         private val encryptionService: EncryptionService
 ) : AbstractResourceController() {

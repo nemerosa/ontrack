@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.boot.resources;
 import com.google.common.collect.Iterables;
 import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.BranchType;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.LinkDefinition;
@@ -24,12 +21,14 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
 
     private final ResourceDecorationContributorService resourceDecorationContributorService;
     private final StructureService structureService;
+    private final BranchFavouriteService branchFavouriteService;
 
     @Autowired
-    public BranchResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService, StructureService structureService) {
+    public BranchResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService, StructureService structureService, BranchFavouriteService branchFavouriteService) {
         super(Branch.class);
         this.resourceDecorationContributorService = resourceDecorationContributorService;
         this.structureService = structureService;
+        this.branchFavouriteService = branchFavouriteService;
     }
 
     @Override
@@ -83,7 +82,7 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
                         link(
                                 "_validationStampFilterCreate",
                                 branch -> on(ValidationStampFilterController.class).getBranchValidationStampFilterForm(branch.getId()),
-                                withProjectFn(ProjectConfig.class)
+                                withProjectFn(ValidationStampFilterCreate.class)
                         ),
                         // All branches for the same project
                         link(
@@ -248,6 +247,18 @@ public class BranchResourceDecorator extends AbstractLinkResourceDecorator<Branc
                                         && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                                         || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync.class)
                                 )
+                        ),
+                        // Favourite --> 'unfavourite'
+                        link(
+                                "_unfavourite",
+                                branch -> on(BranchController.class).unfavouriteBranch(branch.getId()),
+                                (branch, resourceContext) -> resourceContext.isLogged() && branchFavouriteService.isBranchFavourite(branch)
+                        ),
+                        // Not favourite --> 'favourite'
+                        link(
+                                "_favourite",
+                                branch -> on(BranchController.class).favouriteBranch(branch.getId()),
+                                (branch, resourceContext) -> resourceContext.isLogged() && !branchFavouriteService.isBranchFavourite(branch)
                         ),
                         // Page
                         page()

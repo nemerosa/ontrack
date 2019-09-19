@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.repository;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.*;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -88,7 +90,16 @@ public interface StructureRepository {
 
     void deleteBuildLink(ID fromBuildId, ID toBuildId);
 
+    @Deprecated
     List<Build> getBuildLinksFrom(ID buildId);
+
+    /**
+     * Gets the builds used by the given one.
+     *
+     * @param build Source build
+     * @return List of builds used by the given one
+     */
+    List<Build> getBuildsUsedBy(Build build);
 
     /**
      * Gets the builds which use the given one.
@@ -242,4 +253,22 @@ public interface StructureRepository {
     int getValidationRunsCountForValidationStamp(ID validationStampId);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
+
+
+    /**
+     * Gets the parent validation run for a given validation run status ID
+     */
+    @NotNull
+    ValidationRun getParentValidationRun(@NotNull ID validationRunStatusId, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Loads a validation run status
+     */
+    @Nullable
+    ValidationRunStatus getValidationRunStatus(ID id, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Saves a comment for a run status
+     */
+    void saveValidationRunStatusComment(@NotNull ValidationRunStatus runStatus, @NotNull String comment);
 }

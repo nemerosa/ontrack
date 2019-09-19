@@ -9,4 +9,8 @@ dependencies {
     compile 'org.springframework:spring-tx'
 
     testCompile 'org.codehaus.groovy:groovy-all'
+    testCompile project(':ontrack-it-utils')
+    testCompile project(':ontrack-ui-graphql').sourceSets.test.output
+    testRuntime project(':ontrack-service')
+    testRuntime project(':ontrack-repository-impl')
 }

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.YesNo;
+import net.nemerosa.ontrack.model.labels.LabelManagement;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.support.PasswordChange;
@@ -137,16 +138,21 @@ public class UserController extends AbstractResourceController {
             user.add(Action.of("admin-predefined-validation-stamps", "Predefined validation stamps", "admin-predefined-validation-stamps"));
             user.add(Action.of("admin-predefined-promotion-levels", "Predefined promotion levels", "admin-predefined-promotion-levels"));
         }
+        // Management of labels
+        if (securityService.isGlobalFunctionGranted(LabelManagement.class)) {
+            user.add(Action.of("admin-labels", "Labels", "admin-labels"));
+        }
         // Contributions from extensions
-        user = userMenuExtensions(user);
+        ConnectedAccount contributed = userMenuExtensions(user);
         // Admin tools
         if (securityService.isGlobalFunctionGranted(ApplicationManagement.class)) {
-            user.add(Action.of("admin-extensions", "System extensions", "admin-extensions"));
-            user.add(Action.of("admin-jobs", "System jobs", "admin-jobs"));
-            user.add(Action.of("admin-log-entries", "Log entries", "admin-log-entries"));
+            contributed.add(Action.of("admin-health", "System health", "admin-health"));
+            contributed.add(Action.of("admin-extensions", "System extensions", "admin-extensions"));
+            contributed.add(Action.of("admin-jobs", "System jobs", "admin-jobs"));
+            contributed.add(Action.of("admin-log-entries", "Log entries", "admin-log-entries"));
         }
         // OK
-        return user;
+        return contributed;
     }
 
     private ConnectedAccount userMenuExtensions(ConnectedAccount user) {

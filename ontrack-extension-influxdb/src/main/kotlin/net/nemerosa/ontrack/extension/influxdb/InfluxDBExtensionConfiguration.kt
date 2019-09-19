@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.influxdb
 
 import net.nemerosa.ontrack.extension.influxdb.runinfo.InfluxDBRunInfoListener
+import net.nemerosa.ontrack.extension.influxdb.validation.data.InfluxDBValidationRunMetricsExtension
+import net.nemerosa.ontrack.model.structure.ValidationDataTypeService
 import okhttp3.OkHttpClient
 import org.influxdb.BatchOptions
 import org.influxdb.InfluxDB
@@ -47,8 +49,22 @@ class InfluxDBExtensionConfiguration(
 
     @Bean
     @ConditionalOnBean(InfluxDB::class)
+    fun influxDBExtensionHealthIndicator(influxDB: InfluxDB) = InfluxDBExtensionHealthIndicator(influxDB)
+
+
+    @Bean
+    @ConditionalOnBean(InfluxDB::class)
     @ConditionalOnProperty(prefix = INFLUXDB_EXTENSION_PROPERTIES_PREFIX, name = ["run-info"], havingValue = "true", matchIfMissing = true)
     fun influxDBRunInfoListener(influxDB: InfluxDB) = InfluxDBRunInfoListener(influxDB)
+
+    @Bean
+    @ConditionalOnBean(InfluxDB::class)
+    @ConditionalOnProperty(prefix = INFLUXDB_EXTENSION_PROPERTIES_PREFIX, name = ["validation-data"], havingValue = "true", matchIfMissing = true)
+    fun influxDBValidationRunMetricsExtension(
+            influxDBExtensionFeature: InfluxDBExtensionFeature,
+            validationDataTypeService: ValidationDataTypeService,
+            influxDB: InfluxDB
+    ) = InfluxDBValidationRunMetricsExtension(influxDBExtensionFeature, validationDataTypeService, influxDB)
 
 
 }

@@ -26,7 +26,8 @@ class BranchControllerTest {
                 mock(CopyService),
                 mock(BuildFilterService),
                 mock(ExtensionManager),
-                mock(SecurityService)
+                mock(SecurityService),
+                mock(BranchFavouriteService)
         )
     }
 

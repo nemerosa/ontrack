@@ -1,7 +1,10 @@
 <ot-view>
     <div class="row">
-        <div class="col-md-12 alert alert-warning" ng-show="!searchDone">
-            Loading the search results...
+        <div class="col-md-12" ng-show="!searchDone">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the search results...
+            </div>
         </div>
         <div class="col-md-12 alert alert-warning" ng-show="searchDone && results && !results.length">
             No result matches your search.

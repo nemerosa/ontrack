@@ -58,11 +58,13 @@ public class ValidationStampFilterController extends AbstractResourceController 
                 .map(ValidationStamp::getName)
                 .collect(Collectors.toList());
         return filterService.newValidationStampFilter(
-                ValidationStampFilter.builder()
-                        .name(input.getName())
-                        .branch(structureService.getBranch(branchId))
-                        .vsNames(vsNames)
-                        .build()
+                new ValidationStampFilter(
+                        ID.NONE,
+                        input.getName(),
+                        vsNames,
+                        null,
+                        structureService.getBranch(branchId)
+                )
         );
     }
 

@@ -46,8 +46,8 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
         SearchResult result = results[0]
         assert result.title == "Build ${p1}/B1/1.1"
         assert result.description == "${p1} -> 1.1"
-        assert result.uri == "${baseURL}/structure/builds/${id}"
-        assert result.page == "${baseURL}/#/build/${id}"
+        assert result.uri == "/structure/builds/${id}"
+        assert result.page == "/#/build/${id}"
     }
 
     @Test
@@ -90,8 +90,8 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
         def collect = buildLinks.collect { [it.project, it.name, it.page] }
         println collect
         assert collect as Set == [
-                [p1, '1.1', "${baseURL}/#/build/${b111}"],
-                [p2, '2.0', "${baseURL}/#/build/${b220}"],
+                [p1, '1.1', "/#/build/${b111}"],
+                [p2, '2.0', "/#/build/${b220}"],
         ] as Set
 
     }

@@ -46,7 +46,7 @@ class ACCSearch extends AcceptanceTestClient {
         // Check
         def result = results.get(0)
         assert result.title == "Build ${project}/${branch}/${name}" as String
-        assert result.page == "${baseURL}/#/build/${id}" as String
+        assert result.page == "/#/build/${id}" as String
     }
 
 }

@@ -1,0 +1,67 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingLabels">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the labels...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="labels.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No label has been created yet.
+                Click <a ng-click="createLabel()" class="ot-action">here</a> to create one.
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-hover" ng-hide="loadingLabels" ng-if="labels.length > 0">
+        <thead>
+        <tr>
+            <th>Label</th>
+            <th>Description</th>
+            <th>Computed</th>
+            <th>Projects</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="label in labels">
+            <td>
+                <ot-project-label label="label"></ot-project-label>
+            </td>
+            <td>
+                {{label.description}}
+            </td>
+            <td>
+                <span ng-if="label.computedBy" title="{{label.computedBy.id}}">
+                    {{label.computedBy.name}}
+                </span>
+                <span ng-if="!label.computedBy" class="text-muted">No</span>
+            </td>
+            <td>
+                <span ng-if="label.projects.length == 0">
+                    0
+                </span>
+                <a ng-click="goToLabel(label)" class="ot-action" ng-if="label.projects.length > 0">
+                    {{label.projects.length}}
+                </a>
+            </td>
+            <td>
+                <span class="ot-command ot-command-update"
+                      title="Update label {{label.category}}:{{label.name}}"
+                      ng-if="label.links._update"
+                      ng-click="updateLabel(label)"></span>
+                <span class="ot-command ot-command-delete"
+                      title="Delete label {{label.category}}:{{label.name}}"
+                      ng-if="label.links._delete"
+                      ng-click="deleteLabel(label)"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

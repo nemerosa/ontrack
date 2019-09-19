@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.doc.DSLMethod
-import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
 import net.nemerosa.ontrack.dsl.properties.ValidationStampProperties
 
 @DSL
@@ -29,7 +28,8 @@ class ValidationStamp extends AbstractProjectResource {
         closure()
     }
 
-    ProjectEntityProperties getConfig() {
+    @DSLMethod("Access to the validation stamp properties")
+    ValidationStampProperties getConfig() {
         new ValidationStampProperties(ontrack, this)
     }
 
@@ -87,6 +87,14 @@ class ValidationStamp extends AbstractProjectResource {
     def setTextDataType() {
         setDataType(
                 "net.nemerosa.ontrack.extension.general.validation.TextValidationDataType",
+                [:]
+        )
+    }
+
+    @DSLMethod("Sets the data type for this validation stamp to 'metrics'.")
+    def setMetricsDataType() {
+        setDataType(
+                "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType",
                 [:]
         )
     }
@@ -153,6 +161,18 @@ class ValidationStamp extends AbstractProjectResource {
                         warningThreshold: warningThreshold,
                         failureThreshold: failureThreshold,
                         okIfGreater     : okIfGreater,
+                ]
+        )
+    }
+
+    @DSLMethod(value = "Sets the data type for this validation stamp to 'TestSummary'.", count = 1)
+    def setTestSummaryDataType(
+            boolean warningIfSkipped = false
+    ) {
+        setDataType(
+                "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType",
+                [
+                        warningIfSkipped: warningIfSkipped,
                 ]
         )
     }

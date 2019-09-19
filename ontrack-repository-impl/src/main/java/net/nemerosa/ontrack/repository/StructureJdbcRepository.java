@@ -7,11 +7,13 @@ import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -281,6 +283,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "INNER JOIN BUILD_LINKS BL ON BL.TARGETBUILDID = T.ID " +
                         "WHERE BL.BUILDID = :buildId",
                 params("buildId", buildId.get()),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    public List<Build> getBuildsUsedBy(Build build) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT F.* FROM BUILDS F " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.TARGETBUILDID = F.ID " +
+                        "WHERE BL.BUILDID = :buildId " +
+                        "ORDER BY F.ID DESC ",
+                params("buildId", build.id()),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );
     }
@@ -1093,6 +1107,46 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         return validationRun.add(runStatus);
     }
 
+    @NotNull
+    @Override
+    public ValidationRun getParentValidationRun(@NotNull ID validationRunStatusId, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        // Gets the run ID
+        int runId = getFirstItem(
+                "SELECT VALIDATIONRUNID FROM VALIDATION_RUN_STATUSES WHERE ID = :id",
+                params("id", validationRunStatusId.get()),
+                Integer.class
+        );
+        // Loads the run
+        return getValidationRun(ID.of(runId), validationRunStatusService);
+    }
+
+    @Nullable
+    @Override
+    public ValidationRunStatus getValidationRunStatus(ID id, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getFirstItem(
+                "SELECT * FROM VALIDATION_RUN_STATUSES WHERE ID = :id",
+                params("id", id.get()),
+                (rs, rowNum) -> toValidationRunStatus(rs, validationRunStatusService)
+        );
+    }
+
+    @Override
+    public void saveValidationRunStatusComment(@NotNull ValidationRunStatus runStatus, @NotNull String comment) {
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE VALIDATION_RUN_STATUSES SET DESCRIPTION = :description WHERE ID = :id",
+                params("id", runStatus.id()).addValue("description", comment)
+        );
+    }
+
+    protected ValidationRunStatus toValidationRunStatus(ResultSet rs, Function<String, ValidationRunStatusID> validationRunStatusService) throws SQLException {
+        return new ValidationRunStatus(
+                id(rs),
+                readSignature(rs),
+                validationRunStatusService.apply(rs.getString("validationRunStatusId")),
+                rs.getString("description")
+        );
+    }
+
     protected void newValidationRunStatus(int validationRunId, ValidationRunStatus validationRunStatus) {
         dbCreate(
                 "INSERT INTO VALIDATION_RUN_STATUSES(VALIDATIONRUNID, VALIDATIONRUNSTATUSID, CREATION, CREATOR, DESCRIPTION) " +
@@ -1114,11 +1168,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         List<ValidationRunStatus> statuses = getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = :validationRunId ORDER BY CREATION DESC",
                 params("validationRunId", id),
-                (rs1, rowNum) -> ValidationRunStatus.of(
-                        readSignature(rs1),
-                        validationRunStatusService.apply(rs1.getString("validationRunStatusId")),
-                        rs1.getString("description")
-                )
+                (rs1, rowNum) -> toValidationRunStatus(rs1, validationRunStatusService)
         );
         // Build & validation stamp
         ID buildId = id(rs, "buildId");

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.model.structure.Build
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -10,6 +11,210 @@ import kotlin.test.assertTrue
  */
 class BuildGraphQLIT : AbstractQLKTITSupport() {
 
+    @Test
+    fun `Filtered build links`() {
+        // Reference project with two builds to reference
+        val ref1 = project {
+            branch("maintenance") {
+                build("1.0")
+            }
+            branch("master") {
+                build("2.0")
+            }
+        }
+        // Other reference project with one build
+        val ref2 = project {
+            branch("master") {
+                build("3.0")
+            }
+        }
+        // Parent build
+        project {
+            branch {
+                build {
+                    // Links to all the builds above
+                    linkTo(ref1, "1.0")
+                    linkTo(ref1, "2.0")
+                    linkTo(ref2, "3.0")
+
+                    // No filter
+                    run("""{
+                        builds(id: $id) {
+                            uses {
+                                name
+                            }
+                        }
+                    }"""
+                    ).run {
+                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                    }.run {
+                        assertEquals(
+                                setOf("1.0", "2.0", "3.0"),
+                                this
+                        )
+                    }
+
+                    // Filter by project
+                    run("""{
+                        builds(id: $id) {
+                            uses(project: "${ref1.name}") {
+                                name
+                            }
+                        }
+                    }"""
+                    ).run {
+                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                    }.run {
+                        assertEquals(
+                                setOf("1.0", "2.0"),
+                                this
+                        )
+                    }
+
+                    // Filter by branch
+                    run("""{
+                        builds(id: $id) {
+                            uses(project: "${ref1.name}", branch: "master") {
+                                name
+                            }
+                        }
+                    }"""
+                    ).run {
+                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                    }.run {
+                        assertEquals(
+                                setOf("2.0"),
+                                this
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Filtered build origin links`() {
+        // Target build
+        val build = project<Build> {
+            branch<Build> {
+                build()
+            }
+        }
+        // Reference project with two builds to reference from
+        val ref1 = project {
+            branch("maintenance") {
+                build("1.0") {
+                    linkTo(build.project, build.name)
+                }
+            }
+            branch("master") {
+                build("2.0") {
+                    linkTo(build.project, build.name)
+                }
+            }
+        }
+        // Other reference project with one build
+        project {
+            branch("master") {
+                build("3.0") {
+                    linkTo(build.project, build.name)
+                }
+            }
+        }
+
+        build.apply {
+            // No filter, all of them
+            run("""{
+                        builds(id: $id) {
+                            usedBy {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("1.0", "2.0", "3.0"),
+                        this
+                )
+            }
+            // No filter, first one only
+            run("""{
+                        builds(id: $id) {
+                            usedBy(size: 1) {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("3.0"),
+                        this
+                )
+            }
+            // Project restriction, all of them
+            run("""{
+                        builds(id: $id) {
+                            usedBy(project: "${ref1.name}") {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("1.0", "2.0"),
+                        this
+                )
+            }
+            // Project restriction, first one
+            run("""{
+                        builds(id: $id) {
+                            usedBy(project: "${ref1.name}", size: 1) {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("2.0"),
+                        this
+                )
+            }
+            // Branch restriction
+            run("""{
+                        builds(id: $id) {
+                            usedBy(project: "${ref1.name}", branch: "master") {
+                                pageItems {
+                                    name
+                                }
+                            }
+                        }
+                    }"""
+            ).run {
+                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+            }.run {
+                assertEquals(
+                        setOf("2.0"),
+                        this
+                )
+            }
+        }
+    }
 
     @Test
     fun `Build links are empty by default`() {
@@ -183,6 +388,54 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 }
             }
         }""")
+    }
+
+    @Test
+    fun `Build using dependencies`() {
+        val dep1 = project<Build> {
+            branch<Build> {
+                val pl = promotionLevel("IRON")
+                build {
+                    promote(pl)
+                }
+            }
+        }
+        val dep2 = project<Build> {
+            branch<Build> {
+                build()
+            }
+        }
+        // Source build
+        project {
+            branch {
+                build {
+                    // Creates links
+                    linkTo(dep1)
+                    linkTo(dep2)
+                    // Looks for dependencies
+                    val data = asUser().withView(this).call {
+                        run("""
+                            {
+                                builds(id: $id) {
+                                    name
+                                    using {
+                                        pageItems {
+                                            id
+                                        }
+                                    }
+                                }
+                            }
+                        """.trimIndent())
+                    }
+                    // Dependencies Ids
+                    val dependencies = data["builds"][0]["using"]["pageItems"].map { it["id"].asInt() }
+                    assertEquals(
+                            setOf(dep1.id(), dep2.id()),
+                            dependencies.toSet()
+                    )
+                }
+            }
+        }
     }
 
     @Test

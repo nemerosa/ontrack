@@ -30,6 +30,6 @@ public class Signature {
     }
 
     public Signature withTime(LocalDateTime dateTime) {
-        return new Signature(dateTime, user);
+        return new Signature(dateTime != null ? dateTime : Time.now(), user);
     }
 }

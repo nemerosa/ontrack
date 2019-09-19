@@ -1,0 +1,3 @@
+-- 41. Increase property search key max length (#639)
+
+ALTER TABLE PROPERTIES ALTER COLUMN SEARCHKEY TYPE VARCHAR(60000);

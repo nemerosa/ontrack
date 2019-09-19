@@ -1,0 +1,58 @@
+<div class="row" ng-if="gitCommitInfo">
+    <div class="col-md-12">
+
+        <!-- Summary for the commit -->
+        <ot-extension-git-commit-summary ui-commit="gitCommitInfo.uiCommit" title="true"></ot-extension-git-commit-summary>
+
+        <!-- Branch types -->
+        <div class="row" ng-repeat="branchInfos in gitCommitInfo.branchInfosList">
+            <div class="col-md-12">
+                <svg style="vertical-align:center;display: inline;" width="20px" height="20px">
+                </svg>
+                <i class="fa fa-tags"></i>
+                <b><i>{{branchInfos.type}}</i></b>
+                <div class="col-md-12" ng-repeat="branchInfo in branchInfos.branchInfoList">
+                    <svg style="vertical-align:center;display: inline;" width="40px" height="20px">
+                    </svg>
+                    <i class="fa fa-code-fork"></i>
+                    <b>Branch</b>
+                    <a href="{{branchInfo.branch.links._page}}">{{branchInfo.branch.name}}</a>
+                    <span ng-if="branchInfo.branch.disabled" class="label label-default">Disabled</span>
+                    <!-- First build for this branch -->
+                    <div class="col-md-12" ng-if="branchInfo.firstBuild">
+                        <svg style="vertical-align:center;display: inline;" width="60px" height="20px">
+                            <circle cx="50px" cy="15px" r="5px" fill="gray" />
+                        </svg>
+                        <span>First build</span>
+                        <a href="{{branchInfo.firstBuild.links._page}}">{{branchInfo.firstBuild.name}}</a>
+                        <ot-entity-embedded-decorations decorations="branchInfo.firstBuild.decorations"></ot-entity-embedded-decorations>
+                        <span class="ot-description">
+                            --
+                            {{branchInfo.firstBuild.creation.time | date:'mediumDate'}}
+                            {{branchInfo.firstBuild.creation.time | date:'shortTime'}}
+                        </span>
+                    </div>
+                    <!-- Promotions -->
+                    <div class="col-md-12 ot-icon-minis" ng-repeat="promotion in branchInfo.promotions">
+                        <svg style="vertical-align:center;display: inline;" width="40px" height="20px">
+                        </svg>
+                        <ot-entity-image
+                                entity="promotion.promotionLevel"
+                                title="{{promotion.promotionLevel.name}} - {{promotion.promotionLevel.description}}"
+                                link="promotion.promotionLevel.links._page">{{promotion.promotionLevel.name}}</ot-entity-image>
+                        for build
+                        <a href="{{promotion.links._page}}">{{promotion.build.name}}</a>
+                        <ot-entity-embedded-decorations decorations="promotion.build.decorations"></ot-entity-embedded-decorations>
+                        <span class="ot-description">
+                            --
+                            {{promotion.creation.time | date:'mediumDate'}}
+                            {{promotion.creation.time | date:'shortTime'}}
+                        </span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

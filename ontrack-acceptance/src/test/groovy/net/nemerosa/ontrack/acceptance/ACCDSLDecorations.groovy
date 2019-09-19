@@ -118,7 +118,10 @@ class ACCDSLDecorations extends AbstractACCDSL {
     }
 
     @Test
-    void 'Build links decorations'() {
+    void 'Build links decorations using default settings'() {
+
+        // Using defaults (no main label)
+        ontrack.config.mainBuildLinks = []
 
         // Creating projects, branches and builds
 
@@ -152,9 +155,12 @@ class ACCDSLDecorations extends AbstractACCDSL {
         }
 
         // Gets the link decorations
-        def buildLinks = ontrack.build(p1, 'B1', '1.0').buildLinkDecorations
-        assert buildLinks.collect { [it.project, it.build] } == [
-                [p1, '1.1'],
+        def buildLinks = ontrack.build(p1, 'B1', '1.0').buildLinkDecorations[0]
+        def decorations = buildLinks.decorations
+        def decorationsRefs = decorations.collect { [it.project, it.build] }
+
+        assert decorationsRefs == [
+                [p1, "1.1"],
                 [p2, '2.0'],
         ]
 

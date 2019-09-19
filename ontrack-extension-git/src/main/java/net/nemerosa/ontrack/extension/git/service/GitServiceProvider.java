@@ -20,6 +20,7 @@ public class GitServiceProvider implements SCMServiceProvider {
 
     @Override
     public Optional<SCMService> getScmService(Branch branch) {
-        return gitService.getBranchConfiguration(branch).map(conf -> gitService);
+        return Optional.ofNullable(gitService.getBranchConfiguration(branch))
+                .map(conf -> gitService);
     }
 }

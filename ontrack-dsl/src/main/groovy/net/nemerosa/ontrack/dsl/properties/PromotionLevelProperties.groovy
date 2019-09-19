@@ -18,6 +18,23 @@ class PromotionLevelProperties extends ProjectEntityProperties {
     }
 
     /**
+     * Promotion dependencies
+     */
+
+    @DSLMethod("Sets the validation stamps participating into the auto promotion.")
+    void setPromotionDependencies(List<String> promotions) {
+        property('net.nemerosa.ontrack.extension.general.PromotionDependenciesPropertyType', [
+                dependencies: promotions,
+        ])
+    }
+
+    @DSLMethod("Gets the validation stamps participating into the auto promotion. The returned list can be null if the property is not defined.")
+    List<String> getPromotionDependencies() {
+        def value = property('net.nemerosa.ontrack.extension.general.PromotionDependenciesPropertyType', false)
+        return value ? value.dependencies as List<String> : null
+    }
+
+    /**
      * Auto promotion
      */
 

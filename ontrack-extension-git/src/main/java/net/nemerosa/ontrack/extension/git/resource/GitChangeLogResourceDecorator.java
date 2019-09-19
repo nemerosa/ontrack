@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -32,9 +31,9 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
     public List<Link> links(GitChangeLog changeLog, ResourceContext resourceContext) {
         // Issues
         boolean issues = false;
-        Optional<GitConfiguration> configuration = gitService.getProjectConfiguration(changeLog.getProject());
-        if (configuration.isPresent()) {
-            issues = configuration.get().getConfiguredIssueService().isPresent();
+        GitConfiguration configuration = gitService.getProjectConfiguration(changeLog.getProject());
+        if (configuration != null) {
+            issues = configuration.getConfiguredIssueService().isPresent();
         }
         // Links
         return resourceContext.links()
@@ -42,6 +41,11 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
                 .link(
                         "_issues",
                         on(GitController.class).changeLogIssues(changeLog.getUuid()),
+                        issues
+                )
+                .link(
+                        "_issuesIds",
+                        on(GitController.class).changeLogIssuesIds(changeLog.getUuid()),
                         issues
                 )
                 .link("_files", on(GitController.class).changeLogFiles(changeLog.getUuid()))

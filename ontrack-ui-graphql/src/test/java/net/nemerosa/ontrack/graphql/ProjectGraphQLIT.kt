@@ -1,14 +1,49 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
+
+    @Autowired
+    private lateinit var branchFavouriteService: BranchFavouriteService
+
+    @Test
+    fun `Favourite branches for project`() {
+        val account = doCreateAccount()
+        project {
+            branch {}
+            val fav = branch {
+                asAccount(account).withView(this).execute {
+                    branchFavouriteService.setBranchFavourite(this, true)
+                }
+            }
+            // Gets the favourite branches in project
+            val data = asAccount(account).withView(this).call {
+                run("""
+                    {
+                        projects(id: ${this.id}) {
+                            branches(favourite: true) {
+                                id
+                            }
+                        }
+                    }
+                """)
+            }
+            val branchIds: Set<Int> = data["projects"][0]["branches"].map { it["id"].asInt() }.toSet()
+            assertEquals(
+                    setOf(fav.id()),
+                    branchIds
+            )
+        }
+    }
 
     @Test
     fun `All projects`() {

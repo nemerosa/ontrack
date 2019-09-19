@@ -1,11 +1,12 @@
 <div class="modal-header">
     <h3>
-        ontrack {{data.display}}
-        <span ng-if="data.sourceType != 'release'" class="fa fa-warning text-warning"></span>
+        ontrack {{data.version.display}}
+        <span ng-if="data.version.sourceType != 'release'" class="fa fa-warning text-warning"></span>
     </h3>
 </div>
 <div class="modal-body">
-    <div ng-if="data.sourceType != 'release'" class="alert alert-warning">
+    <h3>Version information</h3>
+    <div ng-if="data.version.sourceType != 'release'" class="alert alert-warning">
         <span class="fa fa-warning text-warning"></span>
         This version is not a release! Please use with care.
     </div>
@@ -13,27 +14,42 @@
         <tbody>
         <tr>
             <th>Version</th>
-            <td>{{data.display}}</td>
+            <td>{{data.version.display}}</td>
         </tr>
         <tr>
             <th>Full version</th>
-            <td>{{data.full}}</td>
+            <td>{{data.version.full}}</td>
         </tr>
         <tr>
             <th>Source</th>
-            <td>{{data.source}}</td>
+            <td>{{data.version.source}}</td>
         </tr>
         <tr>
             <th>Type</th>
-            <td>{{data.sourceType}}</td>
+            <td>{{data.version.sourceType}}</td>
         </tr>
         <tr>
             <th>Commit</th>
-            <td>{{data.commit}}</td>
+            <td>{{data.version.commit}}</td>
         </tr>
         <tr>
             <th>Date</th>
-            <td>{{data.date | date:'mediumDate' }} {{data.date | date:'shortTime' }}</td>
+            <td>{{data.version.date | date:'mediumDate' }} {{data.version.date | date:'shortTime' }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3>Extensions</h3>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Version</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="extension in data.extensionList.extensions">
+            <td>{{extension.name}}</td>
+            <td>{{extension.version}}</td>
         </tr>
         </tbody>
     </table>

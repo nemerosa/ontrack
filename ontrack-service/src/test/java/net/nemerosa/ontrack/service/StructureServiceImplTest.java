@@ -39,6 +39,7 @@ public class StructureServiceImplTest {
         DecorationService decorationService = mock(DecorationService.class);
         ProjectFavouriteService projectFavouriteService = mock(ProjectFavouriteService.class);
         ValidationDataTypeService validationDataTypeService = mock(ValidationDataTypeService.class);
+        PromotionRunCheckService promotionRunCheckService = mock(PromotionRunCheckService.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
@@ -50,7 +51,9 @@ public class StructureServiceImplTest {
                 predefinedPromotionLevelService,
                 predefinedValidationStampService,
                 decorationService,
-                projectFavouriteService);
+                projectFavouriteService,
+                promotionRunCheckService
+        );
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(1));

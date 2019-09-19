@@ -86,4 +86,6 @@ class NOPValidationDataType(
             validateNotNull(data) {
                 validate(this >= 0, "Value must be >= 0")
             }
+
+    override fun getMetrics(data: Int): Map<String, *>? = null
 }

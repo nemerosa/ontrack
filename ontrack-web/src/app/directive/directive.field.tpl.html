@@ -24,7 +24,7 @@
           ng-readonly="field.readOnly"></textarea>
 
 <!-- Type selection -->
-<select ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
+<select id="{{field.name}}" ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
         ng-required="field.required"
         ng-options="item[field.itemId] as item[field.itemName] for item in field.items">
     <option value="">&nbsp;</option>
@@ -93,10 +93,15 @@
         No</label>
 </span>
 
+<!-- Color -->
+<input ng-if="field.type == 'color'" ng-model="data[field.name]" name="{{field.name}}"
+       type="color" class="form-control" ng-required="field.required"
+       ng-readonly="field.readOnly" />
+
 <!-- Type: int -->
 <input ng-if="field.type == 'int'" ng-model="data[field.name]" name="{{field.name}}"
        type="number" class="form-control" ng-required="field.required"
-       ng-readonly="field.readOnly" min="{{field.min}}" min="{{field.max}}" step="{{field.step}}"/>
+       ng-readonly="field.readOnly" min="{{field.min}}" max="{{field.max}}" step="{{field.step}}"/>
 
 <!-- Validation message -->
 <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">

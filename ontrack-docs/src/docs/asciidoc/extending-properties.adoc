@@ -190,3 +190,86 @@ The property must be associated with an icon, typically PNG, 24 x 24, located at
                \-- myextension
                   \-- property
                      \-- net.nemerosa.ontrack.extension.myextension.MyPropertyType.png
+
+[[extending-properties-search]]
+===== Property search
+
+By default, properties are not searchable - their value cannot
+be used to perform search.
+
+If the property contains some text, it might be suitable to allow
+this property to be used in search.
+
+To enable this, two main methods must be provided:
+
+* `containsValue`
+* `getSearchArguments`
+
+The `containsValue` is used to check if a given string token is
+present of not in an instance of a property value. Let's take a
+property data type which has a `text` field, we could implement
+the `containsValue` method by checking if this field contains
+the search token in a case insensitive manner:
+
+[source,kotlin]
+----
+override fun containsValue(value: MessageProperty, propertyValue: String): Boolean {
+    return StringUtils.containsIgnoreCase(value.text, propertyValue)
+}
+----
+
+The `getSearchArguments` method is more complex - it allows the
+Ontrack search engine to plug some SQL fragment into a more
+global search, for example like when <<builds-filtering,searching for builds>>.
+
+This method returns a `PropertySearchArguments` instance with three properties:
+
+* `jsonContext` - expression to join with to the `PROPERTIES` table in order to
+            contraint the JSON scope, for example `jsonb_array_elements(pp.json->'items') as item`.
+            This expression is optional.
+* `jsonCriteria` - Criteria to act on the `jsonContext` defined above, based
+              on a search token, for example:
+              `item->>'name' = :name and item->>'value' ilike :value`. This expression
+              is optional. Variables in this expression can be mapped to actual
+              parameters using the `criteriaParams` map parameter below.
+* `criteriaParams`- Map of parameters for the criteria, for example:
+               `name` -> `"name"` and `value` -> `"%value%"`. See
+               the https://docs.spring.io/spring/docs/{spring-version}/spring-framework-reference/htmlsingle/#jdbc-NamedParameterJdbcTemplate[Spring Documentation]
+               for more information.
+
+Most of the time, the `jsonContext` and `jsonCriteria` expressions will
+rely on the `json` column of the `PROPERTIES` table, which is
+a https://www.postgresql.org/docs/9.4/datatype-json.html[Postgres JSONB] data type
+containing a JSON representation of the property data type.
+
+Refer to the https://www.postgresql.org/docs/9.4/functions-json.html[Postgres JSON] documentation for more information about
+the syntax to use in those expressions.
+
+[IMPORTANT]
+====
+In the `jsonContext` and `jsonCriteria` expressions, the `PROPERTIES` table
+is designed using the `pp` alias.
+====
+
+[NOTE]
+====
+The `getSearchArguments` returns a `null` `PropertySearchArguments` instance
+by default - this means that any search on this property does not
+return anything.
+====
+
+Example, for a property data type having a `links` list of `name/value` strings,
+and we want to look in the `value` field in a case insensitive way:
+
+[source,kotlin]
+----
+override fun getSearchArguments(token: String): PropertySearchArguments? {
+    return PropertySearchArguments(
+            jsonContext = "jsonb_array_elements(pp.json->'links') as link",
+            jsonCriteria = "link->>'value' ilike :value",
+            criteriaParams = mapOf(
+                    "value" to "%$token%"
+            )
+    )
+}
+----

@@ -11,6 +11,7 @@ Damien Coraboeuf
 // ========================================================
 :ontrack-version: current
 :spring-boot-version: 2.0.2.RELEASE
+:spring-version: 4.3.22.RELEASE
 // ========================================================
 
 include::installation.adoc[]

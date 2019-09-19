@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.structure.NameDescription;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -30,8 +29,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
 @ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
 @SpringBootTest(
         classes = {
-                AbstractITTestSupport.AbstractIntegrationTestConfiguration.class,
-                MetricsAutoConfiguration.class
+                AbstractITTestSupport.AbstractIntegrationTestConfiguration.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.NONE
 )

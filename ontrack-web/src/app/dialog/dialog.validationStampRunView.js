@@ -71,14 +71,19 @@ angular.module('ot.dialog.validationStampRunView', [
                               runTime
                             }
                             validationRunStatuses {
+                              id
                               creation {
                                 user
                                 time
                               }
                               description
+                              annotatedDescription
                               statusID {
                                 id
                                 name
+                              }
+                              links {
+                                _comment
                               }
                             }
                             links {

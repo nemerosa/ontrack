@@ -32,7 +32,7 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
         build("2.0.0");
         build("2.0.1");
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("1.1.0")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("1.1.0")).filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, "2.0.1", "2.0.0", "1.1.0");
     }
@@ -46,7 +46,7 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
         build("2.0.0");
         build("2.0.1");
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("1.0.*")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("1.0.*")).filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, "2.0.1", "2.0.0", "1.1.0", "1.0.1");
     }
@@ -54,13 +54,13 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
     @Test
     public void from_only_with_explicit_build_and_promotion_before_from() throws Exception {
         // Builds
-        build("1.0.0").withPromotion(bronze);
+        build("1.0.0").withPromotion(getBronze());
         build("1.0.1");
         build("1.1.0");
         build("2.0.0");
-        build("2.0.1").withPromotion(bronze);
+        build("2.0.1").withPromotion(getBronze());
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("1.1.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("1.1.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, "2.0.1");
     }
@@ -70,11 +70,11 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
         // Builds
         build("1.0.0");
         build("1.0.1");
-        build("1.1.0").withPromotion(bronze);
+        build("1.1.0").withPromotion(getBronze());
         build("2.0.0");
-        build("2.0.1").withPromotion(bronze);
+        build("2.0.1").withPromotion(getBronze());
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("1.0.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("1.0.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, "2.0.1", "1.1.0");
     }
@@ -84,11 +84,11 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
         // Builds
         build("1.0.0");
         build("1.0.1");
-        build("1.1.0").withPromotion(bronze);
+        build("1.1.0").withPromotion(getBronze());
         build("2.0.0");
-        build("2.0.1").withPromotion(bronze);
+        build("2.0.1").withPromotion(getBronze());
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("1.1.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("1.1.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, "2.0.1", "1.1.0");
     }
@@ -97,12 +97,12 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
     public void from_only_with_pattern_and_promotions() throws Exception {
         // Builds
         build("1.0.0");
-        build("1.0.1").withPromotion(bronze);
+        build("1.0.1").withPromotion(getBronze());
         build("1.1.0");
-        build("2.0.0").withPromotion(bronze);
+        build("2.0.0").withPromotion(getBronze());
         build("2.0.1");
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("1.0.*").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("1.0.*").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch());
         // Checks the list
         checkList(builds, "2.0.0", "1.0.1");
     }
@@ -114,7 +114,7 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
         build("1.1.0");
         build("2.0.1");
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("0.9.0")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("0.9.0")).filterBranchBuilds(getBranch());
         // Checks the list
         assertTrue(builds.isEmpty());
     }
@@ -126,7 +126,7 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
         build("1.1.0");
         build("2.0.1");
         // Filter
-        List<Build> builds = filter(NamedBuildFilterData.of("0.9.*")).filterBranchBuilds(branch);
+        List<Build> builds = filter(NamedBuildFilterData.of("0.9.*")).filterBranchBuilds(getBranch());
         // Checks the list
         assertTrue(builds.isEmpty());
     }
@@ -141,19 +141,19 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
         build("2.0.1");
         // From & since are explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.0")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.0")).filterBranchBuilds(getBranch()),
                 "2.0.0", "1.1.0");
         // From is explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.*")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.*")).filterBranchBuilds(getBranch()),
                 "2.0.1", "2.0.0", "1.1.0");
         // Since is explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.0")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.0")).filterBranchBuilds(getBranch()),
                 "2.0.0", "1.1.0", "1.0.1");
         // None is explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.*")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.*")).filterBranchBuilds(getBranch()),
                 "2.0.1", "2.0.0", "1.1.0", "1.0.1");
     }
 
@@ -161,25 +161,25 @@ public class NamedBuildFilterIT extends AbstractBuildFilterIT {
     public void from_and_since_with_promotion() throws Exception {
         // Builds
         build("1.0.0");
-        build("1.0.1").withPromotion(bronze);
+        build("1.0.1").withPromotion(getBronze());
         build("1.1.0");
-        build("2.0.0").withPromotion(bronze);
+        build("2.0.0").withPromotion(getBronze());
         build("2.0.1");
         // From & since are explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch()),
                 "2.0.0");
         // From is explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.*").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.1.0").withToBuild("2.0.*").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch()),
                 "2.0.0");
         // Since is explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.0").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch()),
                 "2.0.0", "1.0.1");
         // None is explicit
         checkList(
-                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.*").withWithPromotionLevel("BRONZE")).filterBranchBuilds(branch),
+                filter(NamedBuildFilterData.of("1.0.*").withToBuild("2.0.*").withWithPromotionLevel("BRONZE")).filterBranchBuilds(getBranch()),
                 "2.0.0", "1.0.1");
     }
 

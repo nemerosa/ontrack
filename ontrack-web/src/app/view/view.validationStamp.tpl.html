@@ -61,8 +61,7 @@
                                 <ot-validation-run-data value="validationRun.data"></ot-validation-run-data>
                             </span>
                         </td>
-                        <td>
-                            {{validationRun.validationRunStatuses[0].description}}
+                        <td ng-bind-html="validationRun.validationRunStatuses[0].annotatedDescription">
                         </td>
                         <td>
                             <ot-signature value="{time: validationRun.creation.time, user: {name: validationRun.creation.user}}" user="true" time="true"></ot-signature>

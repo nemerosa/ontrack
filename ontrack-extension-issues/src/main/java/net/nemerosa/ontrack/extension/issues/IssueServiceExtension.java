@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.issues;
 
-import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 
@@ -85,14 +85,6 @@ public interface IssueServiceExtension extends Extension {
     Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey);
 
     /**
-     * Checks if an issue key is contained in a set of keys. This set of keys has typically been extracted
-     * using the
-     * {@link #extractIssueKeysFromMessage(net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration, String)}
-     * method.
-     */
-    boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys);
-
-    /**
      * List of supported export formats for the issues.
      *
      * @param issueServiceConfiguration Configuration for the service
@@ -135,4 +127,13 @@ public interface IssueServiceExtension extends Extension {
     default Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         return Collections.singleton(issue);
     }
+
+    /**
+     * Creates a regular expression to use when looking for this issue in a message.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param issue                     Issue to look for
+     * @return Regular expression
+     */
+    String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
 }

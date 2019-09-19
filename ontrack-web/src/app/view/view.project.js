@@ -3,7 +3,9 @@ angular.module('ot.view.project', [
     'ot.service.core',
     'ot.service.structure',
     'ot.service.copy',
-    'ot.service.graphql'
+    'ot.service.graphql',
+    'ot.service.label',
+    'ot.dialog.project.labels'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('project', {
@@ -12,12 +14,14 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService) {
+    .controller('ProjectCtrl', function ($modal, $scope, $stateParams, $state, $http, ot, otGraphqlService, otStructureService, otAlertService, otCopyService, otLabelService) {
         const view = ot.view();
         // Project's id
         const projectId = $stateParams.projectId;
         // Initial name filter
-        $scope.branchNameFilter = '';
+        $scope.branchFilter = {
+            name: ""
+        };
 
         // Loading the project and its whole information
         function loadProject() {
@@ -30,6 +34,18 @@ angular.module('ot.view.project', [
                 disabled
                 decorations {
                   ...decorationContent
+                }
+                labels {
+                  id
+                  category
+                  name
+                  description
+                  color
+                  foregroundColor
+                  computedBy {
+                    id
+                    name
+                  }
                 }
                 links {
                   _self
@@ -44,8 +60,11 @@ angular.module('ot.view.project', [
                   _extra
                   _events
                   _actions
+                  _labels
+                  _labelFromToken
+                  _labelsCreate
                 }
-                branches {
+                favouriteBranches: branches(favourite: true) {
                   id
                   name
                   disabled
@@ -53,15 +72,23 @@ angular.module('ot.view.project', [
                   decorations {
                     ...decorationContent
                   }
+                  creation {
+                    time
+                  }
                   links {
                     _page
                     _enable
                     _disable
                     _delete
+                    _unfavourite
+                    _favourite
                   }
                   latestBuild: builds(count: 1) {
                     id
                     name
+                    creation {
+                        time
+                    }
                   }
                   promotionLevels {
                     id
@@ -74,6 +101,31 @@ angular.module('ot.view.project', [
                         name
                       }
                     }
+                  }
+                }
+                branches {
+                  id
+                  name
+                  disabled
+                  type
+                  decorations {
+                    ...decorationContent
+                  }
+                  creation {
+                    time
+                  }
+                  latestBuild: builds(count: 1) {
+                    creation {
+                        time
+                    }
+                  }
+                  links {
+                    _page
+                    _enable
+                    _disable
+                    _delete
+                    _unfavourite
+                    _favourite
                   }
                 }
               }
@@ -165,6 +217,17 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
+                            return $scope.project.links._labels;
+                        },
+                        id: 'labelsProject',
+                        name: "Labels",
+                        cls: 'ot-command-project-labels',
+                        action: () => {
+                            $scope.editProjectLabels();
+                        }
+                    },
+                    {
+                        condition: function () {
                             return $scope.project.links._permissions;
                         },
                         id: 'permissionsProject',
@@ -200,7 +263,7 @@ angular.module('ot.view.project', [
                             otAlertService.confirm({
                                 title: "Deleting a project",
                                 message: "Do you really want to delete the project " + $scope.project.name +
-                                " and all its associated data?"
+                                    " and all its associated data?"
                             }).then(function () {
                                 return ot.call($http.delete($scope.project.links._delete));
                             }).then(function () {
@@ -223,6 +286,29 @@ angular.module('ot.view.project', [
         // Reload callback available in the scope
         $scope.reloadProject = loadProject;
 
+        // Time to use for sorting branches
+        $scope.getBranchTime = function (branch) {
+            if (branch.latestBuild && branch.latestBuild.length > 0) {
+                return branch.latestBuild[0].creation.time;
+            } else {
+                return branch.creation.time;
+            }
+        };
+
+        // Sets a branch as favourite
+        $scope.branchFavourite = function (branch) {
+            if (branch.links._favourite) {
+                ot.pageCall($http.put(branch.links._favourite)).then(loadProject);
+            }
+        };
+
+        // Unsets a branch as favourite
+        $scope.branchUnfavourite = function (branch) {
+            if (branch.links._unfavourite) {
+                ot.pageCall($http.put(branch.links._unfavourite)).then(loadProject);
+            }
+        };
+
         // Enabling a branch
         $scope.enableBranch = function (branch) {
             if (branch.links._enable) {
@@ -242,10 +328,54 @@ angular.module('ot.view.project', [
             return otAlertService.confirm({
                 title: "Deleting a branch",
                 message: "Do you really want to delete the branch " + branch.name +
-                " and all its associated data?"
+                    " and all its associated data?"
             }).then(function () {
                 return ot.call($http.delete(branch.links._delete));
             }).then(loadProject);
+        };
+
+        $scope.projectLabelFilter = (label) => {
+            location.href = '#/home?label=' + otLabelService.formatLabel(label);
+        };
+
+        $scope.editProjectLabels = () => {
+            if ($scope.project.links._labels) {
+                const labelQuery = `{
+                    labels {
+                        id
+                        category
+                        name
+                        description
+                        color
+                        foregroundColor
+                        computedBy {
+                            id
+                            name
+                        }
+                    }
+                }`;
+                otGraphqlService.pageGraphQLCall(labelQuery).then(resultLabels => {
+                    return $modal.open({
+                        templateUrl: 'app/dialog/dialog.project.labels.tpl.html',
+                        controller: 'otDialogProjectLabels',
+                        resolve: {
+                            config: function () {
+                                return {
+                                    labels: resultLabels.labels,
+                                    project: $scope.project,
+                                    submit: function (labels) {
+                                        const request = {
+                                            labels: labels.filter(it => it.selected)
+                                                .map(it => it.id)
+                                        };
+                                        return ot.call($http.put($scope.project.links._labels, request));
+                                    }
+                                };
+                            }
+                        }
+                    }).result;
+                }).then(loadProject);
+            }
         };
     })
 ;

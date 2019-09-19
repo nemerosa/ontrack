@@ -100,7 +100,19 @@ interface StructureService {
 
     fun deleteBuildLink(fromBuild: Build, toBuild: Build)
 
+    @Deprecated("Use getBuildsUsedBy instead")
     fun getBuildLinksFrom(build: Build): List<Build>
+
+    /**
+     * Gets the builds used by the given one.
+     *
+     * @param build  Source build
+     * @param offset Offset for pagination
+     * @param size   Page size for pagination
+     * @param filter Optional filter on the builds
+     * @return List of builds which are used by the given one
+     */
+    fun getBuildsUsedBy(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
      * Gets the builds which use the given one.
@@ -108,12 +120,13 @@ interface StructureService {
      * @param build  Source build
      * @param offset Offset for pagination
      * @param size   Page size for pagination
+     * @param filter Optional filter on the builds
      * @return List of builds which use the given one
      */
-    fun getBuildsUsing(build: Build, offset: Int, size: Int): PaginatedList<Build>
+    fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
 
-    @Deprecated("Use {@link #getBuildsUsing(Build, int, int)} instead")
+    @Deprecated("Use getBuildsUsing instead")
     fun getBuildLinksTo(build: Build): List<Build>
 
     fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build>
@@ -162,7 +175,7 @@ interface StructureService {
 
     fun newPromotionLevelFromPredefined(branch: Branch, predefinedPromotionLevel: PredefinedPromotionLevel): PromotionLevel
 
-    fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String): PromotionLevel
+    fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String?): PromotionLevel
 
     // Promotion runs
 
@@ -282,6 +295,34 @@ interface StructureService {
     fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
 
     fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun
+
+    /**
+     * Gets the parent validation run for a given validation run status ID
+     */
+    fun getParentValidationRun(validationRunStatusId: ID): ValidationRun
+
+    /**
+     * Gets a validation run status using its ID.
+     *
+     * @param id ID of the validation run status
+     * @return Validation run status
+     */
+    fun getValidationRunStatus(id: ID): ValidationRunStatus
+
+    /**
+     * Edits a validation run status comment.
+     *
+     * @param run Parent validation run
+     * @param runStatusId ID of the specific run status to edit
+     * @param comment New comment
+     * @return Updated validation run
+     */
+    fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun
+
+    /**
+     * Checks if the validation run status comment is editable by the current user
+     */
+    fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean
 
     /**
      * Gets the total number of validation runs for a build and a validation stamp

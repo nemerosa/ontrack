@@ -9,68 +9,45 @@
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
 
 plugins {
-    id 'org.ajoberstar.github-pages' version '1.5.1'
+    id 'org.ajoberstar.git-publish' version '2.0.0'
 }
 
-task siteOntrackLastReleases(type: OntrackLastReleases) {
+task siteOntrackLast2Releases(type: OntrackLastReleases) {
+    releaseCount = 2
+    releasePattern = /2\.[\d]+\..*/
+}
+
+task siteOntrackLast3Releases(type: OntrackLastReleases) {
     releaseCount = 6
-    releasePattern = /[23]\..*/
+    releasePattern = /3\.[\d]+\..*/
 }
 
 task sitePagesDocJs {
-    dependsOn 'siteOntrackLastReleases'
-    outputs.file project.file('build/site/pages/javascripts/doc/doc.js')
+    dependsOn 'siteOntrackLast2Releases'
+    dependsOn 'siteOntrackLast3Releases'
+    outputs.file project.file('build/site/page/doc.js')
     doLast {
-        project.file('build/site/pages/javascripts/doc').mkdirs()
-        project.file('build/site/pages/javascripts/doc/doc.js').text =
-                "var releases = [${siteOntrackLastReleases.releases.collect { "'${it.name}'" }.join(',')}];"
+        project.file('build/site/page').mkdirs()
+        project.file('build/site/page/doc.js').text =
+                "var releases = [${(siteOntrackLast3Releases.releases + siteOntrackLast2Releases.releases).collect { "'${it.name}'" }.join(',')}];"
     }
 }
 
-task sitePagesCopyHtml(type: Copy) {
-    from 'publication/html5'
-    into "build/site/pages/release/${ontrackVersion}/doc"
-}
-
-task sitePagesCopyPdf(type: Copy) {
-    from 'publication/pdf'
-    into "build/site/pages/release/${ontrackVersion}"
-}
-
-task sitePagesCopyJavadoc(type: Copy) {
-    from zipTree('publication/ontrack-javadoc.zip')
-    into "build/site/pages/release/${ontrackVersion}/javadoc"
-}
-
-task sitePrepare {
-    dependsOn 'sitePagesDocJs'
-    dependsOn 'sitePagesCopyHtml'
-    dependsOn 'sitePagesCopyPdf'
-    dependsOn 'sitePagesCopyJavadoc'
-}
-
-prepareGhPages.dependsOn sitePrepare
-
-githubPages {
-    deleteExistingFiles = false
+gitPublish {
     repoUri = project.properties.ontrackGitHubUri
-    credentials.username = project.properties.ontrackGitHubUser
-    credentials.password = project.properties.ontrackGitHubPassword
-    targetBranch = project.properties.ontrackGitHubPages
-    pages {
-        from ("build/site/pages/release/${ontrackVersion}") {
-            into "release/${ontrackVersion}"
-        }
-        from ("build/site/pages/release/${ontrackVersion}") {
-            into "release/latest"
-        }
-        from("build/site/pages/javascripts/doc") {
+    branch = project.properties.ontrackGitHubPages
+    contents {
+        from 'ontrack-site/src/main/web'
+        from('build/site/page') {
             include 'doc.js'
-            into "javascripts/doc"
+            into 'javascripts/doc/'
         }
     }
+    commitMessage = "GitHub pages for version ${ontrackVersion}" as String
 }
+
+gitPublishCopy.dependsOn sitePagesDocJs
 
 task site {
-    dependsOn 'publishGhPages'
+    dependsOn 'gitPublishPush'
 }

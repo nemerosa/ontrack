@@ -1,6 +1,23 @@
 [[appendix-deprecations]]
 === Deprecations and migration notes
 
+[[appendix-deprecations-3.38]]
+==== Since 3.38
+
+The `PropertyType` interface `getSearchKey` method is now deprecated
+and will be removed in a next version. Returning an empty string
+or calling the default `super` method is enough.
+
+If the property is searchable, the `getSearchArguments` method
+must be implemented instead. See <<extending-properties>> for more
+information.
+
+[NOTE]
+====
+The `searchkey` column in the `properties` database table has been
+_deleted_.
+====
+
 [[appendix-deprecations-3.35]]
 ==== Since 3.35
 

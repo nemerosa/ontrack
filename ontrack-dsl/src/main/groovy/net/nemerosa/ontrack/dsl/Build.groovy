@@ -46,14 +46,14 @@ class Build extends AbstractProjectResource {
         run
     }
 
-    @DSLMethod(id = "validate", count = 2)
-    ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED') {
+    @DSLMethod(id = "validate", count = 3)
+    ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED', String description = "") {
         new ValidationRun(
                 ontrack,
                 ontrack.post(link('validate'), [
                         validationStampName  : validationStamp,
                         validationRunStatusId: validationStampStatus,
-                        description          : ''
+                        description          : description
                 ])
         )
     }
@@ -139,6 +139,36 @@ class Build extends AbstractProjectResource {
                 denominator: denominator,
         ],
                 'net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType',
+                status
+        )
+    }
+
+    @DSLMethod(count = 4, value = """Associates some test results with the validation.""")
+    ValidationRun validateWithTestSummary(String validationStamp, TestSummary testSummary, String status = null) {
+        return validateWithData(
+                validationStamp, [
+                passed : testSummary.passed,
+                skipped: testSummary.skipped,
+                failed : testSummary.failed,
+        ],
+                'net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType',
+                status
+        )
+    }
+
+    @DSLMethod(count = 3, value = """Associates some arbitrary metrics with the validation.""")
+    ValidationRun validateWithMetrics(String validationStamp, Map<String, Double> metrics, String status = null) {
+        return validateWithData(
+                validationStamp,
+                [
+                        metrics: metrics.collect { name, value ->
+                            [
+                                    name : name,
+                                    value: value,
+                            ]
+                        }
+                ],
+                'net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType',
                 status
         )
     }

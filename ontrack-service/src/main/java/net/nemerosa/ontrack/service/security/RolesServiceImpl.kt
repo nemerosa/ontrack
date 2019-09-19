@@ -1,58 +1,53 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.labels.LabelManagement
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.support.StartupService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 /**
  * Management of the roles and functions.
+ *
+ * @property roleContributors Role contributors
  */
 @Service
 @Transactional
-class RolesServiceImpl @Autowired
-constructor(
-        /**
-         * Role contributors
-         */
+class RolesServiceImpl(
         private val roleContributors: List<RoleContributor>
 ) : RolesService, StartupService {
 
     /**
      * Index of global roles
      */
-    private val globalRoles = LinkedHashMap<String, GlobalRole>()
+    private val globalRolesIndex = LinkedHashMap<String, GlobalRole>()
 
     /**
      * Index of project roles
      */
-    private val projectRoles = LinkedHashMap<String, ProjectRole>()
+    private val projectRolesIndex = LinkedHashMap<String, ProjectRole>()
 
-    override fun getGlobalRoles(): List<GlobalRole> {
-        return ArrayList(globalRoles.values)
-    }
+    override val globalRoles: List<GlobalRole>
+        get() = globalRolesIndex.values.toList()
 
     override fun getGlobalRole(id: String): Optional<GlobalRole> {
-        return Optional.ofNullable(globalRoles[id])
+        return Optional.ofNullable(globalRolesIndex[id])
     }
 
-    override fun getProjectRoles(): List<ProjectRole> {
-        return ArrayList(projectRoles.values)
-    }
+    override val projectRoles: List<ProjectRole>
+        get() = projectRolesIndex.values.toList()
 
     override fun getProjectRole(id: String): Optional<ProjectRole> {
-        return Optional.ofNullable(projectRoles[id])
+        return Optional.ofNullable(projectRolesIndex[id])
     }
 
-    override fun getGlobalFunctions(): List<Class<out GlobalFunction>> {
-        return RolesService.defaultGlobalFunctions
-    }
+    override val globalFunctions: List<Class<out GlobalFunction>>
+        get() = RolesService.defaultGlobalFunctions
 
-    override fun getProjectFunctions(): List<Class<out ProjectFunction>> {
-        return RolesService.defaultProjectFunctions
-    }
+    override val projectFunctions: List<Class<out ProjectFunction>>
+        get() = RolesService.defaultProjectFunctions
 
     override fun getProjectRoleAssociation(project: Int, roleId: String): Optional<ProjectRoleAssociation> {
         return getProjectRole(roleId).map { role -> ProjectRoleAssociation(project, role) }
@@ -87,7 +82,9 @@ constructor(
                 "A participant in a project is allowed to change statuses in validation runs.",
                 Arrays.asList(
                         ProjectView::class.java,
-                        ValidationRunStatusChange::class.java
+                        ValidationRunStatusChange::class.java,
+                        ValidationRunStatusCommentEditOwn::class.java,
+                        ValidationStampFilterCreate::class.java
                 )
         )
 
@@ -97,7 +94,11 @@ constructor(
                 ValidationStampEdit::class.java,
                 ValidationStampDelete::class.java,
                 ValidationRunCreate::class.java,
-                ValidationRunStatusChange::class.java
+                ValidationRunStatusChange::class.java,
+                ValidationRunStatusCommentEdit::class.java,
+                ValidationStampFilterCreate::class.java,
+                ValidationStampFilterShare::class.java,
+                ValidationStampFilterMgt::class.java
         )
         register(Roles.PROJECT_VALIDATION_MANAGER, "Validation manager",
                 "The validation manager can manage the validation stamps.",
@@ -123,6 +124,7 @@ constructor(
         projectManagerFunctions.add(BranchCreate::class.java)
         projectManagerFunctions.add(BranchEdit::class.java)
         projectManagerFunctions.add(BranchDelete::class.java)
+        projectManagerFunctions.add(ProjectLabelManagement::class.java)
         register(Roles.PROJECT_MANAGER, "Project manager",
                 "The project manager can promote existing builds, manage the validation stamps, " + "manage the shared build filters, manage the branches and edit some properties.",
                 projectManagerFunctions
@@ -136,7 +138,7 @@ constructor(
 
         // Project roles contributions
         roleContributors.forEach { roleContributor ->
-            roleContributor.getProjectRoles().forEach { roleDefinition ->
+            roleContributor.projectRoles.forEach { roleDefinition ->
                 if (Roles.PROJECT_ROLES.contains(roleDefinition.id)) {
                     // Totally illegal - stopping everything
                     throw IllegalStateException("An existing project role cannot be overridden: " + roleDefinition.id)
@@ -157,7 +159,7 @@ constructor(
         val functions = LinkedHashSet(projectFunctions)
         // Contributions
         roleContributors.forEach { roleContributor ->
-            roleContributor.getProjectFunctionContributionsForProjectRoles()[id]?.forEach { fn ->
+            roleContributor.projectFunctionContributionsForProjectRoles[id]?.forEach { fn ->
                 // Checks if the role is predefined
                 if (Roles.PROJECT_ROLES.contains(id)) {
                     // Checks the function as non core
@@ -185,7 +187,7 @@ constructor(
     }
 
     private fun register(projectRole: ProjectRole) {
-        projectRoles.put(projectRole.id, projectRole)
+        projectRolesIndex[projectRole.id] = projectRole
 
     }
 
@@ -197,13 +199,13 @@ constructor(
                 "An administrator is allowed to do everything in the application.",
                 (globalFunctions +
                         roleContributors.flatMap {
-                            it.globalFunctionContributionsForGlobalRoles.values.flatMap { it }
+                            it.globalFunctionContributionsForGlobalRoles.values.flatten()
                         }
                         ).distinct(),
                 (projectFunctions +
                         roleContributors.flatMap {
-                            it.projectFunctionContributionsForGlobalRoles.values.flatMap { it } +
-                                    it.projectFunctionContributionsForProjectRoles.values.flatMap { it }
+                            it.projectFunctionContributionsForGlobalRoles.values.flatten() +
+                                    it.projectFunctionContributionsForProjectRoles.values.flatten()
                         }
                         ).distinct()
         )
@@ -211,8 +213,11 @@ constructor(
         // Creator
         register(Roles.GLOBAL_CREATOR, "Creator",
                 "A creator is allowed to create new projects and to configure it. Once done, its rights on the " + "project are revoked immediately.",
-                listOf<Class<out GlobalFunction>>(ProjectCreation::class.java),
-                Arrays.asList<Class<out ProjectFunction>>(
+                listOf(
+                        ProjectCreation::class.java,
+                        LabelManagement::class.java
+                ),
+                listOf(
                         // Structure creation functions only
                         ProjectConfig::class.java,
                         BranchCreate::class.java,
@@ -262,6 +267,21 @@ constructor(
                 )
         )
 
+        // Global validation manager
+        register(Roles.GLOBAL_VALIDATION_MANAGER, "Global validation manager",
+                "A global validation manager can manage the validation stamps across all projects and edit validation run comments.",
+                listOf(
+                        ValidationStampBulkUpdate::class.java
+                ),
+                listOf(
+                        ProjectView::class.java,
+                        ValidationStampCreate::class.java,
+                        ValidationStampEdit::class.java,
+                        ValidationStampDelete::class.java,
+                        ValidationRunStatusCommentEdit::class.java
+                )
+        )
+
         // Read only on all projects
         register(Roles.GLOBAL_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all projects",
@@ -293,7 +313,7 @@ constructor(
         if (parent == null) {
             return null
         } else if (Roles.PROJECT_ROLES.contains(parent)) {
-            val parentRole = projectRoles[parent]
+            val parentRole = projectRolesIndex[parent]
             if (parentRole != null) {
                 return parentRole
             }
@@ -305,7 +325,7 @@ constructor(
         if (parent == null) {
             return null
         } else if (Roles.GLOBAL_ROLES.contains(parent)) {
-            val parentRole = globalRoles[parent]
+            val parentRole = globalRolesIndex[parent]
             if (parentRole != null) {
                 return parentRole
             }
@@ -335,7 +355,7 @@ constructor(
         // Global functions and contributions
         val gfns = LinkedHashSet(globalFunctions)
         roleContributors.forEach { roleContributor ->
-            roleContributor.getGlobalFunctionContributionsForGlobalRoles()[id]?.forEach { fn ->
+            roleContributor.globalFunctionContributionsForGlobalRoles[id]?.forEach { fn ->
                 if (Roles.GLOBAL_ROLES.contains(id)) {
                     checkFunctionForContribution(fn)
                 }
@@ -345,7 +365,7 @@ constructor(
         // Project functions
         val pfns = LinkedHashSet(projectFunctions)
         roleContributors.forEach { roleContributor ->
-            roleContributor.getProjectFunctionContributionsForGlobalRoles()[id]?.forEach { fn ->
+            roleContributor.projectFunctionContributionsForGlobalRoles[id]?.forEach { fn ->
                 if (Roles.GLOBAL_ROLES.contains(id)) {
                     checkFunctionForContribution(fn)
                 }
@@ -363,6 +383,6 @@ constructor(
     }
 
     private fun register(role: GlobalRole) {
-        globalRoles.put(role.id, role)
+        globalRolesIndex[role.id] = role
     }
 }
