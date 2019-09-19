@@ -54,6 +54,24 @@ class SonarQubePropertyTypeTest {
     }
 
     @Test
+    fun `Client parsing with default values`() {
+        val client = mapOf(
+                "configuration" to "conf-name",
+                "key" to "project:key"
+        ).asJson()
+        val parsed = type.fromClient(client)
+        assertEquals("conf-name", parsed.configuration.name)
+        assertEquals("https://sonarqube.nemerosa.net", parsed.configuration.url)
+        assertEquals("xxxx", parsed.configuration.password)
+        assertEquals("project:key", parsed.key)
+        assertEquals("sonarqube", parsed.validationStamp)
+        assertEquals(listOf(), parsed.measures)
+        assertEquals(false, parsed.override)
+        assertEquals(false, parsed.branchModel)
+        assertEquals(null, parsed.branchPattern)
+    }
+
+    @Test
     fun clientParsingWithNoMeasure() {
         val client = mapOf(
                 "configuration" to "conf-name",

@@ -1,0 +1,61 @@
+    To enable SonarQube collection of measures for a project:
+
+[source,groovy]
+----
+ontrack.project('project').config {
+   sonarQube(
+      configuration: "...",
+      key: "project:key",
+   )
+}
+
+def property = ontrack.project('project').config.sonarQube
+assert property.configuration.name == "..."
+assert property.key == "project:key"
+----
+
+Only the `configuration` and `key` parameters are required.
+
+Full list of parameters is described below:
+
+|===
+| Parameter | Type | Default | Description
+
+| `configuration`
+| String
+| _Required_
+| Name of the SonarQube configuration
+
+| `key`
+| String
+| _Required_
+| Key of the project in SonarQube
+
+| `validationStamp`
+| String
+| `sonarqube`
+| Name of the validation stamp to listen to when collecting SonarQube measures on validation run
+
+| `measures`
+| List<String>
+| `[]`
+| List of additional measures to collect for this project
+
+| `override`
+| boolean
+| `false`
+| Set to `true` if the `measures` set above must override the general settings.
+
+| `branchModel`
+| boolean
+| `false`
+| If `true`, restricts the branches where the SonarQube measures are collected to the ones
+  matching any branch model associated with the project.
+
+| `branchPattern`
+| Regular expression
+| _None_
+| If set, restricts the branches where the SonarQube measures are collected to the ones
+  matching the regular expression.
+
+|===

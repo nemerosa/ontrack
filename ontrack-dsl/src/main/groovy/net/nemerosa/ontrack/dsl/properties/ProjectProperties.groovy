@@ -226,4 +226,22 @@ class ProjectProperties extends ProjectEntityProperties {
         }
     }
 
+    /**
+     * SonarQube property
+     */
+
+    @DSLMethod(value = "Sets the SonarQube settings for this project.")
+    void sonarQube(Map<String, ?> values) {
+        property("net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType", values)
+    }
+
+    @DSLMethod(see = "sonarQube")
+    Map<String, ?> getSonarQube() {
+        try {
+            return property('net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType') as Map
+        } catch (PropertyNotFoundException ignored) {
+            return null
+        }
+    }
+
 }

@@ -18,4 +18,8 @@ class SonarQubeProperty(
 
     val projectUrl: String
         get() = "${configuration.url}/dashboard?id=${URLEncoder.encode(key, "UTF-8")}"
+
+    companion object {
+        const val DEFAULT_VALIDATION_STAMP = "sonarqube"
+    }
 }

@@ -53,7 +53,7 @@ class SonarQubePropertyType(
                         Text.of("validationStamp")
                                 .label("Validation stamp")
                                 .help("Validation stamp to listen to for collecting SionarQube metrics on validation run")
-                                .value(value?.validationStamp ?: "sonarqube")
+                                .value(value?.validationStamp ?: SonarQubeProperty.DEFAULT_VALIDATION_STAMP)
                 )
                 .with(
                         MultiStrings.of("measures")
@@ -92,7 +92,7 @@ class SonarQubePropertyType(
         return SonarQubeProperty(
                 configuration,
                 node.path("key").asText(),
-                node.path("validationStamp").asText(),
+                node.path("validationStamp").asText().ifBlank { SonarQubeProperty.DEFAULT_VALIDATION_STAMP },
                 node.path("measures").map { it.asText() },
                 node.path("override").asBoolean(),
                 node.path("branchModel").asBoolean(),
