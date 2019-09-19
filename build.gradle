@@ -169,7 +169,7 @@ configure(javaProjects) {
         }
     }
 
-    model {
+    model {ValidationRunWithAutoStampIT
         tasks.generatePomFileForMavenCustomPublication {
             destination = file("${buildDir}/poms/${project.name}-${version}.pom")
         }
