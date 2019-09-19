@@ -1,4 +1,4 @@
-    To enable SonarQube collection of measures for a project:
+To enable SonarQube collection of measures for a project:
 
 [source,groovy]
 ----
