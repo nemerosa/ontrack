@@ -17,4 +17,15 @@ class ACCDSLSonarQube extends AbstractACCDSL {
         assert ontrack.config.sonarQube.find { it == name } != null
     }
 
+    @Test
+    void 'Global settings'() {
+        ontrack.config.sonarQubeSettings = [
+                measures: ["measure-1", "measure-2"],
+                disabled: false
+        ]
+        def settings = ontrack.config.sonarQubeSettings
+        assert settings.measures == ["measure-1", "measure-2"]
+        assert !settings.disabled
+    }
+
 }

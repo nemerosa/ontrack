@@ -423,4 +423,15 @@ class Config {
     List<String> getSonarQube() {
         ontrack.get('extension/sonarqube/configurations/descriptors').resources.collect { it.id }
     }
+
+    @DSLMethod("Gets the global SonarQube settings")
+    SonarQubeMeasuresSettings getSonarQubeSettings() {
+        def json = ontrack.get('settings/sonarqube-measures')
+        return new SonarQubeMeasuresSettings(json.measures as List<String>, json.disabled as boolean)
+    }
+
+    @DSLMethod("Sets the global SonarQube settings")
+    def setSonarQubeSettings(SonarQubeMeasuresSettings settings) {
+        ontrack.put('settings/sonarqube-measures', settings)
+    }
 }

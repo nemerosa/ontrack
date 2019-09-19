@@ -1,85 +1,73 @@
-package net.nemerosa.ontrack.boot.ui;
+package net.nemerosa.ontrack.boot.ui
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.DescribedForm;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.settings.SettingsManager;
-import net.nemerosa.ontrack.model.settings.SettingsManagerNotFoundException;
-import net.nemerosa.ontrack.model.settings.SettingsValidationException;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.Resources;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.ObjectMapperFactory
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.form.DescribedForm
+import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.settings.SettingsManager
+import net.nemerosa.ontrack.model.settings.SettingsManagerNotFoundException
+import net.nemerosa.ontrack.model.settings.SettingsValidationException
+import net.nemerosa.ontrack.ui.controller.AbstractResourceController
+import net.nemerosa.ontrack.ui.resource.Resource
+import net.nemerosa.ontrack.ui.resource.Resources
+import org.apache.commons.lang3.StringUtils
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 /**
  * Global settings management.
  */
 @RestController
 @RequestMapping("/settings")
-public class SettingsController extends AbstractResourceController {
+class SettingsController(
+        private val securityService: SecurityService,
+        private val settingsManagers: Collection<SettingsManager<*>>
+) : AbstractResourceController() {
 
-    private final SecurityService securityService;
-    private final Collection<SettingsManager<?>> settingsManagers;
-    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
-
-    @Autowired
-    public SettingsController(SecurityService securityService, Collection<SettingsManager<?>> settingsManagers) {
-        this.securityService = securityService;
-        this.settingsManagers = settingsManagers;
-    }
+    private val objectMapper = ObjectMapperFactory.create()
 
     /**
      * List of forms to configure.
      */
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public Resources<DescribedForm> configuration() {
-        securityService.checkGlobalFunction(GlobalSettings.class);
-        List<DescribedForm> forms = settingsManagers.stream()
-                .sorted((o1, o2) -> o1.getTitle().compareTo(o2.getTitle()))
-                .map(this::getSettingsForm)
-                .collect(Collectors.toList());
+    @GetMapping("")
+    fun configuration(): Resources<DescribedForm> {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        val forms = settingsManagers
+                .sortedBy { it.title }
+                .map { this.getSettingsForm(it) }
         // OK
         return Resources.of(
                 forms,
-                uri(on(getClass()).configuration())
-        );
+                uri(on(javaClass).configuration())
+        )
     }
 
     /**
      * Gets settings
      */
-    @RequestMapping(value = "/{type:.*}", method = RequestMethod.GET)
-    public <T> Resource<T> getSettings(@PathVariable String type) {
-        securityService.checkGlobalFunction(GlobalSettings.class);
-        T settings = settingsManagers.stream()
-                .filter(candidate -> StringUtils.equals(
-                        type,
-                        getSettingsManagerName(candidate)
-                ))
-                .map(manager -> (T) manager.getSettings())
-                .findFirst()
-                .orElse(null);
-        if (settings != null) {
-            return Resource.of(
+    @GetMapping("/{type:.*}")
+    fun <T> getSettings(@PathVariable type: String): Resource<T> {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        @Suppress("UNCHECKED_CAST") val settings: T? = settingsManagers
+                .filter { candidate ->
+                    StringUtils.equals(
+                            type,
+                            getSettingsManagerName(candidate)
+                    )
+                }
+                .map { it.settings }
+                .firstOrNull() as T?
+        return if (settings != null) {
+            Resource.of(
                     settings,
-                    uri(on(getClass()).getSettings(type))
-            );
+                    uri(on(javaClass).getSettings<Any>(type))
+            )
         } else {
-            throw new SettingsManagerNotFoundException(type);
+            throw SettingsManagerNotFoundException(type)
         }
     }
 
@@ -87,44 +75,46 @@ public class SettingsController extends AbstractResourceController {
     /**
      * Security
      */
-    @RequestMapping(value = "/{type:.*}", method = RequestMethod.PUT)
+    @PutMapping("/{type:.*}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public <T> Ack updateSettings(@PathVariable String type, @RequestBody JsonNode settingsNode) {
-        securityService.checkGlobalFunction(GlobalSettings.class);
+    fun <T> updateSettings(@PathVariable type: String, @RequestBody settingsNode: JsonNode?): Ack {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
         // Gets the settings manager by type
-        @SuppressWarnings("unchecked")
-        SettingsManager<T> settingsManager = (SettingsManager<T>) settingsManagers.stream()
-                .filter(candidate -> StringUtils.equals(
-                        type,
-                        getSettingsManagerName(candidate)
-                ))
-                .findFirst()
-                .orElseThrow(() -> new SettingsManagerNotFoundException(type));
+        @Suppress("UNCHECKED_CAST")
+        val settingsManager: SettingsManager<T> = (settingsManagers
+                .firstOrNull { candidate ->
+                    StringUtils.equals(
+                            type,
+                            getSettingsManagerName(candidate)
+                    )
+                }
+                ?: throw  SettingsManagerNotFoundException(type))
+                as SettingsManager<T>
         // Parsing
-        T settings;
+        val settings: T
         try {
-            settings = objectMapper.treeToValue(settingsNode, settingsManager.getSettingsClass());
-        } catch (JsonProcessingException e) {
-            throw new SettingsValidationException(e);
+            settings = objectMapper.treeToValue(settingsNode!!, settingsManager.settingsClass)
+        } catch (e: JsonProcessingException) {
+            throw SettingsValidationException(e)
         }
+
         // Saves the settings
-        settingsManager.saveSettings(settings);
+        settingsManager.saveSettings(settings)
         // OK
-        return Ack.OK;
+        return Ack.OK
     }
 
-    private String getSettingsManagerName(SettingsManager<?> settingsManager) {
-        return settingsManager.getId();
+    private fun getSettingsManagerName(settingsManager: SettingsManager<*>): String {
+        return settingsManager.id
     }
 
-    private <T> DescribedForm getSettingsForm(SettingsManager<T> settingsManager) {
+    private fun <T> getSettingsForm(settingsManager: SettingsManager<T>): DescribedForm {
         return DescribedForm.create(
                 getSettingsManagerName(settingsManager),
-                settingsManager.getSettingsForm()
+                settingsManager.settingsForm
         )
-                .title(settingsManager.getTitle())
-                .uri(uri(on(getClass()).updateSettings(getSettingsManagerName(settingsManager), null)))
-                ;
+                .title(settingsManager.title)
+                .uri(uri(on(javaClass).updateSettings<Any>(getSettingsManagerName(settingsManager), null)))
     }
 
 }
