@@ -18,44 +18,44 @@ Only the `configuration` and `key` parameters are required.
 
 Full list of parameters is described below:
 
-|===
-| Parameter | Type | Default | Description
+!===
+! Parameter ! Type ! Default ! Description
 
-| `configuration`
-| String
-| _Required_
-| Name of the SonarQube configuration
+! `configuration`
+! String
+! _Required_
+! Name of the SonarQube configuration
 
-| `key`
-| String
-| _Required_
-| Key of the project in SonarQube
+! `key`
+! String
+! _Required_
+! Key of the project in SonarQube
 
-| `validationStamp`
-| String
-| `sonarqube`
-| Name of the validation stamp to listen to when collecting SonarQube measures on validation run
+! `validationStamp`
+! String
+! `sonarqube`
+! Name of the validation stamp to listen to when collecting SonarQube measures on validation run
 
-| `measures`
-| List<String>
-| `[]`
-| List of additional measures to collect for this project
+! `measures`
+! List<String>
+! `[]`
+! List of additional measures to collect for this project
 
-| `override`
-| boolean
-| `false`
-| Set to `true` if the `measures` set above must override the general settings.
+! `override`
+! boolean
+! `false`
+! Set to `true` if the `measures` set above must override the general settings.
 
-| `branchModel`
-| boolean
-| `false`
-| If `true`, restricts the branches where the SonarQube measures are collected to the ones
+! `branchModel`
+! boolean
+! `false`
+! If `true`, restricts the branches where the SonarQube measures are collected to the ones
   matching any branch model associated with the project.
 
-| `branchPattern`
-| Regular expression
-| _None_
-| If set, restricts the branches where the SonarQube measures are collected to the ones
+! `branchPattern`
+! Regular expression
+! _None_
+! If set, restricts the branches where the SonarQube measures are collected to the ones
   matching the regular expression.
 
-|===
+!===
