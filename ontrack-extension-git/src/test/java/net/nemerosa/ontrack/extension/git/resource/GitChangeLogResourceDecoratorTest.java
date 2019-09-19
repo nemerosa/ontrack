@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +61,7 @@ public class GitChangeLogResourceDecoratorTest {
                         ).withId(
                                 ID.of(it)
                         )
-                )
+                        )
                 )
                 .collect(Collectors.toList());
 
@@ -81,11 +80,9 @@ public class GitChangeLogResourceDecoratorTest {
         );
 
         when(gitService.getProjectConfiguration(project)).thenReturn(
-                Optional.of(
-                        new BasicGitActualConfiguration(
-                                BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
-                                MockIssueServiceConfiguration.configuredIssueService("MyTest")
-                        )
+                new BasicGitActualConfiguration(
+                        BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
+                        MockIssueServiceConfiguration.configuredIssueService("MyTest")
                 )
         );
 
@@ -158,6 +155,7 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("uuid", "uuid")
                         .with("_commits", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogCommits:uuid")
                         .with("_issues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogIssues:uuid")
+                        .with("_issuesIds", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogIssuesIds:uuid")
                         .with("_files", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogFiles:uuid")
                         .with("_changeLogFileFilters", "urn:test:net.nemerosa.ontrack.extension.scm.SCMController#getChangeLogFileFilters:1")
                         .with("_diff", "urn:test:net.nemerosa.ontrack.extension.git.GitController#diff:")
@@ -184,7 +182,7 @@ public class GitChangeLogResourceDecoratorTest {
                                 nd(String.valueOf(it), "Build " + it),
                                 signature
                         ).withId(ID.of(it))
-                )
+                        )
                 )
                 .collect(Collectors.toList());
 
@@ -203,11 +201,9 @@ public class GitChangeLogResourceDecoratorTest {
         );
 
         when(gitService.getProjectConfiguration(project)).thenReturn(
-                Optional.of(
-                        new BasicGitActualConfiguration(
-                                BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
-                                null
-                        )
+                new BasicGitActualConfiguration(
+                        BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("mock:MyTest"),
+                        null
                 )
         );
 
@@ -290,7 +286,7 @@ public class GitChangeLogResourceDecoratorTest {
         );
     }
 
-    static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
+    private static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
         assertEquals(
                 mapper.getObjectMapper().writeValueAsString(expectedJson),
                 mapper.write(o)

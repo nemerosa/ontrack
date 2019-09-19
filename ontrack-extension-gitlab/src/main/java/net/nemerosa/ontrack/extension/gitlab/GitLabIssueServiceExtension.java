@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Component
 public class GitLabIssueServiceExtension extends AbstractIssueServiceExtension {
@@ -137,17 +136,6 @@ public class GitLabIssueServiceExtension extends AbstractIssueServiceExtension {
 
     protected int getIssueId(String token) {
         return Integer.parseInt(StringUtils.stripStart(token, "#"), 10);
-    }
-
-    @Override
-    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        // Searchable key?
-        if (StringUtils.isNumeric(key) || validIssueToken(key)) {
-            Set<Integer> ids = keys.stream().map(this::getIssueId).collect(Collectors.toSet());
-            return ids.contains(getIssueId(key));
-        } else {
-            return false;
-        }
     }
 
     @Override

@@ -8,5 +8,5 @@ public interface ProjectEdit extends ProjectView, ProjectConfig,
         PromotionLevelCreate, PromotionLevelEdit, PromotionLevelDelete,
         ValidationStampCreate, ValidationStampEdit, ValidationStampDelete,
         PromotionRunCreate, PromotionRunDelete,
-        ValidationRunCreate, ValidationRunStatusChange {
+        ValidationRunCreate, ValidationRunStatusChange, ValidationRunStatusCommentEditOwn, ValidationRunStatusCommentEdit {
 }

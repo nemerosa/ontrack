@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
+import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
@@ -26,9 +27,11 @@ import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.apache.commons.lang3.Validate
+import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.validation.ValidationUtils
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
@@ -50,8 +53,11 @@ class StructureServiceImpl(
         private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
         private val predefinedValidationStampService: PredefinedValidationStampService,
         private val decorationService: DecorationService,
-        private val projectFavouriteService: ProjectFavouriteService
+        private val projectFavouriteService: ProjectFavouriteService,
+        private val promotionRunCheckService: PromotionRunCheckService
 ) : StructureService {
+
+    private val logger = LoggerFactory.getLogger(StructureService::class.java)
 
     override val projectStatusViews: List<ProjectStatusView>
         get() = projectList
@@ -446,13 +452,22 @@ class StructureServiceImpl(
                 .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
     }
 
-    override fun getBuildsUsing(build: Build, offset: Int, size: Int): PaginatedList<Build> {
+    override fun getBuildsUsedBy(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean): PaginatedList<Build> {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        // Gets the complete list, filtered by ACL
+        val list = structureRepository.getBuildsUsedBy(build)
+                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
+        // OK
+        return PaginatedList.create(list.filter(filter), offset, size)
+    }
+
+    override fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean): PaginatedList<Build> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         // Gets the complete list, filtered by ACL
         val list = structureRepository.getBuildsUsing(build)
                 .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
         // OK
-        return PaginatedList.create(list, offset, size)
+        return PaginatedList.create(list.filter(filter), offset, size)
     }
 
     override fun getBuildLinksTo(build: Build): List<Build> {
@@ -539,6 +554,34 @@ class StructureServiceImpl(
     }
 
     override fun newPromotionLevel(promotionLevel: PromotionLevel): PromotionLevel {
+        // Creation
+        val newPromotionLevel = rawNewPromotionLevel(promotionLevel)
+        // Checking if there is an associated predefined promotion level
+        return securityService.callAsAdmin {
+            val predefined: PredefinedPromotionLevel? = securityService.callAsAdmin {
+                predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
+            }.orElse(null)
+            if (predefined != null) {
+                // Description
+                if (promotionLevel.description.isNullOrBlank()) {
+                    savePromotionLevel(newPromotionLevel.withDescription(predefined.description))
+                }
+                // Image
+                if (predefined.image != null && predefined.image) {
+                    setPromotionLevelImage(
+                            newPromotionLevel.id,
+                            predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefined.id)
+                    )
+                }
+                // Reloading
+                getPromotionLevel(newPromotionLevel.id)
+            } else {
+                newPromotionLevel
+            }
+        }
+    }
+
+    private fun rawNewPromotionLevel(promotionLevel: PromotionLevel): PromotionLevel {
         // Validation
         isEntityNew(promotionLevel, "Promotion level must be new")
         isEntityDefined(promotionLevel.branch, "Branch must be defined")
@@ -618,7 +661,7 @@ class StructureServiceImpl(
     }
 
     override fun newPromotionLevelFromPredefined(branch: Branch, predefinedPromotionLevel: PredefinedPromotionLevel): PromotionLevel {
-        val promotionLevel = newPromotionLevel(
+        val promotionLevel = rawNewPromotionLevel(
                 PromotionLevel.of(
                         branch,
                         NameDescription.nd(predefinedPromotionLevel.name, predefinedPromotionLevel.description)
@@ -655,10 +698,10 @@ class StructureServiceImpl(
         return promotionLevel
     }
 
-    override fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String): PromotionLevel {
+    override fun getOrCreatePromotionLevel(branch: Branch, promotionLevelId: Int?, promotionLevelName: String?): PromotionLevel {
         if (promotionLevelId != null) {
             return getPromotionLevel(ID.of(promotionLevelId))
-        } else {
+        } else if (promotionLevelName != null) {
             var oPromotionLevel = findPromotionLevelByName(
                     branch.project.name,
                     branch.name,
@@ -687,6 +730,8 @@ class StructureServiceImpl(
                         promotionLevelName
                 )
             }
+        } else {
+            throw PromotionRunRequestException()
         }
     }
 
@@ -711,6 +756,8 @@ class StructureServiceImpl(
                 "Promotion for a promotion level can be done only on the same branch than the build.")
         // Checks the authorization
         securityService.checkProjectFunction(promotionRun.build.branch.project.id(), PromotionRunCreate::class.java)
+        // Checks the preconditions for the creation of the promotion run
+        promotionRunCheckService.checkPromotionRunCreation(promotionRun)
         // If the promotion run's time is not defined, takes the current date
         val promotionRunToSave: PromotionRun
         val time = promotionRun.signature.time
@@ -767,6 +814,34 @@ class StructureServiceImpl(
     }
 
     override fun newValidationStamp(validationStamp: ValidationStamp): ValidationStamp {
+        // Raw creation
+        val newValidationStamp = rawNewValidationStamp(validationStamp)
+        // Checking if there is an associated predefined validation stamp
+        return securityService.callAsAdmin {
+            val predefined: PredefinedValidationStamp? = securityService.callAsAdmin {
+                predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name)
+            }.orElse(null)
+            if (predefined != null) {
+                // Description
+                if (validationStamp.description.isNullOrBlank()) {
+                    saveValidationStamp(newValidationStamp.withDescription(predefined.description))
+                }
+                // Image
+                if (predefined.image != null && predefined.image) {
+                    setValidationStampImage(
+                            newValidationStamp.id,
+                            predefinedValidationStampService.getPredefinedValidationStampImage(predefined.id)
+                    )
+                }
+                // Reloading
+                getValidationStamp(newValidationStamp.id)
+            } else {
+                newValidationStamp
+            }
+        }
+    }
+
+    private fun rawNewValidationStamp(validationStamp: ValidationStamp): ValidationStamp {
         // Validation
         isEntityNew(validationStamp, "Validation stamp must be new")
         isEntityDefined(validationStamp.branch, "Branch must be defined")
@@ -922,7 +997,7 @@ class StructureServiceImpl(
 
     override fun bulkUpdateValidationStamps(validationStampId: ID): Ack {
         // Checks access
-        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        securityService.checkGlobalFunction(ValidationStampBulkUpdate::class.java)
         // As admin
         securityService.asAdmin {
             val validationStamp = getValidationStamp(validationStampId)
@@ -1023,7 +1098,7 @@ class StructureServiceImpl(
     }
 
     override fun newValidationStampFromPredefined(branch: Branch, stamp: PredefinedValidationStamp): ValidationStamp {
-        val validationStamp = newValidationStamp(
+        val validationStamp = rawNewValidationStamp(
                 ValidationStamp.of(
                         branch,
                         NameDescription.nd(stamp.name, stamp.description)
@@ -1090,6 +1165,8 @@ class StructureServiceImpl(
         val newValidationRun = structureRepository.newValidationRun(validationRun) { validationRunStatusService.getValidationRunStatus(it) }
         // Event
         eventPostService.post(eventFactory.newValidationRun(newValidationRun))
+        // Metrics
+        publishValidationRunMetrics(newValidationRun)
         // Saves the properties
         for ((propertyTypeName, propertyData) in validationRunRequest.properties) {
             propertyService.editProperty(
@@ -1100,6 +1177,14 @@ class StructureServiceImpl(
         }
         // OK
         return newValidationRun
+    }
+
+    private fun publishValidationRunMetrics(validationRun: ValidationRun) {
+        try {
+            extensionManager.getExtensions(ValidationRunMetricsExtension::class.java).forEach { it.onValidationRun(validationRun) }
+        } catch (ex: Exception) {
+            logger.error("Cannot publish metrics for ${validationRun.entityDisplayName}", ex)
+        }
     }
 
     override fun getValidationRun(validationRunId: ID): ValidationRun {
@@ -1154,6 +1239,7 @@ class StructureServiceImpl(
     override fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun {
         // Entity check
         Entity.isEntityDefined(validationRun, "Validation run must be defined")
+        isEntityNew(runStatus, "Validation run status must not have any defined ID.")
         // Security check
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ValidationRunStatusChange::class.java)
         // Transition check
@@ -1162,8 +1248,71 @@ class StructureServiceImpl(
         val newValidationRun = structureRepository.newValidationRunStatus(validationRun, runStatus)
         // Event
         eventPostService.post(eventFactory.newValidationRunStatus(newValidationRun))
+        // OK, reloading to get IDs correct
+        return getValidationRun(validationRun.id)
+    }
+
+    override fun getParentValidationRun(validationRunStatusId: ID): ValidationRun {
+        // Gets the validation run
+        val run = structureRepository.getParentValidationRun(validationRunStatusId) {
+            validationRunStatusService.getValidationRunStatus(it)
+        }
+        // Checks access rights
+        securityService.checkProjectFunction(run, ProjectView::class.java)
         // OK
-        return newValidationRun
+        return run
+    }
+
+    override fun getValidationRunStatus(id: ID): ValidationRunStatus {
+        return structureRepository.getValidationRunStatus(id) {
+            validationRunStatusService.getValidationRunStatus(it)
+        } ?: throw IllegalStateException("Cannot find validation run status with ID = $id")
+    }
+
+    override fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean {
+        // Loads the parent
+        val run = getParentValidationRun(validationRunStatus)
+        // Checks the edit right
+        return if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEdit::class.java)) {
+            true
+        }
+        // If not, check the current user vs. the creator of the comment
+        else if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEditOwn::class.java)) {
+            // Loads the status
+            val status = structureRepository.getValidationRunStatus(validationRunStatus) {
+                validationRunStatusService.getValidationRunStatus(it)
+            }
+            // Gets the status's author
+            val statusAuthor = status?.signature?.user?.name
+            // Gets the current user name
+            val currentUserName = securityService.currentSignature?.user?.name
+            // Compare both
+            statusAuthor != null && statusAuthor == currentUserName
+        }
+        // No right at all
+        else {
+            false
+        }
+    }
+
+    override fun saveValidationRunStatusComment(run: ValidationRun, runStatusId: ID, comment: String): ValidationRun {
+        // Checks
+        isEntityDefined(run, "Validation run must be defined")
+        // Loading the status
+        val runStatus = structureRepository.getValidationRunStatus(runStatusId) { validationRunStatusService.getValidationRunStatus(it) }
+                ?: throw IllegalStateException("Could not find validation run status with id = $runStatusId")
+        // Checks the parent run
+        val parentOK = run.validationRunStatuses.any { it.id() == runStatus.id() }
+        if (!parentOK) {
+            throw IllegalStateException("Cannot edit a validation run status without a proper reference to its parent run.")
+        }
+        // FIXME Security checks
+        // Saving the new comment
+        structureRepository.saveValidationRunStatusComment(runStatus, comment)
+        // Event
+        eventPostService.post(eventFactory.updateValidationRunStatusComment(run))
+        // Reloading the run
+        return getValidationRun(run.id)
     }
 
     override fun getValidationRunsCountForBuildAndValidationStamp(buildId: ID, validationStampId: ID): Int {

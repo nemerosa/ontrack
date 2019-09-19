@@ -23,11 +23,11 @@ class BasicGitConfigurationTest {
     @Test
     void user_password_with_user_only() {
         BasicGitConfiguration configuration = BasicGitConfiguration.empty()
-                .withUser("test");
-        Optional<UserPassword> userPasswordOptional = configuration.credentials;
-        assertTrue(userPasswordOptional.present);
-        assertEquals("test", userPasswordOptional.get().user);
-        assertEquals("", userPasswordOptional.get().password);
+                .withUser("test")
+        Optional<UserPassword> userPasswordOptional = configuration.credentials
+        assertTrue(userPasswordOptional.present)
+        assertEquals("test", userPasswordOptional.get().user)
+        assertEquals("", userPasswordOptional.get().password)
     }
 
     @Test

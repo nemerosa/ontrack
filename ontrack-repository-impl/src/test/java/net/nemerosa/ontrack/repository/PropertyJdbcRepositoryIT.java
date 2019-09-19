@@ -32,7 +32,7 @@ public class PropertyJdbcRepositoryIT extends AbstractRepositoryTestSupport {
     public void save_retrieve_delete_property() throws JsonProcessingException {
         assertNull(repository.loadProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId()));
 
-        repository.saveProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId(), JsonUtils.object().with("value", 10).end(), "10");
+        repository.saveProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId(), JsonUtils.object().with("value", 10).end());
         TProperty t = repository.loadProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId());
         assertNotNull(t);
         assertJsonEquals(
@@ -48,7 +48,7 @@ public class PropertyJdbcRepositoryIT extends AbstractRepositoryTestSupport {
     public void save_update_data() throws JsonProcessingException {
         assertNull(repository.loadProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId()));
 
-        repository.saveProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId(), JsonUtils.object().with("value", 10).end(), "10");
+        repository.saveProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId(), JsonUtils.object().with("value", 10).end());
         TProperty t = repository.loadProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId());
         assertNotNull(t);
         assertJsonEquals(
@@ -56,7 +56,7 @@ public class PropertyJdbcRepositoryIT extends AbstractRepositoryTestSupport {
                 t.getJson()
         );
 
-        repository.saveProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId(), JsonUtils.object().with("value", 12).end(), "12");
+        repository.saveProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId(), JsonUtils.object().with("value", 12).end());
         t = repository.loadProperty(PROPERTY_TYPE, ProjectEntityType.PROJECT, project.getId());
         assertNotNull(t);
         assertJsonEquals(

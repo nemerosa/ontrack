@@ -30,10 +30,10 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         build(3);
-        build(4).withPromotion(copper);
-        build(5).withPromotion(bronze);
+        build(4).withPromotion(getCopper());
+        build(5).withPromotion(getBronze());
         // Filter
-        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
+        List<Build> builds = asUserWithView(getBranch()).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(getBranch()));
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -54,11 +54,11 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         // Builds
         build(1);
         build(2);
-        build(3).withPromotion(copper);
+        build(3).withPromotion(getCopper());
         build(4);
-        build(5).withPromotion(bronze);
+        build(5).withPromotion(getBronze());
         // Filter
-        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
+        List<Build> builds = asUserWithView(getBranch()).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(getBranch()));
         // Checks the list
         checkList(builds, 5, 3);
     }
@@ -80,10 +80,10 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         build(3);
-        build(4).withPromotion(bronze);
-        build(5).withPromotion(copper);
+        build(4).withPromotion(getBronze());
+        build(5).withPromotion(getCopper());
         // Filter
-        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
+        List<Build> builds = asUserWithView(getBranch()).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(getBranch()));
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -105,10 +105,10 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         build(3);
-        build(4).withPromotion(bronze);
-        build(5).withPromotion(copper).withPromotion(bronze);
+        build(4).withPromotion(getBronze());
+        build(5).withPromotion(getCopper()).withPromotion(getBronze());
         // Filter
-        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
+        List<Build> builds = asUserWithView(getBranch()).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(getBranch()));
         // Checks the list
         checkList(builds, 5);
     }
@@ -130,10 +130,10 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         build(3);
-        build(4).withPromotion(copper).withPromotion(bronze);
-        build(5).withPromotion(bronze);
+        build(4).withPromotion(getCopper()).withPromotion(getBronze());
+        build(5).withPromotion(getBronze());
         // Filter
-        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
+        List<Build> builds = asUserWithView(getBranch()).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(getBranch()));
         // Checks the list
         checkList(builds, 5, 4);
     }
@@ -155,10 +155,10 @@ public class PromotionLevelBuildFilterIT extends AbstractBuildFilterIT {
         build(1);
         build(2);
         build(3);
-        build(4).withPromotion(copper).withPromotion(bronze);
-        build(5).withPromotion(gold);
+        build(4).withPromotion(getCopper()).withPromotion(getBronze());
+        build(5).withPromotion(getGold());
         // Filter
-        List<Build> builds = asUserWithView(branch).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(branch));
+        List<Build> builds = asUserWithView(getBranch()).call(() -> buildFilterService.lastPromotedBuildsFilterData().filterBranchBuilds(getBranch()));
         // Checks the list
         checkList(builds, 5, 4);
     }

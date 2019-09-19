@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.model;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogCommit;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,12 @@ public class SVNChangeLogRevision implements SCMChangeLogCommit {
     @Override
     public String getId() {
         return String.valueOf(revision);
+    }
+
+    @NotNull
+    @Override
+    public String getShortId() {
+        return getId();
     }
 
     @Override

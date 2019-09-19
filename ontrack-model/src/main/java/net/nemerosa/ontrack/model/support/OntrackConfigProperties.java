@@ -55,6 +55,11 @@ public class OntrackConfigProperties {
      */
     private JobConfigProperties jobs = new JobConfigProperties();
 
+    /**
+     * Label provider collection job activation
+     */
+    private boolean jobLabelProviderEnabled = false;
+
     @PostConstruct
     public void log() {
         if (!configurationTest) {

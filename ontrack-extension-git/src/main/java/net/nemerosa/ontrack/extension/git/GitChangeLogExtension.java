@@ -29,6 +29,6 @@ public class GitChangeLogExtension extends AbstractExtension implements BuildDif
      */
     @Override
     public boolean apply(Project project) {
-        return gitService.getProjectConfiguration(project).isPresent();
+        return gitService.getProjectConfiguration(project) != null;
     }
 }

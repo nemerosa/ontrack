@@ -114,50 +114,6 @@ docker run \
    ...
 ----
 
-[[installation-docker-db-volume]]
-==== Database persisted in volume
-
-By default, the database JDBC URL is set to:
-
-[source]
-----
-jdbc:h2:/var/ontrack/data/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE
-----
-
-TIP: In order to put the database file on the host or in a data
-volume, share the `/var/ontrack/data` volume.
-
-NOTE: In this mode, the H2 database is NOT accessible while the Ontrack
-process runs. One will prefer to use the
-<<installation-docker-db-server,H2 server mode>>.
-
-[[installation-docker-db-server]]
-==== Database as H2 server
-
-NOTE: This is the preferred mode when running in production mode.
-
-One can run a H2 server by using Docker. For example:
-
-[source,bash]
-----
-docker container run -d --publish 9082:9082 --name h2 nemerosa/h2:latest
-----
-
-NOTE: Running H2 as a Docker container is not at all required, and any
-other way is fine as long as the running database is accessible from
-the Ontrack process.
-
-Then, just specify the H2 server address as argument. Using the database of
-the example above:
-
-[source,bash]
-----
-docker run \
-   ...
-   --env "ONTRACK_DB_URL=jdbc:h2:tcp://h2:9082/ontrack;MODE=MYSQL"
-   ...
-----
-
 [[installation-docker-compose]]
 ==== Docker Compose deployment
 

@@ -289,4 +289,118 @@ class Config {
     def setLdapSettings(LDAPSettings settings) {
         ontrack.put('settings/ldap', settings)
     }
+
+    /**
+     * Gets an existing label
+     */
+    @DSLMethod(count = 2, value = "Gets an existing label or returns null")
+    Label getLabel(String category, String name) {
+        def result = ontrack.graphQLQuery(
+                '''
+                    query LabelSearch($category:String,$name:String) {
+                        labels(category: $category, name: $name) {
+                            id
+                            category
+                            name
+                            description
+                            color
+                        }
+                    }
+                ''',
+                [
+                        category: category,
+                        name    : name
+                ]
+        )
+        def labels = result.data.labels
+        if (labels.size > 0) {
+            return new Label(ontrack, labels.first())
+        } else {
+            return null
+        }
+    }
+
+    /**
+     * Gets the list of labels
+     */
+    @DSLMethod("Gets the list of labels")
+    List<Label> getLabels() {
+        def result = ontrack.graphQLQuery(
+                '''
+                    query AllLabels {
+                        labels {
+                            id
+                            category
+                            name
+                            description
+                            color
+                        }
+                    }
+                ''',
+                [:]
+        )
+        return result.data.labels.collect {
+            new Label(ontrack, it)
+        }
+    }
+
+    /**
+     * Creating a label
+     */
+    @DSLMethod(count = 4, value = "Creates or updates a label")
+    Label label(String category, String name, String description = "", String color = "#000000") {
+        // Gets the existing label
+        Label existing = getLabel(category, name)
+        if (existing) {
+            def result = ontrack.put("rest/labels/${existing.id}/update", [
+                    category   : category,
+                    name       : name,
+                    description: description,
+                    color      : color
+            ])
+            return new Label(ontrack, result)
+        } else {
+            def result = ontrack.post("rest/labels/create", [
+                    category   : category,
+                    name       : name,
+                    description: description,
+                    color      : color
+            ])
+            return new Label(ontrack, result)
+        }
+    }
+
+    /**
+     * Main build links settings
+     */
+
+    @DSLMethod("Gets the main build links settings")
+    List<String> getMainBuildLinks() {
+        def json = ontrack.get('settings/main-build-links').data
+        return json.labels as List<String>
+    }
+
+    @DSLMethod("Sets the main build links settings")
+    void setMainBuildLinks(List<String> labels) {
+        ontrack.put('settings/main-build-links', [
+                labels: labels
+        ])
+    }
+
+    /**
+     * Previous promotion condition
+     */
+
+    @DSLMethod("Gets the previous promotion condition settings")
+    boolean getPreviousPromotionRequired() {
+        def json = ontrack.get('settings/previous-promotion-condition')
+        return json.previousPromotionRequired as boolean
+    }
+
+    @DSLMethod("Sets the previous promotion condition settings")
+    void setPreviousPromotionRequired(boolean previousPromotionRequired) {
+        ontrack.put('settings/previous-promotion-condition', [
+                previousPromotionRequired: previousPromotionRequired
+        ])
+    }
 }

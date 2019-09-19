@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
 import java.util.function.BiPredicate;
 
-public interface LinkDefinition<T extends ProjectEntity> {
+public interface LinkDefinition<T> {
 
     String getName();
 

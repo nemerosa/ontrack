@@ -32,7 +32,7 @@ public class GitProjectResourceDecorationContributor implements ResourceDecorati
                         "_gitSync",
                         project -> on(GitController.class).getProjectGitSyncInfo(project.getId()),
                         (project, rc) -> rc.isProjectFunctionGranted(project, ProjectConfig.class) &&
-                                gitService.getProjectConfiguration(project).isPresent()
+                                gitService.getProjectConfiguration(project) != null
                 )
         );
     }

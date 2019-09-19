@@ -18,6 +18,6 @@ public class SVNConfigurationGQLType implements GQLType {
 
     @Override
     public GraphQLObjectType createType(GQLTypeCache cache) {
-        return GraphQLBeanConverter.asObjectType(SVNConfiguration.class, cache, ImmutableSet.of("password", "descriptor", "credentials"));
+        return GraphQLBeanConverter.INSTANCE.asObjectType(SVNConfiguration.class, cache, ImmutableSet.of("password", "descriptor", "credentials"));
     }
 }

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.util.Objects;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -92,7 +94,7 @@ public class PromotionRunController extends AbstractResourceController {
                 build,
                 promotionLevel,
                 securityService.getCurrentSignature().withTime(promotionRunRequest.getDateTime()),
-                promotionRunRequest.getDescription()
+                Objects.toString(promotionRunRequest.getDescription(), "")
         );
         // Creation
         promotionRun = structureService.newPromotionRun(promotionRun);

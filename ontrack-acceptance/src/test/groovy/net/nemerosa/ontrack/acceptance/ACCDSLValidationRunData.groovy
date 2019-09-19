@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import net.nemerosa.ontrack.dsl.TestSummary
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -63,6 +64,32 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
         assert run.data != null
         assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TextValidationDataType"
         assert run.data.data == "Some text"
+    }
+
+    @Test
+    void 'Validation run with metrics'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setMetricsDataType()
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithMetrics("VS", [
+                "js.bundle": 1500.56d,
+                "js.error" : 150d,
+        ], "PASSED")
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType"
+        assert run.data.data == [
+                metrics: [
+                        "js.bundle": 1500.56d,
+                        "js.error" : 150d,
+                ]
+        ]
     }
 
     @Test
@@ -212,6 +239,126 @@ class ACCDSLValidationRunData extends AbstractACCDSL {
         assert run.data.data == [
                 numerator  : 30,
                 denominator: 300,
+        ]
+    }
+
+    @Test
+    void 'Validation run with test summary with no test'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setTestSummaryDataType()
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithTestSummary("VS", new TestSummary())
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "PASSED"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType"
+        assert run.data.data == [
+                passed : 0,
+                skipped: 0,
+                failed : 0,
+                total  : 0,
+        ]
+    }
+
+    @Test
+    void 'Validation run with test summary with passed tests'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setTestSummaryDataType()
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithTestSummary("VS", new TestSummary(passed: 1))
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "PASSED"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType"
+        assert run.data.data == [
+                passed : 1,
+                skipped: 0,
+                failed : 0,
+                total  : 1,
+        ]
+    }
+
+    @Test
+    void 'Validation run with test summary with skipped tests and warning off'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setTestSummaryDataType()
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithTestSummary("VS", new TestSummary(passed: 1, skipped: 1))
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "PASSED"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType"
+        assert run.data.data == [
+                passed : 1,
+                skipped: 1,
+                failed : 0,
+                total  : 2,
+        ]
+    }
+
+    @Test
+    void 'Validation run with test summary with skipped tests and warning on'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setTestSummaryDataType(true)
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithTestSummary("VS", new TestSummary(passed: 1, skipped: 1))
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "WARNING"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType"
+        assert run.data.data == [
+                passed : 1,
+                skipped: 1,
+                failed : 0,
+                total  : 2,
+        ]
+    }
+
+    @Test
+    void 'Validation run with test summary with failed tests'() {
+        def projectName = uid("P")
+        // Validation stamp data type
+        ontrack.project(projectName).branch("master") {
+            validationStamp("VS").setTestSummaryDataType(true)
+        }
+        // Creates a build and validates it
+        def build = ontrack.branch(projectName, "master").build("1")
+        build.validateWithTestSummary("VS", new TestSummary(passed: 1, skipped: 1, failed: 1))
+        // Gets the run
+        def run = build.validationRuns[0]
+        // Gets the data
+        assert run.status == "FAILED"
+        assert run.data != null
+        assert run.data.id == "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType"
+        assert run.data.data == [
+                passed : 1,
+                skipped: 1,
+                failed : 1,
+                total  : 3,
         ]
     }
 

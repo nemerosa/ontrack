@@ -1,42 +1,36 @@
 <ot-view>
 
-    <div class="row" ng-hide="ontrackGitIssueInfo">
-        <div class="col-md-12 alert alert-warning">
-            The issue information is loading. This may take some time...
+    <div class="row" ng-hide="gitIssueInfo">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                The issue information is loading. This may take some time..
+            </div>
         </div>
     </div>
 
-    <div class="row" ng-if="ontrackGitIssueInfo">
+    <div class="row" ng-if="gitIssueInfo">
         <div class="col-md-12">
+
+            <!-- Issue -->
 
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <a href="{{ontrackGitIssueInfo.issue.url}}">
-                        {{ontrackGitIssueInfo.issue.displayKey}}
+                    <a href="{{gitIssueInfo.issue.url}}">
+                        {{gitIssueInfo.issue.displayKey}}
                     </a>
                     -
-                    {{ontrackGitIssueInfo.issue.summary}}
+                    {{gitIssueInfo.issue.summary}}
                 </div>
                 <div class="panel-body">
-                    <ot-include value="ontrackGitIssueInfo.issue"
-                                template="extension/{{ontrackGitIssueInfo.issueServiceConfigurationRepresentation.serviceId}}/issue.tpl.html">
+                    <ot-include value="gitIssueInfo.issue"
+                                template="extension/{{gitIssueInfo.issueServiceConfigurationRepresentation.serviceId}}/issue.tpl.html">
                     </ot-include>
                 </div>
             </div>
 
-            <!-- For each commit -->
-            <div class="row" ng-repeat="issueCommitInfo in ontrackGitIssueInfo.commitInfos">
-                <div class="col-md-12">
-
-                    <!-- Summary for the commit -->
-                    <ot-extension-git-commit-summary ui-commit="issueCommitInfo.uiCommit" title="true">
-
-                        <ot-extension-scm-issue-commit-branch-infos infos="issueCommitInfo.branchInfos"></ot-extension-scm-issue-commit-branch-infos>
-
-                    </ot-extension-git-commit-summary>
-
-                </div>
-            </div>
+            <!-- Commit info -->
+            <ot-extension-git-commit-info ng-if="gitIssueInfo.commitInfo" git-commit-info="gitIssueInfo.commitInfo"></ot-extension-git-commit-info>
 
         </div>
     </div>

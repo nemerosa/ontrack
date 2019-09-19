@@ -41,6 +41,7 @@ public interface EventFactory {
 
     EventType NEW_VALIDATION_RUN = SimpleEventType.of("new_validation_run", "Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.");
     EventType NEW_VALIDATION_RUN_STATUS = SimpleEventType.of("new_validation_run_status", "Status for ${VALIDATION_STAMP} validation ${VALIDATION_RUN} for build ${BUILD} in branch ${BRANCH} of ${PROJECT} has changed to ${:status}.");
+    EventType UPDATE_VALIDATION_RUN_STATUS_COMMENT = SimpleEventType.of("update_validation_run_status_comment", "A status message for ${VALIDATION_STAMP} validation ${VALIDATION_RUN} for build ${BUILD} in branch ${BRANCH} of ${PROJECT} has changed.");
 
     EventType PROPERTY_CHANGE = SimpleEventType.of("property_change", "${:property} property has changed for ${:entity} ${REF}.");
     EventType PROPERTY_DELETE = SimpleEventType.of("property_delete", "${:property} property has been removed from ${:entity} ${REF}.");
@@ -116,6 +117,8 @@ public interface EventFactory {
     Event newValidationRun(ValidationRun validationRun);
 
     Event newValidationRunStatus(ValidationRun validationRun);
+
+    Event updateValidationRunStatusComment(ValidationRun validationRun);
 
     <T> Event propertyChange(ProjectEntity entity, PropertyType<T> propertyType);
 

@@ -88,7 +88,8 @@ public class SCMController extends AbstractResourceController {
                     project,
                     SCMFileChangeFilters.class.getName(),
                     SCMFileChangeFilters.class
-            ).orElse(SCMFileChangeFilters.create());
+            );
+            if (config == null) config = SCMFileChangeFilters.create();
             // Updates the store
             config = config.save(filter);
             // Saves the store back
@@ -166,12 +167,14 @@ public class SCMController extends AbstractResourceController {
             // Loads the project
             Project project = structureService.getProject(projectId);
             // Loads the store
-            return entityDataService.retrieve(
+            SCMFileChangeFilters config = entityDataService.retrieve(
                     project,
                     SCMFileChangeFilters.class.getName(),
                     SCMFileChangeFilters.class
             );
-        }).orElse(SCMFileChangeFilters.create());
+            if (config == null) config = SCMFileChangeFilters.create();
+            return config;
+        });
     }
 
     /**

@@ -1,0 +1,55 @@
+<div class="modal-header">
+    <h3>
+        "{{config.project.name}}" project labels
+    </h3>
+</div>
+<form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
+    <div class="modal-body">
+        <div class="row">
+            <div ng-class="{
+                'col-md-12': !labelCreation,
+                'col-md-10': labelCreation
+            }">
+                <input type="text"
+                       class="form-control"
+                       ng-model="filter.text"
+                       placeholder="Filter labels" />
+            </div>
+            <div class="col-md-1" ng-if="labelCreation">
+                <button class="btn btn-info" type="button"
+                        ng-click="createLabelFromToken()"
+                        title="Creates a label for [{{filter.text}}]">
+                    <span class="fa fa-plus"></span>
+                </button>
+            </div>
+        </div>
+        <div class="row ot-project-label-selection"
+             ng-repeat="label in data | filter:labelFilterFn"
+             ng-click="toggleLabel(label)">
+            <div class="col-md-1">
+                <span class="fa fa-check ot-command" ng-show="label.selected && label.computedBy == null"></span>
+                <span class="fa fa-check text-muted" ng-show="label.selected && label.computedBy != null" title="This label is provided automatically and cannot be selected / unselected manually."></span>
+            </div>
+            <div class="col-md-10">
+                <ot-project-label label="label" color-box="true"></ot-project-label>
+                <span ng-if="label.computedBy" class="ot-description">
+                    Provided (<span>{{label.computedBy.name}}</span>)
+                </span>
+            </div>
+            <div class="col-md-1">
+                <span class="fa fa-close ot-command" ng-show="label.selected && label.computedBy == null"></span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="ot-alert-{{message.type}} alert-dismissable" ng-show="message">
+            <span>{{message.content}}</span>
+        </div>
+        <button class="btn btn-default"
+                type="button"
+                title="Unselected all labels (but keeps the ones which are automatically provided)"
+                ng-click="selectNone()">Select none</button>
+        <button class="btn btn-primary" type="submit" ng-disabled="thisForm.$invalid">OK</button>
+        <button class="btn btn-link" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</form>

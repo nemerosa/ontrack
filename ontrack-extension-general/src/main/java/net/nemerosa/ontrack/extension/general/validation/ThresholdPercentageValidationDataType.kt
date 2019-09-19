@@ -52,4 +52,8 @@ class ThresholdPercentageValidationDataType(
             }
 
     override val displayName = "Percentage"
+
+    override fun getMetrics(data: Int): Map<String, *>? {
+        return mapOf("percentage" to data)
+    }
 }

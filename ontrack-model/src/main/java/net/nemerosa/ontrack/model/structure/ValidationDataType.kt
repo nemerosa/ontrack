@@ -99,6 +99,11 @@ interface ValidationDataType<C, T> : Extension {
     fun validateData(config: C?, data: T?): T
 
     /**
+     * Gets some metrics about this data. Return `null` if not applicable.
+     */
+    fun getMetrics(data: T): Map<String, *>?
+
+    /**
      * Descriptor
      */
     val descriptor

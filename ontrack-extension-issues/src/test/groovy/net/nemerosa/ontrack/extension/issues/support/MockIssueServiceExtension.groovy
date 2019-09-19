@@ -81,7 +81,7 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
+    Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
         if (StringUtils.isNumeric(token) || validIssueToken(token)) {
             return Optional.of(String.valueOf(getIssueId(token)));
         } else {
@@ -91,16 +91,6 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
     protected static int getIssueId(String issueKey) {
         return Integer.parseInt(StringUtils.stripStart(issueKey, "#"), 10);
-    }
-
-    @Override
-    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        // Searchable key?
-        if (StringUtils.isNumeric(key) || validIssueToken(key)) {
-            keys.collect { getIssueId(it) }.contains(getIssueId(key))
-        } else {
-            return false;
-        }
     }
 
     @Override
@@ -124,7 +114,7 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        def key = issueKey as int
+        def key = getIssueId(issueKey)
         issues.get(key) ?: new MockIssue(
                 key,
                 MockIssueStatus.OPEN,

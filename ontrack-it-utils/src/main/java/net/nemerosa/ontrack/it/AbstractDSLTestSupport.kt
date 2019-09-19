@@ -1,18 +1,94 @@
 package net.nemerosa.ontrack.it
 
+import net.nemerosa.ontrack.common.Document
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.buildfilter.StandardFilterProviderDataBuilder
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
+import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.SettingsManagerService
+import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.reflect.KClass
+import kotlin.test.assertEquals
 
 abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var securityService: SecurityService
+
+    @Autowired
+    protected lateinit var ontrackConfigProperties: OntrackConfigProperties
+
+    @Autowired
+    protected lateinit var labelManagementService: LabelManagementService
+
+    @Autowired
+    protected lateinit var projectLabelManagementService: ProjectLabelManagementService
+
+    @Autowired
+    protected lateinit var buildFilterService: BuildFilterService
+
+    @Autowired
+    protected lateinit var settingsManagerService: SettingsManagerService
+
+    @Autowired
+    protected lateinit var settingsService: CachedSettingsService
+
+    @Autowired
+    protected lateinit var predefinedPromotionLevelService: PredefinedPromotionLevelService
+
+    @Autowired
+    protected lateinit var predefinedValidationStampService: PredefinedValidationStampService
+
+    /**
+     * Kotlin friendly
+     */
+    fun asUserWithView(vararg entities: ProjectEntity, code: () -> Unit) {
+        asUserWithView(*entities).execute(code)
+    }
+
+    fun <T> ProjectEntity.asUserWithView(code: () -> T): T = asUserWithView(this).call(code)
+
+    /**
+     * Kotlin friendly anonymous execution
+     */
+    fun <T> asAnonymous(code: () -> T): T = asAnonymous().call(code)
+
+    /**
+     * Kotlin friendly account role execution
+     */
+    fun <T> ProjectEntity.asAccountWithProjectRole(role: String, code: () -> T): T {
+        val account = doCreateAccountWithProjectRole(project, role)
+        return asAccount(account).call(code)
+    }
+
+    /**
+     * Kotlin friendly account role execution
+     */
+    fun <T> asAccountWithGlobalRole(role: String, code: () -> T): T {
+        val account = doCreateAccountWithGlobalRole(role)
+        return asAccount(account).call(code)
+    }
+
+    fun <T> withDisabledConfigurationTest(code: () -> T): T {
+        val configurationTest = ontrackConfigProperties.isConfigurationTest
+        ontrackConfigProperties.isConfigurationTest = false
+        return try {
+            code()
+        } finally {
+            ontrackConfigProperties.isConfigurationTest = configurationTest
+        }
+    }
 
     fun project(init: Project.() -> Unit = {}): Project {
         val project = doCreateProject()
@@ -40,8 +116,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return branch.init()
     }
 
-    fun Branch.promotionLevel(name: String): PromotionLevel =
-            doCreatePromotionLevel(this, NameDescription.nd(name, ""))
+    fun Branch.promotionLevel(name: String = uid("P"), init: PromotionLevel.() -> Unit = {}): PromotionLevel =
+            doCreatePromotionLevel(this, NameDescription.nd(name, "")).apply {
+                init()
+            }
 
     /**
      * Creates and returns a validation stamp
@@ -56,7 +134,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     ): ValidationStamp =
             doCreateValidationStamp(this, NameDescription.nd(name, ""), validationDataTypeConfig)
 
-    fun Branch.build(name: String, init: (Build.() -> Unit)? = {}): Build {
+    fun Branch.build(name: String = uid("B"), init: (Build.() -> Unit)? = {}): Build {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
         if (init != null) {
             build.init()
@@ -91,13 +169,16 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun Build.validate(
             validationStamp: ValidationStamp,
             validationRunStatusID: ValidationRunStatusID = ValidationRunStatusID.STATUS_PASSED,
-            description: String? = null
+            description: String? = null,
+            code: ValidationRun.() -> Unit = {}
     ): ValidationRun {
         return this.validateWithData<Any>(
                 validationStampName = validationStamp.name,
                 validationRunStatusID = validationRunStatusID,
                 description = description
-        )
+        ).apply {
+            code()
+        }
     }
 
     /**
@@ -146,6 +227,10 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 project.id,
                 BuildSearchForm().withBuildExactMatch(true).withBuildName(buildName)
         ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
+        linkTo(build)
+    }
+
+    fun Build.linkTo(build: Build) {
         structureService.addBuildLink(
                 this,
                 build
@@ -155,15 +240,179 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Change of status for a validation run
      */
-    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String) {
-        asUser().with(this, ValidationRunStatusChange::class.java).execute {
+    fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String): ValidationRun {
+        return asUser().with(this, ValidationRunStatusChange::class.java).call {
             structureService.newValidationRunStatus(
                     this,
-                    ValidationRunStatus.of(
+                    ValidationRunStatus(
+                            ID.NONE,
                             Signature.of("test"),
                             status,
                             description
                     )
+            )
+        }
+    }
+
+    /**
+     * Change of status for a validation run
+     */
+    fun ValidationRun.validationStatusWithCurrentUser(status: ValidationRunStatusID, description: String): ValidationRun {
+            return structureService.newValidationRunStatus(
+                    this,
+                    ValidationRunStatus(
+                            ID.NONE,
+                            securityService.currentSignature,
+                            status,
+                            description
+                    )
+            )
+    }
+
+    /**
+     * Creates a label
+     */
+    fun label(category: String? = uid("C"), name: String = uid("N"), checkForExisting: Boolean = true): Label {
+        return asUser().with(LabelManagement::class.java).call {
+            if (checkForExisting) {
+                val labels = labelManagementService.findLabels(category, name)
+                val existingLabel = labels.firstOrNull()
+                existingLabel ?: labelManagementService.newLabel(
+                        LabelForm(
+                                category = category,
+                                name = name,
+                                description = null,
+                                color = "#FF0000"
+                        )
+                )
+            } else {
+                labelManagementService.newLabel(
+                    LabelForm(
+                            category = category,
+                            name = name,
+                            description = null,
+                            color = "#FF0000"
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Sets some labels to a project
+     */
+    var Project.labels: List<Label>
+        get() = asUserWithView(this).call {
+            projectLabelManagementService.getLabelsForProject(this)
+        }
+        set(value) {
+            asUser().with(this, ProjectLabelManagement::class.java).execute {
+                projectLabelManagementService.associateProjectToLabels(
+                        this,
+                        ProjectLabelForm(
+                                value.map { it.id }
+                        )
+                )
+            }
+        }
+
+    /**
+     * Creation of a predefined promotion level
+     */
+    protected fun predefinedPromotionLevel(name: String, description: String = "", image: Boolean = false) {
+        asAdmin().call {
+            val ppl = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                    PredefinedPromotionLevel.of(
+                            NameDescription.nd(name, description)
+                    )
+            )
+            if (image) {
+                val document = Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
+                predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
+                        ppl.id,
+                        document
+                )
+            }
+        }
+    }
+
+    /**
+     * Creation of a predefined validation stamp
+     */
+    protected fun predefinedValidationStamp(name: String, description: String = "", image: Boolean = false) {
+        asAdmin().call {
+            val pps = predefinedValidationStampService.newPredefinedValidationStamp(
+                    PredefinedValidationStamp.of(
+                            NameDescription.nd(name, description)
+                    )
+            )
+            if (image) {
+                val document = Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
+                predefinedValidationStampService.setPredefinedValidationStampImage(
+                        pps.id,
+                        document
+                )
+            }
+        }
+    }
+
+    /**
+     * Saving current settings, runs some code and restores the format settings
+     */
+    private inline fun <reified T> withSettings(code: () -> Unit) {
+        val settings: T = settingsService.getCachedSettings(T::class.java)
+        // Runs the code
+        code()
+        // Restores the initial settings (only in case of success)
+        asAdmin().execute {
+            settingsManagerService.saveSettings(settings)
+        }
+    }
+
+    /**
+     * Saving current "main build links" settings, runs some code and restores the format settings
+     */
+    protected fun withMainBuildLinksSettings(code: () -> Unit) = withSettings<MainBuildLinksConfig>(code)
+
+    /**
+     * Settings "main build links" settings
+     */
+    protected fun setMainBuildLinksSettings(vararg labels: String) {
+        asAdmin().execute {
+            settingsManagerService.saveSettings(
+                    MainBuildLinksConfig(
+                            labels.toList()
+                    )
+            )
+        }
+    }
+
+    /**
+     * Getting "main build links" settings
+     */
+    protected val mainBuildLinksSettings: List<String>
+        get() = settingsService.getCachedSettings(MainBuildLinksConfig::class.java).labels
+
+    protected fun Branch.assertBuildSearch(filterBuilder: (StandardFilterProviderDataBuilder) -> Unit): BuildSearchAssertion {
+        val data = buildFilterService.standardFilterProviderData(10)
+        filterBuilder(data)
+        val filter = data.build()
+        return BuildSearchAssertion(this, filter)
+    }
+
+    protected class BuildSearchAssertion(
+            private val branch: Branch,
+            private val filter: BuildFilterProviderData<*>
+    ) {
+        infix fun returns(expected: Build) {
+            returns(listOf(expected))
+        }
+
+        infix fun returns(expected: List<Build>) {
+            val results = filter.filterBranchBuilds(branch)
+            assertEquals(
+                    expected.map { it.id },
+                    results.map { it.id }
             )
         }
     }

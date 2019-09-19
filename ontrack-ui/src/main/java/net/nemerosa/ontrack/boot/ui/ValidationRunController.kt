@@ -116,7 +116,8 @@ constructor(
             )
             // Gets the data type ID if any
             // First, the data type in the request, and if not specified, the type of the validation stamp
-            val typeId: String? = validationRunRequestForm.validationStampData.type ?: validationStamp.dataType?.descriptor?.id
+            val typeId: String? = validationRunRequestForm.validationStampData.type
+                    ?: validationStamp.dataType?.descriptor?.id
             // If no type, ignore the data
             return typeId?.run {
                 // Gets the actual type
@@ -158,7 +159,8 @@ constructor(
         // Gets the current run
         val run = structureService.getValidationRun(validationRunId)
         // Gets the new validation run status
-        val runStatus = ValidationRunStatus.of(
+        val runStatus = ValidationRunStatus(
+                ID.NONE,
                 securityService.currentSignature,
                 validationRunStatusService.getValidationRunStatus(request.validationRunStatusId),
                 request.description

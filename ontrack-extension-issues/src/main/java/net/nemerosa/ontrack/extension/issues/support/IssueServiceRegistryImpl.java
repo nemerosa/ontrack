@@ -49,7 +49,7 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
             List<? extends IssueServiceConfiguration> configurationList = issueServiceExtension.getConfigurationList();
             for (IssueServiceConfiguration issueServiceConfiguration : configurationList) {
                 issueServiceConfigurationRepresentations.add(
-                        IssueServiceConfigurationRepresentation.of(
+                        IssueServiceConfigurationRepresentation.Companion.of(
                                 issueServiceExtension,
                                 issueServiceConfiguration
                         )

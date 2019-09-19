@@ -11,4 +11,5 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-actuator'
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
+    testCompile project(':ontrack-extension-issues').sourceSets.test.output
 }

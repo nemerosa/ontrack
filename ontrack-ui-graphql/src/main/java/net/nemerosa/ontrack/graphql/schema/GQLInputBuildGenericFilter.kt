@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
@@ -36,14 +37,30 @@ class GQLInputBuildGenericFilter(
                 .build()
     }
 
+    fun getFilterType(argument: Any?): String? {
+        return if (argument is Map<*, *>) {
+            argument[FIELD_TYPE] as String?
+        } else {
+            null
+        }
+    }
+
+    fun getFilterData(argument: Any?): JsonNode? {
+        return if (argument is Map<*, *>) {
+            val data = argument[FIELD_DATA] as String?
+            if (data != null && StringUtils.isNotBlank(data)) JsonUtils.parseAsNode(data) else null
+        } else {
+            null
+        }
+    }
+
     override fun convert(argument: Any?): BuildFilterProviderData<*> {
         if (argument == null) {
             return buildFilterService.standardFilterProviderData(10).build()
         } else if (argument is Map<*, *>) {
             val type = argument[FIELD_TYPE] as String?
-            val data = argument[FIELD_DATA] as String?
-            // Parses the data
-            val dataNode = if (data != null && StringUtils.isNotBlank(data)) JsonUtils.parseAsNode(data) else null
+            // Parses and validates the data
+            val dataNode = getFilterData(argument)
             // If no type is defined, use the default filter
             if (type == null) {
                 return buildFilterService.standardFilterProviderData(10).build()

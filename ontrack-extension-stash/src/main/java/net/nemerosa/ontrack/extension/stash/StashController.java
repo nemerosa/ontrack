@@ -84,7 +84,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return StashConfiguration.form();
+        return StashConfiguration.Companion.form();
     }
 
     /**

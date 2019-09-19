@@ -12,13 +12,16 @@ Contributions to _Ontrack_ are welcome!
 [[contributing-branches]]
 === Branching strategy
 
-* development of features always goes to `feature/` branches
-* the branches are created from:
-** the `master` branch for version 2
-** the `v3` branch for version 3
-* new releases are created by branching from `develop` (V2)
-or `master` (V3), using `release/2.' or `release/3.` as a prefix
-* pull requests must be made from the `master` branch
+The branching strategy used for Ontrack is based on
+the https://nvie.com/posts/a-successful-git-branching-model[Git Flow].
+
+* development of features always goes to `feature/` branches created
+  from the `develop` branch
+* new releases are created by branching from the `develop` branch,
+  using `release/` as a prefix
+* pull requests must be made from the `develop` branch
+* the `master` branch contains an image of the latest release - no
+  development is done on it
 
 The versioning is automated using the
 https://github.com/nemerosa/versioning[Gradle Versioning plug-in]. No file

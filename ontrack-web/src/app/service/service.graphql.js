@@ -62,13 +62,13 @@ angular.module('ot.service.graphql', [
          * @return Promise accepting the raw JSON, without any error / data preprocessing
          */
         self.rawGraphQLCall = function (query, variables) {
-            var params = {
+            let params = {
                 query: query
             };
             if (variables) {
-                params.variables = JSON.stringify(variables);
+                params.variables = variables;
             }
-            return ot.pageCall($http.get('/graphql', {params: params}));
+            return ot.pageCall($http.post('/graphql', params));
         };
 
         return self;

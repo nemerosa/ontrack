@@ -26,7 +26,7 @@ public class EntityDataServiceIT extends AbstractServiceTestSupport {
         );
         // Retrieves it using view right only
         String value = asUser().withView(project).call(() ->
-                entityDataService.retrieve(project, key).orElse(null)
+                entityDataService.retrieve(project, key)
         );
         // Cheks
         assertEquals("Value 1", value);

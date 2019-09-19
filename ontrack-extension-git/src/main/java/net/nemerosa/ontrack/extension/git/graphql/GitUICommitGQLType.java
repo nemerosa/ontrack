@@ -20,7 +20,7 @@ public class GitUICommitGQLType implements GQLType {
 
     @Override
     public GraphQLObjectType createType(GQLTypeCache cache) {
-        return GraphQLBeanConverter.asObjectType(GitUICommit.class, cache);
+        return GraphQLBeanConverter.INSTANCE.asObjectType(GitUICommit.class, cache);
     }
 
 }

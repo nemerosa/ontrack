@@ -6,6 +6,9 @@ import graphql.schema.GraphQLObjectType
 
 typealias TypeBuilder = graphql.schema.GraphQLObjectType.Builder
 
+fun TypeBuilder.idField(): GraphQLObjectType.Builder =
+        fields(listOf(GraphqlUtils.idField()))
+
 fun TypeBuilder.intField(name: String, description: String): GraphQLObjectType.Builder =
         field { it.name(name).description(description).type(GraphQLInt) }
 

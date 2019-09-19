@@ -5,17 +5,28 @@ import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import java.net.URI
 
+/**
+ * List of build links, plus an indicator (link to the build page)
+ * showing if there is extra links.
+ */
+class BuildLinkDecorationList(
+        val decorations: List<BuildLinkDecoration>,
+        val extraLink: URI?
+)
+
 class BuildLinkDecoration(
         val project: String,
         val build: String,
+        val label: String,
         val uri: URI,
         val promotions: List<BuildLinkDecorationPromotion>
 )
 
-fun Build.asBuildLinkDecoration(uriBuilder: URIBuilder, promotionRuns: List<PromotionRun>) =
+fun Build.asBuildLinkDecoration(uriBuilder: URIBuilder, promotionRuns: List<PromotionRun>, label: String) =
         BuildLinkDecoration(
                 this.project.name,
                 this.name,
+                label,
                 uriBuilder.getEntityPage(this),
                 promotionRuns.map {
                     BuildLinkDecorationPromotion(

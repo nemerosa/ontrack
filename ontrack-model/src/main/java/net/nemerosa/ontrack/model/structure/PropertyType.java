@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -86,7 +87,7 @@ public interface PropertyType<T> extends Extension {
     /**
      * Parses the JSON representation for a property value and creates the property value directly.
      *
-     * @see #fromStorage(com.fasterxml.jackson.databind.JsonNode)
+     * @see #fromStorage(JsonNode)
      * @see #of(Object)
      */
     default Property<T> of(JsonNode node) {
@@ -100,8 +101,13 @@ public interface PropertyType<T> extends Extension {
      *
      * @param value Value to index
      * @return Index value
+     *
+     * @deprecated The search key is no longer used and will be deleted in next release
      */
-    String getSearchKey(T value);
+    @Deprecated
+    default String getSearchKey(T value) {
+        return "";
+    }
 
     /**
      * Replaces a value by another one by transforming each string of the value into another one.
@@ -122,7 +128,7 @@ public interface PropertyType<T> extends Extension {
      * @return <code>true</code> is found
      */
     default boolean containsValue(T value, String propertyValue) {
-        return StringUtils.containsIgnoreCase(getSearchKey(value), propertyValue);
+        return StringUtils.containsIgnoreCase(value.toString(), propertyValue);
     }
 
     /**
@@ -164,5 +170,17 @@ public interface PropertyType<T> extends Extension {
      * @param oldValue Old value
      */
     default void onPropertyDeleted(ProjectEntity entity, T oldValue) {
+    }
+
+    /**
+     * Gets the additional SQL criteria to add to a search.
+     *
+     * @param token Token to look for this property type
+     * @return Search arguments (or <code>null</code> if no search is possible)
+     * @see PropertySearchArguments
+     */
+    @Nullable
+    default PropertySearchArguments getSearchArguments(String token) {
+        return null;
     }
 }

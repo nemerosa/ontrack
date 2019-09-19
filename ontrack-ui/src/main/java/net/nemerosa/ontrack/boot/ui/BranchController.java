@@ -38,6 +38,7 @@ public class BranchController extends AbstractResourceController {
     private final BuildFilterService buildFilterService;
     private final ExtensionManager extensionManager;
     private final SecurityService securityService;
+    private final BranchFavouriteService branchFavouriteService;
 
     @Autowired
     public BranchController(
@@ -47,7 +48,8 @@ public class BranchController extends AbstractResourceController {
             CopyService copyService,
             BuildFilterService buildFilterService,
             ExtensionManager extensionManager,
-            SecurityService securityService) {
+            SecurityService securityService,
+            BranchFavouriteService branchFavouriteService) {
         this.structureService = structureService;
         this.branchTemplateService = branchTemplateService;
         this.templateSynchronisationService = templateSynchronisationService;
@@ -55,6 +57,7 @@ public class BranchController extends AbstractResourceController {
         this.buildFilterService = buildFilterService;
         this.extensionManager = extensionManager;
         this.securityService = securityService;
+        this.branchFavouriteService = branchFavouriteService;
     }
 
     @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
@@ -479,6 +482,20 @@ public class BranchController extends AbstractResourceController {
                         .collect(Collectors.toList()),
                 buildDiffActions
         );
+    }
+
+    @RequestMapping(value = "branches/{branchId}/favourite", method = RequestMethod.PUT)
+    public Branch favouriteBranch(@PathVariable ID branchId) {
+        Branch branch = structureService.getBranch(branchId);
+        branchFavouriteService.setBranchFavourite(branch, true);
+        return branch;
+    }
+
+    @RequestMapping(value = "branches/{branchId}/unfavourite", method = RequestMethod.PUT)
+    public Branch unfavouriteBranch(@PathVariable ID branchId) {
+        Branch branch = structureService.getBranch(branchId);
+        branchFavouriteService.setBranchFavourite(branch, false);
+        return branch;
     }
 
 }

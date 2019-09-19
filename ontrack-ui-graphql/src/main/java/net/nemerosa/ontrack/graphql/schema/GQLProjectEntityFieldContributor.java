@@ -4,6 +4,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ public interface GQLProjectEntityFieldContributor {
      * @param projectEntityType  Type of project entity
      * @return List of fields to call. <code>null</code> is accepted.
      */
+    @Nullable
     List<GraphQLFieldDefinition> getFields(Class<? extends ProjectEntity> projectEntityClass, ProjectEntityType projectEntityType);
 
 }
