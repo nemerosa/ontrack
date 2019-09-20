@@ -230,7 +230,7 @@ configure(coreProjects) {
             // Overrides from Spring Boot
             dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8'
             dependency 'org.postgresql:postgresql:9.4.1208'
-            dependency 'org.flywaydb:flyway-core:4.2.0'
+            dependency 'org.flywaydb:flyway-core:5.2.4'
         }
     }
 
