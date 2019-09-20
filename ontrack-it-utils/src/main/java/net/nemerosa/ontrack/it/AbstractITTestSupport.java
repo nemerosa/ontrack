@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.*;
 import org.springframework.core.convert.converter.ConverterRegistry;
@@ -33,7 +32,6 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
         },
         webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
-@JdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public abstract class AbstractITTestSupport extends AbstractTransactionalJUnit4SpringContextTests {
 
