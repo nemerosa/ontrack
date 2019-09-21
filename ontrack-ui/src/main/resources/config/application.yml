@@ -26,9 +26,7 @@ server:
 
 # Management
 management:
-  context-path: "/manage"
-  security:
-    roles: ADMIN
+  # TODO Custom URL for the management end points (/manage)
   # Default settings for the metrics
   metrics:
     export:

@@ -1,0 +1,6 @@
+management:
+  # Exposure of all end points in development mode
+  endpoints:
+    web:
+      exposure:
+        include: "*"
