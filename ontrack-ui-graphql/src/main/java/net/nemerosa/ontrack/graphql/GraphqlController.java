@@ -46,7 +46,7 @@ public class GraphqlController {
         private final Map<String, Object> variables;
         private final String operationName;
 
-        public Request withVariables() {
+        Request withVariables() {
             if (variables == null) {
                 return withVariables(Collections.emptyMap());
             } else {
@@ -64,7 +64,7 @@ public class GraphqlController {
             @RequestParam String query,
             @RequestParam(required = false) String variables,
             @RequestParam(required = false) String operationName
-    ) throws IOException {
+    ) {
         return () -> {
             // Parses the arguments
             Map<String, Object> arguments = decodeIntoMap(variables);
@@ -86,7 +86,7 @@ public class GraphqlController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    public Callable<ResponseEntity<JsonNode>> post(@RequestBody String input) throws IOException {
+    public Callable<ResponseEntity<JsonNode>> post(@RequestBody String input) {
         return () -> {
             // Gets the components
             Request request = objectMapper.readValue(input, Request.class);
@@ -102,7 +102,7 @@ public class GraphqlController {
     /**
      * Request execution (JSON)
      */
-    public JsonNode requestAsJson(Request request) {
+    private JsonNode requestAsJson(Request request) {
         return objectMapper.valueToTree(
                 request(request)
         );

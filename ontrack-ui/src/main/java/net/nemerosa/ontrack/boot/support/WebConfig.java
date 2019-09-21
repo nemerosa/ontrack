@@ -6,20 +6,22 @@ import net.nemerosa.ontrack.ui.resource.ResourceModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.task.TaskExecutorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Configuration
-public class WebConfig extends WebMvcConfigurerAdapter {
+public class WebConfig implements WebMvcConfigurer {
 
     private final Logger logger = LoggerFactory.getLogger(WebConfig.class);
 
@@ -32,12 +34,20 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Autowired
     private List<ResourceModule> resourceModules;
 
+    @Autowired
+    private TaskExecutorBuilder taskExecutorBuilder;
+
     /**
      * Logging
      */
     @PostConstruct
     public void log() {
         logger.info("[web] URI builder = " + uriBuilder.getClass().getName());
+    }
+
+    @Override
+    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+        configurer.setTaskExecutor(taskExecutorBuilder.build());
     }
 
     /**
