@@ -1,129 +1,98 @@
-package net.nemerosa.ontrack.graphql;
+package net.nemerosa.ontrack.graphql
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import graphql.ExecutionResult;
-import lombok.Data;
-import lombok.experimental.Wither;
-import net.nemerosa.ontrack.graphql.service.GraphQLService;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.Callable;
+import com.fasterxml.jackson.databind.JsonNode
+import graphql.ExecutionResult
+import net.nemerosa.ontrack.graphql.service.GraphQLService
+import net.nemerosa.ontrack.json.ObjectMapperFactory
+import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.*
+import java.io.IOException
+import java.util.concurrent.Callable
 
 @Transactional
 @RestController
 @RequestMapping("/graphql")
-public class GraphqlController {
+class GraphqlController(
+        private val graphQLService: GraphQLService
+) {
 
-    private final GraphQLService graphQLService;
-
-    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
-
-    @Autowired
-    public GraphqlController(GraphQLService graphQLService) {
-        this.graphQLService = graphQLService;
-    }
+    private val objectMapper = ObjectMapperFactory.create()
 
     /**
      * Request model
      */
-    @Data
-    public static class Request {
-        private final String query;
-        @Wither
-        private final Map<String, Object> variables;
-        private final String operationName;
-
-        Request withVariables() {
-            if (variables == null) {
-                return withVariables(Collections.emptyMap());
-            } else {
-                return this;
-            }
-        }
-    }
+    data class Request(
+            val query: String,
+            val variables: Map<String, Any>? = null,
+            val operationName: String? = null
+    )
 
     /**
      * GET end point
      */
-    @RequestMapping(method = RequestMethod.GET)
-    @Transactional
-    public Callable<ResponseEntity<JsonNode>> get(
-            @RequestParam String query,
-            @RequestParam(required = false) String variables,
-            @RequestParam(required = false) String operationName
-    ) {
-        return () -> {
-            // Parses the arguments
-            Map<String, Object> arguments = decodeIntoMap(variables);
-            // Runs the query
-            return ResponseEntity.ok(
-                    requestAsJson(
-                            new Request(
-                                    query,
-                                    arguments,
-                                    operationName
-                            )
-                    )
-            );
-        };
+    @GetMapping
+    operator fun get(
+            @RequestParam query: String,
+            @RequestParam(required = false) variables: String?,
+            @RequestParam(required = false) operationName: String?
+    ): Callable<ResponseEntity<JsonNode>> = Callable {
+        // Parses the arguments
+        val arguments = decodeIntoMap(variables)
+        // Runs the query
+        ResponseEntity.ok(
+                requestAsJson(
+                        Request(
+                                query,
+                                arguments,
+                                operationName
+                        )
+                )
+        )
     }
 
     /**
      * POST end point
      */
-    @RequestMapping(method = RequestMethod.POST)
-    @Transactional
-    public Callable<ResponseEntity<JsonNode>> post(@RequestBody String input) {
-        return () -> {
-            // Gets the components
-            Request request = objectMapper.readValue(input, Request.class);
-            // Variables must not be null
-            request = request.withVariables();
-            // Runs the query
-            return ResponseEntity.ok(
-                    requestAsJson(request)
-            );
-        };
+    @RequestMapping(method = [RequestMethod.POST])
+    fun post(@RequestBody input: String): Callable<ResponseEntity<JsonNode>> = Callable {
+        // Gets the components
+        val request = objectMapper.readValue(input, Request::class.java)
+        // Runs the query
+        ResponseEntity.ok(
+                requestAsJson(request)
+        )
     }
 
     /**
      * Request execution (JSON)
      */
-    private JsonNode requestAsJson(Request request) {
+    private fun requestAsJson(request: Request): JsonNode {
         return objectMapper.valueToTree(
                 request(request)
-        );
+        )
 
     }
 
     /**
      * Request execution
      */
-    public ExecutionResult request(Request request) {
+    fun request(request: Request): ExecutionResult {
         return graphQLService.execute(
-                request.getQuery(),
-                request.getVariables(),
-                request.getOperationName(),
+                request.query,
+                request.variables ?: emptyMap(),
+                request.operationName,
                 true
-        );
+        )
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> decodeIntoMap(String variablesParam) throws IOException {
-        if (StringUtils.isNotBlank(variablesParam)) {
-            return objectMapper.readValue(variablesParam, Map.class);
-        } else {
-            return Collections.emptyMap();
-        }
-    }
+    @Throws(IOException::class)
+    private fun decodeIntoMap(variablesParam: String?): Map<String, Any> =
+            (if (variablesParam.isNullOrBlank()) {
+                emptyMap()
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                objectMapper.readValue(variablesParam, Map::class.java) as Map<String, Any>
+            })
 
 }
