@@ -80,8 +80,8 @@ if (documentationProfile) {
     build.dependsOn 'asciidoctorPdf'
 
     rootProject.tasks.publicationPackage {
-        dependsOn "asciidoctor"
-        dependsOn "asciidoctorPdf"
+        dependsOn ":ontrack-docs:asciidoctor"
+        dependsOn ":ontrack-docs:asciidoctorPdf"
         from(project(":ontrack-docs").file("build/docs/asciidoc")) {
             into("html5")
         }
