@@ -70,8 +70,9 @@ task preIntegrationTest {
     dependsOn integrationTestComposeUp
     // When done
     doLast {
-        def port = integrationTestComposeUp.servicesInfos.db.firstContainer.tcpPort as int
-        project.ext.jdbcUrl = "jdbc:postgresql://localhost:$port/ontrack"
+        def host = integrationTestComposeUp.servicesInfos.db.firstContainer.host as String
+        def port = integrationTestComposeUp.servicesInfos.db.firstContainer.ports.get(5432) as int
+        project.ext.jdbcUrl = "jdbc:postgresql://$host:$port/ontrack"
     }
 }
 
