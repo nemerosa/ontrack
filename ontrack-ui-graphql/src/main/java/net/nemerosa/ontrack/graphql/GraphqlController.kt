@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.io.IOException
-import java.util.concurrent.Callable
 
 @Transactional
 @RestController
@@ -36,11 +35,11 @@ class GraphqlController(
             @RequestParam query: String,
             @RequestParam(required = false) variables: String?,
             @RequestParam(required = false) operationName: String?
-    ): Callable<ResponseEntity<JsonNode>> = Callable {
+    ): ResponseEntity<JsonNode> {
         // Parses the arguments
         val arguments = decodeIntoMap(variables)
         // Runs the query
-        ResponseEntity.ok(
+        return ResponseEntity.ok(
                 requestAsJson(
                         Request(
                                 query,
@@ -55,11 +54,11 @@ class GraphqlController(
      * POST end point
      */
     @RequestMapping(method = [RequestMethod.POST])
-    fun post(@RequestBody input: String): Callable<ResponseEntity<JsonNode>> = Callable {
+    fun post(@RequestBody input: String): ResponseEntity<JsonNode> {
         // Gets the components
         val request = objectMapper.readValue(input, Request::class.java)
         // Runs the query
-        ResponseEntity.ok(
+        return ResponseEntity.ok(
                 requestAsJson(request)
         )
     }
