@@ -73,6 +73,7 @@ task preIntegrationTest {
         def host = integrationTestComposeUp.servicesInfos.db.firstContainer.host as String
         def port = integrationTestComposeUp.servicesInfos.db.firstContainer.ports.get(5432) as int
         project.ext.jdbcUrl = "jdbc:postgresql://$host:$port/ontrack"
+        logger.info("Pre integration test JDBC URL = ${project.ext.jdbcUrl}")
     }
 }
 
@@ -266,6 +267,9 @@ configure(coreProjects) {
             systemProperty 'spring.datasource.password', 'ontrack'
         }
     }
+
+    // Synchronization with shutting down the database
+    rootProject.integrationTestComposeDown.mustRunAfter project.integrationTest
 
     // Acceptance tests
     task acceptanceTest(type: Test) {
