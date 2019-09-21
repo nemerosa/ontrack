@@ -3,10 +3,8 @@ package net.nemerosa.ontrack.graphql;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
-import graphql.schema.GraphQLSchema;
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.graphql.schema.GraphqlSchemaService;
 import net.nemerosa.ontrack.graphql.service.GraphQLService;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -25,14 +23,12 @@ import java.util.concurrent.Callable;
 @RequestMapping("/graphql")
 public class GraphqlController {
 
-    private final GraphqlSchemaService schemaService;
     private final GraphQLService graphQLService;
 
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     @Autowired
-    public GraphqlController(GraphqlSchemaService schemaService, GraphQLService graphQLService) {
-        this.schemaService = schemaService;
+    public GraphqlController(GraphQLService graphQLService) {
         this.graphQLService = graphQLService;
     }
 
@@ -113,11 +109,7 @@ public class GraphqlController {
      * Request execution
      */
     public ExecutionResult request(Request request) {
-        // Schema
-        GraphQLSchema schema = schemaService.getSchema();
-        // Execution
         return graphQLService.execute(
-                schema,
                 request.getQuery(),
                 request.getVariables(),
                 request.getOperationName(),
