@@ -14,7 +14,7 @@ spring:
     password: ontrack
   # Default profile
   profiles:
-    default: prod
+    active: prod
   # AOP configuration
   aop:
     proxyTargetClass: true
