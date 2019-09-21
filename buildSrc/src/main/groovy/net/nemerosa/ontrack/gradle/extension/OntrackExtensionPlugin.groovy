@@ -8,7 +8,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        println "[ontrack] Applying INTERNAL Ontrack plugin to ${project.path}"
+        project.logger.info("[ontrack] Applying INTERNAL Ontrack plugin to ${project.path}")
 
         /**
          * Project's configuration
@@ -43,14 +43,14 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         project.tasks.create('copyPackageJson') {
             doLast {
-                println "[ontrack] Copies the package.json file to ${project.projectDir}"
+                logger.info("[ontrack] Copies the package.json file to ${project.projectDir}")
                 project.file('package.json').text = getClass().getResourceAsStream('/extension/package.json').text
             }
         }
 
         project.tasks.create('copyGulpFile') {
             doLast {
-                println "[ontrack] Copies the gulpfile.js file to ${project.projectDir}"
+                logger.info("[ontrack] Copies the gulpfile.js file to ${project.projectDir}")
                 project.file('gulpfile.js').text = getClass().getResourceAsStream('/extension/gulpfile.js').text
             }
         }
@@ -78,7 +78,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
             doFirst {
                 project.mkdir project.buildDir
-                println "[ontrack] Generating web resources of ${project.extensions.ontrack.id(project)} in ${project.buildDir}"
+                logger.info("[ontrack] Generating web resources of ${project.extensions.ontrack.id(project)} in ${project.buildDir}")
             }
 
             workingDir = project.projectDir
