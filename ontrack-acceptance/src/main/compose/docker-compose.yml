@@ -10,7 +10,7 @@ services:
    influxdb:
     image: influxdb:1.5.2
    ontrack:
-      image: "docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+      image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
       depends_on:
          postgres:
             condition: service_started
@@ -29,7 +29,7 @@ services:
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
-      image: "docker.nemerosa.net/nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      image: "nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
       depends_on:
          ontrack:
             condition: service_healthy
