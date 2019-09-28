@@ -60,8 +60,8 @@ task prepareDockerImage(type: Copy) {
 
 task buildDockerImage(type: DockerBuildImage) {
     dependsOn prepareDockerImage
-    inputDir project.file('build/docker')
-    tag "nemerosa/ontrack-extension-test:${version}"
+    inputDir.set(project.file('build/docker'))
+    tags.add("nemerosa/ontrack-extension-test:${version}")
 }
 
 assemble.dependsOn buildDockerImage
