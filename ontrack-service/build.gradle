@@ -1,4 +1,6 @@
-apply plugin: 'groovy'
+plugins {
+    id "groovy"
+}
 
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-actuator'
@@ -14,7 +16,7 @@ dependencies {
     compile 'org.springframework.security:spring-security-ldap'
     compile 'org.slf4j:slf4j-api'
     compile 'commons-io:commons-io'
-    compile 'org.codehaus.groovy:groovy-all'
+    compile 'org.codehaus.groovy:groovy'
     compile 'org.kohsuke:groovy-sandbox'
     compile 'org.jgrapht:jgrapht-core'
     compile 'com.github.ben-manes.caffeine:caffeine'

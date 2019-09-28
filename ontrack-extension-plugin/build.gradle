@@ -1,8 +1,10 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-description "Gradle plugin to create an Ontrack extension."
+plugins {
+    id "groovy"
+}
 
-apply plugin: 'groovy'
+description "Gradle plugin to create an Ontrack extension."
 
 repositories {
     maven {

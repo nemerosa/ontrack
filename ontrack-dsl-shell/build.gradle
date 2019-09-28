@@ -1,7 +1,10 @@
+plugins {
+    id "groovy"
+}
+
 description = "DSL Shell for Ontrack."
 
 apply plugin: 'org.springframework.boot'
-apply plugin: 'groovy'
 
 dependencies {
     compile 'args4j:args4j'

@@ -1,11 +1,8 @@
-description = "DSL for Ontrack."
-
-apply plugin: 'groovy'
-
-tasks.withType(AbstractCompile) {
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+plugins {
+    id "groovy"
 }
+
+description = "DSL for Ontrack."
 
 /**
  * Dependencies of the DSL module must be carefully controlled
@@ -13,7 +10,8 @@ tasks.withType(AbstractCompile) {
  */
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.4.15'
+    compile 'org.codehaus.groovy:groovy:2.5.8'
+    compile 'org.codehaus.groovy:groovy-json:2.5.8'
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'org.apache.httpcomponents:httpclient:4.5.3'
     compile 'org.apache.httpcomponents:httpcore:4.4.6'

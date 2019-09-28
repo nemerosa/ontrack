@@ -1,14 +1,15 @@
 plugins {
+    id "groovy"
     id "org.asciidoctor.jvm.convert" version "2.3.0"
     id "org.asciidoctor.jvm.pdf" version "2.3.0"
 }
-
-apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-dsl')
     compile project(':ontrack-json')
     compile 'commons-io:commons-io'
+    compile 'org.codehaus.groovy:groovy'
+    compile 'org.codehaus.groovy:groovy-groovydoc'
 
     runtime("org.fusesource.jansi:jansi:1.18")
 }

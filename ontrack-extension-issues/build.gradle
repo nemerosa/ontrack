@@ -1,8 +1,10 @@
-apply plugin: 'groovy'
+plugins {
+    id "groovy"
+}
 
 dependencies {
     compile project(':ontrack-extension-support')
-    compile 'org.codehaus.groovy:groovy-all'
+    compile 'org.codehaus.groovy:groovy'
 }
 
 configurations {

@@ -1,4 +1,6 @@
-apply plugin: 'groovy'
+plugins {
+    id "groovy"
+}
 
 dependencies {
 
@@ -13,7 +15,7 @@ dependencies {
     compile 'org.slf4j:slf4j-api'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
 
-    testCompile 'org.codehaus.groovy:groovy-all'
+    testCompile 'org.codehaus.groovy:groovy'
     testCompile project(':ontrack-test-utils')
 
 }

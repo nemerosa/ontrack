@@ -1,14 +1,17 @@
 import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
 
+plugins {
+    id "groovy"
+}
+
 apply plugin: OntrackExtensionPlugin
-apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-extension-issues')
     compile project(':ontrack-tx')
     compile 'org.springframework:spring-tx'
 
-    testCompile 'org.codehaus.groovy:groovy-all'
+    testCompile 'org.codehaus.groovy:groovy'
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-ui-graphql').sourceSets.test.output
     testRuntime project(':ontrack-service')
