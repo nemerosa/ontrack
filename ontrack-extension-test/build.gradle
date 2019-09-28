@@ -9,8 +9,11 @@ buildscript {
     }
     dependencies {
         classpath "net.nemerosa.ontrack:ontrack-extension-plugin:${ontrackVersion}"
-        classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
     }
+}
+
+plugins {
+    id 'com.bmuschko.docker-remote-api' version '4.1.0'
 }
 
 group = 'net.nemerosa.ontrack'
@@ -36,8 +39,6 @@ dependencies {
     testCompile "net.nemerosa.ontrack:ontrack-acceptance:${ontrackVersion}"
     testCompile "net.nemerosa.ontrack:ontrack-dsl:${ontrackVersion}"
 }
-
-apply plugin: 'com.bmuschko.docker-remote-api'
 
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.apache.tools.ant.filters.ReplaceTokens
