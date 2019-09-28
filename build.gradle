@@ -1,3 +1,7 @@
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
 buildscript {
     ext {
         kotlinVersion = '1.3.50'
@@ -295,7 +299,21 @@ apply from: 'gradle/os-packaging.gradle'
  * Docker tasks
  */
 
-apply from: 'gradle/docker.gradle'
+task dockerPrepareEnv(type: Copy, dependsOn: ':ontrack-ui:bootJar') {
+    from 'ontrack-ui/build/libs'
+    include '*.jar'
+    exclude '*-javadoc.jar'
+    exclude '*-sources.jar'
+    into project.file('docker')
+    rename '.*', 'ontrack.jar'
+}
+
+task dockerBuild(type: DockerBuildImage) {
+    dependsOn dockerPrepareEnv
+    inputDir = file("docker")
+    tags.add("nemerosa/ontrack:$version")
+    tags.add("nemerosa/ontrack:latest")
+}
 
 /**
  * Acceptance tasks
@@ -307,7 +325,27 @@ apply from: 'gradle/acceptance.gradle'
  * Development tasks
  */
 
-apply from: 'gradle/development.gradle'
+task devPostgresqlCreate(type: DockerCreateContainer) {
+    targetImageId "postgres:9.5.5"
+    portBindings.set([
+            "${project.properties.devPostgresPort}:8080"
+    ])
+    envVars.set([
+            POSTGRES_USER    : 'ontrack',
+            POSTGRES_PASSWORD: 'ontrack',
+    ])
+    containerName.set(project.properties.devPostgresName)
+    restartPolicy.set("always")
+}
+
+task devPostgresqlStart(type: DockerStartContainer) {
+    dependsOn devPostgresqlCreate
+    targetContainerId devPostgresqlCreate.getContainerId()
+}
+
+task devInit {
+    dependsOn devPostgresqlStart
+}
 
 /**
  * Publication tasks
