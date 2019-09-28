@@ -1,21 +1,23 @@
-apply plugin: 'groovy'
+plugins {
+    id "groovy"
+}
 
 dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-cache'
     compile project(':ontrack-model')
     compile project(':ontrack-repository')
     compile project(':ontrack-extension-api')
     compile project(':ontrack-job')
-    compile 'org.springframework:spring-context'
-    compile 'org.springframework:spring-tx'
+    // compile 'org.springframework:spring-context'
+    // compile 'org.springframework:spring-tx'
     compile 'org.springframework.security:spring-security-core'
     compile 'org.springframework.security:spring-security-config'
     compile 'org.springframework.security:spring-security-ldap'
     compile 'org.slf4j:slf4j-api'
     compile 'commons-io:commons-io'
-    compile 'org.codehaus.groovy:groovy-all'
+    compile 'org.codehaus.groovy:groovy'
     compile 'org.kohsuke:groovy-sandbox'
-    compile 'org.springframework.boot:spring-boot-starter-actuator'
-    compile 'org.springframework.boot:spring-boot-starter-cache'
     compile 'org.jgrapht:jgrapht-core'
     compile 'com.github.ben-manes.caffeine:caffeine'
     compile 'org.flywaydb:flyway-core'

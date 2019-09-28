@@ -1,4 +1,6 @@
-apply plugin: 'groovy'
+plugins {
+    id "groovy"
+}
 
 description = "Git client for Ontrack."
 
@@ -8,6 +10,6 @@ dependencies {
     compile 'commons-io:commons-io'
     compile 'com.google.guava:guava'
     compile project(':ontrack-common')
-    compile 'org.codehaus.groovy:groovy-all'
+    compile 'org.codehaus.groovy:groovy'
     compile 'org.slf4j:slf4j-api'
 }

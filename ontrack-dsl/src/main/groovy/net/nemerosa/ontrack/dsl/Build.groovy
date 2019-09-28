@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.properties.BuildProperties
 
+import java.text.SimpleDateFormat
+
 @DSL
 class Build extends AbstractProjectResource {
 
@@ -204,7 +206,7 @@ class Build extends AbstractProjectResource {
                 link('signature'),
                 [
                         user: user,
-                        time: date ? date.format("yyyy-MM-dd'T'HH:mm:ss") : null
+                        time: date ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date) : null
                 ]
         )
     }

@@ -1,5 +1,9 @@
 import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
 
+plugins {
+    id "groovy"
+}
+
 apply plugin: OntrackExtensionPlugin
 
 dependencies {
@@ -7,7 +11,7 @@ dependencies {
     compile 'org.influxdb:influxdb-java'
 
     testCompile project(':ontrack-it-utils')
-    testCompile 'org.codehaus.groovy:groovy-all'
+    testCompile 'org.codehaus.groovy:groovy'
     testCompile project(':ontrack-extension-api').sourceSets.test.output
 
     testRuntime project(':ontrack-service')
