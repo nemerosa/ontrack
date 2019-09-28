@@ -37,7 +37,10 @@ configurations.all {
  */
 
 bootJar {
-    from sourceSets.test.output
+    bootInf {
+        from sourceSets.test.output
+        into "classes"
+    }
     classpath configurations.testRuntime
     mainClassName = 'net.nemerosa.ontrack.acceptance.boot.Start'
     classifier = 'app'
