@@ -1,10 +1,5 @@
 # Application properties
 
-# Flyway configuration
-# See RepositoryConfig for general Flyway configuration
-flyway:
-  baseline-on-migrate: true
-
 # Spring configuration
 spring:
   # Default database connection
