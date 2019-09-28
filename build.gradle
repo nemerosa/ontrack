@@ -334,7 +334,7 @@ task devPostgresqlCreate(type: DockerCreateContainer) {
             POSTGRES_USER    : 'ontrack',
             POSTGRES_PASSWORD: 'ontrack',
     ])
-    containerName.set(project.properties.devPostgresName)
+    containerName.set(project.properties.devPostgresName as String)
     restartPolicy.set("always")
 }
 

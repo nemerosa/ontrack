@@ -18,12 +18,13 @@ services:
     image: nemerosa/ontrack:latest
     environment:
       JAVA_OPTIONS: "${JAVA_OPTIONS}"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql/ontrack"
     links:
       - "influxdb:influxdb"
 
   # Postgresql database
   postgresql:
-    image: postgres:9.5.2
+    image: postgres:9.5.5
     environment:
       POSTGRES_DB      : ontrack
       POSTGRES_USER    : ontrack

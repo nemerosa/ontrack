@@ -1,16 +1,5 @@
 # CI environment
 
-# SSL with self signed certificate
-server:
-  port: 443
-  ssl:
-    enabled: true
-    key-alias: ontrack
-    key-store: "config/keystore.p12"
-    key-store-type: PKCS12
-    key-store-password: ontrack
-    key-password: ontrack
-
 # Remote shutdown enabled
 endpoints:
   shutdown:

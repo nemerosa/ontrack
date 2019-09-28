@@ -102,7 +102,7 @@ git clean -xfd
     integrationTest \\
     publishToMavenLocal \\
     osPackages \\
-    dockerLatest \\
+    dockerBuild \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx4096m \\
