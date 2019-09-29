@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.model.support;
 
 import lombok.Data;
-import org.apache.commons.lang3.Validate;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Data
 public class JobConfigProperties {
@@ -9,11 +11,13 @@ public class JobConfigProperties {
     /**
      * Core pool size for the threads used to run the jobs.
      */
+    @Min(1)
     private int poolSize = 10;
 
     /**
      * Orchestration interval
      */
+    @Min(1)
     private int orchestration = 2;
 
     /**
@@ -29,15 +33,8 @@ public class JobConfigProperties {
     /**
      * Scattering ratio (must be between 0.0 and 1.0 inclusive).
      */
+    @Min(1)
+    @Max(1)
     private double scatteringRatio = 1.0;
-
-    /**
-     * Sets the scattering ratio (must be between 0.0 and 1.0 inclusive).
-     */
-    @SuppressWarnings("unused")
-    public void setScatteringRatio(double value) {
-        Validate.inclusiveBetween(0.0, 1.0, value);
-        this.scatteringRatio = value;
-    }
 
 }
