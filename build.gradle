@@ -1,5 +1,3 @@
-import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 buildscript {
@@ -325,26 +323,22 @@ apply from: 'gradle/acceptance.gradle'
  * Development tasks
  */
 
-task devPostgresqlCreate(type: DockerCreateContainer) {
-    targetImageId "postgres:9.5.5"
-    portBindings.set([
-            "${project.properties.devPostgresPort}:8080"
-    ])
-    envVars.set([
-            POSTGRES_USER    : 'ontrack',
-            POSTGRES_PASSWORD: 'ontrack',
-    ])
-    containerName.set(project.properties.devPostgresName as String)
-    restartPolicy.set("always")
+dockerCompose {
+    dev {
+        useComposeFiles = ["${rootDir}/gradle/compose/docker-compose-dev.yml"]
+        projectName = "dev"
+        forceRecreate = false
+        environment.put("POSTGRES_NAME", project.properties.devPostgresName)
+        environment.put("POSTGRES_PORT", project.properties.devPostgresPort)
+    }
 }
 
-task devPostgresqlStart(type: DockerStartContainer) {
-    dependsOn devPostgresqlCreate
-    targetContainerId devPostgresqlCreate.getContainerId()
+task devStart {
+    dependsOn devComposeUp
 }
 
-task devInit {
-    dependsOn devPostgresqlStart
+task devStop {
+    dependsOn devComposeDown
 }
 
 /**
