@@ -18,7 +18,10 @@ server:
 
 # Management
 management:
-  # TODO Custom URL for the management end points (/manage)
+  # Custom URL for the management end points
+  endpoints:
+    web:
+      base-path: "/manage"
   # Default settings for the metrics
   metrics:
     export:
