@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.validation.ValidationUtils
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
@@ -1252,15 +1251,20 @@ class StructureServiceImpl(
         return getValidationRun(validationRun.id)
     }
 
-    override fun getParentValidationRun(validationRunStatusId: ID): ValidationRun {
+    override fun getParentValidationRun(validationRunStatusId: ID, checkForAccess: Boolean): ValidationRun? {
         // Gets the validation run
         val run = structureRepository.getParentValidationRun(validationRunStatusId) {
             validationRunStatusService.getValidationRunStatus(it)
         }
         // Checks access rights
-        securityService.checkProjectFunction(run, ProjectView::class.java)
-        // OK
-        return run
+        return when {
+            checkForAccess -> {
+                securityService.checkProjectFunction(run, ProjectView::class.java)
+                run
+            }
+            securityService.isProjectFunctionGranted(run, ProjectView::class.java) -> run
+            else -> null
+        }
     }
 
     override fun getValidationRunStatus(id: ID): ValidationRunStatus {
@@ -1271,27 +1275,27 @@ class StructureServiceImpl(
 
     override fun isValidationRunStatusCommentEditable(validationRunStatus: ID): Boolean {
         // Loads the parent
-        val run = getParentValidationRun(validationRunStatus)
-        // Checks the edit right
-        return if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEdit::class.java)) {
-            true
-        }
-        // If not, check the current user vs. the creator of the comment
-        else if (securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEditOwn::class.java)) {
-            // Loads the status
-            val status = structureRepository.getValidationRunStatus(validationRunStatus) {
-                validationRunStatusService.getValidationRunStatus(it)
+        val run = getParentValidationRun(validationRunStatus, checkForAccess = false)
+        return when {
+            // Checks if available at all
+            run == null -> false
+            // Checks the edit right
+            securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEdit::class.java) -> true
+            // If not, check the current user vs. the creator of the comment
+            securityService.isProjectFunctionGranted(run, ValidationRunStatusCommentEditOwn::class.java) -> {
+                // Loads the status
+                val status = structureRepository.getValidationRunStatus(validationRunStatus) {
+                    validationRunStatusService.getValidationRunStatus(it)
+                }
+                // Gets the status's author
+                val statusAuthor = status?.signature?.user?.name
+                // Gets the current user name
+                val currentUserName = securityService.currentSignature?.user?.name
+                // Compare both
+                statusAuthor != null && statusAuthor == currentUserName
             }
-            // Gets the status's author
-            val statusAuthor = status?.signature?.user?.name
-            // Gets the current user name
-            val currentUserName = securityService.currentSignature?.user?.name
-            // Compare both
-            statusAuthor != null && statusAuthor == currentUserName
-        }
-        // No right at all
-        else {
-            false
+            // No right at all
+            else -> false
         }
     }
 
