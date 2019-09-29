@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import graphql.ExecutionResult
 import net.nemerosa.ontrack.graphql.service.GraphQLService
 import net.nemerosa.ontrack.json.ObjectMapperFactory
-import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.io.IOException
@@ -36,18 +35,16 @@ class GraphqlController(
             @RequestParam query: String,
             @RequestParam(required = false) variables: String?,
             @RequestParam(required = false) operationName: String?
-    ): Callable<ResponseEntity<JsonNode>> {
+    ): Callable<JsonNode> {
         // Parses the arguments
         val arguments = decodeIntoMap(variables)
         // Runs the query
         return Callable {
-            ResponseEntity.ok(
-                    requestAsJson(
-                            Request(
-                                    query,
-                                    arguments,
-                                    operationName
-                            )
+            requestAsJson(
+                    Request(
+                            query,
+                            arguments,
+                            operationName
                     )
             )
         }
@@ -56,15 +53,13 @@ class GraphqlController(
     /**
      * POST end point
      */
-    @RequestMapping(method = [RequestMethod.POST])
-    fun post(@RequestBody input: String): Callable<ResponseEntity<JsonNode>> {
+    @PostMapping
+    fun post(@RequestBody input: String): Callable<JsonNode> {
         // Gets the components
         val request = objectMapper.readValue(input, Request::class.java)
         // Runs the query
         return Callable {
-            ResponseEntity.ok(
-                    requestAsJson(request)
-            )
+            requestAsJson(request)
         }
     }
 
