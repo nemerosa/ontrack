@@ -10,9 +10,6 @@ spring:
   # Default profile
   profiles:
     active: prod
-  # AOP configuration
-  aop:
-    proxyTargetClass: true
 
 # Compression of web resources
 server:
