@@ -55,7 +55,7 @@ dependencies {
 
 clean {
     doLast {
-        project.delete 'src/main/resources/application.properties'
+        project.delete 'src/main/resources/config/application.properties'
         project.delete 'src/main/resources/static'
     }
 }
@@ -80,7 +80,7 @@ task copyWebResources(dependsOn: ':ontrack-web:prod') {
 task generateVersionInfo {
     doLast {
         // Amends the application.properties file with version information
-        File file = project.file('src/main/resources/application.properties')
+        File file = project.file('src/main/resources/config/application.properties')
         file.text = """\
 # This file is generated at build time to contain version information
 # Do not edit it, do not commit it

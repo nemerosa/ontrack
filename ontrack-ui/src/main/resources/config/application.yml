@@ -40,7 +40,7 @@ security:
     enabled: false
 
 # General information
-# The version information is generated in /application.properties by the build
+# The version information is generated in /config/application.properties by the build
 info:
   app:
     name: Ontrack
