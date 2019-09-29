@@ -5,12 +5,12 @@ import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.ResourceModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.task.TaskExecutorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
@@ -22,21 +22,25 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Configuration
+@EnableAsync
 public class WebConfig implements WebMvcConfigurer {
 
     private final Logger logger = LoggerFactory.getLogger(WebConfig.class);
 
-    @Autowired
-    private URIBuilder uriBuilder;
+    private final URIBuilder uriBuilder;
 
-    @Autowired
-    private SecurityService securityService;
+    private final SecurityService securityService;
 
-    @Autowired
-    private List<ResourceModule> resourceModules;
+    private final List<ResourceModule> resourceModules;
 
-    @Autowired
-    private TaskExecutorBuilder taskExecutorBuilder;
+    private final TaskExecutorBuilder taskExecutorBuilder;
+
+    public WebConfig(URIBuilder uriBuilder, SecurityService securityService, List<ResourceModule> resourceModules, TaskExecutorBuilder taskExecutorBuilder) {
+        this.uriBuilder = uriBuilder;
+        this.securityService = securityService;
+        this.resourceModules = resourceModules;
+        this.taskExecutorBuilder = taskExecutorBuilder;
+    }
 
     /**
      * Logging
