@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.support;
 
-import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.security.UserSource;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
@@ -67,7 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(EndpointRequest.toAnyEndpoint().excluding(
                         InfoEndpoint.class,
                         HealthEndpoint.class
-                )).hasRole(SecurityRole.ADMINISTRATOR.getRoleAbbreviatedName())
+                )).access("hasRole('ADMIN') or @functionBasedSecurity.hasApplicationManagement(authentication)")
                 .antMatchers("/**").permitAll()
             // Remember be authentication token
             .and().rememberMe()
