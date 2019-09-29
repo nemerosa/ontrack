@@ -33,13 +33,6 @@ management:
     ldap:
       enabled: false
 
-# Security
-
-# No security by default for the application end points
-security:
-  basic:
-    enabled: false
-
 # General information
 # The version information is generated in /config/application.properties by the build
 info:
