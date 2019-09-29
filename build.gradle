@@ -1,9 +1,9 @@
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     ext {
         kotlinVersion = '1.3.50'
-        micrometerVersion = '1.1.1'
     }
     repositories {
         jcenter()
@@ -193,7 +193,7 @@ configure(coreProjects) {
 
     dependencyManagement {
         imports {
-            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES) {
+            mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", kotlinVersion)
             }
         }
@@ -212,13 +212,6 @@ configure(coreProjects) {
             dependency 'org.kohsuke:groovy-sandbox:1.19'
             dependency 'com.graphql-java:graphql-java:11.0'
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
-            // Metrics
-            dependency "io.micrometer:micrometer-core:${micrometerVersion}"
-            dependency "io.micrometer:micrometer-spring-legacy:${micrometerVersion}"
-            dependency "io.micrometer:micrometer-registry-influx:${micrometerVersion}"
-            dependency "io.micrometer:micrometer-registry-prometheus:${micrometerVersion}"
-            // InfluxDB
-            dependency 'org.influxdb:influxdb-java:2.14'
             // Overrides from Spring Boot
             dependency 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8'
             dependency 'org.postgresql:postgresql:9.4.1208'
