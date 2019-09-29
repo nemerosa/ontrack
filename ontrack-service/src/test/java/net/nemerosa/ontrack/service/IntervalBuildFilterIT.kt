@@ -18,45 +18,57 @@ class IntervalBuildFilterIT : AbstractBuildFilterIT() {
 
     @Test
     fun `Validates the from build`() {
-        build("1.0.1")
-        val message = buildFilterService.validateBuildFilterProviderData(
-                branch,
-                BuildIntervalFilterProvider::class.java.name,
-                mapOf(
-                        "from" to "1.0.0",
-                        "to" to "1.0.1"
-                ).toJson()
-        )
-        assertEquals("""Build "1.0.0" does not exist for "${branch.entityDisplayName}".""", message)
+        project {
+            branch {
+                build("1.0.1")
+                val message = buildFilterService.validateBuildFilterProviderData(
+                        this,
+                        BuildIntervalFilterProvider::class.java.name,
+                        mapOf(
+                                "from" to "1.0.0",
+                                "to" to "1.0.1"
+                        ).toJson()
+                )
+                assertEquals("""Build "1.0.0" does not exist for "$entityDisplayName".""", message)
+            }
+        }
     }
 
     @Test
     fun `Validates the to build`() {
-        build("1.0.0")
-        val message = buildFilterService.validateBuildFilterProviderData(
-                branch,
-                BuildIntervalFilterProvider::class.java.name,
-                mapOf(
-                        "from" to "1.0.0",
-                        "to" to "1.0.1"
-                ).toJson()
-        )
-        assertEquals("""Build "1.0.1" does not exist for "${branch.entityDisplayName}".""", message)
+        project {
+            branch {
+                build("1.0.0")
+                val message = buildFilterService.validateBuildFilterProviderData(
+                        this,
+                        BuildIntervalFilterProvider::class.java.name,
+                        mapOf(
+                                "from" to "1.0.0",
+                                "to" to "1.0.1"
+                        ).toJson()
+                )
+                assertEquals("""Build "1.0.1" does not exist for "$entityDisplayName".""", message)
+            }
+        }
     }
 
     @Test
     fun `Validates the builds`() {
-        build("1.0.0")
-        build("1.0.1")
-        val message = buildFilterService.validateBuildFilterProviderData(
-                branch,
-                BuildIntervalFilterProvider::class.java.name,
-                mapOf(
-                        "from" to "1.0.0",
-                        "to" to "1.0.1"
-                ).toJson()
-        )
-        assertNull(message)
+        project {
+            branch {
+                build("1.0.0")
+                build("1.0.1")
+                val message = buildFilterService.validateBuildFilterProviderData(
+                        this,
+                        BuildIntervalFilterProvider::class.java.name,
+                        mapOf(
+                                "from" to "1.0.0",
+                                "to" to "1.0.1"
+                        ).toJson()
+                )
+                assertNull(message)
+            }
+        }
     }
 
     @Test
