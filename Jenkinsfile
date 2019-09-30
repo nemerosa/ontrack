@@ -181,6 +181,7 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             }
             environment {
                 ONTRACK_VERSION = "${version}"
+                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
             }
             steps {
                 // Runs the acceptance tests
@@ -193,9 +194,21 @@ echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --us
 
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name local up --exit-code-from ontrack_acceptance
+docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
 """
                 }
+                // Collection of coverage in Docker
+                sh '''
+                    ./gradlew \\
+                        codeDockerCoverageReport
+                        --stacktrace \\
+                        --profile \\
+                        --console plain
+                '''
+                // Upload to Codecov
+                sh '''
+                    curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/docker.xml
+                '''
             }
             post {
                 always {

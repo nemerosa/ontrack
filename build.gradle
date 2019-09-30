@@ -326,6 +326,37 @@ javaProjects.each { javaProject ->
     }
 }
 
+task codeDockerCoverageExtraction {
+    doLast {
+        ant.taskdef(
+                name: 'jacocoDump',
+                classname: 'org.jacoco.ant.DumpTask',
+                classpath: project.configurations.jacocoAnt.asPath
+        )
+        ant.jacocoDump(
+                address: 'localhost',
+                port: 6300,
+                destfile: 'build/jacoco/docker.exec',
+        )
+    }
+}
+
+task codeDockerCoverageReport(type: JacocoReport) {
+    dependsOn = [ codeDockerCoverageExtraction ]
+    executionData fileTree(project.rootDir.absolutePath).include("build/jacoco/docker.exec")
+
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled = true
+        xml.destination file("build/reports/jacoco/docker.xml")
+        html.enabled = false
+        csv.enabled = false
+    }
+}
+
 /**
  * Packaging for delivery
  */
