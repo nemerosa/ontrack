@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.validation.ValidationUtils
 import java.util.*
-import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
 import java.util.function.Predicate
 import java.util.function.Supplier
@@ -339,24 +337,40 @@ class StructureServiceImpl(
     }
 
     override fun findBuild(branchId: ID, buildPredicate: Predicate<Build>, sortDirection: BuildSortDirection): Optional<Build> {
+        return Optional.ofNullable(
+                findBuild(
+                        branchId,
+                        sortDirection
+                ) { build -> buildPredicate.test(build) }
+        )
+    }
+
+    override fun findBuild(branchId: ID, sortDirection: BuildSortDirection, buildPredicate: (Build) -> Boolean): Build? {
         // Gets the branch
         val branch = getBranch(branchId)
         // Build being found
-        val ref = AtomicReference<Build>()
+        var ref: Build? = null
         // Loops over the builds
         structureRepository.builds(
                 branch,
                 { build ->
-                    val ok = buildPredicate.test(build)
+                    val ok = buildPredicate(build)
                     if (ok) {
-                        ref.set(build)
+                        ref = build
                     }
                     !ok // Going on if no match
                 },
                 sortDirection
         )
         // Result
-        return Optional.ofNullable(ref.get())
+        return ref
+    }
+
+    override fun forEachBuild(branch: Branch, sortDirection: BuildSortDirection, processor: (Build) -> Boolean) {
+        findBuild(branch.id, sortDirection) { build ->
+            val goingOn = processor(build)
+           !goingOn // Found = Not going on
+        }
     }
 
     override fun getLastBuild(branchId: ID): Optional<Build> {

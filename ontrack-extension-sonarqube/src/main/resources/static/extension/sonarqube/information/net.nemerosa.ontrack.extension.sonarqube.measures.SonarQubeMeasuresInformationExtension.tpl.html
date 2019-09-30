@@ -1,0 +1,12 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <img class="ot-icon" src="extension/sonarqube/information/measures.png" alt="SonarQube measures"/> SonarQube measures
+    </div>
+    <div class="panel-body">
+        <ul>
+            <li ng-repeat="(key, value) in value.data.measures">
+                <b>{{key}}</b>: <code>{{value}}</code>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -55,7 +55,7 @@ other databases.
 As of today, only InfluxDB is supported.
 
 [[run-info-export-influxdb]]
-==== Exporting the run info to InfluxDB
+===== Exporting the run info to InfluxDB
 
 [NOTE]
 ====
@@ -74,3 +74,10 @@ following elements must be configured:
 | If `true`, the run info is exported to InfluxDB (`true` by default)
 
 |===
+
+[[run-info-export-extending]]
+===== Exporting the run info using extensions
+
+It's possible to manage your own export of run info by creating a `RunInfoListener` component.
+
+See <<extending-metrics-run-info-listeners>> for more information.
