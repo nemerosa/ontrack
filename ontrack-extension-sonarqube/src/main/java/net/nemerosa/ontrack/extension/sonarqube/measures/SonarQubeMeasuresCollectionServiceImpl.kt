@@ -151,7 +151,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
                                 "branch" to build.branch.name,
                                 "build" to build.name,
                                 "version" to version,
-                                "metric" to name
+                                "measure" to name
                         ),
                         fields = mapOf(
                                 "value" to value

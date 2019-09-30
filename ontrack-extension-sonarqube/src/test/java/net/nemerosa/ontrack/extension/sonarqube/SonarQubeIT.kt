@@ -73,7 +73,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                                 "branch" to build.branch.name,
                                 "build" to build.name,
                                 "version" to "1.0.0",
-                                "metric" to name
+                                "measure" to name
                         )),
                         fields = eq(mapOf(
                                 "value" to value

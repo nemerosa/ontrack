@@ -143,6 +143,6 @@ Measures associated to builds are exported to metrics using:
 ** `branch` - name of the build's branch
 ** `build` - name of the build for which measures are collected
 ** `version` - display name of the build
-** `metric` - name of the measure
+** `measure` - name of the measure
 * value - value of the measure
 * timestamp of the metric is the creation time of the build
