@@ -145,8 +145,27 @@ interface StructureService {
      * @param sortDirection  Build search direction
      * @return Build if found, empty otherwise
      */
-    // TODO Replace by Build?
+    @Deprecated("Must be replaced with the other `findBuild` method.")
     fun findBuild(branchId: ID, buildPredicate: Predicate<Build>, sortDirection: BuildSortDirection): Optional<Build>
+
+    /**
+     * Looks for the first build which matches a given predicate.
+     *
+     * @param branchId       Branch to look builds into
+     * @param sortDirection  Build search direction
+     * @param buildPredicate Predicate for a match
+     * @return Build if found, `null` otherwise
+     */
+    fun findBuild(branchId: ID, sortDirection: BuildSortDirection, buildPredicate: (Build) -> Boolean): Build?
+
+    /**
+     * Loops over all the builds of a branch, stopping when [processor] returns `false`.
+     *
+     * @param branch Branch to look builds into
+     * @param processor Must return `false` when the looping must stop
+     * @param sortDirection  Build search direction
+     */
+    fun forEachBuild(branch: Branch, sortDirection: BuildSortDirection, processor: (Build) -> Boolean)
 
     // TODO Replace by Build?
     fun getLastBuild(branchId: ID): Optional<Build>

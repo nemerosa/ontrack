@@ -1,0 +1,39 @@
+<ot-view>
+    <div class="row">
+        <div class="col-md-12">
+            <ot-section-title>List of configurations</ot-section-title>
+            <ot-noentry list="configurations.resources">
+                No SonarQube configuration has been created yet.
+            </ot-noentry>
+            <table class="table table-hover" ng-show="configurations.resources">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="configuration in configurations.resources">
+                    <td>
+                        <code>{{configuration.name}}</code>
+                    </td>
+                    <td>
+                        <a href="{{configuration.url}}">{{configuration.url}}</a>
+                    </td>
+                    <td>
+                        <span class="ot-command" ng-click="updateConfiguration(configuration)">
+                            <span class="ot-command-update"></span>
+                            Update
+                        </span>
+                        <span class="ot-command" ng-click="deleteConfiguration(configuration)">
+                            <span class="ot-command-delete"></span>
+                            Delete
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</ot-view>
