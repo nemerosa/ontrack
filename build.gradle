@@ -345,7 +345,7 @@ task codeDockerCoverageReport(type: JacocoReport) {
     dependsOn = [ codeDockerCoverageExtraction ]
     executionData fileTree(project.rootDir.absolutePath).include("build/jacoco/docker.exec")
 
-    subprojects.each {
+    javaProjects.each {
         sourceSets it.sourceSets.main
     }
 
