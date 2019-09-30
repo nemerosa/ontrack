@@ -51,10 +51,12 @@ class EntityDataServiceImpl(
     }
 
     override fun retrieveJson(entity: ProjectEntity, key: String): JsonNode? {
+        securityService.checkProjectFunction(entity, ProjectView::class.java)
         return repository.retrieveJson(entity, key)
     }
 
     override fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): T? {
+        securityService.checkProjectFunction(entity, ProjectView::class.java)
         val json = repository.retrieveJson(entity, key)
         return json?.let {
             objectMapper.treeToValue(it, type)

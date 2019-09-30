@@ -6,13 +6,14 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.buildfilter.StandardFilterProviderDataBuilder
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.labels.*
+import net.nemerosa.ontrack.model.security.GlobalFunction
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
+import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils
@@ -53,6 +54,14 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Kotlin friendly
      */
+    protected final inline fun <reified T : GlobalFunction> asUserWith(noinline code: () -> Unit): Unit = asUserWith<T, Unit>(code)
+
+    protected final inline fun <reified T : GlobalFunction, R> asUserWith(noinline code: () -> R): R =
+            asUser().with(T::class.java).call(code)
+
+    /**
+     * Kotlin friendly
+     */
     fun asUserWithView(vararg entities: ProjectEntity, code: () -> Unit) {
         asUserWithView(*entities).execute(code)
     }
@@ -63,6 +72,11 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Kotlin friendly anonymous execution
      */
     fun <T> asAnonymous(code: () -> T): T = asAnonymous().call(code)
+
+    /**
+     * Kotlin friendly admin execution
+     */
+    fun <T> asAdmin(code: () -> T): T = asAdmin().call(code)
 
     /**
      * Kotlin friendly account role execution
@@ -258,15 +272,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Change of status for a validation run
      */
     fun ValidationRun.validationStatusWithCurrentUser(status: ValidationRunStatusID, description: String): ValidationRun {
-            return structureService.newValidationRunStatus(
-                    this,
-                    ValidationRunStatus(
-                            ID.NONE,
-                            securityService.currentSignature,
-                            status,
-                            description
-                    )
-            )
+        return structureService.newValidationRunStatus(
+                this,
+                ValidationRunStatus(
+                        ID.NONE,
+                        securityService.currentSignature,
+                        status,
+                        description
+                )
+        )
     }
 
     /**
@@ -287,12 +301,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 )
             } else {
                 labelManagementService.newLabel(
-                    LabelForm(
-                            category = category,
-                            name = name,
-                            description = null,
-                            color = "#FF0000"
-                    )
+                        LabelForm(
+                                category = category,
+                                name = name,
+                                description = null,
+                                color = "#FF0000"
+                        )
                 )
             }
         }
