@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import java.util.concurrent.Callable;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -28,17 +30,20 @@ public class DecorationsController extends AbstractProjectEntityController {
      * Decorations for an entity.
      */
     @RequestMapping(value = "{entityType}/{id}", method = RequestMethod.GET)
-    public Resources<Decoration<?>> getDecorations(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
+    public Callable<Resources<Decoration<?>>> getDecorations(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
+        // Gets the current request attributes
         RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
-        RequestContextHolder.setRequestAttributes(attributes);
-        try {
-            return Resources.of(
-                    decorationService.getDecorations(getEntity(entityType, id)),
-                    uri(on(getClass()).getDecorations(entityType, id))
-            ).forView(Decoration.class);
-        } finally {
-            RequestContextHolder.resetRequestAttributes();
-        }
+        return () -> {
+            RequestContextHolder.setRequestAttributes(attributes);
+            try {
+                return Resources.of(
+                        decorationService.getDecorations(getEntity(entityType, id)),
+                        uri(on(getClass()).getDecorations(entityType, id))
+                ).forView(Decoration.class);
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        };
     }
 
 }
