@@ -1,61 +1,61 @@
-package net.nemerosa.ontrack.boot.support;
+package net.nemerosa.ontrack.boot.support
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.*;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
+import com.fasterxml.jackson.databind.ObjectMapper
+import net.nemerosa.ontrack.json.ObjectMapperFactory
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
+import net.nemerosa.ontrack.ui.resource.ResourceModule
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory
+import org.springframework.http.HttpInputMessage
+import org.springframework.http.HttpOutputMessage
+import org.springframework.http.MediaType
+import org.springframework.http.converter.AbstractHttpMessageConverter
+import java.io.ByteArrayOutputStream
+import java.nio.charset.Charset
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.List;
+class ResourceHttpMessageConverter(uriBuilder: URIBuilder, securityService: SecurityService, resourceModules: List<ResourceModule>) : AbstractHttpMessageConverter<Any>(MediaType("application", "json", DEFAULT_CHARSET), MediaType("application", "*+json", DEFAULT_CHARSET)) {
 
-public class ResourceHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
+    private val resourceObjectMapper: ResourceObjectMapper
+    private val mapper: ObjectMapper
 
-    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-
-    private final ResourceObjectMapper resourceObjectMapper;
-    private final ObjectMapper mapper;
-
-    public ResourceHttpMessageConverter(URIBuilder uriBuilder, SecurityService securityService, List<ResourceModule> resourceModules) {
-        super(
-                new MediaType("application", "json", DEFAULT_CHARSET),
-                new MediaType("application", "*+json", DEFAULT_CHARSET)
-        );
+    init {
         // Resource context
-        ResourceContext resourceContext = new DefaultResourceContext(uriBuilder, securityService);
+        val resourceContext = DefaultResourceContext(uriBuilder, securityService)
         // Object mapper
-        mapper = ObjectMapperFactory.create();
+        mapper = ObjectMapperFactory.create()
         // Resource mapper
-        resourceObjectMapper = new ResourceObjectMapperFactory(mapper).resourceObjectMapper(
+        resourceObjectMapper = ResourceObjectMapperFactory(mapper).resourceObjectMapper(
                 resourceModules,
                 resourceContext
-        );
+        )
     }
 
-    @Override
-    protected boolean supports(Class<?> clazz) {
-        return true;
+    override fun supports(clazz: Class<*>): Boolean {
+        return true
     }
 
-    @Override
-    protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
-        return mapper.readValue(inputMessage.getBody(), clazz);
+    override fun readInternal(clazz: Class<*>, inputMessage: HttpInputMessage): Any {
+        return mapper.readValue(inputMessage.body, clazz)
     }
 
-    @Override
-    protected void writeInternal(@NotNull Object object, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-        OutputStream body = outputMessage.getBody();
-        resourceObjectMapper.write(body, object);
-        body.flush();
+    public override fun writeInternal(`object`: Any, outputMessage: HttpOutputMessage) {
+        val body = outputMessage.body
+
+        if (logger.isDebugEnabled) {
+            val bytes = ByteArrayOutputStream()
+            resourceObjectMapper.write(bytes, `object`)
+            val value = bytes.toString(DEFAULT_CHARSET.name())
+            logger.debug("Writing value: $value")
+        }
+
+        resourceObjectMapper.write(body, `object`)
+        body.flush()
+    }
+
+    companion object {
+        val DEFAULT_CHARSET: Charset = Charsets.UTF_8
     }
 
 }
