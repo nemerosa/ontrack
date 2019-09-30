@@ -31,7 +31,7 @@ class GraphqlController(
      * GET end point
      */
     @GetMapping
-    operator fun get(
+    fun get(
             @RequestParam query: String,
             @RequestParam(required = false) variables: String?,
             @RequestParam(required = false) operationName: String?

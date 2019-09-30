@@ -1,107 +1,92 @@
-package net.nemerosa.ontrack.boot.support;
+package net.nemerosa.ontrack.boot.support
 
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.task.TaskExecutorBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.filter.ShallowEtagHeaderFilter;
-import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.resource.ResourceModule
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.boot.task.TaskExecutorBuilder
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.http.converter.HttpMessageConverter
+import org.springframework.http.converter.StringHttpMessageConverter
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import org.springframework.web.filter.ShallowEtagHeaderFilter
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
-import javax.annotation.PostConstruct;
-import java.util.List;
+import javax.annotation.PostConstruct
 
 @Configuration
 @EnableAsync
-public class WebConfig implements WebMvcConfigurer {
+class WebConfig(
+        private val uriBuilder: URIBuilder,
+        private val securityService: SecurityService,
+        private val resourceModules: List<ResourceModule>,
+        private val taskExecutorBuilder: TaskExecutorBuilder
+) : WebMvcConfigurer {
 
-    private final Logger logger = LoggerFactory.getLogger(WebConfig.class);
-
-    private final URIBuilder uriBuilder;
-
-    private final SecurityService securityService;
-
-    private final List<ResourceModule> resourceModules;
-
-    private final TaskExecutorBuilder taskExecutorBuilder;
-
-    public WebConfig(URIBuilder uriBuilder, SecurityService securityService, List<ResourceModule> resourceModules, TaskExecutorBuilder taskExecutorBuilder) {
-        this.uriBuilder = uriBuilder;
-        this.securityService = securityService;
-        this.resourceModules = resourceModules;
-        this.taskExecutorBuilder = taskExecutorBuilder;
-    }
+    private val logger = LoggerFactory.getLogger(WebConfig::class.java)
 
     /**
      * Logging
      */
     @PostConstruct
-    public void log() {
-        logger.info("[web] URI builder = " + uriBuilder.getClass().getName());
+    fun log() {
+        logger.info("[web] URI builder = " + uriBuilder.javaClass.name)
     }
 
-    @Override
-    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        ThreadPoolTaskExecutor executor = taskExecutorBuilder.build();
-        executor.initialize();
-        configurer.setTaskExecutor(executor);
-        configurer.setDefaultTimeout(300_000); // 5 minutes
+    override fun configureAsyncSupport(configurer: AsyncSupportConfigurer) {
+        val executor = taskExecutorBuilder.build()
+        executor.initialize()
+        configurer.setTaskExecutor(executor)
+        configurer.setDefaultTimeout(300000) // 5 minutes
     }
 
     /**
      * Uses the HTTP header for content negociation.
      */
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.favorParameter(false);
-        configurer.favorPathExtension(false);
+    override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {
+        configurer.favorParameter(false)
+        configurer.favorPathExtension(false)
     }
 
     /**
      * ETag support
      */
     @Bean
-    public ShallowEtagHeaderFilter shallowEtagHeaderFilter() {
-        return new ShallowEtagHeaderFilter();
+    fun shallowEtagHeaderFilter(): ShallowEtagHeaderFilter {
+        return ShallowEtagHeaderFilter()
     }
 
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.clear();
+    override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
+        converters.clear()
         // Plain text
-        converters.add(new StringHttpMessageConverter());
+        converters.add(StringHttpMessageConverter())
         // Documents
-        converters.add(new DocumentHttpMessageConverter());
+        converters.add(DocumentHttpMessageConverter())
         // JSON
-        converters.add(new ResourceHttpMessageConverter(uriBuilder, securityService, resourceModules));
+        converters.add(ResourceHttpMessageConverter(uriBuilder, securityService, resourceModules))
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/graphql/**");
-        registry.addMapping("/rest/**");
-        registry.addMapping("/accounts/**");
-        registry.addMapping("/admin/**");
-        registry.addMapping("/api/**");
-        registry.addMapping("/structure/**");
-        registry.addMapping("/branches/**");
-        registry.addMapping("/events/**");
-        registry.addMapping("/info/**");
-        registry.addMapping("/properties/**");
-        registry.addMapping("/search/**");
-        registry.addMapping("/settings/**");
-        registry.addMapping("/user/**");
-        registry.addMapping("/validation-stamp-filters/**");
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/graphql/**")
+        registry.addMapping("/rest/**")
+        registry.addMapping("/accounts/**")
+        registry.addMapping("/admin/**")
+        registry.addMapping("/api/**")
+        registry.addMapping("/structure/**")
+        registry.addMapping("/branches/**")
+        registry.addMapping("/events/**")
+        registry.addMapping("/info/**")
+        registry.addMapping("/properties/**")
+        registry.addMapping("/search/**")
+        registry.addMapping("/settings/**")
+        registry.addMapping("/user/**")
+        registry.addMapping("/validation-stamp-filters/**")
     }
 
 }
