@@ -1,0 +1,101 @@
+[[integration-sonarqube]]
+=== Integration with SonarQube
+
+It's possible to configure <<model,projects>> so that any build which has been scanned by SonarQube gets some measures registered in Ontrack and those same measures can then be exported to some event storage like
+<<monitoring-metrics-influxdb,InfluxDB>>.
+
+[plantuml,"integration-sonarqube",png]
+----
+include::integration-sonarqube.puml[]
+----
+
+[[integration-sonarqube-general-configuration]]
+==== General configuration
+
+One configuration must be created per SonarQube server you want to integrate.
+
+As an administrator, you need to select "SonarQube configurations" in your user menu and create SonarQube configurations by setting three parameters:
+
+* _Name_ - name for this configuration
+* _URL_ - the root URL of the SonarQube server
+* _Token_ - an https://docs.sonarqube.org/latest/user-guide/user-token/[authentication token] to get information from SonarQube
+
+[[integration-sonarqube-global-settings]]
+==== Global settings
+
+As an _administrator_, go to the _Settings_ menu.
+In the _SonarQube_ section, click on _Edit_ and fill the following parameters:
+
+|===
+| Name | Default value | Description
+
+| Measures
+| `critical_violations`, `coverage`
+| List of SonarQube metric names to collect. They can be completed or overridden at <<integration-sonarqube-project-configuration,project level>>.
+
+| Disabled
+| `No`
+| Global flag to disable the collection of SonarQube measures
+
+|===
+
+[[integration-sonarqube-project-configuration]]
+==== Project configuration
+
+In order to enable the collection of SonarQube measures for a project, it must be associated with the "SonarQube" property.
+
+The property needs the following parameters:
+
+|===
+| Name | Default value | Description
+
+| Configuration
+| _Required_
+| <<integration-sonarqube-general-configuration,SonarQube server configuration>>
+
+| Key
+| _Required_
+| Key of the project in SonarQube (typically `group:artifact`)
+
+| Validation stamp
+| `sonarqube`
+| Name of the validation stamp, which, when granted to a build, triggers
+the collection of SonarQube measures.
+
+| Measures
+| _Empty_
+| List of SonarQube metric names to collect for this project,
+additionally to those defined <<integration-sonarqube-global-settings,globally>>.
+
+| Override
+| `No`
+| If set to `Yes`, this causes the list of metric names defined by the value
+of _Measures_ to take precedence on the global settings.
+
+| Branch model
+| `No`
+| If set to `Yes`, restricts the collection of SonarQube measures to the
+builds which are branch which comply with the project branch model.
+
+| Branch pattern
+| _Empty_
+| If set, it defines a regular expression to use against the branch name (or Git path)
+| in order to filter the branches where to collect SonarQube measures.
+|===
+
+[NOTE]
+====
+The _Branch model_ and _Branch pattern_ can be combined together.
+====
+
+[[integration-sonarqube-build-measures]]
+==== Build measures
+
+Once SonarQube measures have been collected for a build, they are available in the _Information_ section of the build page.
+
+[[integration-sonarqube-export]]
+==== Export of measures
+
+Once SonarQube measures have been collected for a build, they are automatically exported as metrics, like InfluxDB, if enabled.
+
+See <<monitoring-metrics-influxdb>> for more information.

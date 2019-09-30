@@ -12,3 +12,5 @@ include::integration-graphql.adoc[]
 include::integration-encryption.adoc[]
 
 include::integration-run-info.adoc[]
+
+include::integration-sonarqube.adoc[]
