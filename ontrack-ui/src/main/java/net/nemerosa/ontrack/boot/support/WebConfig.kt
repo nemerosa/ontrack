@@ -59,7 +59,7 @@ class WebConfig(
         val registration = FilterRegistrationBean<ShallowEtagHeaderFilter>()
         registration.filter = ShallowEtagHeaderFilter()
         registration.setDispatcherTypes(DispatcherType.REQUEST, javax.servlet.DispatcherType.ASYNC)
-        registration.addUrlPatterns("/**")
+        registration.addUrlPatterns("/*")
         return registration
     }
 
