@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.resource.Resources
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.RequestContextHolder
@@ -20,7 +20,7 @@ class DecorationsController(
     /**
      * Decorations for an entity.
      */
-    @PostMapping("{entityType}/{id}")
+    @GetMapping("{entityType}/{id}")
     fun getDecorations(
             @PathVariable entityType: ProjectEntityType,
             @PathVariable id: ID
