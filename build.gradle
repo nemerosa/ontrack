@@ -347,11 +347,3 @@ task testReport(type: TestReport) {
     // Include the results from the `test` tasks in all core subprojects
     reportOn coreProjects*.test, coreProjects*.integrationTest, coreProjects*.acceptanceTest
 }
-
-/**
- * Wrapper definition
- */
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.3.1'
-}

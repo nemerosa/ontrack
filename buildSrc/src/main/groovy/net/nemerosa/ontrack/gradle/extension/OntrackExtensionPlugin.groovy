@@ -97,7 +97,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          */
 
         project.tasks.create('ontrackProperties') {
-            description "Prepares the ontrack META-INF file"
+            description = "Prepares the ontrack META-INF file"
             doLast {
                 project.mkdir("build")
                 project.file("build/ontrack.properties").text = """\
