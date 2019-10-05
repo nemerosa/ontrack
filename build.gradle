@@ -1,5 +1,9 @@
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.netflix.gradle.plugins.deb.Deb
+import com.netflix.gradle.plugins.packaging.SystemPackagingTask
+import com.netflix.gradle.plugins.rpm.Rpm
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
+import org.redline_rpm.header.Os
 
 buildscript {
     ext {
@@ -18,7 +22,8 @@ buildscript {
 
 plugins {
     id 'net.nemerosa.versioning' version '2.7.1'
-    id 'nebula.os-package' version '2.2.6'
+    id "nebula.deb" version "6.2.1"
+    id "nebula.rpm" version "6.2.1"
     id 'org.sonarqube' version '2.5'
     id "com.avast.gradle.docker-compose" version "0.9.5"
     id "com.bmuschko.docker-remote-api" version "4.1.0"
@@ -160,7 +165,8 @@ configure(javaProjects) {
         }
     }
 
-    model {ValidationRunWithAutoStampIT
+    model {
+        ValidationRunWithAutoStampIT
         tasks.generatePomFileForMavenCustomPublication {
             destination = file("${buildDir}/poms/${project.name}-${version}.pom")
         }
@@ -281,9 +287,59 @@ apply from: 'gradle/packaging.gradle'
 
 /**
  * Packaging for OS
+ *
+ * The package version does not accept versions like the ones generated
+ * from the Versioning plugin for the feature branches for example.
  */
 
-apply from: 'gradle/os-packaging.gradle'
+def packageVersion
+if (version ==~ /\d+\.\d+\.\d+/) {
+    packageVersion = version.replaceAll(/[^0-9\.-_]/, '')
+} else {
+    packageVersion = '0.0.0'
+}
+println "Using package version = ${packageVersion}"
+
+task debPackage(type: Deb) {
+    dependsOn(":ontrack-ui:bootJar")
+
+    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
+}
+
+task rpmPackage(type: Rpm) {
+    dependsOn(":ontrack-ui:bootJar")
+
+    user = "ontrack"
+    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
+}
+
+tasks.withType(SystemPackagingTask) {
+
+    packageName = "ontrack"
+    release = "1"
+    version = packageVersion
+    os = Os.LINUX // only applied to RPM
+
+    preInstall("gradle/os-package/preInstall.sh")
+    postInstall("gradle/os-package/postInstall.sh")
+
+    from(project(":ontrack-ui").file("build/libs")) {
+        include("ontrack-ui-${project.version}.jar")
+        into("/opt/ontrack/lib")
+        rename(".*", "ontrack.jar")
+    }
+
+    from("gradle/os-package") {
+        include("ontrack.sh")
+        into("/opt/ontrack/bin")
+        fileMode = 0x168 // 0550
+    }
+}
+
+task osPackages {
+    dependsOn(rpmPackage)
+    dependsOn(debPackage)
+}
 
 /**
  * Docker tasks
