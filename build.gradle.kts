@@ -5,10 +5,12 @@ import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 import net.nemerosa.versioning.VersioningExtension
 import net.nemerosa.versioning.VersioningPlugin
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.redline_rpm.header.Os
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     repositories {
@@ -27,6 +29,7 @@ buildscript {
 val kotlinVersion: String by project
 
 plugins {
+    java
     id("net.nemerosa.versioning") version "2.8.2" apply false
     id("nebula.deb") version "6.2.1"
     id("nebula.rpm") version "6.2.1"
@@ -226,56 +229,52 @@ configure(coreProjects) p@{
     }
 
     dependencies {
-        compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-        compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+        "compile"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+        "compile"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
         // Lombok
-        compileOnly("org.projectlombok:lombok:1.18.10")
-        annotationProcessor("org.projectlombok:lombok:1.18.10")
-        testCompileOnly("org.projectlombok:lombok:1.18.10")
-        testAnnotationProcessor("org.projectlombok:lombok:1.18.10")
+        "compileOnly"("org.projectlombok:lombok:1.18.10")
+        "annotationProcessor"("org.projectlombok:lombok:1.18.10")
+        "testCompileOnly"("org.projectlombok:lombok:1.18.10")
+        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.10")
         // Testing
-        testCompile("junit:junit")
-        testCompile("org.mockito:mockito-core")
-        testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-        testCompile("org.jetbrains.kotlin:kotlin-test")
+        "testCompile"("junit:junit")
+        "testCompile"("org.mockito:mockito-core")
+        "testCompile"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+        "testCompile"("org.jetbrains.kotlin:kotlin-test")
     }
 
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileTestKotlin {
+    tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
     }
 
     // Unit tests run with the `test` task
-    test {
-        include "**/*Test.class"
-        reports {
-            html.enabled = false
-        }
+    tasks.named<Test>("test") {
+        include("**/*Test.class")
     }
 
     // Integration tests
-    task integrationTest(type: Test) {
-        mustRunAfter "test"
-        include "**/*IT.class"
+    val integrationTest by tasks.registering(Test::class) {
+        mustRunAfter("test")
+        include("**/*IT.class")
         minHeapSize = "512m"
         maxHeapSize = "1024m"
-        dependsOn preIntegrationTest
-        finalizedBy postIntegrationTest
+        dependsOn("preIntegrationTest")
+        finalizedBy("postIntegrationTest")
         /**
          * Sets the JDBC URL
          */
         doFirst {
-            println "Setting JDBC URL for IT: ${rootProject.ext.jdbcUrl}"
-            systemProperty "spring.datasource.url", rootProject.ext.jdbcUrl
-            systemProperty "spring.datasource.username", "ontrack"
-            systemProperty "spring.datasource.password", "ontrack"
+            println("Setting JDBC URL for IT: ${rootProject.ext["jdbcUrl"]}")
+            systemProperty("spring.datasource.url", rootProject.ext["jdbcUrl"]!!)
+            systemProperty("spring.datasource.username", "ontrack")
+            systemProperty("spring.datasource.password", "ontrack")
         }
     }
 
     // Synchronization with shutting down the database
-    rootProject.integrationTestComposeDown.mustRunAfter project.integrationTest
+    rootProject.tasks.named("integrationTestComposeDown") {
+        mustRunAfter(integrationTest)
+    }
 
 }
 
@@ -292,115 +291,116 @@ configure(coreProjects) p@{
  * - an `ontrack.properties` file which contains the list of modules & the version information
  */
 
-apply plugin: "base"
-
-// Global Javadoc
-
-if (documentationProfile) {
-    apply plugin: "nebula-aggregate-javadocs"
-
-    gradle.projectsEvaluated {
-        aggregateJavadocs {
-            includes = ["net/nemerosa/**"]
-        }
-
-        rootProject.tasks.create("javadocPackage", Zip) {
-            classifier = "javadoc"
-            archiveName = "ontrack-javadoc.zip"
-            dependsOn aggregateJavadocs
-            from rootProject.file("$rootProject.buildDir/docs/javadoc")
-        }
-    }
-}
-
-// ZIP package which contains all artifacts to be published
-
-task publicationPackage(type: Zip) {
-    classifier = "publication"
-    archiveName = "ontrack-publication.zip"
-    subprojects {
-        afterEvaluate {
-            if (tasks.findByName("jar")) {
-                dependsOn assemble
-                if (jar.isEnabled()) {
-                    from jar
-                }
-                if (documentationProfile) {
-                    if (tasks.findByName("javadocJar")) from javadocJar
-                    if (tasks.findByName("sourceJar")) from sourceJar
-                }
-                if (tasks.findByName("testJar")) from testJar
-                // POM file
-                from "${project.buildDir}/poms/${project.name}-${project.version}.pom"
-            }
-        }
-    }
-    // Extension test
-    from("${rootProject.file("ontrack-extension-test")}") {
-        into "ontrack-extension-test"
-    }
-}
-
-if (documentationProfile) {
-    gradle.projectsEvaluated {
-        publicationPackage {
-            from javadocPackage
-        }
-    }
-}
-
 // Ontrack descriptor
 
-task deliveryDescriptor {
-    ext.output = project.file("build/ontrack.properties")
+val deliveryDescriptor by tasks.registering {
+    val output = project.file("build/ontrack.properties")
+    extra["output"] = output
     doLast {
-        (output as File).parentFile.mkdirs()
-        output.text = "# Ontrack properties\n"
-        // Version
-        output << "# Version information"
-        output << "VERSION_BUILD = ${project.versioning.info.build}\n"
-        output << "VERSION_BRANCH = ${project.versioning.info.branch}\n"
-        output << "VERSION_BASE = ${project.versioning.info.base}\n"
-        output << "VERSION_BRANCHID = ${project.versioning.info.branchId}\n"
-        output << "VERSION_BRANCHTYPE = ${project.versioning.info.branchType}\n"
-        output << "VERSION_COMMIT = ${project.versioning.info.commit}\n"
-        output << "VERSION_DISPLAY = ${project.versioning.info.display}\n"
-        output << "VERSION_FULL = ${project.versioning.info.full}\n"
-        output << "VERSION_SCM = ${project.versioning.info.scm}\n"
+        // Directories
+        output.parentFile.mkdirs()
+        output.writeText("# Ontrack properties\n")
+        // Version information
+        val version = rootProject.extensions.getByType<VersioningExtension>().info
+        output.appendText("# Version information\n")
+        output.appendText("VERSION_BUILD = ${version.build}\n")
+        output.appendText("VERSION_BRANCH = ${version.branch}\n")
+        output.appendText("VERSION_BASE = ${version.base}\n")
+        output.appendText("VERSION_BRANCHID = ${version.branchId}\n")
+        output.appendText("VERSION_BRANCHTYPE = ${version.branchType}\n")
+        output.appendText("VERSION_COMMIT = ${version.commit}\n")
+        output.appendText("VERSION_DISPLAY = ${version.display}\n")
+        output.appendText("VERSION_FULL = ${version.full}\n")
+        output.appendText("VERSION_SCM = ${version.scm}\n")
         // Modules
-        output << "# Comma-separated list of modules\n"
-        output << "MODULES = ${project.subprojects.findAll { it.tasks.findByName("jar") }.collect { it.name }.join(",")}\n"
+        output.appendText("# Comma-separated list of modules\n")
+        output.appendText("MODULES = ${rootProject.subprojects.filter { it.tasks.findByName("jar") != null }.joinToString(",") { it.name }}\n")
     }
 }
+
+//// Global Javadoc
+//
+//if (project.hasProperty("documentation")) {
+//    apply(plugin = "nebula-aggregate-javadocs")
+//
+//    gradle.projectsEvaluated {
+//        aggregateJavadocs {
+//            includes = ["net/nemerosa/**"]
+//        }
+//
+//        rootProject.tasks.create("javadocPackage", Zip) {
+//            classifier = "javadoc"
+//            archiveName = "ontrack-javadoc.zip"
+//            dependsOn aggregateJavadocs
+//                    from rootProject . file ("$rootProject.buildDir/docs/javadoc")
+//        }
+//    }
+//}
+//
+//// ZIP package which contains all artifacts to be published
+//
+//task publicationPackage (type: Zip) {
+//    classifier = "publication"
+//    archiveName = "ontrack-publication.zip"
+//    subprojects {
+//        afterEvaluate {
+//            if (tasks.findByName("jar")) {
+//                dependsOn assemble
+//                        if (jar.isEnabled()) {
+//                            from jar
+//                        }
+//                if (documentationProfile) {
+//                    if (tasks.findByName("javadocJar")) from javadocJar
+//                            if (tasks.findByName("sourceJar")) from sourceJar
+//                }
+//                if (tasks.findByName("testJar")) from testJar
+//                        // POM file
+//                        from "${project.buildDir}/poms/${project.name}-${project.version}.pom"
+//            }
+//        }
+//    }
+//    // Extension test
+//    from("${rootProject.file("ontrack-extension-test")}") {
+//        into "ontrack-extension-test"
+//    }
+//}
+//
+//if (documentationProfile) {
+//    gradle.projectsEvaluated {
+//        publicationPackage {
+//            from javadocPackage
+//        }
+//    }
+//}
 
 // Delivery package
 
-task deliveryPackage(type: Zip) {
-    classifier = "delivery"
-    // Gradle files
-    from(projectDir) {
-        include "buildSrc/**"
-        include "*.gradle"
-        include "gradlew*"
-        include "gradle/**"
-        include "gradle.properties"
-        exclude "**/.gradle/**"
-        exclude "**/build/**"
-    }
-    // Acceptance
-    dependsOn ":ontrack-acceptance:normaliseJar"
-    from(project(":ontrack-acceptance").file("src/main/compose")) {
-        into "ontrack-acceptance"
-    }
-    // All artifacts
-    dependsOn publicationPackage
-    from publicationPackage
-    // Descriptor
-    dependsOn deliveryDescriptor
-    from deliveryDescriptor.output
-}
-
-build.dependsOn deliveryPackage
+//task deliveryPackage (type: Zip) {
+//    classifier = "delivery"
+//    // Gradle files
+//    from(projectDir) {
+//        include "buildSrc/**"
+//        include "*.gradle"
+//        include "gradlew*"
+//        include "gradle/**"
+//        include "gradle.properties"
+//        exclude "**/.gradle/**"
+//        exclude "**/build/**"
+//    }
+//    // Acceptance
+//    dependsOn ":ontrack-acceptance:normaliseJar"
+//    from(project(":ontrack-acceptance").file("src/main/compose")) {
+//        into "ontrack-acceptance"
+//    }
+//    // All artifacts
+//    dependsOn publicationPackage
+//            from publicationPackage
+//            // Descriptor
+//            dependsOn deliveryDescriptor
+//            from deliveryDescriptor . output
+//}
+//
+//build.dependsOn deliveryPackage
 
 /**
  * Packaging for OS
@@ -409,28 +409,27 @@ build.dependsOn deliveryPackage
  * from the Versioning plugin for the feature branches for example.
  */
 
-def packageVersion
-if (version ==~ /\d+\.\d+\.\d+/) {
-    packageVersion = version.replaceAll(/[^0-9\.-_]/, "")
+val packageVersion: String = if (version.toString().matches("\\d+\\.\\d+\\.\\d+".toRegex())) {
+    version.toString().replace("[^0-9\\.-_]".toRegex(), "")
 } else {
-    packageVersion = "0.0.0"
+    "0.0.0"
 }
-println "Using package version = ${packageVersion}"
+println("Using package version = ${packageVersion}")
 
-task debPackage(type: Deb) {
+val debPackage by tasks.registering(Deb::class) {
     dependsOn(":ontrack-ui:bootJar")
 
     link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
 }
 
-task rpmPackage(type: Rpm) {
+val rpmPackage by tasks.registering(Rpm::class) {
     dependsOn(":ontrack-ui:bootJar")
 
     user = "ontrack"
     link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
 }
 
-tasks.withType(SystemPackagingTask) {
+tasks.withType(SystemPackagingTask::class) {
 
     packageName = "ontrack"
     release = "1"
@@ -440,20 +439,20 @@ tasks.withType(SystemPackagingTask) {
     preInstall("gradle/os-package/preInstall.sh")
     postInstall("gradle/os-package/postInstall.sh")
 
-    from(project(":ontrack-ui").file("build/libs")) {
+    from(project(":ontrack-ui").file("build/libs"), closureOf<CopySpec> {
         include("ontrack-ui-${project.version}.jar")
         into("/opt/ontrack/lib")
         rename(".*", "ontrack.jar")
-    }
+    })
 
-    from("gradle/os-package") {
+    from("gradle/os-package", closureOf<CopySpec> {
         include("ontrack.sh")
         into("/opt/ontrack/bin")
         fileMode = 0x168 // 0550
-    }
+    })
 }
 
-task osPackages {
+val osPackages by tasks.registering {
     dependsOn(rpmPackage)
     dependsOn(debPackage)
 }
@@ -462,18 +461,19 @@ task osPackages {
  * Docker tasks
  */
 
-task dockerPrepareEnv(type: Copy, dependsOn: ":ontrack-ui:bootJar") {
-    from "ontrack-ui/build/libs"
-    include "*.jar"
-    exclude "*-javadoc.jar"
-    exclude "*-sources.jar"
-    into project.file("docker")
-    rename ".*", "ontrack.jar"
+val dockerPrepareEnv by tasks.registering(Copy::class) {
+    dependsOn(":ontrack-ui:bootJar")
+    from("ontrack-ui/build/libs")
+    include("*.jar")
+    exclude("*-javadoc.jar")
+    exclude("*-sources.jar")
+    into(project.file("docker"))
+    rename(".*", "ontrack.jar")
 }
 
-task dockerBuild(type: DockerBuildImage) {
-    dependsOn dockerPrepareEnv
-    inputDir = file("docker")
+val dockerBuild by tasks.registering(DockerBuildImage::class) {
+    dependsOn(dockerPrepareEnv)
+    inputDir.set(file("docker"))
     tags.add("nemerosa/ontrack:$version")
     tags.add("nemerosa/ontrack:latest")
 }
@@ -482,63 +482,60 @@ task dockerBuild(type: DockerBuildImage) {
  * Acceptance tasks
  */
 
-import net.nemerosa.ontrack.gradle.*
-
 dockerCompose {
-    ci {
-        useComposeFiles = ["${rootDir}/gradle/compose/docker-compose.yml", "${rootDir}/gradle/compose/docker-compose-ci.yml"]
+    createNested("ci").apply {
+        useComposeFiles = listOf("compose/docker-compose-ci.yml")
         projectName = "ci"
-        forceRecreate = true
-        tcpPortsToIgnoreWhenWaiting = [8083, 8086]
+        captureContainersOutputToFiles = project.file("${project.buildDir}/ci-logs")
+        tcpPortsToIgnoreWhenWaiting = listOf(8083, 8086)
     }
 }
 
-task ciStart {
-    dependsOn ciComposeUp
-    // When done
+tasks.named<ComposeUp>("ciComposeUp") {
+    dependsOn(dockerBuild)
     doLast {
-        def host = ciComposeUp.servicesInfos.ontrack.firstContainer.host as String
-        def port = ciComposeUp.servicesInfos.ontrack.firstContainer.ports.get(8080) as int
-        ext.ontrackUrl = "https://$host:$port"
-        logger.info("Ontrack URL = ${ext.ontrackUrl}")
+        val host = servicesInfos["ontrack"]?.host!!
+        val port = servicesInfos["ontrack"]?.firstContainer?.tcpPort!!
+        val url = "http//$host:$port"
+        val ontrackUrl: String by rootProject.extra(url)
+        logger.info("Pre acceptance test Ontrack URL = $ontrackUrl")
     }
 }
 
-task ciStop {
-    dependsOn ciComposeDown
-}
-
-task ciAcceptanceTest(type: RemoteAcceptanceTest) {
-    acceptanceUrl = { ciStart.ontrackUrl }
+tasks.register("ciAcceptanceTest", RemoteAcceptanceTest::class) {
+    acceptanceUrl = closureOf<String> {
+        rootProject.extra["ontrackUrl"] as String
+    }
     disableSsl = true
     acceptanceTimeout = 300
     acceptanceImplicitWait = 30
-    dependsOn ciStart
-    finalizedBy ciStop
+    dependsOn("ciComposeUp")
+    finalizedBy("ciComposeDown")
 }
-
-ciComposeDown.mustRunAfter ciAcceptanceTest
 
 /**
  * Development tasks
  */
 
+val devPostgresName: String by project
+val devPostgresPort: String by project
+
 dockerCompose {
-    dev {
-        useComposeFiles = ["${rootDir}/gradle/compose/docker-compose-dev.yml"]
+    createNested("dev").apply {
+        useComposeFiles = listOf("compose/docker-compose-dev.yml")
         projectName = "dev"
-        forceRecreate = false
-        environment.put("POSTGRES_NAME", project.properties.devPostgresName)
-        environment.put("POSTGRES_PORT", project.properties.devPostgresPort)
+        captureContainersOutputToFiles = project.file("${project.buildDir}/dev-logs")
+        environment.put("POSTGRES_NAME", devPostgresName)
+        environment.put("POSTGRES_PORT", devPostgresPort)
     }
 }
 
-task devStart {
-    dependsOn devComposeUp
+val devStart by tasks.registering {
+    dependsOn("devComposeUp")
 }
 
-task devStop {
-    dependsOn devComposeDown
+val devStop by tasks.registering {
+    dependsOn("devComposeDown")
 }
 
 /**
