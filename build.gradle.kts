@@ -4,6 +4,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.nemerosa.versioning.VersioningExtension
 import net.nemerosa.versioning.VersioningPlugin
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
@@ -23,6 +24,7 @@ buildscript {
 
 // FIXME Try to use version in gradle.properties
 // val springBootVersion: String by project
+val kotlinVersion: String by project
 
 plugins {
     id("net.nemerosa.versioning") version "2.8.2" apply false
@@ -110,7 +112,7 @@ val coreProjects = javaProjects.filter {
     it.path != ":ontrack-dsl"
 }
 
-configure(javaProjects) {
+configure(javaProjects) p@{
 
     /**
      * For all Java projects
@@ -118,24 +120,6 @@ configure(javaProjects) {
 
     apply(plugin = "java")
     apply(plugin = "maven-publish")
-
-    // Javadoc
-
-    if (hasProperty("documentation")) {
-
-        tasks.register<Jar>("javadocJar") {
-            archiveClassifier.set("javadoc")
-            from("javadoc")
-        }
-
-        // Sources
-
-        tasks.register<Jar>("sourcesJar") {
-            dependsOn(JavaPlugin.CLASSES_TASK_NAME)
-            archiveClassifier.set("sources")
-            from(project.the<SourceSetContainer>()["main"].allSource)
-        }
-    }
 
     // POM file
 
@@ -167,7 +151,7 @@ configure(javaProjects) {
                         developer {
                             id.set("dcoraboeuf")
                             name.set("Damien Coraboeuf")
-                            email.set("damien.coraboeuf@gmail.com")
+                            email.set("damien.coraboeuf@nemerosa.com")
                         }
                     }
                 }
@@ -175,73 +159,85 @@ configure(javaProjects) {
         }
     }
 
-//    model {
-//        ValidationRunWithAutoStampIT
-//        tasks.generatePomFileForMavenCustomPublication {
-//            destination = file("${buildDir}/poms/${project.name}-${version}.pom")
-//        }
-//    }
-
-    afterEvaluate {
-        tasks.assemble.dependsOn "generatePomFileForMavenCustomPublication"
+    tasks.named("assemble") {
+        dependsOn("generatePomFileForMavenCustomPublication")
     }
 
-    // Archives for Javadoc and Sources
+    // Documentation
 
-    artifacts {
-        if (documentationProfile) {
-            archives javadocJar
-            archives sourceJar
+    if (hasProperty("documentation")) {
+
+        // Javadoc
+
+        tasks.register<Jar>("javadocJar") {
+            archiveClassifier.set("javadoc")
+            from("javadoc")
         }
+
+        // Sources
+
+        tasks.register<Jar>("sourcesJar") {
+            dependsOn(JavaPlugin.CLASSES_TASK_NAME)
+            archiveClassifier.set("sources")
+            from(project.the<SourceSetContainer>()["main"].allSource)
+        }
+
+        artifacts {
+            add("archives", "javadocJar")
+            add("archives", "sourceJar")
+        }
+
     }
 
 }
 
-configure(coreProjects) {
+configure(coreProjects) p@{
 
     /**
      * For all Java projects
      */
 
-    apply plugin: "kotlin"
-    apply plugin: "kotlin-spring"
-    apply plugin: "io.spring.dependency-management"
+    apply(plugin = "java")
+    apply(plugin = "kotlin")
+    apply(plugin = "kotlin-spring")
+    apply(plugin = "io.spring.dependency-management")
 
-    dependencyManagement {
+    configure<DependencyManagementExtension> {
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", kotlinVersion)
             }
         }
         dependencies {
-            dependency "commons-io:commons-io:2.6"
-            dependency "org.apache.commons:commons-text:1.6"
-            dependency "net.jodah:failsafe:1.1.1"
-            dependency "commons-logging:commons-logging:1.2"
-            dependency "org.apache.commons:commons-math3:3.6.1"
-            dependency "com.google.guava:guava:27.0.1-jre"
-            dependency "args4j:args4j:2.33"
-            dependency "org.jgrapht:jgrapht-core:1.3.0"
-            dependency "org.kohsuke:groovy-sandbox:1.19"
-            dependency "com.graphql-java:graphql-java:11.0"
-            dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
+            dependency("commons-io:commons-io:2.6")
+            dependency("org.apache.commons:commons-text:1.6")
+            dependency("net.jodah:failsafe:1.1.1")
+            dependency("commons-logging:commons-logging:1.2")
+            dependency("org.apache.commons:commons-math3:3.6.1")
+            dependency("com.google.guava:guava:27.0.1-jre")
+            dependency("args4j:args4j:2.33")
+            dependency("org.jgrapht:jgrapht-core:1.3.0")
+            dependency("org.kohsuke:groovy-sandbox:1.19")
+            dependency("com.graphql-java:graphql-java:11.0")
+            dependency("org.jetbrains.kotlin:kotlin-test:${kotlinVersion}")
             // Overrides from Spring Boot
-            dependency "org.postgresql:postgresql:9.4.1208"
+            dependency("org.postgresql:postgresql:9.4.1208")
         }
     }
 
     dependencies {
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
-        compile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
-        compileOnly "org.projectlombok:lombok:1.18.10"
-        annotationProcessor "org.projectlombok:lombok:1.18.10"
-        testCompileOnly "org.projectlombok:lombok:1.18.10"
-        testAnnotationProcessor "org.projectlombok:lombok:1.18.10"
+        compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+        compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+        // Lombok
+        compileOnly("org.projectlombok:lombok:1.18.10")
+        annotationProcessor("org.projectlombok:lombok:1.18.10")
+        testCompileOnly("org.projectlombok:lombok:1.18.10")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.10")
         // Testing
-        testCompile "junit:junit"
-        testCompile "org.mockito:mockito-core"
-        testCompile "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
-        testCompile "org.jetbrains.kotlin:kotlin-test"
+        testCompile("junit:junit")
+        testCompile("org.mockito:mockito-core")
+        testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+        testCompile("org.jetbrains.kotlin:kotlin-test")
     }
 
     compileKotlin {
