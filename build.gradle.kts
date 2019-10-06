@@ -71,10 +71,6 @@ allprojects {
  */
 
 val itProject: String by project
-val itJdbcUrl: String by project
-val itJdbcUsername: String by project
-val itJdbcPassword: String by project
-val itJdbcWait: String by project
 
 // Pre-integration tests: starting Postgresql
 
@@ -318,89 +314,106 @@ val deliveryDescriptor by tasks.registering {
     }
 }
 
-//// Global Javadoc
-//
-//if (project.hasProperty("documentation")) {
-//    apply(plugin = "nebula-aggregate-javadocs")
-//
-//    gradle.projectsEvaluated {
-//        aggregateJavadocs {
-//            includes = ["net/nemerosa/**"]
-//        }
-//
-//        rootProject.tasks.create("javadocPackage", Zip) {
-//            classifier = "javadoc"
-//            archiveName = "ontrack-javadoc.zip"
-//            dependsOn aggregateJavadocs
-//                    from rootProject . file ("$rootProject.buildDir/docs/javadoc")
-//        }
-//    }
-//}
-//
-//// ZIP package which contains all artifacts to be published
-//
-//task publicationPackage (type: Zip) {
-//    classifier = "publication"
-//    archiveName = "ontrack-publication.zip"
-//    subprojects {
-//        afterEvaluate {
-//            if (tasks.findByName("jar")) {
-//                dependsOn assemble
-//                        if (jar.isEnabled()) {
-//                            from jar
-//                        }
-//                if (documentationProfile) {
-//                    if (tasks.findByName("javadocJar")) from javadocJar
-//                            if (tasks.findByName("sourceJar")) from sourceJar
-//                }
-//                if (tasks.findByName("testJar")) from testJar
-//                        // POM file
-//                        from "${project.buildDir}/poms/${project.name}-${project.version}.pom"
-//            }
-//        }
-//    }
-//    // Extension test
-//    from("${rootProject.file("ontrack-extension-test")}") {
-//        into "ontrack-extension-test"
-//    }
-//}
-//
-//if (documentationProfile) {
-//    gradle.projectsEvaluated {
-//        publicationPackage {
-//            from javadocPackage
-//        }
-//    }
-//}
+// Global Javadoc
+
+if (project.hasProperty("documentation")) {
+    apply(plugin = "nebula-aggregate-javadocs")
+
+    tasks.named<Javadoc>("aggregateJavadocs") {
+        include("net/nemerosa/**")
+    }
+
+    rootProject.tasks.register("javadocPackage", Zip::class) {
+        archiveClassifier.set("javadoc")
+        archiveFileName.set("ontrack-javadoc.zip")
+        dependsOn("aggregateJavadocs")
+        from(rootProject.file("$rootProject.buildDir/docs/javadoc"))
+    }
+}
+
+// ZIP package which contains all artifacts to be published
+
+val publicationPackage by tasks.registering(Zip::class) {
+    archiveClassifier.set("publication")
+    archiveFileName.set("ontrack-publication.zip")
+    // Extension test module
+    from(rootProject.file("ontrack-extension-test")) {
+        into("ontrack-extension-test")
+    }
+}
+
+subprojects {
+    afterEvaluate {
+        val jar = tasks.findByName("jar") as? Jar?
+        if (jar != null && jar.isEnabled) {
+            publicationPackage {
+                from(jar)
+            }
+            if (rootProject.hasProperty("documentation")) {
+                val javadoc = tasks.findByName("javadocJar")
+                if (javadoc != null) {
+                    publicationPackage {
+                        from(javadoc)
+                    }
+                }
+                val sources = tasks.findByName("sourcesJar")
+                if (sources != null) {
+                    publicationPackage {
+                        from(sources)
+                    }
+                }
+            }
+            val testJar = tasks.findByName("testJar")
+            if (testJar != null) {
+                publicationPackage {
+                    from(testJar)
+                }
+            }
+            // FIXME POM file
+            // from "${project.buildDir}/poms/${project.name}-${project.version}.pom"
+        }
+    }
+}
+
+if (hasProperty("documentation")) {
+    gradle.projectsEvaluated {
+        val javadocPackage = tasks.named("javadocPackage")
+        publicationPackage {
+            from(javadocPackage)
+        }
+    }
+}
 
 // Delivery package
 
-//task deliveryPackage (type: Zip) {
-//    classifier = "delivery"
-//    // Gradle files
-//    from(projectDir) {
-//        include "buildSrc/**"
-//        include "*.gradle"
-//        include "gradlew*"
-//        include "gradle/**"
-//        include "gradle.properties"
-//        exclude "**/.gradle/**"
-//        exclude "**/build/**"
-//    }
-//    // Acceptance
-//    dependsOn ":ontrack-acceptance:normaliseJar"
-//    from(project(":ontrack-acceptance").file("src/main/compose")) {
-//        into "ontrack-acceptance"
-//    }
-//    // All artifacts
-//    dependsOn publicationPackage
-//            from publicationPackage
-//            // Descriptor
-//            dependsOn deliveryDescriptor
-//            from deliveryDescriptor . output
-//}
-//
-//build.dependsOn deliveryPackage
+val deliveryPackage by tasks.registering(Zip::class) {
+    archiveClassifier.set("delivery")
+    // Gradle files
+    from(projectDir) {
+        include("buildSrc/**")
+        include("*.gradle")
+        include("gradlew*")
+        include("gradle/**")
+        include("gradle.properties")
+        exclude("**/.gradle/**")
+        exclude("**/build/**")
+    }
+    // Acceptance
+    dependsOn(":ontrack-acceptance:normaliseJar")
+    from(project(":ontrack-acceptance").file("src/main/compose")) {
+        into("ontrack-acceptance")
+    }
+    // All artifacts
+    dependsOn(publicationPackage)
+    from(publicationPackage)
+    // Descriptor (defined in main build.gradle)
+    dependsOn("deliveryDescriptor")
+    from(tasks.getByName("deliveryDescriptor").extra["output"])
+}
+
+tasks.named("build") {
+    dependsOn(deliveryPackage)
+}
 
 /**
  * Packaging for OS
@@ -414,7 +427,7 @@ val packageVersion: String = if (version.toString().matches("\\d+\\.\\d+\\.\\d+"
 } else {
     "0.0.0"
 }
-println("Using package version = ${packageVersion}")
+println("Using package version = $packageVersion")
 
 val debPackage by tasks.registering(Deb::class) {
     dependsOn(":ontrack-ui:bootJar")
@@ -525,8 +538,8 @@ dockerCompose {
         useComposeFiles = listOf("compose/docker-compose-dev.yml")
         projectName = "dev"
         captureContainersOutputToFiles = project.file("${project.buildDir}/dev-logs")
-        environment.put("POSTGRES_NAME", devPostgresName)
-        environment.put("POSTGRES_PORT", devPostgresPort)
+        environment["POSTGRES_NAME"] = devPostgresName
+        environment["POSTGRES_PORT"] = devPostgresPort
     }
 }
 
