@@ -1,47 +1,52 @@
+import com.avast.gradle.dockercompose.ComposeExtension
+import com.avast.gradle.dockercompose.tasks.ComposeUp
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
+import net.nemerosa.versioning.VersioningExtension
+import net.nemerosa.versioning.VersioningPlugin
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 import org.redline_rpm.header.Os
 
 buildscript {
     repositories {
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
+        val kotlinVersion: String by project
+        classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
         classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
     }
 }
 
+// FIXME Try to use version in gradle.properties
+// val springBootVersion: String by project
+
 plugins {
-    id 'net.nemerosa.versioning' version '2.7.1'
-    id "nebula.deb" version "6.2.1"
-    id "nebula.rpm" version "6.2.1"
-    id 'org.sonarqube' version '2.5'
-    id "com.avast.gradle.docker-compose" version "0.9.5"
-    id "com.bmuschko.docker-remote-api" version "4.1.0"
-    id "org.springframework.boot" version "2.1.8.RELEASE" apply false
-}
-
-/**
- * Profiles
- */
-
-ext {
-    documentationProfile = project.hasProperty('documentation')
+    id("net.nemerosa.versioning") version "2.8.2" apply false
+    id("nebula.deb") version "6.2.1"
+    id("nebula.rpm") version "6.2.1"
+    id("org.sonarqube") version "2.5"
+    id("com.avast.gradle.docker-compose") version "0.9.5"
+    id("com.bmuschko.docker-remote-api") version "4.1.0"
+    id("org.springframework.boot") version "2.1.9.RELEASE" apply false
 }
 
 /**
  * Meta information
  */
 
+apply<VersioningPlugin>()
+version = extensions.getByType<VersioningExtension>().info.display
+
 allprojects {
-    group = 'net.nemerosa.ontrack'
-    version = versioning.info.display
+    group = "net.nemerosa.ontrack"
+}
+
+subprojects {
+    version = rootProject.version
 }
 
 /**
@@ -60,48 +65,49 @@ allprojects {
  * Integration test environment
  */
 
+val itProject: String by project
+val itJdbcUrl: String by project
+val itJdbcUsername: String by project
+val itJdbcPassword: String by project
+val itJdbcWait: String by project
+
 // Pre-integration tests: starting Postgresql
 
-dockerCompose {
-    integrationTest {
-        useComposeFiles = ["${rootDir}/gradle/it/docker-compose.yml"]
-        projectName = "ontrack_it"
-        forceRecreate = true
+configure<ComposeExtension> {
+    createNested("integrationTest").apply {
+        useComposeFiles = listOf("compose/docker-compose-it.yml")
+        projectName = itProject
     }
 }
 
-task preIntegrationTest {
-    dependsOn integrationTestComposeUp
+val preIntegrationTest by tasks.registering {
+    dependsOn("integrationTestComposeUp")
     // When done
     doLast {
-        def host = integrationTestComposeUp.servicesInfos.db.firstContainer.host as String
-        def port = integrationTestComposeUp.servicesInfos.db.firstContainer.ports.get(5432) as int
-        project.ext.jdbcUrl = "jdbc:postgresql://$host:$port/ontrack"
-        logger.info("Pre integration test JDBC URL = ${project.ext.jdbcUrl}")
+        val host = tasks.named<ComposeUp>("integrationTestComposeUp").get().servicesInfos["db"]?.host!!
+        val port = tasks.named<ComposeUp>("integrationTestComposeUp").get().servicesInfos["db"]?.firstContainer?.tcpPort!!
+        val url = "jdbc:postgresql://$host:$port/ontrack"
+        val jdbcUrl: String by rootProject.extra(url)
+        logger.info("Pre integration test JDBC URL = ${jdbcUrl}")
     }
 }
 
 // Post-integration tests: stopping Postgresql
 
-task postIntegrationTest {
-    dependsOn integrationTestComposeDown
+val postIntegrationTest by tasks.registering {
+    dependsOn("integrationTestComposeDown")
 }
 
 /**
  * Java projects
  */
 
-ext {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+val javaProjects = subprojects.filter {
+    it.path != ":ontrack-web"
 }
 
-def javaProjects = subprojects.findAll {
-    it.path != ':ontrack-web'
-}
-
-def coreProjects = javaProjects.findAll {
-    it.path != ':ontrack-dsl'
+val coreProjects = javaProjects.filter {
+    it.path != ":ontrack-dsl"
 }
 
 configure(javaProjects) {
@@ -110,67 +116,74 @@ configure(javaProjects) {
      * For all Java projects
      */
 
-    apply plugin: 'java'
-    apply plugin: 'maven-publish'
+    apply(plugin = "java")
+    apply(plugin = "maven-publish")
 
     // Javadoc
 
-    if (documentationProfile) {
-        task javadocJar(type: Jar) {
-            classifier = 'javadoc'
-            from javadoc
+    if (hasProperty("documentation")) {
+
+        tasks.register<Jar>("javadocJar") {
+            archiveClassifier.set("javadoc")
+            from("javadoc")
         }
 
         // Sources
 
-        task sourceJar(type: Jar) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
+        tasks.register<Jar>("sourcesJar") {
+            dependsOn(JavaPlugin.CLASSES_TASK_NAME)
+            archiveClassifier.set("sources")
+            from(project.the<SourceSetContainer>()["main"].allSource)
         }
     }
 
     // POM file
 
-    publishing {
+    configure<PublishingExtension> {
         publications {
-            mavenCustom(MavenPublication) {
-                from components.java
-                pom.withXml {
-                    def root = asNode()
-                    root.appendNode('name', project.name)
-                    root.appendNode('description', project.description ?: project.name)
-                    root.appendNode('url', 'http://nemerosa.github.io/ontrack')
-
-                    def licenses = root.appendNode('licenses')
-                    def license = licenses.appendNode('license')
-                    license.appendNode('name', 'The MIT License (MIT)')
-                    license.appendNode('url', 'http://opensource.org/licenses/MIT')
-                    license.appendNode('distribution', 'repo')
-
-                    def scm = root.appendNode('scm')
-                    scm.appendNode('url', 'https://github.com/nemerosa/ontrack')
-                    scm.appendNode('connection', 'scm:git://github.com/nemerosa/ontrack')
-                    scm.appendNode('developerConnection', 'scm:git://github.com/nemerosa/ontrack')
-
-                    def developers = root.appendNode('developers')
-                    def developer = developers.appendNode('developer')
-                    developer.appendNode('id', 'dcoraboeuf')
-                    developer.appendNode('name', 'Damien Coraboeuf')
-                    developer.appendNode('email', 'damien.coraboeuf@gmail.com')
+            create<MavenPublication>("mavenCustom") {
+                from(components["java"])
+                if (hasProperty("documentation")) {
+                    artifact(tasks["sourcesJar"])
+                    artifact(tasks["javadocJar"])
+                }
+                pom {
+                    name.set(this@p.name)
+                    description.set(this@p.description)
+                    url.set("http://nemerosa.github.io/ontrack")
+                    licenses {
+                        license {
+                            name.set("The MIT License (MIT)")
+                            url.set("http://opensource.org/licenses/MIT")
+                            distribution.set("repo")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git://github.com/nemerosa/ontrack")
+                        developerConnection.set("scm:git://github.com/nemerosa/ontrack")
+                        url.set("https://github.com/nemerosa/ontrack/")
+                    }
+                    developers {
+                        developer {
+                            id.set("dcoraboeuf")
+                            name.set("Damien Coraboeuf")
+                            email.set("damien.coraboeuf@gmail.com")
+                        }
+                    }
                 }
             }
         }
     }
 
-    model {
-        ValidationRunWithAutoStampIT
-        tasks.generatePomFileForMavenCustomPublication {
-            destination = file("${buildDir}/poms/${project.name}-${version}.pom")
-        }
-    }
+//    model {
+//        ValidationRunWithAutoStampIT
+//        tasks.generatePomFileForMavenCustomPublication {
+//            destination = file("${buildDir}/poms/${project.name}-${version}.pom")
+//        }
+//    }
 
     afterEvaluate {
-        tasks.assemble.dependsOn 'generatePomFileForMavenCustomPublication'
+        tasks.assemble.dependsOn "generatePomFileForMavenCustomPublication"
     }
 
     // Archives for Javadoc and Sources
@@ -190,9 +203,9 @@ configure(coreProjects) {
      * For all Java projects
      */
 
-    apply plugin: 'kotlin'
-    apply plugin: 'kotlin-spring'
-    apply plugin: 'io.spring.dependency-management'
+    apply plugin: "kotlin"
+    apply plugin: "kotlin-spring"
+    apply plugin: "io.spring.dependency-management"
 
     dependencyManagement {
         imports {
@@ -201,33 +214,33 @@ configure(coreProjects) {
             }
         }
         dependencies {
-            dependency 'commons-io:commons-io:2.6'
-            dependency 'org.apache.commons:commons-text:1.6'
-            dependency 'net.jodah:failsafe:1.1.1'
-            dependency 'commons-logging:commons-logging:1.2'
-            dependency 'org.apache.commons:commons-math3:3.6.1'
-            dependency 'com.google.guava:guava:27.0.1-jre'
-            dependency 'args4j:args4j:2.33'
-            dependency 'org.jgrapht:jgrapht-core:1.3.0'
-            dependency 'org.kohsuke:groovy-sandbox:1.19'
-            dependency 'com.graphql-java:graphql-java:11.0'
+            dependency "commons-io:commons-io:2.6"
+            dependency "org.apache.commons:commons-text:1.6"
+            dependency "net.jodah:failsafe:1.1.1"
+            dependency "commons-logging:commons-logging:1.2"
+            dependency "org.apache.commons:commons-math3:3.6.1"
+            dependency "com.google.guava:guava:27.0.1-jre"
+            dependency "args4j:args4j:2.33"
+            dependency "org.jgrapht:jgrapht-core:1.3.0"
+            dependency "org.kohsuke:groovy-sandbox:1.19"
+            dependency "com.graphql-java:graphql-java:11.0"
             dependency "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
             // Overrides from Spring Boot
-            dependency 'org.postgresql:postgresql:9.4.1208'
+            dependency "org.postgresql:postgresql:9.4.1208"
         }
     }
 
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
         compile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
-        compileOnly 'org.projectlombok:lombok:1.18.10'
-        annotationProcessor 'org.projectlombok:lombok:1.18.10'
-        testCompileOnly 'org.projectlombok:lombok:1.18.10'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+        compileOnly "org.projectlombok:lombok:1.18.10"
+        annotationProcessor "org.projectlombok:lombok:1.18.10"
+        testCompileOnly "org.projectlombok:lombok:1.18.10"
+        testAnnotationProcessor "org.projectlombok:lombok:1.18.10"
         // Testing
-        testCompile 'junit:junit'
-        testCompile 'org.mockito:mockito-core'
-        testCompile 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
+        testCompile "junit:junit"
+        testCompile "org.mockito:mockito-core"
+        testCompile "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
         testCompile "org.jetbrains.kotlin:kotlin-test"
     }
 
@@ -240,7 +253,7 @@ configure(coreProjects) {
 
     // Unit tests run with the `test` task
     test {
-        include '**/*Test.class'
+        include "**/*Test.class"
         reports {
             html.enabled = false
         }
@@ -248,8 +261,8 @@ configure(coreProjects) {
 
     // Integration tests
     task integrationTest(type: Test) {
-        mustRunAfter 'test'
-        include '**/*IT.class'
+        mustRunAfter "test"
+        include "**/*IT.class"
         minHeapSize = "512m"
         maxHeapSize = "1024m"
         dependsOn preIntegrationTest
@@ -259,9 +272,9 @@ configure(coreProjects) {
          */
         doFirst {
             println "Setting JDBC URL for IT: ${rootProject.ext.jdbcUrl}"
-            systemProperty 'spring.datasource.url', rootProject.ext.jdbcUrl
-            systemProperty 'spring.datasource.username', 'ontrack'
-            systemProperty 'spring.datasource.password', 'ontrack'
+            systemProperty "spring.datasource.url", rootProject.ext.jdbcUrl
+            systemProperty "spring.datasource.username", "ontrack"
+            systemProperty "spring.datasource.password", "ontrack"
         }
     }
 
@@ -283,21 +296,21 @@ configure(coreProjects) {
  * - an `ontrack.properties` file which contains the list of modules & the version information
  */
 
-apply plugin: 'base'
+apply plugin: "base"
 
 // Global Javadoc
 
 if (documentationProfile) {
-    apply plugin: 'nebula-aggregate-javadocs'
+    apply plugin: "nebula-aggregate-javadocs"
 
     gradle.projectsEvaluated {
         aggregateJavadocs {
-            includes = ['net/nemerosa/**']
+            includes = ["net/nemerosa/**"]
         }
 
-        rootProject.tasks.create('javadocPackage', Zip) {
-            classifier = 'javadoc'
-            archiveName = 'ontrack-javadoc.zip'
+        rootProject.tasks.create("javadocPackage", Zip) {
+            classifier = "javadoc"
+            archiveName = "ontrack-javadoc.zip"
             dependsOn aggregateJavadocs
             from rootProject.file("$rootProject.buildDir/docs/javadoc")
         }
@@ -307,28 +320,28 @@ if (documentationProfile) {
 // ZIP package which contains all artifacts to be published
 
 task publicationPackage(type: Zip) {
-    classifier = 'publication'
-    archiveName = 'ontrack-publication.zip'
+    classifier = "publication"
+    archiveName = "ontrack-publication.zip"
     subprojects {
         afterEvaluate {
-            if (tasks.findByName('jar')) {
+            if (tasks.findByName("jar")) {
                 dependsOn assemble
                 if (jar.isEnabled()) {
                     from jar
                 }
                 if (documentationProfile) {
-                    if (tasks.findByName('javadocJar')) from javadocJar
-                    if (tasks.findByName('sourceJar')) from sourceJar
+                    if (tasks.findByName("javadocJar")) from javadocJar
+                    if (tasks.findByName("sourceJar")) from sourceJar
                 }
-                if (tasks.findByName('testJar')) from testJar
+                if (tasks.findByName("testJar")) from testJar
                 // POM file
                 from "${project.buildDir}/poms/${project.name}-${project.version}.pom"
             }
         }
     }
     // Extension test
-    from("${rootProject.file('ontrack-extension-test')}") {
-        into 'ontrack-extension-test'
+    from("${rootProject.file("ontrack-extension-test")}") {
+        into "ontrack-extension-test"
     }
 }
 
@@ -343,7 +356,7 @@ if (documentationProfile) {
 // Ontrack descriptor
 
 task deliveryDescriptor {
-    ext.output = project.file('build/ontrack.properties')
+    ext.output = project.file("build/ontrack.properties")
     doLast {
         (output as File).parentFile.mkdirs()
         output.text = "# Ontrack properties\n"
@@ -360,28 +373,28 @@ task deliveryDescriptor {
         output << "VERSION_SCM = ${project.versioning.info.scm}\n"
         // Modules
         output << "# Comma-separated list of modules\n"
-        output << "MODULES = ${project.subprojects.findAll { it.tasks.findByName('jar') }.collect { it.name }.join(',')}\n"
+        output << "MODULES = ${project.subprojects.findAll { it.tasks.findByName("jar") }.collect { it.name }.join(",")}\n"
     }
 }
 
 // Delivery package
 
 task deliveryPackage(type: Zip) {
-    classifier = 'delivery'
+    classifier = "delivery"
     // Gradle files
     from(projectDir) {
-        include 'buildSrc/**'
-        include '*.gradle'
-        include 'gradlew*'
-        include 'gradle/**'
-        include 'gradle.properties'
-        exclude '**/.gradle/**'
-        exclude '**/build/**'
+        include "buildSrc/**"
+        include "*.gradle"
+        include "gradlew*"
+        include "gradle/**"
+        include "gradle.properties"
+        exclude "**/.gradle/**"
+        exclude "**/build/**"
     }
     // Acceptance
-    dependsOn ':ontrack-acceptance:normaliseJar'
-    from(project(':ontrack-acceptance').file('src/main/compose')) {
-        into 'ontrack-acceptance'
+    dependsOn ":ontrack-acceptance:normaliseJar"
+    from(project(":ontrack-acceptance").file("src/main/compose")) {
+        into "ontrack-acceptance"
     }
     // All artifacts
     dependsOn publicationPackage
@@ -402,9 +415,9 @@ build.dependsOn deliveryPackage
 
 def packageVersion
 if (version ==~ /\d+\.\d+\.\d+/) {
-    packageVersion = version.replaceAll(/[^0-9\.-_]/, '')
+    packageVersion = version.replaceAll(/[^0-9\.-_]/, "")
 } else {
-    packageVersion = '0.0.0'
+    packageVersion = "0.0.0"
 }
 println "Using package version = ${packageVersion}"
 
@@ -453,13 +466,13 @@ task osPackages {
  * Docker tasks
  */
 
-task dockerPrepareEnv(type: Copy, dependsOn: ':ontrack-ui:bootJar') {
-    from 'ontrack-ui/build/libs'
-    include '*.jar'
-    exclude '*-javadoc.jar'
-    exclude '*-sources.jar'
-    into project.file('docker')
-    rename '.*', 'ontrack.jar'
+task dockerPrepareEnv(type: Copy, dependsOn: ":ontrack-ui:bootJar") {
+    from "ontrack-ui/build/libs"
+    include "*.jar"
+    exclude "*-javadoc.jar"
+    exclude "*-sources.jar"
+    into project.file("docker")
+    rename ".*", "ontrack.jar"
 }
 
 task dockerBuild(type: DockerBuildImage) {
