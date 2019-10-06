@@ -140,9 +140,13 @@ tasks.named<BootRun>("bootRun") {
  * Spring boot packaging
  */
 
-tasks.getByName<BootJar>("bootJar") {
+val bootJar = tasks.getByName<BootJar>("bootJar") {
     // Allowing the declaration of external extensions, packaged using the Spring Boot Module format
     manifest {
         attributes("Main-Class" to "org.springframework.boot.loader.PropertiesLauncher")
     }
+}
+
+rootProject.tasks.named<Zip>("publicationPackage") {
+    from(bootJar)
 }
