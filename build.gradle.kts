@@ -254,8 +254,8 @@ configure(coreProjects) p@{
         include("**/*IT.class")
         minHeapSize = "512m"
         maxHeapSize = "1024m"
-        dependsOn("preIntegrationTest")
-        finalizedBy("postIntegrationTest")
+        dependsOn(":preIntegrationTest")
+        finalizedBy(":postIntegrationTest")
         /**
          * Sets the JDBC URL
          */
