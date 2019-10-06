@@ -102,3 +102,11 @@ val acceptanceTest by tasks.registering(Test::class) {
 tasks.named<Test>("test") {
     enabled = false
 }
+
+configure<PublishingExtension> {
+    publications {
+        named<MavenPublication>("mavenCustom") {
+            setArtifacts(listOf(bootJar))
+        }
+    }
+}
