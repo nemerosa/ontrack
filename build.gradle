@@ -271,12 +271,6 @@ configure(coreProjects) {
     // Synchronization with shutting down the database
     rootProject.integrationTestComposeDown.mustRunAfter project.integrationTest
 
-    // Acceptance tests
-    task acceptanceTest(type: Test) {
-        mustRunAfter 'integrationTest'
-        include '**/ACC*.class'
-    }
-
 }
 
 /**
@@ -396,12 +390,3 @@ task devStop {
  * `gradle/production.gradle`
  */
 
-/**
- * General test report
- */
-
-task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/allTests")
-    // Include the results from the `test` tasks in all core subprojects
-    reportOn coreProjects*.test, coreProjects*.integrationTest, coreProjects*.acceptanceTest
-}
