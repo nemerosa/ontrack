@@ -140,8 +140,8 @@ configure(javaProjects) p@{
         }
 
         artifacts {
-            add("archives", "javadocJar")
-            add("archives", "sourceJar")
+            add("archives", javadocJar)
+            add("archives", sourceJar)
         }
 
     }
