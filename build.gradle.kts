@@ -120,6 +120,32 @@ configure(javaProjects) p@{
     apply(plugin = "java")
     apply(plugin = "maven-publish")
 
+    // Documentation
+
+    if (hasProperty("documentation")) {
+
+        // Javadoc
+
+        tasks.register<Jar>("javadocJar") {
+            archiveClassifier.set("javadoc")
+            from("javadoc")
+        }
+
+        // Sources
+
+        tasks.register<Jar>("sourcesJar") {
+            dependsOn(JavaPlugin.CLASSES_TASK_NAME)
+            archiveClassifier.set("sources")
+            from(project.the<SourceSetContainer>()["main"].allSource)
+        }
+
+        artifacts {
+            add("archives", "javadocJar")
+            add("archives", "sourceJar")
+        }
+
+    }
+
     // POM file
 
     configure<PublishingExtension> {
@@ -160,32 +186,6 @@ configure(javaProjects) p@{
 
     tasks.named("assemble") {
         dependsOn("generatePomFileForMavenCustomPublication")
-    }
-
-    // Documentation
-
-    if (hasProperty("documentation")) {
-
-        // Javadoc
-
-        tasks.register<Jar>("javadocJar") {
-            archiveClassifier.set("javadoc")
-            from("javadoc")
-        }
-
-        // Sources
-
-        tasks.register<Jar>("sourcesJar") {
-            dependsOn(JavaPlugin.CLASSES_TASK_NAME)
-            archiveClassifier.set("sources")
-            from(project.the<SourceSetContainer>()["main"].allSource)
-        }
-
-        artifacts {
-            add("archives", "javadocJar")
-            add("archives", "sourceJar")
-        }
-
     }
 
 }
