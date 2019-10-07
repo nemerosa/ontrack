@@ -18,7 +18,6 @@ buildscript {
     }
     dependencies {
         val kotlinVersion: String by project
-        classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
         classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
     }
@@ -37,6 +36,7 @@ plugins {
     id("com.avast.gradle.docker-compose") version "0.9.5"
     id("com.bmuschko.docker-remote-api") version "4.1.0"
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
+    id("io.freefair.aggregate-javadoc") version "4.1.2"
 }
 
 /**
@@ -316,17 +316,16 @@ val deliveryDescriptor by tasks.registering {
 
 // Global Javadoc
 
-if (project.hasProperty("documentation")) {
-    apply(plugin = "nebula-aggregate-javadocs")
+tasks.named<Javadoc>("aggregateJavadoc") {
+    include("net/nemerosa/**")
+}
 
-    tasks.named<Javadoc>("aggregateJavadocs") {
-        include("net/nemerosa/**")
-    }
+if (project.hasProperty("documentation")) {
 
     rootProject.tasks.register("javadocPackage", Zip::class) {
         archiveClassifier.set("javadoc")
         archiveFileName.set("ontrack-javadoc.zip")
-        dependsOn("aggregateJavadocs")
+        dependsOn("aggregateJavadoc")
         from(rootProject.file("$rootProject.buildDir/docs/javadoc"))
     }
 }
