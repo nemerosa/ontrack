@@ -126,14 +126,14 @@ configure(javaProjects) p@{
 
         // Javadoc
 
-        tasks.register<Jar>("javadocJar") {
+        val javadocJar = tasks.register<Jar>("javadocJar") {
             archiveClassifier.set("javadoc")
             from("javadoc")
         }
 
         // Sources
 
-        tasks.register<Jar>("sourcesJar") {
+        val sourcesJar = tasks.register<Jar>("sourcesJar") {
             dependsOn(JavaPlugin.CLASSES_TASK_NAME)
             archiveClassifier.set("sources")
             from(project.the<SourceSetContainer>()["main"].allSource)
@@ -141,7 +141,7 @@ configure(javaProjects) p@{
 
         artifacts {
             add("archives", javadocJar)
-            add("archives", sourceJar)
+            add("archives", sourcesJar)
         }
 
     }
