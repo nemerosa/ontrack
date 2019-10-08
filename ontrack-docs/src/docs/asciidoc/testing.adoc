@@ -36,28 +36,18 @@ JUnit integration.
 NOTE: This requires Docker & Docker Compose to be installed and correctly
 configured.
 
-The application can be deployed on a local Docker container, running on SSL with a self signed certificate, and
-tested by running all the acceptance tests:
+The application can be deployed on a local Docker container:
 
 [source,bash]
 ----
-./gradlew ciAcceptanceTest
+./gradlew localAcceptanceTest
 ----
 
-When using a Docker Machine, you will have to specify the Docker host:
-
-[source,bash]
-----
-./gradlew ciAcceptanceTest -PciMachine=`docker-machine ip build`
-----
-
-where `build` is the name of the Docker machine.
-
-If the Docker container used for the tests must be kept, add the `-x ciStop`
+If the Docker container used for the tests must be kept, add the `-x localComposeDown`
 to the arguments.
 
 TIP: To only deploy the application in a container without launching any test,
-you can also run `./gradlew ciStart`.
+you can also run `./gradlew localComposeUp`.
 
 [[testing-acceptance-ide]]
 ===== From the IDE
