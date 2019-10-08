@@ -1,5 +1,6 @@
 plugins {
     groovy
+    `kotlin-dsl`
 }
 
 repositories {
@@ -10,6 +11,7 @@ repositories {
 
 dependencies {
     compile(gradleApi())
+    compile(gradleKotlinDsl())
     compile("gradle.plugin.com.liferay:gradle-plugins-node:5.1.1")
     compile("net.nemerosa.ontrack:ontrack-dsl:2.23.2") {
         exclude(module = "groovy-all")

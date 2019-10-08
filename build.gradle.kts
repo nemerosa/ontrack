@@ -515,14 +515,14 @@ tasks.named<ComposeUp>("localComposeUp") {
     doLast {
         val host = servicesInfos["ontrack"]?.host!!
         val port = servicesInfos["ontrack"]?.firstContainer?.tcpPort!!
-        val url = "http//$host:$port"
+        val url = "http://$host:$port"
         val ontrackUrl: String by rootProject.extra(url)
         logger.info("Pre acceptance test Ontrack URL = $ontrackUrl")
     }
 }
 
 tasks.register("localAcceptanceTest", RemoteAcceptanceTest::class) {
-    acceptanceUrl = closureOf<String> {
+    acceptanceUrlFn = {
         rootProject.extra["ontrackUrl"] as String
     }
     disableSsl = true
