@@ -342,7 +342,7 @@ val publicationPackage by tasks.registering(Zip::class) {
 }
 
 subprojects {
-    afterEvaluate {
+    afterEvaluate p@{
         val jar = tasks.findByName("jar") as? Jar?
         if (jar != null && jar.isEnabled) {
             publicationPackage {
@@ -368,8 +368,15 @@ subprojects {
                     from(testJar)
                 }
             }
-            // FIXME POM file
-            // from "${project.buildDir}/poms/${project.name}-${project.version}.pom"
+            // POM file
+            val pomTask = tasks.findByName("generatePomFileForMavenCustomPublication")
+            if (pomTask != null) {
+                publicationPackage {
+                    from(pomTask) {
+                        rename { "${this@p.name}-${this@p.version}.pom" }
+                    }
+                }
+            }
         }
     }
 }
