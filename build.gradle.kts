@@ -502,15 +502,15 @@ val dockerBuild by tasks.registering(DockerBuildImage::class) {
  */
 
 dockerCompose {
-    createNested("ci").apply {
-        useComposeFiles = listOf("compose/docker-compose-ci.yml")
+    createNested("local").apply {
+        useComposeFiles = listOf("compose/docker-compose-local.yml")
         projectName = "ci"
-        captureContainersOutputToFiles = project.file("${project.buildDir}/ci-logs")
+        captureContainersOutputToFiles = project.file("${project.buildDir}/local-logs")
         tcpPortsToIgnoreWhenWaiting = listOf(8083, 8086)
     }
 }
 
-tasks.named<ComposeUp>("ciComposeUp") {
+tasks.named<ComposeUp>("localComposeUp") {
     dependsOn(dockerBuild)
     doLast {
         val host = servicesInfos["ontrack"]?.host!!
@@ -521,15 +521,15 @@ tasks.named<ComposeUp>("ciComposeUp") {
     }
 }
 
-tasks.register("ciAcceptanceTest", RemoteAcceptanceTest::class) {
+tasks.register("localAcceptanceTest", RemoteAcceptanceTest::class) {
     acceptanceUrl = closureOf<String> {
         rootProject.extra["ontrackUrl"] as String
     }
     disableSsl = true
     acceptanceTimeout = 300
     acceptanceImplicitWait = 30
-    dependsOn("ciComposeUp")
-    finalizedBy("ciComposeDown")
+    dependsOn("localComposeUp")
+    finalizedBy("localComposeDown")
 }
 
 /**
