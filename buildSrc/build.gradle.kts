@@ -1,5 +1,4 @@
 plugins {
-    groovy
     `kotlin-dsl`
 }
 

@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.dsl.Build
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
-class OntrackLastReleases : AbstractOntrackTask() {
+open class OntrackLastReleases : AbstractOntrackTask() {
 
     @Input
     var ontrackProject: String = "ontrack"
