@@ -13,7 +13,7 @@ dependencies {
     compile(gradleApi())
     compile(gradleKotlinDsl())
     compile("gradle.plugin.com.liferay:gradle-plugins-node:5.1.1")
-    compile("net.nemerosa.ontrack:ontrack-dsl:2.23.2") {
+    compile("net.nemerosa.ontrack:ontrack-dsl:3.40.0") {
         exclude(module = "groovy-all")
     }
 }
