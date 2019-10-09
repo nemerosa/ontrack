@@ -5,9 +5,11 @@ import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import net.nemerosa.ontrack.gradle.OntrackLastReleases
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 import net.nemerosa.versioning.VersioningExtension
 import net.nemerosa.versioning.VersioningPlugin
+import org.ajoberstar.gradle.git.publish.GitPublishExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.redline_rpm.header.Os
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
@@ -37,6 +39,8 @@ plugins {
     id("com.bmuschko.docker-remote-api") version "4.1.0"
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
+    // Site
+    id("org.ajoberstar.git-publish") version "2.1.1"
 }
 
 /**
@@ -558,9 +562,56 @@ val devStop by tasks.registering {
 }
 
 /**
- * Publication tasks
+ * Site generation
  *
- * Standalone Gradle tasks in `gradle/publication.gradle` and in
- * `gradle/production.gradle`
+ * Must be called AFTER the current version has been promoted in Ontrack to the RELEASE promotion level.
+ *
+ * This means having a Site job in the pipeline, after the Publish one, calling the `site` task.
  */
 
+val ontrackVersion: String by project
+
+val siteOntrackLast2Releases by tasks.registering(OntrackLastReleases::class) {
+    releaseCount = 2
+    releasePattern = "2\\.[\\d]+\\..*"
+}
+
+val siteOntrackLast3Releases by tasks.registering(OntrackLastReleases::class) {
+    releaseCount = 6
+    releasePattern = "3\\.[\\d]+\\..*"
+}
+
+val sitePagesDocJs by tasks.registering {
+    dependsOn(siteOntrackLast2Releases)
+    dependsOn(siteOntrackLast3Releases)
+    outputs.file(project.file("build/site/page/doc.js"))
+    doLast {
+        val allReleases = siteOntrackLast3Releases.get().releases + siteOntrackLast2Releases.get().releases
+        val allVersions = allReleases.joinToString(",") { "'${it.name}'" }
+        project.file("build/site/page").mkdirs()
+        project.file("build/site/page/doc.js").writeText(
+                """var releases = [$allVersions];"""
+        )
+    }
+}
+
+configure<GitPublishExtension> {
+    repoUri.set(project.properties["ontrackGitHubUri"] as String)
+    branch.set(project.properties["ontrackGitHubPages"] as String)
+    contents {
+        from("ontrack-site/src/main/web")
+        from("build/site/page") {
+            include("doc.js")
+            into("javascripts/doc/")
+        }
+    }
+    commitMessage.set("GitHub pages for version $ontrackVersion")
+}
+
+tasks.named("gitPublishCopy") {
+    dependsOn(sitePagesDocJs)
+}
+
+val site by tasks.registering {
+    dependsOn("gitPublishPush")
+}

@@ -953,7 +953,6 @@ set -e
                 echo "Getting list of releases and publishing the site..."
                 sh '''\
                     ./gradlew \\
-                        --build-file site.gradle \\
                         --info \\
                         --profile \\
                         --console plain \\
