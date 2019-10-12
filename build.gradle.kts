@@ -31,6 +31,7 @@ val kotlinVersion: String by project
 
 plugins {
     java
+    jacoco
     id("net.nemerosa.versioning") version "2.8.2" apply false
     id("nebula.deb") version "6.2.1"
     id("nebula.rpm") version "6.2.1"
@@ -276,6 +277,78 @@ configure(coreProjects) p@{
         mustRunAfter(integrationTest)
     }
 
+}
+
+
+
+/**
+ * Code coverage report
+ */
+
+configure(coreProjects) {
+    apply(plugin = "jacoco")
+}
+
+val codeCoverageReport by tasks.registering(JacocoReport::class) {
+    executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
+
+    javaProjects.forEach {
+        sourceSets(it.sourceSets["main"])
+    }
+
+    reports {
+        xml.isEnabled = true
+        xml.destination = file("${buildDir}/reports/jacoco/report.xml")
+        html.isEnabled = false
+        csv.isEnabled = false
+    }
+}
+
+configure(javaProjects) {
+    tasks.named("test") test@{
+        codeCoverageReport {
+            dependsOn(this@test)
+        }
+    }
+    val integrationTest = tasks.findByName("integrationTest")
+    if (integrationTest != null) {
+        codeCoverageReport {
+            dependsOn(integrationTest)
+        }
+    }
+}
+
+val codeDockerCoverageExtraction by tasks.registering {
+    doLast {
+        ant.withGroovyBuilder {
+            "taskdef"(
+                    "name" to "jacocoDump",
+                    "classname" to "org.jacoco.ant.DumpTask",
+                    "classpath" to project.configurations["jacocoAnt"].asPath
+            )
+            "jacocoDump"(
+                    "address" to "localhost",
+                    "port" to 6300,
+                    "destfile" to "build/jacoco/docker.exec"
+            )
+        }
+    }
+}
+
+val codeDockerCoverageReport by tasks.registering(JacocoReport::class) {
+    dependsOn(codeDockerCoverageExtraction)
+    executionData(fileTree(project.rootDir.absolutePath).include("build/jacoco/docker.exec"))
+
+    javaProjects.forEach {
+        sourceSets(it.sourceSets["main"])
+    }
+
+    reports {
+        xml.isEnabled = true
+        xml.destination = file("build/reports/jacoco/docker.xml")
+        html.isEnabled = false
+        csv.isEnabled = false
+    }
 }
 
 /**
