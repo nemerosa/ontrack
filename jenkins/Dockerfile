@@ -1,5 +1,5 @@
 # Base
-FROM openjdk:8u181-jdk
+FROM openjdk:8u222-jdk
 
 # Makes sure all tools for the build are installed
 RUN apt-get update && apt-get install -y \
@@ -24,11 +24,11 @@ RUN mv docker/* /usr/bin/
 RUN chmod +x /usr/bin/docker
 
 # Installs Docker Compose
-RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
+RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
 RUN chmod +x /usr/bin/docker-compose
 
 # Installs Docker Machine
-RUN curl --fail --silent -L https://github.com/docker/machine/releases/download/v0.16.1/docker-machine-`uname -s`-`uname -m` > /usr/bin/docker-machine
+RUN curl --fail --silent -L https://github.com/docker/machine/releases/download/v0.16.2/docker-machine-`uname -s`-`uname -m` > /usr/bin/docker-machine
 RUN chmod +x /usr/bin/docker-machine
 
 # Git configuration

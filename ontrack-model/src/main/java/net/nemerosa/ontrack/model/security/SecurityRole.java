@@ -18,4 +18,8 @@ public enum SecurityRole {
     public String getRoleName() {
         return roleName;
     }
+
+    public String getRoleAbbreviatedName() {
+        return roleName.substring(5);
+    }
 }

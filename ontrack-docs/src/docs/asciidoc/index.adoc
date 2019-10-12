@@ -10,7 +10,7 @@ Damien Coraboeuf
 :sectanchors:
 // ========================================================
 :ontrack-version: current
-:spring-boot-version: 1.5.18.RELEASE
+:spring-boot-version: 2.0.2.RELEASE
 :spring-version: 4.3.22.RELEASE
 // ========================================================
 

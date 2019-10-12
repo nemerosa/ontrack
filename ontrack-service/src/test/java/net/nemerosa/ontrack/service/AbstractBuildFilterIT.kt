@@ -2,21 +2,17 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.nd
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
-abstract class AbstractBuildFilterIT : AbstractServiceTestSupport() {
-
-    @Autowired
-    protected lateinit var buildFilterService: BuildFilterService
+@Deprecated("Use directly AbstractDSLTestSupport instead")
+abstract class AbstractBuildFilterIT : AbstractDSLTestSupport() {
 
     protected lateinit var branch: Branch
     protected lateinit var copper: PromotionLevel

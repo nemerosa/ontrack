@@ -1,0 +1,42 @@
+version: "2.1"
+
+services:
+  # InfluxDB container
+  influxdb:
+    image: influxdb:1.1-alpine
+    environment:
+      PRE_CREATE_DB: "ontrack"
+    # Makes all ports accessible on the host for testing
+    ports:
+      - "8083"
+      - "8086"
+
+  # Grafana container
+  grafana:
+    image: grafana/grafana:4.1.1
+    ports:
+      - "3000"
+
+  # Ontrack container
+  ontrack:
+    image: nemerosa/ontrack:latest
+    environment:
+      JAVA_OPTIONS: "${JAVA_OPTIONS}"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql/ontrack"
+      PROFILE: acceptance
+    volumes:
+      - "./ci/ontrack:/var/ontrack/conf"
+      # Better startup performances in CI and DO, do not use in Prod
+      - "/dev/urandom:/dev/random"
+    ports:
+      - "8080"
+
+  # Postgresql database
+  postgresql:
+    image: postgres:9.5.5
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+    ports:
+      - "5432"

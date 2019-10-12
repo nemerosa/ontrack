@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.boot.ui.AbstractWebTestSupport;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
+public class ResourceHttpMessageConverterIT extends AbstractWebTestSupport {
 
     @Autowired
     private SecurityService securityService;
@@ -129,13 +129,7 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         when(message.getBody()).thenReturn(output);
         // Serialization
-        asGlobalRole("AUTOMATION").execute(() -> {
-                    try {
-                        converter.writeInternal(b, message);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+        asGlobalRole("AUTOMATION").execute(() -> converter.writeInternal(b, message)
         );
 
         // Content
@@ -161,13 +155,7 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         when(message.getBody()).thenReturn(output);
         // Serialization
-        asGlobalRole("AUTOMATION").execute(() -> {
-                    try {
-                        converter.writeInternal(b, message);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+        asGlobalRole("AUTOMATION").execute(() -> converter.writeInternal(b, message)
         );
 
         // Content

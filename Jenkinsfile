@@ -7,7 +7,7 @@ String projectName = 'ontrack'
 
 boolean pr = false
 
-String buildImageVersion = "nemerosa/ontrack-build:1.0.0"
+String buildImageVersion = "nemerosa/ontrack-build:1.0.1"
 
 pipeline {
 
@@ -106,7 +106,7 @@ git clean -xfd
     codeCoverageReport \\
     publishToMavenLocal \\
     osPackages \\
-    dockerLatest \\
+    dockerBuild \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx4096m \\
@@ -971,7 +971,6 @@ set -e
                 echo "Getting list of releases and publishing the site..."
                 sh '''\
                     ./gradlew \\
-                        --build-file site.gradle \\
                         --info \\
                         --profile \\
                         --console plain \\

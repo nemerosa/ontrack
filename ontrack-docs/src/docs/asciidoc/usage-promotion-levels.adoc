@@ -67,7 +67,7 @@ The order of priority of this check is as follows:
 * project "Previous promotion condition" property (takes precedence on global settings)
 * Global "Previous promotion condition" settings
 
-[[promotion-levels-checks-dependencues]]
+[[promotion-levels-checks-dependencies]]
 ===== Previous dependencies check
 
 You can also define a set of dependencies to a promotion, like

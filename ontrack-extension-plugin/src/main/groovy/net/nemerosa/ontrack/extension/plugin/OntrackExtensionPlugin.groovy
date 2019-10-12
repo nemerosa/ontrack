@@ -121,7 +121,9 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             dependsOn 'npmInstall'
             dependsOn 'copyGulpFile'
 
-            inputs.dir project.file('src/main/resources/static')
+            if (project.file('src/main/resources/static').exists()) {
+                inputs.dir project.file('src/main/resources/static')
+            }
             outputs.file project.file('build/web/dist/module.js')
 
             doFirst {
@@ -145,7 +147,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          */
 
         project.tasks.create('ontrackProperties') {
-            description "Prepares the ontrack META-INF file"
+            description = "Prepares the ontrack META-INF file"
             doLast {
                 project.file("build/ontrack.properties").text = """\
 # Ontrack extension properties

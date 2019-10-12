@@ -1,0 +1,53 @@
+# Application properties
+
+# Spring configuration
+spring:
+  # Default database connection
+  datasource:
+    url: "jdbc:postgresql://localhost/ontrack"
+    username: ontrack
+    password: ontrack
+  # Default profile
+  profiles:
+    active: prod
+
+# Compression of web resources
+server:
+  compression:
+    enabled: true
+
+# Management
+management:
+  # Custom URL for the management end points
+  endpoints:
+    web:
+      base-path: "/manage"
+  # Default settings for the metrics
+  metrics:
+    export:
+      # InfluxDB disabled by default
+      influx:
+        enabled: false
+      # Prometheus disabled by default
+      prometheus:
+        enabled: false
+  # Disable LDAP health indicator
+  health:
+    ldap:
+      enabled: false
+
+# General information
+# The version information is generated in /config/application.properties by the build
+info:
+  app:
+    name: Ontrack
+    description: Continuous Delivery Traceability and Monitoring
+
+# Session configuration
+# This can be overridden at installation level
+#server:
+#  session:
+#    # One hour for the session
+#    timeout: 3600
+#    cookie:
+#      max-age: 3600

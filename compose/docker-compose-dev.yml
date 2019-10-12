@@ -1,0 +1,13 @@
+version: "2.1"
+
+services:
+
+  postgresql:
+    image: postgres:9.5.5
+    container_name: "${POSTGRES_NAME:-postgresql}"
+    environment:
+      POSTGRES_DB: ontrack
+      POSTGRES_USER: ontrack
+      POSTGRES_PASSWORD: ontrack
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"

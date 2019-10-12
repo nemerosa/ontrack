@@ -1,21 +1,16 @@
 package net.nemerosa.ontrack.service.support
 
 import net.nemerosa.ontrack.model.support.ConnectorGlobalStatus
-import org.springframework.boot.actuate.endpoint.Endpoint
-import org.springframework.stereotype.Component
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation
 
-@Component
+@Endpoint(id = "connectors")
 class ConnectorStatusEndpoint(
         private val connectorStatusJob: ConnectorStatusJob
-) : Endpoint<ConnectorGlobalStatus> {
+) {
 
-    override fun isEnabled(): Boolean = true
-
-    override fun isSensitive(): Boolean = true
-
-    override fun getId(): String = "connectors"
-
-    override fun invoke() = ConnectorGlobalStatus(
+    @ReadOperation
+    fun invoke() = ConnectorGlobalStatus(
             connectorStatusJob.statuses.values.flatten().sortedBy {
                 it.status.description.connector
             }

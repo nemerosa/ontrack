@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
 
@@ -41,6 +42,15 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                     setOf(fav.id()),
                     branchIds
             )
+        }
+    }
+
+    @Test
+    fun `All projects`() {
+        val p = doCreateProject()
+        val data = run("{projects { id name }}")
+        assertNotNull(data["projects"].find { it["name"].asText() == p.name }) {
+            assertEquals(p.id(), it["id"].asInt())
         }
     }
 

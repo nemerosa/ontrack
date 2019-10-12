@@ -24,32 +24,39 @@ following Gradle command:
 
 [source,bash]
 ----
-./gradlew devInit
+./gradlew devStart
 ----
 
 This will use Docker in order to set up a Postgres database container, exposing
 the port `5432` on the host and named `postgresql`.
 
-Following properties are available to personalize this setup:
-
-|===
-| Property | Default | Description
-
-| `devPostgresPort` | `5432` | Port the container must expose on the host
-| `devPostgresName` | `postgresql` | Name of the container to create
-
-|===
+[NOTE]
+====
+To override the port being exposed, you can use the
+`devPostgresPort` property.
 
 For example, to use the `5555` port:
 
 [source,bash]
 ----
-./gradlew devInit -PdevPostgresPort=5555
+./gradlew devStart -PdevPostgresPort=5555
 ----
 
-NOTE: This container is used only for your local development, and is not used
+You can also the name of the Postgres container, which
+defaults to `postgresql` by using the
+`devPostgresName` property.
+====
+
+This container is used only for your local development, and is not used
 for running the <<testing,integration tests>>, where another container is
 automatically created and destroyed.
+
+To stop the development environment, you can run:
+
+[source,bash]
+----
+./gradlew devStop
+----
 
 [[development-build]]
 ==== Building locally

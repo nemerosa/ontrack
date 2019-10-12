@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusIDNotAvailableException
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.structure.ID
@@ -39,6 +40,8 @@ class ValidationRunStatusController(
     ): ValidationRun {
         // Gets the parent run
         val run = structureService.getParentValidationRun(validationRunStatusId)
+        // Not found
+                ?: throw ValidationRunStatusIDNotAvailableException(validationRunStatusId)
         // Edits the comment
         return structureService.saveValidationRunStatusComment(
                 run,

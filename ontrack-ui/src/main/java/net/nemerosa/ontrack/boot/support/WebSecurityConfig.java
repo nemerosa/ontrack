@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.boot.support;
 
 import net.nemerosa.ontrack.model.security.UserSource;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,14 +23,17 @@ import java.util.List;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private APIBasicAuthenticationEntryPoint apiBasicAuthenticationEntryPoint;
+    private final APIBasicAuthenticationEntryPoint apiBasicAuthenticationEntryPoint;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private List<UserSource> userSources;
+    private final List<UserSource> userSources;
+
+    public WebSecurityConfig(APIBasicAuthenticationEntryPoint apiBasicAuthenticationEntryPoint, AuthenticationManager authenticationManager, List<UserSource> userSources) {
+        this.apiBasicAuthenticationEntryPoint = apiBasicAuthenticationEntryPoint;
+        this.authenticationManager = authenticationManager;
+        this.userSources = userSources;
+    }
 
     /**
      * By default, all queries are accessible anonymously. Security is enforced at service level.
@@ -58,6 +63,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             // Allows all at Web level
             .authorizeRequests()
+                .requestMatchers(EndpointRequest.toAnyEndpoint().excluding(
+                        InfoEndpoint.class,
+                        HealthEndpoint.class
+                )).access("hasRole('ADMIN') or @functionBasedSecurity.hasApplicationManagement(authentication)")
                 .antMatchers("/**").permitAll()
             // Remember be authentication token
             .and().rememberMe()
@@ -70,8 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // @formatter:on
     }
 
-    @Bean
-    public RememberMeServices rememberMeServices(String rememberBeKey) {
+    private RememberMeServices rememberMeServices(String rememberBeKey) {
         return new PersistentTokenBasedRememberMeServices(
                 rememberBeKey,
                 basicRememberMeUserDetailsService(),
@@ -85,7 +93,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.parentAuthenticationManager(authenticationManager);
     }
 

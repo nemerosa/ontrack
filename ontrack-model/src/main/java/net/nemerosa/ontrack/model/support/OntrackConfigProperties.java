@@ -5,8 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 /**
  * Configuration properties for Ontrack.
@@ -14,6 +17,7 @@ import javax.annotation.PostConstruct;
 @Data
 @Component
 @ConfigurationProperties(prefix = "ontrack.config")
+@Validated
 public class OntrackConfigProperties {
 
     /**
@@ -33,17 +37,13 @@ public class OntrackConfigProperties {
      *
      * @see ApplicationLogEntryLevel#FATAL
      */
+    @Min(1)
     private int applicationLogInfoMax = 10;
 
     /**
      * Home directory
      */
     private String applicationWorkingDir = "work/files";
-
-    /**
-     * Metrics refresh period (in seconds)
-     */
-    private int metricsPeriod = 60;
 
     /**
      * Testing the configurations of external configurations
@@ -53,6 +53,7 @@ public class OntrackConfigProperties {
     /**
      * Job configuration
      */
+    @Valid
     private JobConfigProperties jobs = new JobConfigProperties();
 
     /**

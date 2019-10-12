@@ -317,8 +317,13 @@ interface StructureService {
 
     /**
      * Gets the parent validation run for a given validation run status ID
+     *
+     * @param validationRunStatusId ID of the validation run status ID
+     * @param checkForAccess `false` if the access for view must be checked
+     * @return Validation run which contains the status ID or `null` if the current user
+     * has no access to it. Never `null` if the [checkForAccess] if `true`.
      */
-    fun getParentValidationRun(validationRunStatusId: ID): ValidationRun
+    fun getParentValidationRun(validationRunStatusId: ID, checkForAccess: Boolean = true): ValidationRun?
 
     /**
      * Gets a validation run status using its ID.

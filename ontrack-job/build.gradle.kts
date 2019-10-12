@@ -1,0 +1,13 @@
+description = "Abstract management of identified jobs."
+
+dependencies {
+    compile(project(":ontrack-common"))
+    compile("org.springframework:spring-context")
+    compile("org.slf4j:slf4j-api")
+    compile("io.micrometer:micrometer-core")
+
+    testCompile(project(":ontrack-test-utils"))
+    testCompile("org.apache.commons:commons-math3")
+    testCompile("com.google.guava:guava")
+    testRuntime("org.slf4j:slf4j-log4j12")
+}
