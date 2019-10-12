@@ -199,25 +199,29 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                 }
             }
             post {
-//                success {
-//                    sh '''
-//                        #!/bin/bash
-//                        set -e
-//                        echo "Getting Jacoco coverage"
-//                    '''
-                    // FIXME Collection of coverage in Docker
-//                    sh '''
-//                        ./gradlew \\
-//                            codeDockerCoverageReport
-//                            --stacktrace \\
-//                            --profile \\
-//                            --console plain
-//                    '''
-                    // FIXME Upload to Codecov
-//                    sh '''
-//                        curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/docker.xml
-//                    '''
-//                }
+                success {
+                    sh '''
+                        #!/bin/bash
+                        set -e
+                        echo "Getting Jacoco coverage"
+                        mkdir -p build/jacoco/
+                        cp ontrack-acceptance/src/main/compose/build/jacoco/jacoco.exec build/jacoco/acceptance.exec
+                    '''
+                    // Collection of coverage in Docker
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -PjacocoExecFile=build/jacoco/acceptance.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
+                            --stacktrace \\
+                            --profile \\
+                            --console plain
+                    '''
+                    // Upload to Codecov
+                    sh '''
+                        curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
+                    '''
+                }
                 always {
                     sh '''
                         #!/bin/bash

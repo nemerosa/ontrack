@@ -318,26 +318,11 @@ configure(javaProjects) {
     }
 }
 
-val codeDockerCoverageExtraction by tasks.registering {
-    doLast {
-        ant.withGroovyBuilder {
-            "taskdef"(
-                    "name" to "jacocoDump",
-                    "classname" to "org.jacoco.ant.DumpTask",
-                    "classpath" to project.configurations["jacocoAnt"].asPath
-            )
-            "jacocoDump"(
-                    "address" to "localhost",
-                    "port" to 6300,
-                    "destfile" to "build/jacoco/docker.exec"
-            )
-        }
-    }
-}
+val jacocoExecFile: String by project
+val jacocoReportFile: String by project
 
 val codeDockerCoverageReport by tasks.registering(JacocoReport::class) {
-    dependsOn(codeDockerCoverageExtraction)
-    executionData(fileTree(project.rootDir.absolutePath).include("build/jacoco/docker.exec"))
+    executionData(fileTree(project.rootDir.absolutePath).include(jacocoExecFile))
 
     javaProjects.forEach {
         sourceSets(it.sourceSets["main"])
@@ -345,7 +330,7 @@ val codeDockerCoverageReport by tasks.registering(JacocoReport::class) {
 
     reports {
         xml.isEnabled = true
-        xml.destination = file("build/reports/jacoco/docker.xml")
+        xml.destination = file(jacocoReportFile)
         html.isEnabled = false
         csv.isEnabled = false
     }

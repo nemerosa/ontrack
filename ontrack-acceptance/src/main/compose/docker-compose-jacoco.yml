@@ -8,8 +8,8 @@ services:
     ports:
       - "6300:6300"
     environment:
-      JAVA_OPTIONS: "-Xmx2048m -Xms2048m -javaagent:/jacoco/lib/jacocoagent.jar=destfile=/jacoco/jacoco.exec"
+      JAVA_OPTIONS: "-Xmx2048m -Xms2048m -javaagent:/jacoco/lib/jacocoagent.jar=destfile=/output/jacoco.exec"
     volumes_from:
       - service:jacoco:ro
     volumes:
-      - "./jacoco:/jacoco:rw"
+      - "./jacoco:/output:rw"
