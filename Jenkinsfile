@@ -197,31 +197,38 @@ cd ontrack-acceptance/src/main/compose
 docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
 """
                 }
-                // Collection of coverage in Docker
-                sh '''
-                    ./gradlew \\
-                        codeDockerCoverageReport
-                        --stacktrace \\
-                        --profile \\
-                        --console plain
-                '''
-                // Upload to Codecov
-                sh '''
-                    curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/docker.xml
-                '''
             }
             post {
+//                success {
+//                    sh '''
+//                        #!/bin/bash
+//                        set -e
+//                        echo "Getting Jacoco coverage"
+//                    '''
+                    // FIXME Collection of coverage in Docker
+//                    sh '''
+//                        ./gradlew \\
+//                            codeDockerCoverageReport
+//                            --stacktrace \\
+//                            --profile \\
+//                            --console plain
+//                    '''
+                    // FIXME Upload to Codecov
+//                    sh '''
+//                        curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/docker.xml
+//                    '''
+//                }
                 always {
-                    sh """\
-#!/bin/bash
-set -e
-echo "Cleanup..."
-rm -rf build/acceptance
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name local down --volumes
-"""
+                    sh '''
+                        #!/bin/bash
+                        set -e
+                        echo "Cleanup..."
+                        rm -rf build/acceptance
+                        mkdir -p build
+                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose --project-name local down --volumes
+                    '''
                     script {
                         def results = junit('build/acceptance/*.xml')
                         if (!pr) {
