@@ -12,7 +12,6 @@ import org.springframework.http.HttpInputMessage
 import org.springframework.http.HttpOutputMessage
 import org.springframework.http.MediaType
 import org.springframework.http.converter.AbstractHttpMessageConverter
-import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 
 class ResourceHttpMessageConverter(uriBuilder: URIBuilder, securityService: SecurityService, resourceModules: List<ResourceModule>) : AbstractHttpMessageConverter<Any>(MediaType("application", "json", DEFAULT_CHARSET), MediaType("application", "*+json", DEFAULT_CHARSET)) {
@@ -42,14 +41,6 @@ class ResourceHttpMessageConverter(uriBuilder: URIBuilder, securityService: Secu
 
     public override fun writeInternal(`object`: Any, outputMessage: HttpOutputMessage) {
         val body = outputMessage.body
-
-        if (logger.isDebugEnabled) {
-            val bytes = ByteArrayOutputStream()
-            resourceObjectMapper.write(bytes, `object`)
-            val value = bytes.toString(DEFAULT_CHARSET.name())
-            logger.debug("Writing value: $value")
-        }
-
         resourceObjectMapper.write(body, `object`)
         body.flush()
     }
