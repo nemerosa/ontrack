@@ -1,25 +1,21 @@
-package net.nemerosa.ontrack.graphql.schema;
+package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.GraphQLFieldDefinition;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-
-import javax.annotation.Nullable;
-import java.util.List;
+import graphql.schema.GraphQLFieldDefinition
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 
 /**
  * Contributes a list of fields to a project entity.
  */
-public interface GQLProjectEntityFieldContributor {
+interface GQLProjectEntityFieldContributor {
 
     /**
      * List of field contributions
      *
      * @param projectEntityClass Class of project entity
      * @param projectEntityType  Type of project entity
-     * @return List of fields to call. <code>null</code> is accepted.
+     * @return List of fields to call. `null` is accepted.
      */
-    @Nullable
-    List<GraphQLFieldDefinition> getFields(Class<? extends ProjectEntity> projectEntityClass, ProjectEntityType projectEntityType);
+    fun getFields(projectEntityClass: Class<out ProjectEntity>, projectEntityType: ProjectEntityType): List<GraphQLFieldDefinition>?
 
 }

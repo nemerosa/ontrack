@@ -1,24 +1,28 @@
 plugins {
     groovy
+    `java-library`
 }
 
 dependencies {
+    api(project(":ontrack-ui-support"))
+    api("com.graphql-java:graphql-java")
 
-    compile(project(":ontrack-ui-support"))
-    compile("com.graphql-java:graphql-java")
-    compile("org.springframework:spring-tx")
+    implementation("org.springframework:spring-tx")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.apache.commons:commons-lang3")
 
-    testCompile(project(":ontrack-test-utils"))
-    testCompile(project(":ontrack-it-utils"))
-    testCompile(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testCompile(project(path = ":ontrack-model", configuration = "tests"))
-    testCompile("org.codehaus.groovy:groovy")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile(project(":ontrack-repository-impl"))
-    testCompile(project(":ontrack-extension-general"))
+    testImplementation(project(":ontrack-test-utils"))
+    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
+    testImplementation("org.codehaus.groovy:groovy")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(project(":ontrack-repository-impl"))
+    testImplementation(project(":ontrack-extension-general"))
 
-    testRuntime(project(":ontrack-service"))
-
+    testRuntimeOnly(project(":ontrack-service"))
 }
 
 val testJar by tasks.registering(Jar::class) {
