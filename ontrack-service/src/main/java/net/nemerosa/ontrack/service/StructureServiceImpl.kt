@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service
 
-import com.google.common.collect.Iterables
 import net.nemerosa.ontrack.common.CachedSupplier
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.common.Time
@@ -686,19 +685,12 @@ class StructureServiceImpl(
         val predefinedPromotionLevels = securityService.asAdmin(
                 Supplier { predefinedPromotionLevelService.predefinedPromotionLevels }
         )
-        val sortedIds = getPromotionLevelListForBranch(branch.id).stream()
-                // TODO Kotlin - do not use stream
-                .sorted { o1, o2 ->
-                    val name1 = o1.name
-                    val name2 = o2.name
-                    // Looking for the order in the predefined list
-                    val order1 = Iterables.indexOf(predefinedPromotionLevels) { pred -> StringUtils.equals(pred?.name, name1) }
-                    val order2 = Iterables.indexOf(predefinedPromotionLevels) { pred -> StringUtils.equals(pred?.name, name2) }
-                    // Comparing the orders
-                    order1 - order2
+        val sortedIds = getPromotionLevelListForBranch(branch.id)
+                .sortedBy { pl ->
+                    val name: String = pl.name
+                    predefinedPromotionLevels.indexOfFirst { pred -> pred.name == name }
                 }
                 .map { it.id() }
-                .toList()
         reorderPromotionLevels(branch.id, Reordering(sortedIds))
 
         // Image?
