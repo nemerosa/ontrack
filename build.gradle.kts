@@ -229,18 +229,18 @@ configure(coreProjects) p@{
     }
 
     dependencies {
-        "compile"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-        "compile"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+        "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+        "implementation"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
         // Lombok
         "compileOnly"("org.projectlombok:lombok:1.18.10")
         "annotationProcessor"("org.projectlombok:lombok:1.18.10")
         "testCompileOnly"("org.projectlombok:lombok:1.18.10")
         "testAnnotationProcessor"("org.projectlombok:lombok:1.18.10")
         // Testing
-        "testCompile"("junit:junit")
-        "testCompile"("org.mockito:mockito-core")
-        "testCompile"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-        "testCompile"("org.jetbrains.kotlin:kotlin-test")
+        "testImplementation"("junit:junit")
+        "testImplementation"("org.mockito:mockito-core")
+        "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+        "testImplementation"("org.jetbrains.kotlin:kotlin-test")
     }
 
     tasks.withType<KotlinCompile> {

@@ -1,3 +1,7 @@
+plugins {
+    `java-library`
+}
+
 dependencies {
-    compile(project(":ontrack-model"))
+    api(project(":ontrack-model"))
 }

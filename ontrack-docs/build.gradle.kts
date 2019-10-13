@@ -3,18 +3,20 @@ import org.asciidoctor.gradle.jvm.AsciidoctorTask
 
 plugins {
     groovy
+    `java-library`
     id("org.asciidoctor.jvm.convert") version "2.3.0"
     id("org.asciidoctor.jvm.pdf") version "2.3.0"
 }
 
 dependencies {
-    compile(project(":ontrack-dsl"))
-    compile(project(":ontrack-json"))
-    compile("commons-io:commons-io")
-    compile("org.codehaus.groovy:groovy")
-    compile("org.codehaus.groovy:groovy-groovydoc")
+    implementation(project(":ontrack-dsl"))
+    implementation(project(":ontrack-json"))
+    implementation("commons-io:commons-io")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.codehaus.groovy:groovy")
+    implementation("org.codehaus.groovy:groovy-groovydoc")
 
-    runtime("org.fusesource.jansi:jansi:1.18")
+    runtimeOnly("org.fusesource.jansi:jansi:1.18")
 }
 
 if (project.hasProperty("documentation")) {
