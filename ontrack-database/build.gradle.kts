@@ -1,6 +1,11 @@
+plugins {
+    `java-library`
+}
+
 dependencies {
-    compile("org.springframework:spring-context")
-    compile("org.springframework:spring-jdbc")
-    compile("org.flywaydb:flyway-core")
-    compile(project(":ontrack-model"))
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-jdbc")
+    implementation("org.flywaydb:flyway-core")
+    implementation(project(":ontrack-model"))
+    implementation("org.slf4j:slf4j-api")
 }

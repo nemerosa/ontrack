@@ -1,10 +1,14 @@
 plugins {
     groovy
+    `java-library`
 }
 
 dependencies {
-    compile(project(":ontrack-extension-support"))
-    compile("org.codehaus.groovy:groovy")
+    api(project(":ontrack-extension-support"))
+
+    implementation("org.codehaus.groovy:groovy")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("com.google.guava:guava")
 }
 
 val testJar by tasks.registering(Jar::class) {

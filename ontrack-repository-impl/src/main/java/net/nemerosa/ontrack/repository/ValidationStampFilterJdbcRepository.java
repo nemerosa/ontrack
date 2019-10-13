@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.ImmutableList;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNotFoundException;
@@ -224,7 +223,7 @@ public class ValidationStampFilterJdbcRepository extends AbstractJdbcRepository 
                 for (JsonNode node : json) {
                     values.add(node.asText());
                 }
-                return ImmutableList.copyOf(values);
+                return values;
             } else {
                 return Collections.emptyList();
             }

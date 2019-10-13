@@ -16,6 +16,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")
+    implementation("com.google.guava:guava:27.0.1-jre")
     implementation("org.codehaus.groovy:groovy")
     implementation("org.kohsuke:groovy-sandbox")
     implementation("org.jgrapht:jgrapht-core")

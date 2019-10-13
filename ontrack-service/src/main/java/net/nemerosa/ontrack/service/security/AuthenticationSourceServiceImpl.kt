@@ -1,35 +1,20 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import com.google.common.collect.Maps;
-import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceProviderNotFoundException;
-import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
-import net.nemerosa.ontrack.model.security.AuthenticationSourceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceProviderNotFoundException
+import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider
+import net.nemerosa.ontrack.model.security.AuthenticationSourceService
+import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
-public class AuthenticationSourceServiceImpl implements AuthenticationSourceService {
+class AuthenticationSourceServiceImpl(providers: Collection<AuthenticationSourceProvider>) : AuthenticationSourceService {
 
-    private final Map<String, ? extends AuthenticationSourceProvider> providers;
-
-    @Autowired
-    public AuthenticationSourceServiceImpl(Collection<? extends AuthenticationSourceProvider> providers) {
-        this.providers = Maps.uniqueIndex(
-                providers,
-                p -> p.getSource().getId()
-        );
+    private val providers: Map<String, AuthenticationSourceProvider> = providers.associateBy {
+        it.source.id
     }
 
-    @Override
-    public AuthenticationSourceProvider getAuthenticationSourceProvider(String mode)
-            throws AuthenticationSourceProviderNotFoundException {
-        return Optional.ofNullable(providers.get(mode)).orElseThrow(
-                () -> new AuthenticationSourceProviderNotFoundException(mode)
-        );
+    override fun getAuthenticationSourceProvider(mode: String): AuthenticationSourceProvider {
+        return Optional.ofNullable(providers[mode]).orElseThrow { AuthenticationSourceProviderNotFoundException(mode) }
     }
 
 }

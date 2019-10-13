@@ -1,12 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.model;
 
-import com.google.common.collect.Lists;
 import lombok.Data;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -42,6 +38,6 @@ public class SCMFileChangeFilters {
                         ))
         );
         action.accept(store);
-        return new SCMFileChangeFilters(Lists.newArrayList(store.values()));
+        return new SCMFileChangeFilters(new ArrayList<>(store.values()));
     }
 }

@@ -2,17 +2,13 @@ package net.nemerosa.ontrack.extension.api.model
 
 import net.nemerosa.ontrack.model.structure.ID
 
-open class BuildDiffRequest {
+open class BuildDiffRequest
+@JvmOverloads
+constructor(
+        var from: ID? = null,
+        var to: ID? = null
+) {
 
-    /**
-     * Build ID
-     */
-    var from: ID? = null
-
-    /**
-     * Build ID
-     */
-    var to: ID? = null
 
     fun withFrom(value: ID?) = apply { from = value }
     fun withTo(value: ID?) = apply { to = value }

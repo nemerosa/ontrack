@@ -2,16 +2,17 @@ import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
 
 plugins {
     groovy
+    `java-library`
 }
 
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    compile(project(":ontrack-extension-support"))
-    compile(project(":ontrack-extension-issues"))
+    api(project(":ontrack-extension-issues"))
+    implementation("org.apache.commons:commons-lang3")
 
-    testCompile("org.codehaus.groovy:groovy")
-    testCompile(project(":ontrack-it-utils"))
-    testRuntime(project(":ontrack-service"))
-    testRuntime(project(":ontrack-repository-impl"))
+    testImplementation("org.codehaus.groovy:groovy")
+    testImplementation(project(":ontrack-it-utils"))
+    testRuntimeOnly(project(":ontrack-service"))
+    testRuntimeOnly(project(":ontrack-repository-impl"))
 }

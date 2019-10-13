@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.jira;
 
-import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
@@ -77,7 +76,7 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
                     followLinks(
                             (JIRAConfiguration) issueServiceConfiguration,
                             (JIRAIssue) issue,
-                            Sets.newHashSet(property.getLinkNames()),
+                            new HashSet<>(property.getLinkNames()),
                             issues
                     );
                     return issues.values();
