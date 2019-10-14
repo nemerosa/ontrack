@@ -116,7 +116,6 @@ class SonarQubeMeasuresCollectionServiceImpl(
         val metricTags = mapOf(
                 "project" to build.project.name,
                 "branch" to build.branch.name,
-                "build" to build.name,
                 "uri" to property.configuration.url
         )
         val measures: Map<String, Double?>? = meterRegistry.measure(

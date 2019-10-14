@@ -109,7 +109,6 @@ All metrics linked to the collection of the measures are associated with the fol
 
 * `project` - name of the build's project
 * `branch` - name of the build's branch
-* `build` - name of the build for which measures are collected
 * `uri` - SonarQube URL
 
 Following metrics are collected:
@@ -128,7 +127,6 @@ This metric is associated with following tags:
 
 * `project` - name of the build's project
 * `branch` - name of the build's branch
-* `build` - name of the build for which measures are collected
 * `uri` - SonarQube URL
 * `measure` - name of the measure
 
