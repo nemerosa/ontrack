@@ -16,11 +16,11 @@ val springBootVersion: String by project
 val kotlinVersion: String by project
 
 dependencies {
-    compile(gradleApi())
-    compile("gradle.plugin.com.liferay:gradle-plugins-node:4.3.3")
-    compile("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    compile("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-    compile("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+    implementation(gradleApi())
+    implementation("gradle.plugin.com.liferay:gradle-plugins-node:4.3.3")
+    implementation("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
 }
 
 tasks.named<ProcessResources>("processResources") {
