@@ -1,14 +1,10 @@
-package net.nemerosa.ontrack.extension.issues.export;
-
-import lombok.Data;
+package net.nemerosa.ontrack.extension.issues.export
 
 /**
  * List of issues, exported as text for a given format.
  */
-@Data
-public class ExportedIssues {
+class ExportedIssues(
+        val format: String,
+        val content: String
+)
 
-    private final String format;
-    private final String content;
-
-}

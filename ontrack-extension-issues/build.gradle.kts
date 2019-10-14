@@ -9,6 +9,7 @@ dependencies {
     implementation("org.codehaus.groovy:groovy")
     implementation("org.apache.commons:commons-lang3")
     implementation("com.google.guava:guava")
+    implementation("org.slf4j:slf4j-api")
 }
 
 val testJar by tasks.registering(Jar::class) {
