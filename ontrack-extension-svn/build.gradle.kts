@@ -16,6 +16,7 @@ dependencies {
     implementation("org.tmatesoft.svnkit:svnkit:1.8.12")
     implementation("org.apache.commons:commons-lang3")
     implementation("commons-io:commons-io")
+    implementation("com.google.guava:guava")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
