@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetcher
+import graphql.schema.DataFetchingEnvironment
+import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
@@ -10,7 +12,9 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
@@ -24,11 +28,14 @@ class GQLTypeProject(
         private val projectLabelManagementService: ProjectLabelManagementService,
         creation: GQLTypeCreation,
         private val branch: GQLTypeBranch,
+        private val validationRun: GQLTypeValidationRun,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val label: GQLTypeLabel,
         private val branchFavouriteService: BranchFavouriteService,
-        private val branchModelMatcherService: BranchModelMatcherService
+        private val branchModelMatcherService: BranchModelMatcherService,
+        private val paginatedListFactory: GQLPaginatedListFactory,
+        private val validationRunSearchService: ValidationRunSearchService
 ) : AbstractGQLProjectEntity<Project>(
         Project::class.java,
         ProjectEntityType.PROJECT,
@@ -81,13 +88,58 @@ class GQLTypeProject(
                                 projectLabelManagementService.getLabelsForProject(project)
                             }
                 }
+                // Search on validation runs
+                .field(
+                        paginatedListFactory.createPaginatedField(
+                                cache = cache,
+                                fieldName = "validationRuns",
+                                fieldDescription = "Searching for validation runs in the project",
+                                itemType = validationRun,
+                                itemPaginatedListProvider = { environment, project: Project, offset, size ->
+                                    findValidationsRuns(environment, project, offset, size)
+                                },
+                                arguments = listOf(
+                                        GraphQLArgument.newArgument()
+                                                .name("branch")
+                                                .description("Branch where to look for validation runs (regular expression, defaults to all)")
+                                                .type(GraphQLString)
+                                                .build(),
+                                        GraphQLArgument.newArgument()
+                                                .name("validationStamp")
+                                                .description("Validation stamp where to look for validation runs (regular expression, defaults to all)")
+                                                .type(GraphQLString)
+                                                .build(),
+                                        GraphQLArgument.newArgument()
+                                                .name("statuses")
+                                                .description("Validation status to look for (regular expression, defaults to all)")
+                                                .type(GraphQLString)
+                                                .build()
+                                )
+                        )
+                )
                 // OK
                 .build()
 
     }
 
-    private fun projectBranchesFetcher(): DataFetcher<*> {
-        return DataFetcher<List<Branch>> { environment ->
+    private fun findValidationsRuns(
+            environment: DataFetchingEnvironment,
+            project: Project,
+            offset: Int,
+            size: Int
+    ): PaginatedList<ValidationRun> {
+        val request = ValidationRunSearchRequest(
+                branch = environment.getArgument("branch"),
+                validationStamp = environment.getArgument("validationStamp"),
+                statuses = environment.getArgument("statuses"),
+                offset = offset,
+                size = size
+        )
+        return validationRunSearchService.searchProjectValidationRuns(project, request)
+    }
+
+    private fun projectBranchesFetcher(): DataFetcher<List<Branch>> {
+        return DataFetcher { environment ->
             val source = environment.getSource<Any>()
             if (source is Project) {
                 val name: String? = environment.getArgument<String>("name")

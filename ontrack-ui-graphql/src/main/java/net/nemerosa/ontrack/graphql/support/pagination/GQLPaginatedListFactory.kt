@@ -50,7 +50,7 @@ class GQLPaginatedListFactory(
                     itemType,
                     arguments
             ).dataFetcher { environment ->
-                val source: P = environment.getSource<P>()
+                val source: P = environment.getSource()
                 val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
                 val size = environment.getArgument<Int>(ARG_SIZE) ?: PageRequest.DEFAULT_PAGE_SIZE
                 itemPaginatedListProvider(
@@ -83,7 +83,7 @@ class GQLPaginatedListFactory(
             createBasePaginatedListField(
                     cache, fieldName, fieldDescription, itemType, arguments
             ).dataFetcher { environment ->
-                val source: P = environment.getSource<P>()
+                val source: P = environment.getSource()
                 val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
                 val size = environment.getArgument<Int>(ARG_SIZE) ?: PageRequest.DEFAULT_PAGE_SIZE
                 val total = itemListCounter(environment, source)
@@ -137,22 +137,21 @@ class GQLPaginatedListFactory(
     ): GraphQLObjectType {
         val paginatedListTypeName = "${itemType.typeName}Paginated"
         return cache.getOrCreate(
-                paginatedListTypeName,
-                {
-                    GraphQLObjectType.newObject()
-                            .name(paginatedListTypeName)
-                            .field {
-                                it.name("pageInfo")
-                                        .description("Information about the current page")
-                                        .type(pageInfo.typeRef)
-                            }
-                            .field {
-                                it.name("pageItems")
-                                        .description("Items in the current page")
-                                        .type(stdList(itemType.typeRef))
-                            }
-                            .build()
-                }
-        )
+                paginatedListTypeName
+        ) {
+            GraphQLObjectType.newObject()
+                    .name(paginatedListTypeName)
+                    .field {
+                        it.name("pageInfo")
+                                .description("Information about the current page")
+                                .type(pageInfo.typeRef)
+                    }
+                    .field {
+                        it.name("pageItems")
+                                .description("Items in the current page")
+                                .type(stdList(itemType.typeRef))
+                    }
+                    .build()
+        }
     }
 }
