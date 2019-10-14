@@ -54,13 +54,6 @@ public class IssueChangeLogExportRequestTest {
     }
 
     @Test
-    public void getExcludedTypes_null() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setExclude(null);
-        assertTrue(request.getExcludedTypes().isEmpty());
-    }
-
-    @Test
     public void getExcludedTypes_empty() {
         IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
         request.setExclude("");
