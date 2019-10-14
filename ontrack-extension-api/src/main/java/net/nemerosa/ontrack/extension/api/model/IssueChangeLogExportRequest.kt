@@ -108,4 +108,9 @@ class IssueChangeLogExportRequest : BuildDiffRequest() {
         } else {
             split(this.exclude, ",").map { it.trim() }.toSet()
         }
+
+    override fun toString(): String {
+        return "IssueChangeLogExportRequest(format='$format', grouping='$grouping', exclude='$exclude', altGroup='$altGroup')"
+    }
+
 }
