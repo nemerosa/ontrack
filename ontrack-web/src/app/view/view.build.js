@@ -323,11 +323,12 @@ angular.module('ot.view.build', [
                         });
                         // Change log since previous?
                         if ($scope.build.links._changeLogPage) {
+                            let link = `${$scope.build.links._changeLogPage}?from=${previousBuild.id}&to=${$scope.build.id}`;
                             view.commands.splice(0, 0, {
                                 id: 'changeLogSincePreviousBuild',
                                 name: "Change log",
                                 cls: 'ot-command-changelog',
-                                absoluteLink: $scope.build.links._changeLogPage + '?from=' + previousBuild.id + '&to=' + build.id,
+                                absoluteLink: link,
                                 title: "Change log since " + previousBuild.name
                             });
                         }
