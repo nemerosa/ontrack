@@ -3,6 +3,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     groovy
+    `java-library`
 }
 
 apply(plugin = "org.springframework.boot")
@@ -45,7 +46,7 @@ val bootJar = tasks.getByName<BootJar>("bootJar") {
         from(sourceSets["test"].output)
         into("classes")
     }
-    classpath(configurations.named("testRuntime"))
+    classpath(configurations.named("testRuntimeClasspath"))
     mainClassName = "net.nemerosa.ontrack.acceptance.boot.Start"
 }
 
