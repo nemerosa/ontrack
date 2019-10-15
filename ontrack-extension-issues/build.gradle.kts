@@ -5,8 +5,8 @@ plugins {
 
 dependencies {
     api(project(":ontrack-extension-support"))
-
-    implementation("org.codehaus.groovy:groovy")
+    api("org.codehaus.groovy:groovy")
+    
     implementation("org.apache.commons:commons-lang3")
     implementation("com.google.guava:guava")
     implementation("org.slf4j:slf4j-api")
