@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.events.EventFactory;
@@ -25,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -41,7 +40,10 @@ public class PropertyServiceImpl implements PropertyService {
     private final SecurityService securityService;
     private final ExtensionManager extensionManager;
 
-    private final Cache<String, PropertyType<?>> cache = CacheBuilder.newBuilder().build();
+    /**
+     * The number of available property types is fairly limited so a static cache is enough.
+     */
+    private final ConcurrentMap<String, PropertyType<?>> cache = new ConcurrentHashMap<>();
 
     @Autowired
     public PropertyServiceImpl(EventPostService eventPostService, EventFactory eventFactory, PropertyRepository propertyRepository, SecurityService securityService, ExtensionManager extensionManager) {
@@ -62,21 +64,18 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public <T> PropertyType<T> getPropertyTypeByName(String propertyTypeName) {
-        try {
-            @SuppressWarnings("unchecked")
-            PropertyType<T> type = (PropertyType<T>) cache.get(propertyTypeName, () -> getPropertyTypes().stream()
-                    .filter(p -> StringUtils.equals(propertyTypeName, p.getClass().getName()))
-                    .findFirst()
-                    .orElse(null));
-            if (type != null) {
-                return type;
-            } else {
-                throw new PropertyTypeNotFoundException(propertyTypeName);
-            }
-        } catch (ExecutionException ex) {
-            PropertyTypeNotFoundException pex = new PropertyTypeNotFoundException(propertyTypeName);
-            pex.initCause(ex);
-            throw pex;
+        @SuppressWarnings("unchecked")
+        PropertyType<T> type = (PropertyType<T>) cache.computeIfAbsent(
+                propertyTypeName,
+                (ignored) -> getPropertyTypes().stream()
+                        .filter(p -> StringUtils.equals(propertyTypeName, p.getClass().getName()))
+                        .findFirst()
+                        .orElse(null)
+        );
+        if (type != null) {
+            return type;
+        } else {
+            throw new PropertyTypeNotFoundException(propertyTypeName);
         }
     }
 
