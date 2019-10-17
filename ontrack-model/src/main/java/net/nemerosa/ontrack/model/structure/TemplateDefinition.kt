@@ -1,47 +1,52 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.structure
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Maps;
-import lombok.Data;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Text;
-import net.nemerosa.ontrack.model.form.YesNo;
-
-import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.form.YesNo
+import java.util.*
 
 /**
  * Describes the definition of a branch template.
+ *
+ * @property parameters List of template parameters for this definition.
+ * @property synchronisationSourceConfig Source of branch names
+ * @property absencePolicy Policy to apply when a branch is configured but no longer available.
+ * @property interval Synchronisation interval (in minutes). 0 means that synchronisation must be performed manually.
  */
-@Data
-public class TemplateDefinition {
+class TemplateDefinition(
+        val parameters: List<TemplateParameter>,
+        val synchronisationSourceConfig: ServiceConfiguration,
+        val absencePolicy: TemplateSynchronisationAbsencePolicy,
+        val interval: Int
+) {
 
-    /**
-     * List of template parameters for this definition.
-     */
-    private final List<TemplateParameter> parameters;
-
-    /**
-     * Source of branch names
-     *
-     * @see TemplateSynchronisationSource#getId()
-     */
-    @NotNull
-    private final ServiceConfiguration synchronisationSourceConfig;
-
-    /**
-     * Policy to apply when a branch is configured but no longer available.
-     */
-    @NotNull
-    private final TemplateSynchronisationAbsencePolicy absencePolicy;
-
-    /**
-     * Synchronisation interval (in minutes). 0 means that synchronisation must be performed manually.
-     */
-    private final int interval;
+    // Parameters only if at least one is available
+    // Auto expression
+    // Template parameters
+    // OK
+    val form: Form
+        @JsonIgnore
+        get() {
+            var form = Form.create()
+            if (parameters.isNotEmpty()) {
+                form = form.with(
+                        YesNo.of("manual")
+                                .label("Manual")
+                                .help("Do not use automatic expansion of parameters using the branch name.")
+                                .value(false)
+                )
+                for ((name, description) in parameters) {
+                    form = form.with(
+                            Text.of(name)
+                                    .label(name)
+                                    .visibleIf("manual")
+                                    .help(description)
+                    )
+                }
+            }
+            return form
+        }
 
     /**
      * Gets the execution context for the creation of a template instance.
@@ -50,24 +55,22 @@ public class TemplateDefinition {
      * @param expressionEngine Expression engine to use
      * @return Transformed string
      */
-    public TemplateInstanceExecution templateInstanceExecution(String sourceName, ExpressionEngine expressionEngine) {
+    fun templateInstanceExecution(sourceName: String, expressionEngine: ExpressionEngine): TemplateInstanceExecution {
         // Transforms each parameter in a name/value pair, using only the source name as input
-        Map<String, String> sourceNameInput = Collections.singletonMap("sourceName", sourceName);
-        Map<String, String> parameterMap = Maps.transformValues(
-                Maps.uniqueIndex(
-                        parameters,
-                        TemplateParameter::getName
-                ),
-                parameter -> expressionEngine.render(parameter.getExpression(), sourceNameInput)
-        );
+        val sourceNameInput = Collections.singletonMap("sourceName", sourceName)
+        val parameterMap = parameters.associateBy {
+            it.name
+        }.mapValues { (_, parameter) ->
+            expressionEngine.render(parameter.expression, sourceNameInput)
+        }
         // Concatenates the maps
-        Map<String, String> inputMap = new HashMap<>(sourceNameInput);
-        inputMap.putAll(parameterMap);
+        val inputMap = sourceNameInput.toMutableMap()
+        inputMap.putAll(parameterMap)
         // Resolves the final expression
-        return new TemplateInstanceExecution(
-                value -> expressionEngine.render(value, inputMap),
+        return TemplateInstanceExecution(
+                { value -> expressionEngine.render(value, inputMap) },
                 parameterMap
-        );
+        )
     }
 
     /**
@@ -75,35 +78,9 @@ public class TemplateDefinition {
      *
      * @param expressionEngine Engine to use for the compilation
      * @throws net.nemerosa.ontrack.model.exceptions.ExpressionCompilationException In case of compilation problem
-     * @see net.nemerosa.ontrack.model.structure.ExpressionEngine#render(String, java.util.Map)
+     * @see net.nemerosa.ontrack.model.structure.ExpressionEngine.render
      */
-    public void checkCompilation(ExpressionEngine expressionEngine) {
-        templateInstanceExecution("x", expressionEngine);
-    }
-
-    @JsonIgnore
-    public Form getForm() {
-        Form form = Form.create();
-        // Parameters only if at least one is available
-        if (!parameters.isEmpty()) {
-            // Auto expression
-            form = form.with(
-                    YesNo.of("manual")
-                            .label("Manual")
-                            .help("Do not use automatic expansion of parameters using the branch name.")
-                            .value(false)
-            );
-            // Template parameters
-            for (TemplateParameter parameter : parameters) {
-                form = form.with(
-                        Text.of(parameter.getName())
-                                .label(parameter.getName())
-                                .visibleIf("manual")
-                                .help(parameter.getDescription())
-                );
-            }
-        }
-        // OK
-        return form;
+    fun checkCompilation(expressionEngine: ExpressionEngine) {
+        templateInstanceExecution("x", expressionEngine)
     }
 }

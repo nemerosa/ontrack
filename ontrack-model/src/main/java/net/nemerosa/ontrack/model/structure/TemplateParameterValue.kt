@@ -1,20 +1,16 @@
-package net.nemerosa.ontrack.model.structure;
-
-import lombok.Data;
+package net.nemerosa.ontrack.model.structure
 
 /**
  * Value for a template parameter.
  */
-@Data
-public class TemplateParameterValue {
+class TemplateParameterValue(
+        /**
+         * Name of the parameter.
+         */
+        val name: String,
+        /**
+         * Value of the parameter.
+         */
+        val value: String
 
-    /**
-     * Name of the parameter.
-     */
-    private final String name;
-    /**
-     * Value of the parameter.
-     */
-    private final String value;
-
-}
+)
