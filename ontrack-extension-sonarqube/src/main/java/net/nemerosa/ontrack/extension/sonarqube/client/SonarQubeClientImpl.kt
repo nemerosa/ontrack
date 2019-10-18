@@ -16,13 +16,14 @@ class SonarQubeClientImpl(
     override val systemHealth: String
         get() = restTemplate.getForObject("/api/system/health", SystemHealth::class.java).health
 
-    override fun getMeasuresForVersion(key: String, version: String, metrics: List<String>): Map<String, Double?>? {
+    override fun getMeasuresForVersion(key: String, branch: String, version: String, metrics: List<String>): Map<String, Double?>? {
 
         val analysis: Analysis? = paginateUntil(
                 ProjectAnalysisSearch::class.java,
                 uri = { page ->
-                    "/api/project_analyses/search?project={project}&category=VERSION&p={page}" to mapOf(
+                    "/api/project_analyses/search?project={project}&branch={branch}&category=VERSION&p={page}" to mapOf(
                             "project" to key,
+                            "branch" to branch,
                             "page" to page
                     )
                 },
