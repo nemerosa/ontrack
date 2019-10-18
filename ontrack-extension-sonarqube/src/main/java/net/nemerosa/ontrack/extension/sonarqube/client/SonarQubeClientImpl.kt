@@ -40,10 +40,11 @@ class SonarQubeClientImpl(
             val timestamp = analysis.date
             // History measures
             val measures: MeasureSearchHistory = restTemplate.getForObject(
-                    "/api/measures/search_history?component={component}&metrics={metrics}&from={timestamp}&to={timestamp}",
+                    "/api/measures/search_history?component={component}&branch={branch}&metrics={metrics}&from={timestamp}&to={timestamp}",
                     MeasureSearchHistory::class.java,
                     mapOf(
                             "component" to key,
+                            "branch" to branch,
                             "metrics" to metrics.joinToString(","),
                             "timestamp" to timestamp
                     )
