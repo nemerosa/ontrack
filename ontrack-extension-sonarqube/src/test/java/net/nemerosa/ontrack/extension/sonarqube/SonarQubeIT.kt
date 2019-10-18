@@ -759,7 +759,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
         )).then { invocation ->
             // List of desired measures
             @Suppress("UNCHECKED_CAST")
-            val measureList: List<String> = invocation.arguments[2] as List<String>
+            val measureList: List<String> = invocation.arguments[3] as List<String>
             // Map of measures
             val index = measures.toMap()
             // Results
