@@ -8,7 +8,6 @@ dependencies {
     api(project(":ontrack-common"))
 
     implementation(project(":ontrack-job"))
-    implementation("com.google.guava:guava")
     implementation("org.apache.commons:commons-text")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.security:spring-security-core")
