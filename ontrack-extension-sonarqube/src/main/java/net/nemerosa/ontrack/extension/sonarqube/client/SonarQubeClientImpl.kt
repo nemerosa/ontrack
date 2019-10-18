@@ -3,8 +3,9 @@ package net.nemerosa.ontrack.extension.sonarqube.client
 import net.nemerosa.ontrack.extension.sonarqube.client.model.*
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
-import java.net.URLEncoder
 
 class SonarQubeClientImpl(
         configuration: SonarQubeConfiguration
@@ -83,9 +84,17 @@ class SonarQubeClientImpl(
             // URI to call
             val url = uri(page++)
             // Getting the page
-            val pageResult: R = restTemplate.getForObject(url.first, resultType, url.second)
+            val pageResult: R? = try {
+                restTemplate.getForObject(url.first, resultType, url.second)
+            } catch (ex: HttpClientErrorException) {
+                if (ex.statusCode == HttpStatus.NOT_FOUND) {
+                    null
+                } else {
+                    throw ex
+                }
+            }
             // Empty results?
-            if (pageResult.isEmpty) {
+            if (pageResult == null || pageResult.isEmpty) {
                 return null
             }
             // Gets a result in there
@@ -94,8 +103,5 @@ class SonarQubeClientImpl(
         // Result
         return result
     }
-
-    private fun String.encode() = URLEncoder.encode(this, "UTF-8")
-
 
 }
