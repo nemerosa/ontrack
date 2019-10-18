@@ -14,7 +14,7 @@ import java.util.*
  * @property absencePolicy Policy to apply when a branch is configured but no longer available.
  * @property interval Synchronisation interval (in minutes). 0 means that synchronisation must be performed manually.
  */
-class TemplateDefinition(
+data class TemplateDefinition(
         val parameters: List<TemplateParameter>,
         val synchronisationSourceConfig: ServiceConfiguration,
         val absencePolicy: TemplateSynchronisationAbsencePolicy,

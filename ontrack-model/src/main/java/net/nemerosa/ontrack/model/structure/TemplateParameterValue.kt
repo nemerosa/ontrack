@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.model.structure
 /**
  * Value for a template parameter.
  */
-class TemplateParameterValue(
+data class TemplateParameterValue(
         /**
          * Name of the parameter.
          */
