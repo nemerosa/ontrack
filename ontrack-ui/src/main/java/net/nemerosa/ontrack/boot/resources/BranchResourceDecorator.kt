@@ -1,16 +1,13 @@
 package net.nemerosa.ontrack.boot.resources
 
-import com.google.common.collect.Iterables
 import net.nemerosa.ontrack.boot.ui.*
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.resource.*
+import net.nemerosa.ontrack.ui.resource.LinkDefinitions.link
+import net.nemerosa.ontrack.ui.resource.LinkDefinitions.page
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-
-import java.util.Arrays
-
-import net.nemerosa.ontrack.ui.resource.LinkDefinitions.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
