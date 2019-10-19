@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.model.support
 
-import com.google.common.collect.ImmutableList
 import org.junit.Test
 
 class PageTest {
 
-    private final List<String> list = ImmutableList.of(
+    private final List<String> list = [
             "Zero",
             "One",
             "Two",
@@ -14,7 +13,7 @@ class PageTest {
             "Five",
             "Six",
             "Seven",
-    )
+    ]
 
     @Test
     void 'Sub list from 0'() {
