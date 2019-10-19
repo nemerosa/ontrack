@@ -1,22 +1,26 @@
-package net.nemerosa.ontrack.ui.resource;
+package net.nemerosa.ontrack.ui.resource
 
-import lombok.Data;
+import java.util.function.BiFunction
+import java.util.function.BiPredicate
 
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
+class SimpleLinkDefinition<T>(
+        override val name: String,
+        val linkFn: (T, ResourceContext) -> Any,
+        override val checkFn: (T, ResourceContext) -> Boolean
+) : LinkDefinition<T> {
 
-@Data
-public class SimpleLinkDefinition<T> implements LinkDefinition<T> {
-    private final String name;
-    private final BiFunction<T, ResourceContext, Object> linkFn;
-    private final BiPredicate<T, ResourceContext> checkFn;
+    @Deprecated("Use Kotlin functions")
+    constructor(name: String, linkFn: BiFunction<T, ResourceContext, Any>, checkFn: BiPredicate<T, ResourceContext>) : this(
+            name,
+            linkFn::apply,
+            checkFn::test
+    )
 
-    @Override
-    public LinksBuilder addLink(LinksBuilder linksBuilder, T resource, ResourceContext resourceContext) {
+    override fun addLink(linksBuilder: LinksBuilder, resource: T, resourceContext: ResourceContext): LinksBuilder {
         return linksBuilder.link(
                 name,
-                linkFn.apply(resource, resourceContext)
-        );
+                linkFn(resource, resourceContext)
+        )
     }
 
 }

@@ -1,30 +1,28 @@
-package net.nemerosa.ontrack.ui.resource;
+package net.nemerosa.ontrack.ui.resource
 
-import lombok.Data;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+import java.util.function.BiFunction
+import java.util.function.BiPredicate
 
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
+class PagePathLinkDefinition<T : ProjectEntity>(
+        override val name: String,
+        val pathFn: (T, ResourceContext) -> String,
+        override val checkFn: (T, ResourceContext) -> Boolean
+) : LinkDefinition<T> {
 
-@Data
-public class PagePathLinkDefinition<T extends ProjectEntity> implements LinkDefinition<T> {
+    @Deprecated("Use Kotlin functions")
+    constructor(name: String, pathFn: BiFunction<T, ResourceContext, String>, checkFn: BiPredicate<T, ResourceContext>) : this(
+            name,
+            pathFn::apply,
+            checkFn::test
+    )
 
-    private final String name;
-    private final BiFunction<T, ResourceContext, String> pathFn;
-    private final BiPredicate<T, ResourceContext> checkFn;
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public LinksBuilder addLink(LinksBuilder linksBuilder, T resource, ResourceContext resourceContext) {
+    override fun addLink(linksBuilder: LinksBuilder, resource: T, resourceContext: ResourceContext): LinksBuilder {
         return linksBuilder.page(
                 name,
-                checkFn.test(resource, resourceContext),
-                pathFn.apply(resource, resourceContext)
-        );
+                checkFn(resource, resourceContext),
+                pathFn(resource, resourceContext)
+        )
     }
 
 }

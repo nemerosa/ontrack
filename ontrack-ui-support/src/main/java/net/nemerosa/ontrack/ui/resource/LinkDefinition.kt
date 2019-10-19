@@ -1,15 +1,11 @@
-package net.nemerosa.ontrack.ui.resource;
+package net.nemerosa.ontrack.ui.resource
 
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
+interface LinkDefinition<T> {
 
-import java.util.function.BiPredicate;
+    val name: String
 
-public interface LinkDefinition<T> {
+    val checkFn: (T, ResourceContext) -> Boolean
 
-    String getName();
-
-    BiPredicate<T, ResourceContext> getCheckFn();
-
-    LinksBuilder addLink(LinksBuilder linksBuilder, T resource, ResourceContext resourceContext);
+    fun addLink(linksBuilder: LinksBuilder, resource: T, resourceContext: ResourceContext): LinksBuilder
 
 }
