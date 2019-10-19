@@ -16,7 +16,7 @@ import java.util.*
  */
 data class TemplateDefinition(
         val parameters: List<TemplateParameter>,
-        val synchronisationSourceConfig: ServiceConfiguration,
+        val synchronisationSourceConfig: ServiceConfiguration?,
         val absencePolicy: TemplateSynchronisationAbsencePolicy,
         val interval: Int
 ) {
