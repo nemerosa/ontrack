@@ -1,132 +1,113 @@
-package net.nemerosa.ontrack.boot.resources;
+package net.nemerosa.ontrack.boot.resources
 
-import com.google.common.collect.Iterables;
-import net.nemerosa.ontrack.boot.ui.*;
-import net.nemerosa.ontrack.model.labels.LabelManagement;
-import net.nemerosa.ontrack.model.labels.LabelTokenForm;
-import net.nemerosa.ontrack.model.labels.ProjectLabelManagement;
-import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.ProjectFavouriteService;
-import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.LinkDefinition;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributorService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-
-import static net.nemerosa.ontrack.ui.resource.LinkDefinitions.*;
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import net.nemerosa.ontrack.boot.ui.*
+import net.nemerosa.ontrack.model.labels.LabelManagement
+import net.nemerosa.ontrack.model.labels.LabelTokenForm
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
+import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.ProjectFavouriteService
+import net.nemerosa.ontrack.ui.resource.*
+import net.nemerosa.ontrack.ui.resource.LinkDefinitions.link
+import net.nemerosa.ontrack.ui.resource.LinkDefinitions.page
+import org.springframework.stereotype.Component
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
-public class ProjectResourceDecorator extends AbstractLinkResourceDecorator<Project> {
+class ProjectResourceDecorator(
+        private val resourceDecorationContributorService: ResourceDecorationContributorService,
+        private val projectFavouriteService: ProjectFavouriteService
+) : AbstractLinkResourceDecorator<Project>(Project::class.java) {
 
-    private final ResourceDecorationContributorService resourceDecorationContributorService;
-    private final ProjectFavouriteService projectFavouriteService;
-
-    @Autowired
-    public ProjectResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService, ProjectFavouriteService projectFavouriteService) {
-        super(Project.class);
-        this.resourceDecorationContributorService = resourceDecorationContributorService;
-        this.projectFavouriteService = projectFavouriteService;
-    }
-
-    protected Iterable<LinkDefinition<Project>> getLinkDefinitions() {
-        return Iterables.concat(
-                Arrays.asList(
-                        link(Link.SELF, project -> on(ProjectController.class).getProject(project.getId())),
-                        // List of branches for this project
-                        link("_branches", project -> on(BranchController.class).getBranchListForProject(project.getId())),
-                        // Creates a branch for this project
-                        link(
-                                "_createBranch",
-                                project -> on(BranchController.class).newBranchForm(project.getId()),
-                                withProjectFn(BranchCreate.class)
-                        ),
-                        // List of branches and their views
-                        link("_branchStatusViews", project -> on(ProjectController.class).getBranchStatusViews(project.getId())),
-                        // Build search
-                        link("_buildSearch", project -> on(BuildController.class).buildSearchForm(project.getId())),
-                        // Build diff actions
-                        link("_buildDiffActions", project -> on(BuildController.class).buildDiffActions(project.getId())),
-                        // Actual properties for this project
-                        link("_properties", project -> on(PropertyController.class).getProperties(ProjectEntityType.PROJECT, project.getId())),
-                        // Extra information
-                        link(
-                                "_extra",
-                                project -> on(ProjectEntityExtensionController.class).getInformation(ProjectEntityType.PROJECT, project.getId())
-                        ),
-                        // Actions
-                        link("_actions", project -> on(ProjectEntityExtensionController.class).getActions(ProjectEntityType.PROJECT, project.getId())),
-                        // Updating the project
-                        link(Link.UPDATE, project -> on(ProjectController.class).saveProject(project.getId(), null), withProjectFn(ProjectEdit.class)),
-                        // Delete link
-                        link(Link.DELETE, project -> on(ProjectController.class).deleteProject(project.getId()), withProjectFn(ProjectDelete.class)),
-                        // Decorations
-                        link("_decorations", project -> on(DecorationsController.class).getDecorations(project.getProjectEntityType(), project.getId())),
-                        // Authorisation management
-                        link("_permissions", project -> on(PermissionController.class).getProjectPermissions(project.getId()), withProjectFn(ProjectAuthorisationMgt.class)),
-                        // Events
-                        link("_events", project -> on(EventController.class).getEvents(project.getProjectEntityType(), project.getId(), 0, 10)),
-                        // Clone to another project
-                        link(
-                                "_clone",
-                                project -> on(ProjectController.class).clone(project.getId()),
-                                withGlobalFn(ProjectCreation.class)
-                        ),
-                        // Enable
-                        link(
-                                "_enable",
-                                project -> on(ProjectController.class).enableProject(project.getId()),
-                                (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit.class)
-                                        && project.isDisabled()
-                        ),
-                        // Disable
-                        link(
-                                "_disable",
-                                project -> on(ProjectController.class).disableProject(project.getId()),
-                                (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit.class)
-                                        && !project.isDisabled()
-                        ),
-                        // Favourite --> 'unfavourite'
-                        link(
-                                "_unfavourite",
-                                project -> on(ProjectController.class).unfavouriteProject(project.getId()),
-                                (project, resourceContext) -> resourceContext.isLogged() && projectFavouriteService.isProjectFavourite(project)
-                        ),
-                        // Not favourite --> 'favourite'
-                        link(
-                                "_favourite",
-                                project -> on(ProjectController.class).favouriteProject(project.getId()),
-                                (project, resourceContext) -> resourceContext.isLogged() && !projectFavouriteService.isProjectFavourite(project)
-                        ),
-                        // Setting the project labels
-                        link(
-                                "_labels",
-                                project -> on(ProjectLabelController.class).getLabelsForProject(project.id()),
-                                (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement.class)
-                        ),
-                        // Creating a label from a project and a token
-                        link(
-                                "_labelFromToken",
-                                project -> on(LabelController.class).getFormForToken(new LabelTokenForm("")),
-                                (project, resourceContext) -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement.class)
-                                        && resourceContext.isGlobalFunctionGranted(LabelManagement.class)
-                        ),
-                        // Creation of a label for the project
-                        link(
-                                "_labelsCreate",
-                                project -> on(LabelController.class).getCreationForm(),
-                                (project, resourceContext) -> resourceContext.isGlobalFunctionGranted(LabelManagement.class)
-                        ),
-                        // Page
-                        page()
+    override fun getLinkDefinitions(): Iterable<LinkDefinition<Project>> {
+        return listOf(
+                link(Link.SELF) { project -> on(ProjectController::class.java).getProject(project.id) },
+                // List of branches for this project
+                link("_branches") { project -> on(BranchController::class.java).getBranchListForProject(project.id) },
+                // Creates a branch for this project
+                "_createBranch" linkTo { project: Project ->
+                    on(BranchController::class.java).newBranchForm(project.id)
+                } linkIf (BranchCreate::class),
+                // List of branches and their views
+                link("_branchStatusViews") { project -> on(ProjectController::class.java).getBranchStatusViews(project.id) },
+                // Build search
+                link("_buildSearch") { project -> on(BuildController::class.java).buildSearchForm(project.id) },
+                // Build diff actions
+                link("_buildDiffActions") { project -> on(BuildController::class.java).buildDiffActions(project.id) },
+                // Actual properties for this project
+                link("_properties") { project -> on(PropertyController::class.java).getProperties(ProjectEntityType.PROJECT, project.id) },
+                // Extra information
+                link("_extra") { project ->
+                    on(ProjectEntityExtensionController::class.java).getInformation(ProjectEntityType.PROJECT, project.id)
+                },
+                // Actions
+                link("_actions") { project -> on(ProjectEntityExtensionController::class.java).getActions(ProjectEntityType.PROJECT, project.id) },
+                // Updating the project
+                Link.UPDATE linkTo { project: Project ->
+                    on(ProjectController::class.java).saveProject(project.id, null)
+                } linkIf (ProjectEdit::class),
+                // Delete link
+                Link.DELETE linkTo { project: Project ->
+                    on(ProjectController::class.java).deleteProject(project.id)
+                } linkIf (ProjectDelete::class),
+                // Decorations
+                link("_decorations") { project -> on(DecorationsController::class.java).getDecorations(project.projectEntityType, project.id) },
+                // Authorisation management
+                "_permissions" linkTo { project: Project ->
+                    on(PermissionController::class.java).getProjectPermissions(project.id)
+                } linkIf (ProjectAuthorisationMgt::class),
+                // Events
+                link("_events") { project -> on(EventController::class.java).getEvents(project.projectEntityType, project.id, 0, 10) },
+                // Clone to another project
+                "_clone" linkTo { project: Project ->
+                    on(ProjectController::class.java).clone(project.id)
+                } linkIfGlobal (ProjectCreation::class),
+                // Enable
+                link(
+                        "_enable",
+                        { project -> on(ProjectController::class.java).enableProject(project.id) },
+                        { project, resourceContext -> resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit::class.java) && project.isDisabled }
                 ),
-                resourceDecorationContributorService.getLinkDefinitions(ProjectEntityType.PROJECT)
-        );
+                // Disable
+                link(
+                        "_disable",
+                        { project -> on(ProjectController::class.java).disableProject(project.id) },
+                        { project, resourceContext -> resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit::class.java) && !project.isDisabled }
+                ),
+                // Favourite --> 'unfavourite'
+                link(
+                        "_unfavourite",
+                        { project -> on(ProjectController::class.java).unfavouriteProject(project.id) },
+                        { project, resourceContext -> resourceContext.isLogged && projectFavouriteService.isProjectFavourite(project) }
+                ),
+                // Not favourite --> 'favourite'
+                link(
+                        "_favourite",
+                        { project -> on(ProjectController::class.java).favouriteProject(project.id) },
+                        { project, resourceContext -> resourceContext.isLogged && !projectFavouriteService.isProjectFavourite(project) }
+                ),
+                // Setting the project labels
+                link(
+                        "_labels",
+                        { project -> on(ProjectLabelController::class.java).getLabelsForProject(project.id()) },
+                        { project, resourceContext -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement::class.java) }
+                ),
+                // Creating a label from a project and a token
+                link(
+                        "_labelFromToken",
+                        { _ -> on(LabelController::class.java).getFormForToken(LabelTokenForm("")) },
+                        { project, resourceContext -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement::class.java) && resourceContext.isGlobalFunctionGranted(LabelManagement::class.java) }
+                ),
+                // Creation of a label for the project
+                link(
+                        "_labelsCreate",
+                        { _ -> on(LabelController::class.java).getCreationForm() },
+                        { _, resourceContext -> resourceContext.isGlobalFunctionGranted(LabelManagement::class.java) }
+                ),
+                // Page
+                page()
+        ) + resourceDecorationContributorService.getLinkDefinitions(ProjectEntityType.PROJECT)
     }
 
 }

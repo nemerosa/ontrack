@@ -28,8 +28,8 @@ class CoreResourceModuleTest {
     private var mapper: ResourceObjectMapper? = null
     private var securityService: SecurityService? = null
     private var structureService: StructureService? = null
-    private var projectFavouriteService: ProjectFavouriteService? = null
-    private var branchFavouriteService: BranchFavouriteService? = null
+    private lateinit var projectFavouriteService: ProjectFavouriteService
+    private lateinit var branchFavouriteService: BranchFavouriteService
 
     @Before
     fun before() {
@@ -874,7 +874,7 @@ class CoreResourceModuleTest {
     @Throws(JsonProcessingException::class)
     fun resource_collection_with_filtering() {
         val project = Project.of(NameDescription("PRJ", "Project")).withId(ID.of(1))
-        val branches = Arrays.asList(
+        val branches = listOf(
                 Branch.of(project, NameDescription("B1", "Branch 1")).withId(ID.of(1)).withSignature(SIGNATURE),
                 Branch.of(project, NameDescription("B2", "Branch 2")).withId(ID.of(2)).withSignature(SIGNATURE)
         )
