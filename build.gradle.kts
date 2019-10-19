@@ -213,7 +213,7 @@ configure(coreProjects) p@{
         }
         dependencies {
             dependency("commons-io:commons-io:2.6")
-            dependency("org.apache.commons:commons-text:1.6")
+            dependency("org.apache.commons:commons-text:1.8")
             dependency("net.jodah:failsafe:1.1.1")
             dependency("commons-logging:commons-logging:1.2")
             dependency("org.apache.commons:commons-math3:3.6.1")

@@ -20,7 +20,7 @@ public class LinkDefinitions {
 
     public static <T> LinkDefinition<T> link(String name, BiFunction<T, ResourceContext, Object> linkFn,
                                              BiPredicate<T, ResourceContext> checkFn) {
-        return new SimpleLinkDefinition<T>(
+        return new SimpleLinkDefinition<>(
                 name,
                 linkFn,
                 checkFn
@@ -91,7 +91,7 @@ public class LinkDefinitions {
     }
 
     public static <T extends ProjectEntity> LinkDefinition<T> page(String name, BiPredicate<T, ResourceContext> checkFn, BiFunction<T, ResourceContext, String> pathFn) {
-        return new PagePathLinkDefinition<T>(
+        return new PagePathLinkDefinition<>(
                 name,
                 pathFn,
                 checkFn

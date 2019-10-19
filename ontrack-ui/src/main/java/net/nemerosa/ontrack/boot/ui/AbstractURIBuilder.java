@@ -1,15 +1,9 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import com.google.common.base.CaseFormat;
-import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.apache.commons.text.CaseUtils;
 
 import java.net.URI;
 
@@ -18,7 +12,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 public abstract class AbstractURIBuilder implements URIBuilder {
 
-    protected String pagePath(String path, Object... arguments) {
+    String pagePath(String path, Object... arguments) {
         return format(
                 "/#/%s",
                 format(path, arguments)
@@ -49,7 +43,11 @@ public abstract class AbstractURIBuilder implements URIBuilder {
     }
 
     String getEntityPageName(ProjectEntityType projectEntityType) {
-        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, projectEntityType.name().toLowerCase());
+        return CaseUtils.toCamelCase(
+                projectEntityType.name().toLowerCase(),
+                false,
+                '_'
+        );
     }
 
     @Override
