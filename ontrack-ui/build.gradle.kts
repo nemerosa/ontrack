@@ -24,7 +24,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
     implementation("commons-io:commons-io")
-    implementation("com.google.guava:guava")
 
     runtimeOnly(project(":ontrack-service"))
     runtimeOnly(project(":ontrack-repository-impl"))
