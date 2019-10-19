@@ -1,19 +1,15 @@
-package net.nemerosa.ontrack.tx;
+package net.nemerosa.ontrack.tx
 
-import java.util.function.Supplier;
+interface TransactionService {
 
-public interface TransactionService {
+    fun start(): Transaction
 
-    Transaction start();
+    fun start(nested: Boolean): Transaction
 
-    Transaction start(boolean nested);
+    fun get(): Transaction
 
-    Transaction get();
-
-    default <T> T doInTransaction(Supplier<T> task) {
-        try (Transaction ignored = start()) {
-            return task.get();
-        }
+    fun <T> doInTransaction(task: () -> T): T {
+        start().use { _ -> return task() }
     }
 
 }

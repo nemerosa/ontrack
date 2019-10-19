@@ -1,7 +1,7 @@
-package net.nemerosa.ontrack.tx;
+package net.nemerosa.ontrack.tx
 
-public interface TransactionResource extends AutoCloseable {
+interface TransactionResource : AutoCloseable {
 
-	void close();
+    override fun close()
 
 }

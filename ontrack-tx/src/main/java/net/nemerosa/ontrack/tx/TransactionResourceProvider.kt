@@ -1,8 +1,8 @@
-package net.nemerosa.ontrack.tx;
+package net.nemerosa.ontrack.tx
 
 @FunctionalInterface
-public interface TransactionResourceProvider<T extends TransactionResource> {
+interface TransactionResourceProvider<T : TransactionResource> {
 
-    T createTxResource();
+    fun createTxResource(): T
 
 }

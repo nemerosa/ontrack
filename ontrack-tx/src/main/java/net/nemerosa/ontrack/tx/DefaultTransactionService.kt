@@ -1,123 +1,106 @@
-package net.nemerosa.ontrack.tx;
+package net.nemerosa.ontrack.tx
 
-import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
-import org.springframework.stereotype.Service;
-
-import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.stereotype.Service
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.atomic.AtomicInteger
 
 @Service
-public class DefaultTransactionService implements TransactionService {
+class DefaultTransactionService : TransactionService {
 
-    private final ThreadLocal<Stack<ITransaction>> transaction = new ThreadLocal<>();
+    private val transaction = ThreadLocal<Stack<ITransaction>>()
 
-    @Override
-    public Transaction start() {
-        return start(false);
+    override fun start(): Transaction {
+        return start(false)
     }
 
-    @Override
-    public Transaction start(boolean nested) {
-        Stack<ITransaction> currents = transaction.get();
+    override fun start(nested: Boolean): Transaction {
+        var currents: Stack<ITransaction>? = transaction.get()
         if (currents == null || currents.isEmpty()) {
             // Creates a new transaction
-            ITransaction current = createTransaction();
+            val current = createTransaction()
             // Registers it
-            currents = new Stack<>();
-            currents.push(current);
-            transaction.set(currents);
+            currents = Stack()
+            currents.push(current)
+            transaction.set(currents)
             // OK
-            return current;
+            return current
         } else if (nested) {
             // Creates a new transaction
-            ITransaction current = createTransaction();
+            val current = createTransaction()
             // Registers it
-            currents.push(current);
+            currents.push(current)
             // OK
-            return current;
+            return current
         } else {
             // Reuses the same transaction
-            currents.peek().reuse();
-            return currents.peek();
+            currents.peek().reuse()
+            return currents.peek()
         }
     }
 
-    @Override
-    public Transaction get() {
-        Stack<ITransaction> stack = transaction.get();
-        if (stack != null) {
-            return stack.peek();
-        } else {
-            return null;
-        }
+    override fun get(): Transaction {
+        val stack = transaction.get()
+        return stack?.peek() as Transaction
     }
 
-    protected ITransaction createTransaction() {
+    private fun createTransaction(): ITransaction {
         // Creates the transaction
-        return new TransactionImpl(tx -> {
-            Stack<ITransaction> stack = transaction.get();
-            stack.pop();
-            if (stack.isEmpty()) {
-                transaction.set(null);
+        return TransactionImpl(object : TransactionCallback {
+            override fun remove(tx: ITransaction) {
+                val stack = transaction.get()
+                stack.pop()
+                if (stack.isEmpty()) {
+                    transaction.set(null)
+                }
             }
-        });
+        })
     }
 
-    private interface ITransaction extends Transaction {
+    private interface ITransaction : Transaction {
 
-        void reuse();
+        fun reuse()
 
     }
 
     private interface TransactionCallback {
 
-        void remove(ITransaction tx);
+        fun remove(tx: ITransaction)
 
     }
 
-    private static class TransactionImpl implements ITransaction {
+    private class TransactionImpl(private val transactionCallback: TransactionCallback) : ITransaction {
+        private val count = AtomicInteger(1)
 
-        private final TransactionCallback transactionCallback;
-        private final AtomicInteger count = new AtomicInteger(1);
-        private final Table<Class<? extends TransactionResource>, Object, TransactionResource> resources = Tables
-                .newCustomTable(
-                        new ConcurrentHashMap<>(),
-                        ConcurrentHashMap::new
-                );
+        private val resources: ConcurrentMap<Pair<Class<out TransactionResource>, Any>, TransactionResource> =
+                ConcurrentHashMap()
 
-        public TransactionImpl(TransactionCallback transactionCallback) {
-            this.transactionCallback = transactionCallback;
-        }
-
-        @Override
-        public void close() {
-            int value = count.decrementAndGet();
+        override fun close() {
+            val value = count.decrementAndGet()
             if (value == 0) {
                 // Removes the transaction
-                transactionCallback.remove(this);
+                transactionCallback.remove(this)
                 // Disposal
-                for (TransactionResource resource : resources.values()) {
-                    resource.close();
+                for (resource in resources.values) {
+                    resource.close()
                 }
             }
         }
 
-        @Override
-        public synchronized <T extends TransactionResource> T getResource(Class<T> resourceType, Object resourceId, TransactionResourceProvider<T> provider) {
-            @SuppressWarnings("unchecked")
-            T resource = (T) resources.get(resourceType, resourceId);
+        @Synchronized
+        override fun <T : TransactionResource> getResource(resourceType: Class<T>, resourceId: Any, provider: TransactionResourceProvider<T>): T {
+            @Suppress("UNCHECKED_CAST")
+            var resource: T? = resources[resourceType to resourceId] as T?
             if (resource == null) {
-                resource = provider.createTxResource();
-                resources.put(resourceType, resourceId, resource);
+                resource = provider.createTxResource()
+                resources[resourceType to resource] = resource
             }
-            return resource;
+            return resource
         }
 
-        @Override
-        public void reuse() {
-            count.incrementAndGet();
+        override fun reuse() {
+            count.incrementAndGet()
         }
 
     }
