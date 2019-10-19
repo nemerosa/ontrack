@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.form
 
-class Form {
+open class Form {
 
     private val internalFields: MutableMap<String, Field> = mutableMapOf()
 
