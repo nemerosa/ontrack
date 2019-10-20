@@ -1,41 +1,23 @@
-package net.nemerosa.ontrack.extension.svn.model;
+package net.nemerosa.ontrack.extension.svn.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+class SVNHistory(
+        val references: List<SVNReference>
+) {
+    val revision: Long
+        @JsonIgnore
+        get() = references[0].revision
 
-@Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SVNHistory {
+    constructor() : this(emptyList<SVNReference>())
 
-    private final List<SVNReference> references;
+    constructor(vararg references: SVNReference) : this(listOf<SVNReference>(*references))
 
-    public SVNHistory() {
-        this(Collections.<SVNReference>emptyList());
-    }
+    fun add(reference: SVNReference): SVNHistory = SVNHistory(
+            references + reference
+    )
 
-    public SVNHistory(SVNReference... references) {
-        this(Arrays.asList(references));
-    }
-
-    public SVNHistory add(SVNReference reference) {
-        List<SVNReference> target = new ArrayList<>(references);
-        target.add(reference);
-        return new SVNHistory(target);
-    }
-
-    public SVNHistory truncateAbove(int index) {
-        return new SVNHistory(references.subList(index + 1, references.size()));
-    }
-
-    @JsonIgnore
-    public long getRevision() {
-        return references.get(0).getRevision();
+    fun truncateAbove(index: Int): SVNHistory {
+        return SVNHistory(references.subList(index + 1, references.size))
     }
 }
