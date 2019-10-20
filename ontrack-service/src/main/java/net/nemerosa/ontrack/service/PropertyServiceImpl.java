@@ -13,12 +13,12 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.PropertyRepository;
 import net.nemerosa.ontrack.repository.TProperty;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
