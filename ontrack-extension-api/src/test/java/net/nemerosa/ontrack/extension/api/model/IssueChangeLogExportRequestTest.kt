@@ -1,106 +1,102 @@
-package net.nemerosa.ontrack.extension.api.model;
+package net.nemerosa.ontrack.extension.api.model
 
-import com.google.common.collect.Sets;
-import org.junit.Test;
+import org.junit.Test
 
-import java.util.Map;
-import java.util.Set;
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class IssueChangeLogExportRequestTest {
+class IssueChangeLogExportRequestTest {
 
     @Test
-    public void empty() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        Map<String, Set<String>> spec = request.getGroupingSpecification();
-        assertTrue(spec.isEmpty());
+    fun empty() {
+        val request = IssueChangeLogExportRequest()
+        val spec = request.groupingSpecification
+        assertTrue(spec.isEmpty())
     }
 
     @Test
-    public void one_group() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setGrouping("Bugs=bug");
-        Map<String, Set<String>> spec = request.getGroupingSpecification();
-        assertEquals(1, spec.size());
-        assertEquals(Sets.newHashSet("bug"), spec.get("Bugs"));
+    fun one_group() {
+        val request = IssueChangeLogExportRequest()
+        request.grouping = "Bugs=bug"
+        val spec = request.groupingSpecification
+        assertEquals(1, spec.size.toLong())
+        assertEquals(setOf("bug"), spec["Bugs"])
     }
 
     @Test
-    public void one_group_with_several_values() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setGrouping("Features=feature,enhancement");
-        Map<String, Set<String>> spec = request.getGroupingSpecification();
-        assertEquals(1, spec.size());
-        assertEquals(Sets.newHashSet("feature", "enhancement"), spec.get("Features"));
+    fun one_group_with_several_values() {
+        val request = IssueChangeLogExportRequest()
+        request.grouping = "Features=feature,enhancement"
+        val spec = request.groupingSpecification
+        assertEquals(1, spec.size.toLong())
+        assertEquals(setOf("feature", "enhancement"), spec["Features"])
     }
 
     @Test
-    public void two_groups() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setGrouping("Bugs=bug|Features=feature,enhancement");
-        Map<String, Set<String>> spec = request.getGroupingSpecification();
-        assertEquals(2, spec.size());
-        assertEquals(Sets.newHashSet("bug"), spec.get("Bugs"));
-        assertEquals(Sets.newHashSet("feature", "enhancement"), spec.get("Features"));
+    fun two_groups() {
+        val request = IssueChangeLogExportRequest()
+        request.grouping = "Bugs=bug|Features=feature,enhancement"
+        val spec = request.groupingSpecification
+        assertEquals(2, spec.size.toLong())
+        assertEquals(setOf("bug"), spec["Bugs"])
+        assertEquals(setOf("feature", "enhancement"), spec["Features"])
     }
 
-    @Test(expected = ExportRequestGroupingFormatException.class)
-    public void group_format_exception_equal_sign() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setGrouping("Bugs=bug=test");
-        request.getGroupingSpecification();
-    }
-
-    @Test
-    public void getExcludedTypes_empty() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setExclude("");
-        assertTrue(request.getExcludedTypes().isEmpty());
+    @Test(expected = ExportRequestGroupingFormatException::class)
+    fun group_format_exception_equal_sign() {
+        val request = IssueChangeLogExportRequest()
+        request.grouping = "Bugs=bug=test"
+        request.groupingSpecification
     }
 
     @Test
-    public void getExcludedTypes_blank() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setExclude("  ");
-        assertTrue(request.getExcludedTypes().isEmpty());
+    fun getExcludedTypes_empty() {
+        val request = IssueChangeLogExportRequest()
+        request.exclude = ""
+        assertTrue(request.excludedTypes.isEmpty())
     }
 
     @Test
-    public void getExcludedTypes_one() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setExclude("type1");
+    fun getExcludedTypes_blank() {
+        val request = IssueChangeLogExportRequest()
+        request.exclude = "  "
+        assertTrue(request.excludedTypes.isEmpty())
+    }
+
+    @Test
+    fun getExcludedTypes_one() {
+        val request = IssueChangeLogExportRequest()
+        request.exclude = "type1"
         assertEquals(
-                Sets.newHashSet("type1"),
-                request.getExcludedTypes());
+                setOf("type1"),
+                request.excludedTypes)
     }
 
     @Test
-    public void getExcludedTypes_one_trimmed() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setExclude(" type1  ");
+    fun getExcludedTypes_one_trimmed() {
+        val request = IssueChangeLogExportRequest()
+        request.exclude = " type1  "
         assertEquals(
-                Sets.newHashSet("type1"),
-                request.getExcludedTypes());
+                setOf("type1"),
+                request.excludedTypes)
     }
 
     @Test
-    public void getExcludedTypes_several() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setExclude("type1,type2,type3");
+    fun getExcludedTypes_several() {
+        val request = IssueChangeLogExportRequest()
+        request.exclude = "type1,type2,type3"
         assertEquals(
-                Sets.newHashSet("type1", "type2", "type3"),
-                request.getExcludedTypes());
+                setOf("type1", "type2", "type3"),
+                request.excludedTypes)
     }
 
     @Test
-    public void getExcludedTypes_several_trimmed() {
-        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
-        request.setExclude(" type1  ,  type2 ,    type3   ");
+    fun getExcludedTypes_several_trimmed() {
+        val request = IssueChangeLogExportRequest()
+        request.exclude = " type1  ,  type2 ,    type3   "
         assertEquals(
-                Sets.newHashSet("type1", "type2", "type3"),
-                request.getExcludedTypes());
+                setOf("type1", "type2", "type3"),
+                request.excludedTypes)
     }
 
 }
