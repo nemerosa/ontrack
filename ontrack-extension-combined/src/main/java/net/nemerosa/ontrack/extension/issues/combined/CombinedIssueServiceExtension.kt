@@ -1,41 +1,27 @@
-package net.nemerosa.ontrack.extension.issues.combined;
+package net.nemerosa.ontrack.extension.issues.combined
 
-import com.google.common.collect.Sets;
-import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
-import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
-import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
-import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.model.support.MessageAnnotation;
-import net.nemerosa.ontrack.model.support.MessageAnnotator;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import net.nemerosa.ontrack.common.asOptional
+import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.Issue
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
+import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.support.MessageAnnotator
+import org.apache.commons.lang3.StringUtils
+import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
-public class CombinedIssueServiceExtension extends AbstractExtension implements IssueServiceExtension {
-
-    public static final String SERVICE = "combined";
-    private final CombinedIssueServiceConfigurationService configurationService;
-    private final IssueServiceRegistry issueServiceRegistry;
-
-    @Autowired
-    public CombinedIssueServiceExtension(
-            CombinedIssueServiceExtensionFeature extensionFeature,
-            IssueServiceRegistry issueServiceRegistry,
-            CombinedIssueServiceConfigurationService configurationService) {
-        super(extensionFeature);
-        this.issueServiceRegistry = issueServiceRegistry;
-        this.configurationService = configurationService;
-    }
+class CombinedIssueServiceExtension(
+        extensionFeature: CombinedIssueServiceExtensionFeature,
+        private val issueServiceRegistry: IssueServiceRegistry,
+        private val configurationService: CombinedIssueServiceConfigurationService
+) : AbstractExtension(extensionFeature), IssueServiceExtension {
 
     /**
      * Gets the list of attached configured issue services.
@@ -43,176 +29,134 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
      * @param issueServiceConfiguration Configuration of the combined issue service
      * @return List of associated configured issue services
      */
-    protected Collection<ConfiguredIssueService> getConfiguredIssueServices(IssueServiceConfiguration issueServiceConfiguration) {
-        CombinedIssueServiceConfiguration combinedIssueServiceConfiguration = (CombinedIssueServiceConfiguration) issueServiceConfiguration;
-        return combinedIssueServiceConfiguration.getIssueServiceConfigurationIdentifiers().stream()
-                .map(issueServiceRegistry::getConfiguredIssueService)
-                .collect(Collectors.toList());
+    protected fun getConfiguredIssueServices(issueServiceConfiguration: IssueServiceConfiguration): Collection<ConfiguredIssueService> {
+        val combinedIssueServiceConfiguration = issueServiceConfiguration as CombinedIssueServiceConfiguration
+        return combinedIssueServiceConfiguration
+                .issueServiceConfigurationIdentifiers
+                .map { issueServiceRegistry.getConfiguredIssueService(it) }
     }
 
-    @Override
-    public String getId() {
-        return SERVICE;
+    override fun getId(): String {
+        return SERVICE
     }
 
-    @Override
-    public String getName() {
-        return "Combined issue service";
+    override fun getName(): String {
+        return "Combined issue service"
     }
 
-    @Override
-    public List<? extends IssueServiceConfiguration> getConfigurationList() {
-        return configurationService.getConfigurationList();
+    override fun getConfigurationList(): List<IssueServiceConfiguration> {
+        return configurationService.configurationList
     }
 
-    @Override
-    public IssueServiceConfiguration getConfigurationByName(String name) {
-        return configurationService.getConfigurationByName(name).orElse(null);
+    override fun getConfigurationByName(name: String): IssueServiceConfiguration {
+        return configurationService.getConfigurationByName(name).orElse(null)
     }
 
     /**
      * Without any specific configuration, we have to assume the token is valid.
      */
-    @Override
-    public boolean validIssueToken(String token) {
-        return true;
+    override fun validIssueToken(token: String): Boolean {
+        return true
     }
 
-    @Override
-    public String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+    override fun getMessageRegex(issueServiceConfiguration: IssueServiceConfiguration, issue: Issue): String {
         return getConfiguredIssueServices(issueServiceConfiguration)
                 .stream()
                 .findFirst()
-                .map(o -> o.getMessageRegex(issue))
-                .orElse("");
+                .map { o -> o.getMessageRegex(issue) }
+                .orElse("")
     }
 
-    @Override
-    public Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
-        return getConfiguredIssueServices(issueServiceConfiguration).stream()
-                .map(
-                        configuredIssueService ->
-                                configuredIssueService.getIssueServiceExtension().extractIssueKeysFromMessage(
-                                        configuredIssueService.getIssueServiceConfiguration(),
-                                        message
-                                )
-                )
-                .collect(
-                        Collectors.reducing(
-                                Collections.<String>emptySet(),
-                                Sets::union
-                        )
-                );
+    override fun extractIssueKeysFromMessage(issueServiceConfiguration: IssueServiceConfiguration, message: String): Set<String> {
+        return getConfiguredIssueServices(issueServiceConfiguration)
+                .map { configuredIssueService ->
+                    configuredIssueService.issueServiceExtension.extractIssueKeysFromMessage(
+                            configuredIssueService.issueServiceConfiguration,
+                            message
+                    )
+                }
+                .fold(emptySet()) { acc, values ->
+                    acc + values
+                }
     }
 
-    @Override
-    public Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
+    override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): Optional<MessageAnnotator> {
         // Gets all the defined message annotators
-        Collection<MessageAnnotator> messageAnnotators = getConfiguredIssueServices(issueServiceConfiguration).stream()
-                .map(
-                        configuredIssueService ->
-                                configuredIssueService.getIssueServiceExtension().getMessageAnnotator(
-                                        configuredIssueService.getIssueServiceConfiguration()
-                                )
-                )
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        if (messageAnnotators.isEmpty()) {
-            return Optional.empty();
+        val messageAnnotators = getConfiguredIssueServices(issueServiceConfiguration)
+                .mapNotNull { configuredIssueService ->
+                    configuredIssueService.issueServiceExtension.getMessageAnnotator(
+                            configuredIssueService.issueServiceConfiguration
+                    ).getOrNull()
+                }
+        return if (messageAnnotators.isEmpty()) {
+            Optional.empty()
         } else {
             // For each message annotator, gets the list of annotation
-            return Optional.of(
-                    text -> messageAnnotators.stream()
-                            .map(messageAnnotator -> messageAnnotator.annotate(text))
-                            .map((Function<Collection<MessageAnnotation>, HashSet<MessageAnnotation>>) HashSet::new)
-                            .collect(
-                                    // ... and gets them all together
-                                    Collectors.reducing(
-                                            Collections.<MessageAnnotation>emptySet(),
-                                            Sets::union
-                                    )
-                            )
-            );
+            val messageAnnotator = MessageAnnotator { text ->
+                messageAnnotators
+                        .map { messageAnnotator -> messageAnnotator.annotate(text).toSet() }
+                        .fold(emptySet()) { acc, values -> acc + values }
+            }
+            Optional.of(messageAnnotator)
         }
     }
 
-    @Override
-    public String getLinkForAllIssues(IssueServiceConfiguration issueServiceConfiguration, List<Issue> issues) {
-        return null;
+    override fun getLinkForAllIssues(issueServiceConfiguration: IssueServiceConfiguration, issues: List<Issue>): String? {
+        return null
     }
 
-    @Override
-    public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        return getConfiguredIssueServices(issueServiceConfiguration).stream()
-                .map(
-                        configuredIssueService ->
-                                configuredIssueService.getIssueServiceExtension().getIssue(
-                                        configuredIssueService.getIssueServiceConfiguration(),
-                                        issueKey
-                                )
-                )
-                .filter(issue -> issue != null)
-                .findFirst()
-                .orElse(null)
-                ;
+    override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue {
+        return getConfiguredIssueServices(issueServiceConfiguration)
+                .mapNotNull { configuredIssueService ->
+                    configuredIssueService.issueServiceExtension.getIssue(
+                            configuredIssueService.issueServiceConfiguration,
+                            issueKey
+                    )
+                }
+                .first()
     }
 
-    @Override
-    public List<ExportFormat> exportFormats(IssueServiceConfiguration issueServiceConfiguration) {
-        Set<ExportFormat> lists = getConfiguredIssueServices(issueServiceConfiguration).stream()
-                .map(
-                        configuredIssueService ->
-                                configuredIssueService.getIssueServiceExtension().exportFormats(
-                                        configuredIssueService.getIssueServiceConfiguration()
-                                )
-                )
-                .map(HashSet::new)
-                .collect(
-                        // ... and gets them all together
-                        Collectors.reducing(
-                                Collections.<ExportFormat>emptySet(),
-                                Sets::union
-                        )
-                );
-        return new ArrayList<>(lists);
+    override fun exportFormats(issueServiceConfiguration: IssueServiceConfiguration): List<ExportFormat> {
+        return getConfiguredIssueServices(issueServiceConfiguration)
+                .map { configuredIssueService ->
+                    configuredIssueService.issueServiceExtension.exportFormats(
+                            configuredIssueService.issueServiceConfiguration
+                    ).toSet()
+                }
+                .fold(emptySet<ExportFormat>()) { acc, v -> acc + v }
+                .toList()
     }
 
-    @Override
-    public ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request) {
-        List<ExportedIssues> exportedIssues = getConfiguredIssueServices(issueServiceConfiguration).stream()
-                .map(
-                        configuredIssueService ->
-                                configuredIssueService.getIssueServiceExtension().exportIssues(
-                                        configuredIssueService.getIssueServiceConfiguration(),
-                                        issues,
-                                        request
-                                )
-                )
-                .collect(Collectors.toList());
+    override fun exportIssues(issueServiceConfiguration: IssueServiceConfiguration, issues: List<Issue>, request: IssueChangeLogExportRequest): ExportedIssues {
+        val exportedIssues = getConfiguredIssueServices(issueServiceConfiguration)
+                .map { configuredIssueService ->
+                    configuredIssueService.issueServiceExtension.exportIssues(
+                            configuredIssueService.issueServiceConfiguration,
+                            issues,
+                            request
+                    )
+                }
         // Checks the format is the same for all exports (it must)
-        if (!exportedIssues.stream().allMatch(it -> StringUtils.equals(it.getFormat(), request.getFormat()))) {
-            throw new IllegalStateException("All exported issues must have the same export format");
-        }
+        check(exportedIssues.all { it -> StringUtils.equals(it.format, request.format) }) { "All exported issues must have the same export format" }
         // Concatenates the content
-        return new ExportedIssues(
-                request.getFormat(),
-                exportedIssues.stream().map(ExportedIssues::getContent).collect(Collectors.joining(""))
-        );
+        return ExportedIssues(
+                request.format,
+                exportedIssues.joinToString("") { it.content }
+        )
     }
 
-    @Override
-    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
-        return getConfiguredIssueServices(issueServiceConfiguration).stream()
-                .map(
-                        configuredIssueService ->
-                                configuredIssueService.getIssueServiceExtension().getIssueId(
-                                        configuredIssueService.getIssueServiceConfiguration(),
-                                        token
-                                )
-                )
-                .filter(Optional::isPresent)
-                .findFirst()
-                .orElse(Optional.<String>empty());
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): Optional<String> {
+        return getConfiguredIssueServices(issueServiceConfiguration)
+                .mapNotNull { configuredIssueService ->
+                    configuredIssueService.issueServiceExtension.getIssueId(
+                            configuredIssueService.issueServiceConfiguration,
+                            token
+                    ).getOrNull()
+                }
+                .firstOrNull().asOptional()
+    }
+
+    companion object {
+        const val SERVICE = "combined"
     }
 }

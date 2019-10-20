@@ -10,7 +10,6 @@ apply<OntrackExtensionPlugin>()
 dependencies {
     implementation(project(":ontrack-extension-issues"))
     implementation("org.apache.commons:commons-lang3")
-    implementation("com.google.guava:guava")
 
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
     testImplementation("org.codehaus.groovy:groovy")
