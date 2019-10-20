@@ -1,70 +1,62 @@
-package net.nemerosa.ontrack.git.support;
+package net.nemerosa.ontrack.git.support
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import net.nemerosa.ontrack.git.GitRepository;
-import net.nemerosa.ontrack.git.GitRepositoryClient;
-import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
-import net.nemerosa.ontrack.git.exceptions.GitRepositoryDirException;
-import org.apache.commons.io.FileUtils;
+import net.nemerosa.ontrack.git.GitRepository
+import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory
+import net.nemerosa.ontrack.git.exceptions.GitRepositoryDirException
+import org.apache.commons.io.FileUtils
+import org.springframework.cache.CacheManager
+import java.io.File
+import java.io.IOException
+import java.util.concurrent.locks.ReentrantLock
 
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
+class GitRepositoryClientFactoryImpl(
+        private val root: File,
+        private val cacheManager: CacheManager
+) : GitRepositoryClientFactory {
 
-public class GitRepositoryClientFactoryImpl implements GitRepositoryClientFactory {
-
-    private final File root;
-
-    private final Cache<String, GitRepositoryClient> repositoryClientCache =
-            CacheBuilder.newBuilder()
-                    .maximumSize(10)
-                    .build();
-
-    private final ReentrantLock lock = new ReentrantLock();
-
-    public GitRepositoryClientFactoryImpl(File root) {
-        this.root = root;
+    companion object {
+        const val CACHE_GIT_REPOSITORY_CLIENT = "gitRepositoryClient"
     }
 
-    @Override
-    public GitRepositoryClient getClient(GitRepository repository) {
-        String remote = repository.getRemote();
-        lock.lock();
+    private val lock = ReentrantLock()
+
+    override fun getClient(repository: GitRepository): GitRepositoryClient {
+        val remote = repository.remote
+        lock.lock()
         try {
             // Gets any existing repository in the cache
-            GitRepositoryClient repositoryClient = repositoryClientCache.getIfPresent(remote);
-            if (repositoryClient != null && repositoryClient.isCompatible(repository)) {
-                return repositoryClient;
-            }
-            // Repository to be created
-            else {
-                return createAndRegisterRepositoryClient(repository);
-            }
+            val repositoryClient = cacheManager.getCache(CACHE_GIT_REPOSITORY_CLIENT)?.get(remote)?.get() as? GitRepositoryClient?
+            return if (repositoryClient != null && repositoryClient.isCompatible(repository)) {
+                repositoryClient
+            } else {
+                createAndRegisterRepositoryClient(repository)
+            }// Repository to be created
         } finally {
-            lock.unlock();
+            lock.unlock()
         }
     }
 
-    protected GitRepositoryClient createAndRegisterRepositoryClient(GitRepository repository) {
-        GitRepositoryClient client = createRepositoryClient(repository);
-        repositoryClientCache.put(repository.getRemote(), client);
-        return client;
+    private fun createAndRegisterRepositoryClient(repository: GitRepository): GitRepositoryClient {
+        val client = createRepositoryClient(repository)
+        cacheManager.getCache(CACHE_GIT_REPOSITORY_CLIENT)?.put(repository.remote, client)
+        return client
     }
 
-    protected GitRepositoryClient createRepositoryClient(GitRepository repository) {
+    private fun createRepositoryClient(repository: GitRepository): GitRepositoryClient {
         // ID for this repository
-        String repositoryId = repository.getId();
+        val repositoryId = repository.id
         // Directory for this repository
-        File repositoryDir = new File(root, repositoryId);
+        val repositoryDir = File(root, repositoryId)
         // Makes sure the directory is ready
         try {
-            FileUtils.forceMkdir(repositoryDir);
-        } catch (IOException ex) {
-            throw new GitRepositoryDirException(repositoryDir, ex);
+            FileUtils.forceMkdir(repositoryDir)
+        } catch (ex: IOException) {
+            throw GitRepositoryDirException(repositoryDir, ex)
         }
+
         // Creates the client
-        return new GitRepositoryClientImpl(repositoryDir, repository);
+        return GitRepositoryClientImpl(repositoryDir, repository)
     }
 
 }
