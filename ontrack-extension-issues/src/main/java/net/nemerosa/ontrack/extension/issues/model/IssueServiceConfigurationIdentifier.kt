@@ -14,8 +14,8 @@ class IssueServiceConfigurationIdentifier(
 
     companion object {
         @JvmStatic
-        fun parse(value: String): IssueServiceConfigurationIdentifier? {
-            return if (StringUtils.isBlank(value)) {
+        fun parse(value: String?): IssueServiceConfigurationIdentifier? {
+            return if (value.isNullOrBlank()) {
                 null
             } else {
                 val serviceId = StringUtils.substringBefore(value, "//").trim()
