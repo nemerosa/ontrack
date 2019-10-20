@@ -1,23 +1,18 @@
-package net.nemerosa.ontrack.extension.svn.graphql;
+package net.nemerosa.ontrack.extension.svn.graphql
 
-import com.google.common.collect.ImmutableSet;
-import graphql.schema.GraphQLObjectType;
-import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
-import net.nemerosa.ontrack.graphql.schema.GQLType;
-import net.nemerosa.ontrack.graphql.schema.GQLTypeCache;
-import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter;
-import org.springframework.stereotype.Component;
+import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
+import net.nemerosa.ontrack.graphql.schema.GQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
+import org.springframework.stereotype.Component
 
 @Component
-public class SVNConfigurationGQLType implements GQLType {
+class SVNConfigurationGQLType : GQLType {
 
-    @Override
-    public String getTypeName() {
-        return SVNConfiguration.class.getSimpleName();
-    }
+    override fun getTypeName(): String = SVNConfiguration::class.java.simpleName
 
-    @Override
-    public GraphQLObjectType createType(GQLTypeCache cache) {
-        return GraphQLBeanConverter.INSTANCE.asObjectType(SVNConfiguration.class, cache, ImmutableSet.of("password", "descriptor", "credentials"));
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
+        return GraphQLBeanConverter.asObjectType(SVNConfiguration::class.java, cache, setOf("password", "descriptor", "credentials"))
     }
 }
