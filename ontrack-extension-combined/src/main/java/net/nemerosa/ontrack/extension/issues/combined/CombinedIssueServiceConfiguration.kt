@@ -1,52 +1,32 @@
-package net.nemerosa.ontrack.extension.issues.combined;
+package net.nemerosa.ontrack.extension.issues.combined
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.extension.issues.model.SelectableIssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.MultiSelection;
-import net.nemerosa.ontrack.model.support.Configuration;
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
+import net.nemerosa.ontrack.extension.issues.model.SelectableIssueServiceConfigurationRepresentation
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.MultiSelection
+import net.nemerosa.ontrack.model.support.Configuration
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 
-import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
+class CombinedIssueServiceConfiguration(
+        private val name: String,
+        val issueServiceConfigurationIdentifiers: List<String>
+) : Configuration<CombinedIssueServiceConfiguration>, IssueServiceConfiguration {
 
-@Data
-public class CombinedIssueServiceConfiguration implements Configuration, IssueServiceConfiguration {
+    override fun getName(): String = name
 
-    private final String name;
-    private final List<String> issueServiceConfigurationIdentifiers;
-
-    @Override
     @JsonIgnore
-    public String getServiceId() {
-        return CombinedIssueServiceExtension.SERVICE;
-    }
+    override fun getServiceId(): String = CombinedIssueServiceExtension.SERVICE
 
-    @Override
     @JsonIgnore
-    public ConfigurationDescriptor getDescriptor() {
-        return new ConfigurationDescriptor(name, name);
-    }
+    override fun getDescriptor(): ConfigurationDescriptor = ConfigurationDescriptor(name, name)
 
-    @Override
-    public Configuration obfuscate() {
-        return this;
-    }
+    override fun obfuscate(): CombinedIssueServiceConfiguration = this
 
-    public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
-        return new CombinedIssueServiceConfiguration(
-                "",
-                Collections.emptyList()
-        ).asForm(availableIssueServiceConfigurations);
-    }
-
-    public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
+    fun asForm(availableIssueServiceConfigurations: List<IssueServiceConfigurationRepresentation>): Form {
         return Form.create()
                 .with(defaultNameField().value(name))
                 .with(
@@ -54,18 +34,25 @@ public class CombinedIssueServiceConfiguration implements Configuration, IssueSe
                                 .label("Issue services")
                                 .help("List of issue services to combine.")
                                 .items(
-                                        availableIssueServiceConfigurations.stream()
-                                                .map(
-                                                        issueServiceConfigurationRepresentation ->
-                                                                new SelectableIssueServiceConfigurationRepresentation(
-                                                                        issueServiceConfigurationRepresentation,
-                                                                        issueServiceConfigurationIdentifiers.contains(issueServiceConfigurationRepresentation.getId())
-                                                                )
-                                                )
-                                                .collect(Collectors.toList())
+                                        availableIssueServiceConfigurations
+                                                .map { issueServiceConfigurationRepresentation ->
+                                                    SelectableIssueServiceConfigurationRepresentation(
+                                                            issueServiceConfigurationRepresentation,
+                                                            issueServiceConfigurationIdentifiers.contains(issueServiceConfigurationRepresentation.id)
+                                                    )
+                                                }
 
                                 )
                 )
-                ;
+    }
+
+    companion object {
+        @JvmStatic
+        fun form(availableIssueServiceConfigurations: List<IssueServiceConfigurationRepresentation>): Form {
+            return CombinedIssueServiceConfiguration(
+                    "",
+                    emptyList()
+            ).asForm(availableIssueServiceConfigurations)
+        }
     }
 }

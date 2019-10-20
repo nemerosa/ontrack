@@ -1,31 +1,30 @@
-package net.nemerosa.ontrack.extension.issues.model;
+package net.nemerosa.ontrack.extension.issues.model
 
-import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils
 
 /**
- * Representation of the ID of an {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration}.
+ * Representation of the ID of an [net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration].
  */
-@Data
-public class IssueServiceConfigurationIdentifier {
+class IssueServiceConfigurationIdentifier(
+        val serviceId: String,
+        val name: String
+) {
 
-    private final String serviceId;
-    private final String name;
+    fun format(): String = "$serviceId//$name"
 
-    public String format() {
-        return String.format("%s//%s", serviceId, name);
-    }
-
-    public static IssueServiceConfigurationIdentifier parse(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        } else {
-            String serviceId = StringUtils.substringBefore(value, "//").trim();
-            String name = StringUtils.substringAfter(value, "//").trim();
-            if (StringUtils.isNotBlank(serviceId) && StringUtils.isNotBlank(name)) {
-                return new IssueServiceConfigurationIdentifier(serviceId, name);
+    companion object {
+        @JvmStatic
+        fun parse(value: String): IssueServiceConfigurationIdentifier? {
+            return if (StringUtils.isBlank(value)) {
+                null
             } else {
-                throw new IssueServiceConfigurationIdentifierFormatException(value);
+                val serviceId = StringUtils.substringBefore(value, "//").trim()
+                val name = StringUtils.substringAfter(value, "//").trim()
+                if (StringUtils.isNotBlank(serviceId) && StringUtils.isNotBlank(name)) {
+                    IssueServiceConfigurationIdentifier(serviceId, name)
+                } else {
+                    throw IssueServiceConfigurationIdentifierFormatException(value)
+                }
             }
         }
     }
