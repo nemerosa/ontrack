@@ -1,390 +1,366 @@
-package net.nemerosa.ontrack.extension.git;
+package net.nemerosa.ontrack.extension.git
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
-import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
-import net.nemerosa.ontrack.extension.git.model.*;
-import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
-import net.nemerosa.ontrack.extension.git.service.GitService;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
-import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
-import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
-import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException;
-import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.StructureService;
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.Resources;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
+import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
+import net.nemerosa.ontrack.extension.git.model.*
+import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
+import net.nemerosa.ontrack.extension.git.service.GitService
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.Issue
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException
+import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException
+import net.nemerosa.ontrack.extension.support.AbstractExtensionController
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.buildfilter.BuildDiff
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
+import net.nemerosa.ontrack.model.support.ConnectionResult
+import net.nemerosa.ontrack.ui.resource.Link
+import net.nemerosa.ontrack.ui.resource.Resource
+import net.nemerosa.ontrack.ui.resource.Resources
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.Collections
+import java.util.Optional
+import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
 @RequestMapping("extension/git")
-public class GitController extends AbstractExtensionController<GitExtensionFeature> {
+class GitController(
+        feature: GitExtensionFeature,
+        private val structureService: StructureService,
+        private val gitService: GitService,
+        private val configurationService: GitConfigurationService,
+        private val issueServiceRegistry: IssueServiceRegistry,
+        private val securityService: SecurityService
+) : AbstractExtensionController<GitExtensionFeature>(feature) {
 
-    private final StructureService structureService;
-    private final GitService gitService;
-    private final GitConfigurationService configurationService;
-    private final IssueServiceRegistry issueServiceRegistry;
-    private final SecurityService securityService;
-
-    private final Cache<String, GitChangeLog> logCache;
-
-    @Autowired
-    public GitController(GitExtensionFeature feature,
-                         StructureService structureService,
-                         GitService gitService,
-                         GitConfigurationService configurationService,
-                         IssueServiceRegistry issueServiceRegistry,
-                         SecurityService securityService) {
-        super(feature);
-        this.structureService = structureService;
-        this.gitService = gitService;
-        this.configurationService = configurationService;
-        this.issueServiceRegistry = issueServiceRegistry;
-        this.securityService = securityService;
-        // Cache
-        logCache = CacheBuilder.newBuilder()
-                .maximumSize(20)
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .build();
-    }
-
-    @Override
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public Resource<ExtensionFeatureDescription> getDescription() {
-        return Resource.of(
-                feature.getFeatureDescription(),
-                uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
-        )
-                .with("configurations", uri(on(getClass()).getConfigurations()), securityService.isGlobalFunctionGranted(GlobalSettings.class))
-                ;
-    }
+    private val logCache: Cache<String, GitChangeLog>
 
     /**
      * Gets the configurations
      */
-    @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public Resources<BasicGitConfiguration> getConfigurations() {
-        return Resources.of(
-                configurationService.getConfigurations(),
-                uri(on(getClass()).getConfigurations())
+    val configurations: Resources<BasicGitConfiguration>
+        @GetMapping("configurations")
+        get() = Resources.of(
+                configurationService.configurations,
+                uri(on(javaClass).configurations)
         )
-                .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
-                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
-                ;
-    }
+                .with(Link.CREATE, uri(on(javaClass).configurationForm))
+                .with("_test", uri(on(javaClass).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
 
     /**
      * Gets the configuration descriptors
      */
-    @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
-    public Resources<ConfigurationDescriptor> getConfigurationsDescriptors() {
-        return Resources.of(
-                configurationService.getConfigurationDescriptors(),
-                uri(on(getClass()).getConfigurationsDescriptors())
-        );
+    val configurationsDescriptors: Resources<ConfigurationDescriptor>
+        @GetMapping("configurations/descriptors")
+        get() = Resources.of(
+                configurationService.configurationDescriptors,
+                uri(on(javaClass).configurationsDescriptors)
+        )
+
+    /**
+     * Form for a configuration
+     */
+    val configurationForm: Form
+        @GetMapping("configurations/create")
+        get() = BasicGitConfiguration.form(issueServiceRegistry.availableIssueServiceConfigurations)
+
+    init {
+        // Cache
+        logCache = CacheBuilder.newBuilder()
+                .maximumSize(20)
+                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .build()
+    }
+
+    @GetMapping("")
+    override fun getDescription(): Resource<ExtensionFeatureDescription> {
+        @Suppress("RecursivePropertyAccessor")
+        return Resource.of(
+                feature.featureDescription,
+                uri(MvcUriComponentsBuilder.on(javaClass).description)
+        )
+                .with("configurations", uri(on(javaClass).configurations), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
     }
 
     /**
      * Test for a configuration
      */
-    @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
-    public ConnectionResult testConfiguration(@RequestBody BasicGitConfiguration configuration) {
-        return configurationService.test(configuration);
-    }
-
-    /**
-     * Form for a configuration
-     */
-    @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
-    public Form getConfigurationForm() {
-        return BasicGitConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
+    @PostMapping("configurations/test")
+    fun testConfiguration(@RequestBody configuration: BasicGitConfiguration?): ConnectionResult {
+        return configurationService.test(configuration)
     }
 
     /**
      * Creating a configuration
      */
-    @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
-    public BasicGitConfiguration newConfiguration(@RequestBody BasicGitConfiguration configuration) {
-        return configurationService.newConfiguration(configuration);
+    @PostMapping("configurations/create")
+    fun newConfiguration(@RequestBody configuration: BasicGitConfiguration): BasicGitConfiguration {
+        return configurationService.newConfiguration(configuration)
     }
 
     /**
      * Gets one configuration
      */
-    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.GET)
-    public BasicGitConfiguration getConfiguration(@PathVariable String name) {
-        return configurationService.getConfiguration(name);
+    @GetMapping("configurations/{name:.*}")
+    fun getConfiguration(@PathVariable name: String): BasicGitConfiguration {
+        return configurationService.getConfiguration(name)
     }
 
     /**
      * Deleting one configuration
      */
-    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.DELETE)
+    @DeleteMapping("configurations/{name:.*}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Ack deleteConfiguration(@PathVariable String name) {
-        configurationService.deleteConfiguration(name);
-        return Ack.OK;
+    fun deleteConfiguration(@PathVariable name: String): Ack {
+        configurationService.deleteConfiguration(name)
+        return Ack.OK
     }
 
     /**
      * Update form
      */
-    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.GET)
-    public Form updateConfigurationForm(@PathVariable String name) {
-        return configurationService.getConfiguration(name).asForm(issueServiceRegistry.getAvailableIssueServiceConfigurations());
+    @GetMapping("configurations/{name:.*}/update")
+    fun updateConfigurationForm(@PathVariable name: String): Form {
+        return configurationService.getConfiguration(name).asForm(issueServiceRegistry.availableIssueServiceConfigurations)
     }
 
     /**
      * Updating one configuration
      */
-    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.PUT)
-    public BasicGitConfiguration updateConfiguration(@PathVariable String name, @RequestBody BasicGitConfiguration configuration) {
-        configurationService.updateConfiguration(name, configuration);
-        return getConfiguration(name);
+    @PutMapping("configurations/{name:.*}/update")
+    fun updateConfiguration(@PathVariable name: String, @RequestBody configuration: BasicGitConfiguration): BasicGitConfiguration {
+        configurationService.updateConfiguration(name, configuration)
+        return getConfiguration(name)
     }
 
     /**
      * Launches the build synchronisation for a branch.
      */
-    @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
-    public Ack launchBuildSync(@PathVariable ID branchId) {
-        return Ack.validate(gitService.launchBuildSync(branchId, false) != null);
+    @PostMapping("sync/{branchId}")
+    fun launchBuildSync(@PathVariable branchId: ID): Ack {
+        return Ack.validate(gitService.launchBuildSync(branchId, false) != null)
     }
 
     /**
      * Change log entry point
      */
-    @RequestMapping(value = "changelog", method = RequestMethod.GET)
-    public BuildDiff changeLog(BuildDiffRequest request) {
-        GitChangeLog changeLog = gitService.changeLog(request);
+    @GetMapping("changelog")
+    fun changeLog(request: BuildDiffRequest): BuildDiff {
+        val changeLog = gitService.changeLog(request)
         // Stores in cache
-        logCache.put(changeLog.getUuid(), changeLog);
+        logCache.put(changeLog.uuid, changeLog)
         // OK
-        return changeLog;
+        return changeLog
     }
 
     /**
      * Change log export, list of formats
      */
-    @RequestMapping(value = "changelog/export/{projectId}/formats", method = RequestMethod.GET)
-    public Resources<ExportFormat> changeLogExportFormats(@PathVariable ID projectId) {
+    @GetMapping("changelog/export/{projectId}/formats")
+    fun changeLogExportFormats(@PathVariable projectId: ID): Resources<ExportFormat> {
         // Gets the project
-        Project project = structureService.getProject(projectId);
+        val project = structureService.getProject(projectId)
         // Gets the configuration for the project
-        GitConfiguration projectConfiguration = gitService.getProjectConfiguration(project);
+        val projectConfiguration = gitService.getProjectConfiguration(project)
         if (projectConfiguration != null) {
-            Optional<ConfiguredIssueService> configuredIssueService = projectConfiguration.getConfiguredIssueService();
-            if (configuredIssueService.isPresent()) {
+            val configuredIssueService = projectConfiguration.configuredIssueService
+            if (configuredIssueService.isPresent) {
                 return Resources.of(
-                        configuredIssueService.get().getIssueServiceExtension().exportFormats(
-                                configuredIssueService.get().getIssueServiceConfiguration()
+                        configuredIssueService.get().issueServiceExtension.exportFormats(
+                                configuredIssueService.get().issueServiceConfiguration
                         ),
-                        uri(on(GitController.class).changeLogExportFormats(projectId))
-                );
+                        uri(on(GitController::class.java).changeLogExportFormats(projectId))
+                )
             }
         }
         // Not found
         return Resources.of(
-                Collections.emptyList(),
-                uri(on(GitController.class).changeLogExportFormats(projectId))
-        );
+                emptyList(),
+                uri(on(GitController::class.java).changeLogExportFormats(projectId))
+        )
     }
 
     /**
      * Change log export
      */
-    @RequestMapping(value = "changelog/export", method = RequestMethod.GET)
-    public ResponseEntity<String> changeLog(IssueChangeLogExportRequest request) {
+    @GetMapping("changelog/export")
+    fun changeLog(request: IssueChangeLogExportRequest): ResponseEntity<String> {
         // Gets the change log
-        GitChangeLog changeLog = gitService.changeLog(request);
+        val changeLog = gitService.changeLog(request)
         // Gets the associated project
-        Project project = changeLog.getProject();
+        val project = changeLog.project
         // Gets the configuration for the project
-        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
-        if (gitConfiguration == null) {
-            throw new GitProjectNotConfiguredException(project.getId());
-        }
-        // Gets the issue service
-        Optional<ConfiguredIssueService> optConfiguredIssueService = gitConfiguration.getConfiguredIssueService();
-        if (!optConfiguredIssueService.isPresent()) {
-            return new ResponseEntity<>(
+        val gitConfiguration = gitService.getProjectConfiguration(project)
+                ?: throw GitProjectNotConfiguredException(project.id)
+// Gets the issue service
+        val optConfiguredIssueService = gitConfiguration.configuredIssueService
+        if (!optConfiguredIssueService.isPresent) {
+            return ResponseEntity(
                     "The branch is not configured for issues",
                     HttpStatus.NO_CONTENT
-            );
+            )
         }
-        ConfiguredIssueService configuredIssueService = optConfiguredIssueService.get();
+        val configuredIssueService = optConfiguredIssueService.get()
         // Gets the issue change log
-        GitChangeLogIssues changeLogIssues = gitService.getChangeLogIssues(changeLog);
+        val changeLogIssues = gitService.getChangeLogIssues(changeLog)
         // List of issues
-        List<Issue> issues = changeLogIssues.getList().stream()
-                .map(SCMChangeLogIssue::getIssue)
-                .collect(Collectors.toList());
+        val issues = changeLogIssues.list.map { it.issue }
         // Exports the change log using the given format
-        ExportedIssues exportedChangeLogIssues = configuredIssueService.getIssueServiceExtension()
+        val exportedChangeLogIssues = configuredIssueService.issueServiceExtension
                 .exportIssues(
-                        configuredIssueService.getIssueServiceConfiguration(),
+                        configuredIssueService.issueServiceConfiguration,
                         issues,
                         request
-                );
+                )
         // Content type
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat() + "; charset=utf-8");
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Content-Type", exportedChangeLogIssues.format + "; charset=utf-8")
         // Body and headers
-        return new ResponseEntity<>(exportedChangeLogIssues.getContent(), responseHeaders, HttpStatus.OK);
+        return ResponseEntity(exportedChangeLogIssues.content, responseHeaders, HttpStatus.OK)
     }
 
-    private GitChangeLog getChangeLog(String uuid) {
-        GitChangeLog changeLog = logCache.getIfPresent(uuid);
-        if (changeLog != null) {
-            return changeLog;
-        } else {
-            throw new SCMChangeLogUUIDException(uuid);
-        }
+    private fun getChangeLog(uuid: String): GitChangeLog {
+        val changeLog = logCache.getIfPresent(uuid)
+        return changeLog ?: throw SCMChangeLogUUIDException(uuid)
     }
 
     /**
      * File diff change log
      */
-    @RequestMapping(value = "changelog/diff", method = RequestMethod.GET)
-    public ResponseEntity<String> diff(FileDiffChangeLogRequest request) {
+    @GetMapping("changelog/diff")
+    fun diff(request: FileDiffChangeLogRequest?): ResponseEntity<String> {
         // Null proof
-        FileDiffChangeLogRequest nonNullRequest = request != null ? request : new FileDiffChangeLogRequest();
+        val nonNullRequest = request ?: FileDiffChangeLogRequest()
         // Gets the change log
-        GitChangeLog changeLog = gitService.changeLog(nonNullRequest);
+        val changeLog = gitService.changeLog(nonNullRequest)
         // Diff export
-        String diff = gitService.diff(
+        val diff = gitService.diff(
                 changeLog,
-                nonNullRequest.getPatterns()
-        );
+                nonNullRequest.patterns
+        )
         // Content type
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", "text/plain");
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Content-Type", "text/plain")
         // Body and headers
-        return new ResponseEntity<>(diff, responseHeaders, HttpStatus.OK);
+        return ResponseEntity(diff, responseHeaders, HttpStatus.OK)
     }
 
     /**
      * Change log commits
      */
-    @RequestMapping(value = "changelog/{uuid}/commits", method = RequestMethod.GET)
-    public GitChangeLogCommits changeLogCommits(@PathVariable String uuid) {
+    @GetMapping("changelog/{uuid}/commits")
+    fun changeLogCommits(@PathVariable uuid: String): GitChangeLogCommits {
         // Gets the change log
-        GitChangeLog changeLog = getChangeLog(uuid);
+        val changeLog = getChangeLog(uuid)
         // Cached?
-        GitChangeLogCommits commits = changeLog.getCommits();
+        val commits = changeLog.commits
         if (commits != null) {
-            return commits;
+            return commits
         }
         // Loads the commits
-        GitChangeLogCommits loadedCommits = changeLog.loadCommits(gitService::getChangeLogCommits);
+        val loadedCommits = changeLog.loadCommits { changeLog: GitChangeLog -> gitService.getChangeLogCommits(changeLog) }
         // Stores in cache
-        logCache.put(uuid, changeLog);
+        logCache.put(uuid, changeLog)
         // OK
-        return loadedCommits;
+        return loadedCommits
     }
 
     /**
      * Change log issues
      */
-    @RequestMapping(value = "changelog/{uuid}/issues", method = RequestMethod.GET)
-    public GitChangeLogIssues changeLogIssues(@PathVariable String uuid) {
+    @GetMapping("changelog/{uuid}/issues")
+    fun changeLogIssues(@PathVariable uuid: String): GitChangeLogIssues {
         // Gets the change log
-        GitChangeLog changeLog = getChangeLog(uuid);
+        val changeLog = getChangeLog(uuid)
         // Cached?
-        GitChangeLogIssues issues = changeLog.getIssues();
+        var issues = changeLog.issues
         if (issues != null) {
-            return issues;
+            return issues
         }
         // Loads the issues
-        issues = gitService.getChangeLogIssues(changeLog);
+        issues = gitService.getChangeLogIssues(changeLog)
         // Stores in cache
-        logCache.put(uuid, changeLog.withIssues(issues));
+        logCache.put(uuid, changeLog.withIssues(issues))
         // OK
-        return issues;
+        return issues
     }
 
     /**
      * Change log issues Ids
      */
-    @RequestMapping(value = "changelog/{uuid}/issuesIds", method = RequestMethod.GET)
-    public List<String> changeLogIssuesIds(@PathVariable String uuid) {
+    @GetMapping("changelog/{uuid}/issuesIds")
+    fun changeLogIssuesIds(@PathVariable uuid: String): List<String> {
         // Gets the change log
-        GitChangeLog changeLog = getChangeLog(uuid);
+        val changeLog = getChangeLog(uuid)
         // Gets the issues IDs
-        return gitService.getChangeLogIssuesIds(changeLog);
+        return gitService.getChangeLogIssuesIds(changeLog)
     }
 
     /**
      * Change log files
      */
-    @RequestMapping(value = "changelog/{uuid}/files", method = RequestMethod.GET)
-    public GitChangeLogFiles changeLogFiles(@PathVariable String uuid) {
+    @GetMapping("changelog/{uuid}/files")
+    fun changeLogFiles(@PathVariable uuid: String): GitChangeLogFiles {
         // Gets the change log
-        GitChangeLog changeLog = getChangeLog(uuid);
+        val changeLog = getChangeLog(uuid)
         // Cached?
-        GitChangeLogFiles files = changeLog.getFiles();
+        var files = changeLog.files
         if (files != null) {
-            return files;
+            return files
         }
         // Loads the files
-        files = gitService.getChangeLogFiles(changeLog);
+        files = gitService.getChangeLogFiles(changeLog)
         // Stores in cache
-        logCache.put(uuid, changeLog.withFiles(files));
+        logCache.put(uuid, changeLog.withFiles(files))
         // OK
-        return files;
+        return files
     }
 
     /**
      * Commit information in a project
      */
-    @RequestMapping(value = "{projectId}/commit-info/{commit}", method = RequestMethod.GET)
-    public Resource<OntrackGitCommitInfo> commitProjectInfo(@PathVariable ID projectId, @PathVariable String commit) {
+    @GetMapping("{projectId}/commit-info/{commit}")
+    fun commitProjectInfo(@PathVariable projectId: ID, @PathVariable commit: String): Resource<OntrackGitCommitInfo> {
         return Resource.of(
                 gitService.getCommitProjectInfo(projectId, commit),
-                uri(on(getClass()).commitProjectInfo(projectId, commit))
-        ).withView(Build.class);
+                uri(on(javaClass).commitProjectInfo(projectId, commit))
+        ).withView(Build::class.java)
     }
 
     /**
      * Issue information in a project
      */
-    @RequestMapping(value = "{projectId}/issue-info/{issue}", method = RequestMethod.GET)
-    public Resource<OntrackGitIssueInfo> issueProjectInfo(@PathVariable ID projectId, @PathVariable String issue) {
-        return Resource.of(
+    @GetMapping("{projectId}/issue-info/{issue}")
+    fun issueProjectInfo(@PathVariable projectId: ID, @PathVariable issue: String): Resource<OntrackGitIssueInfo> {
+        return Resource.of<OntrackGitIssueInfo>(
                 gitService.getIssueProjectInfo(projectId, issue),
-                uri(on(getClass()).issueProjectInfo(projectId, issue))
-        ).withView(Build.class);
+                uri(on(javaClass).issueProjectInfo(projectId, issue))
+        ).withView(Build::class.java)
     }
 
     /**
@@ -392,13 +368,11 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      *
      * @param branchId ID to download a document from
      */
-    @RequestMapping(value = "download/{branchId}")
-    public ResponseEntity<String> download(@PathVariable ID branchId, String path) {
-        return gitService.download(structureService.getBranch(branchId), path)
-                .map(ResponseEntity::ok)
-                .orElseThrow(
-                        () -> new SCMDocumentNotFoundException(path)
-                );
+    @GetMapping("download/{branchId}")
+    fun download(@PathVariable branchId: ID, path: String): ResponseEntity<String> {
+        return gitService.download(structureService.getBranch(branchId), path).getOrNull()
+                ?.let { ResponseEntity.ok(it) }
+                ?: throw SCMDocumentNotFoundException(path)
     }
 
     /**
@@ -407,19 +381,19 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * @param projectId ID of the project
      * @return Synchronisation information
      */
-    @RequestMapping(value = "project-sync/{projectId}", method = RequestMethod.GET)
-    public GitSynchronisationInfo getProjectGitSyncInfo(@PathVariable ID projectId) {
-        Project project = structureService.getProject(projectId);
-        return gitService.getProjectGitSyncInfo(project);
+    @GetMapping("project-sync/{projectId}")
+    fun getProjectGitSyncInfo(@PathVariable projectId: ID): GitSynchronisationInfo {
+        val project = structureService.getProject(projectId)
+        return gitService.getProjectGitSyncInfo(project)
     }
 
     /**
      * Launching the synchronisation
      */
-    @RequestMapping(value = "project-sync/{projectId}", method = RequestMethod.POST)
-    public Ack projectGitSync(@PathVariable ID projectId, @RequestBody GitSynchronisationRequest request) {
-        Project project = structureService.getProject(projectId);
-        return gitService.projectSync(project, request);
+    @PostMapping("project-sync/{projectId}")
+    fun projectGitSync(@PathVariable projectId: ID, @RequestBody request: GitSynchronisationRequest): Ack {
+        val project = structureService.getProject(projectId)
+        return gitService.projectSync(project, request)
     }
 
 }
