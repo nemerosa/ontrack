@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.git
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest
@@ -11,10 +9,6 @@ import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat
-import net.nemerosa.ontrack.extension.issues.export.ExportedIssues
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
-import net.nemerosa.ontrack.extension.issues.model.Issue
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException
 import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController
@@ -26,26 +20,22 @@ import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-
-import java.util.Collections
-import java.util.Optional
-import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
-
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+
+const val CACHE_GIT_CHANGE_LOG = "gitChangeLog"
 
 @RestController
 @RequestMapping("extension/git")
@@ -55,10 +45,11 @@ class GitController(
         private val gitService: GitService,
         private val configurationService: GitConfigurationService,
         private val issueServiceRegistry: IssueServiceRegistry,
-        private val securityService: SecurityService
+        private val securityService: SecurityService,
+        cacheManager: CacheManager
 ) : AbstractExtensionController<GitExtensionFeature>(feature) {
 
-    private val logCache: Cache<String, GitChangeLog>
+    private val logCache: Cache? = cacheManager.getCache(CACHE_GIT_CHANGE_LOG)
 
     /**
      * Gets the configurations
@@ -75,6 +66,7 @@ class GitController(
     /**
      * Gets the configuration descriptors
      */
+    @Suppress("unused")
     val configurationsDescriptors: Resources<ConfigurationDescriptor>
         @GetMapping("configurations/descriptors")
         get() = Resources.of(
@@ -88,14 +80,6 @@ class GitController(
     val configurationForm: Form
         @GetMapping("configurations/create")
         get() = BasicGitConfiguration.form(issueServiceRegistry.availableIssueServiceConfigurations)
-
-    init {
-        // Cache
-        logCache = CacheBuilder.newBuilder()
-                .maximumSize(20)
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .build()
-    }
 
     @GetMapping("")
     override fun getDescription(): Resource<ExtensionFeatureDescription> {
@@ -173,7 +157,7 @@ class GitController(
     fun changeLog(request: BuildDiffRequest): BuildDiff {
         val changeLog = gitService.changeLog(request)
         // Stores in cache
-        logCache.put(changeLog.uuid, changeLog)
+        logCache?.put(changeLog.uuid, changeLog)
         // OK
         return changeLog
     }
@@ -245,8 +229,7 @@ class GitController(
     }
 
     private fun getChangeLog(uuid: String): GitChangeLog {
-        val changeLog = logCache.getIfPresent(uuid)
-        return changeLog ?: throw SCMChangeLogUUIDException(uuid)
+        return logCache?.get(uuid)?.get() as? GitChangeLog? ?: throw SCMChangeLogUUIDException(uuid)
     }
 
     /**
@@ -283,9 +266,9 @@ class GitController(
             return commits
         }
         // Loads the commits
-        val loadedCommits = changeLog.loadCommits { changeLog: GitChangeLog -> gitService.getChangeLogCommits(changeLog) }
+        val loadedCommits = changeLog.loadCommits(gitService::getChangeLogCommits)
         // Stores in cache
-        logCache.put(uuid, changeLog)
+        logCache?.put(uuid, changeLog)
         // OK
         return loadedCommits
     }
@@ -305,7 +288,7 @@ class GitController(
         // Loads the issues
         issues = gitService.getChangeLogIssues(changeLog)
         // Stores in cache
-        logCache.put(uuid, changeLog.withIssues(issues))
+        logCache?.put(uuid, changeLog.withIssues(issues))
         // OK
         return issues
     }
@@ -336,7 +319,7 @@ class GitController(
         // Loads the files
         files = gitService.getChangeLogFiles(changeLog)
         // Stores in cache
-        logCache.put(uuid, changeLog.withFiles(files))
+        logCache?.put(uuid, changeLog.withFiles(files))
         // OK
         return files
     }
