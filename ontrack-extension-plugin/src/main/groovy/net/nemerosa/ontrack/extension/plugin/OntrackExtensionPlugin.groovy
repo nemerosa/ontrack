@@ -192,7 +192,6 @@ ontrack = ${ontrackVersion}
                 exclude group: 'org.projectlombok'
                 exclude group: 'org.slf4j'
                 exclude group: 'commons-io'
-                exclude group: 'com.google.guava'
             }
         }
 
