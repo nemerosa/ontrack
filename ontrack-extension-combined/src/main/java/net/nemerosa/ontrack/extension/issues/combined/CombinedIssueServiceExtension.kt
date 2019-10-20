@@ -105,7 +105,7 @@ class CombinedIssueServiceExtension(
         return null
     }
 
-    override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue {
+    override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? {
         return getConfiguredIssueServices(issueServiceConfiguration)
                 .mapNotNull { configuredIssueService ->
                     configuredIssueService.issueServiceExtension.getIssue(
@@ -113,7 +113,7 @@ class CombinedIssueServiceExtension(
                             issueKey
                     )
                 }
-                .first()
+                .firstOrNull()
     }
 
     override fun exportFormats(issueServiceConfiguration: IssueServiceConfiguration): List<ExportFormat> {
