@@ -125,7 +125,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 time = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_TIME,
                 tags = metricTags
         ) {
-            client.getMeasuresForVersion(property.key, version, metrics)
+            val scmBranch = getBranchPath(build.branch)
+            client.getMeasuresForVersion(property.key, scmBranch, version, metrics)
         }
         // Safe measures
         if (!measures.isNullOrEmpty()) {
