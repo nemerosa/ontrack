@@ -18,7 +18,6 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")
-    implementation("com.google.guava:guava")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
