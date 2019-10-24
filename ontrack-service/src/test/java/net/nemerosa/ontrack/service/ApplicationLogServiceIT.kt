@@ -49,10 +49,10 @@ class ApplicationLogServiceIT : AbstractDSLTestSupport() {
     class SampleServiceInitialException : BaseException("Sample message")
     class SampleServiceException : BaseException("Sample message")
 
-    @Transactional
-    class SampleServiceImpl(
+    open class SampleServiceImpl(
             private val applicationLogService: ApplicationLogService
     ) : SampleService {
+        @Transactional
         override fun run(uuid: String) {
             applicationLogService.log(
                     ApplicationLogEntry.error(
