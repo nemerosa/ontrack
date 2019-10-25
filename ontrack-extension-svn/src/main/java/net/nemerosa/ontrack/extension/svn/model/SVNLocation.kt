@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.svn.model
 
-data class SVNLocation(
+class SVNLocation(
         val path: String,
         val revision: Long
 ) {
-    fun withRevision(revision: Long): SVNLocation {
-        return SVNLocation(path, revision)
-    }
+    fun withRevision(revision: Long) = SVNLocation(path, revision)
 }
+

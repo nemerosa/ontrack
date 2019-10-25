@@ -25,7 +25,7 @@ interface SCMChangeLogCommit {
     /**
      * Mail of the author of the commit. Can be `null` if not available.
      */
-    val authorEmail: String
+    val authorEmail: String?
 
     /**
      * Timestamp of the commit
