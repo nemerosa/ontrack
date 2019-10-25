@@ -19,7 +19,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-test")
     implementation("io.micrometer:micrometer-core")
-    implementation("com.google.guava:guava")
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.flywaydb:flyway-core")

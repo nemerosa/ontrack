@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.it;
 
-import com.google.common.collect.ImmutableSet;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsManagerService;
@@ -11,9 +10,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -370,7 +367,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                     Optional.of(
                             new GlobalRole(
                                     "test", "Test global role", "",
-                                    ImmutableSet.copyOf(fn),
+                                    new HashSet<>(Arrays.asList(fn)),
                                     Collections.emptySet()
                             )
                     )

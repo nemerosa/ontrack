@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;

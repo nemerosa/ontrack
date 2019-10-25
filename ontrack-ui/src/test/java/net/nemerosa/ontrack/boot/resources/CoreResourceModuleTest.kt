@@ -25,11 +25,11 @@ import org.mockito.Mockito.`when`
 
 class CoreResourceModuleTest {
 
-    private var mapper: ResourceObjectMapper? = null
-    private var securityService: SecurityService? = null
-    private var structureService: StructureService? = null
-    private var projectFavouriteService: ProjectFavouriteService? = null
-    private var branchFavouriteService: BranchFavouriteService? = null
+    private lateinit var mapper: ResourceObjectMapper
+    private lateinit var securityService: SecurityService
+    private lateinit var structureService: StructureService
+    private lateinit var projectFavouriteService: ProjectFavouriteService
+    private lateinit var branchFavouriteService: BranchFavouriteService
 
     @Before
     fun before() {
@@ -66,9 +66,9 @@ class CoreResourceModuleTest {
     @Throws(JsonProcessingException::class)
     fun project_granted_for_update() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
-        `when`(securityService!!.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
+        `when`(securityService.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "P")
@@ -98,9 +98,9 @@ class CoreResourceModuleTest {
     fun project_not_favourite() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
                 .withSignature(SIGNATURE)
-        `when`(securityService!!.isLogged).thenReturn(true)
+        `when`(securityService.isLogged).thenReturn(true)
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "P")
@@ -130,7 +130,7 @@ class CoreResourceModuleTest {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
                 .withSignature(SIGNATURE)
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "P")
@@ -874,7 +874,7 @@ class CoreResourceModuleTest {
     @Throws(JsonProcessingException::class)
     fun resource_collection_with_filtering() {
         val project = Project.of(NameDescription("PRJ", "Project")).withId(ID.of(1))
-        val branches = Arrays.asList(
+        val branches = listOf(
                 Branch.of(project, NameDescription("B1", "Branch 1")).withId(ID.of(1)).withSignature(SIGNATURE),
                 Branch.of(project, NameDescription("B2", "Branch 2")).withId(ID.of(2)).withSignature(SIGNATURE)
         )

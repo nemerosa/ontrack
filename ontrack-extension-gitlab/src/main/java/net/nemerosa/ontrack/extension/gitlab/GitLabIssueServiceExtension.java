@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.gitlab;
 
-import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClient;
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClientFactory;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfiguration;
@@ -25,7 +24,7 @@ import java.util.regex.Pattern;
 public class GitLabIssueServiceExtension extends AbstractIssueServiceExtension {
 
     public static final String GITLAB_SERVICE_ID = "gitlab";
-    public static final String GITLAB_ISSUE_PATTERN = "#(\\d+)";
+    private static final String GITLAB_ISSUE_PATTERN = "#(\\d+)";
     private final GitLabConfigurationService configurationService;
     private final OntrackGitLabClientFactory gitLabClientFactory;
 
@@ -141,8 +140,6 @@ public class GitLabIssueServiceExtension extends AbstractIssueServiceExtension {
     @Override
     protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         GitLabIssueWrapper wrapper = (GitLabIssueWrapper) issue;
-        return Sets.newLinkedHashSet(
-                wrapper.getLabels()
-        );
+        return new HashSet<>(wrapper.getLabels());
     }
 }

@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":ontrack-extension-git"))
     implementation("org.gitlab:java-gitlab-api:1.2.7")
     implementation("org.apache.commons:commons-lang3")
-    implementation("com.google.guava:guava")
 
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))

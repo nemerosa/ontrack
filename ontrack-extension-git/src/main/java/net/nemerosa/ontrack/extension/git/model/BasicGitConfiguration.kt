@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.defaultNameField
+import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.Text

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.github.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.defaultNameField
+import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor

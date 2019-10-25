@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.acceptance.browser
 
-import com.google.common.base.Function
 import net.nemerosa.ontrack.acceptance.config.AcceptanceConfig
 import net.nemerosa.ontrack.acceptance.support.AcceptanceRunContext
 import org.apache.commons.io.FileUtils
@@ -81,13 +80,7 @@ class Configuration {
                 .pollingEvery(1, TimeUnit.SECONDS)
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
-                .until(
-                new Function<WebDriver, WebElement>() {
-                    WebElement apply(WebDriver driver) {
-                        return driver.findElement(by)
-                    }
-                }
-        )
+                .until { driver -> driver.findElement(by) }
     }
 
     Collection<WebElement> findElements(By by) {
@@ -96,13 +89,7 @@ class Configuration {
                 .pollingEvery(1, TimeUnit.SECONDS)
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
-                .until(
-                new Function<WebDriver, Collection<WebElement>>() {
-                    Collection<WebElement> apply(WebDriver driver) {
-                        return driver.findElements(by)
-                    }
-                }
-        )
+                .until { driver -> driver.findElements(by) }
     }
 
     void waitUntil(Closure<Boolean> closure) {
@@ -115,12 +102,7 @@ class Configuration {
 
     void waitUntil(String message, int seconds, Closure<Boolean> closure) {
         try {
-            new WebDriverWait(driver, seconds).until(new Function<WebDriver, Boolean>() {
-                @Override
-                Boolean apply(WebDriver input) {
-                    return closure()
-                }
-            })
+            new WebDriverWait(driver, seconds).until { driver -> closure() }
         } catch (TimeoutException ex) {
             // Takes a screenshot
             screenshot("timeout")
