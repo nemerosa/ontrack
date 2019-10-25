@@ -217,7 +217,6 @@ configure(coreProjects) p@{
             dependency("net.jodah:failsafe:1.1.1")
             dependency("commons-logging:commons-logging:1.2")
             dependency("org.apache.commons:commons-math3:3.6.1")
-            dependency("com.google.guava:guava:27.0.1-jre")
             dependency("args4j:args4j:2.33")
             dependency("org.jgrapht:jgrapht-core:1.3.0")
             dependency("org.kohsuke:groovy-sandbox:1.19")
