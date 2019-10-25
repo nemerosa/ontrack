@@ -24,7 +24,7 @@ class ApplicationLogServiceImpl(
 
     private val logger = LoggerFactory.getLogger(ApplicationLogService::class.java)
 
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun log(entry: ApplicationLogEntry) {
         val signedEntry = entry.withAuthentication(
                 securityService.account.map { it.name }.orElse("anonymous")

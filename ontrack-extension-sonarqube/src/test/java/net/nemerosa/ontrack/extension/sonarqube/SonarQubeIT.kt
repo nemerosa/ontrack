@@ -27,6 +27,7 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
+import org.mockito.Matchers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -752,12 +753,13 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     private fun mockSonarQubeMeasures(key: String, version: String, vararg measures: Pair<String, Double>) {
         whenever(client.getMeasuresForVersion(
                 eq(key),
+                Matchers.anyString(),
                 eq(version),
                 any()
         )).then { invocation ->
             // List of desired measures
             @Suppress("UNCHECKED_CAST")
-            val measureList: List<String> = invocation.arguments[2] as List<String>
+            val measureList: List<String> = invocation.arguments[3] as List<String>
             // Map of measures
             val index = measures.toMap()
             // Results
