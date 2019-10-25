@@ -1,29 +1,20 @@
-package net.nemerosa.ontrack.extension.svn.model;
+package net.nemerosa.ontrack.extension.svn.model
 
-import lombok.Data;
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+class SVNChangeLogFile(
+        override val path: String,
+        val url: String
+) : SCMChangeLogFile {
 
-@Data
-public class SVNChangeLogFile implements SCMChangeLogFile {
+    val changes = mutableListOf<SVNChangeLogFileChange>()
 
-    private final String path;
-    private final String url;
-    private final List<SVNChangeLogFileChange> changes = new ArrayList<>();
+    override val changeTypes: List<SCMChangeLogFileChangeType>
+        get() = changes.map { it.changeType }
 
-    public SVNChangeLogFile addChange(SVNChangeLogFileChange change) {
-        changes.add(change);
-        return this;
-    }
-
-    @Override
-    public List<SCMChangeLogFileChangeType> getChangeTypes() {
-        return changes.stream()
-                .map(SVNChangeLogFileChange::getChangeType)
-                .collect(Collectors.toList());
+    fun addChange(change: SVNChangeLogFileChange): SVNChangeLogFile {
+        changes.add(change)
+        return this
     }
 }

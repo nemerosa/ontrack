@@ -1,16 +1,12 @@
-package net.nemerosa.ontrack.extension.svn.model;
+package net.nemerosa.ontrack.extension.svn.model
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Data
-public class SVNChangeLogReference {
-
-    private final String path;
-    private final long start;
-    private final long end;
-
-    public boolean isNone() {
-        return start == end;
-    }
-    
+class SVNChangeLogReference(
+        val path: String,
+        val start: Long,
+        val end: Long
+) {
+    @JsonProperty("none")
+    val isNone: Boolean = (start == end)
 }

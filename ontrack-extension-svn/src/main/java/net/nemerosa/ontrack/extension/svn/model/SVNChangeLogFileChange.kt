@@ -1,13 +1,9 @@
-package net.nemerosa.ontrack.extension.svn.model;
+package net.nemerosa.ontrack.extension.svn.model
 
-import lombok.Data;
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 
-@Data
-public class SVNChangeLogFileChange {
-
-    private final SVNRevisionInfo revisionInfo;
-    private final SCMChangeLogFileChangeType changeType;
-    private final String url;
-
-}
+class SVNChangeLogFileChange(
+        val revisionInfo: SVNRevisionInfo,
+        val changeType: SCMChangeLogFileChangeType,
+        val url: String
+)
