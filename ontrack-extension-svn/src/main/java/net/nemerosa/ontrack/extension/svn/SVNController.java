@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.svn;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
@@ -33,6 +31,8 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -60,10 +59,10 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final SecurityService securityService;
     private final StructureService structureService;
 
-    private final Cache<String, SVNChangeLog> logCache;
+    private final Cache logCache;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNInfoService svnInfoService, SCMUtilsService scmService, SVNSyncService svnSyncService, SecurityService securityService, StructureService structureService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNInfoService svnInfoService, SCMUtilsService scmService, SVNSyncService svnSyncService, SecurityService securityService, StructureService structureService, CacheManager cacheManager) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
@@ -76,10 +75,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         this.securityService = securityService;
         this.structureService = structureService;
         // Cache
-        logCache = CacheBuilder.newBuilder()
-                .maximumSize(20)
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .build();
+        this.logCache = cacheManager.getCache("svnChangeLog");
     }
 
     @Override
@@ -348,7 +344,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     }
 
     private SVNChangeLog getChangeLog(String uuid) {
-        SVNChangeLog changeLog = logCache.getIfPresent(uuid);
+        SVNChangeLog changeLog = logCache.get(uuid, SVNChangeLog.class);
         if (changeLog != null) {
             return changeLog;
         } else {
