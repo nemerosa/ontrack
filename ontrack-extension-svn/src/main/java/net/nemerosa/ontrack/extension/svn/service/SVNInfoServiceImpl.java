@@ -15,10 +15,10 @@ import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProper
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.ConfiguredBuildSvnRevisionLink;
 import net.nemerosa.ontrack.model.structure.*;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
