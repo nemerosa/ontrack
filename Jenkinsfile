@@ -205,7 +205,7 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                         set -e
                         echo "Getting Jacoco coverage"
                         mkdir -p build/jacoco/
-                        cp ontrack-acceptance/src/main/compose/build/jacoco/jacoco.exec build/jacoco/acceptance.exec
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/acceptance.exec
                     '''
                     // Collection of coverage in Docker
                     sh '''
