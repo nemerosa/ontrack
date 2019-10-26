@@ -1,6 +1,12 @@
+plugins {
+    `java-library`
+}
+
 dependencies {
-    compile("junit:junit")
-    compile("commons-io:commons-io")
-    compile("org.jetbrains.kotlin:kotlin-test")
-    compile(project(":ontrack-json"))
+    api("junit:junit")
+    api(project(":ontrack-json"))
+
+    implementation("org.apache.commons:commons-lang3")
+    implementation("commons-io:commons-io")
+    implementation("org.jetbrains.kotlin:kotlin-test")
 }

@@ -2,26 +2,30 @@ import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
 
 plugins {
     groovy
+    `java-library`
 }
 
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    compile(project(":ontrack-extension-scm"))
-    compile(project(":ontrack-ui-graphql"))
-    compile(project(":ontrack-git"))
-    compile(project(":ontrack-tx"))
-    compile(project(":ontrack-json"))
-    compile(project(":ontrack-repository-support"))
-    compile("org.springframework:spring-tx")
-    compile("commons-io:commons-io")
+    api(project(":ontrack-extension-scm"))
+    api(project(":ontrack-git"))
+    api(project(":ontrack-tx"))
+    api(project(":ontrack-json"))
 
-    testCompile(project(":ontrack-it-utils"))
-    testCompile(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testCompile(project(path = ":ontrack-extension-issues", configuration = "tests"))
-    testCompile(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testCompile("org.codehaus.groovy:groovy")
-    testRuntime(project(":ontrack-service"))
-    testRuntime(project(":ontrack-repository-impl"))
-    testRuntime("org.springframework.boot:spring-boot-starter-web")
+    implementation(project(":ontrack-ui-graphql"))
+    implementation(project(":ontrack-repository-support"))
+    implementation("org.springframework:spring-tx")
+    implementation("commons-io:commons-io")
+    implementation("org.apache.commons:commons-lang3")
+
+    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+    testImplementation("org.codehaus.groovy:groovy")
+    
+    testRuntimeOnly(project(":ontrack-service"))
+    testRuntimeOnly(project(":ontrack-repository-impl"))
+    testRuntimeOnly("org.springframework.boot:spring-boot-starter-web")
 }

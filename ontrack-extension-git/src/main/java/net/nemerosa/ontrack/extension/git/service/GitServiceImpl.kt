@@ -137,8 +137,8 @@ class GitServiceImpl(
     override fun changeLog(request: BuildDiffRequest): GitChangeLog {
         transactionService.start().use { ignored ->
             // Gets the two builds
-            var buildFrom = structureService.getBuild(request.from)
-            var buildTo = structureService.getBuild(request.to)
+            var buildFrom = structureService.getBuild(request.from!!)
+            var buildTo = structureService.getBuild(request.to!!)
             // Ordering of builds
             if (buildFrom.id() > buildTo.id()) {
                 val t = buildFrom

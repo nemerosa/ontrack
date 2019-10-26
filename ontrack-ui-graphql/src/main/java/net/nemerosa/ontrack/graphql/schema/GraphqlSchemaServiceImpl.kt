@@ -16,9 +16,8 @@ class GraphqlSchemaServiceImpl(
 
     private val schemaSupplier = CachedSupplier.of<GraphQLSchema> { this.createSchema() }
 
-    override fun getSchema(): GraphQLSchema {
-        return schemaSupplier.get()
-    }
+    override val schema: GraphQLSchema
+        get() = schemaSupplier.get()
 
     private fun createSchema(): GraphQLSchema {
         // All types

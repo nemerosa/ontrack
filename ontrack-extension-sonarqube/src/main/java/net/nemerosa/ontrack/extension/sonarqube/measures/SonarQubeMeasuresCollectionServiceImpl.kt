@@ -116,7 +116,6 @@ class SonarQubeMeasuresCollectionServiceImpl(
         val metricTags = mapOf(
                 "project" to build.project.name,
                 "branch" to build.branch.name,
-                "build" to build.name,
                 "uri" to property.configuration.url
         )
         val measures: Map<String, Double?>? = meterRegistry.measure(
@@ -126,7 +125,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 time = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_TIME,
                 tags = metricTags
         ) {
-            client.getMeasuresForVersion(property.key, version, metrics)
+            val scmBranch = getBranchPath(build.branch)
+            client.getMeasuresForVersion(property.key, scmBranch, version, metrics)
         }
         // Safe measures
         if (!measures.isNullOrEmpty()) {

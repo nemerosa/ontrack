@@ -1,28 +1,30 @@
 plugins {
     groovy
+    `java-library`
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile("org.springframework.boot:spring-boot-starter-cache")
-    compile(project(":ontrack-model"))
-    compile(project(":ontrack-repository"))
-    compile(project(":ontrack-extension-api"))
-    compile(project(":ontrack-job"))
-    compile("org.springframework.security:spring-security-core")
-    compile("org.springframework.security:spring-security-config")
-    compile("org.springframework.security:spring-security-ldap")
-    compile("org.slf4j:slf4j-api")
-    compile("commons-io:commons-io")
-    compile("org.codehaus.groovy:groovy")
-    compile("org.kohsuke:groovy-sandbox")
-    compile("org.jgrapht:jgrapht-core")
-    compile("com.github.ben-manes.caffeine:caffeine")
-    compile("org.flywaydb:flyway-core")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation(project(":ontrack-model"))
+    implementation(project(":ontrack-repository"))
+    implementation(project(":ontrack-extension-api"))
+    implementation(project(":ontrack-job"))
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework.security:spring-security-config")
+    implementation("org.springframework.security:spring-security-ldap")
+    implementation("org.slf4j:slf4j-api")
+    implementation("commons-io:commons-io")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.codehaus.groovy:groovy")
+    implementation("org.kohsuke:groovy-sandbox")
+    implementation("org.jgrapht:jgrapht-core")
+    implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("org.flywaydb:flyway-core")
 
-    testCompile(project(":ontrack-it-utils"))
-    testCompile(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testRuntime(project(":ontrack-repository-impl"))
-    testRuntime("io.micrometer:micrometer-registry-prometheus")
+    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testRuntimeOnly(project(":ontrack-repository-impl"))
+    testRuntimeOnly("io.micrometer:micrometer-registry-prometheus")
 
 }

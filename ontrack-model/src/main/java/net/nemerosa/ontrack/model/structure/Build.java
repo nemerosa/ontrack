@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
@@ -10,6 +9,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -42,10 +42,10 @@ public class Build implements RunnableEntity {
     @Override
     @JsonIgnore
     public Map<String, String> getRunMetricTags() {
-        return ImmutableMap.of(
-                "project", branch.getProject().getName(),
-                "branch", branch.getName()
-        );
+        Map<String,String> map = new HashMap<>();
+        map.put("project", branch.getProject().getName());
+        map.put("branch", branch.getName());
+        return map;
     }
 
     public static Build of(Branch branch, NameDescription nameDescription, Signature signature) {

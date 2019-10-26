@@ -3,8 +3,8 @@ package net.nemerosa.ontrack.extension.scm.service;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
 import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 import net.nemerosa.ontrack.model.structure.Build;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;

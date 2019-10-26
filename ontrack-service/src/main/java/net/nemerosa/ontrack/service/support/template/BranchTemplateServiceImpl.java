@@ -208,7 +208,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             Function<String, String> replacementFn = value -> expressionEngine.render(value, engineParams);
             // Template instance execution context
             TemplateInstanceExecution templateInstanceExecution = new TemplateInstanceExecution(
-                    replacementFn,
+                    replacementFn::apply,
                     request.getParameters()
             );
             // OK
@@ -238,7 +238,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         copyService.copy(
                 instance, // Target
                 template, // Source
-                templateInstanceExecution.getReplacementFn(),
+                templateInstanceExecution::replace,
                 SyncPolicy.SYNC_KEEP // Conservative approach
         );
         // Template instance

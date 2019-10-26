@@ -26,12 +26,12 @@ class ReleasePropertyTypeTest {
     @Test
     fun getEditionForm_empty() {
         val form = type.getEditionForm(null, null)
-        assertNull(form.getField("name").value)
+        assertNull(form.getField("name")?.value)
     }
 
     @Test
     fun getEditionForm_not_empty() {
         val form = type.getEditionForm(null, ReleaseProperty("test"))
-        assertEquals("test", form.getField("name").value)
+        assertEquals("test", form.getField("name")?.value)
     }
 }

@@ -214,11 +214,10 @@ configure(coreProjects) p@{
         }
         dependencies {
             dependency("commons-io:commons-io:2.6")
-            dependency("org.apache.commons:commons-text:1.6")
+            dependency("org.apache.commons:commons-text:1.8")
             dependency("net.jodah:failsafe:1.1.1")
             dependency("commons-logging:commons-logging:1.2")
             dependency("org.apache.commons:commons-math3:3.6.1")
-            dependency("com.google.guava:guava:27.0.1-jre")
             dependency("args4j:args4j:2.33")
             dependency("org.jgrapht:jgrapht-core:1.3.0")
             dependency("org.kohsuke:groovy-sandbox:1.19")
@@ -230,18 +229,18 @@ configure(coreProjects) p@{
     }
 
     dependencies {
-        "compile"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-        "compile"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+        "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+        "implementation"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
         // Lombok
         "compileOnly"("org.projectlombok:lombok:1.18.10")
         "annotationProcessor"("org.projectlombok:lombok:1.18.10")
         "testCompileOnly"("org.projectlombok:lombok:1.18.10")
         "testAnnotationProcessor"("org.projectlombok:lombok:1.18.10")
         // Testing
-        "testCompile"("junit:junit")
-        "testCompile"("org.mockito:mockito-core")
-        "testCompile"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-        "testCompile"("org.jetbrains.kotlin:kotlin-test")
+        "testImplementation"("junit:junit")
+        "testImplementation"("org.mockito:mockito-core")
+        "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+        "testImplementation"("org.jetbrains.kotlin:kotlin-test")
     }
 
     tasks.withType<KotlinCompile> {

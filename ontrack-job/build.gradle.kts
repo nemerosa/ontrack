@@ -1,13 +1,17 @@
+plugins {
+    `java-library`
+}
+
 description = "Abstract management of identified jobs."
 
 dependencies {
-    compile(project(":ontrack-common"))
-    compile("org.springframework:spring-context")
-    compile("org.slf4j:slf4j-api")
-    compile("io.micrometer:micrometer-core")
+    implementation("org.apache.commons:commons-lang3")
+    implementation(project(":ontrack-common"))
+    implementation("org.springframework:spring-context")
+    implementation("org.slf4j:slf4j-api")
+    implementation("io.micrometer:micrometer-core")
 
-    testCompile(project(":ontrack-test-utils"))
-    testCompile("org.apache.commons:commons-math3")
-    testCompile("com.google.guava:guava")
-    testRuntime("org.slf4j:slf4j-log4j12")
+    testImplementation(project(":ontrack-test-utils"))
+    testImplementation("org.apache.commons:commons-math3")
+    testImplementation("org.slf4j:slf4j-log4j12")
 }

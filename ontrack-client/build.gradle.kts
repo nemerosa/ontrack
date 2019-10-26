@@ -1,9 +1,15 @@
+plugins {
+    `java-library`
+}
+
 description = "Generic customisable HTTP and JSON client."
 
 dependencies {
-    compile(project(":ontrack-common"))
-    compile(project(":ontrack-json"))
-    compile("org.apache.httpcomponents:httpclient")
-    compile("org.apache.httpcomponents:httpmime")
-    compile("org.slf4j:slf4j-api")
+    api(project(":ontrack-common"))
+    api(project(":ontrack-json"))
+    api("org.apache.httpcomponents:httpclient")
+
+    implementation("org.apache.httpcomponents:httpmime")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
 }

@@ -1,8 +1,14 @@
 import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
 
+plugins {
+    `java-library`
+}
+
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    compile(project(":ontrack-extension-support"))
-    compile("org.springframework:spring-tx")
+    implementation(project(":ontrack-extension-support"))
+    implementation("org.springframework:spring-tx")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
 }

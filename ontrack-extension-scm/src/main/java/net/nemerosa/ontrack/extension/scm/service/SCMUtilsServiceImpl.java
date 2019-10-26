@@ -5,10 +5,10 @@ import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.BuildView;
 import net.nemerosa.ontrack.model.structure.StructureService;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;

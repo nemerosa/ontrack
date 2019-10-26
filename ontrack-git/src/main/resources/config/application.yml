@@ -1,0 +1,4 @@
+ontrack:
+  config:
+    cache:
+      gitRepositoryClient: maximumSize=10,expireAfterWrite=1d,recordStats

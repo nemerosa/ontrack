@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -82,6 +83,7 @@ public interface IssueServiceExtension extends Extension {
      * @param issueKey                  Issue key
      * @return Issue if found, <code>null</code> otherwise
      */
+    @Nullable
     Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey);
 
     /**

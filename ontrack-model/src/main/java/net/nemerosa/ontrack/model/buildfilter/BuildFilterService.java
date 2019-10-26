@@ -6,8 +6,8 @@ import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**

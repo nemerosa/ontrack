@@ -1,12 +1,19 @@
-dependencies {
-    compile(project(":ontrack-database"))
-    compile(project(":ontrack-repository"))
-    compile(project(":ontrack-repository-support"))
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile("org.springframework:spring-context")
-    compile("org.slf4j:slf4j-api")
-    compile("org.flywaydb:flyway-core")
+plugins {
+    `java-library`
+}
 
-    testCompile(project(":ontrack-it-utils"))
-    testRuntime(project(":ontrack-service"))
+dependencies {
+    api(project(":ontrack-repository"))
+    api("org.springframework:spring-jdbc")
+
+    implementation(project(":ontrack-database"))
+    implementation(project(":ontrack-repository-support"))
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-actuator")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.apache.commons:commons-lang3")
+
+    testImplementation(project(":ontrack-it-utils"))
+    testRuntimeOnly(project(":ontrack-service"))
 }

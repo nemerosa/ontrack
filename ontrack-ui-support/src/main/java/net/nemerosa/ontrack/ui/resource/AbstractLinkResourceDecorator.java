@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.ui.resource;
 
 import net.nemerosa.ontrack.common.CachedSupplier;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,7 @@ public abstract class AbstractLinkResourceDecorator<T> extends AbstractResourceD
     public List<Link> links(T resource, ResourceContext resourceContext) {
         LinksBuilder linksBuilder = resourceContext.links();
         for (LinkDefinition<T> linkDefinition : linkDefinitions.get()) {
-            if (linkDefinition.getCheckFn().test(resource, resourceContext)) {
+            if (linkDefinition.getCheckFn().invoke(resource, resourceContext)) {
                 linksBuilder = linkDefinition.addLink(linksBuilder, resource, resourceContext);
             }
         }

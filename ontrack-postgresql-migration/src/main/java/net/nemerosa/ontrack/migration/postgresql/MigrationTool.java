@@ -6,16 +6,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import java.util.Collections;
 
 @Configuration
 @SpringBootApplication
@@ -26,16 +23,8 @@ public class MigrationTool {
 
     private final MigrationProperties migrationProperties;
 
-    private final FlywayProperties flywayProperties;
-
-    public MigrationTool(MigrationProperties migrationProperties, FlywayProperties flywayProperties) {
+    public MigrationTool(MigrationProperties migrationProperties) {
         this.migrationProperties = migrationProperties;
-        this.flywayProperties = flywayProperties;
-    }
-
-    @PostConstruct
-    public void start() {
-        flywayProperties.setLocations(Collections.singletonList("classpath:/ontrack/sql"));
     }
 
     public static void main(String[] args) {

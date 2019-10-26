@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service
 
-import com.google.common.collect.ImmutableList
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
@@ -32,7 +31,7 @@ class ValidationStampFilterServiceImpl(
         // Gets for project
         repository.getProjectValidationStampFilters(project).forEach { f -> filters[f.name] = f }
         // OK
-        return ImmutableList.copyOf(filters.values)
+        return filters.values.toList()
     }
 
     override fun getBranchValidationStampFilters(branch: Branch, includeAll: Boolean): List<ValidationStampFilter> {
@@ -47,7 +46,7 @@ class ValidationStampFilterServiceImpl(
         // Gets for branch
         repository.getBranchValidationStampFilters(branch).forEach { f -> filters[f.name] = f }
         // OK
-        return ImmutableList.copyOf(filters.values)
+        return filters.values.toList()
     }
 
     override fun getValidationStampFilterByName(branch: Branch, name: String): Optional<ValidationStampFilter> {

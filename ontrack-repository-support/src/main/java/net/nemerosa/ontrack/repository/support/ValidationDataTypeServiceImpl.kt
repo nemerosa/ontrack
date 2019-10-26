@@ -3,13 +3,10 @@ package net.nemerosa.ontrack.repository.support
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.structure.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class ValidationDataTypeServiceImpl
-@Autowired
-constructor(
+class ValidationDataTypeServiceImpl(
         private val types: List<ValidationDataType<*, *>>
 ) : ValidationDataTypeService {
 

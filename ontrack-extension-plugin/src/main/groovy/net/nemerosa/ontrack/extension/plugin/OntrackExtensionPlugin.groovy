@@ -37,6 +37,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          */
 
         project.apply plugin: 'java'
+        project.apply plugin: 'java-library'
 
         /**
          * Default dependencies
@@ -49,11 +50,11 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            compile "net.nemerosa.ontrack:ontrack-extension-support:${ontrackVersion}"
+            implementation "net.nemerosa.ontrack:ontrack-extension-support:${ontrackVersion}"
 
-            testCompile "net.nemerosa.ontrack:ontrack-it-utils:${ontrackVersion}"
-            testRuntime "net.nemerosa.ontrack:ontrack-service:${ontrackVersion}"
-            testRuntime "net.nemerosa.ontrack:ontrack-repository-impl:${ontrackVersion}"
+            testImplementation "net.nemerosa.ontrack:ontrack-it-utils:${ontrackVersion}"
+            testRuntimeOnly "net.nemerosa.ontrack:ontrack-service:${ontrackVersion}"
+            testRuntimeOnly "net.nemerosa.ontrack:ontrack-repository-impl:${ontrackVersion}"
 
             ontrack "net.nemerosa.ontrack:ontrack-ui:${ontrackVersion}"
         }
@@ -191,7 +192,6 @@ ontrack = ${ontrackVersion}
                 exclude group: 'org.projectlombok'
                 exclude group: 'org.slf4j'
                 exclude group: 'commons-io'
-                exclude group: 'com.google.guava'
             }
         }
 

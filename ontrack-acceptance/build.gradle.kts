@@ -3,6 +3,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     groovy
+    `java-library`
 }
 
 apply(plugin = "org.springframework.boot")
@@ -11,18 +12,20 @@ apply(plugin = "com.bmuschko.docker-remote-api")
 val seleniumVersion = "3.11.0"
 
 dependencies {
-    testCompile(project(":ontrack-client"))
-    testCompile(project(":ontrack-dsl"))
-    testCompile(project(":ontrack-dsl-shell"))
-    testCompile(project(":ontrack-test-utils"))
-    testCompile("org.codehaus.groovy:groovy")
-    testCompile("org.codehaus.groovy:groovy-xml")
-    testCompile("org.springframework.boot:spring-boot-starter")
+    testImplementation(project(":ontrack-client"))
+    testImplementation(project(":ontrack-dsl"))
+    testImplementation(project(":ontrack-dsl-shell"))
+    testImplementation(project(":ontrack-test-utils"))
+    testImplementation("org.apache.commons:commons-lang3")
+    testImplementation("commons-io:commons-io")
+    testImplementation("org.codehaus.groovy:groovy")
+    testImplementation("org.codehaus.groovy:groovy-xml")
+    testImplementation("org.springframework.boot:spring-boot-starter")
 
-    testCompile("org.influxdb:influxdb-java")
+    testImplementation("org.influxdb:influxdb-java")
 
-    testCompile("org.seleniumhq.selenium:selenium-java:$seleniumVersion")
-    testCompile("org.seleniumhq.selenium:selenium-support:$seleniumVersion")
+    testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumVersion")
+    testImplementation("org.seleniumhq.selenium:selenium-support:$seleniumVersion")
 }
 
 //noinspection GroovyAssignabilityCheck
@@ -43,7 +46,7 @@ val bootJar = tasks.getByName<BootJar>("bootJar") {
         from(sourceSets["test"].output)
         into("classes")
     }
-    classpath(configurations.named("testRuntime"))
+    classpath(configurations.named("testRuntimeClasspath"))
     mainClassName = "net.nemerosa.ontrack.acceptance.boot.Start"
 }
 

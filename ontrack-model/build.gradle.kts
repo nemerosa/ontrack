@@ -1,21 +1,22 @@
 plugins {
     groovy
+    `java-library`
 }
 
 dependencies {
-    compile(project(":ontrack-common"))
-    compile(project(":ontrack-json"))
-    compile(project(":ontrack-job"))
-    compile("com.google.guava:guava")
-    compile("org.apache.commons:commons-text")
-    compile("org.springframework:spring-context")
-    compile("org.springframework.security:spring-security-core")
-    compile("javax.validation:validation-api")
-    compile("org.slf4j:slf4j-api")
-    compile("org.springframework.boot:spring-boot-starter-actuator")
+    api(project(":ontrack-json"))
+    api(project(":ontrack-common"))
 
-    testCompile("org.codehaus.groovy:groovy")
-    testCompile(project(":ontrack-test-utils"))
+    implementation(project(":ontrack-job"))
+    implementation("org.apache.commons:commons-text")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("javax.validation:validation-api")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    testImplementation("org.codehaus.groovy:groovy")
+    testImplementation(project(":ontrack-test-utils"))
 }
 
 val testJar by tasks.registering(Jar::class) {

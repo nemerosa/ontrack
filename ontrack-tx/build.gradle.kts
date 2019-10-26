@@ -1,5 +1,8 @@
+plugins {
+    `java-library`
+}
+
 dependencies {
-    compile("com.google.guava:guava")
-    compile("org.slf4j:slf4j-api")
-    compile("org.springframework:spring-context")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework:spring-context")
 }

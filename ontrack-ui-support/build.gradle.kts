@@ -1,8 +1,15 @@
-dependencies {
-    compile(project(":ontrack-model"))
-    compile(project(":ontrack-extension-api"))
-    compile("org.springframework:spring-webmvc")
-    compile("org.springframework.boot:spring-boot-starter-web")
+plugins {
+    `java-library`
+}
 
-    testCompile(project(path = ":ontrack-model", configuration = "tests"))
+dependencies {
+    api(project(":ontrack-model"))
+    api(project(":ontrack-extension-api"))
+    api("org.springframework:spring-web")
+    api("org.springframework:spring-webmvc")
+
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.apache.commons:commons-lang3")
+
+    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
 }

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.api.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
@@ -11,10 +10,11 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -91,9 +91,7 @@ public class TestSimplePropertyType extends AbstractPropertyType<TestSimplePrope
         return new PropertySearchArguments(
                 null,
                 "pp.json->>'value' like :value",
-                ImmutableMap.of(
-                        "value", "%" + token + "%"
-                )
+                Collections.singletonMap("value", "%" + token + "%")
         );
     }
 

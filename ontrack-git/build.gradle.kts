@@ -1,15 +1,18 @@
 plugins {
     groovy
+    `java-library`
 }
 
 description = "Git client for Ontrack."
 
 dependencies {
-    compile("org.eclipse.jgit:org.eclipse.jgit:4.11.5.201810191925-r")
-    compile("org.springframework:spring-tx")
-    compile("commons-io:commons-io")
-    compile("com.google.guava:guava")
-    compile(project(":ontrack-common"))
-    compile("org.codehaus.groovy:groovy")
-    compile("org.slf4j:slf4j-api")
+    api("org.eclipse.jgit:org.eclipse.jgit:4.11.5.201810191925-r")
+
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
+    implementation("commons-io:commons-io")
+    implementation(project(":ontrack-common"))
+    implementation("org.codehaus.groovy:groovy")
+    implementation("org.slf4j:slf4j-api")
 }

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github;
 
-import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
@@ -149,8 +148,6 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     @Override
     protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         GitHubIssue gitHubIssue = (GitHubIssue) issue;
-        return Sets.newLinkedHashSet(
-                gitHubIssue.getLabels().stream().map(GitHubLabel::getName).collect(Collectors.toList())
-        );
+        return gitHubIssue.getLabels().stream().map(GitHubLabel::getName).collect(Collectors.toSet());
     }
 }

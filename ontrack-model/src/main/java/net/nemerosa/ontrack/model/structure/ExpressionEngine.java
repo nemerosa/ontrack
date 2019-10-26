@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 /**
@@ -10,6 +12,7 @@ public interface ExpressionEngine {
     /**
      * Renders an expression in its context
      */
+    @NotNull
     String render(String template, Map<String, ?> parameters);
 
     /**

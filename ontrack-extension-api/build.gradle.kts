@@ -1,6 +1,12 @@
+plugins {
+    `java-library`
+}
+
 dependencies {
-    compile(project(":ontrack-model"))
-    compile("org.springframework.boot:spring-boot-starter-actuator")
+    api(project(":ontrack-model"))
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.apache.commons:commons-lang3")
 }
 
 val testJar by tasks.registering(Jar::class) {
