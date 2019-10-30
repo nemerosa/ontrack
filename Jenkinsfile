@@ -115,7 +115,7 @@ git clean -xfd
     --parallel \\
     --console plain
 '''
-                sh ''' curl -s https://codecov.io/bash | bash '''
+                sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
@@ -932,19 +932,19 @@ set -e
             steps {
                 sh '''\
                     echo "Making sure the images are available on this node..."
-                    
+
                     echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
                     docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
-                    
+
                     echo "Tagging..."
-                    
+
                     docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
                     docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-                    
+
                     echo "Publishing latest versions in Docker Hub..."
-                    
+
                     echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-                    
+
                     docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
                     docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
                 '''
