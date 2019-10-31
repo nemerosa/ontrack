@@ -206,6 +206,7 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                         echo "Getting Jacoco coverage"
                         mkdir -p build/jacoco/
                         cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/acceptance.exec
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco-dsl.exec build/jacoco/dsl.exec
                     '''
                     // Collection of coverage in Docker
                     sh '''
@@ -218,9 +219,21 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                             --profile \\
                             --console plain
                     '''
+                    // Collection of coverage in DSL
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -x classes \\
+                            -PjacocoExecFile=build/jacoco/dsl.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
+                            --stacktrace \\
+                            --profile \\
+                            --console plain
+                    '''
                     // Upload to Codecov
                     sh '''
                         curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
+                        curl -s https://codecov.io/bash | bash -s -- -c -F dsl -f build/reports/jacoco/dsl.xml
                     '''
                 }
                 always {
