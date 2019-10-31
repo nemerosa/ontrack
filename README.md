@@ -1,6 +1,8 @@
 ontrack
 =======
 
+[![codecov](https://codecov.io/gh/nemerosa/ontrack/branch/develop/graph/badge.svg)](https://codecov.io/gh/nemerosa/ontrack)
+
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nemerosa/ontrack)
 
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/nemerosa/ontrack.svg)](http://isitmaintained.com/project/nemerosa/ontrack "Average time to resolve an issue")
