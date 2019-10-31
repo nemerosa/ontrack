@@ -211,6 +211,7 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
+                            -x classes \\
                             -PjacocoExecFile=build/jacoco/acceptance.exec \\
                             -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
                             --stacktrace \\
@@ -298,6 +299,7 @@ docker-compose --project-name ext --file docker-compose-ext.yml --file docker-co
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
+                            -x classes \\
                             -PjacocoExecFile=build/jacoco/extension.exec \\
                             -PjacocoReportFile=build/reports/jacoco/extension.xml \\
                             --stacktrace \\
