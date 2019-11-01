@@ -31,6 +31,7 @@ val kotlinVersion: String by project
 
 plugins {
     java
+    jacoco
     id("net.nemerosa.versioning") version "2.8.2" apply false
     id("nebula.deb") version "6.2.1"
     id("nebula.rpm") version "6.2.1"
@@ -275,6 +276,63 @@ configure(coreProjects) p@{
         mustRunAfter(integrationTest)
     }
 
+}
+
+
+
+/**
+ * Code coverage report
+ */
+
+configure(coreProjects) {
+    apply(plugin = "jacoco")
+}
+
+val codeCoverageReport by tasks.registering(JacocoReport::class) {
+    executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
+
+    javaProjects.forEach {
+        sourceSets(it.sourceSets["main"])
+    }
+
+    reports {
+        xml.isEnabled = true
+        xml.destination = file("${buildDir}/reports/jacoco/report.xml")
+        html.isEnabled = false
+        csv.isEnabled = false
+    }
+}
+
+configure(javaProjects) {
+    tasks.named("test") test@{
+        codeCoverageReport {
+            dependsOn(this@test)
+        }
+    }
+    val integrationTest = tasks.findByName("integrationTest")
+    if (integrationTest != null) {
+        codeCoverageReport {
+            dependsOn(integrationTest)
+        }
+    }
+}
+
+val jacocoExecFile: String by project
+val jacocoReportFile: String by project
+
+val codeDockerCoverageReport by tasks.registering(JacocoReport::class) {
+    executionData(fileTree(project.rootDir.absolutePath).include(jacocoExecFile))
+
+    javaProjects.forEach {
+        sourceSets(it.sourceSets["main"])
+    }
+
+    reports {
+        xml.isEnabled = true
+        xml.destination = file(jacocoReportFile)
+        html.isEnabled = false
+        csv.isEnabled = false
+    }
 }
 
 /**

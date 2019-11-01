@@ -78,6 +78,9 @@ pipeline {
                     branch 'master'
                 }
             }
+            environment {
+                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
+            }
             steps {
                 sh '''\
 git checkout -B ${BRANCH_NAME}
@@ -100,6 +103,7 @@ git clean -xfd
     test \\
     build \\
     integrationTest \\
+    codeCoverageReport \\
     publishToMavenLocal \\
     osPackages \\
     dockerBuild \\
@@ -111,6 +115,7 @@ git clean -xfd
     --parallel \\
     --console plain
 '''
+                sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
                 sh """\
 echo "(*) Building the test extension..."
 cd ontrack-extension-test
@@ -176,6 +181,7 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             }
             environment {
                 ONTRACK_VERSION = "${version}"
+                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
             }
             steps {
                 // Runs the acceptance tests
@@ -188,22 +194,59 @@ echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --us
 
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name local up --exit-code-from ontrack_acceptance
+docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
 """
                 }
             }
             post {
+                success {
+                    sh '''
+                        #!/bin/bash
+                        set -e
+                        echo "Getting Jacoco coverage"
+                        mkdir -p build/jacoco/
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/acceptance.exec
+                        cp ontrack-acceptance/src/main/compose/jacoco-dsl/jacoco.exec build/jacoco/dsl.exec
+                    '''
+                    // Collection of coverage in Docker
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -x classes \\
+                            -PjacocoExecFile=build/jacoco/acceptance.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
+                            --stacktrace \\
+                            --profile \\
+                            --console plain
+                    '''
+                    // Collection of coverage in DSL
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -x classes \\
+                            -PjacocoExecFile=build/jacoco/dsl.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
+                            --stacktrace \\
+                            --profile \\
+                            --console plain
+                    '''
+                    // Upload to Codecov
+                    sh '''
+                        curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
+                        curl -s https://codecov.io/bash | bash -s -- -c -F dsl -f build/reports/jacoco/dsl.xml
+                    '''
+                }
                 always {
-                    sh """\
-#!/bin/bash
-set -e
-echo "Cleanup..."
-rm -rf build/acceptance
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name local down --volumes
-"""
+                    sh '''
+                        #!/bin/bash
+                        set -e
+                        echo "Cleanup..."
+                        rm -rf build/acceptance
+                        mkdir -p build
+                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml down --volumes
+                    '''
                     script {
                         def results = junit('build/acceptance/*.xml')
                         if (!pr) {
@@ -235,6 +278,7 @@ docker-compose --project-name local down --volumes
             }
             environment {
                 ONTRACK_VERSION = "${version}"
+                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
             }
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
@@ -251,11 +295,35 @@ echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --us
 
 echo "Launching tests..."
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml up --exit-code-from ontrack_acceptance
+docker-compose --project-name ext --file docker-compose-ext.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
 """
                 }
             }
             post {
+                success {
+                    sh '''
+                        #!/bin/bash
+                        set -e
+                        echo "Getting Jacoco coverage"
+                        mkdir -p build/jacoco/
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/extension.exec
+                    '''
+                    // Collection of coverage in Docker
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -x classes \\
+                            -PjacocoExecFile=build/jacoco/extension.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/extension.xml \\
+                            --stacktrace \\
+                            --profile \\
+                            --console plain
+                    '''
+                    // Upload to Codecov
+                    sh '''
+                        curl -s https://codecov.io/bash | bash -s -- -c -F extension -f build/reports/jacoco/extension.xml
+                    '''
+                }
                 always {
                     sh """\
 echo "Cleanup..."
@@ -263,7 +331,7 @@ mkdir -p build
 rm -rf build/extension
 cp -r ontrack-acceptance/src/main/compose/build build/extension
 cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml down --volumes
+docker-compose --project-name ext --file docker-compose-ext.yml --file docker-compose-jacoco.yml down --volumes
 """
                     script {
                         def results = junit 'build/extension/*.xml'
@@ -903,19 +971,19 @@ set -e
             steps {
                 sh '''\
                     echo "Making sure the images are available on this node..."
-                    
+
                     echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
                     docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
-                    
+
                     echo "Tagging..."
-                    
+
                     docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
                     docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-                    
+
                     echo "Publishing latest versions in Docker Hub..."
-                    
+
                     echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-                    
+
                     docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
                     docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
                 '''
