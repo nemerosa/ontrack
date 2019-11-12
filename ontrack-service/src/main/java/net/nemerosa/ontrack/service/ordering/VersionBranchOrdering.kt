@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Version
 import net.nemerosa.ontrack.common.toVersion
 import net.nemerosa.ontrack.model.ordering.BranchOrdering
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
 import org.springframework.stereotype.Component
 
 /**
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Component
  * cannot be extracted are classified alphabetically and put at the end.
  */
 @Component
-class VersionBranchOrdering : BranchOrdering {
+class VersionBranchOrdering(
+        val branchDisplayNameService: BranchDisplayNameService
+) : BranchOrdering {
 
     override val id: String = "version"
 
@@ -26,9 +29,12 @@ class VersionBranchOrdering : BranchOrdering {
 
     private fun Branch.getVersion(regex: Regex): VersionOrString {
         // Path to use for the branch
-        // TODO ... SCM path?
-        val path: String = name
-        // Extracts a version from the path
+        val path: String = branchDisplayNameService.getBranchDisplayName(this)
+        // Path first, then name, then version = name
+        return getVersion(regex, path) ?: getVersion(regex, name) ?: VersionOrString(null)
+    }
+
+    private fun getVersion(regex: Regex, path: String): VersionOrString? {
         val matcher = regex.matchEntire(path)
         if (matcher != null && matcher.groupValues.size >= 2) {
             // Getting the first group
@@ -40,18 +46,13 @@ class VersionBranchOrdering : BranchOrdering {
                 return VersionOrString(version)
             }
         }
-        // Name as default
-        return VersionOrString(name)
+        // Nothing
+        return null
     }
 
-    private class VersionOrString private constructor(
-            val version: Version?,
-            val name: String?
+    private class VersionOrString(
+            val version: Version?
     ) : Comparable<VersionOrString> {
-
-        constructor(version: Version) : this(version, null)
-        constructor(name: String) : this(null, name)
-
         override fun compareTo(other: VersionOrString): Int {
             return if (version != null && other.version != null) {
                 version.compareTo(other.version)
