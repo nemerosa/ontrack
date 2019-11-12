@@ -15,7 +15,6 @@ class VersionBranchOrdering : BranchOrdering {
 
     override val id: String = "version"
 
-
     override fun getComparator(param: String?): Comparator<Branch> {
         return if (param != null && param.isNotBlank()) {
             val regex = param.toRegex()
@@ -25,7 +24,7 @@ class VersionBranchOrdering : BranchOrdering {
         }
     }
 
-    private fun Branch.getVersion(regex: Regex): Comparable<*> {
+    private fun Branch.getVersion(regex: Regex): VersionOrString {
         // Path to use for the branch
         // TODO ... SCM path?
         val path: String = name
@@ -38,10 +37,29 @@ class VersionBranchOrdering : BranchOrdering {
             val version = token.toVersion()
             // ... and using it if not null
             if (version != null) {
-                return version
+                return VersionOrString(version)
             }
         }
         // Name as default
-        return name
+        return VersionOrString(name)
+    }
+
+    private class VersionOrString private constructor(
+            val version: Version?,
+            val name: String?
+    ) : Comparable<VersionOrString> {
+
+        constructor(version: Version) : this(version, null)
+        constructor(name: String) : this(null, name)
+
+        override fun compareTo(other: VersionOrString): Int {
+            return if (version != null && other.version != null) {
+                version.compareTo(other.version)
+            } else if (version != null) {
+                1
+            } else {
+                -1
+            }
+        }
     }
 }

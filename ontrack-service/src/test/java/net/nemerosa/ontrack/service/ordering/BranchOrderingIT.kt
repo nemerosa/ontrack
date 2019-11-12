@@ -34,6 +34,25 @@ class BranchOrderingIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Ordering by name`() {
+        project {
+            val b1 = branch("release-1.0")
+            val b2 = branch("release-2.0")
+            val b3 = branch("release-1.1")
+            val b4 = branch("feature-908-awesome")
+            val ordering = branchOrderingService.getBranchOrdering("name")
+            assertNotNull(ordering) { order ->
+                val comparator = order.getComparator(null) // No parameter needed
+                val branches = listOf(b1, b2, b3, b4).sortedWith(comparator)
+                assertEquals(
+                        listOf(b2, b3, b1, b4).map { it.id() },
+                        branches.map { it.id() }
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Ordering by version with only matching versions`() {
         project {
             val b1 = branch("release-1.0")
@@ -41,10 +60,29 @@ class BranchOrderingIT : AbstractDSLTestSupport() {
             val b3 = branch("release-1.1")
             val ordering = branchOrderingService.getBranchOrdering("version")
             assertNotNull(ordering) { order ->
-                val comparator = order.getComparator("release-(\\d+\\.\\d+)") // No parameter needed
+                val comparator = order.getComparator("release-(\\d+\\.\\d+)")
                 val branches = listOf(b1, b2, b3).sortedWith(comparator)
                 assertEquals(
                         listOf(b2, b3, b1).map { it.id() },
+                        branches.map { it.id() }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Ordering by version`() {
+        project {
+            val b1 = branch("release-1.0")
+            val b2 = branch("release-2.0")
+            val b3 = branch("release-1.1")
+            val b4 = branch("feature-908-awesome")
+            val ordering = branchOrderingService.getBranchOrdering("version")
+            assertNotNull(ordering) { order ->
+                val comparator = order.getComparator("release-(\\d+\\.\\d+)")
+                val branches = listOf(b1, b2, b3, b4).sortedWith(comparator)
+                assertEquals(
+                        listOf(b2, b3, b1, b4).map { it.id() },
                         branches.map { it.id() }
                 )
             }
