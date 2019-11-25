@@ -88,6 +88,57 @@ class IssueReportingIT : AbstractGitTestSupport() {
     }
 
     @Test
+    fun `Getting last issues using the branch`() {
+        withTestContext { project ->
+            // Running the query to get the opened issues
+            val data = run("""{
+                projects(id: ${project.id}) {
+                    branches(name: "master") {
+                        validationIssues {
+                            validationRuns {
+                                validationStamp {
+                                    name
+                                }
+                                build {
+                                    name
+                                }
+                            }
+                            issue {
+                                key
+                                displayKey
+                                summary
+                                url
+                                status {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            }""")
+            val branch = data["projects"][0]["branches"][0]
+            // Check issue #3 is present
+            branch.apply {
+                val validationIssue = get("validationIssues").first { it["issue"]["key"].asInt() == 3 }
+                val validationRuns = validationIssue["validationRuns"]
+                assertEquals(1, validationRuns.size())
+                val validationRun = validationRuns[0]
+                assertEquals("1.0", validationRun["build"]["name"].asText())
+                assertEquals("VS1", validationRun["validationStamp"]["name"].asText())
+            }
+            // Check issue #4 is present
+            branch.apply {
+                val validationIssue = get("validationIssues").first { it["issue"]["key"].asInt() == 4 }
+                val validationRuns = validationIssue["validationRuns"]
+                assertEquals(1, validationRuns.size())
+                val validationRun = validationRuns[0]
+                assertEquals("1.1", validationRun["build"]["name"].asText())
+                assertEquals("VS2", validationRun["validationStamp"]["name"].asText())
+            }
+        }
+    }
+
+    @Test
     fun `Getting last issues on a branch`() {
         withTestContext { project ->
             // Running the query to get the opened issues
