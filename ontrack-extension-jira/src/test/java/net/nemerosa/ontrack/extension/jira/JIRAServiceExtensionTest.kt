@@ -144,7 +144,7 @@ class JIRAServiceExtensionTest {
     @Test
     fun getLinkForAllIssues_one_issue() {
         val issue = mock(Issue::class.java)
-        `when`(issue.getKey()).thenReturn("PRJ-13")
+        `when`(issue.key).thenReturn("PRJ-13")
         val link = service.getLinkForAllIssues(
                 jiraConfiguration(),
                 listOf(issue)

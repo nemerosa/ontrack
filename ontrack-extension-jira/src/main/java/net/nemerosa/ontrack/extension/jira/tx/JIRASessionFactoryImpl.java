@@ -33,6 +33,7 @@ public class JIRASessionFactoryImpl implements JIRASessionFactory {
         JIRAClient client = new JIRAClientImpl(jsonClient);
         // Creates the session
         return new JIRASession() {
+
             @Override
             public JIRAClient getClient() {
                 return client;
