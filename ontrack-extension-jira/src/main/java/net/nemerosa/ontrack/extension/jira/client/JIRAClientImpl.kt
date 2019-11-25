@@ -12,10 +12,20 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
 
+    private val issues: ConcurrentMap<Pair<String, String>, JIRAIssue?> = ConcurrentHashMap()
+
     override fun getIssue(key: String, configuration: JIRAConfiguration): JIRAIssue? {
+        return issues.getOrPut(configuration.url to key) {
+            fetchIssue(key, configuration)
+        }
+    }
+
+    private fun fetchIssue(key: String, configuration: JIRAConfiguration): JIRAIssue? {
         val node: JsonNode
         try {
             node = jsonClient.get("/rest/api/2/issue/%s?expand=names", key)
