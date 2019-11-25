@@ -1276,6 +1276,18 @@ class StructureServiceImpl(
         }
     }
 
+    override fun getValidationRunsForStatus(branchId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+        val branch = getBranch(branchId)
+        return structureRepository.getValidationRunsForStatus(
+                branch,
+                statuses,
+                offset,
+                count
+        ) {
+            validationRunStatusService.getValidationRunStatus(it)
+        }
+    }
+
     override fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun {
         // Entity check
         Entity.isEntityDefined(validationRun, "Validation run must be defined")

@@ -346,6 +346,21 @@ interface StructureService {
             count: Int
     ): List<ValidationRun>
 
+    /**
+     * Gets the list of validation runs for a branch and a list of statuses.
+     * @param branchId ID of the branch
+     * @param statuses          List of statuses for the last status of the run
+     * @param offset            Offset in the list
+     * @param count             Maximum number of elemnts to return
+     * @return List of validation runs
+     */
+    fun getValidationRunsForStatus(
+            branchId: ID,
+            statuses: List<ValidationRunStatusID>,
+            offset: Int,
+            count: Int
+    ): List<ValidationRun>
+
     fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun
 
     /**

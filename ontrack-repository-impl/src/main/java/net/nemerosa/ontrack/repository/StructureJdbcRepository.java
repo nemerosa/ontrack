@@ -1140,6 +1140,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForStatus(Branch branch, List<ValidationRunStatusID> statuses, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                        "FROM VALIDATION_RUNS VR " +
+                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                        "INNER JOIN VALIDATION_RUN_STATUSES VST ON VST.VALIDATIONRUNID = VR.ID " +
+                        "INNER JOIN BUILDS B ON B.ID = VR.BUILDID " +
+                        "WHERE B.BRANCHID = :branchId " +
+                        "AND VST.VALIDATIONRUNSTATUSID IN (:statuses) " +
+                        "ORDER BY VR.BUILDID DESC, VR.ID DESC " +
+                        "LIMIT :limit OFFSET :offset",
+                params("branchId", branch.id())
+                        .addValue("statuses", statuses.stream().map(ValidationRunStatusID::getId).collect(Collectors.toList()))
+                        .addValue("limit", count)
+                        .addValue("offset", offset),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        this::getBuild,
+                        this::getValidationStamp,
+                        validationRunStatusService
+                )
+        );
+    }
+
+    @Override
     public int getValidationRunsCountForValidationStamp(ID validationStampId) {
         return getNamedParameterJdbcTemplate().queryForObject(
                 "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId",
