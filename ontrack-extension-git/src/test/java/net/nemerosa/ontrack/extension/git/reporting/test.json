@@ -1,0 +1,45 @@
+{
+  "name": "VS1",
+  "validationRunsPaginated": {
+    "pageItems": [
+      {
+        "build": {
+          "name": "1.1"
+        },
+        "validationRunStatuses": [
+          {
+            "statusID": {
+              "id": "DEFECTIVE"
+            },
+            "issues": []
+          },
+          {
+            "statusID": {
+              "id": "FAILED"
+            },
+            "issues": []
+          }
+        ]
+      },
+      {
+        "build": {
+          "name": "1.1"
+        },
+        "validationRunStatuses": [
+          {
+            "statusID": {
+              "id": "DEFECTIVE"
+            },
+            "issues": []
+          },
+          {
+            "statusID": {
+              "id": "FAILED"
+            },
+            "issues": []
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1069,7 +1069,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "LEFT JOIN VALIDATION_RUN_STATUSES VST ON VST.VALIDATIONRUNID = VR.ID " +
                         "WHERE VR.BUILDID = :buildId " +
                         "AND VR.VALIDATIONSTAMPID = :validationStampId " +
-                        "AND VST.VALIDATIONRUNSTATUSID in :statuses " +
+                        "AND VST.VALIDATIONRUNSTATUSID IN (:statuses) " +
                         "ORDER BY VR.ID DESC " +
                         "LIMIT :limit OFFSET :offset",
                 params("buildId", build.id()).addValue("validationStampId", validationStamp.id())
@@ -1123,7 +1123,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
                         "LEFT JOIN VALIDATION_RUN_STATUSES VST ON VST.VALIDATIONRUNID = VR.ID " +
                         "WHERE VR.VALIDATIONSTAMPID = :validationStampId " +
-                        "AND VST.VALIDATIONRUNSTATUSID in :statuses " +
+                        "AND VST.VALIDATIONRUNSTATUSID IN (:statuses) " +
                         "ORDER BY VR.BUILDID DESC, VR.ID DESC " +
                         "LIMIT :limit OFFSET :offset",
                 params("validationStampId", validationStamp.id())

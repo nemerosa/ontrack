@@ -50,7 +50,9 @@ class IssueReportingIT : AbstractGitTestSupport() {
                                             displayKey
                                             summary
                                             url
-                                            status
+                                            status {
+                                                name
+                                            }
                                         }
                                     }
                                 }
@@ -63,7 +65,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Check issue #3 is not present
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS1" }
-                val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.0" }
+                val run = vs["validationRunsPaginated"]["pageItems"].first { it["build"]["name"].asText() == "1.0" }
                 val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(0, issues.size()) // #3 is excluded by the filter
@@ -71,7 +73,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Check issue #4 is present
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS2" }
-                val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.1" }
+                val run = vs["validationRunsPaginated"]["pageItems"].first { it["build"]["name"].asText() == "1.1" }
                 val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(1, issues.size())
@@ -79,8 +81,8 @@ class IssueReportingIT : AbstractGitTestSupport() {
                 assertEquals(4, issue["key"].asInt())
                 assertEquals("#4", issue["displayKey"].asText())
                 assertEquals("Issue #4", issue["summary"].asText())
-                assertEquals("", issue["url"].asText())
-                assertEquals("OPEN", issue["status"].asText())
+                assertEquals("uri:issue/4", issue["url"].asText())
+                assertEquals("OPEN", issue["status"]["name"].asText())
             }
         }
     }
@@ -108,7 +110,9 @@ class IssueReportingIT : AbstractGitTestSupport() {
                                             displayKey
                                             summary
                                             url
-                                            status
+                                            status {
+                                                name
+                                            }
                                         }
                                     }
                                 }
@@ -121,7 +125,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             // Check issue #3 is not present
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS1" }
-                val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.0" }
+                val run = vs["validationRunsPaginated"]["pageItems"].first { it["build"]["name"].asText() == "1.0" }
                 val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(1, issues.size())
@@ -129,13 +133,13 @@ class IssueReportingIT : AbstractGitTestSupport() {
                 assertEquals(3, issue["key"].asInt())
                 assertEquals("#3", issue["displayKey"].asText())
                 assertEquals("Issue #3", issue["summary"].asText())
-                assertEquals("", issue["url"].asText())
-                assertEquals("CLOSED", issue["status"].asText())
+                assertEquals("uri:issue/3", issue["url"].asText())
+                assertEquals("CLOSED", issue["status"]["name"].asText())
             }
             // Check issue #4 is present
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS2" }
-                val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.1" }
+                val run = vs["validationRunsPaginated"]["pageItems"].first { it["build"]["name"].asText() == "1.1" }
                 val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(1, issues.size())
@@ -143,8 +147,8 @@ class IssueReportingIT : AbstractGitTestSupport() {
                 assertEquals(4, issue["key"].asInt())
                 assertEquals("#4", issue["displayKey"].asText())
                 assertEquals("Issue #4", issue["summary"].asText())
-                assertEquals("", issue["url"].asText())
-                assertEquals("OPEN", issue["status"].asText())
+                assertEquals("uri:issue/4", issue["url"].asText())
+                assertEquals("OPEN", issue["status"]["name"].asText())
             }
         }
     }
@@ -169,7 +173,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
                     // Creates all the validations we want to monitor
                     val stamps = (0..2).map { validationStamp("VS$it") }
                     // Creates a list of builds
-                    val builds = (1 downTo 0).map { build("1.$it") }
+                    val builds = (0..1).map { build("1.$it") }
                     // Activates the validations & descriptions
                     builds[0].validate(stamps[0], ValidationRunStatusID.STATUS_FAILED)
                     builds[0].validate(stamps[1], ValidationRunStatusID.STATUS_FAILED)
