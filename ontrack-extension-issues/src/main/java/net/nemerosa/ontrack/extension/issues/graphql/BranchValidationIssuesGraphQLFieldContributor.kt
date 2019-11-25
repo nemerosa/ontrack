@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.issues.graphql
 
 import graphql.Scalars.GraphQLBoolean
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLList
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtensionService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -33,10 +35,16 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                             .description("Filters the validation runs according to their status")
                                             .type(GraphQLBoolean)
                                 }
+                                .argument {
+                                    it.name("status")
+                                            .description("List of issue statuses to keep")
+                                            .type(GraphQLList(GraphQLString))
+                                }
                                 .dataFetcher { env ->
                                     val branch: Branch = env.getSource()
                                     val passed: Boolean? = env.getArgument("passed")
-                                    getValidationIssues(branch, passed)
+                                    val status: List<String>? = env.getArgument("status")
+                                    getValidationIssues(branch, passed, status?.toSet())
                                 }
                                 .build()
                 )
@@ -44,7 +52,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                 null
             }
 
-    private fun getValidationIssues(branch: Branch, passed: Boolean?): List<GQLTypeValidationIssue.Data> {
+    private fun getValidationIssues(branch: Branch, passed: Boolean?, status: Set<String>?): List<GQLTypeValidationIssue.Data> {
         return transactionService.doInTransaction {
             // Gets the issue service for the project
             val issueService = issueServiceExtensionService.getIssueServiceExtension(branch.project)
@@ -95,6 +103,8 @@ class BranchValidationIssuesGraphQLFieldContributor(
                             issue = issueService.getIssue(key),
                             validationRuns = runs
                     )
+                }.filter { data ->
+                    status == null || data.issue.status.name in status
                 }
             } else {
                 emptyList()
