@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.graphql
 
+import graphql.Scalars.GraphQLBoolean
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtensionService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
@@ -27,9 +28,15 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                 .name("validationIssues")
                                 .description("List of issues reported into the validation run statuses")
                                 .type(stdList(validationIssue.typeRef))
+                                .argument {
+                                    it.name("passed")
+                                            .description("Filters the validation runs according to their status")
+                                            .type(GraphQLBoolean)
+                                }
                                 .dataFetcher { env ->
                                     val branch: Branch = env.getSource()
-                                    getValidationIssues(branch)
+                                    val passed: Boolean? = env.getArgument("passed")
+                                    getValidationIssues(branch, passed)
                                 }
                                 .build()
                 )
@@ -37,7 +44,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                 null
             }
 
-    private fun getValidationIssues(branch: Branch): List<GQLTypeValidationIssue.Data> {
+    private fun getValidationIssues(branch: Branch, passed: Boolean?): List<GQLTypeValidationIssue.Data> {
         return transactionService.doInTransaction {
             // Gets the issue service for the project
             val issueService = issueServiceExtensionService.getIssueServiceExtension(branch.project)
@@ -45,9 +52,18 @@ class BranchValidationIssuesGraphQLFieldContributor(
                 // Index of issue key --> list of runs
                 val index = mutableMapOf<String, MutableList<ValidationRun>>()
                 // Gets validation runs for the branch
+                val statuses = if (passed != null) {
+                    if (passed) {
+                        validationRunStatusService.validationRunStatusList.filter { it.isPassed }
+                    } else {
+                        validationRunStatusService.validationRunStatusList.filter { !it.isPassed }
+                    }
+                } else {
+                    validationRunStatusService.validationRunStatusList.toList()
+                }
                 val runs = structureService.getValidationRunsForStatus(
                         branch.id,
-                        validationRunStatusService.validationRunStatusList.toList(), // TODO Passed or not passed as argument
+                        statuses,
                         0,
                         10 // TODO Make this an argument (limit in the past)
                 )
