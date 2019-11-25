@@ -42,7 +42,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
                                         name
                                     }
                                     validationRunStatuses {
-                                        status {
+                                        statusID {
                                             id
                                         }
                                         issues(status: "OPEN") {
@@ -64,7 +64,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS1" }
                 val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.0" }
-                val status = run["validationRunStatuses"].first { it["status"]["id"].asText() == "DEFECTIVE" }
+                val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(0, issues.size()) // #3 is excluded by the filter
             }
@@ -72,7 +72,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS2" }
                 val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.1" }
-                val status = run["validationRunStatuses"].first { it["status"]["id"].asText() == "DEFECTIVE" }
+                val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(1, issues.size())
                 val issue = issues[0]
@@ -100,7 +100,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
                                         name
                                     }
                                     validationRunStatuses {
-                                        status {
+                                        statusID {
                                             id
                                         }
                                         issues {
@@ -122,7 +122,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS1" }
                 val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.0" }
-                val status = run["validationRunStatuses"].first { it["status"]["id"].asText() == "DEFECTIVE" }
+                val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(1, issues.size())
                 val issue = issues[0]
@@ -136,7 +136,7 @@ class IssueReportingIT : AbstractGitTestSupport() {
             branch.apply {
                 val vs = get("validationStamps").first { it["name"].asText() == "VS2" }
                 val run = vs["validationRunsPaginated"]["pageIteams"].first { it["build"]["name"].asText() == "1.1" }
-                val status = run["validationRunStatuses"].first { it["status"]["id"].asText() == "DEFECTIVE" }
+                val status = run["validationRunStatuses"].first { it["statusID"]["id"].asText() == "DEFECTIVE" }
                 val issues = status["issues"]
                 assertEquals(1, issues.size())
                 val issue = issues[0]

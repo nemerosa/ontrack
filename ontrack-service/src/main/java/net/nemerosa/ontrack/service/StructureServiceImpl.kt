@@ -1244,10 +1244,36 @@ class StructureServiceImpl(
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
+    override fun getValidationRunsForBuildAndValidationStampAndStatus(buildId: ID, validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+        val build = getBuild(buildId)
+        val validationStamp = getValidationStamp(validationStampId)
+        securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
+        return structureRepository.getValidationRunsForBuildAndValidationStampAndStatus(
+                build,
+                validationStamp,
+                statuses,
+                offset,
+                count
+        ) { validationRunStatusService.getValidationRunStatus(it) }
+    }
+
     override fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
         val validationStamp = getValidationStamp(validationStampId)
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return structureRepository.getValidationRunsForValidationStamp(validationStamp, offset, count) { validationRunStatusService.getValidationRunStatus(it) }
+    }
+
+    override fun getValidationRunsForValidationStampAndStatus(validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+        val validationStamp = getValidationStamp(validationStampId)
+        securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
+        return structureRepository.getValidationRunsForValidationStampAndStatus(
+                validationStamp,
+                statuses,
+                offset,
+                count
+        ) {
+            validationRunStatusService.getValidationRunStatus(it)
+        }
     }
 
     override fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun {
