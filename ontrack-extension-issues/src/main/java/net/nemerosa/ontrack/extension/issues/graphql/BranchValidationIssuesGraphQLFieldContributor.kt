@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.graphql
 
-import graphql.Scalars.GraphQLBoolean
-import graphql.Scalars.GraphQLString
+import graphql.Scalars.*
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLList
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtensionService
@@ -40,11 +39,18 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                             .description("List of issue statuses to keep")
                                             .type(GraphQLList(GraphQLString))
                                 }
+                                .argument {
+                                    it.name("count")
+                                            .description("Maximum number of validation runs to fetch in order to get the issues")
+                                            .defaultValue(10)
+                                            .type(GraphQLInt)
+                                }
                                 .dataFetcher { env ->
                                     val branch: Branch = env.getSource()
                                     val passed: Boolean? = env.getArgument("passed")
                                     val status: List<String>? = env.getArgument("status")
-                                    getValidationIssues(branch, passed, status?.toSet())
+                                    val count: Int? = env.getArgument("count")
+                                    getValidationIssues(branch, passed, status?.toSet(), count ?: 100)
                                 }
                                 .build()
                 )
@@ -52,7 +58,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                 null
             }
 
-    private fun getValidationIssues(branch: Branch, passed: Boolean?, status: Set<String>?): List<GQLTypeValidationIssue.Data> {
+    private fun getValidationIssues(branch: Branch, passed: Boolean?, status: Set<String>?, count: Int): List<GQLTypeValidationIssue.Data> {
         return transactionService.doInTransaction {
             // Gets the issue service for the project
             val issueService = issueServiceExtensionService.getIssueServiceExtension(branch.project)
@@ -73,7 +79,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                         branch.id,
                         statuses,
                         0,
-                        10 // TODO Make this an argument (limit in the past)
+                        count
                 )
                 // Loops over all statuses
                 runs.forEach { run ->
