@@ -17,11 +17,19 @@
                 <tr>
                     <td class="success" colspan="3">
                         <span ng-if="selectedStatuses.length > 0">
+                            <span>
+                                <input id="show-details" type="checkbox" ng-model="displayOptions.showingDetails">
+                                <label for="show-details">Show details</label>
+                            </span>
+                            |
+                        </span>
+                        <span ng-if="selectedStatuses.length > 0">
                             Statuses:
                             <span ng-repeat="selectedStatus in selectedStatuses">
                                 <input id="status-{{selectedStatus.status}}" type="checkbox" ng-model="selectedStatus.selected">
                                 <label for="status-{{selectedStatus.status}}">{{selectedStatus.status}}</label>
                             </span>
+                            |
                         </span>
                         <span>
                             Total number of issues: {{branch.validationIssues.length}}
@@ -38,7 +46,7 @@
                         - <span class="ot-description">{{validationIssue.issue.updateTime | date:'mediumDate' }}&nbsp;{{validationIssue.issue.updateTime | date:'shortTime' }}</span>
                     </td>
                 </tr>
-                <tr ng-repeat="validationRun in validationIssue.validationRuns | limitTo: 10">
+                <tr ng-repeat="validationRun in validationIssue.validationRuns | limitTo: 10" ng-show="displayOptions.showingDetails">
                     <td style="width: 3em;">
                         <a href="{{validationRun.links._page}}"><span class="fa fa-info-circle" title="List of statuses where the issue has been added"></span></a>
                     </td>

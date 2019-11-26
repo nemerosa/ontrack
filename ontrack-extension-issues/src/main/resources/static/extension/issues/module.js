@@ -97,6 +97,10 @@ angular.module('ontrack.extension.issues', [
                 let selection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
                 return selection && selection.selected;
             };
+            // Showing the details
+            $scope.displayOptions = {
+                showingDetails:  false
+            };
         }).finally(() => {
             $scope.loadingIssues = false;
         });
