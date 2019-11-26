@@ -140,6 +140,53 @@ class IssueReportingIT : AbstractGitTestSupport() {
     }
 
     @Test
+    fun `Getting last issues on a validation stamp using the branch`() {
+        withTestContext { project ->
+            // Running the query to get the opened issues
+            val data = run("""{
+                projects(id: ${project.id}) {
+                    branches(name: "master") {
+                        validationIssues(stamp: "VS2") {
+                            validationRuns {
+                                validationStamp {
+                                    name
+                                }
+                                build {
+                                    name
+                                }
+                            }
+                            issue {
+                                key
+                                displayKey
+                                summary
+                                url
+                                status {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            }""")
+            val branch = data["projects"][0]["branches"][0]
+            // Check issue #3 is NOT present
+            branch.apply {
+                val validationIssue = get("validationIssues").firstOrNull { it.path("issue").path("key").asInt() == 3 }
+                assertNull(validationIssue, "Issue 3 has been filtered out")
+            }
+            // Check issue #4 is present
+            branch.apply {
+                val validationIssue = get("validationIssues").first { it["issue"]["key"].asInt() == 4 }
+                val validationRuns = validationIssue["validationRuns"]
+                assertEquals(1, validationRuns.size())
+                val validationRun = validationRuns[0]
+                assertEquals("1.1", validationRun["build"]["name"].asText())
+                assertEquals("VS2", validationRun["validationStamp"]["name"].asText())
+            }
+        }
+    }
+
+    @Test
     fun `Getting last issues on failed validation runs using the branch`() {
         withTestContext { project ->
             // Running the query to get the opened issues

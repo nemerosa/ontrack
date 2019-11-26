@@ -45,12 +45,18 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                             .defaultValue(10)
                                             .type(GraphQLInt)
                                 }
+                                .argument {
+                                    it.name("stamp")
+                                            .description("Regular expression to filter on the validation stamps.")
+                                            .type(GraphQLString)
+                                }
                                 .dataFetcher { env ->
                                     val branch: Branch = env.getSource()
                                     val passed: Boolean? = env.getArgument("passed")
                                     val status: List<String>? = env.getArgument("status")
                                     val count: Int? = env.getArgument("count")
-                                    getValidationIssues(branch, passed, status?.toSet(), count ?: 100)
+                                    val stampRegex: String? = env.getArgument("stamp")
+                                    getValidationIssues(branch, passed, status?.toSet(), count ?: 100, stampRegex)
                                 }
                                 .build()
                 )
@@ -58,7 +64,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                 null
             }
 
-    private fun getValidationIssues(branch: Branch, passed: Boolean?, status: Set<String>?, count: Int): List<GQLTypeValidationIssue.Data> {
+    private fun getValidationIssues(branch: Branch, passed: Boolean?, status: Set<String>?, count: Int, stampRegex: String?): List<GQLTypeValidationIssue.Data> {
         return transactionService.doInTransaction {
             // Gets the issue service for the project
             val issueService = issueServiceExtensionService.getIssueServiceExtension(branch.project)
@@ -76,8 +82,15 @@ class BranchValidationIssuesGraphQLFieldContributor(
                     validationRunStatusService.validationRunStatusList.toList()
                 }
                 // Gets all validation stamps
-                // TODO Filter on validation stamps
+                val pattern = if (stampRegex.isNullOrBlank()) {
+                    null
+                } else {
+                    stampRegex.toRegex()
+                }
                 val stamps = structureService.getValidationStampListForBranch(branch.id)
+                        .filter { stamp ->
+                            pattern == null || pattern.matches(stamp.name)
+                        }
                 // For each validation stamp
                 stamps.forEach { stamp ->
                     // Gets the runs for this validation stamp
