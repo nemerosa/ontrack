@@ -1,0 +1,30 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingIssues">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading issues for this branch...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="branch">
+        <div class="col-md-12">
+
+            <table class="table table-hover">
+                <tbody ng-repeat="validationIssue in branch.validationIssues">
+                <tr>
+                    <td>
+                        <a href="{{validationIssue.issue.url}}">{{validationIssue.issue.displayKey}}</a>
+                        - <b>{{validationIssue.issue.status.name}}</b>
+                        - {{validationIssue.issue.summary}}
+                        - <span class="ot-description">{{validationIssue.issue.updateTime | date:'mediumDate' }}&nbsp;{{validationIssue.issue.updateTime | date:'shortTime' }}</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</ot-view>

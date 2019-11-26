@@ -131,6 +131,8 @@ class BranchValidationIssuesGraphQLFieldContributor(
                     )
                 }.filter { data ->
                     status == null || data.issue.status.name in status
+                }.sortedByDescending {
+                    it.issue.updateTime
                 }
             } else {
                 emptyList()
