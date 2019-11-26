@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jira.model
 
-class JIRAVersion(
+data class JIRAVersion(
         val name: String,
         val released: Boolean
 )

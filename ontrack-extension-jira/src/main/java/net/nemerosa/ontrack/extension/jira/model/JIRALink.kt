@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jira.model
 
-class JIRALink(
+data class JIRALink(
         val key: String,
         val url: String,
         val status: JIRAStatus,

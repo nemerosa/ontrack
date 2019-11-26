@@ -55,7 +55,8 @@ class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
 
         private val JIRA_DATA_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
-        private fun toIssue(configuration: JIRAConfiguration, node: JsonNode): JIRAIssue {
+        @JvmStatic
+        fun toIssue(configuration: JIRAConfiguration, node: JsonNode): JIRAIssue {
             // Translation of fields
             val fields = ArrayList<JIRAField>()
             val names = node.path("names")
@@ -134,7 +135,8 @@ class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
             )
         }
 
-        private fun parseFromJIRA(value: String): LocalDateTime {
+        @JvmStatic
+        fun parseFromJIRA(value: String): LocalDateTime {
             return LocalDateTime.ofInstant(
                     ZonedDateTime.parse(value, JIRA_DATA_TIME).toInstant(),
                     ZoneOffset.UTC
