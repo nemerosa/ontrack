@@ -3,6 +3,7 @@ apply plugin: 'groovy'
 dependencies {
 
     compile project(':ontrack-ui-support')
+    compile project(':ontrack-tx')
     compile 'com.graphql-java:graphql-java'
     compile 'org.springframework:spring-tx'
 
