@@ -41,7 +41,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                 }
                                 .argument {
                                     it.name("count")
-                                            .description("Maximum number of validation runs to fetch in order to get the issues")
+                                            .description("Maximum number of validation runs to fetch per validation stamp in order to get the issues")
                                             .defaultValue(10)
                                             .type(GraphQLInt)
                                 }
@@ -75,25 +75,32 @@ class BranchValidationIssuesGraphQLFieldContributor(
                 } else {
                     validationRunStatusService.validationRunStatusList.toList()
                 }
-                val runs = structureService.getValidationRunsForStatus(
-                        branch.id,
-                        statuses,
-                        0,
-                        count
-                )
-                // Loops over all statuses
-                runs.forEach { run ->
-                    run.validationRunStatuses.forEach { runStatus ->
-                        val description = runStatus.description
-                        if (!description.isNullOrBlank()) {
-                            // Gets the issue keys
-                            val keys = issueService.extractIssueKeysFromMessage(description)
-                            keys.forEach { key ->
-                                val existing = index[key]
-                                if (existing != null) {
-                                    existing += run
-                                } else {
-                                    index[key] = mutableListOf(run)
+                // Gets all validation stamps
+                // TODO Filter on validation stamps
+                val stamps = structureService.getValidationStampListForBranch(branch.id)
+                // For each validation stamp
+                stamps.forEach { stamp ->
+                    // Gets the runs for this validation stamp
+                    val runs = structureService.getValidationRunsForValidationStampAndStatus(
+                            stamp.id,
+                            statuses,
+                            0,
+                            count
+                    )
+                    // Loops over all statuses
+                    runs.forEach { run ->
+                        run.validationRunStatuses.forEach { runStatus ->
+                            val description = runStatus.description
+                            if (!description.isNullOrBlank()) {
+                                // Gets the issue keys
+                                val keys = issueService.extractIssueKeysFromMessage(description)
+                                keys.forEach { key ->
+                                    val existing = index[key]
+                                    if (existing != null) {
+                                        existing += run
+                                    } else {
+                                        index[key] = mutableListOf(run)
+                                    }
                                 }
                             }
                         }
