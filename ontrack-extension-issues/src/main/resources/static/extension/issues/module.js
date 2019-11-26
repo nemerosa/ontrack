@@ -36,8 +36,12 @@ angular.module('ontrack.extension.issues', [
                     }
                   }
                   validationRuns {
+                    links {
+                        _page
+                    }
                     validationStamp {
                       name
+                      description
                       image
                       _image
                       links {
@@ -46,8 +50,16 @@ angular.module('ontrack.extension.issues', [
                     }
                     build {
                       name
-                      releaseProperty {
-                        value
+                      links {
+                        _page
+                      }
+                      decorations {
+                        decorationType
+                        error
+                        data
+                        feature {
+                          id
+                        }
                       }
                     }
                   }
