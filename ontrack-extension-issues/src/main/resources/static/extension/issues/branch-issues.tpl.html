@@ -13,7 +13,18 @@
         <div class="col-md-12">
 
             <table class="table table-hover">
-                <tbody ng-repeat="validationIssue in branch.validationIssues">
+                <thead>
+                <tr>
+                    <td class="success" colspan="3">
+                        Statuses:
+                        <span ng-repeat="selectedStatus in selectedStatuses">
+                            <input id="status-{{selectedStatus.status}}" type="checkbox" ng-model="selectedStatus.selected">
+                            <label for="status-{{selectedStatus.status}}">{{selectedStatus.status}}</label>
+                        </span>
+                    </td>
+                </tr>
+                </thead>
+                <tbody ng-repeat="validationIssue in branch.validationIssues" ng-show="selectedStatus(validationIssue)">
                 <tr>
                     <td class="info" colspan="3">
                         <a href="{{validationIssue.issue.url}}">{{validationIssue.issue.displayKey}}</a>

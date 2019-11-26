@@ -82,6 +82,21 @@ angular.module('ontrack.extension.issues', [
             view.commands = [
                 ot.viewCloseCommand('/branch/' + $scope.branch.id)
             ];
+            // Unique statuses
+            $scope.statuses = $scope.branch.validationIssues
+                .map(it => it.issue.status.name)
+                .filter((v, i, a) => a.indexOf(v) === i) // Gets unique elements only
+                .sort();
+            // Selection of statuses
+            $scope.selectedStatuses = $scope.statuses.map(it => ({
+                status: it,
+                selected: true
+            }));
+            // Is an issue selected?
+            $scope.selectedStatus = function (validationIssue) {
+                let selection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
+                return selection && selection.selected;
+            };
         }).finally(() => {
             $scope.loadingIssues = false;
         });
