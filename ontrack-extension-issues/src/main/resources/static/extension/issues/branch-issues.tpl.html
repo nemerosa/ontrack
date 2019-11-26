@@ -16,10 +16,15 @@
                 <thead>
                 <tr>
                     <td class="success" colspan="3">
-                        Statuses:
-                        <span ng-repeat="selectedStatus in selectedStatuses">
-                            <input id="status-{{selectedStatus.status}}" type="checkbox" ng-model="selectedStatus.selected">
-                            <label for="status-{{selectedStatus.status}}">{{selectedStatus.status}}</label>
+                        <span ng-if="selectedStatuses.length > 0">
+                            Statuses:
+                            <span ng-repeat="selectedStatus in selectedStatuses">
+                                <input id="status-{{selectedStatus.status}}" type="checkbox" ng-model="selectedStatus.selected">
+                                <label for="status-{{selectedStatus.status}}">{{selectedStatus.status}}</label>
+                            </span>
+                        </span>
+                        <span>
+                            Total number of issues: {{branch.validationIssues.length}}
                         </span>
                     </td>
                 </tr>
