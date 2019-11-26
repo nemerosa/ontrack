@@ -17,11 +17,17 @@ import java.util.concurrent.ConcurrentMap
 
 class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
 
-    private val issues: ConcurrentMap<Pair<String, String>, JIRAIssue?> = ConcurrentHashMap()
+    private val issues: ConcurrentMap<Pair<String, String>, JIRAIssue> = ConcurrentHashMap()
+
+    private class IssueNotFoundException : RuntimeException()
 
     override fun getIssue(key: String, configuration: JIRAConfiguration): JIRAIssue? {
-        return issues.getOrPut(configuration.url to key) {
-            fetchIssue(key, configuration)
+        return try {
+            issues.getOrPut(configuration.url to key) {
+                fetchIssue(key, configuration) ?: throw IssueNotFoundException()
+            }
+        } catch (ignored: IssueNotFoundException) {
+            null
         }
     }
 
