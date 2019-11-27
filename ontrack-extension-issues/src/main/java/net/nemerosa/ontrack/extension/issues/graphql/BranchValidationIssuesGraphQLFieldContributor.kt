@@ -6,9 +6,32 @@ import graphql.schema.GraphQLList
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtensionService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
+import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.tx.TransactionService
 import org.springframework.stereotype.Component
+
+/**
+ * Maximum number of validation runs to fetch per validation stamp in order to get the issues
+ */
+private const val ARG_COUNT = "count"
+
+/**
+ * Default value for the count
+ */
+private const val DEFAULT_COUNT = 100
+
+/**
+ * Arbitrary maximum number of validation runs to never exceed for [ARG_COUNT]
+ */
+private const val MAX_COUNT = 1000
+
+/**
+ * Thrown when the maximum number of validation runs is exceeded
+ */
+class MaximumValidationRunCountExceededException(count: Int) : InputException(
+        "The `count` argument, set to $count, must not exceed $MAX_COUNT"
+)
 
 /**
  * Adds a `validationIssues` to the `Branch` GraphQL type, containing
@@ -40,7 +63,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                             .type(GraphQLList(GraphQLString))
                                 }
                                 .argument {
-                                    it.name("count")
+                                    it.name(ARG_COUNT)
                                             .description("Maximum number of validation runs to fetch per validation stamp in order to get the issues")
                                             .defaultValue(10)
                                             .type(GraphQLInt)
@@ -54,9 +77,12 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                     val branch: Branch = env.getSource()
                                     val passed: Boolean? = env.getArgument("passed")
                                     val status: List<String>? = env.getArgument("status")
-                                    val count: Int? = env.getArgument("count")
+                                    val count: Int = env.getArgument(ARG_COUNT) ?: DEFAULT_COUNT
+                                    if (count > MAX_COUNT) {
+                                        throw MaximumValidationRunCountExceededException(count)
+                                    }
                                     val stampRegex: String? = env.getArgument("stamp")
-                                    getValidationIssues(branch, passed, status?.toSet(), count ?: 100, stampRegex)
+                                    getValidationIssues(branch, passed, status?.toSet(), count, stampRegex)
                                 }
                                 .build()
                 )
