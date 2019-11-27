@@ -124,11 +124,13 @@ class BranchValidationIssuesGraphQLFieldContributor(
                     runs.distinctBy { it.id() }
                 }
                 // Loading of the issues
-                reducedIndex.map { (key, runs) ->
-                    GQLTypeValidationIssue.Data(
-                            issue = issueService.getIssue(key),
-                            validationRuns = runs
-                    )
+                reducedIndex.mapNotNull { (key, runs) ->
+                    issueService.getIssue(key)?.let { issue ->
+                        GQLTypeValidationIssue.Data(
+                                issue = issue,
+                                validationRuns = runs
+                        )
+                    }
                 }.filter { data ->
                     status == null || data.issue.status.name in status
                 }.sortedByDescending {

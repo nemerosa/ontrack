@@ -17,7 +17,7 @@ angular.module('ontrack.extension.issues', [
         view.title = "";
 
         const query = `
-            query BranchIssues($id: Int!) {
+            query BranchIssues($id: Int!, $count: Int!) {
               branches(id: $id) {
                 id
                 name
@@ -25,7 +25,7 @@ angular.module('ontrack.extension.issues', [
                   id
                   name
                 }
-                validationIssues(passed: false) {
+                validationIssues(passed: false, count: $count) {
                   issue {
                     displayKey
                     summary
@@ -68,42 +68,61 @@ angular.module('ontrack.extension.issues', [
             }
         `;
 
-        const queryVariables = {
-            id: $stateParams.branch
+        // Showing the details
+        $scope.displayOptions = {
+            showingDetails: false,
+            historyLimit: 10
         };
 
-        otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
-            $scope.branch = data.branches[0];
-            // Title
-            view.title = `Issues opened for ${$scope.branch.name}`;
-            // View configuration
-            view.breadcrumbs = ot.branchBreadcrumbs($scope.branch);
-            // Commands
-            view.commands = [
-                ot.viewCloseCommand('/branch/' + $scope.branch.id)
-            ];
-            // Unique statuses
-            $scope.statuses = $scope.branch.validationIssues
-                .map(it => it.issue.status.name)
-                .filter((v, i, a) => a.indexOf(v) === i) // Gets unique elements only
-                .sort();
-            // Selection of statuses
-            $scope.selectedStatuses = $scope.statuses.map(it => ({
-                status: it,
-                selected: true
-            }));
-            // Is an issue selected?
-            $scope.selectedStatus = function (validationIssue) {
-                let selection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
-                return selection && selection.selected;
+        let viewInitialized = false;
+
+        const loadIssues = () => {
+            $scope.loadingIssues = true;
+
+            const queryVariables = {
+                id: $stateParams.branch,
+                count: $scope.displayOptions.historyLimit
             };
-            // Showing the details
-            $scope.displayOptions = {
-                showingDetails:  false
-            };
-        }).finally(() => {
-            $scope.loadingIssues = false;
-        });
+
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+                $scope.branch = data.branches[0];
+                if (!viewInitialized) {
+                    // Title
+                    view.title = `Issues opened for ${$scope.branch.name}`;
+                    // View configuration
+                    view.breadcrumbs = ot.branchBreadcrumbs($scope.branch);
+                    // Commands
+                    view.commands = [
+                        ot.viewCloseCommand('/branch/' + $scope.branch.id)
+                    ];
+                    // OK
+                    viewInitialized = true;
+                }
+                // Unique statuses
+                $scope.statuses = $scope.branch.validationIssues
+                    .map(it => it.issue.status.name)
+                    .filter((v, i, a) => a.indexOf(v) === i) // Gets unique elements only
+                    .sort();
+                // Selection of statuses
+                $scope.selectedStatuses = $scope.statuses.map(it => ({
+                    status: it,
+                    selected: true
+                }));
+                // Is an issue selected?
+                $scope.selectedStatus = function (validationIssue) {
+                    let selection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
+                    return selection && selection.selected;
+                };
+            }).finally(() => {
+                $scope.loadingIssues = false;
+            });
+        };
+
+        // Loads the issues
+        loadIssues();
+
+        // Reloading the issues
+        $scope.reloadIssues = loadIssues;
     })
 
 ;

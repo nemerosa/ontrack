@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="row" ng-show="branch">
+    <div class="row" ng-show="branch && !loadingIssues">
         <div class="col-md-12">
 
             <table class="table table-hover">
@@ -29,6 +29,14 @@
                                 <input id="status-{{selectedStatus.status}}" type="checkbox" ng-model="selectedStatus.selected">
                                 <label for="status-{{selectedStatus.status}}">{{selectedStatus.status}}</label>
                             </span>
+                            |
+                        </span>
+                        <span title="Specifies how far we need to look into the history of a validation stamp in order to get issues.">
+                            <label for="history-limit">History limit:</label>
+                            <input id="history-limit" type="number" min="1" max="500" ng-model="displayOptions.historyLimit">
+                            <button class="btn btn-default" title="Refreshes the list of issues" ng-click="reloadIssues()">
+                                <span class="fa fa-refresh"></span>
+                            </button>
                             |
                         </span>
                         <span>
