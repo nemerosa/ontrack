@@ -11,6 +11,7 @@ angular.module('ontrack.extension.issues', [
     })
     .controller('BranchIssuesCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
 
+        const branchId = $stateParams.branch;
         $scope.loadingIssues = true;
 
         const view = ot.view();
@@ -68,10 +69,19 @@ angular.module('ontrack.extension.issues', [
             }
         `;
 
+        // History limit
+        const STORAGE_HISTORY_LIMIT = `extension.issues.history-limit.${branchId}`;
+        const DEFAULT_HISTORY_LIMIT = 10;
+        const MAX_HISTORY_LIMIT = 500;
+        let historyLimit = Number(localStorage.getItem(STORAGE_HISTORY_LIMIT));
+        if (!historyLimit || historyLimit > MAX_HISTORY_LIMIT) {
+            historyLimit = DEFAULT_HISTORY_LIMIT;
+        }
+
         // Showing the details
         $scope.displayOptions = {
             showingDetails: false,
-            historyLimit: 10,
+            historyLimit: historyLimit,
             textFilter: ""
         };
 
@@ -80,8 +90,12 @@ angular.module('ontrack.extension.issues', [
         const loadIssues = () => {
             $scope.loadingIssues = true;
 
+            if (!$scope.displayOptions.historyLimit || $scope.displayOptions.historyLimit > MAX_HISTORY_LIMIT) {
+                $scope.displayOptions.historyLimit = DEFAULT_HISTORY_LIMIT;
+            }
+
             const queryVariables = {
-                id: $stateParams.branch,
+                id: branchId,
                 count: $scope.displayOptions.historyLimit
             };
 
@@ -111,6 +125,8 @@ angular.module('ontrack.extension.issues', [
                 }));
             }).finally(() => {
                 $scope.loadingIssues = false;
+
+                localStorage.setItem(STORAGE_HISTORY_LIMIT, $scope.displayOptions.historyLimit);
             });
         };
 
