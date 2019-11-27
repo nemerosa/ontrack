@@ -11,13 +11,14 @@ angular.module('ontrack.extension.issues', [
     })
     .controller('BranchIssuesCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
 
+        const branchId = $stateParams.branch;
         $scope.loadingIssues = true;
 
         const view = ot.view();
         view.title = "";
 
         const query = `
-            query BranchIssues($id: Int!) {
+            query BranchIssues($id: Int!, $count: Int!) {
               branches(id: $id) {
                 id
                 name
@@ -25,7 +26,7 @@ angular.module('ontrack.extension.issues', [
                   id
                   name
                 }
-                validationIssues(passed: false) {
+                validationIssues(passed: false, count: $count) {
                   issue {
                     displayKey
                     summary
@@ -68,42 +69,82 @@ angular.module('ontrack.extension.issues', [
             }
         `;
 
-        const queryVariables = {
-            id: $stateParams.branch
+        // History limit
+        const STORAGE_HISTORY_LIMIT = `extension.issues.history-limit.${branchId}`;
+        const DEFAULT_HISTORY_LIMIT = 10;
+        const MAX_HISTORY_LIMIT = 500;
+        let historyLimit = Number(localStorage.getItem(STORAGE_HISTORY_LIMIT));
+        if (!historyLimit || historyLimit > MAX_HISTORY_LIMIT) {
+            historyLimit = DEFAULT_HISTORY_LIMIT;
+        }
+
+        // Showing the details
+        $scope.displayOptions = {
+            showingDetails: false,
+            historyLimit: historyLimit,
+            textFilter: ""
         };
 
-        otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
-            $scope.branch = data.branches[0];
-            // Title
-            view.title = `Issues opened for ${$scope.branch.name}`;
-            // View configuration
-            view.breadcrumbs = ot.branchBreadcrumbs($scope.branch);
-            // Commands
-            view.commands = [
-                ot.viewCloseCommand('/branch/' + $scope.branch.id)
-            ];
-            // Unique statuses
-            $scope.statuses = $scope.branch.validationIssues
-                .map(it => it.issue.status.name)
-                .filter((v, i, a) => a.indexOf(v) === i) // Gets unique elements only
-                .sort();
-            // Selection of statuses
-            $scope.selectedStatuses = $scope.statuses.map(it => ({
-                status: it,
-                selected: true
-            }));
-            // Is an issue selected?
-            $scope.selectedStatus = function (validationIssue) {
-                let selection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
-                return selection && selection.selected;
+        let viewInitialized = false;
+
+        const loadIssues = () => {
+            $scope.loadingIssues = true;
+
+            if (!$scope.displayOptions.historyLimit || $scope.displayOptions.historyLimit > MAX_HISTORY_LIMIT) {
+                $scope.displayOptions.historyLimit = DEFAULT_HISTORY_LIMIT;
+            }
+
+            const queryVariables = {
+                id: branchId,
+                count: $scope.displayOptions.historyLimit
             };
-            // Showing the details
-            $scope.displayOptions = {
-                showingDetails:  false
-            };
-        }).finally(() => {
-            $scope.loadingIssues = false;
-        });
+
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+                $scope.branch = data.branches[0];
+                if (!viewInitialized) {
+                    // Title
+                    view.title = `Issues opened for ${$scope.branch.name}`;
+                    // View configuration
+                    view.breadcrumbs = ot.branchBreadcrumbs($scope.branch);
+                    // Commands
+                    view.commands = [
+                        ot.viewCloseCommand('/branch/' + $scope.branch.id)
+                    ];
+                    // OK
+                    viewInitialized = true;
+                }
+                // Unique statuses
+                $scope.statuses = $scope.branch.validationIssues
+                    .map(it => it.issue.status.name)
+                    .filter((v, i, a) => a.indexOf(v) === i) // Gets unique elements only
+                    .sort();
+                // Selection of statuses
+                $scope.selectedStatuses = $scope.statuses.map(it => ({
+                    status: it,
+                    selected: true
+                }));
+            }).finally(() => {
+                $scope.loadingIssues = false;
+
+                localStorage.setItem(STORAGE_HISTORY_LIMIT, $scope.displayOptions.historyLimit);
+            });
+        };
+
+        // Loads the issues
+        loadIssues();
+
+        // Reloading the issues
+        $scope.reloadIssues = loadIssues;
+
+        // Is an issue selected?
+        $scope.isIssueSelected = validationIssue => {
+            let statusSelection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
+            let textSelection = !$scope.displayOptions.textFilter || (
+                (validationIssue.issue.displayKey.toLowerCase().indexOf($scope.displayOptions.textFilter.toLowerCase()) >= 0) ||
+                (validationIssue.issue.summary.toLowerCase().indexOf($scope.displayOptions.textFilter.toLowerCase()) >= 0)
+            );
+            return statusSelection && statusSelection.selected && textSelection;
+        };
     })
 
 ;
