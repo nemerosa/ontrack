@@ -71,7 +71,8 @@ angular.module('ontrack.extension.issues', [
         // Showing the details
         $scope.displayOptions = {
             showingDetails: false,
-            historyLimit: 10
+            historyLimit: 10,
+            textFilter: ""
         };
 
         let viewInitialized = false;
@@ -108,11 +109,6 @@ angular.module('ontrack.extension.issues', [
                     status: it,
                     selected: true
                 }));
-                // Is an issue selected?
-                $scope.selectedStatus = function (validationIssue) {
-                    let selection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
-                    return selection && selection.selected;
-                };
             }).finally(() => {
                 $scope.loadingIssues = false;
             });
@@ -123,6 +119,16 @@ angular.module('ontrack.extension.issues', [
 
         // Reloading the issues
         $scope.reloadIssues = loadIssues;
+
+        // Is an issue selected?
+        $scope.isIssueSelected = validationIssue => {
+            let statusSelection = $scope.selectedStatuses.find(it => it.status === validationIssue.issue.status.name);
+            let textSelection = !$scope.displayOptions.textFilter || (
+                (validationIssue.issue.displayKey.toLowerCase().indexOf($scope.displayOptions.textFilter.toLowerCase()) >= 0) ||
+                (validationIssue.issue.summary.toLowerCase().indexOf($scope.displayOptions.textFilter.toLowerCase()) >= 0)
+            );
+            return statusSelection && statusSelection.selected && textSelection;
+        };
     })
 
 ;
