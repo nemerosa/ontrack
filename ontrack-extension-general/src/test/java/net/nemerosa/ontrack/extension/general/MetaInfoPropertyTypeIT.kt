@@ -2,9 +2,17 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.SearchRequest
+import net.nemerosa.ontrack.model.structure.SearchService
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
 
 class MetaInfoPropertyTypeIT : AbstractPropertyTypeIT() {
+
+    @Autowired
+    private lateinit var searchService: SearchService
 
     @Test
     fun `Search by meta value`() {
@@ -108,6 +116,37 @@ class MetaInfoPropertyTypeIT : AbstractPropertyTypeIT() {
                 } returns listOf(build3, build2, build1)
             }
         }
+    }
+
+    @Test
+    fun `Search meta information with categories`() {
+        val prefix = uid("n")
+        val category = uid("c")
+        val build = project<Build> {
+            branch<Build> {
+                build {
+                    setProperty(
+                            this,
+                            MetaInfoPropertyType::class.java,
+                            MetaInfoProperty(
+                                    listOf(
+                                            MetaInfoPropertyItem("$prefix-1", "value-1", null, category),
+                                            MetaInfoPropertyItem("$prefix-2", "value-2", null, category),
+                                            MetaInfoPropertyItem("$prefix-3", "value-3", null, category)
+                                    )
+                            )
+                    )
+                }
+            }
+        }
+        // Searching for the build using the search service
+        val results = searchService.search(SearchRequest("$prefix-2:value-2"))
+        assertEquals(
+                listOf(build.entityDisplayName),
+                results.map {
+                    it.title
+                }
+        )
     }
 
 }
