@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general;
 
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
@@ -13,17 +14,18 @@ import static org.mockito.Mockito.mock;
 public class MetaInfoSearchExtensionTest {
 
     private MetaInfoSearchExtension extension;
-    private PropertyService propertyService;
 
     @Before
     public void before() {
-        propertyService = mock(PropertyService.class);
+        PropertyService propertyService = mock(PropertyService.class);
         StructureService structureService = mock(StructureService.class);
         extension = new MetaInfoSearchExtension(
                 new GeneralExtensionFeature(),
                 new MockURIBuilder(),
                 propertyService,
-                structureService);
+                structureService,
+                mock(SecurityService.class)
+        );
     }
 
     @Test

@@ -49,7 +49,7 @@ class MetaInfoPropertyType(
                                     )
                     )
                             .label("Items")
-                            .value(if (value != null) value.items else emptyList<Any>())
+                            .value(value?.items ?: emptyList<Any>())
             )
 
     override fun fromClient(node: JsonNode): MetaInfoProperty {
@@ -57,7 +57,7 @@ class MetaInfoPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): MetaInfoProperty {
-        return AbstractPropertyType.parse(node, MetaInfoProperty::class.java)
+        return parse(node, MetaInfoProperty::class.java)
     }
 
     override fun getSearchKey(value: MetaInfoProperty): String {
@@ -84,7 +84,7 @@ class MetaInfoPropertyType(
                         .map { item ->
                             MetaInfoPropertyItem(
                                     item.name,
-                                    replacementFunction.apply(item.value),
+                                    item.value?.apply { replacementFunction.apply(this) },
                                     item.link?.apply { replacementFunction.apply(this) },
                                     item.category?.apply { replacementFunction.apply(this) }
                             )
