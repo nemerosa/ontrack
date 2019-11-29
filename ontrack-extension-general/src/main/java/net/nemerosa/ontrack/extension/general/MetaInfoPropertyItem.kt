@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 class MetaInfoPropertyItem(
         val name: String,
-        val value: String,
+        val value: String?,
         val link: String?,
         val category: String?
 ) {

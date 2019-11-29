@@ -7,8 +7,8 @@ class MetaInfoProperty(
      * Does one of the items match the name-&gt;value? The value can be blank (meaning all values)
      * or contains wildcards (*).
      */
-    fun matchNameValue(name: String, value: String): Boolean {
-        return items.stream().anyMatch { item -> item.matchNameValue(name, value) }
+    fun matchNameValue(name: String, value: String): Boolean = items.any { item ->
+        item.matchNameValue(name, value)
     }
 
     /**
