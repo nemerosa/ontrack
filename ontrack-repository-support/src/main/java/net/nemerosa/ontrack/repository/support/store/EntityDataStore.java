@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository.support.store;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +22,7 @@ public interface EntityDataStore {
      * @param data      Data
      * @return Data record
      */
-    EntityDataStoreRecord add(ProjectEntity entity, String category, String name, Signature signature, String groupName, JsonNode data);
+    EntityDataStoreRecord add(ProjectEntity entity, String category, String name, Signature signature, @Nullable String groupName, JsonNode data);
 
     /**
      * Overrides an entry in the store
@@ -34,7 +35,7 @@ public interface EntityDataStore {
      * @param data      Data
      * @return Data record
      */
-    EntityDataStoreRecord replaceOrAdd(ProjectEntity entity, String category, String name, Signature signature, String groupName, JsonNode data);
+    EntityDataStoreRecord replaceOrAdd(ProjectEntity entity, String category, String name, Signature signature, @Nullable String groupName, JsonNode data);
 
     /**
      * Gets the audit data for an entry
@@ -112,7 +113,7 @@ public interface EntityDataStore {
      * @param data      Data
      * @return Data record
      */
-    EntityDataStoreRecord addObject(ProjectEntity entity, String category, String name, Signature signature, String groupName, Object data);
+    EntityDataStoreRecord addObject(ProjectEntity entity, String category, String name, Signature signature, @Nullable String groupName, Object data);
 
     /**
      * Overrides an entry in the store
@@ -125,7 +126,7 @@ public interface EntityDataStore {
      * @param data      Data
      * @return Data record
      */
-    EntityDataStoreRecord replaceOrAddObject(ProjectEntity entity, String category, String name, Signature signature, String groupName, Object data);
+    EntityDataStoreRecord replaceOrAddObject(ProjectEntity entity, String category, String name, Signature signature, @Nullable String groupName, Object data);
 
     /**
      * Gets a record by ID
@@ -163,7 +164,7 @@ public interface EntityDataStore {
     /**
      * Gets a list of records based on a filter
      * <p>
-     * Note that the {@link EntityDataStoreFilter#entity} parameter is required.
+     * Note that the {@link EntityDataStoreFilter#getEntity()} parameter is required.
      */
     List<EntityDataStoreRecord> getByFilter(EntityDataStoreFilter entityDataStoreFilter);
 
@@ -173,7 +174,14 @@ public interface EntityDataStore {
     int getCountByFilter(EntityDataStoreFilter entityDataStoreFilter);
 
     /**
-     * Deletes a list of records based on a filter
+     * Deletes a list of records based on a filter. Careful, {@link EntityDataStoreFilter#getCount()} and {@link EntityDataStoreFilter#getOffset()}
+     * are <b>ignored</b> in this call
      */
     int deleteByFilter(EntityDataStoreFilter entityDataStoreFilter);
+
+    /**
+     * Deletes a list of records based on a filter, limiting the deletion to the range
+     * specified by {@link EntityDataStoreFilter#getCount()} and {@link EntityDataStoreFilter#getOffset()}.
+     */
+    int deleteRangeByFilter(EntityDataStoreFilter entityDataStoreFilter);
 }
