@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api(project(":ontrack-ui-support"))
+    api(project(":ontrack-tx"))
     api("com.graphql-java:graphql-java")
 
     implementation("org.springframework:spring-tx")

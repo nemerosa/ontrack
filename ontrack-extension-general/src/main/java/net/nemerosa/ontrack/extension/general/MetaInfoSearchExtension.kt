@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.security.ProjectView
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
@@ -13,7 +16,8 @@ class MetaInfoSearchExtension(
         extensionFeature: GeneralExtensionFeature,
         private val uriBuilder: URIBuilder,
         private val propertyService: PropertyService,
-        private val structureService: StructureService
+        private val structureService: StructureService,
+        private val securityService: SecurityService
 ) : AbstractExtension(extensionFeature), SearchExtension {
 
     override fun getSearchProvider(): SearchProvider {
@@ -35,29 +39,34 @@ class MetaInfoSearchExtension(
             val name = StringUtils.substringBefore(token, ":")
             val value = StringUtils.substringAfter(token, ":")
             // Searchs for all entities with the value
-            val entities = propertyService.searchWithPropertyValue(
-                    MetaInfoPropertyType::class.java,
-                    { entityType, id -> entityType.getEntityFn(structureService).apply(id) },
-                    { metaInfoProperty -> metaInfoProperty.matchNameValue(name, value) }
-            )
+            val entities = securityService.callAsAdmin {
+                propertyService.searchWithPropertyValue(
+                        MetaInfoPropertyType::class.java,
+                        { entityType, id -> entityType.getEntityFn(structureService).apply(id) },
+                        { metaInfoProperty -> metaInfoProperty.matchNameValue(name, value) }
+                )
+            }.filter { entity ->
+                securityService.isProjectFunctionGranted(entity, ProjectView::class.java)
+            }
             // Returns search results
-            entities.map { entity -> toSearchResult(entity, name) }
+            entities.mapNotNull { entity -> toSearchResult(entity, name) }
         } else {
             emptyList()
         }
     }
 
-    protected fun toSearchResult(entity: ProjectEntity, name: String): SearchResult {
+    protected fun toSearchResult(entity: ProjectEntity, name: String): SearchResult? {
         // Gets the property value for the meta info name (required)
         val value = propertyService.getProperty(entity, MetaInfoPropertyType::class.java).value.getValue(name)
-                ?: throw IllegalStateException("Expecting to have a meta info property")
         // OK
-        return SearchResult(
-                entity.entityDisplayName,
-                String.format("%s -> %s", name, value),
-                uriBuilder.getEntityURI(entity),
-                uriBuilder.getEntityPage(entity),
-                100
-        )
+        return value?.run {
+            SearchResult(
+                    entity.entityDisplayName,
+                    String.format("%s -> %s", name, this),
+                    uriBuilder.getEntityURI(entity),
+                    uriBuilder.getEntityPage(entity),
+                    100
+            )
+        }
     }
 }

@@ -233,7 +233,13 @@ public interface StructureRepository {
 
     List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
 
+    List<ValidationRun> getValidationRunsForBuildAndValidationStampAndStatus(Build build, ValidationStamp validationStamp, List<ValidationRunStatusID> statuses, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
     List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    List<ValidationRun> getValidationRunsForValidationStampAndStatus(ValidationStamp validationStamp, List<ValidationRunStatusID> statuses, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    List<ValidationRun> getValidationRunsForStatus(Branch branch, List<ValidationRunStatusID> statuses, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     /**
      * Gets the total number of validation runs for a build and a validation stamp

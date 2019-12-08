@@ -7,4 +7,3 @@ class ExportedIssues(
         val format: String,
         val content: String
 )
-

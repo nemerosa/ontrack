@@ -3,11 +3,22 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.dialogs.ProjectDialog
 import org.openqa.selenium.By
+import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.FindBy
 
 public class HomePage extends AbstractHeaderPage {
 
+    @FindBy(className = 'ot-command-api')
+    protected WebElement commandApi;
+
     public HomePage(Browser browser) {
         super(browser);
+    }
+
+    @Override
+    void waitFor() {
+        super.waitFor()
+        browser.waitUntil("API command") { commandApi.displayed }
     }
 
     @Override

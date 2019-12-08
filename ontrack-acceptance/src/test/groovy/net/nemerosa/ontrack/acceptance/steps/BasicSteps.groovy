@@ -9,6 +9,7 @@ class BasicSteps {
         browser.with {
             def home = login(browser, 'admin', browser.configuration.acceptanceConfig.admin, 'Administrator')
             waitUntil("Project creation button is displayed") { home.menuLoaded }
+            goTo HomePage, [:]
             home
         }
     }
@@ -18,6 +19,7 @@ class BasicSteps {
             def home = goTo HomePage, [:]
             home.login name, password
             waitUntil("User name is '${fullName}'") { home.header.userName == fullName }
+            goTo HomePage, [:]
             home
         }
     }

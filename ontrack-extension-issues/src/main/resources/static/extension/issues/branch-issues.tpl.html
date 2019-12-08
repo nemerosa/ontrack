@@ -1,0 +1,88 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingIssues">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading issues for this branch...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="branch && !loadingIssues">
+        <div class="col-md-12">
+
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <td class="success" colspan="3">
+                        <span ng-if="selectedStatuses.length > 0">
+                            <span>
+                                <input id="show-details" type="checkbox" ng-model="displayOptions.showingDetails">
+                                <label for="show-details">Show details</label>
+                            </span>
+                            |
+                        </span>
+                        <span ng-if="selectedStatuses.length > 0">
+                            Statuses:
+                            <span ng-repeat="selectedStatus in selectedStatuses">
+                                <input id="status-{{selectedStatus.status}}" type="checkbox" ng-model="selectedStatus.selected">
+                                <label for="status-{{selectedStatus.status}}">{{selectedStatus.status}}</label>
+                            </span>
+                            |
+                        </span>
+                        <span title="Specifies how far we need to look into the history of a validation stamp in order to get issues.">
+                            <label for="history-limit">History limit:</label>
+                            <input id="history-limit" type="number" min="1" max="500" ng-model="displayOptions.historyLimit">
+                            <button class="btn btn-default" title="Refreshes the list of issues" ng-click="reloadIssues()">
+                                <span class="fa fa-refresh"></span>
+                            </button>
+                            |
+                        </span>
+                        <span>
+                            <label for="text-filter">Filter:</label>
+                            <input id="text-filter" type="text" ng-model="displayOptions.textFilter" placeholder="Search for text / ticket number" />
+                            |
+                        </span>
+                        <span>
+                            Total number of issues: {{branch.validationIssues.length}}
+                        </span>
+                    </td>
+                </tr>
+                </thead>
+                <tbody ng-repeat="validationIssue in branch.validationIssues" ng-show="isIssueSelected(validationIssue)">
+                <tr>
+                    <td class="info" colspan="3">
+                        <a href="{{validationIssue.issue.url}}">{{validationIssue.issue.displayKey}}</a>
+                        - <b>{{validationIssue.issue.status.name}}</b>
+                        - {{validationIssue.issue.summary}}
+                        - <span class="ot-description">{{validationIssue.issue.updateTime | date:'mediumDate' }}&nbsp;{{validationIssue.issue.updateTime | date:'shortTime' }}</span>
+                    </td>
+                </tr>
+                <tr ng-repeat="validationRun in validationIssue.validationRuns | limitTo: 10" ng-show="displayOptions.showingDetails">
+                    <td style="width: 3em;">
+                        <a href="{{validationRun.links._page}}"><span class="fa fa-info-circle" title="List of statuses where the issue has been added"></span></a>
+                    </td>
+                    <td style="width: 20%;">
+                        <ot-entity-image
+                                title="{{validationRun.validationStamp.name}} - {{validationRun.validationStamp.description}}"
+                                link="{{validationRun.validationStamp.links._page}}"
+                                entity="validationRun.validationStamp">{{validationRun.validationStamp.name}}</ot-entity-image>
+                    </td>
+                    <td>
+                        <!-- Build name and link -->
+                        <a href="{{validationRun.build.links._page}}">
+                            {{validationRun.build.name}}
+                        </a>
+                        <!-- Build decorations -->
+                        <span class="ot-decoration-list">
+                            <ot-entity-embedded-decorations decorations="validationRun.build.decorations"></ot-entity-embedded-decorations>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</ot-view>

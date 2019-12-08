@@ -12,7 +12,7 @@ class MarkdownIssueExportService : AbstractTextIssueExportService(ExportFormat.M
         groupedIssues.forEach { (groupName, issues) ->
             // Group header
             if (groupName.isNotBlank()) {
-                s.append("### ${groupName}\n\n")
+                s.append("### $groupName\n\n")
             }
             // List of issues
             issues.forEach { issue ->

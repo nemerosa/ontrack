@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
+import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLInt
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLArgument
@@ -21,6 +22,7 @@ class GQLTypeValidationStamp(
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val paginatedListFactory: GQLPaginatedListFactory,
         private val validationRun: GQLTypeValidationRun,
+        private val validationRunStatusService: ValidationRunStatusService,
         private val validationDataTypeConfig: GQLTypeValidationDataTypeConfig,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
 ) : AbstractGQLProjectEntity<ValidationStamp>(
@@ -79,10 +81,37 @@ class GQLTypeValidationStamp(
                                 },
                                 itemListProvider = { environment, validationStamp, offset, size ->
                                     val buildId: Int? = environment.getArgument<Int>("buildId")
+                                    val passed: Boolean? = environment.getArgument("passed")
+                                    val statuses = if (passed != null) {
+                                        if (passed) {
+                                            validationRunStatusService.validationRunStatusList.filter { it.isPassed }
+                                        } else {
+                                            validationRunStatusService.validationRunStatusList.filter { !it.isPassed }
+                                        }
+                                    } else {
+                                        null
+                                    }
                                     if (buildId != null) {
-                                        structureService.getValidationRunsForBuildAndValidationStamp(
-                                                ID.of(buildId),
+                                        if (statuses != null) {
+                                            structureService.getValidationRunsForBuildAndValidationStampAndStatus(
+                                                    ID.of(buildId),
+                                                    validationStamp.id,
+                                                    statuses,
+                                                    offset,
+                                                    size
+                                            )
+                                        } else {
+                                            structureService.getValidationRunsForBuildAndValidationStamp(
+                                                    ID.of(buildId),
+                                                    validationStamp.id,
+                                                    offset,
+                                                    size
+                                            )
+                                        }
+                                    } else if (statuses != null) {
+                                        structureService.getValidationRunsForValidationStampAndStatus(
                                                 validationStamp.id,
+                                                statuses,
                                                 offset,
                                                 size
                                         )
@@ -99,6 +128,11 @@ class GQLTypeValidationStamp(
                                                 .name("buildId")
                                                 .description("Validation runs for this build only")
                                                 .type(GraphQLInt)
+                                                .build(),
+                                        GraphQLArgument.newArgument()
+                                                .name("passed")
+                                                .description("Allows to filter on the last status of the run")
+                                                .type(GraphQLBoolean)
                                                 .build()
                                 )
                         )
