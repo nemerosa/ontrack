@@ -56,7 +56,7 @@ class ValidationRunStatusIssuesGraphQLFieldContributor(
             // Gets the validation run
             val validationRun = structureService.getParentValidationRun(validationRunStatus.id)
             // Gets the configured issue service for this project
-            val issueService = issueServiceExtensionService.getIssueServiceExtension(validationRun.project)
+            val issueService = validationRun?.run { issueServiceExtensionService.getIssueServiceExtension(project) }
             // If no issue service is configured, no issue
             issueService
                     // Getting the issues from the description
