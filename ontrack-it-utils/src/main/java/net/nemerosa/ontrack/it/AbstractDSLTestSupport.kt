@@ -161,13 +161,23 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return build.init()
     }
 
-    protected fun <T, P : PropertyType<T>> Build.property(type: KClass<P>, value: T) {
-        propertyService.editProperty<T>(
-                this,
-                type.java,
-                value
-        )
+    protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>, value: T?) {
+        if (value != null) {
+            propertyService.editProperty<T>(
+                    this,
+                    type.java,
+                    value
+            )
+        } else {
+            propertyService.deleteProperty(
+                    this,
+                    type.java
+            )
+        }
     }
+
+    protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>): T? =
+            propertyService.getProperty(this, type.java).value
 
     fun Build.promote(promotionLevel: PromotionLevel) {
         doPromote(this, promotionLevel, "")
