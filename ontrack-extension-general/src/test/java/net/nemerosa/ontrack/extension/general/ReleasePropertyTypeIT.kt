@@ -18,7 +18,22 @@ class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
                 }
                 assertBuildSearch {
                     it.withWithProperty(ReleasePropertyType::class.java.name)
-                            .withWithPropertyValue("ONE")
+                            .withWithPropertyValue("*ONE")
+                } returns build
+            }
+        }
+    }
+
+    @Test
+    fun `Exact case insensitive search on release property`() {
+        project {
+            branch branch@{
+                val build = build {
+                    release("Release one")
+                }
+                assertBuildSearch {
+                    it.withWithProperty(ReleasePropertyType::class.java.name)
+                            .withWithPropertyValue("RELEASE ONE")
                 } returns build
             }
         }
@@ -39,7 +54,7 @@ class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
 
                 assertBuildSearch {
                     it.withWithProperty(ReleasePropertyType::class.java.name)
-                            .withWithPropertyValue("1.2")
+                            .withWithPropertyValue("1.2.*")
                 } returns build
             }
         }
@@ -77,7 +92,7 @@ class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
             branch {
                 build {
                     val form = releasePropertyType.getEditionForm(this, null)
-                    assertEquals("", form.getField("name").value)
+                    assertEquals(null, form.getField("name").value)
                 }
             }
         }

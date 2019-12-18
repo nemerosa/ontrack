@@ -76,7 +76,7 @@ class ReleasePropertyType(
             } else {
                 PropertySearchArguments(
                         null,
-                        "pp.json->>'name' = :token",
+                        "UPPER(pp.json->>'name') = UPPER(:token)",
                         mapOf("token" to token)
                 )
             }
