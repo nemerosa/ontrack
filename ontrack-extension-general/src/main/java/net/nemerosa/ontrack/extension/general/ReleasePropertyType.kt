@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.common.collect.ImmutableMap
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
@@ -67,12 +66,20 @@ class ReleasePropertyType(
     }
 
     override fun getSearchArguments(token: String): PropertySearchArguments? {
-        return if (StringUtils.isNotBlank(token) && token.length > 1) {
-            PropertySearchArguments(
-                    null,
-                    "pp.json->>'name' ilike :token",
-                    ImmutableMap.of<String, String?>("token", "%$token%")
-            )
+        return if (!token.isBlank()) {
+            if ("*" in token) {
+                PropertySearchArguments(
+                        null,
+                        "pp.json->>'name' ilike :token",
+                        mapOf("token" to token.replace("*", "%"))
+                )
+            } else {
+                PropertySearchArguments(
+                        null,
+                        "pp.json->>'name' = :token",
+                        mapOf("token" to token)
+                )
+            }
         } else {
             null
         }
