@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
-import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.function.Function
@@ -61,9 +60,13 @@ class ReleasePropertyType(
         return value
     }
 
-    override fun containsValue(value: ReleaseProperty, propertyValue: String): Boolean {
-        return StringUtils.containsIgnoreCase(value.name, propertyValue)
-    }
+    override fun containsValue(value: ReleaseProperty, propertyValue: String): Boolean =
+        if ("*" in propertyValue) {
+            val regex = propertyValue.replace("*", ".*").toRegex(RegexOption.IGNORE_CASE)
+            regex.matches(value.name)
+        } else {
+            value.name.equals(propertyValue, ignoreCase = true)
+        }
 
     override fun getSearchArguments(token: String): PropertySearchArguments? {
         return if (!token.isBlank()) {

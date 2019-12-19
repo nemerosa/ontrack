@@ -12,12 +12,26 @@ class ReleasePropertyTypeTest {
 
     @Test
     fun `Contains value tests`() {
-        assertFalse(type.containsValue(ReleaseProperty("Rel one"), "two"))
-        assertTrue(type.containsValue(ReleaseProperty("Rel one"), "one"))
-        assertTrue(type.containsValue(ReleaseProperty("Rel one"), "ONE"))
-        assertTrue(type.containsValue(ReleaseProperty("1.2.3"), "1.2"))
-        // Not testing on the JSON
-        assertFalse(type.containsValue(ReleaseProperty("1.2.3"), "name"))
-        assertFalse(type.containsValue(ReleaseProperty("1.2.3"), "NAME"))
+        "Rel one" `does not contain` "two"
+        "Rel one" `does not contain` "one"
+        "Rel one" `does not contain` "ONE"
+        "1.2.3" `does not contain` "1.2"
+        "1.2.3" `does not contain` "name"
+        "1.2.3" `does not contain` "NAME"
+
+        "Rel one" contains "Rel one"
+        "Rel one" contains "Rel ONE"
+        "Rel one" contains "Rel*"
+        "Rel one" contains "*one"
+        "Rel one" contains "*ONE"
     }
+
+    private infix fun String.`does not contain`(value: String) {
+        assertFalse(type.containsValue(ReleaseProperty(this), value))
+    }
+
+    private infix fun String.contains(value: String) {
+        assertTrue(type.containsValue(ReleaseProperty(this), value))
+    }
+
 }
