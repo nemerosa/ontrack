@@ -174,7 +174,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 )
             }
             // OK
-            return SonarQubeMeasuresCollectionResult.ok
+            return SonarQubeMeasuresCollectionResult.ok(safeMeasures)
         } else {
             return SonarQubeMeasuresCollectionResult.error("No SonarQube measure can be found for ${build.entityDisplayName}")
         }

@@ -59,10 +59,10 @@ class SonarQubeController(
             return if (sonarQubeMeasuresCollectionService.matches(build, property)) {
                 sonarQubeMeasuresCollectionService.collect(build, property)
             } else {
-                SonarQubeMeasuresCollectionResult("${build.entityDisplayName} is not eligible for SonarQube collection")
+                SonarQubeMeasuresCollectionResult.error("${build.entityDisplayName} is not eligible for SonarQube collection")
             }
         } else {
-            SonarQubeMeasuresCollectionResult("SonarQube collection is not accessible for this project or your security profile does not grant you the right to request a scan.")
+            SonarQubeMeasuresCollectionResult.error("SonarQube collection is not accessible for this project or your security profile does not grant you the right to request a scan.")
         }
     }
 

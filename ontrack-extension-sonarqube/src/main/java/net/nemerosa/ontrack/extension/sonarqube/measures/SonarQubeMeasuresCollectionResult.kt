@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.extension.sonarqube.measures
 
 open class SonarQubeMeasuresCollectionResult(
+        val measures: Map<String, Double>?,
         val message: String?
 ) {
-    val ok = message.isNullOrBlank()
+    val ok = measures != null && message.isNullOrBlank()
 
     companion object {
-        val ok = SonarQubeMeasuresCollectionResult(null)
-        fun error(message: String) = SonarQubeMeasuresCollectionResult(message)
+        fun ok(measures: Map<String, Double>) = SonarQubeMeasuresCollectionResult(measures, null)
+        fun error(message: String) = SonarQubeMeasuresCollectionResult(null, message)
     }
 }
