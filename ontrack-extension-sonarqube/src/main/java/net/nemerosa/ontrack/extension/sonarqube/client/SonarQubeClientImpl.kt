@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.sonarqube.client
 
 import net.nemerosa.ontrack.extension.sonarqube.client.model.*
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
+import net.nemerosa.ontrack.json.asJson
+import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
@@ -11,6 +13,8 @@ class SonarQubeClientImpl(
         configuration: SonarQubeConfiguration
 ) : SonarQubeClient {
 
+    private val logger = LoggerFactory.getLogger(SonarQubeClient::class.java)
+
     override val serverVersion: String
         get() = restTemplate.getForObject("/api/server/version", String::class.java)
 
@@ -18,6 +22,10 @@ class SonarQubeClientImpl(
         get() = restTemplate.getForObject("/api/system/health", SystemHealth::class.java).health
 
     override fun getMeasuresForVersion(key: String, branch: String, version: String, metrics: List<String>): Map<String, Double?>? {
+
+        if (logger.isDebugEnabled) {
+            logger.debug("Getting measures,key=$key,branch=$branch,version=$version,metrics=$metrics")
+        }
 
         val analysis: Analysis? = paginateUntil(
                 ProjectAnalysisSearch::class.java,
@@ -36,6 +44,9 @@ class SonarQubeClientImpl(
         )
 
         if (analysis != null) {
+            if (logger.isDebugEnabled) {
+                logger.debug("Getting analysis,key=$key,branch=$branch,version=$version,metrics=$metrics,analysis=${analysis.asJson()}")
+            }
             // Timestamp of the version
             val timestamp = analysis.date
             // History measures
@@ -49,8 +60,11 @@ class SonarQubeClientImpl(
                             "timestamp" to timestamp
                     )
             )
+            if (logger.isDebugEnabled) {
+                logger.debug("Getting measures,key=$key,branch=$branch,version=$version,metrics=$metrics,measures=${measures.measures.asJson()}")
+            }
             // Converts to measures
-            return measures.measures.associate { measure ->
+            val finalMeasures = measures.measures.associate { measure ->
                 val name = measure.metric
                 val value = measure.history.firstOrNull()?.value
                 if (value != null) {
@@ -63,6 +77,10 @@ class SonarQubeClientImpl(
                     name to null
                 }
             }
+            if (logger.isDebugEnabled) {
+                logger.debug("Final measures,key=$key,branch=$branch,version=$version,metrics=$metrics,measures=${finalMeasures.asJson()}")
+            }
+            return finalMeasures
         } else {
             return null
         }
