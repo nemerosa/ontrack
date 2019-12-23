@@ -7,4 +7,9 @@ interface SCMCatalog {
      */
     fun collectSCMCatalog(logger: (String) -> Unit)
 
+    /**
+     * Gets a stream of catalog entries to work with.
+     */
+    val catalogEntries: Sequence<SCMCatalogEntry>
+
 }

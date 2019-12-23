@@ -45,6 +45,9 @@ class SCMCatalogImpl(
             storageService.delete(SCM_CATALOG_STORE, it)
         }
     }
+
+    override val catalogEntries: Sequence<SCMCatalogEntry>
+        get() = storageService.getData(SCM_CATALOG_STORE, SCMCatalogEntry::class.java).values.asSequence()
 }
 
 private const val SCM_CATALOG_STORE = "scm-catalog"

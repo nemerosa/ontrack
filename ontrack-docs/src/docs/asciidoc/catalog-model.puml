@@ -23,7 +23,7 @@ class SCMCatalogSource {
 SCMCatalogProvider .right.> SCMCatalogSource: returns
 
 class SCMCatalogEntry {
-    id: Long
+    / key: String
     scm: String // github, bitbucket, etc.
     source: String // config name
     repository: String // location
@@ -41,6 +41,8 @@ SCMCatalogEntry "0..*" - "0..*" Project
 interface CatalogLinkService <<service>>
 
 CatalogLinkService .up.> SCMCatalogProjectLink: manages
+
+CatalogLinkService .up.> SCMCatalogProvider: uses
 
 interface CatalogInfoContributor<? extends CatalogInfo> <<extension>> {
     collectInfo(project: Project): CatalogInfo
