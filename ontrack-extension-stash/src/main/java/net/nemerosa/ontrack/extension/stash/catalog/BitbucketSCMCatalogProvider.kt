@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.extension.stash.catalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProvider
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogSource
+import net.nemerosa.ontrack.extension.scm.catalog.SCMLocation
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClientFactory
+import net.nemerosa.ontrack.extension.stash.property.StashGitConfiguration
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
@@ -41,4 +43,16 @@ class BitbucketSCMCatalogProvider(
                 property.configuration.name == entry.config &&
                 "${property.project}/${property.repository}" == entry.repository
     }
+
+    override fun getSCMLocation(project: Project): SCMLocation? =
+            propertyService.getProperty(project, StashProjectConfigurationPropertyType::class.java).value
+                    ?.run {
+                        val gitConfig = StashGitConfiguration(this, null)
+                        SCMLocation(
+                                scm = "bitbucket",
+                                name = configuration.name,
+                                uri = gitConfig.remote,
+                                url = repositoryUrl
+                        )
+                    }
 }
