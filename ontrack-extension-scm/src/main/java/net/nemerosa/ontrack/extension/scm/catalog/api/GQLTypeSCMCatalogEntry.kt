@@ -37,6 +37,11 @@ class GQLTypeSCMCatalogEntry(
                                 .type(GraphQLString)
                     }
                     .field {
+                        it.name("repositoryPage")
+                                .description("URL to browse the repository")
+                                .type(GraphQLString)
+                    }
+                    .field {
                         it.name("timestamp")
                                 .description("Collection timestamp")
                                 .type(GQLScalarLocalDateTime.INSTANCE)

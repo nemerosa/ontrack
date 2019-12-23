@@ -32,7 +32,8 @@ class BitbucketSCMCatalogProvider(
                     }.map { repo ->
                         SCMCatalogSource(
                                 config = config.name,
-                                repository = "${repo.project}/${repo.repository}"
+                                repository = "${repo.project}/${repo.repository}",
+                                repositoryPage = StashProjectConfigurationProperty(config, repo.project, repo.repository, 0, null).repositoryUrl
                         )
                     }
                 }

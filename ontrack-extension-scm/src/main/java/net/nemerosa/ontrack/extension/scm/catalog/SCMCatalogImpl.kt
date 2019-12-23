@@ -27,6 +27,7 @@ class SCMCatalogImpl(
                         scm = provider.id,
                         config = source.config,
                         repository = source.repository,
+                        repositoryPage = source.repositoryPage,
                         timestamp = Time.now()
                 )
                 // Stores the entry

@@ -9,6 +9,7 @@ data class SCMCatalogEntry(
         val scm: String,
         val config: String,
         val repository: String,
+        val repositoryPage: String?,
         val timestamp: LocalDateTime
 ) {
     @get:JsonIgnore

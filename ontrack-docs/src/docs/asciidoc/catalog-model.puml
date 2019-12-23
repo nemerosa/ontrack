@@ -27,6 +27,7 @@ class SCMCatalogEntry {
     scm: String // github, bitbucket, etc.
     source: String // config name
     repository: String // location
+    repositoryPage: String // browsing URL for the repository
     timestamp: LocalDateTime // time of last collection
 }
 
