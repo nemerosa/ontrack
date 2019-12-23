@@ -19,7 +19,7 @@ class GQLRootQuerySCMCatalog(
         private val scmCatalog: SCMCatalog
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-            paginatedListFactory.createPaginatedField<Any, SCMCatalogEntry>(
+            paginatedListFactory.createPaginatedField<Any?, SCMCatalogEntry>(
                     cache = GQLTypeCache(),
                     fieldName = "scmCatalog",
                     fieldDescription = "List of SCM catalog entries",
