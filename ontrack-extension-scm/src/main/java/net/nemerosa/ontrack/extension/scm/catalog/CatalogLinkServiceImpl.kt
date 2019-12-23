@@ -22,8 +22,19 @@ class CatalogLinkServiceImpl(
     override fun computeCatalogLinks() {
         val projects = structureService.projectList
         val providers = scmCatalogProviders.associateBy { it.id }
-        scmCatalog.catalogEntries.forEach {
-            computeCatalogLink(it, projects, providers)
+        val catalogEntries = scmCatalog.catalogEntries
+        val leftOverKeys = catalogEntries.map { it.key }.toMutableSet()
+        catalogEntries.forEach {
+            if (computeCatalogLink(it, projects, providers)) {
+                leftOverKeys.remove(it.key)
+            }
+        }
+        // Cleanup
+        projects.forEach { project ->
+            val value = entityDataService.retrieve(project, CatalogLinkService::class.java.name)
+            if (!value.isNullOrBlank() && value in leftOverKeys) {
+                entityDataService.delete(project, value)
+            }
         }
     }
 
@@ -31,7 +42,7 @@ class CatalogLinkServiceImpl(
             entry: SCMCatalogEntry,
             projects: List<Project>,
             providers: Map<String, SCMCatalogProvider>
-    ) {
+    ): Boolean {
         logger.debug("Catalog link for ${entry.key}")
         // Gets a provider for this entry
         val provider = providers[entry.scm]
@@ -47,9 +58,13 @@ class CatalogLinkServiceImpl(
                             CatalogLinkService::class.java.name,
                             entry.key
                     )
+                    // OK
+                    return true
                 }
             }
         }
+        // Not linked
+        return false
     }
 
 }
