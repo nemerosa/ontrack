@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,6 +49,10 @@ class SCMCatalogImpl(
 
     override val catalogEntries: Sequence<SCMCatalogEntry>
         get() = storageService.getData(SCM_CATALOG_STORE, SCMCatalogEntry::class.java).values.asSequence()
+
+    override fun getCatalogEntry(key: String): SCMCatalogEntry? =
+            storageService.retrieve(SCM_CATALOG_STORE, key, SCMCatalogEntry::class.java).getOrNull()
+
 }
 
 private const val SCM_CATALOG_STORE = "scm-catalog"

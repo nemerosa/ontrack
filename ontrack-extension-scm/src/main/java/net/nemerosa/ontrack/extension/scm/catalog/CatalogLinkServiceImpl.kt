@@ -40,6 +40,10 @@ class CatalogLinkServiceImpl(
         }
     }
 
+    override fun getSCMCatalogEntry(project: Project): SCMCatalogEntry? =
+            entityDataService.retrieve(project, CatalogLinkService::class.java.name)
+                    ?.run { scmCatalog.getCatalogEntry(this) }
+
     private fun computeCatalogLink(
             entry: SCMCatalogEntry,
             projects: List<Project>,

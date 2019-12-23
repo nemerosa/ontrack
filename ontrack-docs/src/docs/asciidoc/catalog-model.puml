@@ -48,9 +48,6 @@ interface CatalogInfoContributor<? extends CatalogInfo> <<extension>> {
     collectInfo(project: Project): CatalogInfo
 }
 
-interface CatalogInfo
-CatalogInfoContributor *-down- CatalogInfo
-
 CatalogInfoContributor .left.> Project: associates data
 
 interface CatalogInfoCollector <<service>>
