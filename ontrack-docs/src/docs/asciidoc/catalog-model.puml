@@ -1,0 +1,59 @@
+@startuml
+
+package core {
+    class Project
+}
+
+interface SCMCatalogProvider {
+    id: String
+    entries: [SCMCatalogEntry]
+}
+
+interface SCMCatalog <<service>>
+
+SCMCatalog ..> SCMCatalogEntry: manages
+
+SCMCatalog ..> SCMCatalogProvider: uses "1..*"
+
+class SCMCatalogEntry {
+    id: Long
+    scm: String // github, bitbucket, etc.
+    source: String // config name
+    repository: String // location
+    timestamp: LocalDateTime // time of last collection
+    linked: Boolean // false if not stored in SCM any longer
+}
+
+class SCMCatalogProjectLink
+
+
+SCMCatalogEntry "0..*" - "0..*" Project
+
+(SCMCatalogEntry, Project) .. SCMCatalogProjectLink
+
+interface CatalogLinkService <<service>>
+
+CatalogLinkService .up.> SCMCatalogProjectLink: manages
+
+interface CatalogInfoContributor<? extends CatalogInfo> <<extension>> {
+    collectInfo(project: Project): CatalogInfo
+}
+
+interface CatalogInfo
+CatalogInfoContributor *-down- CatalogInfo
+
+CatalogInfoContributor .left.> Project: associates data
+
+interface CatalogInfoCollector <<service>>
+
+CatalogInfoCollector ..> CatalogInfoContributor: uses "1..*"
+
+package scm {
+    interface BitbucketConfigurationService
+    class BitbucketCatalogProvider
+
+    BitbucketCatalogProvider -up-|> SCMCatalogProvider
+    BitbucketCatalogProvider .down.> BitbucketConfigurationService: uses
+}
+
+@enduml
