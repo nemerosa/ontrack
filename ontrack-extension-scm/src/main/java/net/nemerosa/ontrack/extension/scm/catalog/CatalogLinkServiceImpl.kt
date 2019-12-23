@@ -23,6 +23,7 @@ class CatalogLinkServiceImpl(
         val projects = structureService.projectList
         val providers = scmCatalogProviders.associateBy { it.id }
         val catalogEntries = scmCatalog.catalogEntries
+        val allCatalogKeys = catalogEntries.map { it.key }.toSet()
         val leftOverKeys = catalogEntries.map { it.key }.toMutableSet()
         catalogEntries.forEach {
             if (computeCatalogLink(it, projects, providers)) {
@@ -32,7 +33,8 @@ class CatalogLinkServiceImpl(
         // Cleanup
         projects.forEach { project ->
             val value = entityDataService.retrieve(project, CatalogLinkService::class.java.name)
-            if (!value.isNullOrBlank() && value in leftOverKeys) {
+            if (!value.isNullOrBlank() && (value in leftOverKeys || value !in allCatalogKeys)) {
+                logger.debug("Catalog entry $value linked with ${project.name} is obsolete.")
                 entityDataService.delete(project, value)
             }
         }
