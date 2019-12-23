@@ -42,11 +42,6 @@ class GQLTypeSCMCatalogEntry(
                                 .type(GQLScalarLocalDateTime.INSTANCE)
                     }
                     .field {
-                        it.name("linked")
-                                .description("Is this repository linked to an actual location?")
-                                .type(GraphQLBoolean)
-                    }
-                    .field {
                         it.name("link")
                                 .description("Link to Ontrack project and SCM information")
                                 .type(catalogInfo.typeRef)

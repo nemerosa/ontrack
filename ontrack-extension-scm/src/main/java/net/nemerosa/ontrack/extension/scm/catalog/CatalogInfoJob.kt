@@ -31,7 +31,7 @@ class CatalogInfoJob(
 
     private fun createCatalogInfoJob(project: Project) = object : Job {
 
-        override fun isDisabled(): Boolean = project.isDisabled || catalogLinkService.getSCMCatalogEntry(project)?.takeIf { it.linked } == null
+        override fun isDisabled(): Boolean = project.isDisabled || catalogLinkService.getSCMCatalogEntry(project) == null
 
         override fun getKey(): JobKey =
                 SCMJobs.category

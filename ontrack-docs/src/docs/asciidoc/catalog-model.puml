@@ -28,7 +28,6 @@ class SCMCatalogEntry {
     source: String // config name
     repository: String // location
     timestamp: LocalDateTime // time of last collection
-    linked: Boolean // false if not stored in SCM any longer
 }
 
 class SCMCatalogProjectLink

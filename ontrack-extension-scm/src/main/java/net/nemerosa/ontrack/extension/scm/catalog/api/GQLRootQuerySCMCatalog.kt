@@ -27,10 +27,6 @@ class GQLRootQuerySCMCatalog(
                     itemListCounter = { env, _ -> loadSCMCatalogEntries(env, 0, Int.MAX_VALUE).size },
                     itemListProvider = { env, _, offset, size -> loadSCMCatalogEntries(env, offset, size) },
                     arguments = listOf(
-                            GraphQLArgument.newArgument().name("linked")
-                                    .description("Filters on linked entries only")
-                                    .type(GraphQLBoolean)
-                                    .build(),
                             GraphQLArgument.newArgument().name("scm")
                                     .description("Filters on SCM type (exact match)")
                                     .type(GraphQLString)
@@ -47,13 +43,11 @@ class GQLRootQuerySCMCatalog(
             )
 
     private fun loadSCMCatalogEntries(env: DataFetchingEnvironment, offset: Int, size: Int): List<SCMCatalogEntry> {
-        val linked: Boolean? = env.getArgument("linked")
         val scm: String? = env.getArgument("scm")
         val config: String? = env.getArgument("config")
         val repository: Regex? = env.getArgument<String>("repository")?.toRegex()
         return scmCatalog.catalogEntries.filter {
-            (linked == null || it.linked == linked) &&
-                    (scm.isNullOrBlank() || it.scm == scm) &&
+            (scm.isNullOrBlank() || it.scm == scm) &&
                     (config.isNullOrBlank() || it.config == config) &&
                     (repository == null || repository.matches(it.repository))
         }.toList().drop(offset).take(size)
