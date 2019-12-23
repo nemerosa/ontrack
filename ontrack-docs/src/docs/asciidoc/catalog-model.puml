@@ -6,7 +6,7 @@ package core {
 
 interface SCMCatalogProvider {
     id: String
-    entries: [SCMCatalogEntry]
+    entries: [SCMCatalogSource]
 }
 
 interface SCMCatalog <<service>>
@@ -14,6 +14,13 @@ interface SCMCatalog <<service>>
 SCMCatalog ..> SCMCatalogEntry: manages
 
 SCMCatalog ..> SCMCatalogProvider: uses "1..*"
+
+class SCMCatalogSource {
+    source: String // config name
+    repository: String // location
+}
+
+SCMCatalogProvider .right.> SCMCatalogSource: returns
 
 class SCMCatalogEntry {
     id: Long

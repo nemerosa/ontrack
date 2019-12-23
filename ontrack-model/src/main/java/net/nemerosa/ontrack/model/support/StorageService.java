@@ -69,6 +69,11 @@ public interface StorageService {
                 .map(node -> JsonUtils.parse(node, type));
     }
 
+    /**
+     * Deletes an entry
+     */
+    void delete(String store, String key);
+
 
     /**
      * Gets all the data for a store

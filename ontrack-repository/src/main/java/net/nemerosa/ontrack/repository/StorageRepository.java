@@ -42,4 +42,9 @@ public interface StorageRepository {
      * @param store Store (typically an extension class name)
      */
     Map<String, JsonNode> getData(String store);
+
+    /**
+     * Deletes an entry
+     */
+    void delete(String store, String key);
 }
