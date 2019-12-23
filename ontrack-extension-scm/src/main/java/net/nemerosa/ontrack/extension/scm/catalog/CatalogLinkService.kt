@@ -8,4 +8,6 @@ interface CatalogLinkService {
 
     fun getSCMCatalogEntry(project: Project): SCMCatalogEntry?
 
+    fun getLinkedProject(entry: SCMCatalogEntry): Project?
+
 }

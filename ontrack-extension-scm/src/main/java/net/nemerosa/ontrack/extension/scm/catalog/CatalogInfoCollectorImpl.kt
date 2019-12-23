@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
+import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecord
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,12 +18,16 @@ class CatalogInfoCollectorImpl(
         private val securityService: SecurityService
 ) : CatalogInfoCollector {
 
+    val contributors: Map<String, CatalogInfoContributor<*>> by lazy {
+        extensionManager.getExtensions(CatalogInfoContributor::class.java).associateBy { it.id }
+    }
+
     override fun collectCatalogInfo(project: Project, logger: (String) -> Unit) {
         logger("Catalog info for ${project.name}")
         val entry = catalogLinkService.getSCMCatalogEntry(project)
         if (entry != null) {
             logger("Catalog info for ${project.name} linked with ${entry.key}")
-            val contributors: Collection<CatalogInfoContributor<*>> = extensionManager.getExtensions(CatalogInfoContributor::class.java)
+            val contributors: Collection<CatalogInfoContributor<*>> = contributors.values
             contributors.forEach { collectCatalogInfo(project, entry, it, logger) }
         } else {
             logger("Deleting catalog info for ${project.name} because no associated SCM catalog entry")
@@ -31,6 +36,26 @@ class CatalogInfoCollectorImpl(
                             entity = project,
                             category = STORE_CATEGORY
                     )
+            )
+        }
+    }
+
+    override fun getCatalogInfos(project: Project): List<CatalogInfo<*>> =
+            entityDataStore.getByFilter(
+                    EntityDataStoreFilter(
+                            entity = project,
+                            category = STORE_CATEGORY
+                    )
+            ).mapNotNull { toCatalogInfo<Any>(it) }
+
+    private fun <T> toCatalogInfo(record: EntityDataStoreRecord): CatalogInfo<T>? {
+        @Suppress("UNCHECKED_CAST")
+        val extension: CatalogInfoContributor<T>? = contributors[record.name] as CatalogInfoContributor<T>?
+        return extension?.run {
+            CatalogInfo(
+                    collector = extension,
+                    data = extension.fromJson(record.data),
+                    timestamp = record.signature.time
             )
         }
     }

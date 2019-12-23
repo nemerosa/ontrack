@@ -28,4 +28,9 @@ interface CatalogInfoContributor<T> : Extension {
      */
     val id: String get() = javaClass.name
 
+    /**
+     * Display name for this contributor
+     */
+    val name: String
+
 }

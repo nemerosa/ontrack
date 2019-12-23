@@ -9,4 +9,6 @@ interface CatalogInfoCollector {
 
     fun collectCatalogInfo(project: Project, logger: (String) -> Unit)
 
+    fun getCatalogInfos(project: Project): List<CatalogInfo<*>>
+
 }

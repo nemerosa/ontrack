@@ -16,6 +16,8 @@ class SCMLocationCatalogInfoContributor(
         private val scmCatalogProviders: List<SCMCatalogProvider>
 ) : AbstractCoreCatalogInfoContributor<SCMLocation>(extensionFeature) {
 
+    override val name: String = "SCM Location"
+
     override fun collectInfo(project: Project, entry: SCMCatalogEntry): SCMLocation? =
             scmCatalogProviders
                     .firstOrNull { it.matches(entry, project) }
