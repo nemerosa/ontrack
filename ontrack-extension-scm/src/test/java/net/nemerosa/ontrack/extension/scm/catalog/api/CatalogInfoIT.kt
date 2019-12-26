@@ -14,7 +14,7 @@ import kotlin.test.assertNotNull
 /**
  * Integration tests
  */
-class CatalogInfoIntegrationTest : AbstractQLKTITSupport() {
+class CatalogInfoIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var scmCatalog: SCMCatalog
