@@ -84,21 +84,55 @@ class CatalogInfoIntegrationTest : AbstractQLKTITSupport() {
                 }
             """)
             // Checking data
-            val link = data["projects"][0]["scmCatalogEntryLink"]
+            assertNotNull(data) {
+                val link = it["projects"][0]["scmCatalogEntryLink"]
 
-            val entry = link["scmCatalogEntry"]
-            assertEquals("mocking", entry["scm"].asText())
-            assertEquals("MainConfig", entry["config"].asText())
-            assertEquals("project/repository", entry["repository"].asText())
-            assertEquals("uri:project/repository", entry["repositoryPage"].asText())
+                val entry = link["scmCatalogEntry"]
+                assertEquals("mocking", entry["scm"].asText())
+                assertEquals("MainConfig", entry["config"].asText())
+                assertEquals("project/repository", entry["repository"].asText())
+                assertEquals("uri:project/repository", entry["repositoryPage"].asText())
 
-            val infos = link["infos"]
-            assertEquals(1, infos.size())
-            val info = infos[0]
-            assertEquals("net.nemerosa.ontrack.extension.scm.catalog.mock.MockCatalogInfoContributor", info["id"].asText())
-            assertEquals("mock", info["name"].asText())
-            assertEquals("$name@project/repository", info["data"]["value"].asText())
-            assertEquals("test", info["feature"]["id"].asText())
+                val infos = link["infos"]
+                assertEquals(1, infos.size())
+                val info = infos[0]
+                assertEquals("net.nemerosa.ontrack.extension.scm.catalog.mock.MockCatalogInfoContributor", info["id"].asText())
+                assertEquals("mock", info["name"].asText())
+                assertEquals("$name@project/repository", info["data"]["value"].asText())
+                assertEquals("test", info["feature"]["id"].asText())
+            }
+            // Getting the data through GraphQL & catalog entries
+            val entryCollectionData = run("""{
+                scmCatalog {
+                    pageItems {
+                        link {
+                            project {
+                                name
+                            }
+                            infos {
+                                id
+                                name
+                                data
+                                feature {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }
+            }""")
+            assertNotNull(entryCollectionData) {
+                val link = it["scmCatalog"]["pageItems"][0]["link"]
+                assertEquals(name, link["project"]["name"].asText())
+
+                val infos = link["infos"]
+                assertEquals(1, infos.size())
+                val info = infos[0]
+                assertEquals("net.nemerosa.ontrack.extension.scm.catalog.mock.MockCatalogInfoContributor", info["id"].asText())
+                assertEquals("mock", info["name"].asText())
+                assertEquals("$name@project/repository", info["data"]["value"].asText())
+                assertEquals("test", info["feature"]["id"].asText())
+            }
         }
     }
 
