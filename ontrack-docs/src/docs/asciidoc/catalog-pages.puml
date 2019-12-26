@@ -1,0 +1,24 @@
+@startuml
+
+component Project <<page>> #yellow
+
+component ProjectCatalogInfo <<page>>
+note right of ProjectCatalogInfo
+    Might be devoid of a
+    catalog info / entry
+end note
+
+component CatalogInfo <<component>>
+
+component CatalogEntry <<page>>
+
+component "SCM Catalog" <<page>> as SCMCatalog
+
+Project <-> ProjectCatalogInfo: command / close
+ProjectCatalogInfo *-up-> CatalogInfo: list "0..*"
+
+ProjectCatalogInfo <--> CatalogEntry: links "0..1"
+
+SCMCatalog <-up-> CatalogEntry: link/close
+
+@enduml

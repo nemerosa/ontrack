@@ -488,4 +488,83 @@ angular.module('ontrack.extension.scm', [
             $modalInstance.dismiss('cancel');
         };
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('project-catalog-info', {
+            url: '/extension/scm/project/{project}/catalog-info',
+            templateUrl: 'extension/scm/project-catalog-info.tpl.html',
+            controller: 'ProjectCatalogInfoCtrl'
+        });
+    })
+    .controller('ProjectCatalogInfoCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+        const projectId = $stateParams.project;
+        $scope.loadingInfo = true;
+
+        const view = ot.view();
+        view.title = "";
+
+        const query = `
+            query ProjectCatalogInfo($id: Int!) {
+                projects(id: $id) {
+                    id
+                    name
+                    scmCatalogEntryLink {
+                        scmCatalogEntry {
+                            scm
+                            config
+                            repository
+                            repositoryPage
+                        }
+                        infos {
+                            id
+                            name
+                            data
+                            feature {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
+        `;
+
+        let viewInitialized = false;
+
+        const loadCatalogInfo = () => {
+            $scope.loadingInfo = true;
+
+            const queryVariables = {
+                id: projectId
+            };
+
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+                $scope.project = data.projects[0];
+                if (!viewInitialized) {
+                    // Title
+                    view.title = `SCM Catalog info for ${$scope.project.name}`;
+                    // View configuration
+                    view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
+                    // Commands
+                    view.commands = [
+                        ot.viewCloseCommand('/project/' + $scope.project.id)
+                    ];
+                    // OK
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingInfo = false;
+            });
+        };
+
+        // Loads the issues
+        loadCatalogInfo();
+    })
+    .directive('otScmCatalogEntry', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/scm/directive.scmCatalogEntry.tpl.html',
+            scope: {
+                entry: '='
+            }
+        };
+    })
 ;

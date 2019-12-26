@@ -1,0 +1,25 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingInfo">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading catalog info for this project...
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">SCM Catalog Entry</h3>
+        </div>
+        <div class="panel-body">
+            <p class="text-danger" ng-if="!project.scmCatalogEntryLink.scmCatalogEntry">
+                This project is not associated with any SCM entry. This is abnormal.
+                All Ontrack projects should be associated with some SCM.
+            </p>
+            <ot-scm-catalog-entry ng-if="project.scmCatalogEntryLink.scmCatalogEntry" entry="project.scmCatalogEntryLink.scmCatalogEntry"></ot-scm-catalog-entry>
+        </div>
+    </div>
+
+</ot-view>
