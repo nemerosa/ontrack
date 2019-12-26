@@ -557,6 +557,9 @@ angular.module('ontrack.extension.scm', [
 
         // Loads the issues
         loadCatalogInfo();
+
+        // Path to the catalog info template
+        $scope.getCatalogInfoPath = (info) => `extension/${info.feature.id}/catalog-info/${info.id}.tpl.html`;
     })
     .directive('otScmCatalogEntry', function () {
         return {
