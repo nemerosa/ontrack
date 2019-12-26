@@ -35,7 +35,7 @@ class CatalogLinkServiceImpl(
             val value = entityDataService.retrieve(project, CatalogLinkService::class.java.name)
             if (!value.isNullOrBlank() && (value in leftOverKeys || value !in allCatalogKeys)) {
                 logger.debug("Catalog entry $value linked with ${project.name} is obsolete.")
-                entityDataService.delete(project, value)
+                entityDataService.delete(project, CatalogLinkService::class.java.name)
             }
         }
     }
