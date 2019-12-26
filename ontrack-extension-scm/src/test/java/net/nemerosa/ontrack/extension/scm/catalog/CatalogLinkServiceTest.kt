@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.catalog
 
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures.entry
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Before
 import org.junit.Test
@@ -161,13 +162,5 @@ class CatalogLinkServiceTest {
         val loaded = catalogLinkService.getLinkedProject(entry)
         assertNull(loaded)
     }
-
-    private fun entry(scm: String = "test") = SCMCatalogEntry(
-            config = "test-config",
-            repository = "project/repository",
-            repositoryPage = "uri:project/repository",
-            scm = scm,
-            timestamp = Time.now()
-    )
 
 }
