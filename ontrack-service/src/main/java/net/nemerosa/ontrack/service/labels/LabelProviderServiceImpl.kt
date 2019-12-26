@@ -27,7 +27,7 @@ class LabelProviderServiceImpl(
     override fun collectLabels(project: Project) {
         securityService.checkProjectFunction(project, ProjectLabelManagement::class.java)
         // Computes labels for every provider
-        providers.forEach { provider ->
+        providers.filter { it.isEnabled }.forEach { provider ->
             collectLabels(project, provider)
         }
     }
