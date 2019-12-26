@@ -1,12 +1,11 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.extension.api.support.TestExtensionFeature
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures.entry
+import net.nemerosa.ontrack.extension.scm.catalog.mock.MockCatalogInfoContributor
+import net.nemerosa.ontrack.extension.scm.catalog.mock.MockInfo
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -156,26 +155,5 @@ class CatalogInfoCollectorImplTest {
     }
 
 }
-
-private class MockCatalogInfoContributor : AbstractCatalogInfoContributor<MockInfo>(TestExtensionFeature()) {
-
-    override fun collectInfo(project: Project, entry: SCMCatalogEntry): MockInfo? =
-            when (entry.scm) {
-                "scm" -> MockInfo(entry.repository)
-                "error" -> throw IllegalStateException("Error while collecting information")
-                else -> null
-            }
-
-    override fun asJson(info: MockInfo): JsonNode = info.asJson()
-
-    override fun fromJson(node: JsonNode): MockInfo = node.parse()
-
-    override val name: String = "mock"
-
-}
-
-private data class MockInfo(
-        val value: String
-)
 
 private const val STORE = "net.nemerosa.ontrack.extension.scm.catalog.CatalogInfoCollector"

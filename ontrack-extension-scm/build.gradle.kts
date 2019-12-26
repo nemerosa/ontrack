@@ -14,7 +14,8 @@ dependencies {
 
     testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-it-utils"))
-    testImplementation(project(":ontrack-extension-api", "tests"))
+    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
 }

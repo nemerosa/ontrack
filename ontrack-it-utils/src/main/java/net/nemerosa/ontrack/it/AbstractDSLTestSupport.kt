@@ -104,8 +104,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun project(init: Project.() -> Unit = {}): Project {
-        val project = doCreateProject()
+    fun project(name: NameDescription = AbstractITTestSupport.nameDescription(), init: Project.() -> Unit = {}): Project {
+        val project = doCreateProject(name)
         securityService.asAdmin {
             project.init()
         }
