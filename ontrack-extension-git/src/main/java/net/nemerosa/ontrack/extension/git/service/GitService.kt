@@ -202,4 +202,9 @@ interface GitService : SCMService {
      * Collects and stores the [IndexableGitCommit]s one build.
      */
     fun collectIndexableGitCommitForBuild(build: Build)
+
+    /**
+     * Converts a raw [GitCommit] into an annotated [GitUICommit]
+     */
+    fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit
 }
