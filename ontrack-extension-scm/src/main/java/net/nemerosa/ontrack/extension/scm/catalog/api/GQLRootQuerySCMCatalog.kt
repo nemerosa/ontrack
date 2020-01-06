@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.scm.catalog.api
 
-import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
+import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component
 class GQLRootQuerySCMCatalog(
         private val paginatedListFactory: GQLPaginatedListFactory,
         private val scmCatalogEntry: GQLTypeSCMCatalogEntry,
+        private val catalogLinkService: CatalogLinkService,
         private val scmCatalog: SCMCatalog
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
@@ -38,6 +39,10 @@ class GQLRootQuerySCMCatalog(
                             GraphQLArgument.newArgument().name("repository")
                                     .description("Filters on repository (regular expression)")
                                     .type(GraphQLString)
+                                    .build(),
+                            GraphQLArgument.newArgument().name("linked")
+                                    .description("Filters on entries which are linked or not to projects (ALL, LINKED, ORPHAN)")
+                                    .type(GraphQLString)
                                     .build()
                     )
             )
@@ -46,10 +51,19 @@ class GQLRootQuerySCMCatalog(
         val scm: String? = env.getArgument("scm")
         val config: String? = env.getArgument("config")
         val repository: Regex? = env.getArgument<String>("repository")?.toRegex()
+        val linked: CatalogEntryLink = env.getArgument<String>("linked")?.run { CatalogEntryLink.valueOf(this) }
+                ?: CatalogEntryLink.ALL
         return scmCatalog.catalogEntries.filter {
             (scm.isNullOrBlank() || it.scm == scm) &&
                     (config.isNullOrBlank() || it.config == config) &&
-                    (repository == null || repository.matches(it.repository))
+                    (repository == null || repository.matches(it.repository)) &&
+                    (when (linked) {
+                        CatalogEntryLink.ALL -> true
+                        CatalogEntryLink.LINKED -> isLinked(it)
+                        CatalogEntryLink.ORPHAN -> !isLinked(it)
+                    })
         }.toList().drop(offset).take(size)
     }
+
+    private fun isLinked(entry: SCMCatalogEntry): Boolean = catalogLinkService.getLinkedProject(entry) != null
 }

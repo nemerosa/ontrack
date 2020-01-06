@@ -489,6 +489,79 @@ angular.module('ontrack.extension.scm', [
         };
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('scm-catalog', {
+            url: '/extension/scm/catalog',
+            templateUrl: 'extension/scm/catalog.tpl.html',
+            controller: 'CatalogCtrl'
+        });
+    })
+    .controller('CatalogCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+        $scope.loadingCatalog = true;
+
+        const view = ot.view();
+        view.title = "SCM Catalog";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            ot.viewCloseCommand('/home')
+        ];
+
+        const queryVariables = {
+            offset: 0,
+            size: 40
+        };
+
+        const query = `
+            query CatalogInfo($offset: Int!, $size: Int!) {
+                scmCatalog(offset: $offset, size: $size) {
+                    pageInfo {
+                      totalSize
+                      currentOffset
+                      currentSize
+                      pageTotal
+                      pageIndex
+                      nextPage {
+                        offset
+                        size
+                      }
+                      previousPage {
+                        offset
+                        size
+                      }
+                    }
+                    pageItems {
+                      scm
+                      config
+                      repository
+                      repositoryPage
+                      timestamp
+                      link {
+                        project {
+                          name
+                          links {
+                            _page
+                          }
+                        }
+                      }
+                    }
+                }
+            }
+        `;
+
+        const loadCatalog = () => {
+            $scope.loadingCatalog = true;
+
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+                $scope.data = data;
+            }).finally(() => {
+                $scope.loadingCatalog = false;
+            });
+        };
+
+        // Loads the issues
+        loadCatalog();
+
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('project-catalog-info', {
             url: '/extension/scm/project/{project}/catalog-info',
             templateUrl: 'extension/scm/project-catalog-info.tpl.html',
