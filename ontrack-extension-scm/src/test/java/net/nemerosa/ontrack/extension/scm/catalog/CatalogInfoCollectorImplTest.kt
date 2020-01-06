@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecord
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class CatalogInfoCollectorImplTest {
 
@@ -79,7 +80,24 @@ class CatalogInfoCollectorImplTest {
                 eq(MockCatalogInfoContributor::class.java.name),
                 eq(signature),
                 eq(null),
-                eq(MockInfo("project/repository").asJson())
+                eq(mapOf("info" to MockInfo("project/repository"), "error" to null).asJson())
+        )
+    }
+
+    @Test
+    fun `Storing catalog info error`() {
+        val signature = Signature.of("test")
+        whenever(securityService.currentSignature).thenReturn(signature)
+        whenever(catalogLinkService.getSCMCatalogEntry(project)).thenReturn(entry("error"))
+        registerMockContributor()
+        collector.collectCatalogInfo(project) { println(it) }
+        verify(entityDataStore).add(
+                eq(project),
+                eq(STORE),
+                eq(MockCatalogInfoContributor::class.java.name),
+                eq(signature),
+                eq(null),
+                eq(mapOf("info" to null, "error" to "Error while collecting information").asJson())
         )
     }
 
@@ -88,7 +106,6 @@ class CatalogInfoCollectorImplTest {
         whenever(catalogLinkService.getSCMCatalogEntry(project)).thenReturn(entry("error"))
         registerMockContributor()
         collector.collectCatalogInfo(project) { println(it) }
-        verifyZeroInteractions(entityDataStore)
         verify(applicationLogService).log(any())
     }
 
@@ -116,7 +133,7 @@ class CatalogInfoCollectorImplTest {
                         "unknown-contributor",
                         null,
                         Signature.of("test"),
-                        MockInfo("test").asJson()
+                        mapOf("info" to MockInfo("test")).asJson()
                 )
         ))
         val infos = collector.getCatalogInfos(project)
@@ -138,7 +155,7 @@ class CatalogInfoCollectorImplTest {
                         MockCatalogInfoContributor::class.java.name,
                         null,
                         signature,
-                        MockInfo("test").asJson()
+                        mapOf("info" to MockInfo("test")).asJson()
                 )
         ))
         val infos = collector.getCatalogInfos(project)
@@ -148,6 +165,35 @@ class CatalogInfoCollectorImplTest {
         assertEquals("mock", info.collector.name)
         assertEquals(signature.time, info.timestamp)
         assertEquals(MockInfo("test"), info.data)
+        assertNull(info.error)
+    }
+
+    @Test
+    fun `Loading catalog info with stored error`() {
+        registerMockContributor()
+        val signature = Signature.of("test")
+        whenever(entityDataStore.getByFilter(EntityDataStoreFilter(
+                entity = project,
+                category = STORE
+        ))).thenReturn(listOf(
+                EntityDataStoreRecord(
+                        0,
+                        project,
+                        STORE,
+                        MockCatalogInfoContributor::class.java.name,
+                        null,
+                        signature,
+                        mapOf("error" to "Sample error").asJson()
+                )
+        ))
+        val infos = collector.getCatalogInfos(project)
+        assertEquals(1, infos.size)
+        @Suppress("UNCHECKED_CAST")
+        val info: CatalogInfo<MockInfo> = infos.first() as CatalogInfo<MockInfo>
+        assertEquals("mock", info.collector.name)
+        assertEquals(signature.time, info.timestamp)
+        assertNull(info.data)
+        assertEquals("Sample error", info.error)
     }
 
     private fun registerMockContributor() {

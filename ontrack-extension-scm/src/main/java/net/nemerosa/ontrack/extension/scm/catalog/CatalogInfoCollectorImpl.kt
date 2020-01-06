@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.api.ExtensionManager
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
@@ -53,12 +56,14 @@ class CatalogInfoCollectorImpl(
             ).mapNotNull { toCatalogInfo<Any>(it) }
 
     private fun <T> toCatalogInfo(record: EntityDataStoreRecord): CatalogInfo<T>? {
+        val store: StoredCatalogInfo = record.data.parse()
         @Suppress("UNCHECKED_CAST")
         val extension: CatalogInfoContributor<T>? = contributors[record.name] as CatalogInfoContributor<T>?
         return extension?.run {
             CatalogInfo(
                     collector = extension,
-                    data = extension.fromJson(record.data),
+                    data = store.info?.run { extension.fromJson(this) },
+                    error = store.error,
                     timestamp = record.signature.time
             )
         }
@@ -83,7 +88,7 @@ class CatalogInfoCollectorImpl(
                         contributor.id,
                         securityService.currentSignature,
                         null,
-                        contributor.asJson(info)
+                        StoredCatalogInfo.info(contributor.asJson(info))
                 )
             } else {
                 logger("Deleting catalog info for ${project.name} linked with ${entry.key} by ${contributor.javaClass.name}")
@@ -109,11 +114,30 @@ class CatalogInfoCollectorImpl(
                             "contributor", contributor.id
                     )
             )
+            logger("Setting error as catalog info for ${project.name} linked with ${entry.key} by ${contributor.javaClass.name}")
+            entityDataStore.add(
+                    project,
+                    STORE_CATEGORY,
+                    contributor.id,
+                    securityService.currentSignature,
+                    null,
+                    StoredCatalogInfo.error(ex.message ?: "Unexpected error - no detailed message available. Contact your administrator.")
+            )
         }
     }
 
     companion object {
         val STORE_CATEGORY: String = CatalogInfoCollector::class.java.name
+    }
+
+    data class StoredCatalogInfo(
+            val info: JsonNode?,
+            val error: String?
+    ) {
+        companion object {
+            fun info(value: JsonNode) = StoredCatalogInfo(value, null).asJson()
+            fun error(message: String) = StoredCatalogInfo(null, message).asJson()
+        }
     }
 
 }

@@ -20,7 +20,8 @@ class GQLTypeCatalogInfoItem(
     class Data(
             val id: String,
             val name: String,
-            val data: JsonNode,
+            val data: JsonNode?,
+            val error: String?,
             val timestamp: LocalDateTime,
             val feature: ExtensionFeatureDescription
     )
@@ -43,6 +44,11 @@ class GQLTypeCatalogInfoItem(
                         it.name("data")
                                 .description("Data collected by the catalog info contributor")
                                 .type(GQLScalarJSON.INSTANCE)
+                    }
+                    .field {
+                        it.name("error")
+                                .description("Error field")
+                                .type(GraphQLString)
                     }
                     .field {
                         it.name("timestamp")
