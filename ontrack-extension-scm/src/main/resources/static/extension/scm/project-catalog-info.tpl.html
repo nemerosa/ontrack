@@ -15,7 +15,7 @@
         </div>
         <div class="panel-body">
             <p class="text-danger" ng-if="!project.scmCatalogEntryLink.scmCatalogEntry">
-                This project is not associated with any SCM entry. This is abnormal.
+                This project is not associated with any SCM entry. This is <strong>abnormal</strong>.
                 All Ontrack projects should be associated with some SCM.
             </p>
             <ot-scm-catalog-entry ng-if="project.scmCatalogEntryLink.scmCatalogEntry" entry="project.scmCatalogEntryLink.scmCatalogEntry"></ot-scm-catalog-entry>
@@ -27,7 +27,11 @@
             <h3 class="panel-title">{{info.name}}</h3>
         </div>
         <div class="panel-body">
-            <ng-include src="getCatalogInfoPath(info)"></ng-include>
+            <p ng-if="info.error" class="text-danger">
+                This information could not be collected:
+                <strong>{{info.error}}</strong>
+            </p>
+            <ng-include ng-if="!info.error" src="getCatalogInfoPath(info)"></ng-include>
         </div>
     </div>
 

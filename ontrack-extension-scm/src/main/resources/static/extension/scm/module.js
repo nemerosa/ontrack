@@ -518,6 +518,7 @@ angular.module('ontrack.extension.scm', [
                             id
                             name
                             data
+                            error
                             feature {
                                 id
                             }
