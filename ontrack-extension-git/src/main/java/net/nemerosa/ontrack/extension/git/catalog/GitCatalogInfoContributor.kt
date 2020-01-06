@@ -42,6 +42,6 @@ class GitCatalogInfoContributor(
 
     override fun fromJson(node: JsonNode): GitCatalogInfo = node.parse()
 
-    override val name: String = "git-info"
+    override val name: String = "Git information"
 
 }
