@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
 import com.nhaarman.mockitokotlin2.*
-import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures.entry
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Before
 import org.junit.Test
@@ -148,10 +148,26 @@ class CatalogLinkServiceTest {
     @Test
     fun `Getting linked project from an entry`() {
         val entry = entry()
-        whenever(structureService.projectList).thenReturn(listOf(project))
-        whenever(entityDataService.retrieve(project, CatalogLinkService::class.java.name)).thenReturn(entry.key)
+        whenever(entityDataService.findEntityByValue(
+                ProjectEntityType.PROJECT,
+                CatalogLinkService::class.java.name,
+                entry.key.asJson()
+        )).thenReturn(ProjectEntityID(ProjectEntityType.PROJECT, project.id))
+        whenever(structureService.getProject(project.id)).thenReturn(project)
         val loaded = catalogLinkService.getLinkedProject(entry)
         assertEquals(project, loaded)
+    }
+
+    @Test
+    fun `Getting linked flag from an entry`() {
+        val entry = entry()
+        whenever(entityDataService.findEntityByValue(
+                ProjectEntityType.PROJECT,
+                CatalogLinkService::class.java.name,
+                entry.key.asJson()
+        )).thenReturn(ProjectEntityID(ProjectEntityType.PROJECT, project.id))
+        val linked = catalogLinkService.isLinked(entry)
+        assertEquals(true, linked)
     }
 
     @Test

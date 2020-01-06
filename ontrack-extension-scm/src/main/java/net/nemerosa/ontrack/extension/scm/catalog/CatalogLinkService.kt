@@ -10,4 +10,9 @@ interface CatalogLinkService {
 
     fun getLinkedProject(entry: SCMCatalogEntry): Project?
 
+    /**
+     * Quick check for checking if an [entry] is linked to a project.
+     */
+    fun isLinked(entry: SCMCatalogEntry): Boolean
+
 }

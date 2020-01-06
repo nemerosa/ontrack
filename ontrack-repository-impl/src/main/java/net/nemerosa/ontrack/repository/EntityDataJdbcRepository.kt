@@ -2,9 +2,16 @@ package net.nemerosa.ontrack.repository
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.format
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.ProjectEntityID
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import net.nemerosa.ontrack.repository.support.getNullableInt
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 import javax.sql.DataSource
 
 @Repository
@@ -27,12 +34,12 @@ class EntityDataJdbcRepository(
                 Int::class.java
         )
         if (existingId.isPresent) {
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     "UPDATE ENTITY_DATA SET JSON_VALUE = CAST(:value AS JSONB) WHERE ID = :id",
                     params("id", existingId.get()).addValue("value", writeJson(value))
             )
         } else {
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     String.format(
                             "INSERT INTO ENTITY_DATA(%s, NAME, JSON_VALUE) VALUES (:entityId, :name, CAST(:value AS JSONB))",
                             entity.projectEntityType.name
@@ -59,8 +66,26 @@ class EntityDataJdbcRepository(
         ).map { this.readJson(it) }.orElse(null)
     }
 
+    override fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID? {
+        return namedParameterJdbcTemplate!!.query(
+                """
+                    SELECT ${type.name}
+                    FROM ENTITY_DATA
+                    WHERE ${type.name} IS NOT NULL
+                    AND NAME = :key
+                    AND JSON_VALUE = :value::jsonb
+                    ORDER BY ID DESC
+                    LIMIT 1
+                """,
+                params("key", key).addValue("value", value.format())
+        ) { rs: ResultSet, _ ->
+            val id: ID = ID.of(rs.getInt(type.name))
+            ProjectEntityID(type, id)
+        }.firstOrNull()
+    }
+
     override fun delete(entity: ProjectEntity, key: String) {
-        namedParameterJdbcTemplate.update(
+        namedParameterJdbcTemplate!!.update(
                 String.format(
                         "DELETE FROM ENTITY_DATA WHERE %s = :entityId AND NAME = :name",
                         entity.projectEntityType.name

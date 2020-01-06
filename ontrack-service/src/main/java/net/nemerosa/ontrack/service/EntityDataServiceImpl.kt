@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.EntityDataService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.ProjectEntityID
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.repository.EntityDataRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -67,6 +69,10 @@ class EntityDataServiceImpl(
         securityService.checkProjectFunction(entity, ProjectView::class.java)
         val text = repository.retrieve(entity, key)
         return text?.let(parser)
+    }
+
+    override fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID? {
+        return repository.findEntityByValue(type, key, value)
     }
 
     override fun delete(entity: ProjectEntity, key: String) {

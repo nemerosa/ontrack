@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.EntityDataService
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -45,9 +47,13 @@ class CatalogLinkServiceImpl(
                     ?.run { scmCatalog.getCatalogEntry(this) }
 
     override fun getLinkedProject(entry: SCMCatalogEntry): Project? =
-            structureService.projectList.firstOrNull {
-                entityDataService.retrieve(it, CatalogLinkService::class.java.name) == entry.key
+            entityDataService.findEntityByValue(ProjectEntityType.PROJECT, CatalogLinkService::class.java.name, entry.key.asJson())?.run {
+                assert(type == ProjectEntityType.PROJECT)
+                structureService.getProject(id)
             }
+
+    override fun isLinked(entry: SCMCatalogEntry): Boolean =
+            entityDataService.findEntityByValue(ProjectEntityType.PROJECT, CatalogLinkService::class.java.name, entry.key.asJson()) != null
 
     private fun computeCatalogLink(
             entry: SCMCatalogEntry,

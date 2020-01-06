@@ -10,6 +10,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * Integration tests
@@ -45,9 +46,27 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
         assertEquals("MainConfig", item["config"].asText())
         assertEquals("project/repository", item["repository"].asText())
         assertEquals("uri:project/repository", item["repositoryPage"].asText())
+        // Search on orphan entries
+        val orphanData = run("""{
+            scmCatalog(link: "ORPHAN") {
+                pageItems {
+                    repository
+                    link {
+                        project {
+                            name
+                        }
+                    }
+                }
+            }
+        }""")
+        assertNotNull(orphanData) {
+            val orphanItem = it["scmCatalog"]["pageItems"][0]
+            assertEquals("project/repository", orphanItem["repository"].asText())
+            assertTrue(orphanItem["link"].isNull, "Entry is not linked")
+        }
         // Link with one project
         val name = uid("repository-")
-        project(nd(name, "")) {
+        val project = project(nd(name, "")) {
             // Collection of catalog links
             catalogLinkService.computeCatalogLinks()
             // Checks the link has been recorded
@@ -133,6 +152,24 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
                 assertEquals("$name@project/repository", info["data"]["value"].asText())
                 assertEquals("test", info["feature"]["id"].asText())
             }
+        }
+        // Search on linked entries
+        val data = project.asUserWithView {
+            run("""{
+                scmCatalog(link: "LINKED") {
+                    pageItems {
+                        link { 
+                            project {
+                                name
+                            }
+                        }
+                    }
+                }
+            }""")
+        }
+        assertNotNull(data) {
+            val link = it["scmCatalog"]["pageItems"][0]["link"]
+            assertEquals(name, link["project"]["name"].asText())
         }
     }
 

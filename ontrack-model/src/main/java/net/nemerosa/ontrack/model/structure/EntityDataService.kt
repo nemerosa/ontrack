@@ -54,6 +54,11 @@ interface EntityDataService {
     fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): T?
 
     /**
+     * Looks for a linked entry using a text value
+     */
+    fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID?
+
+    /**
      * Deletes data
      *
      * @param entity Entity to delete data from

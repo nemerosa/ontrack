@@ -26,6 +26,11 @@ inline fun <reified T> JsonNode.parse(): T =
         JsonUtils.parse(this, T::class.java)
 
 /**
+ * Formatting a JSON node as a string
+ */
+fun JsonNode.format() = JsonUtils.toJSONString(this)
+
+/**
  * Gets a field as enum
  */
 inline fun <reified E : Enum<E>> JsonNode.getEnum(field: String): E? {
