@@ -57,7 +57,9 @@ class LabelProviderJob(
         override fun getTask() = JobRun {
             securityService.asAdmin {
                 structureService.projectList.forEach { project ->
-                    labelProviderService.collectLabels(project)
+                    if (!project.isDisabled) {
+                        labelProviderService.collectLabels(project)
+                    }
                 }
             }
         }
@@ -81,8 +83,10 @@ class LabelProviderJob(
                     LABEL_PROVIDER_JOB_TYPE.getKey(project.name)
 
             override fun getTask() = JobRun {
-                securityService.asAdmin {
-                    labelProviderService.collectLabels(project)
+                if (!project.isDisabled) {
+                    securityService.asAdmin {
+                        labelProviderService.collectLabels(project)
+                    }
                 }
             }
 
