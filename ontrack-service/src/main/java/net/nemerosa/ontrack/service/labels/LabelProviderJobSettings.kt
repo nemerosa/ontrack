@@ -5,5 +5,6 @@ package net.nemerosa.ontrack.service.labels
  */
 data class LabelProviderJobSettings(
         val enabled: Boolean,
-        val interval: Int
+        val interval: Int,
+        val perProject: Boolean
 )

@@ -23,6 +23,7 @@ class LabelProviderJobSettingsManager(
     override fun doSaveSettings(settings: LabelProviderJobSettings) {
         settingsRepository.setBoolean(LabelProviderJobSettings::class.java, LabelProviderJobSettings::enabled.name, settings.enabled)
         settingsRepository.setInt(LabelProviderJobSettings::class.java, LabelProviderJobSettings::interval.name, settings.interval)
+        settingsRepository.setBoolean(LabelProviderJobSettings::class.java, LabelProviderJobSettings::perProject.name, settings.perProject)
     }
 
     override fun getId(): String = "label-provider-job"
@@ -46,4 +47,11 @@ class LabelProviderJobSettingsManager(
                                     .step(1)
                                     .value(settings.interval)
                     )
+                    .with(
+                            YesNo.of(LabelProviderJobSettings::perProject.name)
+                                    .label("Job per project")
+                                    .help("Check to have one distinct label collection job per project.")
+                                    .value(settings.perProject)
+                    )
+    
 }

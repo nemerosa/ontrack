@@ -31,23 +31,51 @@ class LabelProviderJob(
     override fun collectJobRegistrations(): Stream<JobRegistration> {
         val settings: LabelProviderJobSettings = settingsService.getCachedSettings(LabelProviderJobSettings::class.java)
         return if (settings.enabled) {
-            securityService.callAsAdmin {
-                structureService.projectList
-                        .map { createLabelProviderJobRegistration(it, settings) }
-                        .stream()
+            if (settings.perProject) {
+                securityService.callAsAdmin {
+                    structureService.projectList
+                            .map { createLabelProviderJobRegistrationForProject(it, settings) }
+                            .stream()
+                }
+            } else {
+                sequenceOf(createLabelProviderJobRegistration(settings)).asStream()
             }
         } else {
             emptySequence<JobRegistration>().asStream()
         }
     }
 
-    private fun createLabelProviderJobRegistration(project: Project, settings: LabelProviderJobSettings): JobRegistration {
+    private fun createLabelProviderJobRegistration(settings: LabelProviderJobSettings): JobRegistration =
+            JobRegistration
+                    .of(createLabelProviderJob())
+                    .withSchedule(Schedule.everyMinutes(settings.interval.toLong()))
+
+    private fun createLabelProviderJob(): Job = object : Job {
+        override fun getKey(): JobKey =
+                LABEL_PROVIDER_JOB_TYPE.getKey("label-collection")
+
+        override fun getTask() = JobRun {
+            securityService.asAdmin {
+                structureService.projectList.forEach { project ->
+                    labelProviderService.collectLabels(project)
+                }
+            }
+        }
+
+        override fun getDescription(): String =
+                "Collection of automated labels for all projects"
+
+        override fun isDisabled(): Boolean = false
+
+    }
+
+    private fun createLabelProviderJobRegistrationForProject(project: Project, settings: LabelProviderJobSettings): JobRegistration {
         return JobRegistration
-                .of(createLabelProviderJob(project))
+                .of(createLabelProviderJobForProject(project))
                 .withSchedule(Schedule.everyMinutes(settings.interval.toLong()))
     }
 
-    private fun createLabelProviderJob(project: Project): Job {
+    private fun createLabelProviderJobForProject(project: Project): Job {
         return object : Job {
             override fun getKey(): JobKey =
                     LABEL_PROVIDER_JOB_TYPE.getKey(project.name)

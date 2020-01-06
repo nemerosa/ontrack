@@ -14,7 +14,8 @@ class LabelProviderJobSettingsProvider(
     override fun getSettings(): LabelProviderJobSettings =
             LabelProviderJobSettings(
                     settingsRepository.getBoolean(LabelProviderJobSettings::class.java, LabelProviderJobSettings::enabled.name, ontrackConfigProperties.isJobLabelProviderEnabled),
-                    settingsRepository.getInt(LabelProviderJobSettings::class.java, LabelProviderJobSettings::interval.name, DEFAULT_LABEL_PROVIDER_JOB_INTERVAL)
+                    settingsRepository.getInt(LabelProviderJobSettings::class.java, LabelProviderJobSettings::interval.name, DEFAULT_LABEL_PROVIDER_JOB_INTERVAL),
+                    settingsRepository.getBoolean(LabelProviderJobSettings::class.java, LabelProviderJobSettings::perProject.name, DEFAULT_LABEL_PROVIDER_JOB_PER_PROJECT)
             )
 
     override fun getSettingsClass(): Class<LabelProviderJobSettings> = LabelProviderJobSettings::class.java
@@ -24,3 +25,8 @@ class LabelProviderJobSettingsProvider(
  * Default interval for scanning labels of projects
  */
 internal const val DEFAULT_LABEL_PROVIDER_JOB_INTERVAL = 60
+
+/**
+ * Default configuration for the collection of lavels for projects
+ */
+internal const val DEFAULT_LABEL_PROVIDER_JOB_PER_PROJECT = false
