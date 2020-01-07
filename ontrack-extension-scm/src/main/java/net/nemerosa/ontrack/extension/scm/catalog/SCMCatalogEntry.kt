@@ -11,8 +11,15 @@ data class SCMCatalogEntry(
         val repository: String,
         val repositoryPage: String?,
         val timestamp: LocalDateTime
-) {
+) : Comparable<SCMCatalogEntry> {
     @get:JsonIgnore
     val key: String
         get() = "$scm::$config::$repository"
+
+    override fun compareTo(other: SCMCatalogEntry): Int =
+            compareValuesBy(this, other,
+                    { it.scm },
+                    { it.config },
+                    { it.repository }
+            )
 }

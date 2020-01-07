@@ -12,7 +12,7 @@ class SCMCatalogFilterServiceImpl(
 
     override fun findCatalogEntries(filter: SCMCatalogFilter): List<SCMCatalogEntry> {
         val repositoryRegex = filter.repository?.toRegex()
-        return scmCatalog.catalogEntries.filter { entry ->
+        return scmCatalog.catalogEntries.sorted().filter { entry ->
             filter.scm?.let { entry.scm == it } ?: true
         }.filter { entry ->
             filter.config?.let { entry.config == it } ?: true
