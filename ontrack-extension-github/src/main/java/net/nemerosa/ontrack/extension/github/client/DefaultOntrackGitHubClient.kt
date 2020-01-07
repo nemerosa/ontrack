@@ -10,6 +10,7 @@ import org.eclipse.egit.github.core.User
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.client.RequestException
 import org.eclipse.egit.github.core.service.IssueService
+import org.eclipse.egit.github.core.service.OrganizationService
 import org.eclipse.egit.github.core.service.RepositoryService
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -37,6 +38,38 @@ class DefaultOntrackGitHubClient(
                 throw OntrackGitHubClientException(e)
             }
         }
+
+    override val organizations: List<GitHubUser>
+        get() {
+            // Getting a client
+            val client = createGitHubClient()
+            // Service
+            val service = OrganizationService(client)
+            // Gets the organization names
+            return try {
+                service.organizations.map {
+                    GitHubUser(
+                            login = it.login,
+                            url = it.htmlUrl
+                    )
+                }
+            } catch (e: IOException) {
+                throw OntrackGitHubClientException(e)
+            }
+        }
+
+    override fun findRepositoriesByOrganization(organization: String): List<String> {
+        // Getting a client
+        val client = createGitHubClient()
+        // Service
+        val repositoryService = RepositoryService(client)
+        // Gets the repository names
+        return try {
+            repositoryService.getRepositories(organization).map { it.name }
+        } catch (e: IOException) {
+            throw OntrackGitHubClientException(e)
+        }
+    }
 
     override fun getIssue(repository: String, id: Int): GitHubIssue? {
         // Logging

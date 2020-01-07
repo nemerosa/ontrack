@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.client
 
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue
+import net.nemerosa.ontrack.extension.github.model.GitHubUser
 
 /**
  * Client used to connect to a GitHub engine from Ontrack.
@@ -19,4 +20,17 @@ interface OntrackGitHubClient {
      * Gets the list of repositories available using this client.
      */
     val repositories: List<String>
+
+    /**
+     * Gets the list of organizations available from this client.
+     */
+    val organizations: List<GitHubUser>
+
+    /**
+     * Gets the list of repositories for an organization
+     *
+     * @param organization Organization name
+     * @return List of repository names (complete with organization name)
+     */
+    fun findRepositoriesByOrganization(organization: String): List<String>
 }

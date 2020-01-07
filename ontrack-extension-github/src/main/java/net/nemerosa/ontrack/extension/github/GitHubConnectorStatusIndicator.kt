@@ -23,7 +23,7 @@ class GitHubConnectorStatusIndicator(
     override val type: String = "github"
 
     override fun connect(config: GitHubEngineConfiguration) {
-        gitHubClientFactory.create(config).repositories
+        gitHubClientFactory.create(config).organizations
     }
 
     override fun connectorDescription(config: GitHubEngineConfiguration) = ConnectorDescription(
