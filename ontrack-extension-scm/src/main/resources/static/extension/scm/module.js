@@ -536,6 +536,7 @@ angular.module('ontrack.extension.scm', [
                       timestamp
                       link {
                         project {
+                          id
                           name
                           links {
                             _page
