@@ -1,163 +1,135 @@
-package net.nemerosa.ontrack.extension.github.client;
+package net.nemerosa.ontrack.extension.github.client
 
-import net.nemerosa.ontrack.common.Time;
-import net.nemerosa.ontrack.extension.github.model.*;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.egit.github.core.*;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.client.RequestException;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.RepositoryService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.github.model.*
+import org.apache.commons.lang3.StringUtils
+import org.eclipse.egit.github.core.Issue
+import org.eclipse.egit.github.core.Label
+import org.eclipse.egit.github.core.Milestone
+import org.eclipse.egit.github.core.User
+import org.eclipse.egit.github.core.client.GitHubClient
+import org.eclipse.egit.github.core.client.RequestException
+import org.eclipse.egit.github.core.service.IssueService
+import org.eclipse.egit.github.core.service.RepositoryService
+import org.slf4j.LoggerFactory
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.time.LocalDateTime
+import java.util.*
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+class DefaultOntrackGitHubClient(
+        private val configuration: GitHubEngineConfiguration
+) : OntrackGitHubClient {
 
-public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
+    private val logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
 
-    private final Logger logger = LoggerFactory.getLogger(OntrackGitHubClient.class);
-
-    private final GitHubEngineConfiguration configuration;
-
-    public DefaultOntrackGitHubClient(GitHubEngineConfiguration configuration) {
-        this.configuration = configuration;
-    }
-
-    @Override
-    public List<String> getRepositories() {
-        // Logging
-        logger.debug("[github] Getting repository list");
-        // Getting a client
-        GitHubClient client = createGitHubClient();
-        // Service
-        RepositoryService repositoryService = new RepositoryService(client);
-        // Gets the repository names
-        try {
-            return repositoryService.getRepositories().stream()
-                    .map(Repository::getName)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new OntrackGitHubClientException(e);
-        }
-    }
-
-    @Override
-    public GitHubIssue getIssue(String repository, int id) {
-        // Logging
-        logger.debug("[github] Getting issue {}/{}", repository, id);
-        // Getting a client
-        GitHubClient client = createGitHubClient();
-        // Issue service using this client
-        IssueService service = new IssueService(client);
-        // Gets the repository for this project
-        String owner = StringUtils.substringBefore(repository, "/");
-        String name = StringUtils.substringAfter(repository, "/");
-        Issue issue;
-        try {
-            issue = service.getIssue(owner, name, id);
-        } catch (RequestException ex) {
-            if (ex.getStatus() == 404) {
-                return null;
-            } else {
-                throw new OntrackGitHubClientException(ex);
+    override val repositories: List<String>
+        get() {
+            logger.debug("[github] Getting repository list")
+            // Getting a client
+            val client = createGitHubClient()
+            // Service
+            val repositoryService = RepositoryService(client)
+            // Gets the repository names
+            return try {
+                repositoryService.repositories.map { it.name }
+            } catch (e: IOException) {
+                throw OntrackGitHubClientException(e)
             }
-        } catch (IOException e) {
-            throw new OntrackGitHubClientException(e);
+        }
+
+    override fun getIssue(repository: String, id: Int): GitHubIssue? {
+        // Logging
+        logger.debug("[github] Getting issue {}/{}", repository, id)
+        // Getting a client
+        val client = createGitHubClient()
+        // Issue service using this client
+        val service = IssueService(client)
+        // Gets the repository for this project
+        val owner = repository.substringBefore("/")
+        val name = repository.substringAfter("/")
+        val issue: Issue = try {
+            service.getIssue(owner, name, id)
+        } catch (ex: RequestException) {
+            return if (ex.status == 404) {
+                null
+            } else {
+                throw OntrackGitHubClientException(ex)
+            }
+        } catch (e: IOException) {
+            throw OntrackGitHubClientException(e)
         }
         // Conversion
-        return new GitHubIssue(
+        return GitHubIssue(
                 id,
-                issue.getHtmlUrl(),
-                issue.getTitle(),
-                issue.getBodyText(),
-                issue.getBodyHtml(),
-                toUser(issue.getAssignee()),
-                toLabels(issue.getLabels()),
-                toState(issue.getState()),
-                toMilestone(repository, issue.getMilestone()),
-                toDateTime(issue.getCreatedAt()),
-                toDateTime(issue.getUpdatedAt()),
-                toDateTime(issue.getClosedAt())
-        );
+                issue.htmlUrl,
+                issue.title,
+                issue.bodyText,
+                issue.bodyHtml,
+                toUser(issue.assignee),
+                toLabels(issue.labels),
+                toState(issue.state),
+                toMilestone(repository, issue.milestone),
+                toDateTime(issue.createdAt),
+                toDateTime(issue.updatedAt),
+                toDateTime(issue.closedAt)
+        )
     }
 
-    protected GitHubClient createGitHubClient() {
+    private fun createGitHubClient(): GitHubClient {
         // GitHub client (non authentified)
-        GitHubClient client = new GitHubClient() {
-            @Override
-            protected HttpURLConnection configureRequest(HttpURLConnection request) {
-                HttpURLConnection connection = super.configureRequest(request);
-                connection.setRequestProperty(HEADER_ACCEPT, "application/vnd.github.v3.full+json");
-                return connection;
+        val client: GitHubClient = object : GitHubClient() {
+            override fun configureRequest(request: HttpURLConnection): HttpURLConnection {
+                val connection = super.configureRequest(request)
+                connection.setRequestProperty(HEADER_ACCEPT, "application/vnd.github.v3.full+json")
+                return connection
             }
-        };
+        }
         // Authentication
-        String oAuth2Token = configuration.getOauth2Token();
+        val oAuth2Token = configuration.oauth2Token
         if (StringUtils.isNotBlank(oAuth2Token)) {
-            client.setOAuth2Token(oAuth2Token);
+            client.setOAuth2Token(oAuth2Token)
         } else {
-            String user = configuration.getUser();
-            String password = configuration.getPassword();
+            val user = configuration.user
+            val password = configuration.password
             if (StringUtils.isNotBlank(user)) {
-                client.setCredentials(user, password);
+                client.setCredentials(user, password)
             }
         }
-        return client;
+        return client
     }
 
-    private LocalDateTime toDateTime(Date date) {
-        if (date == null) {
-            return null;
-        } else {
-            return Time.from(date, null);
-        }
-    }
+    private fun toDateTime(date: Date): LocalDateTime = Time.from(date, null)
 
-    private GitHubMilestone toMilestone(String repository, Milestone milestone) {
-        if (milestone != null) {
-            return new GitHubMilestone(
-                    milestone.getTitle(),
-                    toState(milestone.getState()),
-                    milestone.getNumber(),
-                    String.format(
-                            "%s/%s/issues?milestone=%d&state=open",
-                            configuration.getUrl(),
-                            repository,
-                            milestone.getNumber()
-                    )
-            );
-        } else {
-            return null;
-        }
-    }
-
-    private GitHubState toState(String state) {
-        return GitHubState.valueOf(state);
-    }
-
-    private List<GitHubLabel> toLabels(List<Label> labels) {
-        return labels.stream()
-                .map(label -> new GitHubLabel(
-                        label.getName(),
-                        label.getColor()
+    private fun toMilestone(repository: String, milestone: Milestone): GitHubMilestone =
+            milestone.run {
+                GitHubMilestone(
+                        title,
+                        toState(state),
+                        number, String.format(
+                        "%s/%s/issues?milestone=%d&state=open",
+                        configuration.url,
+                        repository,
+                        number
                 ))
-                .collect(Collectors.toList());
-    }
+            }
 
-    private GitHubUser toUser(User user) {
-        if (user == null) {
-            return null;
-        } else {
-            return new GitHubUser(
-                    user.getLogin(),
-                    user.getHtmlUrl()
-            );
-        }
-    }
+    private fun toState(state: String): GitHubState = GitHubState.valueOf(state)
+
+    private fun toLabels(labels: List<Label>): List<GitHubLabel> = labels
+            .map { label: Label ->
+                GitHubLabel(
+                        label.name,
+                        label.color
+                )
+            }
+
+    private fun toUser(user: User): GitHubUser =
+            user.run {
+                GitHubUser(
+                        login,
+                        htmlUrl
+                )
+            }
 
 }

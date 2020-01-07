@@ -1,52 +1,31 @@
-package net.nemerosa.ontrack.extension.github.model;
+package net.nemerosa.ontrack.extension.github.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.issues.model.IssueStatus;
+import net.nemerosa.ontrack.extension.issues.model.Issue
+import net.nemerosa.ontrack.extension.issues.model.IssueStatus
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-import java.util.List;
+data class GitHubIssue(
+        val id: Int,
+        override val url: String,
+        override val summary: String,
+        val body: String,
+        val bodyHtml: String,
+        val assignee: GitHubUser,
+        val labels: List<GitHubLabel>,
+        val state: GitHubState,
+        val milestone: GitHubMilestone,
+        val createdAt: LocalDateTime,
+        override val updateTime: LocalDateTime,
+        val closedAt: LocalDateTime
+) : Issue {
 
-@Data
-public class GitHubIssue implements Issue {
+    override val key: String
+        get() = id.toString()
 
-    private final int id;
-    private final String url;
-    private final String title;
-    private final String body;
-    private final String bodyHtml;
-    private final GitHubUser assignee;
-    private final List<GitHubLabel> labels;
-    private final GitHubState state;
-    private final GitHubMilestone milestone;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final LocalDateTime closedAt;
+    override val displayKey: String
+        get() = "#$id"
 
-    @Override
-    public String getKey() {
-        return String.valueOf(id);
-    }
+    override val status: IssueStatus
+        get() = GitHubIssueStatus(state.name)
 
-    @Override
-    public String getDisplayKey() {
-        return "#" + id;
-    }
-
-    @Override
-    public String getSummary() {
-        return title;
-    }
-
-    @Override
-    public IssueStatus getStatus() {
-        return new GitHubIssueStatus(state.name());
-    }
-
-    @Override
-    @JsonIgnore
-    public LocalDateTime getUpdateTime() {
-        return updatedAt;
-    }
 }

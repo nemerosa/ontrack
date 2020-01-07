@@ -1,26 +1,22 @@
-package net.nemerosa.ontrack.extension.github.client;
+package net.nemerosa.ontrack.extension.github.client
 
-import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
-
-import java.util.List;
+import net.nemerosa.ontrack.extension.github.model.GitHubIssue
 
 /**
  * Client used to connect to a GitHub engine from Ontrack.
  */
-public interface OntrackGitHubClient {
-
+interface OntrackGitHubClient {
     /**
      * Gets an issue from a repository.
      *
-     * @param repository Repository name, like <code>nemerosa/ontrack</code>
+     * @param repository Repository name, like `nemerosa/ontrack`
      * @param id         ID of the issue
      * @return Details about the issue
      */
-    GitHubIssue getIssue(String repository, int id);
+    fun getIssue(repository: String, id: Int): GitHubIssue?
 
     /**
      * Gets the list of repositories available using this client.
      */
-    List<String> getRepositories();
-
+    val repositories: List<String>
 }

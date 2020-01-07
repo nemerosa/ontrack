@@ -1,7 +1,5 @@
-package net.nemerosa.ontrack.extension.github.model;
+package net.nemerosa.ontrack.extension.github.model
 
-public enum GitHubState {
-
+enum class GitHubState {
     open, closed
-
 }

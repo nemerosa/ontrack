@@ -1,11 +1,6 @@
-package net.nemerosa.ontrack.extension.github.model;
+package net.nemerosa.ontrack.extension.github.model
 
-import lombok.Data;
-
-@Data
-public class GitHubUser {
-
-    private final String login;
-    private final String url;
-
-}
+data class GitHubUser(
+        val login: String,
+        val url: String
+)

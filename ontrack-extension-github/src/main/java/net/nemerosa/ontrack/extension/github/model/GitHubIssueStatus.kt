@@ -1,11 +1,7 @@
-package net.nemerosa.ontrack.extension.github.model;
+package net.nemerosa.ontrack.extension.github.model
 
-import lombok.Data;
-import net.nemerosa.ontrack.extension.issues.model.IssueStatus;
+import net.nemerosa.ontrack.extension.issues.model.IssueStatus
 
-@Data
-public class GitHubIssueStatus implements IssueStatus {
-
-    private final String name;
-
-}
+data class GitHubIssueStatus(
+        override val name: String
+) : IssueStatus
