@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogAccessFunction
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.NameDescription.nd
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
@@ -76,7 +77,7 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
         }
         // Link with one project
         val name = uid("repository-")
-        val project = project(nd(name, "")) {
+        project(nd(name, "")) {
             // Collection of catalog links
             catalogLinkService.computeCatalogLinks()
             // Checks the link has been recorded
@@ -190,6 +191,64 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
         assertNotNull(data) {
             val link = it["scmCatalog"]["pageItems"][0]["link"]
             assertEquals(name, link["project"]["name"].asText())
+        }
+    }
+
+    @Test
+    fun `SCM Catalog accessible to administrators in view-to-all mode`() {
+        scmCatalogTest {
+            withGrantViewToAll {
+                asAdmin(it)
+            }
+        }
+    }
+
+    @Test
+    fun `SCM Catalog accessible to administrators in restricted mode`() {
+        scmCatalogTest {
+            withNoGrantViewToAll {
+                asAdmin(it)
+            }
+        }
+    }
+
+    @Test
+    fun `SCM Catalog accessible to global read only`() {
+        scmCatalogTest {
+            withNoGrantViewToAll {
+                asAccountWithGlobalRole(Roles.GLOBAL_READ_ONLY, it)
+            }
+        }
+    }
+
+    private fun scmCatalogTest(setup: (code: () -> Unit) -> Unit) {
+        // Collection of entries
+        scmCatalog.collectSCMCatalog { println(it) }
+        // Link with one project
+        val name = uid("repository-")
+        project(nd(name, "")) {
+            // Collection of catalog links
+            catalogLinkService.computeCatalogLinks()
+            // Fires the collection of information for this project
+            catalogInfoCollector.collectCatalogInfo(this) { println(it) }
+        }
+        // Checks rights
+        setup {
+            val data = run("""{
+                    scmCatalog(link: "LINKED") {
+                        pageItems {
+                            link { 
+                                project {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }""")
+            assertNotNull(data) {
+                val link = it["scmCatalog"]["pageItems"][0]["link"]
+                assertEquals(name, link["project"]["name"].asText())
+            }
         }
     }
 }
