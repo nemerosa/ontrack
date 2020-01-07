@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.scm.catalog.mock
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProvider
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogSource
-import net.nemerosa.ontrack.extension.scm.catalog.SCMLocation
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Component
 
@@ -22,15 +21,4 @@ class MockSCMCatalogProvider : SCMCatalogProvider {
 
     override fun matches(entry: SCMCatalogEntry, project: Project): Boolean =
             project.name.startsWith("repository-")
-
-    override fun getSCMLocation(project: Project): SCMLocation? = if (project.name.startsWith("project/")) {
-        SCMLocation(
-                "mock",
-                "MainConfig",
-                "uri:${project.name}",
-                "url:${project.name}"
-        )
-    } else {
-        null
-    }
 }

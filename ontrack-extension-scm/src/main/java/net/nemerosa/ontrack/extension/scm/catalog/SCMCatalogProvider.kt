@@ -12,9 +12,4 @@ interface SCMCatalogProvider {
      */
     fun matches(entry: SCMCatalogEntry, project: Project): Boolean
 
-    /**
-     * Gets the SCM location for a project
-     */
-    fun getSCMLocation(project: Project): SCMLocation?
-
 }
