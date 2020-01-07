@@ -505,7 +505,7 @@ angular.module('ontrack.extension.scm', [
             ot.viewCloseCommand('/home')
         ];
 
-        const queryVariables = {
+        $scope.queryVariables = {
             offset: 0,
             size: 30,
             scm: "",
@@ -514,8 +514,8 @@ angular.module('ontrack.extension.scm', [
         };
 
         const query = `
-            query CatalogInfo($offset: Int!, $size: Int!) {
-                scmCatalog(offset: $offset, size: $size) {
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository) {
                     pageInfo {
                       totalSize
                       currentOffset
@@ -554,7 +554,11 @@ angular.module('ontrack.extension.scm', [
         const loadCatalog = () => {
             $scope.loadingCatalog = true;
 
-            otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
+            if ($scope.queryVariables.repository && $scope.queryVariables.repository.indexOf("*") < 0) {
+                $scope.queryVariables.repository = `.*${$scope.queryVariables.repository}.*`;
+            }
+
+            otGraphqlService.pageGraphQLCall(query, $scope.queryVariables).then(data => {
                 $scope.data = data;
             }).finally(() => {
                 $scope.loadingCatalog = false;
@@ -563,10 +567,18 @@ angular.module('ontrack.extension.scm', [
 
         // Loads the issues
         loadCatalog();
+        $scope.loadCatalog = loadCatalog;
+
+        // Clearing the filter
+        $scope.clearCatalogFilter = function () {
+            $scope.queryVariables.scm = "";
+            $scope.queryVariables.config = "";
+            $scope.queryVariables.repository = "";
+        };
 
         // Navigating
         $scope.navigate = pageRequest => {
-            queryVariables.offset = pageRequest.offset;
+            $scope.queryVariables.offset = pageRequest.offset;
             loadCatalog();
         };
 

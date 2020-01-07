@@ -19,19 +19,53 @@
 
     <table class="table table-hover table-condensed" ng-show="data.scmCatalog.pageInfo.currentSize > 0">
         <thead>
-        <tr class="well">
+        <tr>
             <td colspan="4">
-                <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
-                    <span class="fa fa-step-backward"></span>
-                    Previous
-                </button>
-                <span>
-                    {{data.scmCatalog.pageInfo.currentOffset + 1}}-{{data.scmCatalog.pageInfo.currentOffset + data.scmCatalog.pageInfo.currentSize}} / {{data.scmCatalog.pageInfo.totalSize}}
-                </span>
-                <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.nextPage)" ng-disabled="!data.scmCatalog.pageInfo.nextPage">
-                    <span class="fa fa-step-forward"></span>
-                    Next
-                </button>
+                <form class="form-inline">
+                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
+                        <span class="fa fa-step-backward"></span>
+                        Previous
+                    </button>
+                    <span>
+                        {{data.scmCatalog.pageInfo.currentOffset + 1}}-{{data.scmCatalog.pageInfo.currentOffset + data.scmCatalog.pageInfo.currentSize}} / {{data.scmCatalog.pageInfo.totalSize}}
+                    </span>
+                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.nextPage)" ng-disabled="!data.scmCatalog.pageInfo.nextPage">
+                        <span class="fa fa-step-forward"></span>
+                        Next
+                    </button>
+                    <!-- SCM filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-scm">SCM</label>
+                        <input id="catalog-filter-scm" class="form-control col-md-3" type="text" ng-model="queryVariables.scm" />
+                    </div>
+                    <!-- Config filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-config">Config</label>
+                        <input id="catalog-filter-config" class="form-control col-md-3" type="text" ng-model="queryVariables.config" />
+                    </div>
+                    <!-- Repository filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-repository">Repository</label>
+                        <input id="catalog-filter-repository" class="form-control col-md-3" type="text" ng-model="queryVariables.repository" />
+                    </div>
+                    <!-- Search button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-click="loadCatalog()"
+                                class="btn btn-primary">
+                            <span class="fa fa-search"></span>
+                        </button>
+                    </div>
+                    <!-- Clear button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-click="clearCatalogFilter()"
+                                title="Clears current filter and reloads the catalog"
+                                class="btn btn-default">
+                            <span class="fa fa-ban"></span>
+                        </button>
+                    </div>
+                </form>
             </td>
         </tr>
         </thead>
