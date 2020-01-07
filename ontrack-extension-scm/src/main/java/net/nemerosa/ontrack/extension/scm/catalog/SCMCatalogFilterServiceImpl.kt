@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -7,10 +8,12 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class SCMCatalogFilterServiceImpl(
         private val scmCatalog: SCMCatalog,
-        private val catalogLinkService: CatalogLinkService
+        private val catalogLinkService: CatalogLinkService,
+        private val securityService: SecurityService
 ) : SCMCatalogFilterService {
 
     override fun findCatalogEntries(filter: SCMCatalogFilter): List<SCMCatalogEntry> {
+        securityService.checkGlobalFunction(SCMCatalogAccessFunction::class.java)
         val repositoryRegex = filter.repository?.takeIf { it.isNotBlank() }?.toRegex()
         return scmCatalog.catalogEntries.sorted().filter { entry ->
             filter.scm?.takeIf { it.isNotBlank() }?.let { entry.scm == it } ?: true
