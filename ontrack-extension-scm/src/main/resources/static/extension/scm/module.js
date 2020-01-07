@@ -560,6 +560,12 @@ angular.module('ontrack.extension.scm', [
         // Loads the issues
         loadCatalog();
 
+        // Navigating
+        $scope.navigate = pageRequest => {
+            queryVariables.offset = pageRequest.offset;
+            loadCatalog();
+        };
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('project-catalog-info', {

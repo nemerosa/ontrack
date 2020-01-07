@@ -11,6 +11,23 @@
 
     <table class="table table-hover table-condensed" ng-show="data.scmCatalog.pageInfo.currentSize > 0">
         <thead>
+        <tr class="well">
+            <td colspan="4">
+                <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
+                    <span class="fa fa-step-backward"></span>
+                    Previous
+                </button>
+                <span>
+                    {{data.scmCatalog.pageInfo.currentOffset + 1}}-{{data.scmCatalog.pageInfo.currentOffset + data.scmCatalog.pageInfo.currentSize}} / {{data.scmCatalog.pageInfo.totalSize}}
+                </span>
+                <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.nextPage)" ng-disabled="!data.scmCatalog.pageInfo.nextPage">
+                    <span class="fa fa-step-forward"></span>
+                    Next
+                </button>
+            </td>
+        </tr>
+        </thead>
+        <thead>
         <tr>
             <th>SCM</th>
             <th>Config</th>
