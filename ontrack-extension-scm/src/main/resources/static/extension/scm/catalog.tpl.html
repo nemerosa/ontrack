@@ -1,0 +1,34 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingCatalog">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading catalog...
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-hover table-condensed" ng-show="data.scmCatalog.pageInfo.currentSize > 0">
+        <thead>
+        <tr>
+            <th>SCM</th>
+            <th>Config</th>
+            <th>Repository</th>
+            <th>Project</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in data.scmCatalog.pageItems">
+            <td>{{item.scm}}</td>
+            <td>{{item.config}}</td>
+            <td><a href="{{item.repositoryPage}}">{{item.repository}}</a></td>
+            <td>
+                <span ng-if="!item.link"><span class="fa fa-ban" title="No project associated with this repository."></span></span>
+                <a ng-if="item.link" href="{{item.link.project.links._page}}">{{item.link.project.name}}</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>
