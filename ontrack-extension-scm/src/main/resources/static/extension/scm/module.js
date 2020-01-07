@@ -510,12 +510,19 @@ angular.module('ontrack.extension.scm', [
             size: 30,
             scm: "",
             config: "",
-            repository: ""
+            repository: "",
+            link: "ALL"
+        };
+
+        $scope.filterLinks = {
+            ALL: "All projects",
+            LINKED: "Linked entries",
+            ORPHAN: "Orphan entries"
         };
 
         const query = `
-            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String) {
-                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository) {
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link) {
                     pageInfo {
                       totalSize
                       currentOffset
@@ -574,6 +581,8 @@ angular.module('ontrack.extension.scm', [
             $scope.queryVariables.scm = "";
             $scope.queryVariables.config = "";
             $scope.queryVariables.repository = "";
+            $scope.queryVariables.link = "ALL";
+            loadCatalog();
         };
 
         // Navigating

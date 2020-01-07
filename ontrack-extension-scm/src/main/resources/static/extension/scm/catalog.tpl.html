@@ -33,6 +33,18 @@
                         <span class="fa fa-step-forward"></span>
                         Next
                     </button>
+                    <!-- Link filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+                            {{queryVariables.link ? filterLinks[queryVariables.link] : filterLinks["ALL"]}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="(key, name) in filterLinks">
+                                <a class="ot-action" ng-click="queryVariables.link = key;">{{name}}</a>
+                            </li>
+                        </ul>
+                    </div>
                     <!-- SCM filter -->
                     <div class="form-group">
                         <label for="catalog-filter-scm">SCM</label>
