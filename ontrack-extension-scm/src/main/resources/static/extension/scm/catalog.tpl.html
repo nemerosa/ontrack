@@ -9,6 +9,14 @@
         </div>
     </div>
 
+    <div class="row" ng-if="data && data.scmCatalog.pageInfo.currentSize == 0">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                No SCM catalog entry was collected.
+            </div>
+        </div>
+    </div>
+
     <table class="table table-hover table-condensed" ng-show="data.scmCatalog.pageInfo.currentSize > 0">
         <thead>
         <tr class="well">
