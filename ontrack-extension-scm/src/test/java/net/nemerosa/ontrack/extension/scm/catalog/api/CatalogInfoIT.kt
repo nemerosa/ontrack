@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.scm.catalog.api
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogInfoCollector
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
+import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogAccessFunction
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.NameDescription.nd
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -31,34 +33,42 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
         // Collection of entries
         scmCatalog.collectSCMCatalog { println(it) }
         // Checks entry has been collected
-        val collectionData = run("""{
-            scmCatalog {
-                pageItems {
-                    scm
-                    config
-                    repository
-                    repositoryPage
-                }
+        val collectionData = withGrantViewToAll {
+            asUserWith<SCMCatalogAccessFunction, JsonNode> {
+                run("""{
+                    scmCatalog {
+                        pageItems {
+                            scm
+                            config
+                            repository
+                            repositoryPage
+                        }
+                    }
+                }""")
             }
-        }""")
+        }
         val item = collectionData["scmCatalog"]["pageItems"][0]
         assertEquals("mocking", item["scm"].asText())
         assertEquals("MainConfig", item["config"].asText())
         assertEquals("project/repository", item["repository"].asText())
         assertEquals("uri:project/repository", item["repositoryPage"].asText())
         // Search on orphan entries
-        val orphanData = run("""{
-            scmCatalog(link: "ORPHAN") {
-                pageItems {
-                    repository
-                    link {
-                        project {
-                            name
+        val orphanData = withGrantViewToAll {
+            asUserWith<SCMCatalogAccessFunction, JsonNode> {
+                run("""{
+                    scmCatalog(link: "ORPHAN") {
+                        pageItems {
+                            repository
+                            link {
+                                project {
+                                    name
+                                }
+                            }
                         }
                     }
-                }
+                }""")
             }
-        }""")
+        }
         assertNotNull(orphanData) {
             val orphanItem = it["scmCatalog"]["pageItems"][0]
             assertEquals("project/repository", orphanItem["repository"].asText())
@@ -80,28 +90,32 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
             // Fires the collection of information for this project
             catalogInfoCollector.collectCatalogInfo(this) { println(it) }
             // Getting the data through GraphQL & project root
-            val data = run("""
-                query ProjectInfo {
-                    projects(id: $id) {
-                        scmCatalogEntryLink {
-                            scmCatalogEntry {
-                                scm
-                                config
-                                repository
-                                repositoryPage
-                            }
-                            infos {
-                                id
-                                name
-                                data
-                                feature {
-                                    id
+            val data = withGrantViewToAll {
+                asUserWith<SCMCatalogAccessFunction, JsonNode> {
+                    run("""
+                        query ProjectInfo {
+                            projects(id: $id) {
+                                scmCatalogEntryLink {
+                                    scmCatalogEntry {
+                                        scm
+                                        config
+                                        repository
+                                        repositoryPage
+                                    }
+                                    infos {
+                                        id
+                                        name
+                                        data
+                                        feature {
+                                            id
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
+                    """)
                 }
-            """)
+            }
             // Checking data
             assertNotNull(data) {
                 val link = it["projects"][0]["scmCatalogEntryLink"]
@@ -121,25 +135,29 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
                 assertEquals("test", info["feature"]["id"].asText())
             }
             // Getting the data through GraphQL & catalog entries
-            val entryCollectionData = run("""{
-                scmCatalog {
-                    pageItems {
-                        link {
-                            project {
-                                name
-                            }
-                            infos {
-                                id
-                                name
-                                data
-                                feature {
-                                    id
+            val entryCollectionData = withGrantViewToAll {
+                asUserWith<SCMCatalogAccessFunction, JsonNode> {
+                    run("""{
+                        scmCatalog {
+                            pageItems {
+                                link {
+                                    project {
+                                        name
+                                    }
+                                    infos {
+                                        id
+                                        name
+                                        data
+                                        feature {
+                                            id
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
+                    }""")
                 }
-            }""")
+            }
             assertNotNull(entryCollectionData) {
                 val link = it["scmCatalog"]["pageItems"][0]["link"]
                 assertEquals(name, link["project"]["name"].asText())
@@ -154,23 +172,24 @@ class CatalogInfoIT : AbstractQLKTITSupport() {
             }
         }
         // Search on linked entries
-        val data = project.asUserWithView {
-            run("""{
-                scmCatalog(link: "LINKED") {
-                    pageItems {
-                        link { 
-                            project {
-                                name
+        val data = withGrantViewToAll {
+            asUserWith<SCMCatalogAccessFunction, JsonNode> {
+                run("""{
+                    scmCatalog(link: "LINKED") {
+                        pageItems {
+                            link { 
+                                project {
+                                    name
+                                }
                             }
                         }
                     }
-                }
-            }""")
+                }""")
+            }
         }
         assertNotNull(data) {
             val link = it["scmCatalog"]["pageItems"][0]["link"]
             assertEquals(name, link["project"]["name"].asText())
         }
     }
-
 }

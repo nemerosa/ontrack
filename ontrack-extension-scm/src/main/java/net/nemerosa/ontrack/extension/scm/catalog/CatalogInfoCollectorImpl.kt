@@ -82,7 +82,7 @@ class CatalogInfoCollectorImpl(
             // Storing the information as JSON
             if (info != null) {
                 logger("Storing catalog info for ${project.name} linked with ${entry.key} by ${contributor.javaClass.name}")
-                entityDataStore.add(
+                entityDataStore.replaceOrAdd(
                         project,
                         STORE_CATEGORY,
                         contributor.id,
@@ -115,7 +115,7 @@ class CatalogInfoCollectorImpl(
                     )
             )
             logger("Setting error as catalog info for ${project.name} linked with ${entry.key} by ${contributor.javaClass.name}")
-            entityDataStore.add(
+            entityDataStore.replaceOrAdd(
                     project,
                     STORE_CATEGORY,
                     contributor.id,

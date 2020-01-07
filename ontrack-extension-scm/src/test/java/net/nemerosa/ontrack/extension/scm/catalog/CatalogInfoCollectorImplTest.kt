@@ -74,7 +74,7 @@ class CatalogInfoCollectorImplTest {
         whenever(catalogLinkService.getSCMCatalogEntry(project)).thenReturn(entry("scm"))
         registerMockContributor()
         collector.collectCatalogInfo(project) { println(it) }
-        verify(entityDataStore).add(
+        verify(entityDataStore).replaceOrAdd(
                 eq(project),
                 eq(STORE),
                 eq(MockCatalogInfoContributor::class.java.name),
@@ -91,7 +91,7 @@ class CatalogInfoCollectorImplTest {
         whenever(catalogLinkService.getSCMCatalogEntry(project)).thenReturn(entry("error"))
         registerMockContributor()
         collector.collectCatalogInfo(project) { println(it) }
-        verify(entityDataStore).add(
+        verify(entityDataStore).replaceOrAdd(
                 eq(project),
                 eq(STORE),
                 eq(MockCatalogInfoContributor::class.java.name),
