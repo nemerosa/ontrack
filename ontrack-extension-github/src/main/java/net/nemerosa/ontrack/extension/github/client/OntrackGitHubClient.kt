@@ -30,7 +30,7 @@ interface OntrackGitHubClient {
      * Gets the list of repositories for an organization
      *
      * @param organization Organization name
-     * @return List of repository names (complete with organization name)
+     * @return List of repository names in this [organization]
      */
     fun findRepositoriesByOrganization(organization: String): List<String>
 }

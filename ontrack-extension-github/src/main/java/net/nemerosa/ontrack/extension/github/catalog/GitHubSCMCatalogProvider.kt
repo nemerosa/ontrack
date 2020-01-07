@@ -34,7 +34,7 @@ class GitHubSCMCatalogProvider(
     private fun getConfigEntries(settings: GitHubSCMCatalogSettings, config: GitHubEngineConfiguration): Iterable<SCMCatalogSource> {
         val client = gitHubClientFactory.create(config)
         return client.organizations.filter { it.login in settings.orgs }.flatMap {
-            client.findRepositoriesByOrganization(it.login)
+           client.findRepositoriesByOrganization(it.login).map { name -> "${it.login}/$name"}
         }.map { repo ->
             SCMCatalogSource(
                     config.name,
