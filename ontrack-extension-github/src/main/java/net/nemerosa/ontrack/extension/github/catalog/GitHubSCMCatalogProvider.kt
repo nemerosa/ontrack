@@ -8,12 +8,14 @@ import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProvider
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogSource
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Component
 
 @Component
 class GitHubSCMCatalogProvider(
+        private val cachedSettingsService: CachedSettingsService,
         private val gitHubConfigurationService: GitHubConfigurationService,
         private val gitHubClientFactory: OntrackGitHubClientFactory,
         private val propertyService: PropertyService
@@ -22,13 +24,19 @@ class GitHubSCMCatalogProvider(
     override val id: String = "github"
 
     override val entries: List<SCMCatalogSource>
-        get() = gitHubConfigurationService.configurations.flatMap { config ->
-            getConfigEntries(config)
+        get() {
+            val settings = cachedSettingsService.getCachedSettings(GitHubSCMCatalogSettings::class.java)
+            return gitHubConfigurationService.configurations.flatMap { config ->
+                getConfigEntries(settings, config)
+            }
         }
 
-    private fun getConfigEntries(config: GitHubEngineConfiguration): Iterable<SCMCatalogSource> {
+    private fun getConfigEntries(settings: GitHubSCMCatalogSettings, config: GitHubEngineConfiguration): Iterable<SCMCatalogSource> {
         val client = gitHubClientFactory.create(config)
-        return client.repositories.map { repo ->
+        return client.repositories.filter { repo ->
+            val org = repo.substringBefore("/")
+            org in settings.orgs
+        }.map { repo ->
             SCMCatalogSource(
                     config.name,
                     repo,
