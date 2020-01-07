@@ -11,11 +11,11 @@ class SCMCatalogFilterServiceImpl(
 ) : SCMCatalogFilterService {
 
     override fun findCatalogEntries(filter: SCMCatalogFilter): List<SCMCatalogEntry> {
-        val repositoryRegex = filter.repository?.toRegex()
+        val repositoryRegex = filter.repository?.takeIf { it.isNotBlank() }?.toRegex()
         return scmCatalog.catalogEntries.sorted().filter { entry ->
-            filter.scm?.let { entry.scm == it } ?: true
+            filter.scm?.takeIf { it.isNotBlank() }?.let { entry.scm == it } ?: true
         }.filter { entry ->
-            filter.config?.let { entry.config == it } ?: true
+            filter.config?.takeIf { it.isNotBlank() }?.let { entry.config == it } ?: true
         }.filter { entry ->
             repositoryRegex?.let { it.matches(entry.repository) } ?: true
         }.filter { entry ->

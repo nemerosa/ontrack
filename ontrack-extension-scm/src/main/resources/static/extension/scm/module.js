@@ -507,7 +507,10 @@ angular.module('ontrack.extension.scm', [
 
         const queryVariables = {
             offset: 0,
-            size: 30
+            size: 30,
+            scm: "",
+            config: "",
+            repository: ""
         };
 
         const query = `
