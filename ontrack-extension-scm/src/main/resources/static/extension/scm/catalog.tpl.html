@@ -18,8 +18,11 @@
                         <span class="fa fa-step-backward"></span>
                         Previous
                     </button>
-                    <span>
+                    <span ng-if="data.scmCatalog.pageInfo.currentSize > 0">
                         {{data.scmCatalog.pageInfo.currentOffset + 1}}-{{data.scmCatalog.pageInfo.currentOffset + data.scmCatalog.pageInfo.currentSize}} / {{data.scmCatalog.pageInfo.totalSize}}
+                    </span>
+                    <span ng-if="data.scmCatalog.pageInfo.currentSize == 0">
+                        -
                     </span>
                     <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.nextPage)" ng-disabled="!data.scmCatalog.pageInfo.nextPage">
                         <span class="fa fa-step-forward"></span>
@@ -39,18 +42,18 @@
                     </div>
                     <!-- SCM filter -->
                     <div class="form-group">
-                        <label for="catalog-filter-scm">SCM</label>
-                        <input id="catalog-filter-scm" class="form-control col-md-3" type="text" ng-model="queryVariables.scm" />
+                        <label for="catalogFilterScm">SCM</label>
+                        <input type="text" class="form-control" id="catalogFilterScm" ng-model="queryVariables.scm">
                     </div>
                     <!-- Config filter -->
                     <div class="form-group">
                         <label for="catalog-filter-config">Config</label>
-                        <input id="catalog-filter-config" class="form-control col-md-3" type="text" ng-model="queryVariables.config" />
+                        <input id="catalog-filter-config" class="form-control" type="text" ng-model="queryVariables.config" />
                     </div>
                     <!-- Repository filter -->
                     <div class="form-group">
                         <label for="catalog-filter-repository">Repository</label>
-                        <input id="catalog-filter-repository" class="form-control col-md-3" type="text" ng-model="queryVariables.repository" />
+                        <input id="catalog-filter-repository" class="form-control" type="text" ng-model="queryVariables.repository" />
                     </div>
                     <!-- Search button -->
                     <div class="form-group">
