@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -924,6 +925,32 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                     params("id", id).addValue("order", order++)
             );
         }
+    }
+
+    @Override
+    public void forEachValidationRun(Function<String, ValidationRunStatusID> validationRunStatusService, Consumer<ValidationRun> processing) {
+        getProjectList().forEach((project) ->
+                getBranchesForProject(project.getId()).forEach((branch) ->
+                        getValidationStampListForBranch(branch.getId()).forEach((validationStamp ->
+                                        getNamedParameterJdbcTemplate().query(
+                                                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                                                        "FROM VALIDATION_RUNS VR " +
+                                                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
+                                                        "WHERE VR.VALIDATIONSTAMPID = :stampId",
+                                                params("stampId", validationStamp.id()),
+                                                (rs) -> {
+                                                    ValidationRun validationRun = toValidationRun(
+                                                            rs,
+                                                            this::getBuild,
+                                                            (id) -> validationStamp,
+                                                            validationRunStatusService
+                                                    );
+                                                    processing.accept(validationRun);
+                                                })
+                                )
+                        )
+                )
+        );
     }
 
     @Override

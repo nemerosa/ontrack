@@ -24,7 +24,7 @@ class RunInfoRestorationJob(
     override fun isDisabled(): Boolean = false
 
     override fun getKey(): JobKey =
-            JobCategory.CORE.getType("run-info-restoration").withName("Run Info Restoration").getKey("0")
+            RestorationJobs.RESTORATION_JOB_TYPE.getKey("run-info-restoration")
 
     override fun getDescription(): String = "Run Info Restoration"
 
