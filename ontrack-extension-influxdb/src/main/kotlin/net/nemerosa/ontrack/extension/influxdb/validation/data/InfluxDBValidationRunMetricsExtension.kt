@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.influxdb.validation.data
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
 import net.nemerosa.ontrack.extension.influxdb.InfluxDBExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -45,7 +46,7 @@ class InfluxDBValidationRunMetricsExtension(
                                 // Fields
                                 .fields(metrics)
                                 // OK
-                                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                                .time(Time.toEpochMillis(validationRun.signature.time), TimeUnit.MILLISECONDS)
                                 .build()
                 )
                 influxDB.flush()
