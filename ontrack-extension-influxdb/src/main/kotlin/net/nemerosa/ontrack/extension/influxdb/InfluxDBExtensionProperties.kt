@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.influxdb
 
+import org.influxdb.InfluxDB
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
@@ -15,6 +16,7 @@ class InfluxDBExtensionProperties {
     var db: String = "ontrack"
     var create: Boolean = true
     var ssl = SSLProperties()
+    var log = InfluxDB.LogLevel.NONE
 
     class SSLProperties {
         var hostCheck: Boolean = true
