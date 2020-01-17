@@ -44,7 +44,9 @@ class InfluxDBExtensionConfiguration(
         if (influxDBExtensionProperties.create) {
             influxDB.createDatabase(influxDBExtensionProperties.db)
         }
+        influxDB.setLogLevel(influxDBExtensionProperties.log)
         influxDB.enableBatch(BatchOptions.DEFAULTS)
+
         return influxDB
     }
 
