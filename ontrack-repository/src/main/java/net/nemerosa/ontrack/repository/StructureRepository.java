@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -198,6 +199,13 @@ public interface StructureRepository {
     void reorderValidationStamps(ID branchId, Reordering reordering);
 
     // Validation runs
+
+    /**
+     * Looping over ALL validation runs.
+     * @param validationRunStatusService Run status mapping function (provided by caller)
+     * @param processing Processing code
+     */
+    void forEachValidationRun(Function<String, ValidationRunStatusID> validationRunStatusService, Consumer<ValidationRun> processing);
 
     ValidationRun newValidationRun(ValidationRun validationRun, Function<String, ValidationRunStatusID> validationRunStatusService);
 

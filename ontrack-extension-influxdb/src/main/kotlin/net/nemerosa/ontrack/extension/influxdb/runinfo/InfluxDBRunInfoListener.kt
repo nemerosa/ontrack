@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.influxdb.runinfo
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoListener
 import net.nemerosa.ontrack.model.structure.RunnableEntity
@@ -19,7 +20,7 @@ class InfluxDBRunInfoListener(
                             .tag(runnableEntity.runMetricTags)
                             .addField("value", runTime)
                             .addField("name", runnableEntity.runMetricName)
-                            .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                            .time(Time.toEpochMillis(runnableEntity.runTime), TimeUnit.MILLISECONDS)
                             .build()
             )
             influxDB.flush()

@@ -364,6 +364,11 @@ interface StructureService {
     fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun
 
     /**
+     * Re-exporting all validation run data metrics.
+     */
+    fun restoreValidationRunDataMetrics(logger: (String) -> Unit = {})
+
+    /**
      * Gets the parent validation run for a given validation run status ID
      */
     fun getParentValidationRun(validationRunStatusId: ID): ValidationRun

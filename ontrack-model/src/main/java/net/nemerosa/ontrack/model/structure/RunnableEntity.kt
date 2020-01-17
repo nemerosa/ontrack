@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.ProjectFunction
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
+import java.time.LocalDateTime
 import kotlin.reflect.KClass
 
 /**
@@ -21,6 +22,10 @@ interface RunnableEntity : ProjectEntity {
      * Gets a name for this entity in a metric record
      */
     val runMetricName: String
+    /**
+     * Gets the creation time for this entity
+     */
+    val runTime: LocalDateTime
 }
 
 /**
