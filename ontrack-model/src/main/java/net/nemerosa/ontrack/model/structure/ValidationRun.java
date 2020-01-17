@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.experimental.Wither;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +53,13 @@ public class ValidationRun implements RunnableEntity {
                 "validationStamp", validationStamp.getName(),
                 "status", getLastStatusId()
         );
+    }
+
+    @NotNull
+    @Override
+    @JsonIgnore
+    public LocalDateTime getRunTime() {
+        return getSignature().getTime();
     }
 
     /**
