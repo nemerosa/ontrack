@@ -16,10 +16,10 @@ class SonarQubeClientImpl(
     private val logger = LoggerFactory.getLogger(SonarQubeClient::class.java)
 
     override val serverVersion: String
-        get() = restTemplate.getForObject("/api/server/version", String::class.java)
+        get() = restTemplate.getForObject("/api/server/version", String::class.java)!!
 
     override val systemHealth: String
-        get() = restTemplate.getForObject("/api/system/health", SystemHealth::class.java).health
+        get() = restTemplate.getForObject("/api/system/health", SystemHealth::class.java)!!.health
 
     override fun getMeasuresForVersion(key: String, branch: String, version: String, metrics: List<String>): Map<String, Double?>? {
 
@@ -59,7 +59,7 @@ class SonarQubeClientImpl(
                             "metrics" to metrics.joinToString(","),
                             "timestamp" to timestamp
                     )
-            )
+            )!!
             if (logger.isDebugEnabled) {
                 logger.debug("Getting measures,key=$key,branch=$branch,version=$version,metrics=$metrics,measures=${measures.measures.asJson()}")
             }

@@ -92,7 +92,7 @@ class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
             branch {
                 build {
                     val form = releasePropertyType.getEditionForm(this, null)
-                    assertEquals(null, form.getField("name").value)
+                    assertEquals(null, form.getField("name")?.value)
                 }
             }
         }
@@ -104,7 +104,7 @@ class ReleasePropertyTypeIT : AbstractPropertyTypeIT() {
             branch {
                 build {
                     val form = releasePropertyType.getEditionForm(this, ReleaseProperty("test"))
-                    assertEquals("test", form.getField("name").value)
+                    assertEquals("test", form.getField("name")?.value)
                 }
             }
         }
