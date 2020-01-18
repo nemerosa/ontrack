@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.general
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -14,24 +12,26 @@ class ReleasePropertyTypeTest {
 
     @Test
     fun `Contains value tests`() {
-        assertFalse(type.containsValue(ReleaseProperty("Rel one"), "two"))
-        assertTrue(type.containsValue(ReleaseProperty("Rel one"), "one"))
-        assertTrue(type.containsValue(ReleaseProperty("Rel one"), "ONE"))
-        assertTrue(type.containsValue(ReleaseProperty("1.2.3"), "1.2"))
-        // Not testing on the JSON
-        assertFalse(type.containsValue(ReleaseProperty("1.2.3"), "name"))
-        assertFalse(type.containsValue(ReleaseProperty("1.2.3"), "NAME"))
+        "Rel one" `does not contain` "two"
+        "Rel one" `does not contain` "one"
+        "Rel one" `does not contain` "ONE"
+        "1.2.3" `does not contain` "1.2"
+        "1.2.3" `does not contain` "name"
+        "1.2.3" `does not contain` "NAME"
+
+        "Rel one" contains "Rel one"
+        "Rel one" contains "Rel ONE"
+        "Rel one" contains "Rel*"
+        "Rel one" contains "*one"
+        "Rel one" contains "*ONE"
     }
 
-    @Test
-    fun getEditionForm_empty() {
-        val form = type.getEditionForm(null, null)
-        assertNull(form.getField("name")?.value)
+    private infix fun String.`does not contain`(value: String) {
+        assertFalse(type.containsValue(ReleaseProperty(this), value))
     }
 
-    @Test
-    fun getEditionForm_not_empty() {
-        val form = type.getEditionForm(null, ReleaseProperty("test"))
-        assertEquals("test", form.getField("name")?.value)
+    private infix fun String.contains(value: String) {
+        assertTrue(type.containsValue(ReleaseProperty(this), value))
     }
+
 }

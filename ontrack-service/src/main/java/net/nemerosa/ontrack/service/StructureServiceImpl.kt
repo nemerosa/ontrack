@@ -21,6 +21,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.isEntityNew
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper
+import net.nemerosa.ontrack.repository.StatsRepository
 import net.nemerosa.ontrack.repository.StructureRepository
 import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
@@ -51,7 +52,8 @@ class StructureServiceImpl(
         private val predefinedValidationStampService: PredefinedValidationStampService,
         private val decorationService: DecorationService,
         private val projectFavouriteService: ProjectFavouriteService,
-        private val promotionRunCheckService: PromotionRunCheckService
+        private val promotionRunCheckService: PromotionRunCheckService,
+        private val statsRepository: StatsRepository
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -368,7 +370,7 @@ class StructureServiceImpl(
     override fun forEachBuild(branch: Branch, sortDirection: BuildSortDirection, processor: (Build) -> Boolean) {
         findBuild(branch.id, sortDirection) { build ->
             val goingOn = processor(build)
-           !goingOn // Found = Not going on
+            !goingOn // Found = Not going on
         }
     }
 
@@ -1191,6 +1193,24 @@ class StructureServiceImpl(
         } catch (ex: Exception) {
             logger.error("Cannot publish metrics for ${validationRun.entityDisplayName}", ex)
         }
+    }
+
+    override fun restoreValidationRunDataMetrics(logger: (String) -> Unit) {
+        val extensions = extensionManager.getExtensions(ValidationRunMetricsExtension::class.java)
+        var count = 0
+        val total = statsRepository.validationRunCount
+        structureRepository.forEachValidationRun({ validationRunStatusService.getValidationRunStatus(it) }) { validationRun ->
+            try {
+                extensions.forEach { it.onValidationRun(validationRun) }
+                count++
+                if (count % 100 == 0) {
+                    this.logger.info("Restored $count/$total validation run data metrics...")
+                }
+            } catch (ex: Exception) {
+                this.logger.error("Cannot publish metrics for ${validationRun.entityDisplayName}", ex)
+            }
+        }
+        this.logger.info("Restored $total validation run data metrics.")
     }
 
     override fun getValidationRun(validationRunId: ID): ValidationRun {

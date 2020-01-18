@@ -281,11 +281,12 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                 withConfiguredProject(key) {
                     branch {
                         build {
-                            val ack = sonarQubeMeasuresCollectionService.collect(
+                            val result = sonarQubeMeasuresCollectionService.collect(
                                     this,
                                     getProperty(project, SonarQubePropertyType::class.java)
                             )
-                            assertFalse(ack.isSuccess, "Nothing was collected")
+                            assertFalse(result.ok, "Nothing was collected")
+                            assertEquals("Validation stamp sonarqube cannot be found in ${branch.entityDisplayName}", result.message)
                         }
                     }
                 }

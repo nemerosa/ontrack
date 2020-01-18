@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,13 @@ public class Build implements RunnableEntity {
         map.put("project", branch.getProject().getName());
         map.put("branch", branch.getName());
         return map;
+    }
+
+    @NotNull
+    @Override
+    @JsonIgnore
+    public LocalDateTime getRunTime() {
+        return signature.getTime();
     }
 
     public static Build of(Branch branch, NameDescription nameDescription, Signature signature) {
