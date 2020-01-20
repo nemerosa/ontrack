@@ -53,14 +53,14 @@ class CatalogInfoCollectorImpl(
                             entity = project,
                             category = STORE_CATEGORY
                     )
-            ).mapNotNull { toCatalogInfo<Any>(it) }
+            ).mapNotNull { toCatalogInfo<Any>(project, it) }
 
-    private fun <T> toCatalogInfo(record: EntityDataStoreRecord): CatalogInfo<T>? {
+    private fun <T> toCatalogInfo(project: Project, record: EntityDataStoreRecord): CatalogInfo<T>? {
         val store: StoredCatalogInfo = record.data.parse()
         @Suppress("UNCHECKED_CAST")
         val extension: CatalogInfoContributor<T>? = contributors[record.name] as CatalogInfoContributor<T>?
         return extension?.run {
-            val model = store.info?.run { extension.fromStoredJson(this) }
+            val model = store.info?.run { extension.fromStoredJson(project, this) }
             model?.let {
                 CatalogInfo(
                         collector = extension,

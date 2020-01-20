@@ -21,10 +21,11 @@ interface CatalogInfoContributor<T> : Extension {
     /**
      * Converts a stored JSON to the model
      *
+     * @param project Project for which the catalog info is reloaded
      * @param node Stored JSON
      * @return Model object or `null` if the stored JSON cannot be parsed into a valid representation.
      */
-    fun fromStoredJson(node: JsonNode): T?
+    fun fromStoredJson(project: Project, node: JsonNode): T?
 
     /**
      * Converts an object from the model to a JSON representation, for client usage
