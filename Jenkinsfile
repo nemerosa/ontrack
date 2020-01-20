@@ -777,6 +777,7 @@ set -e
                 }
             }
             environment {
+                ONTRACK_VERSION = "${version}"
                 AMS3_DELIVERY = credentials("AMS3_DELIVERY")
             }
             when {
