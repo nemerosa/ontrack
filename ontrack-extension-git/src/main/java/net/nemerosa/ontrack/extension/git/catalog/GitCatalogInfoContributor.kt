@@ -40,7 +40,7 @@ class GitCatalogInfoContributor(
 
     override fun asStoredJson(info: GitCatalogInfo): JsonNode = info.asJson()
 
-    override fun fromStoredJson(node: JsonNode): GitCatalogInfo? = node.parse()
+    override fun fromStoredJson(project: Project, node: JsonNode): GitCatalogInfo? = node.parse()
 
     override fun asClientJson(info: GitCatalogInfo): JsonNode = info.asJson()
 

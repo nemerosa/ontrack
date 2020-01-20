@@ -26,13 +26,13 @@
         <div class="panel-heading">
             <h3 class="panel-title">{{info.name}}</h3>
         </div>
-        <div class="panel-body">
+        <div class="panel-body text-danger" ng-if="info.error">
             <p ng-if="info.error" class="text-danger">
                 This information could not be collected:
                 <strong>{{info.error}}</strong>
             </p>
-            <ng-include ng-if="!info.error" src="getCatalogInfoPath(info)"></ng-include>
         </div>
+        <ng-include ng-if="!info.error" src="getCatalogInfoPath(info)"></ng-include>
     </div>
 
 </ot-view>

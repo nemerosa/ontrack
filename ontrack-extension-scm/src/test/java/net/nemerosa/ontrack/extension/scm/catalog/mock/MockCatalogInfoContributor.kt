@@ -22,7 +22,7 @@ class MockCatalogInfoContributor : AbstractCatalogInfoContributor<MockInfo>(Test
 
     override fun asStoredJson(info: MockInfo): JsonNode = info.asJson()
 
-    override fun fromStoredJson(node: JsonNode): MockInfo? = node.parse()
+    override fun fromStoredJson(project: Project, node: JsonNode): MockInfo? = node.parse()
 
     override fun asClientJson(info: MockInfo): JsonNode = info.asJson()
 
