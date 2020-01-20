@@ -10,13 +10,13 @@ data class GitHubIssue(
         override val summary: String,
         val body: String,
         val bodyHtml: String,
-        val assignee: GitHubUser,
+        val assignee: GitHubUser?,
         val labels: List<GitHubLabel>,
         val state: GitHubState,
-        val milestone: GitHubMilestone,
+        val milestone: GitHubMilestone?,
         val createdAt: LocalDateTime,
         override val updateTime: LocalDateTime,
-        val closedAt: LocalDateTime
+        val closedAt: LocalDateTime?
 ) : Issue {
 
     override val key: String
