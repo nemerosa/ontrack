@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.catalog.api
 
 import com.fasterxml.jackson.databind.JsonNode
+import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
@@ -19,6 +20,7 @@ class GQLTypeCatalogInfoItem(
 
     class Data(
             val id: String,
+            val isDynamic: Boolean,
             val name: String,
             val data: JsonNode?,
             val error: String?,
@@ -34,6 +36,11 @@ class GQLTypeCatalogInfoItem(
                         it.name("id")
                                 .description("ID of the catalog info contributor")
                                 .type(GraphQLString)
+                    }
+                    .field {
+                        it.name("isDynamic")
+                                .description("Dynamic nature of the catalog info contributor")
+                                .type(GraphQLBoolean)
                     }
                     .field {
                         it.name("name")

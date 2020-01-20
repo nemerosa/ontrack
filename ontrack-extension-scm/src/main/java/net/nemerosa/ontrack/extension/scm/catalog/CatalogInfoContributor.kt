@@ -42,4 +42,9 @@ interface CatalogInfoContributor<T> : Extension {
      */
     val name: String
 
+    /**
+     * Returns `true` if the information is always computed (and not stored)
+     */
+    val isDynamic: Boolean get() = false
+
 }

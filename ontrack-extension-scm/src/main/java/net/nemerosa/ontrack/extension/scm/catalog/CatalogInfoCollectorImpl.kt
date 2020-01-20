@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -60,13 +61,14 @@ class CatalogInfoCollectorImpl(
         @Suppress("UNCHECKED_CAST")
         val extension: CatalogInfoContributor<T>? = contributors[record.name] as CatalogInfoContributor<T>?
         return extension?.run {
+            val timestamp = if (extension.isDynamic) Time.now() else record.signature.time
             val model = store.info?.run { extension.fromStoredJson(project, this) }
             model?.let {
                 CatalogInfo(
                         collector = extension,
                         data = it,
                         error = store.error,
-                        timestamp = record.signature.time
+                        timestamp = timestamp
                 )
             }
         }

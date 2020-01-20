@@ -55,6 +55,12 @@ class ACLCatalogInfoContributor(
      * Reloading all the time
      */
     override fun fromStoredJson(project: Project, node: JsonNode) = loadACL(project)
+
+    /**
+     * Dynamic collection
+     */
+    override val isDynamic: Boolean = true
+
 }
 
 data class ACLCatalogInfo(

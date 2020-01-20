@@ -19,6 +19,11 @@ class ACLCatalogInfoContributorIT : AbstractDSLTestSupport() {
     private lateinit var contributor: ACLCatalogInfoContributor
 
     @Test
+    fun `Dynamic contributor`() {
+        assertTrue(contributor.isDynamic, "Dynamic contributor")
+    }
+
+    @Test
     fun `Project without any specific ACL returns an empty ACL catalog info`() {
         project {
             val info = contributor.fromStoredJson(this, NullNode.instance)

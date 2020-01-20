@@ -621,6 +621,8 @@ angular.module('ontrack.extension.scm', [
                         infos {
                             id
                             name
+                            isDynamic
+                            timestamp
                             data
                             error
                             feature {

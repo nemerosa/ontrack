@@ -25,6 +25,11 @@
     <div class="panel panel-default" ng-repeat="info in project.scmCatalogEntryLink.infos">
         <div class="panel-heading">
             <h3 class="panel-title">{{info.name}}</h3>
+            <span class="ot-description">
+                {{info.timestamp | date:'mediumDate'}}
+                {{info.timestamp | date:'shortTime'}}
+                <i ng-if="info.isDynamic">(dynamic)</i>
+            </span>
         </div>
         <div class="panel-body text-danger" ng-if="info.error">
             <p ng-if="info.error" class="text-danger">

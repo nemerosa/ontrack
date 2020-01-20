@@ -71,6 +71,7 @@ class GQLTypeCatalogInfo(
     private fun <T> toData(it: CatalogInfo<T>): GQLTypeCatalogInfoItem.Data {
         return GQLTypeCatalogInfoItem.Data(
                 id = it.collector.id,
+                isDynamic = it.collector.isDynamic,
                 name = it.collector.name,
                 data = it.data?.run { it.collector.asClientJson(this) },
                 error = it.error,
