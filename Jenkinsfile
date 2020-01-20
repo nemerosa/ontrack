@@ -781,11 +781,12 @@ set -e
             }
             when {
                 beforeAgent true
-                branch 'release/*'
+                anyOf {
+                    branch 'release/*'
+                    branch 'develop'
+                }
             }
             steps {
-                echo "Release"
-
                 unstash name: "delivery"
                 sh '''\
                     unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
@@ -802,6 +803,14 @@ set -e
                         releaseDocPrepare
                 '''
 
+                script {
+                    if (BRANCH_NAME == 'develop') {
+                        env.DOC_DIR = 'develop'
+                    } else {
+                        env.DOC_DIR = env.ONTRACK_VERSION
+                    }
+                }
+
                 sh '''
                     s3cmd \\
                         --access_key=${AMS3_DELIVERY_USR} \\
@@ -810,7 +819,7 @@ set -e
                         --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
                         put \\
                         build/site/release/* \\
-                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
+                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
                         --acl-public \\
                         --add-header=Cache-Control:max-age=86400 \\
                         --recursive
