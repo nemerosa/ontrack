@@ -42,4 +42,7 @@ Full documentation available in the
 [Ontrack web site](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html) or as
 [PDF](https://static.nemerosa.net/ontrack/release/latest/docs/index.pdf).
 
+> The latest version of the documentation is also generated from the `develop` branch and is available at 
+https://static.nemerosa.net/ontrack/release/develop/docs/doc/index.html
+
 [Contributions](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#contributing) are welcome!
