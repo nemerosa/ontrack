@@ -135,7 +135,7 @@ tasks.named<ProcessResources>("processResources") {
 }
 
 tasks.named<BootRun>("bootRun") {
-    dependsOn("bootRepackage")
+    dependsOn("bootJar")
     dependsOn(":ontrack-web:dev")
     // Running with `dev` profile by default with `bootRun`
     args("--spring.profiles.active=dev")
