@@ -301,28 +301,3 @@ task publicationRelease {
 // Makes sure to not create a tag if the Maven publication is not OK
 
 publicationGitHubRelease.mustRunAfter publicationMaven
-
-/**
- * Tasks called during a release
- */
-
-task releaseDocCopyHtml(type: Copy) {
-    from 'publication/html5'
-    into "build/site/release/doc/"
-}
-
-task releaseDocCopyPdf(type: Copy) {
-    from 'publication/pdf'
-    into "build/site/release/"
-}
-
-task releaseDocCopyJavadoc(type: Copy) {
-    from zipTree('publication/ontrack-javadoc.zip')
-    into "build/site/release/javadoc/"
-}
-
-task releaseDocPrepare {
-    dependsOn 'releaseDocCopyHtml'
-    dependsOn 'releaseDocCopyPdf'
-    dependsOn 'releaseDocCopyJavadoc'
-}

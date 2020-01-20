@@ -619,6 +619,44 @@ val devStop by tasks.registering {
 }
 
 /**
+ * Documentation preparation
+ */
+
+if (hasProperty("documentation")) {
+
+    val releaseDocCopyHtml by tasks.registering(Copy::class) {
+        dependsOn(":ontrack-docs:asciidoctor")
+        from("ontrack-docs/build/docs/asciidoc")
+        exclude(".asciidoctor")
+        into("build/site/release/doc/")
+    }
+
+    val releaseDocCopyPdf by tasks.registering(Copy::class) {
+        dependsOn(":ontrack-docs:asciidoctorPdf")
+        from("ontrack-docs/build/docs/asciidocPdf")
+        include("index.pdf")
+        into("build/site/release")
+    }
+
+    val releaseDocCopyJavadoc by tasks.registering(Copy::class) {
+        dependsOn("aggregateJavadoc")
+        from("build/docs/javadoc")
+        into("build/site/release/javadoc/")
+    }
+
+    val releaseDocPrepare by tasks.registering {
+        dependsOn(releaseDocCopyHtml)
+        dependsOn(releaseDocCopyPdf)
+        dependsOn(releaseDocCopyJavadoc)
+    }
+
+    tasks.named("build") {
+        dependsOn(releaseDocPrepare)
+    }
+
+}
+
+/**
  * Site generation
  *
  * Must be called AFTER the current version has been promoted in Ontrack to the RELEASE promotion level.

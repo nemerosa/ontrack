@@ -162,6 +162,7 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
                     stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
                     stash name: "rpm", includes: "build/distributions/*.rpm"
                     stash name: "debian", includes: "build/distributions/*.deb"
+                    stash name: "site", includes: "build/site/**"
                 }
             }
         }
@@ -776,7 +777,6 @@ set -e
                 }
             }
             environment {
-                ONTRACK_VERSION = "${version}"
                 AMS3_DELIVERY = credentials("AMS3_DELIVERY")
             }
             when {
@@ -787,21 +787,7 @@ set -e
                 }
             }
             steps {
-                unstash name: "delivery"
-                sh '''\
-                    unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-                    unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-                '''
-
-                sh '''\
-                    ./gradlew \\
-                        --build-file publication.gradle \\
-                        --info \\
-                        --profile \\
-                        --console plain \\
-                        --stacktrace \\
-                        releaseDocPrepare
-                '''
+                unstash name: "site"
 
                 script {
                     if (BRANCH_NAME == 'develop') {
