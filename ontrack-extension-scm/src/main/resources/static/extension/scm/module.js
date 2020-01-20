@@ -617,6 +617,7 @@ angular.module('ontrack.extension.scm', [
                             config
                             repository
                             repositoryPage
+                            timestamp
                         }
                         infos {
                             id
