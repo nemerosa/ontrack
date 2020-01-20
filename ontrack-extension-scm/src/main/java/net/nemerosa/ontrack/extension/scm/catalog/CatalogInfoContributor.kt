@@ -14,14 +14,22 @@ interface CatalogInfoContributor<T> : Extension {
     fun collectInfo(project: Project, entry: SCMCatalogEntry): T?
 
     /**
-     * Converts an object from the model to a JSON representation
+     * Converts an object from the model to a JSON representation, for storage
      */
-    fun asJson(info: T): JsonNode
+    fun asStoredJson(info: T): JsonNode
 
     /**
      * Converts a stored JSON to the model
+     *
+     * @param node Stored JSON
+     * @return Model object or `null` if the stored JSON cannot be parsed into a valid representation.
      */
-    fun fromJson(node: JsonNode): T
+    fun fromStoredJson(node: JsonNode): T?
+
+    /**
+     * Converts an object from the model to a JSON representation, for client usage
+     */
+    fun asClientJson(info: T): JsonNode
 
     /**
      * ID of this contributor

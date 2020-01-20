@@ -20,9 +20,11 @@ class MockCatalogInfoContributor : AbstractCatalogInfoContributor<MockInfo>(Test
                 else -> null
             }
 
-    override fun asJson(info: MockInfo): JsonNode = info.asJson()
+    override fun asStoredJson(info: MockInfo): JsonNode = info.asJson()
 
-    override fun fromJson(node: JsonNode): MockInfo = node.parse()
+    override fun fromStoredJson(node: JsonNode): MockInfo? = node.parse()
+
+    override fun asClientJson(info: MockInfo): JsonNode = info.asJson()
 
     override val name: String = "mock"
 

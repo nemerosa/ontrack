@@ -628,15 +628,19 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public PromotionRun getPromotionRun(ID promotionRunId) {
-        return getNamedParameterJdbcTemplate().queryForObject(
-                "SELECT * FROM PROMOTION_RUNS WHERE ID = :id",
-                params("id", promotionRunId.getValue()),
-                (rs, rowNum) -> toPromotionRun(
-                        rs,
-                        this::getBuild,
-                        this::getPromotionLevel
-                )
-        );
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM PROMOTION_RUNS WHERE ID = :id",
+                    params("id", promotionRunId.getValue()),
+                    (rs, rowNum) -> toPromotionRun(
+                            rs,
+                            this::getBuild,
+                            this::getPromotionLevel
+                    )
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new PromotionRunNotFoundException(promotionRunId);
+        }
     }
 
     @Override

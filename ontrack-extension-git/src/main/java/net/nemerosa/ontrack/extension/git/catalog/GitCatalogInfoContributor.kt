@@ -38,9 +38,11 @@ class GitCatalogInfoContributor(
         }
     }
 
-    override fun asJson(info: GitCatalogInfo): JsonNode = info.asJson()
+    override fun asStoredJson(info: GitCatalogInfo): JsonNode = info.asJson()
 
-    override fun fromJson(node: JsonNode): GitCatalogInfo = node.parse()
+    override fun fromStoredJson(node: JsonNode): GitCatalogInfo? = node.parse()
+
+    override fun asClientJson(info: GitCatalogInfo): JsonNode = info.asJson()
 
     override val name: String = "Git information"
 

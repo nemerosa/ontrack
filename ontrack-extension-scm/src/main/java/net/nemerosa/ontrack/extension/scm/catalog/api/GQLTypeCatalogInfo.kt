@@ -72,7 +72,7 @@ class GQLTypeCatalogInfo(
         return GQLTypeCatalogInfoItem.Data(
                 id = it.collector.id,
                 name = it.collector.name,
-                data = it.data?.run { it.collector.asJson(this) },
+                data = it.data?.run { it.collector.asClientJson(this) },
                 error = it.error,
                 timestamp = it.timestamp,
                 feature = it.collector.feature.featureDescription

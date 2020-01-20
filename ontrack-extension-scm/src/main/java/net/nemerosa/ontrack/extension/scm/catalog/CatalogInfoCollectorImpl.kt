@@ -60,12 +60,15 @@ class CatalogInfoCollectorImpl(
         @Suppress("UNCHECKED_CAST")
         val extension: CatalogInfoContributor<T>? = contributors[record.name] as CatalogInfoContributor<T>?
         return extension?.run {
-            CatalogInfo(
-                    collector = extension,
-                    data = store.info?.run { extension.fromJson(this) },
-                    error = store.error,
-                    timestamp = record.signature.time
-            )
+            val model = store.info?.run { extension.fromStoredJson(this) }
+            model?.let {
+                CatalogInfo(
+                        collector = extension,
+                        data = it,
+                        error = store.error,
+                        timestamp = record.signature.time
+                )
+            }
         }
     }
 
@@ -88,7 +91,7 @@ class CatalogInfoCollectorImpl(
                         contributor.id,
                         securityService.currentSignature,
                         null,
-                        StoredCatalogInfo.info(contributor.asJson(info))
+                        StoredCatalogInfo.info(contributor.asStoredJson(info))
                 )
             } else {
                 logger("Deleting catalog info for ${project.name} linked with ${entry.key} by ${contributor.javaClass.name}")
