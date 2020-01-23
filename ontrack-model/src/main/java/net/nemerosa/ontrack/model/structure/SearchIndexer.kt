@@ -32,8 +32,16 @@ interface SearchIndexer<T : SearchItem> {
     val schedule: Schedule get() = Schedule.NONE
 
     /**
-     * Launching a full indexation
+     * Gets the index name
      */
-    fun createFullIndex(): SearchIndex<T>
+    val index: String
+
+    /**
+     * Gets the sequence of items to index.
+     *
+     * Items can be returned as a sequence, allowing the ES indexation to be
+     * processed in batches.
+     */
+    fun indexation(): Sequence<T>
 
 }

@@ -1,7 +1,12 @@
 package net.nemerosa.ontrack.extension.elastic
 
+import io.searchbox.client.JestClient
+import io.searchbox.core.Bulk
+import io.searchbox.core.Index
+import io.searchbox.indices.CreateIndex
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.model.support.StartupService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional
         name = [OntrackConfigProperties.SEARCH_PROPERTY],
         havingValue = ElasticSearchConfigProperties.SEARCH_SERVICE_ELASTICSEARCH
 )
-class ElasticSearchServiceImpl : SearchService, ElasticSearchService {
+class ElasticSearchServiceImpl(
+        private val jestClient: JestClient,
+        private val searchProviders: List<SearchProvider>
+) : SearchService, ElasticSearchService, StartupService {
 
     override fun search(request: SearchRequest): Collection<SearchResult> {
         TODO("ElasticSearch search to be implemented")
@@ -20,15 +28,36 @@ class ElasticSearchServiceImpl : SearchService, ElasticSearchService {
 
     override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {
         val batchSize = 1000 // TODO Make the batch size configurable
-        val index = indexer.createFullIndex()
-        val items = index.items()
+        val items = indexer.indexation()
         items.chunked(batchSize).forEach { batch ->
-            index(index, batch)
+            index(indexer, batch)
         }
     }
 
-    private fun <T : SearchItem> index(index: SearchIndex<T>, items: List<T>) {
-        TODO("Indexation")
+    private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {
+        // Bulk indexation of the items
+        val bulk = Bulk.Builder().defaultIndex(indexer.name)
+                .addAction(
+                        items.map { item ->
+                            Index.Builder(item).build()
+                        }
+                )
+                .build()
+        // Launching the indexation of this batch
+        jestClient.execute(bulk)
+    }
+
+    override fun getName(): String = "Creation of ElasticSearch indexes"
+
+    override fun startupOrder(): Int = StartupService.JOB_REGISTRATION - 1 // Just before the jobs
+
+    override fun start() {
+        searchProviders.forEach { provider ->
+            provider.searchIndexers.map { indexer ->
+                val action = CreateIndex.Builder(indexer.index).build()
+                jestClient.execute(action)
+            }
+        }
     }
 
 }
