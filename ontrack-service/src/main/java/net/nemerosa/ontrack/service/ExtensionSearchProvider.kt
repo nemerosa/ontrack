@@ -2,11 +2,10 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.SearchExtension
+import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchProvider
 import net.nemerosa.ontrack.model.structure.SearchResult
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.util.stream.Collectors
 import java.util.stream.Stream
 
 /**
@@ -17,19 +16,27 @@ class ExtensionSearchProvider(
         private val extensionManager: ExtensionManager
 ) : SearchProvider {
 
-    protected fun providers(): Stream<SearchProvider> {
-        return extensionManager.getExtensions(SearchExtension::class.java).stream().map { obj: SearchExtension -> obj.searchProvider }
+    private val providers: List<SearchProvider> by lazy {
+        extensionManager.getExtensions(SearchExtension::class.java).map {
+            it.searchProvider
+        }
     }
 
+    protected fun providers(): Stream<SearchProvider> = providers.stream()
+
     override fun isTokenSearchable(token: String): Boolean {
-        return providers().anyMatch { p: SearchProvider -> p.isTokenSearchable(token) }
+        return providers.any { p: SearchProvider -> p.isTokenSearchable(token) }
     }
 
     override fun search(token: String): Collection<SearchResult> {
-        return providers()
+        return providers
                 .filter { p: SearchProvider -> p.isTokenSearchable(token) }
-                .flatMap { p: SearchProvider -> p.search(token).stream() }
-                .collect(Collectors.toList())
+                .flatMap { p: SearchProvider -> p.search(token) }
     }
+
+    override fun getSearchIndexers(): Collection<SearchIndexer<*>> =
+            providers.flatMap {
+                it.searchIndexers
+            }
 
 }
