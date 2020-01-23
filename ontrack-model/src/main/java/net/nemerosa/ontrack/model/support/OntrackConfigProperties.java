@@ -16,9 +16,24 @@ import javax.validation.constraints.Min;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "ontrack.config")
+@ConfigurationProperties(prefix = OntrackConfigProperties.PREFIX)
 @Validated
 public class OntrackConfigProperties {
+
+    /**
+     * Properties prefix
+     */
+    public static final String PREFIX = "ontrack.config";
+
+    /**
+     * Search service key
+     */
+    public static final String SEARCH = "search";
+
+    /**
+     * Search complete key
+     */
+    public static final String SEARCH_PROPERTY = PREFIX + "." + SEARCH;
 
     /**
      * Key store type
@@ -60,6 +75,11 @@ public class OntrackConfigProperties {
      * Label provider collection job activation
      */
     private boolean jobLabelProviderEnabled = false;
+
+    /**
+     * Search engine to be used.
+     */
+    private String search = SEARCH;
 
     @PostConstruct
     public void log() {
