@@ -34,19 +34,19 @@ class ElasticSearchIndexationJobs(
 
     private fun <T: SearchItem> createIndexationJobRegistration(searchIndexer: SearchIndexer<T>) = JobRegistration(
             job = createIndexationJob(searchIndexer),
-            schedule = searchIndexer.schedule
+            schedule = searchIndexer.indexerSchedule
     )
 
     private fun <T: SearchItem> createIndexationJob(indexer: SearchIndexer<T>) = object : Job {
-        override fun isDisabled(): Boolean = indexer.isDisabled
+        override fun isDisabled(): Boolean = indexer.isIndexerDisabled
 
         override fun getKey(): JobKey =
-                indexationJobType.getKey(indexer.id)
+                indexationJobType.getKey(indexer.indexerId)
 
-        override fun getDescription(): String = indexer.name
+        override fun getDescription(): String = indexer.indexerName
 
         override fun getTask() = JobRun { listener ->
-            listener.message("Launching indexation for ${indexer.name}")
+            listener.message("Launching indexation for ${indexer.indexerName}")
             elasticSearchService.index(indexer)
         }
     }

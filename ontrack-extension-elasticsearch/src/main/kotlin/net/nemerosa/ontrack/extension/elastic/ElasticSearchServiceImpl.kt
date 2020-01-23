@@ -36,7 +36,7 @@ class ElasticSearchServiceImpl(
 
     private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {
         // Bulk indexation of the items
-        val bulk = Bulk.Builder().defaultIndex(indexer.name)
+        val bulk = Bulk.Builder().defaultIndex(indexer.indexName)
                 .addAction(
                         items.map { item ->
                             Index.Builder(item).build()
@@ -54,7 +54,7 @@ class ElasticSearchServiceImpl(
     override fun start() {
         searchProviders.forEach { provider ->
             provider.searchIndexers.map { indexer ->
-                val action = CreateIndex.Builder(indexer.index).build()
+                val action = CreateIndex.Builder(indexer.indexName).build()
                 jestClient.execute(action)
             }
         }

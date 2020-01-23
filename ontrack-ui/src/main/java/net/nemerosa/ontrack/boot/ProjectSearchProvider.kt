@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.boot
 
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.SearchResult
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
@@ -21,7 +19,7 @@ const val PROJECT_SEARCH_PROVIDER_TOKEN_MIN_LENGTH = 3
 class ProjectSearchProvider(
         uriBuilder: URIBuilder,
         private val structureService: StructureService
-) : AbstractSearchProvider(uriBuilder) {
+) : AbstractSearchProvider(uriBuilder), SearchIndexer<ProjectSearchItem> {
 
     override fun isTokenSearchable(token: String): Boolean {
         return Pattern.matches(NameDescription.NAME, token)
@@ -45,4 +43,26 @@ class ProjectSearchProvider(
                     )
                 }
     }
+
+    override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this)
+
+    override val indexerName: String = "Projects"
+
+    override val indexName: String = "projects"
+
+    override fun indexation(): Sequence<ProjectSearchItem> = structureService.projectList
+            .asSequence()
+            .map { project ->
+                ProjectSearchItem(project)
+            }
+}
+
+class ProjectSearchItem(project: Project) : SearchItem {
+    override val id: String = project.id.toString()
+
+    override val fields: Map<String, Any> = mapOf(
+            "name" to project.name,
+            "description" to project.description
+    )
+
 }
