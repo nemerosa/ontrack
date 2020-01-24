@@ -70,7 +70,7 @@ class BranchSearchProvider(
         }
     }
 
-    private fun Branch.asSearchIndex() = BranchSearchItem(project)
+    private fun Branch.asSearchIndex() = BranchSearchItem(this)
 }
 
 class BranchSearchItem(branch: Branch) : SearchItem {

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -147,4 +148,9 @@ public interface PropertyService {
      * @param <T>           Type of the property
      */
     <T> void copyProperty(ProjectEntity sourceEntity, Property<T> property, ProjectEntity targetEntity, Function<String, String> replacementFn);
+
+    /**
+     * Loops over all the properties of a given type.
+     */
+    <T> void forEachEntityWithProperty(Class<? extends PropertyType<T>> propertyTypeClass, BiConsumer<ProjectEntityID, T> consumer);
 }

@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.repository
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.PropertySearchArguments
+import net.nemerosa.ontrack.model.structure.*
 import java.util.function.BiFunction
 import java.util.function.Predicate
 
@@ -28,4 +25,9 @@ interface PropertyRepository {
     fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments?): ID?
 
     fun findByEntityTypeAndSearchkey(entityType: ProjectEntityType, typeName: String, searchArguments: PropertySearchArguments?): List<ID>
+
+    /**
+     * Loops over all the properties of a given type.
+     */
+    fun forEachEntityWithProperty(typeName: String, consumer: (ProjectEntityID, TProperty) -> Unit)
 }

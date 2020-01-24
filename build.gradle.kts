@@ -231,6 +231,7 @@ configure(coreProjects) p@{
     dependencies {
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
         "implementation"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
         // Lombok
         "compileOnly"("org.projectlombok:lombok:1.18.10")
         "annotationProcessor"("org.projectlombok:lombok:1.18.10")

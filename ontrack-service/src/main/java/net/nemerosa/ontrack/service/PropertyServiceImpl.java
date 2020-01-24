@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -233,6 +234,25 @@ public class PropertyServiceImpl implements PropertyService {
                 propertyTypeName,
                 entityLoader,
                 t -> predicate.test(propertyType.fromStorage(t.getJson()))
+        );
+    }
+
+    @Override
+    public <T> void forEachEntityWithProperty(Class<? extends PropertyType<T>> propertyTypeClass, BiConsumer<ProjectEntityID, T> consumer) {
+        // Gets the property type by name
+        PropertyType<T> actualPropertyType = getPropertyTypeByName(propertyTypeClass.getName());
+        // Gets the property type name
+        String propertyTypeName = propertyTypeClass.getName();
+        // Loops over the properties
+        propertyRepository.forEachEntityWithProperty(
+                propertyTypeName,
+                (projectEntityID, t) -> {
+                    consumer.accept(
+                            projectEntityID,
+                            actualPropertyType.fromStorage(t.getJson())
+                    );
+                    return null; // Will look in Kotlin
+                }
         );
     }
 

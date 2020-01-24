@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -18,7 +19,7 @@ class MetaInfoSearchExtension(
         private val propertyService: PropertyService,
         private val structureService: StructureService,
         private val securityService: SecurityService
-) : AbstractExtension(extensionFeature), SearchExtension {
+) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<MetaInfoSearchItem> {
 
     override fun getSearchProvider(): SearchProvider {
         return object : AbstractSearchProvider(uriBuilder) {
@@ -29,6 +30,8 @@ class MetaInfoSearchExtension(
             override fun search(token: String): Collection<SearchResult> {
                 return this@MetaInfoSearchExtension.search(token)
             }
+
+            override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this@MetaInfoSearchExtension)
         }
     }
 
@@ -69,4 +72,41 @@ class MetaInfoSearchExtension(
             )
         }
     }
+
+    override val indexerName: String = "Meta info properties"
+    override val indexName: String = "meta-info-properties"
+
+    override fun indexation(): Sequence<MetaInfoSearchItem> = runBlocking {
+        sequence {
+            propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
+                yieldAll(
+                        property.items.map {
+                            MetaInfoSearchItem(
+                                    name = it.name,
+                                    value = it.value,
+                                    link = it.link,
+                                    category = it.category,
+                                    entityType = entityId.type,
+                                    entityId = entityId.id
+                            )
+                        }
+                )
+            }
+        }
+    }
+}
+
+class MetaInfoSearchItem(
+        val name: String,
+        val value: String?,
+        val link: String?,
+        val category: String?,
+        val entityType: ProjectEntityType,
+        val entityId: Int
+) : SearchItem {
+
+    override val id: String = "$entityType::$entityId"
+
+    override val fields: Map<String, Any> = TODO("Convert POJO to map")
+
 }
