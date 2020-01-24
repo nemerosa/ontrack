@@ -39,7 +39,9 @@ class ElasticSearchServiceImpl(
         val bulk = Bulk.Builder().defaultIndex(indexer.indexName)
                 .addAction(
                         items.map { item ->
-                            Index.Builder(item).build()
+                            Index.Builder(item.fields)
+                                    .id(item.id)
+                                    .build()
                         }
                 )
                 .build()
