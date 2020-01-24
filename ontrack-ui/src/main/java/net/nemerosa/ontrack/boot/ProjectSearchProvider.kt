@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.boot
 
+import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
@@ -18,8 +21,13 @@ const val PROJECT_SEARCH_PROVIDER_TOKEN_MIN_LENGTH = 3
 @Component
 class ProjectSearchProvider(
         uriBuilder: URIBuilder,
-        private val structureService: StructureService
-) : AbstractSearchProvider(uriBuilder), SearchIndexer<ProjectSearchItem> {
+        private val structureService: StructureService,
+        private val searchIndexService: SearchIndexService
+) : AbstractSearchProvider(uriBuilder), SearchIndexer<ProjectSearchItem>, EventListener {
+
+    companion object {
+        const val PROJECTS_INDEX = "projects"
+    }
 
     override fun isTokenSearchable(token: String): Boolean {
         return Pattern.matches(NameDescription.NAME, token)
@@ -48,13 +56,31 @@ class ProjectSearchProvider(
 
     override val indexerName: String = "Projects"
 
-    override val indexName: String = "projects"
+    override val indexName: String = PROJECTS_INDEX
 
     override fun indexation(): Sequence<ProjectSearchItem> = structureService.projectList
             .asSequence()
-            .map { project ->
-                ProjectSearchItem(project)
+            .map { project -> project.asSearchIndex() }
+
+    override fun onEvent(event: Event) {
+        when (event.eventType) {
+            EventFactory.NEW_PROJECT -> {
+                val project = event.getEntity<Project>(ProjectEntityType.PROJECT)
+                searchIndexService.createSearchIndex(this, project.asSearchIndex())
             }
+            EventFactory.UPDATE_PROJECT -> {
+                val project = event.getEntity<Project>(ProjectEntityType.PROJECT)
+                searchIndexService.updateSearchIndex(this, project.asSearchIndex())
+            }
+            EventFactory.DELETE_PROJECT -> {
+                val projectId = event.getIntValue("project_id")
+                searchIndexService.deleteSearchIndex(this, projectId)
+            }
+        }
+    }
+
+    private fun Project.asSearchIndex() = ProjectSearchItem(this)
+
 }
 
 class ProjectSearchItem(project: Project) : SearchItem {

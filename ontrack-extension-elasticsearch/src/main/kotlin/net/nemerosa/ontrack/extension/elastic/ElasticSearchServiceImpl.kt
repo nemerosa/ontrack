@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.elastic
 
 import io.searchbox.client.JestClient
 import io.searchbox.core.Bulk
+import io.searchbox.core.Delete
 import io.searchbox.core.Index
 import io.searchbox.indices.CreateIndex
 import net.nemerosa.ontrack.model.structure.*
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 class ElasticSearchServiceImpl(
         private val jestClient: JestClient,
         private val searchProviders: List<SearchProvider>
-) : SearchService, ElasticSearchService, StartupService {
+) : SearchService, ElasticSearchService, StartupService, SearchIndexService {
 
     override fun search(request: SearchRequest): Collection<SearchResult> {
         TODO("ElasticSearch search to be implemented")
@@ -47,6 +48,28 @@ class ElasticSearchServiceImpl(
                 .build()
         // Launching the indexation of this batch
         jestClient.execute(bulk)
+    }
+
+    override val searchIndexesAvailable: Boolean = true
+
+    override fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T) {
+        jestClient.execute(
+                Index.Builder(item.fields)
+                        .index(indexer.indexName)
+                        .id(item.id)
+                        .build()
+        )
+    }
+
+    override fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T) =
+            createSearchIndex(indexer, item)
+
+    override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {
+        jestClient.execute(
+                Delete.Builder(id)
+                        .index(indexer.indexName)
+                        .build()
+        )
     }
 
     override fun getName(): String = "Creation of ElasticSearch indexes"
