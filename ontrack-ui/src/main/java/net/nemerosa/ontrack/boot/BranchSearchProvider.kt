@@ -44,24 +44,23 @@ class BranchSearchProvider(
 
     override val indexName: String = "branches"
 
-    override fun indexation(): Sequence<BranchSearchItem> =
-            structureService.projectList
-                    .asSequence()
-                    .flatMap {
-                        structureService.getBranchesForProject(it.id)
-                                .asSequence()
-                                .map { branch -> branch.asSearchIndex() }
-                    }
+    override fun indexAll(processor: (BranchSearchItem) -> Unit) {
+        structureService.projectList.forEach {
+            structureService.getBranchesForProject(it.id).forEach { branch ->
+                processor(branch.asSearchItem())
+            }
+        }
+    }
 
     override fun onEvent(event: Event) {
         when (event.eventType) {
             EventFactory.NEW_BRANCH -> {
                 val branch = event.getEntity<Branch>(ProjectEntityType.BRANCH)
-                searchIndexService.createSearchIndex(this, branch.asSearchIndex())
+                searchIndexService.createSearchIndex(this, branch.asSearchItem())
             }
             EventFactory.UPDATE_BRANCH -> {
                 val branch = event.getEntity<Branch>(ProjectEntityType.BRANCH)
-                searchIndexService.updateSearchIndex(this, branch.asSearchIndex())
+                searchIndexService.updateSearchIndex(this, branch.asSearchItem())
             }
             EventFactory.DELETE_BRANCH -> {
                 val branchId = event.getIntValue("branch_id")
@@ -70,7 +69,7 @@ class BranchSearchProvider(
         }
     }
 
-    private fun Branch.asSearchIndex() = BranchSearchItem(this)
+    private fun Branch.asSearchItem() = BranchSearchItem(this)
 }
 
 class BranchSearchItem(branch: Branch) : SearchItem {

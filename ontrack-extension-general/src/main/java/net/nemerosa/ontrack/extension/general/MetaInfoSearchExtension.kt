@@ -77,8 +77,6 @@ class MetaInfoSearchExtension(
     override val indexerName: String = "Meta info properties"
     override val indexName: String = "meta-info-properties"
 
-    override fun indexation(): Sequence<MetaInfoSearchItem> = TODO()
-
     override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
         propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
             property.items.forEach {

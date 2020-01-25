@@ -58,19 +58,21 @@ class ProjectSearchProvider(
 
     override val indexName: String = PROJECTS_INDEX
 
-    override fun indexation(): Sequence<ProjectSearchItem> = structureService.projectList
-            .asSequence()
-            .map { project -> project.asSearchIndex() }
+    override fun indexAll(processor: (ProjectSearchItem) -> Unit) {
+        structureService.projectList.forEach { project ->
+            processor(project.asSearchItem())
+        }
+    }
 
     override fun onEvent(event: Event) {
         when (event.eventType) {
             EventFactory.NEW_PROJECT -> {
                 val project = event.getEntity<Project>(ProjectEntityType.PROJECT)
-                searchIndexService.createSearchIndex(this, project.asSearchIndex())
+                searchIndexService.createSearchIndex(this, project.asSearchItem())
             }
             EventFactory.UPDATE_PROJECT -> {
                 val project = event.getEntity<Project>(ProjectEntityType.PROJECT)
-                searchIndexService.updateSearchIndex(this, project.asSearchIndex())
+                searchIndexService.updateSearchIndex(this, project.asSearchItem())
             }
             EventFactory.DELETE_PROJECT -> {
                 val projectId = event.getIntValue("project_id")
@@ -79,7 +81,7 @@ class ProjectSearchProvider(
         }
     }
 
-    private fun Project.asSearchIndex() = ProjectSearchItem(this)
+    private fun Project.asSearchItem() = ProjectSearchItem(this)
 
 }
 

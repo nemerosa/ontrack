@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.model.structure
 
-import kotlinx.coroutines.channels.Channel
 import net.nemerosa.ontrack.job.Schedule
 
 /**
@@ -40,16 +39,8 @@ interface SearchIndexer<T : SearchItem> {
     val indexName: String
 
     /**
-     * Gets the sequence of items to index.
-     *
-     * Items can be returned as a sequence, allowing the ES indexation to be
-     * processed in batches.
+     * Index all elements.
      */
-    fun indexation(): Sequence<T>
-
-    /**
-     * Index all elements using a channel
-     */
-    fun indexAll(processor: (T) -> Unit) { TODO() }
+    fun indexAll(processor: (T) -> Unit)
 
 }
