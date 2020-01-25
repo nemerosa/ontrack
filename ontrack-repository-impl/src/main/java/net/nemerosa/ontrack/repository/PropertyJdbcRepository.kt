@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.repository
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.PropertySearchArguments
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,8 +20,9 @@ import java.util.function.Predicate
 import javax.sql.DataSource
 
 @Repository
-class PropertyJdbcRepository @Autowired
-constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), PropertyRepository {
+class PropertyJdbcRepository(
+        dataSource: DataSource
+) : AbstractJdbcRepository(dataSource), PropertyRepository {
 
     @Cacheable(cacheNames = ["properties"], key = "#typeName + #entityType.name() + #entityId.value")
     override fun loadProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): TProperty? {
@@ -98,6 +96,10 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
             }
             entities
         }
+    }
+
+    override fun forEachEntityWithProperty(typeName: String, consumer: (ProjectEntityID, TProperty) -> Unit) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments?): ID? {
