@@ -146,6 +146,6 @@ interface PropertyService {
     /**
      * Loops over all the properties of a given type.
      */
-    suspend fun <T> forEachEntityWithProperty(propertyTypeClass: KClass<out PropertyType<T>>, consumer: (ProjectEntityID, T) -> Unit)
+    fun <T> forEachEntityWithProperty(propertyTypeClass: KClass<out PropertyType<T>>, consumer: (ProjectEntityID, T) -> Unit)
 
 }

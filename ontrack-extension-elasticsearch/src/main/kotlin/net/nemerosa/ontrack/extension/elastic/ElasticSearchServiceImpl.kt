@@ -29,10 +29,16 @@ class ElasticSearchServiceImpl(
 
     override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {
         val batchSize = 1000 // TODO Make the batch size configurable
-        val items = indexer.indexation()
-        items.chunked(batchSize).forEach { batch ->
-            index(indexer, batch)
+        val buffer = mutableListOf<T>()
+        indexer.indexAll { item ->
+            buffer.add(item)
+            if (buffer.size == batchSize) {
+                index(indexer, buffer)
+                buffer.clear()
+            }
         }
+        // Remaining items
+        index(indexer, buffer)
     }
 
     private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {

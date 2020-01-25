@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.general
 
-import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -79,6 +78,22 @@ class MetaInfoSearchExtension(
     override val indexName: String = "meta-info-properties"
 
     override fun indexation(): Sequence<MetaInfoSearchItem> = TODO()
+
+    override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
+        propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
+            property.items.forEach {
+                val item = MetaInfoSearchItem(
+                        name = it.name,
+                        value = it.value,
+                        link = it.link,
+                        category = it.category,
+                        entityType = entityId.type,
+                        entityId = entityId.id
+                )
+                processor(item)
+            }
+        }
+    }
 }
 
 class MetaInfoSearchItem(
