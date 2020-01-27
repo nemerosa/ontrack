@@ -73,6 +73,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                                 "project" to build.project.name,
                                 "branch" to build.branch.name,
                                 "build" to build.name,
+                                "status" to "PASSED",
                                 "version" to "1.0.0",
                                 "measure" to name
                         )),
@@ -485,7 +486,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Builds require a passed validation`() {
+    fun `Builds do not require a passed validation`() {
         withDisabledConfigurationTest {
             withSonarQubeSettings {
                 val key = uid("p")
@@ -514,7 +515,15 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                     // Scanning of the project
                     sonarQubeMeasuresCollectionService.collect(this) { println(it) }
                     // Checks the measures attached to the builds
-                    assertNull(sonarQubeMeasuresCollectionService.getMeasures(build1))
+                    assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build1)) {
+                        assertEquals(
+                                mapOf(
+                                        "measure-1" to 1.0,
+                                        "measure-2" to 1.1
+                                ),
+                                it.measures
+                        )
+                    }
                     assertNotNull(sonarQubeMeasuresCollectionService.getMeasures(build2)) {
                         assertEquals(
                                 mapOf(

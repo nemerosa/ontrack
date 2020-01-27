@@ -105,15 +105,17 @@ class SonarQubeMeasuresCollectionServiceImpl(
     }
 
     private fun doCollect(build: Build, property: SonarQubeProperty, metrics: List<String>, validationStamp: ValidationStamp): SonarQubeMeasuresCollectionResult {
-        // Gets the validation runs for this build and the validation stamp
-        val passed = structureService.getValidationRunsForBuildAndValidationStamp(
+        // Gets the last validation run for this build and the validation stamp
+        val lastRun = structureService.getValidationRunsForBuildAndValidationStamp(
                 buildId = build.id,
                 validationStampId = validationStamp.id,
                 offset = 0,
                 count = 1
-        ).any { it.isPassed }
-        // If not passed, we don't want to go further
-        if (!passed) return SonarQubeMeasuresCollectionResult.error("No passed validation run for ${validationStamp.name} can be found for ${build.entityDisplayName}")
+        ).firstOrNull()
+        // If no run, we don't want to go further
+                ?: return SonarQubeMeasuresCollectionResult.error("No validation run for ${validationStamp.name} can be found for ${build.entityDisplayName}")
+        // Gets the status of the last run
+        val status = lastRun.lastStatus.statusID.id
         // Client
         val client = clientFactory.getClient(property.configuration)
         // Name of the build
@@ -156,6 +158,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
                                 "project" to build.project.name,
                                 "branch" to build.branch.name,
                                 "build" to build.name,
+                                "status" to status,
                                 "version" to version,
                                 "measure" to name
                         ),
