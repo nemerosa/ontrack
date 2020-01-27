@@ -1,10 +1,15 @@
 package net.nemerosa.ontrack.extension.elastic
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.searchbox.client.JestClient
 import io.searchbox.core.Bulk
 import io.searchbox.core.Delete
 import io.searchbox.core.Index
+import io.searchbox.core.Search
 import io.searchbox.indices.CreateIndex
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.asJsonString
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.StartupService
@@ -24,6 +29,19 @@ class ElasticSearchServiceImpl(
 ) : SearchService, ElasticSearchService, StartupService, SearchIndexService {
 
     override fun search(request: SearchRequest): Collection<SearchResult> {
+        val query = mapOf(
+                "query" to mapOf(
+                        "multi_match" to mapOf(
+                                "query" to request.token,
+                                "type" to "best_fields"
+                        )
+                )
+        ).asJson().asJsonString()
+
+        val search = Search.Builder(query).build()
+
+        val result = jestClient.execute(search).jsonString.parseAsJson()
+
         TODO("ElasticSearch search to be implemented")
     }
 

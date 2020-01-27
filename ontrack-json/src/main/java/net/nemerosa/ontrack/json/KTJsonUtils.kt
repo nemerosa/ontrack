@@ -3,6 +3,11 @@ package net.nemerosa.ontrack.json
 import com.fasterxml.jackson.databind.JsonNode
 
 /**
+ * Parses a string as JSON
+ */
+fun String.parseAsJson(): JsonNode = JsonUtils.parseAsNode(this)
+
+/**
  * Map as JSON
  */
 fun jsonOf(vararg pairs: Pair<*, *>) =
@@ -18,6 +23,11 @@ fun <T> T?.toJson(): JsonNode? =
  * Non-null JSON transformation
  */
 fun <T> T.asJson(): JsonNode = JsonUtils.format(this)!!
+
+/**
+ * Format as a string
+ */
+fun JsonNode.asJsonString(): String = JsonUtils.toJSONString(this)
 
 /**
  * Parses any node into an object.
