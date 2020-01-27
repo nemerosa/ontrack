@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.elastic
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.searchbox.client.JestClient
 import io.searchbox.core.Bulk
 import io.searchbox.core.Delete
