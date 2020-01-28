@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.boot
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.SearchResult
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
@@ -14,7 +13,7 @@ import java.util.regex.Pattern
 class BuildSearchProvider(
         uriBuilder: URIBuilder,
         private val structureService: StructureService
-) : AbstractSearchProvider(uriBuilder) {
+) : AbstractSearchProvider(uriBuilder), SearchIndexer<BuildSearchItem> {
 
     override fun isTokenSearchable(token: String): Boolean {
         return Pattern.matches(NameDescription.NAME, token)
@@ -39,5 +38,58 @@ class BuildSearchProvider(
                     )
                 }
     }
+
+    override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this)
+
+    override val indexerName: String = "Builds"
+    override val indexName: String = BUILD_SEARCH_INDEX
+
+    override fun indexAll(processor: (BuildSearchItem) -> Unit) {
+        structureService.projectList.forEach { project ->
+            structureService.getBranchesForProject(project.id).forEach { branch ->
+                structureService.forEachBuild(branch, BuildSortDirection.FROM_OLDEST) { build ->
+                    processor(BuildSearchItem(build))
+                    true // Going on
+                }
+            }
+        }
+    }
+
+    override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
+        return try {
+            val build = structureService.getBuild(ID.of(id.toInt()))
+            SearchResult(
+                    build.entityDisplayName,
+                    build.description,
+                    uriBuilder.getEntityURI(build),
+                    uriBuilder.getEntityPage(build),
+                    score
+            )
+        } catch (_: BuildNotFoundException) {
+            null
+        }
+    }
+}
+
+/**
+ * Index name for the builds
+ */
+const val BUILD_SEARCH_INDEX = "builds"
+
+data class BuildSearchItem(
+        override val id: String,
+        val name: String,
+        val description: String
+) : SearchItem {
+    constructor(build: Build) : this(
+            id = build.id().toString(),
+            name = build.name,
+            description = build.description
+    )
+
+    override val fields: Map<String, Any?> = mapOf(
+            "name" to name,
+            "description" to description
+    )
 
 }
