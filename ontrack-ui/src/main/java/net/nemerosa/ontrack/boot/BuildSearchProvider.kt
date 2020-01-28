@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.boot
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
@@ -12,8 +15,9 @@ import java.util.regex.Pattern
 @Component
 class BuildSearchProvider(
         uriBuilder: URIBuilder,
-        private val structureService: StructureService
-) : AbstractSearchProvider(uriBuilder), SearchIndexer<BuildSearchItem> {
+        private val structureService: StructureService,
+        private val searchIndexService: SearchIndexService
+) : AbstractSearchProvider(uriBuilder), SearchIndexer<BuildSearchItem>, EventListener {
 
     override fun isTokenSearchable(token: String): Boolean {
         return Pattern.matches(NameDescription.NAME, token)
@@ -67,6 +71,23 @@ class BuildSearchProvider(
             )
         } catch (_: BuildNotFoundException) {
             null
+        }
+    }
+
+    override fun onEvent(event: Event) {
+        when (event.eventType) {
+            EventFactory.NEW_BUILD -> {
+                val build = event.getEntity<Build>(ProjectEntityType.BUILD)
+                searchIndexService.createSearchIndex(this, BuildSearchItem(build))
+            }
+            EventFactory.UPDATE_BUILD -> {
+                val build = event.getEntity<Build>(ProjectEntityType.BUILD)
+                searchIndexService.updateSearchIndex(this, BuildSearchItem(build))
+            }
+            EventFactory.DELETE_BUILD -> {
+                val buildId = event.getIntValue("build_id")
+                searchIndexService.deleteSearchIndex(this, buildId)
+            }
         }
     }
 }
