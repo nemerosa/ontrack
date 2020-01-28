@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchProvider
 import net.nemerosa.ontrack.model.structure.SearchService
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +18,7 @@ abstract class AbstractSearchTestSupport : AbstractDSLTestSupport() {
     protected lateinit var searchService: SearchService
 
     @Autowired
-    protected lateinit var elasticSearchService: ElasticSearchService
+    protected lateinit var searchIndexService: SearchIndexService
 
     @Autowired
     protected lateinit var providers: List<SearchProvider>
@@ -26,7 +27,7 @@ abstract class AbstractSearchTestSupport : AbstractDSLTestSupport() {
         providers.forEach { provider ->
             provider.searchIndexers.forEach { indexer ->
                 if (indexer.indexName == indexName) {
-                    elasticSearchService.index(indexer)
+                    searchIndexService.index(indexer)
                 }
             }
         }

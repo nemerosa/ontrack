@@ -14,6 +14,8 @@ interface SearchIndexService {
      */
     val searchIndexesAvailable: Boolean
 
+    fun <T : SearchItem> index(indexer: SearchIndexer<T>)
+
     fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T)
 
     fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T)
@@ -40,6 +42,8 @@ fun <T : SearchItem> SearchIndexService.deleteSearchIndex(indexer: SearchIndexer
 class NOPSearchIndexService : SearchIndexService {
 
     override val searchIndexesAvailable: Boolean = false
+
+    override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {}
 
     override fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T) {}
 

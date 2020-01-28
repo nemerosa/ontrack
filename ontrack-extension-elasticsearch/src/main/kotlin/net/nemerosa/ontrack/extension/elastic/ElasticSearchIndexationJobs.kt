@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.elastic
 
 import net.nemerosa.ontrack.job.*
+import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchItem
 import net.nemerosa.ontrack.model.structure.SearchProvider
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component
 )
 class ElasticSearchIndexationJobs(
         private val providers: List<SearchProvider>,
-        private val elasticSearchService: ElasticSearchService
+        private val elasticSearchService: SearchIndexService
 ) : JobProvider {
 
     private val jobCategory = JobCategory("elasticsearch", "ElasticSearch")
@@ -32,12 +33,12 @@ class ElasticSearchIndexationJobs(
                 }
             }
 
-    private fun <T: SearchItem> createIndexationJobRegistration(searchIndexer: SearchIndexer<T>) = JobRegistration(
+    private fun <T : SearchItem> createIndexationJobRegistration(searchIndexer: SearchIndexer<T>) = JobRegistration(
             job = createIndexationJob(searchIndexer),
             schedule = searchIndexer.indexerSchedule
     )
 
-    private fun <T: SearchItem> createIndexationJob(indexer: SearchIndexer<T>) = object : Job {
+    private fun <T : SearchItem> createIndexationJob(indexer: SearchIndexer<T>) = object : Job {
         override fun isDisabled(): Boolean = indexer.isIndexerDisabled
 
         override fun getKey(): JobKey =

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import org.junit.Test
