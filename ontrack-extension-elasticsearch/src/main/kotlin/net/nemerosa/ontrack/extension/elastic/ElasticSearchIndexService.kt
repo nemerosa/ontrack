@@ -4,6 +4,7 @@ import io.searchbox.client.JestClient
 import io.searchbox.core.Bulk
 import io.searchbox.core.Delete
 import io.searchbox.core.Index
+import io.searchbox.indices.Refresh
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchItem
@@ -22,6 +23,12 @@ class ElasticSearchIndexService(
         private val jestClient: JestClient
 ) : SearchIndexService {
 
+    private fun <T : SearchItem> refreshIndex(indexer: SearchIndexer<T>) {
+        Refresh.Builder().addIndex(indexer.indexName).build().apply {
+            jestClient.execute(this)
+        }
+    }
+
     override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {
         val batchSize = 1000 // TODO Make the batch size configurable
         val buffer = mutableListOf<T>()
@@ -34,6 +41,8 @@ class ElasticSearchIndexService(
         }
         // Remaining items
         index(indexer, buffer)
+        // Refreshes the index
+        refreshIndex(indexer)
     }
 
     private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {
