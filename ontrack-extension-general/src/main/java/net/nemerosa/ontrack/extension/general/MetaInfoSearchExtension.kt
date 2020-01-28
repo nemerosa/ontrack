@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -69,7 +70,7 @@ class MetaInfoSearchExtension(
                     String.format("%s -> %s", name, this),
                     uriBuilder.getEntityURI(entity),
                     uriBuilder.getEntityPage(entity),
-                    100
+                    100.0
             )
         }
     }
@@ -91,6 +92,10 @@ class MetaInfoSearchExtension(
                 processor(item)
             }
         }
+    }
+
+    override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 

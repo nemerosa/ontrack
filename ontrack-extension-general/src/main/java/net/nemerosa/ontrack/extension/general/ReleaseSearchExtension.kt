@@ -40,7 +40,7 @@ class ReleaseSearchExtension(
                             "Build ${build.entityDisplayName} having version/label/release $token",
                             uriBuilder.getEntityURI(build),
                             uriBuilder.getEntityPage(build),
-                            100
+                            100.0
                     )
                 }
     }

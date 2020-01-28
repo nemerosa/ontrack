@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.boot
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
+import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
@@ -47,7 +49,7 @@ class ProjectSearchProvider(
                             "",
                             uriBuilder.getEntityURI(project),
                             uriBuilder.getEntityPage(project),
-                            100
+                            100.0
                     )
                 }
     }
@@ -61,6 +63,21 @@ class ProjectSearchProvider(
     override fun indexAll(processor: (ProjectSearchItem) -> Unit) {
         structureService.projectList.forEach { project ->
             processor(project.asSearchItem())
+        }
+    }
+
+    override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
+        return try {
+            val project = structureService.getProject(ID.of(id.toInt()))
+            SearchResult(
+                    project.name,
+                    project.entityDisplayName,
+                    uriBuilder.getEntityURI(project),
+                    uriBuilder.getEntityPage(project),
+                    score
+            )
+        } catch (_: ProjectNotFoundException) {
+            null
         }
     }
 

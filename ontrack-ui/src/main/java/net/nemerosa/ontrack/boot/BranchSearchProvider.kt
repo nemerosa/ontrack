@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -34,7 +35,7 @@ class BranchSearchProvider(
                                 "",
                                 uriBuilder.getEntityURI(branch),
                                 uriBuilder.getEntityPage(branch),
-                                100
+                                100.0
                         )
                     }
 
@@ -50,6 +51,10 @@ class BranchSearchProvider(
                 processor(branch.asSearchItem())
             }
         }
+    }
+
+    override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onEvent(event: Event) {

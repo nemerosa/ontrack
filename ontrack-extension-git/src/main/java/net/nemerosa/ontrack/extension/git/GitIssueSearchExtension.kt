@@ -76,7 +76,7 @@ class GitIssueSearchExtension(
                                         uriBuilder.page("extension/git/%d/issue/%s",
                                                 project.id(),
                                                 issue.key),
-                                        100
+                                        100.0
                                 )
                             }
                         }

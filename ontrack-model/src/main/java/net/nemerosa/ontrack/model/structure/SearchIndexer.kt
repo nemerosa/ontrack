@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.job.Schedule
 
 /**
@@ -42,5 +43,15 @@ interface SearchIndexer<T : SearchItem> {
      * Index all elements.
      */
     fun indexAll(processor: (T) -> Unit)
+
+    /**
+     * Given some raw search results, transform them into a [SearchResult] for display.
+     *
+     * @param id ID of the entity having being found
+     * @param score Score of the item in the search
+     * @param source Raw search result, typically a JSON representation of [SearchItem.fields]
+     * @return `null` if the [source] cannot be read
+     */
+    fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult?
 
 }

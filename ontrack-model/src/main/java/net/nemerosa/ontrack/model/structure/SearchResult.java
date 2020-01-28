@@ -20,6 +20,6 @@ public class SearchResult {
      */
     private final URI page;
 
-    private final int accuracy;
+    private final double accuracy;
 
 }
