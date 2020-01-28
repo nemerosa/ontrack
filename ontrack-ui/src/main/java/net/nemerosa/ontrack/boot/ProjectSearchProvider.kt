@@ -17,6 +17,11 @@ import java.util.regex.Pattern
 const val PROJECT_SEARCH_PROVIDER_TOKEN_MIN_LENGTH = 3
 
 /**
+ * Projects search index name
+ */
+const val PROJECT_SEARCH_INDEX = "projects"
+
+/**
  * Matches against projects either by name or by content if the
  * search token is at least [PROJECT_SEARCH_PROVIDER_TOKEN_MIN_LENGTH] characters long.
  */
@@ -26,10 +31,6 @@ class ProjectSearchProvider(
         private val structureService: StructureService,
         private val searchIndexService: SearchIndexService
 ) : AbstractSearchProvider(uriBuilder), SearchIndexer<ProjectSearchItem>, EventListener {
-
-    companion object {
-        const val PROJECTS_INDEX = "projects"
-    }
 
     override fun isTokenSearchable(token: String): Boolean {
         return Pattern.matches(NameDescription.NAME, token)
@@ -58,7 +59,7 @@ class ProjectSearchProvider(
 
     override val indexerName: String = "Projects"
 
-    override val indexName: String = PROJECTS_INDEX
+    override val indexName: String = PROJECT_SEARCH_INDEX
 
     override fun indexAll(processor: (ProjectSearchItem) -> Unit) {
         structureService.projectList.forEach { project ->

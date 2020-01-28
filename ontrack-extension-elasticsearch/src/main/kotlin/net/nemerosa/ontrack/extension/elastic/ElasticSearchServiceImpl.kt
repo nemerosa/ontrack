@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -60,11 +61,16 @@ class ElasticSearchServiceImpl(
     }
 
     private fun <T : SearchItem> toResult(hitNode: HitNode, indexer: SearchIndexer<T>): SearchResult? =
-            indexer.toSearchResult(
-                    hitNode.id,
-                    hitNode.score,
-                    hitNode.source
-            )
+            try {
+                indexer.toSearchResult(
+                        hitNode.id,
+                        hitNode.score,
+                        hitNode.source
+                )
+            } catch (ex: AccessDeniedException) {
+                // We don't access results which are not authorized
+                null
+            }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private class HitNode(
