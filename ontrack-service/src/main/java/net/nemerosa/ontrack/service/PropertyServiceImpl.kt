@@ -15,7 +15,6 @@ import net.nemerosa.ontrack.repository.TProperty
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 import java.util.function.Predicate
@@ -202,9 +201,9 @@ class PropertyServiceImpl(
         // Loops over the properties
         propertyRepository.forEachEntityWithProperty(
                 propertyTypeName
-        ) { projectEntityID: ProjectEntityID, t: TProperty ->
+        ) { t: TProperty ->
             consumer(
-                    projectEntityID,
+                    ProjectEntityID(t.entityType, t.entityId.value),
                     actualPropertyType.fromStorage(t.json)
             )
         }

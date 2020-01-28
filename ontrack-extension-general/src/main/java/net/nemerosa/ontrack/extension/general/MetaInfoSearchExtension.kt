@@ -79,7 +79,7 @@ class MetaInfoSearchExtension(
     }
 
     override val indexerName: String = "Meta info properties"
-    override val indexName: String = "meta-info-properties"
+    override val indexName: String = META_INFO_SEARCH_INDEX
 
     override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
         propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
@@ -121,6 +121,11 @@ class MetaInfoSearchExtension(
  * Separator between name and value when looking for meta information.
  */
 const val META_INFO_SEPARATOR = ":"
+
+/**
+ * Index name for the meta info search
+ */
+const val META_INFO_SEARCH_INDEX = "meta-info-properties"
 
 class MetaInfoSearchItem(
         val name: String,
