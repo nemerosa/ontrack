@@ -1,21 +1,25 @@
 package net.nemerosa.ontrack.boot.search
 
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import org.junit.Test
 import kotlin.test.assertEquals
 
 /**
- * Search indexation for projects
+ * Search indexation for branches
  */
-class ProjectSearchIT : AbstractSearchTestSupport() {
+class BranchSearchIT : AbstractSearchTestSupport() {
 
     @Test
-    fun `Indexation of projects and looking for projects`() {
-        val candidate = project {}
+    fun `Indexation of branches and looking for branches`() {
+        val candidate = project<Branch> {
+            branch()
+        }
         // Creates 3 other projects
-        repeat(3) { project {} }
-        // Launching indexation for the projects
+        repeat(3) { project { branch {} } }
+        // Launching indexation for the projects & branches
         index("projects")
+        index("branches")
         // Searches for the candidate project
         val results = searchService.search(SearchRequest(candidate.name))
         assertEquals(1, results.size)

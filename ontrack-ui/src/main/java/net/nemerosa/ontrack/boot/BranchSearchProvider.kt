@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
+import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
@@ -54,7 +55,18 @@ class BranchSearchProvider(
     }
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return try {
+            val branch = structureService.getBranch(ID.of(id.toInt()))
+            SearchResult(
+                    branch.name,
+                    branch.entityDisplayName,
+                    uriBuilder.getEntityURI(branch),
+                    uriBuilder.getEntityPage(branch),
+                    score
+            )
+        } catch (_: BranchNotFoundException) {
+            null
+        }
     }
 
     override fun onEvent(event: Event) {
