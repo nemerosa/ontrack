@@ -36,6 +36,16 @@ inline fun <reified T> JsonNode.parse(): T =
         JsonUtils.parse(this, T::class.java)
 
 /**
+ * Parses any node into an object or returns `null` if parsing fails
+ */
+inline fun <reified T> JsonNode.parseOrNull(): T? =
+        try {
+            parse()
+        } catch (_: JsonParseException) {
+            null
+        }
+
+/**
  * Gets a field as enum
  */
 inline fun <reified E : Enum<E>> JsonNode.getEnum(field: String): E? {

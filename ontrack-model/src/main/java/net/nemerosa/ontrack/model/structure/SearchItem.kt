@@ -13,6 +13,6 @@ interface SearchItem {
     /**
      * Fields for this item
      */
-    val fields: Map<String, Any>
+    val fields: Map<String, Any?>
 
 }
