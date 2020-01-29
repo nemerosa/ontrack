@@ -95,12 +95,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     }
 
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
-        val configurationTest = ontrackConfigProperties.isConfigurationTest
-        ontrackConfigProperties.isConfigurationTest = false
+        val configurationTest = ontrackConfigProperties.configurationTest
+        ontrackConfigProperties.configurationTest = false
         return try {
             code()
         } finally {
-            ontrackConfigProperties.isConfigurationTest = configurationTest
+            ontrackConfigProperties.configurationTest = configurationTest
         }
     }
 
