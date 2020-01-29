@@ -33,6 +33,22 @@ class ACCSearch extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Looking for a project after its creation'() {
+        // Prerequisites
+        JsonNode node = doCreateProject()
+        // Data
+        String project = node.path('name').asText()
+        String id = node.path('id').asText()
+        // Looking for this project as admin
+        def results = ontrack.search(project)
+        // Check
+        assert results.size() > 0: "At least one result is returned"
+        def result = results.get(0)
+        assert result.title == "Project ${project}" as String
+        assert result.page == "/#/project/${id}" as String
+    }
+
+    @Test
     void 'Looking for a build after its creation'() {
         // Prerequisites
         JsonNode build = doCreateBuild()
