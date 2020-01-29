@@ -14,6 +14,18 @@ import kotlin.test.assertTrue
 class ProjectSearchIT : AbstractSearchTestSupport() {
 
     @Test
+    fun `Searching for a project after its creation`() {
+        val candidate = project {}
+        // Searches for the candidate project
+        val results = searchService.search(SearchRequest(candidate.name)).toList()
+        assertTrue(results.isNotEmpty(), "At least one result")
+        results[0].apply {
+            assertEquals(candidate.name, title)
+            assertEquals(candidate.entityDisplayName, description)
+        }
+    }
+
+    @Test
     fun `Indexation of projects and looking for projects`() {
         val candidate = project {}
         // Creates 3 other projects
