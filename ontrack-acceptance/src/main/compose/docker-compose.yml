@@ -32,7 +32,8 @@ services:
          ONTRACK_INFLUXDB_ENABLED: "true"
          ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
          # Elastic search
-         ONTRACK_CONFIG_SEARCH: "elasticsearch"
+         ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
+         ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
          SPRING_ELASTICSEARCH_JEST_URIS: "http://elasticsearch:9200"
    selenium:
       image: "selenium/standalone-chrome:3.11.0"

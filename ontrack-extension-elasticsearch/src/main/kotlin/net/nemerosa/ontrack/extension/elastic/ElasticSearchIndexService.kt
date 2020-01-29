@@ -20,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional
         havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
 )
 class ElasticSearchIndexService(
-        private val jestClient: JestClient
+        private val jestClient: JestClient,
+        private val ontrackConfigProperties: OntrackConfigProperties
 ) : SearchIndexService {
 
     private fun <T : SearchItem> refreshIndex(indexer: SearchIndexer<T>) {
@@ -42,7 +43,7 @@ class ElasticSearchIndexService(
         // Remaining items
         index(indexer, buffer)
         // Refreshes the index
-        refreshIndex(indexer)
+        immediateRefreshIfRequested(indexer)
     }
 
     private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {
@@ -58,6 +59,14 @@ class ElasticSearchIndexService(
                 .build()
         // Launching the indexation of this batch
         jestClient.execute(bulk)
+        // Refreshes the index
+        immediateRefreshIfRequested(indexer)
+    }
+
+    private fun <T : SearchItem> immediateRefreshIfRequested(indexer: SearchIndexer<T>) {
+        if (ontrackConfigProperties.search.index.immediate) {
+            refreshIndex(indexer)
+        }
     }
 
     override val searchIndexesAvailable: Boolean = true
@@ -69,6 +78,8 @@ class ElasticSearchIndexService(
                         .id(item.id)
                         .build()
         )
+        // Refreshes the index
+        immediateRefreshIfRequested(indexer)
     }
 
     override fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T) =
@@ -80,6 +91,8 @@ class ElasticSearchIndexService(
                         .index(indexer.indexName)
                         .build()
         )
+        // Refreshes the index
+        immediateRefreshIfRequested(indexer)
     }
 
 }

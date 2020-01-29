@@ -27,6 +27,6 @@ class SearchConfigProperties {
          * Flag to enable immediate re-indexation after items are added into the search index (used mostly
          * for testing).
          */
-        private var immediate = false
+        var immediate = false
     }
 }
