@@ -44,6 +44,7 @@ class ACCSearch extends AcceptanceTestClient {
         // Looking for this build as admin
         def results = ontrack.search(build.path('name').asText())
         // Check
+        assert results.size() > 0: "At least one result is returned"
         def result = results.get(0)
         assert result.title == "Build ${project}/${branch}/${name}" as String
         assert result.page == "/#/build/${id}" as String
