@@ -9,7 +9,7 @@ import org.springframework.test.context.TestPropertySource
 
 @TestPropertySource(
         properties = [
-            "ontrack.config.search=elasticsearch"
+            "ontrack.config.search.engine=elasticsearch"
         ]
 )
 abstract class AbstractSearchTestSupport : AbstractDSLTestSupport() {

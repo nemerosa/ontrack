@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 @ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_PROPERTY],
+        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
         havingValue = "default",
         matchIfMissing = true
 )

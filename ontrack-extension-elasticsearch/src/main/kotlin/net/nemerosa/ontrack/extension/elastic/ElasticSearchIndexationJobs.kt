@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 @ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_PROPERTY],
-        havingValue = ElasticSearchConfigProperties.SEARCH_SERVICE_ELASTICSEARCH
+        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
+        havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
 )
 class ElasticSearchIndexationJobs(
         private val providers: List<SearchProvider>,

@@ -4,9 +4,9 @@ class ElasticSearchConfigProperties {
 
     companion object {
         /**
-         * Value in Ontrack configuration properties to enable ElasticSearch as THE search service
+         * Value in Ontrack configuration properties to enable ElasticSearch as THE search engine
          */
-        const val SEARCH_SERVICE_ELASTICSEARCH = "elasticsearch"
+        const val SEARCH_ENGINE_ELASTICSEARCH = "elasticsearch"
     }
 
 }

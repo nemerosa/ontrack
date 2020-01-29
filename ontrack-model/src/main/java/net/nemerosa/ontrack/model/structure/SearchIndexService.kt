@@ -35,7 +35,7 @@ fun <T : SearchItem> SearchIndexService.deleteSearchIndex(indexer: SearchIndexer
  */
 @Service
 @ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_PROPERTY],
+        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
         havingValue = "default",
         matchIfMissing = true
 )

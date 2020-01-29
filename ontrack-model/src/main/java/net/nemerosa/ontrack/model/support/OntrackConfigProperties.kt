@@ -16,45 +16,41 @@ import javax.validation.constraints.Min
 @Validated
 class OntrackConfigProperties {
 
-    private var logger = LoggerFactory.getLogger(OntrackConfigProperties::class.java)
+    var logger = LoggerFactory.getLogger(OntrackConfigProperties::class.java)
 
     /**
      * Maximum number of days to keep the log entries
      */
-    private var applicationLogRetentionDays = 7
+    var applicationLogRetentionDays = 7
     /**
      * Number of fatal errors to notify into the GUI.
      *
      * @see ApplicationLogEntryLevel.FATAL
      */
     @Min(1)
-    private var applicationLogInfoMax = 10
+    var applicationLogInfoMax = 10
     /**
      * Home directory
      */
-    private var applicationWorkingDir = "work/files"
+    var applicationWorkingDir = "work/files"
     /**
      * Testing the configurations of external configurations
      */
-    private var configurationTest = true
+    var configurationTest = true
     /**
      * Job configuration
      */
     @Valid
-    private var jobs: JobConfigProperties = JobConfigProperties()
+    var jobs: JobConfigProperties = JobConfigProperties()
     /**
      * Label provider collection job activation
      */
-    private var jobLabelProviderEnabled = false
+    var jobLabelProviderEnabled = false
+
     /**
-     * Search engine to be used.
+     * Search configuration
      */
-    private var search = SEARCH
-    /**
-     * Flag to enable immediate re-indexation after items are added into the search index (used mostly
-     * for testing).
-     */
-    private var searchIndexImmediate = false
+    var search = SearchConfigProperties()
 
     @PostConstruct
     fun log() {
@@ -71,11 +67,15 @@ class OntrackConfigProperties {
         /**
          * Search service key
          */
-        const val SEARCH = "search"
+        internal const val SEARCH = "search"
         /**
          * Search complete key
          */
-        const val SEARCH_PROPERTY = "$PREFIX.$SEARCH"
+        private const val SEARCH_PROPERTY = "$PREFIX.$SEARCH"
+        /**
+         * Search engine property
+         */
+        const val SEARCH_ENGINE_PROPERTY = "$SEARCH_PROPERTY.${SearchConfigProperties.ENGINE_PROPERTY}"
         /**
          * Key store type
          */

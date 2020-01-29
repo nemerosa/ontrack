@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 @ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_PROPERTY],
-        havingValue = ElasticSearchConfigProperties.SEARCH_SERVICE_ELASTICSEARCH
+        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
+        havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
 )
 class ElasticSearchStartupService(
         private val jestClient: JestClient,
