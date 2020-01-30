@@ -62,6 +62,25 @@ class BranchSearchIT : AbstractSearchTestSupport() {
     }
 
     @Test
+    fun `Search branch on project name`() {
+        val branch = project<Branch> {
+            branch {}
+        }
+        // Launching indexation for the projects
+        index(PROJECT_SEARCH_INDEX)
+        index(BRANCH_SEARCH_INDEX)
+        // Search on project name
+        val results = searchService.search(SearchRequest(branch.project.name))
+        // Project is found
+        val projectResult = results.find { it.title == branch.project.entityDisplayName }
+                ?: error("Cannot find project")
+        // Branch is found
+        val branchResult = results.find { it.title == branch.entityDisplayName } ?: error("Cannot find branch")
+        // Project result has a higher score than the branch
+        assertTrue(projectResult.accuracy >= branchResult.accuracy, "Project result has a higher score than the branch")
+    }
+
+    @Test
     fun `Search branches and filter on access rights`() {
         val prefix = uid("P")
         // Creates projects and branches

@@ -92,17 +92,20 @@ const val BRANCH_SEARCH_INDEX = "branches"
 class BranchSearchItem(
         override val id: String,
         val name: String,
-        val description: String
+        val description: String,
+        val project: String
 ) : SearchItem {
 
     constructor(branch: Branch) : this(
             id = branch.id.toString(),
             name = branch.name,
-            description = branch.description
+            description = branch.description,
+            project = branch.project.name
     )
 
     override val fields: Map<String, Any> = mapOf(
             "name" to name,
-            "description" to description
+            "description" to description,
+            "project" to project
     )
 }
