@@ -44,7 +44,7 @@ class BranchSearchProvider(
 
     override val indexerName: String = "Branches"
 
-    override val indexName: String = "branches"
+    override val indexName: String = BRANCH_SEARCH_INDEX
 
     override fun indexAll(processor: (BranchSearchItem) -> Unit) {
         structureService.projectList.forEach {
@@ -88,6 +88,11 @@ class BranchSearchProvider(
 
     private fun Branch.asSearchItem() = BranchSearchItem(this)
 }
+
+/**
+ * Index name for the branches
+ */
+const val BRANCH_SEARCH_INDEX = "branches"
 
 class BranchSearchItem(
         override val id: String,
