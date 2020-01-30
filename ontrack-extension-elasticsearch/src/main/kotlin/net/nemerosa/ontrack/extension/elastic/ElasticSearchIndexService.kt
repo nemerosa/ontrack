@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchItem
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,7 +27,10 @@ class ElasticSearchIndexService(
         private val ontrackConfigProperties: OntrackConfigProperties
 ) : SearchIndexService {
 
+    private val logger: Logger = LoggerFactory.getLogger(ElasticSearchIndexService::class.java)
+
     private fun <T : SearchItem> refreshIndex(indexer: SearchIndexer<T>) {
+        logger.debug("Refreshing index ${indexer.indexName}")
         Refresh.Builder().addIndex(indexer.indexName).build().apply {
             jestClient.execute(this)
         }
@@ -33,6 +38,7 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {
         val batchSize = 1000 // TODO Make the batch size configurable
+        logger.debug("Full indexation for ${indexer.indexName} with batch size = $batchSize")
         val buffer = mutableListOf<T>()
         indexer.indexAll { item ->
             buffer.add(item)
@@ -73,6 +79,7 @@ class ElasticSearchIndexService(
     override val searchIndexesAvailable: Boolean = true
 
     override fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T) {
+        logger.debug("Create index ${indexer.indexName}")
         jestClient.execute(
                 Bulk.Builder().addAction(
                         Index.Builder(item.fields)
@@ -86,6 +93,7 @@ class ElasticSearchIndexService(
     }
 
     override fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T) {
+        logger.debug("Update index ${indexer.indexName}")
         jestClient.execute(
                 Index.Builder(item.fields)
                         .index(indexer.indexName)
@@ -95,6 +103,7 @@ class ElasticSearchIndexService(
     }
 
     override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {
+        logger.debug("Delete index ${indexer.indexName}")
         jestClient.execute(
                 Delete.Builder(id)
                         .index(indexer.indexName)
