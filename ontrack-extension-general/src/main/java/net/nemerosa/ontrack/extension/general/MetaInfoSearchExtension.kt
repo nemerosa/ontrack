@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
-import net.nemerosa.ontrack.model.exceptions.NotFoundException
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
@@ -106,10 +105,8 @@ class MetaInfoSearchExtension(
 
     private fun toSearchResult(item: MetaInfoSearchItem): SearchResult? {
         // Loads the entity
-        val entity = try {
-            item.entityType.getEntityFn(structureService).apply(ID.of(item.entityId))
-        } catch (_: NotFoundException) {
-            null
+        val entity: ProjectEntity? = item.entityType.getEntityFn(structureService).apply(ID.of(item.entityId))?.takeIf {
+            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
         }
         // Conversion (using legacy code)
         return entity?.let { toSearchResult(it, item.name) }

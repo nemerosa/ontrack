@@ -59,20 +59,16 @@ class BuildSearchProvider(
         }
     }
 
-    override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
-        return try {
-            val build = structureService.getBuild(ID.of(id.toInt()))
-            SearchResult(
-                    build.entityDisplayName,
-                    build.description,
-                    uriBuilder.getEntityURI(build),
-                    uriBuilder.getEntityPage(build),
-                    score
-            )
-        } catch (_: BuildNotFoundException) {
-            null
-        }
-    }
+    override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? =
+            structureService.findBuildByID(ID.of(id.toInt()))?.run {
+                SearchResult(
+                        entityDisplayName,
+                        description,
+                        uriBuilder.getEntityURI(this),
+                        uriBuilder.getEntityPage(this),
+                        score
+                )
+            }
 
     override fun onEvent(event: Event) {
         when (event.eventType) {

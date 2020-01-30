@@ -50,7 +50,7 @@ interface SearchIndexer<T : SearchItem> {
      * @param id ID of the entity having being found
      * @param score Score of the item in the search
      * @param source Raw search result, typically a JSON representation of [SearchItem.fields]
-     * @return `null` if the [source] cannot be read
+     * @return `null` if the [source] cannot be read, cannot be found or is not authorized
      */
     fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult?
 

@@ -22,6 +22,13 @@ interface StructureService {
 
     fun newProject(project: Project): Project
 
+    /**
+     * Looks for a project using its ID.
+     * @param projectId ID of the project
+     * @return Project or `null` if not found
+     */
+    fun findProjectByID(projectId: ID): Project?
+
     fun getProject(projectId: ID): Project
 
     fun saveProject(project: Project)
@@ -33,6 +40,13 @@ interface StructureService {
     fun deleteProject(projectId: ID): Ack
 
     // Branches
+
+    /**
+     * Looks for a branch using its ID.
+     * @param branchId ID of the branch
+     * @return Branch or `null` if not found
+     */
+    fun findBranchByID(branchId: ID): Branch?
 
     fun getBranch(branchId: ID): Branch
 
@@ -57,6 +71,13 @@ interface StructureService {
     fun newBuild(build: Build): Build
 
     fun saveBuild(build: Build): Build
+
+    /**
+     * Looks for a build using its ID.
+     * @param buildId ID of the build
+     * @return Build or `null` if not found
+     */
+    fun findBuildByID(buildId: ID): Build?
 
     fun getBuild(buildId: ID): Build
 

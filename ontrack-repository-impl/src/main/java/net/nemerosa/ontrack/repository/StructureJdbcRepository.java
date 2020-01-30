@@ -72,14 +72,22 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    @Nullable
+    public Project findProjectByID(ID projectId) {
+        return getFirstItem(
+                "SELECT * FROM PROJECTS WHERE ID = :id",
+                params("id", projectId.getValue()),
+                (rs, rowNum) -> toProject(rs)
+        );
+    }
+
+    @Override
+    @NotNull
     public Project getProject(ID projectId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM PROJECTS WHERE ID = :id",
-                    params("id", projectId.getValue()),
-                    (rs, rowNum) -> toProject(rs)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        Project project = findProjectByID(projectId);
+        if (project != null) {
+            return project;
+        } else {
             throw new ProjectNotFoundException(projectId);
         }
     }
@@ -116,15 +124,23 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Nullable
     @Override
+    public Branch findBranchByID(ID branchId) {
+        return getFirstItem(
+                "SELECT * FROM BRANCHES WHERE ID = :id",
+                params("id", branchId.getValue()),
+                (rs, rowNum) -> toBranch(rs, this::getProject)
+        );
+    }
+
+    @Override
+    @NotNull
     public Branch getBranch(ID branchId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM BRANCHES WHERE ID = :id",
-                    params("id", branchId.getValue()),
-                    (rs, rowNum) -> toBranch(rs, this::getProject)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        Branch branch = findBranchByID(branchId);
+        if (branch != null) {
+            return branch;
+        } else {
             throw new BranchNotFoundException(branchId);
         }
     }
@@ -428,15 +444,23 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         }
     }
 
+    @Nullable
     @Override
+    public Build findBuildByID(ID buildId) {
+        return getFirstItem(
+                "SELECT * FROM BUILDS WHERE ID = :id",
+                params("id", buildId.getValue()),
+                (rs, rowNum) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    @NotNull
     public Build getBuild(ID buildId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM BUILDS WHERE ID = :id",
-                    params("id", buildId.getValue()),
-                    (rs, rowNum) -> toBuild(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        Build build = findBuildByID(buildId);
+        if (build != null) {
+            return build;
+        } else {
             throw new BuildNotFoundException(buildId);
         }
     }

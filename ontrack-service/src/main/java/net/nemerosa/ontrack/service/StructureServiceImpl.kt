@@ -107,6 +107,12 @@ class StructureServiceImpl(
         return newProject
     }
 
+    override fun findProjectByID(projectId: ID): Project? {
+        return structureRepository.findProjectByID(projectId)?.takeIf {
+            securityService.isProjectFunctionGranted(it.id(), ProjectView::class.java)
+        }
+    }
+
     override fun getProject(projectId: ID): Project {
         securityService.checkProjectFunction(projectId.value, ProjectView::class.java)
         return structureRepository.getProject(projectId)
@@ -139,6 +145,11 @@ class StructureServiceImpl(
         eventPostService.post(eventFactory.deleteProject(getProject(projectId)))
         return structureRepository.deleteProject(projectId)
     }
+
+    override fun findBranchByID(branchId: ID): Branch? =
+            structureRepository.findBranchByID(branchId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
 
     override fun getBranch(branchId: ID): Branch {
         val branch = structureRepository.getBranch(branchId)
@@ -330,6 +341,11 @@ class StructureServiceImpl(
             securityService.checkProjectFunction(build, ProjectEdit::class.java)
         }
     }
+
+    override fun findBuildByID(buildId: ID): Build? =
+            structureRepository.findBuildByID(buildId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
 
     override fun getBuild(buildId: ID): Build {
         val build = structureRepository.getBuild(buildId)

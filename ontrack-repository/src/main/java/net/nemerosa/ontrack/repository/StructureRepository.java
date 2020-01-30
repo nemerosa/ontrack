@@ -20,6 +20,15 @@ public interface StructureRepository {
 
     List<Project> getProjectList();
 
+    /**
+     * Looks for a project using its ID.
+     * @param projectId ID of the project
+     * @return Project or <code>null</code> if not found
+     */
+    @Nullable
+    Project findProjectByID(ID projectId);
+
+    @NotNull
     Project getProject(ID projectId);
 
     Optional<Project> getProjectByName(String project);
@@ -30,6 +39,15 @@ public interface StructureRepository {
 
     // Branches
 
+    /**
+     * Looks for a branch using its ID.
+     * @param branchId ID of the project
+     * @return Branch or `null` if not found
+     */
+    @Nullable
+    Branch findBranchByID(ID branchId);
+
+    @NotNull
     Branch getBranch(ID branchId);
 
     Optional<Branch> getBranchByName(String project, String branch);
@@ -48,6 +66,15 @@ public interface StructureRepository {
 
     Build saveBuild(Build build);
 
+    /**
+     * Looks for a build using its ID.
+     * @param buildId ID of the build
+     * @return Build or `null` if not found
+     */
+    @Nullable
+    Build findBuildByID(ID buildId);
+
+    @NotNull
     Build getBuild(ID buildId);
 
     Optional<Build> getBuildByName(String project, String branch, String build);
