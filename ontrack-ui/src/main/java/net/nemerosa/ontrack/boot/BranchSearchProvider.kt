@@ -58,8 +58,8 @@ class BranchSearchProvider(
         return try {
             val branch = structureService.getBranch(ID.of(id.toInt()))
             SearchResult(
-                    branch.name,
                     branch.entityDisplayName,
+                    branch.description,
                     uriBuilder.getEntityURI(branch),
                     uriBuilder.getEntityPage(branch),
                     score
@@ -89,11 +89,20 @@ class BranchSearchProvider(
     private fun Branch.asSearchItem() = BranchSearchItem(this)
 }
 
-class BranchSearchItem(branch: Branch) : SearchItem {
-    override val id: String = branch.id.toString()
+class BranchSearchItem(
+        override val id: String,
+        val name: String,
+        val description: String
+) : SearchItem {
+
+    constructor(branch: Branch) : this(
+            id = branch.id.toString(),
+            name = branch.name,
+            description = branch.description
+    )
 
     override val fields: Map<String, Any> = mapOf(
-            "name" to branch.name,
-            "description" to branch.description
+            "name" to name,
+            "description" to description
     )
 }

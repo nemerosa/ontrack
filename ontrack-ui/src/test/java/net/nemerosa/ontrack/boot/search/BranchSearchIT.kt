@@ -26,8 +26,8 @@ class BranchSearchIT : AbstractSearchTestSupport() {
         assertEquals(1, results.size)
         val result = results.first()
         result.apply {
-            assertEquals(candidate.name, result.title)
-            assertEquals(candidate.entityDisplayName, result.description)
+            assertEquals(candidate.entityDisplayName, result.title)
+            assertEquals(candidate.description, result.description)
         }
     }
 
@@ -49,12 +49,12 @@ class BranchSearchIT : AbstractSearchTestSupport() {
         assertEquals(2, results.size)
         assertTrue(results[0].accuracy > results[1].accuracy, "Project is returned first")
         results[0].apply {
-            assertEquals(project.name, title)
-            assertEquals(project.entityDisplayName, description)
+            assertEquals(project.entityDisplayName, title)
+            assertEquals(project.description, description)
         }
         results[1].apply {
-            assertEquals(branch.name, title)
-            assertEquals(branch.entityDisplayName, description)
+            assertEquals(branch.entityDisplayName, title)
+            assertEquals(branch.description, description)
         }
     }
 

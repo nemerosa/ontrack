@@ -20,8 +20,8 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
         val results = searchService.search(SearchRequest(candidate.name)).toList()
         assertTrue(results.isNotEmpty(), "At least one result")
         results[0].apply {
-            assertEquals(candidate.name, title)
-            assertEquals(candidate.entityDisplayName, description)
+            assertEquals(candidate.entityDisplayName, title)
+            assertEquals(candidate.description, description)
         }
     }
 
@@ -37,8 +37,8 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
         assertEquals(1, results.size)
         val result = results.first()
         result.apply {
-            assertEquals(candidate.name, result.title)
-            assertEquals(candidate.entityDisplayName, result.description)
+            assertEquals(candidate.entityDisplayName, result.title)
+            assertEquals(candidate.description, result.description)
         }
     }
 
@@ -60,10 +60,10 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
                 // Names of projects
                 val foundNames = results.map { it.title }
                 // Checks that authorized project is found
-                assertTrue(projects[0].name in foundNames, "Authorized project must be found")
+                assertTrue(projects[0].entityDisplayName in foundNames, "Authorized project must be found")
                 // Checks that unauthorized projects are NOT found
                 (1..3).forEach {
-                    assertTrue(projects[it].name !in foundNames, "Not authorized projects must be filtered out")
+                    assertTrue(projects[it].entityDisplayName !in foundNames, "Not authorized projects must be filtered out")
                 }
             }
         }
