@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.support
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
@@ -16,7 +17,7 @@ import javax.validation.constraints.Min
 @Validated
 class OntrackConfigProperties {
 
-    var logger = LoggerFactory.getLogger(OntrackConfigProperties::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(OntrackConfigProperties::class.java)
 
     /**
      * Maximum number of days to keep the log entries
@@ -57,6 +58,8 @@ class OntrackConfigProperties {
         if (!configurationTest) {
             logger.warn("[config] Tests of external configurations are disabled")
         }
+        logger.info("[search] Engine = ${search.engine}")
+        logger.info("[search] Index immediate refresh = ${search.index.immediate}")
     }
 
     companion object {
