@@ -41,6 +41,31 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
     }
 
     @Test
+    fun `Looking for builds with meta information after update of property`() {
+        val name1 = uid("N")
+        val value1 = uid("V")
+        val name2 = uid("M")
+        val value2 = uid("W")
+        project {
+            branch {
+                val build = build {
+                    metaInfo(name1 to value1)
+                }
+                // Looks for exact match now
+                searchService.search(SearchRequest("$name1:$value1")).toList().apply {
+                    assertTrue(any { it.title == build.entityDisplayName }, "Build found with current meta information")
+                }
+                // Changing the meta info
+                build.metaInfo(name2 to value2)
+                // Looks for exact match now
+                searchService.search(SearchRequest("$name2:$value2")).toList().apply {
+                    assertTrue(any { it.title == build.entityDisplayName }, "Build found with new meta information")
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Looking for builds with several meta info items`() {
         val name1 = uid("N")
         val name2 = uid("N")
