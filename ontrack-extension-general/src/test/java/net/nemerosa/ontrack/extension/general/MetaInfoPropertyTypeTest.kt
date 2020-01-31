@@ -1,46 +1,53 @@
-package net.nemerosa.ontrack.extension.general;
+package net.nemerosa.ontrack.extension.general
 
-import org.junit.Test;
+import com.nhaarman.mockitokotlin2.mock
+import net.nemerosa.ontrack.extension.general.MetaInfoPropertyItem.Companion.of
+import net.nemerosa.ontrack.ui.controller.MockURIBuilder
+import org.junit.Test
+import java.util.*
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-import java.util.Arrays;
-import java.util.Collections;
+class MetaInfoPropertyTypeTest {
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-public class MetaInfoPropertyTypeTest {
-
-    private MetaInfoPropertyType type = new MetaInfoPropertyType(
-            new GeneralExtensionFeature()
-    );
+    private val type = MetaInfoPropertyType(
+            extensionFeature = GeneralExtensionFeature(),
+            searchIndexService = mock(),
+            metaInfoSearchExtension = MetaInfoSearchExtension(
+                    extensionFeature = GeneralExtensionFeature(),
+                    uriBuilder = MockURIBuilder(),
+                    propertyService = mock(),
+                    structureService = mock(),
+                    securityService = mock()
+            )
+    )
 
     @Test
-    public void containsValueNOKIfWrongFormat() {
-        assertFalse(type.containsValue(new MetaInfoProperty(Collections.singletonList(
-                MetaInfoPropertyItem.Companion.of("name", "value")
-        )), "value"));
+    fun containsValueNOKIfWrongFormat() {
+        assertFalse(type.containsValue(MetaInfoProperty(listOf(
+                of("name", "value")
+        )), "value"))
     }
 
     @Test
-    public void containsValueNOKIfNotFound() {
-        assertFalse(type.containsValue(new MetaInfoProperty(Collections.singletonList(
-                MetaInfoPropertyItem.Companion.of("name", "value1")
-        )), "name:value"));
+    fun containsValueNOKIfNotFound() {
+        assertFalse(type.containsValue(MetaInfoProperty(listOf(
+                of("name", "value1")
+        )), "name:value"))
     }
 
     @Test
-    public void containsValueOKIfFound() {
-        assertTrue(type.containsValue(new MetaInfoProperty(Collections.singletonList(
-                MetaInfoPropertyItem.Companion.of("name", "value1")
-        )), "name:value1"));
+    fun containsValueOKIfFound() {
+        assertTrue(type.containsValue(MetaInfoProperty(listOf(
+                of("name", "value1")
+        )), "name:value1"))
     }
 
     @Test
-    public void containsValueOKIfFoundAmongOthers() {
-        assertTrue(type.containsValue(new MetaInfoProperty(Arrays.asList(
-                MetaInfoPropertyItem.Companion.of("name1", "value1"),
-                MetaInfoPropertyItem.Companion.of("name2", "value2")
-        )), "name2:value2"));
+    fun containsValueOKIfFoundAmongOthers() {
+        assertTrue(type.containsValue(MetaInfoProperty(Arrays.asList(
+                of("name1", "value1"),
+                of("name2", "value2")
+        )), "name2:value2"))
     }
-
 }

@@ -9,24 +9,22 @@ class MetaInfoSearchItemTest {
     @Test
     fun `Map representation`() {
         val item = MetaInfoSearchItem(
-                name = "name",
-                value = "some-value",
-                link = null,
-                category = null,
+                items = mapOf("name" to "some-value"),
                 entityType = ProjectEntityType.BRANCH,
                 entityId = 10
         )
+        assertEquals("BRANCH::10", item.id)
         val actual = item.fields
         assertEquals(
                 mapOf(
-                        "name" to "name",
-                        "value" to "some-value",
-                        "link" to null,
-                        "category" to null,
+                        "items" to mapOf(
+                                "name" to "some-value"
+                        ),
+                        "keys" to listOf(
+                                "name:some-value"
+                        ),
                         "entityType" to ProjectEntityType.BRANCH,
-                        "entityId" to 10,
-                        "key" to "name:some-value",
-                        "id" to "BRANCH::10"
+                        "entityId" to 10
                 ),
                 actual
         )
