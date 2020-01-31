@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.SearchResult
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -74,6 +73,70 @@ class ACCDSLSearch extends AbstractACCDSL {
         // Checks that we do NOT find the build any longer
         def newResults = ontrack.search("$name:$value")
         assert !newResults.find { it.title == "Build ${build.project}/${build.branch}/${build.name}" }: "Build not found"
+
+    }
+
+    @Test
+    void 'Searching for a branch based on its meta information'() {
+        def project = uid('P')
+        def name = uid('N')
+        def value = uid('V')
+        ontrack.project(project) {
+            branch('test-1') {
+                config {
+                    metaInfo name, "${value}-1"
+                }
+            }
+            branch('test-2') {
+                config {
+                    metaInfo name, "${value}-2"
+                }
+            }
+        }
+
+        def branch1 = ontrack.branch(project, 'test-1')
+        def branch2 = ontrack.branch(project, 'test-2')
+
+        // Checks that we find two builds on exact match but with according scores
+        def results = ontrack.search("$name:${value}-1")
+        def branch1Result = results.find { it.title == "Branch ${branch1.project}/${branch1.name}" }
+        assert branch1Result: "Branch 1 found"
+        def branch2Result = results.find { it.title == "Branch ${branch2.project}/${branch2.name}" }
+        assert branch2Result: "Branch 2 found"
+        assert branch1Result.accuracy > branch2Result.accuracy: "Branch 1 has a better score than branch 2"
+
+        // Checks that we find two branches on prefix match
+        results = ontrack.search("$name:$value")
+        assert results.find { it.title == "Branch ${branch1.project}/${branch1.name}" }: "Branch 1 found"
+        assert results.find { it.title == "Branch ${branch2.project}/${branch2.name}" }: "Branch 2 found"
+
+    }
+
+    @Test
+    void 'Searching for a branch based on its meta information after it has been deleted does not return any result'() {
+        def project = uid('P')
+        def name = uid('N')
+        def value = uid('V')
+        ontrack.project(project) {
+            branch('test') {
+                config {
+                    metaInfo name, value
+                }
+            }
+        }
+
+        def branch = ontrack.branch(project, 'test')
+
+        // Checks that we find the branch
+        def results = ontrack.search("$name:$value")
+        assert results.find { it.title == "Branch ${branch.project}/${branch.name}" }: "Branch found"
+
+        // Deletes the branch
+        branch.delete()
+
+        // Checks that we do NOT find the branch any longer
+        def newResults = ontrack.search("$name:$value")
+        assert !newResults.find { it.title == "Branch ${branch.project}/${branch.name}" }: "Branch not found"
 
     }
 
