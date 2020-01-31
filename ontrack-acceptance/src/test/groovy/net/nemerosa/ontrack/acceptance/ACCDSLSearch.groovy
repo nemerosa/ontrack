@@ -140,4 +140,60 @@ class ACCDSLSearch extends AbstractACCDSL {
 
     }
 
+    @Test
+    void 'Searching for a project based on its meta information'() {
+        def project1Name = uid('P')
+        def project2Name = uid('P')
+        def name = uid('N')
+        def value = uid('V')
+        ontrack.project(project1Name) {
+            config {
+                metaInfo name, "${value}-1"
+            }
+        }
+        ontrack.project(project2Name) {
+            config {
+                metaInfo name, "${value}-2"
+            }
+        }
+
+        // Checks that we find two projects on exact match but with according scores
+        def results = ontrack.search("$name:${value}-1")
+        def project1Result = results.find { it.title == "Project ${project1Name}" }
+        assert project1Result: "Project 1 found"
+        def project2Result = results.find { it.title == "Project ${project2Name}" }
+        assert project2Result: "Project 2 found"
+        assert project1Result.accuracy > project2Result.accuracy: "Project 1 has a better score than project 2"
+
+        // Checks that we find two projects on prefix match
+        results = ontrack.search("$name:$value")
+        assert results.find { it.title == "Project ${project1Name}" }: "Project 1 found"
+        assert results.find { it.title == "Project ${project2Name}" }: "Project 2 found"
+
+    }
+
+    @Test
+    void 'Searching for a project based on its meta information after it has been deleted does not return any result'() {
+        def projectName = uid('P')
+        def name = uid('N')
+        def value = uid('V')
+        def project = ontrack.project(projectName) {
+            config {
+                metaInfo name, value
+            }
+        }
+
+        // Checks that we find the project
+        def results = ontrack.search("$name:$value")
+        assert results.find { it.title == "Project ${projectName}" }: "Project found"
+
+        // Deletes the project
+        project.delete()
+
+        // Checks that we do NOT find the project any longer
+        def newResults = ontrack.search("$name:$value")
+        assert !newResults.find { it.title == "Project ${projectName}" }: "Project not found"
+
+    }
+
 }
