@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
@@ -56,13 +56,13 @@ class MetaInfoSearchExtension(
                 securityService.isProjectFunctionGranted(entity, ProjectView::class.java)
             }
             // Returns search results
-            entities.mapNotNull { entity -> toSearchResult(entity, name, 100.0) }
+            entities.mapNotNull { entity -> toSearchResult(entity, name) }
         } else {
             emptyList()
         }
     }
 
-    protected fun toSearchResult(entity: ProjectEntity, name: String, score: Double): SearchResult? {
+    protected fun toSearchResult(entity: ProjectEntity, name: String): SearchResult? {
         // Gets the property value for the meta info name (required)
         val value = propertyService.getProperty(entity, MetaInfoPropertyType::class.java).value?.getValue(name)
         // OK
@@ -72,7 +72,7 @@ class MetaInfoSearchExtension(
                     String.format("%s -> %s", name, this),
                     uriBuilder.getEntityURI(entity),
                     uriBuilder.getEntityPage(entity),
-                    score
+                    100.0
             )
         }
     }
@@ -82,17 +82,15 @@ class MetaInfoSearchExtension(
 
     override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
         propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
-            property.items.forEach {
-                val item = MetaInfoSearchItem(
-                        name = it.name,
-                        value = it.value,
-                        link = it.link,
-                        category = it.category,
-                        entityType = entityId.type,
-                        entityId = entityId.id
-                )
-                processor(item)
-            }
+            processor(
+                    MetaInfoSearchItem(
+                            items = property.items.map {
+                                it.name to (it.value ?: "")
+                            }.associate { it },
+                            entityType = entityId.type,
+                            entityId = entityId.id
+                    )
+            )
         }
     }
 
@@ -109,7 +107,15 @@ class MetaInfoSearchExtension(
             securityService.isProjectFunctionGranted(it, ProjectView::class.java)
         }
         // Conversion (using legacy code)
-        return entity?.let { toSearchResult(it, item.name, score) }
+        return entity?.let {
+            SearchResult(
+                    entity.entityDisplayName,
+                    item.items.map { (name, value) -> "$name -> $value" }.sorted().joinToString(", "),
+                    uriBuilder.getEntityURI(entity),
+                    uriBuilder.getEntityPage(entity),
+                    score
+            )
+        }
     }
 
 }
@@ -124,19 +130,20 @@ const val META_INFO_SEPARATOR = ":"
  */
 const val META_INFO_SEARCH_INDEX = "meta-info-properties"
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class MetaInfoSearchItem(
-        val name: String,
-        val value: String?,
-        val link: String?,
-        val category: String?,
+        val items: Map<String, String>,
         val entityType: ProjectEntityType,
         val entityId: Int
 ) : SearchItem {
 
     override val id: String = "$entityType::$entityId"
 
-    val key = "$name$META_INFO_SEPARATOR${value ?: ""}"
-
-    override val fields: Map<String, Any?> = asMap(MetaInfoSearchItem::fields.name)
+    override val fields: Map<String, Any?> = mapOf(
+            "keys" to items.map { (name, value) -> "$name$META_INFO_SEPARATOR$value" },
+            "items" to items,
+            "entityType" to entityType,
+            "entityId" to entityId
+    )
 
 }
