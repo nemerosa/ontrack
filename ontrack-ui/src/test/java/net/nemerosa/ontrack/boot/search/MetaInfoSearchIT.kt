@@ -14,6 +14,34 @@ import kotlin.test.assertTrue
 class MetaInfoSearchIT : AbstractSearchTestSupport() {
 
     @Test
+    fun `Looking for builds with meta information after creation`() {
+        val name = uid("N")
+        val value = uid("V")
+        project {
+            branch {
+                val build1 = build {
+                    metaInfo(name to "${value}1")
+                }
+                val build2 = build {
+                    metaInfo(name to "${value}2")
+                }
+                // Indexation of meta information
+                // FIXME #723 Rely on events for the indexation
+                index(META_INFO_SEARCH_INDEX)
+                // Looks for exact match
+                val exactMatches = searchService.search(SearchRequest("$name:${value}1")).toList()
+                val exactMatch = exactMatches.find { it.title == build1.entityDisplayName } ?: error("Exact match not found")
+                val variantMatch = exactMatches.find { it.title == build2.entityDisplayName } ?: error("Variant not found")
+                assertTrue(exactMatch.accuracy > variantMatch.accuracy, "Exact match scope is higher than non exact match")
+                // Looks for prefix
+                val prefixMatches = searchService.search(SearchRequest("$name:$value")).toList()
+                assertTrue(prefixMatches.any { it.title == build1.entityDisplayName }, "Build 1 found")
+                assertTrue(prefixMatches.any { it.title == build2.entityDisplayName }, "Build 2 found")
+            }
+        }
+    }
+
+    @Test
     fun `Looking for a build with meta information`() {
         val name = uid("N")
         val value = uid("V")
@@ -36,6 +64,7 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                         metaInfo(uid("N") to uid("W"))
                     }
                 }
+
                 // Indexation of meta information
                 index(META_INFO_SEARCH_INDEX)
 

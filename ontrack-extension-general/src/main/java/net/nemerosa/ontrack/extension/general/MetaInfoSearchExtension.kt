@@ -56,13 +56,13 @@ class MetaInfoSearchExtension(
                 securityService.isProjectFunctionGranted(entity, ProjectView::class.java)
             }
             // Returns search results
-            entities.mapNotNull { entity -> toSearchResult(entity, name) }
+            entities.mapNotNull { entity -> toSearchResult(entity, name, 100.0) }
         } else {
             emptyList()
         }
     }
 
-    protected fun toSearchResult(entity: ProjectEntity, name: String): SearchResult? {
+    protected fun toSearchResult(entity: ProjectEntity, name: String, score: Double): SearchResult? {
         // Gets the property value for the meta info name (required)
         val value = propertyService.getProperty(entity, MetaInfoPropertyType::class.java).value?.getValue(name)
         // OK
@@ -72,7 +72,7 @@ class MetaInfoSearchExtension(
                     String.format("%s -> %s", name, this),
                     uriBuilder.getEntityURI(entity),
                     uriBuilder.getEntityPage(entity),
-                    100.0
+                    score
             )
         }
     }
@@ -100,16 +100,16 @@ class MetaInfoSearchExtension(
         // Parsing
         val item = source.parseOrNull<MetaInfoSearchItem>()
         // Conversion
-        return item?.let { toSearchResult(it) }
+        return item?.let { toSearchResult(it, score) }
     }
 
-    private fun toSearchResult(item: MetaInfoSearchItem): SearchResult? {
+    private fun toSearchResult(item: MetaInfoSearchItem, score: Double): SearchResult? {
         // Loads the entity
         val entity: ProjectEntity? = item.entityType.getEntityFn(structureService).apply(ID.of(item.entityId))?.takeIf {
             securityService.isProjectFunctionGranted(it, ProjectView::class.java)
         }
         // Conversion (using legacy code)
-        return entity?.let { toSearchResult(it, item.name) }
+        return entity?.let { toSearchResult(it, item.name, score) }
     }
 
 }
