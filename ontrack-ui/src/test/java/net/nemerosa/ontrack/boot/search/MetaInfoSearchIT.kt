@@ -30,13 +30,39 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                 index(META_INFO_SEARCH_INDEX)
                 // Looks for exact match
                 val exactMatches = searchService.search(SearchRequest("$name:${value}1")).toList()
-                val exactMatch = exactMatches.find { it.title == build1.entityDisplayName } ?: error("Exact match not found")
-                val variantMatch = exactMatches.find { it.title == build2.entityDisplayName } ?: error("Variant not found")
+                val exactMatch = exactMatches.find { it.title == build1.entityDisplayName }
+                        ?: error("Exact match not found")
+                val variantMatch = exactMatches.find { it.title == build2.entityDisplayName }
+                        ?: error("Variant not found")
                 assertTrue(exactMatch.accuracy > variantMatch.accuracy, "Exact match scope is higher than non exact match")
                 // Looks for prefix
                 val prefixMatches = searchService.search(SearchRequest("$name:$value")).toList()
                 assertTrue(prefixMatches.any { it.title == build1.entityDisplayName }, "Build 1 found")
                 assertTrue(prefixMatches.any { it.title == build2.entityDisplayName }, "Build 2 found")
+            }
+        }
+    }
+
+    @Test
+    fun `Looking for builds with several meta info items`() {
+        val name1 = uid("N")
+        val name2 = uid("N")
+        val value1 = uid("V")
+        val value2 = uid("V")
+        project {
+            branch {
+                val build1 = build {
+                    metaInfo(name1 to value1, name2 to value2)
+                }
+                val build2 = build {
+                    metaInfo(name1 to value1)
+                }
+                // Indexation of meta information
+                index(META_INFO_SEARCH_INDEX)
+                // Search should return those two builds
+                val results = searchService.search(SearchRequest("$name1:value1")).toList()
+                assertTrue(results.any { it.title == build1.entityDisplayName }, "Build 1 found")
+                assertTrue(results.any { it.title == build2.entityDisplayName }, "Build 2 found")
             }
         }
     }
