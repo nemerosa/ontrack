@@ -4,7 +4,6 @@ import io.searchbox.client.JestClient
 import io.searchbox.core.Bulk
 import io.searchbox.core.Delete
 import io.searchbox.core.Index
-import io.searchbox.core.Update
 import io.searchbox.indices.Refresh
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
@@ -105,9 +104,11 @@ class ElasticSearchIndexService(
     override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {
         logger.debug("Delete index ${indexer.indexName}")
         jestClient.execute(
-                Delete.Builder(id)
-                        .index(indexer.indexName)
-                        .build()
+                Bulk.Builder().addAction(
+                        Delete.Builder(id)
+                                .index(indexer.indexName)
+                                .build()
+                ).build()
         )
         // Refreshes the index
         immediateRefreshIfRequested(indexer)

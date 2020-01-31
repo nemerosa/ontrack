@@ -66,6 +66,29 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
     }
 
     @Test
+    fun `Looking for builds with meta information after deletion of property`() {
+        val name = uid("N")
+        val value = uid("V")
+        project {
+            branch {
+                val build = build {
+                    metaInfo(name to value)
+                }
+                // Looks for exact match now
+                searchService.search(SearchRequest("$name:$value")).toList().apply {
+                    assertTrue(any { it.title == build.entityDisplayName }, "Build found with meta information")
+                }
+                // Deleting the meta info
+                deleteProperty(build, MetaInfoPropertyType::class.java)
+                // Looks for exact match now should not return this build
+                searchService.search(SearchRequest("$name:$value")).toList().apply {
+                    assertTrue(none { it.title == build.entityDisplayName }, "Build not found with meta information")
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Looking for builds with several meta info items`() {
         val name1 = uid("N")
         val name2 = uid("N")
