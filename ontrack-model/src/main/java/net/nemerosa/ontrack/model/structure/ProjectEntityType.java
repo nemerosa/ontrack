@@ -9,15 +9,15 @@ import java.util.function.Function;
  */
 public enum ProjectEntityType {
 
-    PROJECT("project", StructureService::getProject),
+    PROJECT("project", StructureService::getProject, StructureService::findProjectByID),
 
-    BRANCH("branch", StructureService::getBranch),
+    BRANCH("branch", StructureService::getBranch, StructureService::findBranchByID),
 
     PROMOTION_LEVEL("promotion level", StructureService::getPromotionLevel),
 
     VALIDATION_STAMP("validation stamp", StructureService::getValidationStamp),
 
-    BUILD("build", StructureService::getBuild),
+    BUILD("build", StructureService::getBuild, StructureService::findBuildByID),
 
     PROMOTION_RUN("promotion run", StructureService::getPromotionRun),
 
@@ -25,10 +25,20 @@ public enum ProjectEntityType {
 
     private final String displayName;
     private final BiFunction<StructureService, ID, ProjectEntity> entityFn;
+    private final BiFunction<StructureService, ID, ProjectEntity> findEntityFn;
 
     ProjectEntityType(String displayName, BiFunction<StructureService, ID, ProjectEntity> entityFn) {
+        this(displayName, entityFn, entityFn);
+    }
+
+    ProjectEntityType(String displayName, BiFunction<StructureService, ID, ProjectEntity> entityFn, BiFunction<StructureService, ID, ProjectEntity> findEntityFn) {
         this.displayName = displayName;
         this.entityFn = entityFn;
+        this.findEntityFn = findEntityFn;
+    }
+
+    public Function<ID, ProjectEntity> getFindEntityFn(StructureService structureService) {
+        return id -> findEntityFn.apply(structureService, id);
     }
 
     public Function<ID, ProjectEntity> getEntityFn(StructureService structureService) {
