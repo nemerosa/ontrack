@@ -78,17 +78,15 @@ class MetaInfoSearchExtension(
     }
 
     override val indexerName: String = "Meta info properties"
+
     override val indexName: String = META_INFO_SEARCH_INDEX
 
     override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
         propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
             processor(
                     MetaInfoSearchItem(
-                            items = property.items.map {
-                                it.name to (it.value ?: "")
-                            }.associate { it },
-                            entityType = entityId.type,
-                            entityId = entityId.id
+                            entityId = entityId,
+                            property = property
                     )
             )
         }
@@ -136,6 +134,19 @@ class MetaInfoSearchItem(
         val entityType: ProjectEntityType,
         val entityId: Int
 ) : SearchItem {
+
+    constructor(entity: ProjectEntity, property: MetaInfoProperty) : this(
+            entityId = ProjectEntityID(entity.projectEntityType, entity.id()),
+            property = property
+    )
+
+    constructor(entityId: ProjectEntityID, property: MetaInfoProperty) : this(
+            items = property.items.map {
+                it.name to (it.value ?: "")
+            }.associate { it },
+            entityType = entityId.type,
+            entityId = entityId.id
+    )
 
     override val id: String = "$entityType::$entityId"
 

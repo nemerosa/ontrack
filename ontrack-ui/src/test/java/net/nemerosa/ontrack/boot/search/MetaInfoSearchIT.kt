@@ -25,9 +25,6 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                 val build2 = build {
                     metaInfo(name to "${value}2")
                 }
-                // Indexation of meta information
-                // FIXME #723 Rely on events for the indexation
-                index(META_INFO_SEARCH_INDEX)
                 // Looks for exact match
                 val exactMatches = searchService.search(SearchRequest("$name:${value}1")).toList()
                 val exactMatch = exactMatches.find { it.title == build1.entityDisplayName }
