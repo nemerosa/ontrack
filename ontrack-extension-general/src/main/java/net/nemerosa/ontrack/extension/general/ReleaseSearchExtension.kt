@@ -1,12 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
-import net.nemerosa.ontrack.model.security.ProjectView
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
@@ -17,8 +14,7 @@ class ReleaseSearchExtension(
         extensionFeature: GeneralExtensionFeature,
         private val uriBuilder: URIBuilder,
         private val propertyService: PropertyService,
-        private val structureService: StructureService,
-        private val securityService: SecurityService
+        private val structureService: StructureService
 ) : AbstractExtension(
         extensionFeature
 ), SearchExtension, SearchIndexer<ReleaseSearchItem> {
@@ -75,9 +71,7 @@ class ReleaseSearchExtension(
 
     private fun toSearchResult(item: ReleaseSearchItem, score: Double): SearchResult? {
         // Loads the entity
-        val entity: ProjectEntity? = item.entityType.getEntityFn(structureService).apply(ID.of(item.entityId))?.takeIf {
-            securityService.isProjectFunctionGranted(it, ProjectView::class.java)
-        }
+        val entity: ProjectEntity? = item.entityType.getFindEntityFn(structureService).apply(ID.of(item.entityId))
         // Conversion
         return entity?.let {
             SearchResult(
@@ -101,6 +95,17 @@ data class ReleaseSearchItem(
         val entityType: ProjectEntityType,
         val entityId: Int
 ) : SearchItem {
+
+    constructor(entity: ProjectEntity, property: ReleaseProperty) : this(
+            release = property.name,
+            entityType = entity.projectEntityType,
+            entityId = entity.id()
+    )
+
     override val id: String = "$entityType::$entityId"
-    override val fields: Map<String, Any?> = asMap(ReleaseSearchItem::fields.name)
+    override val fields: Map<String, Any?> = mapOf(
+            "release" to release,
+            "entityType" to entityType,
+            "entityId" to entityId
+    )
 }
