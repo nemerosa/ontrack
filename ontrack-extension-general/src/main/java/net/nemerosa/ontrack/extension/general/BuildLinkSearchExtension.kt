@@ -1,79 +1,63 @@
-package net.nemerosa.ontrack.extension.general;
+package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.extension.api.SearchExtension;
-import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.SearchProvider;
-import net.nemerosa.ontrack.model.structure.SearchResult;
-import net.nemerosa.ontrack.model.structure.StructureService;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.support.AbstractSearchProvider;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import net.nemerosa.ontrack.extension.api.SearchExtension
+import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.SearchProvider
+import net.nemerosa.ontrack.model.structure.SearchResult
+import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.ui.controller.URIBuilder
+import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
+import org.apache.commons.lang3.StringUtils
+import org.springframework.stereotype.Component
+import java.util.stream.Collectors
 
 /**
  * Searching on the build links.
  */
 @Component
-public class BuildLinkSearchExtension extends AbstractExtension implements SearchExtension {
+class BuildLinkSearchExtension(
+        extensionFeature: GeneralExtensionFeature,
+        private val uriBuilder: URIBuilder,
+        private val structureService: StructureService
+) : AbstractExtension(extensionFeature), SearchExtension {
 
-    private final URIBuilder uriBuilder;
-    private final StructureService structureService;
-
-    @Autowired
-    public BuildLinkSearchExtension(GeneralExtensionFeature extensionFeature, URIBuilder uriBuilder, StructureService structureService) {
-        super(extensionFeature);
-        this.uriBuilder = uriBuilder;
-        this.structureService = structureService;
-    }
-
-    @Override
-    public SearchProvider getSearchProvider() {
-        return new AbstractSearchProvider(uriBuilder) {
-            @Override
-            public boolean isTokenSearchable(String token) {
-                return BuildLinkSearchExtension.this.isTokenSearchable(token);
+    override fun getSearchProvider(): SearchProvider {
+        return object : AbstractSearchProvider(uriBuilder) {
+            override fun isTokenSearchable(token: String): Boolean {
+                return this@BuildLinkSearchExtension.isTokenSearchable(token)
             }
 
-            @Override
-            public Collection<SearchResult> search(String token) {
-                return BuildLinkSearchExtension.this.search(token);
+            override fun search(token: String): Collection<SearchResult> {
+                return this@BuildLinkSearchExtension.search(token)
             }
-        };
-    }
-
-    protected boolean isTokenSearchable(String token) {
-        return StringUtils.indexOf(token, ":") > 0;
-    }
-
-    protected Collection<SearchResult> search(String token) {
-        if (isTokenSearchable(token)) {
-            String project = StringUtils.substringBefore(token, ":");
-            String buildName = StringUtils.substringAfter(token, ":");
-            // Searchs for all builds which are linked to project:build*
-            List<Build> builds = structureService.searchBuildsLinkedTo(project, buildName);
-            // Returns search results
-            return builds.stream()
-                    .map(this::toSearchResult)
-                    .collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
         }
     }
 
-    protected SearchResult toSearchResult(Build build) {
-        return new SearchResult(
-                build.getEntityDisplayName(),
-                String.format("%s -> %s", build.getProject().getName(), build.getName()),
+    fun isTokenSearchable(token: String): Boolean {
+        return StringUtils.indexOf(token, ":") > 0
+    }
+
+    protected fun search(token: String): Collection<SearchResult> {
+        return if (isTokenSearchable(token)) {
+            val project = StringUtils.substringBefore(token, ":")
+            val buildName = StringUtils.substringAfter(token, ":")
+            // Searches for all builds which are linked to project:build*
+            val builds = structureService.searchBuildsLinkedTo(project, buildName)
+            // Returns search results
+            builds.map { build: Build -> toSearchResult(build) }
+        } else {
+            emptyList()
+        }
+    }
+
+    protected fun toSearchResult(build: Build): SearchResult {
+        return SearchResult(
+                build.entityDisplayName, "${build.project.name} -> ${build.name}",
                 uriBuilder.getEntityURI(build),
                 uriBuilder.getEntityPage(build),
-                100
-        );
+                100.0
+        )
     }
+
 }
