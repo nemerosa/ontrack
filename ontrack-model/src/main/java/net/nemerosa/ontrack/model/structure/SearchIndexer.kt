@@ -40,6 +40,11 @@ interface SearchIndexer<T : SearchItem> {
     val indexName: String
 
     /**
+     * Index mapping if defined
+     */
+    val indexMapping: SearchIndexMapping? get() = null
+
+    /**
      * Index all elements.
      */
     fun indexAll(processor: (T) -> Unit)

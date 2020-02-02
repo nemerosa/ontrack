@@ -7,9 +7,9 @@ import io.searchbox.core.Index
 import io.searchbox.indices.CreateIndex
 import io.searchbox.indices.DeleteIndex
 import io.searchbox.indices.Refresh
-import net.nemerosa.ontrack.model.structure.SearchIndexService
-import net.nemerosa.ontrack.model.structure.SearchIndexer
-import net.nemerosa.ontrack.model.structure.SearchItem
+import io.searchbox.indices.mapping.DeleteMapping
+import io.searchbox.indices.mapping.PutMapping
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,6 +56,59 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {
         jestClient.execute(CreateIndex.Builder(indexer.indexName).build())
+        indexer.indexMapping?.let {
+            jestClient.execute(
+                    DeleteMapping.Builder(
+                            indexer.indexName,
+                            indexer.indexName
+                    ).build()
+            )
+            jestClient.execute(
+                    PutMapping.Builder(
+                            indexer.indexName,
+                            indexer.indexName,
+                            mappingToMap(it)
+                    ).build()
+            )
+        }
+    }
+
+    /**
+     * Converts a generic mapping into an ElasticSearch mapping.
+     */
+    private fun mappingToMap(mapping: SearchIndexMapping): Map<String, Any> {
+        return mapOf(
+                "properties" to mapping.fields
+                        .filter { it.types.isNotEmpty() }
+                        .associate { fieldMapping ->
+                            // Property mapping
+                            val property = mutableMapOf<String, Any>()
+                            // Primary type
+                            val primary = fieldMapping.types[0]
+                            setType(property, primary)
+                            // Other fields
+                            if (fieldMapping.types.size > 1) {
+                                val fields = mutableMapOf<String, Any>()
+                                property["fields"] = fields
+                                fieldMapping.types.drop(1)
+                                        .forEach { type ->
+                                            if (!type.type.isNullOrBlank()) {
+                                                val typeMap = mutableMapOf<String, Any>()
+                                                fields[type.type!!] = typeMap
+                                                setType(typeMap, type)
+                                            }
+                                        }
+                            }
+                            // OK
+                            fieldMapping.name to property
+                        }
+        )
+    }
+
+    private fun setType(property: MutableMap<String, Any>, type: SearchIndexMappingFieldType) {
+        type.index?.let { property["index"] = it }
+        type.type?.let { property["type"] = it }
+        type.scoreBoost?.let { property["boost"] = it }
     }
 
     override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {

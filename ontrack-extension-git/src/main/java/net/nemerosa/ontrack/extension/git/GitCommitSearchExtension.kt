@@ -80,6 +80,27 @@ class GitCommitSearchExtension(
 
     override val indexerSchedule: Schedule = Schedule.EVERY_HOUR
 
+    override val indexMapping: SearchIndexMapping? = indexMappings<GitCommitSearchItem> {
+        +GitCommitSearchItem::projectId to {
+            index = false
+        }
+        +GitCommitSearchItem::gitType to {
+            index = false
+        }
+        +GitCommitSearchItem::gitName to {
+            index = false
+        }
+        +GitCommitSearchItem::commit to {
+            scoreBoost = 3.0
+        }
+        +GitCommitSearchItem::commitShort to {
+            scoreBoost = 2.0
+        }
+        +GitCommitSearchItem::commitAuthor to {
+            type = "keyword"
+        }
+    }
+
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
             gitService.sync(gitConfiguration, GitSynchronisationRequest(false))?.let {
@@ -121,10 +142,8 @@ const val GIT_COMMIT_SEARCH_INDEX = "git-commit"
 
 class GitCommitSearchItem(
         val projectId: Int,
-        val projectName: String,
         val gitType: String,
         val gitName: String,
-        val gitRemote: String,
         val commit: String,
         val commitShort: String,
         val commitAuthor: String,
@@ -133,24 +152,20 @@ class GitCommitSearchItem(
 
     constructor(project: Project, gitConfiguration: GitConfiguration, commit: GitCommit) : this(
             projectId = project.id(),
-            projectName = project.name,
             gitType = gitConfiguration.type,
             gitName = gitConfiguration.name,
-            gitRemote = gitConfiguration.remote,
             commit = commit.id,
             commitShort = commit.shortId,
             commitAuthor = commit.author.name,
             commitMessage = commit.shortMessage
     )
 
-    override val id: String = "$projectName::$gitName::$commit"
+    override val id: String = "$gitName::$commit"
 
     override val fields: Map<String, Any?> = asMap(
             this::projectId,
-            this::projectName,
             this::gitType,
             this::gitName,
-            this::gitRemote,
             this::commit,
             this::commitAuthor,
             this::commitShort,
