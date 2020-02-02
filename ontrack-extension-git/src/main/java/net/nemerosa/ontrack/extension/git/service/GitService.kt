@@ -202,4 +202,9 @@ interface GitService : SCMService {
      * Collects and stores the [IndexableGitCommit]s one build.
      */
     fun collectIndexableGitCommitForBuild(build: Build)
+
+    /**
+     * Loops over the commits of a configuration
+     */
+    fun forEachCommit(gitConfiguration: GitConfiguration, code: (GitCommit) -> Unit)
 }

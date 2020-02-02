@@ -343,6 +343,13 @@ class GitServiceImpl(
         return gitClient.getCommitFor(id)
     }
 
+    override fun forEachCommit(gitConfiguration: GitConfiguration, code: (GitCommit) -> Unit) {
+        // Gets the client client for this configuration
+        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+        // Looping
+        gitClient.forEachCommit(code)
+    }
+
     override fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo {
         return getOntrackGitCommitInfo(structureService.getProject(projectId), commit)
     }
@@ -841,10 +848,10 @@ class GitServiceImpl(
 
     override fun getCommitForBuild(build: Build): IndexableGitCommit? =
             entityDataService.retrieve(
-            build,
-            "git-commit",
-            IndexableGitCommit::class.java
-    )
+                    build,
+                    "git-commit",
+                    IndexableGitCommit::class.java
+            )
 
     override fun setCommitForBuild(build: Build, commit: IndexableGitCommit) {
         entityDataService.store(

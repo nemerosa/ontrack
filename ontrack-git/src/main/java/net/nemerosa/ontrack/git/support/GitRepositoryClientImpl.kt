@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.lang.String.format
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -279,6 +278,18 @@ class GitRepositoryClientImpl(
         }
     }
 
+    override fun forEachCommit(code: (GitCommit) -> Unit) {
+        try {
+            git.log().call()
+                    .map { toCommit(it) }
+                    .forEach(code)
+        } catch (e: GitAPIException) {
+            throw GitRepositoryAPIException(repository.remote, e)
+        } catch (e: IOException) {
+            throw GitRepositoryIOException(repository.remote, e)
+        }
+    }
+
     override fun log(from: String, to: String): Stream<GitCommit> {
         try {
             val gitRepository = git.repository
@@ -299,7 +310,6 @@ class GitRepositoryClientImpl(
         } catch (e: IOException) {
             throw GitRepositoryIOException(repository.remote, e)
         }
-
     }
 
     override fun graph(from: String, to: String): GitLog {

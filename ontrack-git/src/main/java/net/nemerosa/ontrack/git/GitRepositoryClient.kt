@@ -105,6 +105,11 @@ interface GitRepositoryClient {
     fun <T> forEachCommitFrom(branch: String, commit: String, include: Boolean = true, code: (RevCommit) -> T?): T?
 
     /**
+     * Loops through all commmits of a repository.
+     */
+    fun forEachCommit(code: (GitCommit) -> Unit)
+
+    /**
      * Gets the earliest commit that contains the commit.
      *
      *
@@ -183,4 +188,5 @@ interface GitRepositoryClient {
      * whose message matches the given [regex] regular expression.
      */
     fun getLastCommitForExpression(regex: String): String?
+
 }
