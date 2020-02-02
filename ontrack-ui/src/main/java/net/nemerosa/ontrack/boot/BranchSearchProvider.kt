@@ -57,7 +57,7 @@ class BranchSearchProvider(
             structureService.findBranchByID(ID.of(id.toInt()))?.run {
                 SearchResult(
                         entityDisplayName,
-                        description,
+                        description ?: "",
                         uriBuilder.getEntityURI(this),
                         uriBuilder.getEntityPage(this),
                         score
@@ -99,7 +99,7 @@ class BranchSearchItem(
     constructor(branch: Branch) : this(
             id = branch.id.toString(),
             name = branch.name,
-            description = branch.description,
+            description = branch.description ?: "",
             project = branch.project.name
     )
 

@@ -70,7 +70,7 @@ class ProjectSearchProvider(
         return structureService.findProjectByID(ID.of(id.toInt()))?.run {
             SearchResult(
                     entityDisplayName,
-                    description,
+                    description ?: "",
                     uriBuilder.getEntityURI(this),
                     uriBuilder.getEntityPage(this),
                     score
@@ -107,7 +107,7 @@ class ProjectSearchItem(
     constructor(project: Project) : this(
             id = project.id.toString(),
             name = project.name,
-            description = project.description
+            description = project.description ?: ""
     )
 
     override val fields: Map<String, Any> = mapOf(

@@ -63,7 +63,7 @@ class BuildSearchProvider(
             structureService.findBuildByID(ID.of(id.toInt()))?.run {
                 SearchResult(
                         entityDisplayName,
-                        description,
+                        description ?: "",
                         uriBuilder.getEntityURI(this),
                         uriBuilder.getEntityPage(this),
                         score
@@ -101,7 +101,7 @@ data class BuildSearchItem(
     constructor(build: Build) : this(
             id = build.id().toString(),
             name = build.name,
-            description = build.description
+            description = build.description ?: ""
     )
 
     override val fields: Map<String, Any?> = mapOf(
