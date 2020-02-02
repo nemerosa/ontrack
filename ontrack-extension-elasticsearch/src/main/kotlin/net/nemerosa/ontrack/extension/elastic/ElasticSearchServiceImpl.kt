@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.asJsonString
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -23,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional
 )
 class ElasticSearchServiceImpl(
         private val jestClient: JestClient,
-        private val searchProviders: List<SearchProvider>
+        private val searchProviders: List<SearchProvider>,
+        private val searchIndexService: SearchIndexService
 ) : SearchService {
 
     val indexers: Map<String, SearchIndexer<*>> by lazy {
@@ -50,6 +52,13 @@ class ElasticSearchServiceImpl(
 
         // Transforming into search results
         return hits.mapNotNull { toResult(it) }
+    }
+
+    override fun indexReset(reindex: Boolean): Ack {
+        val ok = indexers.all { (_, indexer) ->
+            searchIndexService.resetIndex(indexer, reindex)
+        }
+        return Ack(ok)
     }
 
     private fun toResult(hitNode: HitNode): SearchResult? {

@@ -160,6 +160,11 @@ class Ontrack {
         }
     }
 
+    @DSLMethod(value = "Resets all search indexes and re-index optionally", count = 1)
+    void searchIndexReset(boolean reindex = false) {
+        post('search/index/reset', [reindex: reindex])
+    }
+
     @DSLMethod(value = "Configures the general settings of Ontrack. See <<dsl-config>>.")
     def configure(Closure closure) {
         Config configResource = new Config(this)

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.elastic
 
+import net.nemerosa.ontrack.extension.elastic.ElasticSearchJobs.indexationAllJobKey
+import net.nemerosa.ontrack.extension.elastic.ElasticSearchJobs.indexationJobType
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
@@ -24,8 +26,6 @@ class ElasticSearchIndexationJobs(
         private val jobScheduler: JobScheduler
 ) : JobProvider {
 
-    private val jobCategory = JobCategory("elasticsearch", "ElasticSearch")
-    private val indexationJobType = jobCategory.getType("indexation").withName("Search indexation")
 
     override fun getStartingJobs(): Collection<JobRegistration> =
             providers.flatMap { provider ->
@@ -39,8 +39,7 @@ class ElasticSearchIndexationJobs(
             job = object : Job {
                 override fun isDisabled(): Boolean = false
 
-                override fun getKey(): JobKey =
-                        indexationJobType.getKey("all")
+                override fun getKey(): JobKey = indexationAllJobKey
 
                 override fun getDescription(): String = "All re-indexations"
 
