@@ -34,4 +34,10 @@ class SearchServiceImpl(
     override fun indexReset(reindex: Boolean): Ack {
         return Ack.NOK;
     }
+
+    /**
+     * NOP
+     */
+    override fun indexInit() {
+    }
 }

@@ -54,11 +54,15 @@ class ElasticSearchIndexService(
         immediateRefreshIfRequested(indexer)
     }
 
+    override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {
+        jestClient.execute(CreateIndex.Builder(indexer.indexName).build())
+    }
+
     override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {
         // Deletes the index
         jestClient.execute(DeleteIndex.Builder(indexer.indexName).build())
         // Re-creates the index
-        jestClient.execute(CreateIndex.Builder(indexer.indexName).build())
+        initIndex(indexer)
         // Re-index if requested
         if (reindex) {
             index(indexer)

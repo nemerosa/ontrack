@@ -10,6 +10,11 @@ public interface SearchService {
     Collection<SearchResult> search(SearchRequest request);
 
     /**
+     * Makes sure all search indexes are initialized.
+     */
+    void indexInit();
+
+    /**
      * Resetting all search indexes, optionally restoring them.
      * <p>
      * This method is mostly used for testing but could be used

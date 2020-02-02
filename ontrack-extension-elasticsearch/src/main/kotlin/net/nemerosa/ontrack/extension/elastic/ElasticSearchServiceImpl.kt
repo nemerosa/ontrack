@@ -61,6 +61,10 @@ class ElasticSearchServiceImpl(
         return Ack(ok)
     }
 
+    override fun indexInit() {
+        indexers.forEach { (_, indexer) -> searchIndexService.initIndex(indexer) }
+    }
+
     private fun toResult(hitNode: HitNode): SearchResult? {
         // Gets the indexer
         val indexer = indexers[hitNode.index]
