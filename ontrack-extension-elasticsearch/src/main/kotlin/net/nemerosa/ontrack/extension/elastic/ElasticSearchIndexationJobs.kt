@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component
 )
 class ElasticSearchIndexationJobs(
         private val providers: List<SearchProvider>,
-        private val elasticSearchService: SearchIndexService
+        private val elasticSearchService: SearchIndexService,
+        private val jobScheduler: JobScheduler
 ) : JobProvider {
 
     private val jobCategory = JobCategory("elasticsearch", "ElasticSearch")
@@ -31,7 +32,29 @@ class ElasticSearchIndexationJobs(
                 provider.searchIndexers.map { indexer ->
                     createIndexationJobRegistration(indexer)
                 }
+            } + createGlobalIndexationJob()
+
+    private fun createGlobalIndexationJob() = JobRegistration(
+            schedule = Schedule.NONE,
+            job = object : Job {
+                override fun isDisabled(): Boolean = false
+
+                override fun getKey(): JobKey =
+                        indexationJobType.getKey("all")
+
+                override fun getDescription(): String = "All re-indexations"
+
+                override fun getTask() = JobRun { listener ->
+                    listener.message("Launching all indexations")
+                    providers.flatMap { provider ->
+                        provider.searchIndexers.map { indexer ->
+                            val key = indexationJobType.getKey(indexer.indexerId)
+                            jobScheduler.fireImmediately(key)
+                        }
+                    }
+                }
             }
+    )
 
     private fun <T : SearchItem> createIndexationJobRegistration(searchIndexer: SearchIndexer<T>) = JobRegistration(
             job = createIndexationJob(searchIndexer),
