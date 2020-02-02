@@ -56,6 +56,8 @@ data class Schedule(
         @JvmField
         val EVERY_MINUTE = everyMinutes(1)
         @JvmField
+        val EVERY_HOUR = Schedule(0, 1, TimeUnit.HOURS)
+        @JvmField
         val EVERY_DAY = Schedule(0, 1, TimeUnit.DAYS)
     }
 }

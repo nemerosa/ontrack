@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.git.model.GitSynchronisationRequest
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.git.model.GitCommit
+import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -76,6 +77,8 @@ class GitCommitSearchExtension(
     override val indexerName: String = "Git commits"
 
     override val indexName: String = GIT_COMMIT_SEARCH_INDEX
+
+    override val indexerSchedule: Schedule = Schedule.EVERY_HOUR
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
