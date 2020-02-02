@@ -102,7 +102,7 @@ class GitCommitSearchExtension(
         // Conversion
         return if (item != null && project != null) {
             SearchResult(
-                    "${project.name} ${item.commitShort}",
+                    "${project.name} ${item.commit}",
                     "${item.commitAuthor}: ${item.commitMessage}",
                     uriBuilder.build(
                             MvcUriComponentsBuilder.on(GitController::class.java).commitProjectInfo(
