@@ -81,6 +81,13 @@ class MetaInfoSearchExtension(
 
     override val indexName: String = META_INFO_SEARCH_INDEX
 
+    override val indexMapping: SearchIndexMapping? = indexMappings<MetaInfoSearchItem> {
+        +MetaInfoSearchItem::entityId to id { index = false }
+        +MetaInfoSearchItem::entityType to keyword { index = false }
+        +MetaInfoSearchItem::items to nested()
+        +MetaInfoSearchItem::keys to keyword { scoreBoost = 3.0 } to text()
+    }
+
     override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
         propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
             processor(
@@ -145,6 +152,8 @@ class MetaInfoSearchItem(
             entityType = entityId.type,
             entityId = entityId.id
     )
+
+    val keys = items.map { (name, value) -> "$name$META_INFO_SEPARATOR$value" }
 
     override val id: String = "$entityType::$entityId"
 

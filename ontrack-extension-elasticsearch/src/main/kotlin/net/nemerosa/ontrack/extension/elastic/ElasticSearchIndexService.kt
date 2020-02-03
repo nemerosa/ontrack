@@ -90,7 +90,7 @@ class ElasticSearchIndexService(
                             val property = mutableMapOf<String, Any>()
                             // Primary type
                             val primary = fieldMapping.types[0]
-                            setType(property, primary)
+                            setType(property, primary, nested = false)
                             // Other fields
                             if (fieldMapping.types.size > 1) {
                                 val fields = mutableMapOf<String, Any>()
@@ -100,7 +100,7 @@ class ElasticSearchIndexService(
                                             if (!type.type.isNullOrBlank()) {
                                                 val typeMap = mutableMapOf<String, Any>()
                                                 fields[type.type!!] = typeMap
-                                                setType(typeMap, type)
+                                                setType(typeMap, type, nested = true)
                                             }
                                         }
                             }
@@ -110,10 +110,12 @@ class ElasticSearchIndexService(
         )
     }
 
-    private fun setType(property: MutableMap<String, Any>, type: SearchIndexMappingFieldType) {
-        type.index?.let { property["index"] = it }
+    private fun setType(property: MutableMap<String, Any>, type: SearchIndexMappingFieldType, nested: Boolean) {
         type.type?.let { property["type"] = it }
-        type.scoreBoost?.let { property["boost"] = it }
+        type.index?.let { property["index"] = it }
+        if (!nested) {
+            type.scoreBoost?.let { property["boost"] = it }
+        }
     }
 
     override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {

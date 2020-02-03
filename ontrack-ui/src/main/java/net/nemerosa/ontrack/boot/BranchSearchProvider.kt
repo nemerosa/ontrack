@@ -45,6 +45,12 @@ class BranchSearchProvider(
 
     override val indexName: String = BRANCH_SEARCH_INDEX
 
+    override val indexMapping: SearchIndexMapping = indexMappings<BranchSearchItem> {
+        +BranchSearchItem::name to keyword { scoreBoost = 3.0 }
+        +BranchSearchItem::description to text()
+        +BranchSearchItem::project to keyword()
+    }
+
     override fun indexAll(processor: (BranchSearchItem) -> Unit) {
         structureService.projectList.forEach {
             structureService.getBranchesForProject(it.id).forEach { branch ->

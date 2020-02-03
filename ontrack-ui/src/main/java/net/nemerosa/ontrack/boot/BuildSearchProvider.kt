@@ -48,6 +48,11 @@ class BuildSearchProvider(
     override val indexerName: String = "Builds"
     override val indexName: String = BUILD_SEARCH_INDEX
 
+    override val indexMapping: SearchIndexMapping = indexMappings<BuildSearchItem> {
+        +BuildSearchItem::name to keyword { scoreBoost = 3.0 }
+        +BuildSearchItem::description to text()
+    }
+
     override fun indexAll(processor: (BuildSearchItem) -> Unit) {
         structureService.projectList.forEach { project ->
             structureService.getBranchesForProject(project.id).forEach { branch ->
