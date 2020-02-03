@@ -1,20 +1,18 @@
 package net.nemerosa.ontrack.extension.elastic
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
-import io.searchbox.client.JestClient
-import io.searchbox.core.Search
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.asJsonString
-import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.elasticsearch.client.RequestOptions
+import org.elasticsearch.client.RestHighLevelClient
+import org.elasticsearch.index.query.MultiMatchQueryBuilder
+import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+
+typealias ESSearchRequest = org.elasticsearch.action.search.SearchRequest
 
 @Service
 @Transactional
@@ -23,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
         havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
 )
 class ElasticSearchServiceImpl(
-        private val jestClient: JestClient,
+        private val client: RestHighLevelClient,
         private val searchProviders: List<SearchProvider>,
         private val searchIndexService: SearchIndexService
 ) : SearchService {
@@ -33,22 +31,24 @@ class ElasticSearchServiceImpl(
     }
 
     override fun search(request: SearchRequest): Collection<SearchResult> {
-        // ES query
-        val query = mapOf(
-                "query" to mapOf(
-                        "multi_match" to mapOf(
-                                "query" to request.token,
-                                "type" to "best_fields"
-                        )
+        val esRequest = ESSearchRequest().source(
+                SearchSourceBuilder().query(
+                        MultiMatchQueryBuilder(request.token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
                 )
-        ).asJson().asJsonString()
-        val search = Search.Builder(query).build()
+        )
 
         // Getting the result of the search
-        val result = jestClient.execute(search).checkResult().jsonString.parseAsJson()
+        val response = client.search(esRequest, RequestOptions.DEFAULT)
 
-        // Getting the hits
-        val hits = result["hits"]["hits"].map { it.parse<HitNode>() }
+        // Hits as JSON nodes
+        val hits = response.hits.hits.map {
+            HitNode(
+                    it.index,
+                    it.id,
+                    it.score.toDouble(),
+                    it.sourceAsMap
+            )
+        }
 
         // Transforming into search results
         return hits.mapNotNull { toResult(it) }
@@ -76,19 +76,14 @@ class ElasticSearchServiceImpl(
             indexer.toSearchResult(
                     hitNode.id,
                     hitNode.score,
-                    hitNode.source
+                    hitNode.source.asJson()
             )
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     private class HitNode(
-            @JsonProperty("_index")
             val index: String,
-            @JsonProperty("_id")
             val id: String,
-            @JsonProperty("_score")
             val score: Double,
-            @JsonProperty("_source")
-            val source: JsonNode
+            val source: Map<String, Any?>
     )
 
 }

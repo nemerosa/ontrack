@@ -28,6 +28,9 @@ buildscript {
 // FIXME Try to use version in gradle.properties
 // val springBootVersion: String by project
 val kotlinVersion: String by project
+val elasticSearchVersion: String by project
+
+extra["elasticsearch.version"] = elasticSearchVersion
 
 plugins {
     java
@@ -210,6 +213,7 @@ configure(coreProjects) p@{
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", kotlinVersion)
+                bomProperty("elasticsearch.version", elasticSearchVersion)
             }
         }
         dependencies {

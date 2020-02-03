@@ -1,16 +1,17 @@
 package net.nemerosa.ontrack.extension.elastic
 
-import io.searchbox.client.JestClient
-import io.searchbox.core.Bulk
-import io.searchbox.core.Delete
-import io.searchbox.core.Index
-import io.searchbox.indices.CreateIndex
-import io.searchbox.indices.DeleteIndex
-import io.searchbox.indices.IndicesExists
-import io.searchbox.indices.Refresh
-import io.searchbox.indices.mapping.PutMapping
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
+import org.elasticsearch.action.bulk.BulkRequest
+import org.elasticsearch.action.delete.DeleteRequest
+import org.elasticsearch.action.index.IndexRequest
+import org.elasticsearch.client.RequestOptions
+import org.elasticsearch.client.RestHighLevelClient
+import org.elasticsearch.client.indices.CreateIndexRequest
+import org.elasticsearch.client.indices.GetIndexRequest
+import org.elasticsearch.client.indices.PutMappingRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional
         havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
 )
 class ElasticSearchIndexService(
-        private val jestClient: JestClient,
+        private val client: RestHighLevelClient,
         private val ontrackConfigProperties: OntrackConfigProperties
 ) : SearchIndexService {
 
@@ -32,9 +33,8 @@ class ElasticSearchIndexService(
 
     private fun <T : SearchItem> refreshIndex(indexer: SearchIndexer<T>) {
         logger.debug("Refreshing index ${indexer.indexName}")
-        Refresh.Builder().addIndex(indexer.indexName).build().apply {
-            jestClient.execute(this).checkResult()
-        }
+        val refreshRequest = RefreshRequest(indexer.indexName)
+        client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
     }
 
     override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {
@@ -56,24 +56,25 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {
         logger.info("[elasticsearch][index][${indexer.indexName}] Init")
-        val indexExistResult = jestClient.execute(IndicesExists.Builder(indexer.indexName).build())
-        if (indexExistResult.isSucceeded) {
+        val indexExists = client.indices().exists(GetIndexRequest(indexer.indexName), RequestOptions.DEFAULT)
+        if (indexExists) {
             logger.info("[elasticsearch][index][${indexer.indexName}] Already exists")
             indexer.indexMapping?.let { mapping ->
                 val mappingSource = mappingToMap(mapping)
                 logger.info("[elasticsearch][index][${indexer.indexName}] Updating mapping: $mappingSource")
-                jestClient.execute(PutMapping.Builder(indexer.indexName, TYPE_NAME, mappingSource).build()).checkResult()
+                val request = PutMappingRequest(indexer.indexName).source(mappingSource)
+                client.indices().putMapping(request, RequestOptions.DEFAULT)
             }
         } else {
             logger.info("[elasticsearch][index][${indexer.indexName}] Creating index")
-            val builder = CreateIndex.Builder(indexer.indexName).run {
+            val request = CreateIndexRequest(indexer.indexName).run {
                 indexer.indexMapping?.let {
-                    val mapping = mappingToMap(it)
-                    logger.info("[elasticsearch][index][${indexer.indexName}] Mapping=$mapping")
-                    this.mappings(mappingToMap(it))
+                    val mappingSource = mappingToMap(it)
+                    logger.info("[elasticsearch][index][${indexer.indexName}] Mapping=$mappingSource")
+                    mapping(mappingSource)
                 } ?: this
             }
-            jestClient.execute(builder.build()).checkResult()
+            client.indices().create(request, RequestOptions.DEFAULT)
         }
     }
 
@@ -117,7 +118,7 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {
         // Deletes the index
-        jestClient.execute(DeleteIndex.Builder(indexer.indexName).build()).checkResult()
+        client.indices().delete(DeleteIndexRequest(indexer.indexName), RequestOptions.DEFAULT)
         // Re-creates the index
         initIndex(indexer)
         // Re-index if requested
@@ -132,17 +133,11 @@ class ElasticSearchIndexService(
 
     private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {
         // Bulk indexation of the items
-        val bulk = Bulk.Builder().defaultIndex(indexer.indexName)
-                .addAction(
-                        items.map { item ->
-                            Index.Builder(item.fields)
-                                    .id(item.id)
-                                    .build()
-                        }
-                )
-                .build()
+        val bulk = items.fold(BulkRequest(indexer.indexName)) { acc, item ->
+            acc.add(IndexRequest().id(item.id).source(item.fields))
+        }
         // Launching the indexation of this batch
-        jestClient.execute(bulk).checkResult()
+        client.bulk(bulk, RequestOptions.DEFAULT)
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
     }
@@ -157,46 +152,30 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T) {
         logger.debug("Create index ${indexer.indexName}")
-        jestClient.execute(
-                Bulk.Builder().addAction(
-                        Index.Builder(item.fields)
-                                .index(indexer.indexName)
-                                .id(item.id)
-                                .build()
-                ).build()
-        ).checkResult()
+        client.index(
+                IndexRequest(indexer.indexName).id(item.id).source(item.fields),
+                RequestOptions.DEFAULT
+        )
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
     }
 
     override fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T) {
         logger.debug("Update index ${indexer.indexName}")
-        jestClient.execute(
-                Index.Builder(item.fields)
-                        .index(indexer.indexName)
-                        .id(item.id)
-                        .build()
-        ).checkResult()
+        client.index(
+                IndexRequest(indexer.indexName).id(item.id).source(item.fields),
+                RequestOptions.DEFAULT
+        )
     }
 
     override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {
         logger.debug("Delete index ${indexer.indexName}")
-        jestClient.execute(
-                Bulk.Builder().addAction(
-                        Delete.Builder(id)
-                                .index(indexer.indexName)
-                                .build()
-                ).build()
-        ).checkResult()
+        client.delete(
+                DeleteRequest(indexer.indexName).id(id),
+                RequestOptions.DEFAULT
+        )
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
-    }
-
-    companion object {
-        /**
-         * Name of the type to use in indexes
-         */
-        private const val TYPE_NAME = "_doc"
     }
 
 }
