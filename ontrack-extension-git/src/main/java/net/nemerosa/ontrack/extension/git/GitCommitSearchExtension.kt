@@ -22,7 +22,7 @@ import java.util.regex.Pattern
 
 @Component
 class GitCommitSearchExtension(
-        extensionFeature: GitExtensionFeature?,
+        extensionFeature: GitExtensionFeature,
         private val gitService: GitService,
         private val uriBuilder: URIBuilder,
         private val securityService: SecurityService,
