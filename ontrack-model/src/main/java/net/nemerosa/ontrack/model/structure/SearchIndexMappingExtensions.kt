@@ -22,7 +22,9 @@ class SearchIndexMappingBuilder<T : SearchItem> {
 
     fun type(typeName: String, typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = SearchIndexMappingFieldTypeBuilder(typeName).apply { typeInit() }
 
+    fun id(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("long", typeInit)
     fun keyword(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("keyword", typeInit)
+    fun text(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("text", typeInit)
 
     fun createMapping() = SearchIndexMapping(
             fields = fields.map { it.createField() }

@@ -81,22 +81,13 @@ class GitCommitSearchExtension(
     override val indexerSchedule: Schedule = Schedule.EVERY_HOUR
 
     override val indexMapping: SearchIndexMapping? = indexMappings<GitCommitSearchItem> {
-        +GitCommitSearchItem::projectId to type("long") {
-            index = false
-        }
-        +GitCommitSearchItem::gitType to keyword {
-            index = false
-        }
-        +GitCommitSearchItem::gitName to keyword {
-            index = false
-        }
-        +GitCommitSearchItem::commit to keyword {
-            scoreBoost = 3.0
-        }
-        +GitCommitSearchItem::commitShort to keyword {
-            scoreBoost = 2.0
-        }
+        +GitCommitSearchItem::projectId to id { index = false }
+        +GitCommitSearchItem::gitType to keyword { index = false }
+        +GitCommitSearchItem::gitName to keyword { index = false }
+        +GitCommitSearchItem::commit to keyword { scoreBoost = 3.0 }
+        +GitCommitSearchItem::commitShort to keyword { scoreBoost = 2.0 }
         +GitCommitSearchItem::commitAuthor to keyword()
+        +GitCommitSearchItem::commitMessage to text()
     }
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
