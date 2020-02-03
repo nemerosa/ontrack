@@ -30,12 +30,20 @@ class ElasticSearchServiceImpl(
         searchProviders.flatMap { it.searchIndexers }.associateBy { it.indexName }
     }
 
+    val indexerByResultType: Map<String, SearchIndexer<*>> by lazy {
+        searchProviders.flatMap { it.searchIndexers }.associateBy { it.searchResultType.id }
+    }
+
     override fun search(request: SearchRequest): Collection<SearchResult> {
         val esRequest = ESSearchRequest().source(
                 SearchSourceBuilder().query(
                         MultiMatchQueryBuilder(request.token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
                 )
-        )
+        ).run {
+            request.type?.let { type ->
+                indexerByResultType[type]?.let { indexer -> indices(indexer.indexName) }
+            } ?: this
+        }
 
         // Getting the result of the search
         val response = client.search(esRequest, RequestOptions.DEFAULT)
@@ -54,10 +62,11 @@ class ElasticSearchServiceImpl(
         return hits.mapNotNull { toResult(it) }
     }
 
-    override val searchResultTypes: List<SearchResultType> get() =
-        indexers
-                .map { (_, indexer) -> indexer.searchResultType }
-                .sortedBy { it.name }
+    override val searchResultTypes: List<SearchResultType>
+        get() =
+            indexers
+                    .map { (_, indexer) -> indexer.searchResultType }
+                    .sortedBy { it.name }
 
     override fun indexReset(reindex: Boolean): Ack {
         val ok = indexers.all { (_, indexer) ->
