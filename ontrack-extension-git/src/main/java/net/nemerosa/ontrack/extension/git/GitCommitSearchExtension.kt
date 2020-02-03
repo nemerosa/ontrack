@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
-import net.nemerosa.ontrack.extension.git.model.GitSynchronisationRequest
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.git.model.GitCommit
@@ -18,7 +17,6 @@ import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
-import java.util.concurrent.TimeUnit
 import java.util.function.BiConsumer
 import java.util.regex.Pattern
 
@@ -92,12 +90,14 @@ class GitCommitSearchExtension(
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
-            gitService.sync(gitConfiguration, GitSynchronisationRequest(false))?.let {
-                it.get(1L, TimeUnit.HOURS)
+            try {
                 gitService.forEachCommit(gitConfiguration) { commit: GitCommit ->
                     val item = GitCommitSearchItem(project, gitConfiguration, commit)
                     processor(item)
                 }
+            } catch (_: Exception) {
+                // Ignoring any error linked to missing indexation
+                // They will be caught be the indexation itself
             }
         })
     }
