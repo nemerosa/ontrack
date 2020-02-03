@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.elastic
 
 import io.searchbox.client.JestClient
-import io.searchbox.client.JestResult
 import io.searchbox.core.Bulk
 import io.searchbox.core.Delete
 import io.searchbox.core.Index
@@ -32,7 +31,7 @@ class ElasticSearchIndexService(
     private fun <T : SearchItem> refreshIndex(indexer: SearchIndexer<T>) {
         logger.debug("Refreshing index ${indexer.indexName}")
         Refresh.Builder().addIndex(indexer.indexName).build().apply {
-            checkResult(jestClient.execute(this))
+            jestClient.execute(this).checkResult()
         }
     }
 
@@ -62,13 +61,7 @@ class ElasticSearchIndexService(
                 this.mappings(mappingToMap(it))
             } ?: this
         }
-        checkResult(jestClient.execute(builder.build()))
-    }
-
-    private fun checkResult(result: JestResult) {
-        if (!result.isSucceeded) {
-            throw ElasticSearchException("[${result.responseCode}] ${result.errorMessage} ${result.jsonString}")
-        }
+        jestClient.execute(builder.build()).checkResult()
     }
 
     /**
@@ -111,7 +104,7 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {
         // Deletes the index
-        checkResult(jestClient.execute(DeleteIndex.Builder(indexer.indexName).build()))
+        jestClient.execute(DeleteIndex.Builder(indexer.indexName).build()).checkResult()
         // Re-creates the index
         initIndex(indexer)
         // Re-index if requested
@@ -136,7 +129,7 @@ class ElasticSearchIndexService(
                 )
                 .build()
         // Launching the indexation of this batch
-        checkResult(jestClient.execute(bulk))
+        jestClient.execute(bulk).checkResult()
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
     }
@@ -151,52 +144,39 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T) {
         logger.debug("Create index ${indexer.indexName}")
-        checkResult(
-                jestClient.execute(
-                        Bulk.Builder().addAction(
-                                Index.Builder(item.fields)
-                                        .index(indexer.indexName)
-                                        .id(item.id)
-                                        .build()
-                        ).build()
-                )
-        )
+        jestClient.execute(
+                Bulk.Builder().addAction(
+                        Index.Builder(item.fields)
+                                .index(indexer.indexName)
+                                .id(item.id)
+                                .build()
+                ).build()
+        ).checkResult()
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
     }
 
     override fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T) {
         logger.debug("Update index ${indexer.indexName}")
-        checkResult(
-                jestClient.execute(
-                        Index.Builder(item.fields)
-                                .index(indexer.indexName)
-                                .id(item.id)
-                                .build()
-                )
-        )
+        jestClient.execute(
+                Index.Builder(item.fields)
+                        .index(indexer.indexName)
+                        .id(item.id)
+                        .build()
+        ).checkResult()
     }
 
     override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {
         logger.debug("Delete index ${indexer.indexName}")
-        checkResult(
-                jestClient.execute(
-                        Bulk.Builder().addAction(
-                                Delete.Builder(id)
-                                        .index(indexer.indexName)
-                                        .build()
-                        ).build()
-                )
-        )
+        jestClient.execute(
+                Bulk.Builder().addAction(
+                        Delete.Builder(id)
+                                .index(indexer.indexName)
+                                .build()
+                ).build()
+        ).checkResult()
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
-    }
-
-    companion object {
-        /**
-         * Name of the type to associate with the index
-         */
-        private const val TYPE_NAME = "_doc"
     }
 
 }
