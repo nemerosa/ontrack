@@ -12,6 +12,7 @@
         <div class="col-md-12" ng-show="searchDone && results">
             <dl ng-repeat="result in results" class="ot-search-result">
                 <dt>
+                    <img class="ot-icon" src="extension/{{result.type.feature.id}}/search-icon/{{result.type.id}}.png" title="{{result.type.name}}"/>
                     <a href="{{result.page}}">{{result.title}}</a>
                 </dt>
                 <dd ng-bind-html="result.description">
