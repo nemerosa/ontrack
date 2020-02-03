@@ -45,7 +45,7 @@ class ElasticSearchServiceImpl(
         val search = Search.Builder(query).build()
 
         // Getting the result of the search
-        val result = jestClient.execute(search).jsonString.parseAsJson()
+        val result = jestClient.execute(search).checkResult().jsonString.parseAsJson()
 
         // Getting the hits
         val hits = result["hits"]["hits"].map { it.parse<HitNode>() }

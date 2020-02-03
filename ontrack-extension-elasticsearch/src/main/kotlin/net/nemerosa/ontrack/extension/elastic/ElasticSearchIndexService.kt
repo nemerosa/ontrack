@@ -6,7 +6,9 @@ import io.searchbox.core.Delete
 import io.searchbox.core.Index
 import io.searchbox.indices.CreateIndex
 import io.searchbox.indices.DeleteIndex
+import io.searchbox.indices.IndicesExists
 import io.searchbox.indices.Refresh
+import io.searchbox.indices.mapping.PutMapping
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.slf4j.Logger
@@ -54,14 +56,25 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {
         logger.info("[elasticsearch][index][${indexer.indexName}] Init")
-        val builder = CreateIndex.Builder(indexer.indexName).run {
-            indexer.indexMapping?.let {
-                val mapping = mappingToMap(it)
-                logger.info("[elasticsearch][index][${indexer.indexName}] Mapping=$mapping")
-                this.mappings(mappingToMap(it))
-            } ?: this
+        val indexExistResult = jestClient.execute(IndicesExists.Builder(indexer.indexName).build())
+        if (indexExistResult.isSucceeded) {
+            logger.info("[elasticsearch][index][${indexer.indexName}] Already exists")
+            indexer.indexMapping?.let { mapping ->
+                val mappingSource = mappingToMap(mapping)
+                logger.info("[elasticsearch][index][${indexer.indexName}] Updating mapping: $mappingSource")
+                jestClient.execute(PutMapping.Builder(indexer.indexName, TYPE_NAME, mappingSource).build()).checkResult()
+            }
+        } else {
+            logger.info("[elasticsearch][index][${indexer.indexName}] Creating index")
+            val builder = CreateIndex.Builder(indexer.indexName).run {
+                indexer.indexMapping?.let {
+                    val mapping = mappingToMap(it)
+                    logger.info("[elasticsearch][index][${indexer.indexName}] Mapping=$mapping")
+                    this.mappings(mappingToMap(it))
+                } ?: this
+            }
+            jestClient.execute(builder.build()).checkResult()
         }
-        jestClient.execute(builder.build()).checkResult()
     }
 
     /**
@@ -177,6 +190,13 @@ class ElasticSearchIndexService(
         ).checkResult()
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
+    }
+
+    companion object {
+        /**
+         * Name of the type to use in indexes
+         */
+        private const val TYPE_NAME = "_doc"
     }
 
 }
