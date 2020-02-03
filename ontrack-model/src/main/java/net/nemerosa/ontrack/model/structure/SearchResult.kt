@@ -25,5 +25,9 @@ class SearchResult(
         /**
          * Score for the search
          */
-        val accuracy: Double
+        val accuracy: Double,
+        /**
+         * Type of result
+         */
+        val type: SearchResultType
 )

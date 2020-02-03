@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.SearchProvider
-import net.nemerosa.ontrack.model.structure.SearchResult
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.apache.commons.lang3.StringUtils
@@ -21,6 +18,12 @@ class BuildLinkSearchExtension(
         private val uriBuilder: URIBuilder,
         private val structureService: StructureService
 ) : AbstractExtension(extensionFeature), SearchExtension {
+
+    private val resultType = SearchResultType(
+            extensionFeature.featureDescription,
+            "build-link",
+            "Build Link"
+    )
 
     override fun getSearchProvider(): SearchProvider {
         return object : AbstractSearchProvider(uriBuilder) {
@@ -56,7 +59,8 @@ class BuildLinkSearchExtension(
                 build.entityDisplayName, "${build.project.name} -> ${build.name}",
                 uriBuilder.getEntityURI(build),
                 uriBuilder.getEntityPage(build),
-                100.0
+                100.0,
+                resultType
         )
     }
 

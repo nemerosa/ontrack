@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.SearchProvider
 import net.nemerosa.ontrack.model.structure.SearchResult
+import net.nemerosa.ontrack.model.structure.SearchResultType
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
@@ -21,6 +22,12 @@ class GitIssueSearchExtension(
         private val gitService: GitService,
         private val uriBuilder: URIBuilder
 ) : AbstractExtension(extensionFeature), SearchExtension {
+
+    private val resultType = SearchResultType(
+            extensionFeature.featureDescription,
+            "git-issue",
+            "Git Issue"
+    )
 
     override fun getSearchProvider(): SearchProvider {
         return GitIssueSearchProvider(uriBuilder)
@@ -76,7 +83,8 @@ class GitIssueSearchExtension(
                                         uriBuilder.page("extension/git/%d/issue/%s",
                                                 project.id(),
                                                 issue.key),
-                                        100.0
+                                        100.0,
+                                        resultType
                                 )
                             }
                         }

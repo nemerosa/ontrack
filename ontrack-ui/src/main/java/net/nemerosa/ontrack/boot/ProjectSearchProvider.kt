@@ -21,6 +21,11 @@ const val PROJECT_SEARCH_PROVIDER_TOKEN_MIN_LENGTH = 3
 const val PROJECT_SEARCH_INDEX = "projects"
 
 /**
+ * Search result type
+ */
+const val PROJECT_SEARCH_RESULT_TYPE = "project"
+
+/**
  * Matches against projects either by name or by content if the
  * search token is at least [PROJECT_SEARCH_PROVIDER_TOKEN_MIN_LENGTH] characters long.
  */
@@ -30,6 +35,12 @@ class ProjectSearchProvider(
         private val structureService: StructureService,
         private val searchIndexService: SearchIndexService
 ) : AbstractSearchProvider(uriBuilder), SearchIndexer<ProjectSearchItem>, EventListener {
+
+    private val resultType = SearchResultType(
+            feature = CoreExtensionFeature.INSTANCE.featureDescription,
+            id = PROJECT_SEARCH_RESULT_TYPE,
+            name = "Project"
+    )
 
     override fun isTokenSearchable(token: String): Boolean {
         return Pattern.matches(NameDescription.NAME, token)
@@ -45,11 +56,12 @@ class ProjectSearchProvider(
                 }
                 .map { project ->
                     SearchResult(
-                            project.entityDisplayName,
-                            "",
-                            uriBuilder.getEntityURI(project),
-                            uriBuilder.getEntityPage(project),
-                            100.0
+                            title = project.entityDisplayName,
+                            description = "",
+                            uri = uriBuilder.getEntityURI(project),
+                            page = uriBuilder.getEntityPage(project),
+                            accuracy = 100.0,
+                            type = resultType
                     )
                 }
     }
@@ -74,11 +86,12 @@ class ProjectSearchProvider(
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
         return structureService.findProjectByID(ID.of(id.toInt()))?.run {
             SearchResult(
-                    entityDisplayName,
-                    description ?: "",
-                    uriBuilder.getEntityURI(this),
-                    uriBuilder.getEntityPage(this),
-                    score
+                    title = entityDisplayName,
+                    description = description ?: "",
+                    uri = uriBuilder.getEntityURI(this),
+                    page = uriBuilder.getEntityPage(this),
+                    accuracy = score,
+                    type = resultType
             )
         }
     }

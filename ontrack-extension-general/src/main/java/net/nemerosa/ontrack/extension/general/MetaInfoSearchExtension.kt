@@ -25,6 +25,12 @@ class MetaInfoSearchExtension(
         private val securityService: SecurityService
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<MetaInfoSearchItem> {
 
+    private val resultType = SearchResultType(
+            extensionFeature.featureDescription,
+            "build-meta-info",
+            "Build with Meta Info"
+    )
+
     override fun getSearchProvider(): SearchProvider {
         return object : AbstractSearchProvider(uriBuilder) {
             override fun isTokenSearchable(token: String): Boolean {
@@ -72,7 +78,8 @@ class MetaInfoSearchExtension(
                     String.format("%s -> %s", name, this),
                     uriBuilder.getEntityURI(entity),
                     uriBuilder.getEntityPage(entity),
-                    100.0
+                    100.0,
+                    resultType
             )
         }
     }
@@ -112,11 +119,12 @@ class MetaInfoSearchExtension(
         // Conversion (using legacy code)
         return entity?.let {
             SearchResult(
-                    entity.entityDisplayName,
-                    item.items.map { (name, value) -> "$name -> $value" }.sorted().joinToString(", "),
-                    uriBuilder.getEntityURI(entity),
-                    uriBuilder.getEntityPage(entity),
-                    score
+                    title = entity.entityDisplayName,
+                    description = item.items.map { (name, value) -> "$name -> $value" }.sorted().joinToString(", "),
+                    uri = uriBuilder.getEntityURI(entity),
+                    page = uriBuilder.getEntityPage(entity),
+                    accuracy = score,
+                    type = resultType
             )
         }
     }

@@ -18,6 +18,12 @@ class BranchSearchProvider(
         private val searchIndexService: SearchIndexService
 ) : AbstractSearchProvider(uriBuilder), SearchIndexer<BranchSearchItem>, EventListener {
 
+    private val resultType = SearchResultType(
+            feature = CoreExtensionFeature.INSTANCE.featureDescription,
+            id = BRANCH_SEARCH_RESULT_TYPE,
+            name = "Branch"
+    )
+
     override fun isTokenSearchable(token: String): Boolean = Pattern.matches(NameDescription.NAME, token)
 
     override fun search(token: String): Collection<SearchResult> =
@@ -31,11 +37,12 @@ class BranchSearchProvider(
                     // Creates the search result
                     .map { branch: Branch ->
                         SearchResult(
-                                branch.entityDisplayName,
-                                "",
-                                uriBuilder.getEntityURI(branch),
-                                uriBuilder.getEntityPage(branch),
-                                100.0
+                                title = branch.entityDisplayName,
+                                description = "",
+                                uri = uriBuilder.getEntityURI(branch),
+                                page = uriBuilder.getEntityPage(branch),
+                                accuracy = 100.0,
+                                type = resultType
                         )
                     }
 
@@ -62,11 +69,12 @@ class BranchSearchProvider(
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? =
             structureService.findBranchByID(ID.of(id.toInt()))?.run {
                 SearchResult(
-                        entityDisplayName,
-                        description ?: "",
-                        uriBuilder.getEntityURI(this),
-                        uriBuilder.getEntityPage(this),
-                        score
+                        title = entityDisplayName,
+                        description = description ?: "",
+                        uri = uriBuilder.getEntityURI(this),
+                        page = uriBuilder.getEntityPage(this),
+                        accuracy = score,
+                        type = resultType
                 )
             }
 
@@ -94,6 +102,11 @@ class BranchSearchProvider(
  * Index name for the branches
  */
 const val BRANCH_SEARCH_INDEX = "branches"
+
+/**
+ * Search result type
+ */
+const val BRANCH_SEARCH_RESULT_TYPE = "branch"
 
 class BranchSearchItem(
         override val id: String,

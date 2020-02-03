@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
-import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
@@ -18,6 +17,12 @@ class BuildSearchProvider(
         private val structureService: StructureService,
         private val searchIndexService: SearchIndexService
 ) : AbstractSearchProvider(uriBuilder), SearchIndexer<BuildSearchItem>, EventListener {
+
+    private val resultType = SearchResultType(
+            feature = CoreExtensionFeature.INSTANCE.featureDescription,
+            id = BUILD_SEARCH_RESULT_TYPE,
+            name = "Build"
+    )
 
     override fun isTokenSearchable(token: String): Boolean {
         return Pattern.matches(NameDescription.NAME, token)
@@ -34,11 +39,12 @@ class BuildSearchProvider(
                 // Creates the search result
                 .map { build: Build ->
                     SearchResult(
-                            build.entityDisplayName,
-                            "",
-                            uriBuilder.getEntityURI(build),
-                            uriBuilder.getEntityPage(build),
-                            100.0
+                            title = build.entityDisplayName,
+                            description = "",
+                            uri = uriBuilder.getEntityURI(build),
+                            page = uriBuilder.getEntityPage(build),
+                            accuracy = 100.0,
+                            type = resultType
                     )
                 }
     }
@@ -67,11 +73,12 @@ class BuildSearchProvider(
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? =
             structureService.findBuildByID(ID.of(id.toInt()))?.run {
                 SearchResult(
-                        entityDisplayName,
-                        description ?: "",
-                        uriBuilder.getEntityURI(this),
-                        uriBuilder.getEntityPage(this),
-                        score
+                        title = entityDisplayName,
+                        description = description ?: "",
+                        uri = uriBuilder.getEntityURI(this),
+                        page = uriBuilder.getEntityPage(this),
+                        accuracy = score,
+                        type = resultType
                 )
             }
 
@@ -97,6 +104,11 @@ class BuildSearchProvider(
  * Index name for the builds
  */
 const val BUILD_SEARCH_INDEX = "builds"
+
+/**
+ * Search result type
+ */
+const val BUILD_SEARCH_RESULT_TYPE = "build"
 
 data class BuildSearchItem(
         override val id: String,

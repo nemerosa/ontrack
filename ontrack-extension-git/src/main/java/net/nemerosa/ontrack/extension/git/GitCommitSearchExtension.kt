@@ -31,6 +31,12 @@ class GitCommitSearchExtension(
 
     private val shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}")
 
+    private val resultType = SearchResultType(
+            extensionFeature.featureDescription,
+            "git-commit",
+            "Git Commit"
+    )
+
     override fun getSearchProvider(): SearchProvider {
         return GitCommitSearchProvider(uriBuilder)
     }
@@ -60,7 +66,8 @@ class GitCommitSearchExtension(
                                     uriBuilder.page("extension/git/%d/commit/%s",
                                             project.id(),
                                             commit.id),
-                                    100.0
+                                    100.0,
+                                    resultType
                             )
                     )
                 }
@@ -112,16 +119,17 @@ class GitCommitSearchExtension(
         // Conversion
         return if (item != null && project != null) {
             SearchResult(
-                    "${project.name} ${item.commit}",
-                    "${item.commitAuthor}: ${item.commitMessage}",
-                    uriBuilder.build(
+                    title = "${project.name} ${item.commit}",
+                    description = "${item.commitAuthor}: ${item.commitMessage}",
+                    uri = uriBuilder.build(
                             MvcUriComponentsBuilder.on(GitController::class.java).commitProjectInfo(
                                     project.id,
                                     item.commit
                             )
                     ),
-                    uriBuilder.page("extension/git/${project.id}/commit/${item.commit}"),
-                    score
+                    page = uriBuilder.page("extension/git/${project.id}/commit/${item.commit}"),
+                    accuracy = score,
+                    type = resultType
             )
         } else null
     }

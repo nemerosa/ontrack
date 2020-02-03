@@ -19,6 +19,12 @@ class ReleaseSearchExtension(
         extensionFeature
 ), SearchExtension, SearchIndexer<ReleaseSearchItem> {
 
+    private val resultType = SearchResultType(
+            extensionFeature.featureDescription,
+            "build-release",
+            "Build with Release"
+    )
+
     override fun getSearchProvider() = object : AbstractSearchProvider(uriBuilder) {
 
         /**
@@ -39,7 +45,8 @@ class ReleaseSearchExtension(
                             "Build ${build.entityDisplayName} having version/label/release $token",
                             uriBuilder.getEntityURI(build),
                             uriBuilder.getEntityPage(build),
-                            100.0
+                            100.0,
+                            resultType
                     )
                 }
 
@@ -81,11 +88,12 @@ class ReleaseSearchExtension(
         // Conversion
         return entity?.let {
             SearchResult(
-                    entity.entityDisplayName,
-                    "${entity.entityDisplayName} having version/label/release ${item.release}",
-                    uriBuilder.getEntityURI(entity),
-                    uriBuilder.getEntityPage(entity),
-                    score
+                    title = entity.entityDisplayName,
+                    description = "${entity.entityDisplayName} having version/label/release ${item.release}",
+                    uri = uriBuilder.getEntityURI(entity),
+                    page = uriBuilder.getEntityPage(entity),
+                    accuracy = score,
+                    type = resultType
             )
         }
     }
