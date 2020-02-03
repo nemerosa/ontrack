@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.structure.SearchProvider
-import net.nemerosa.ontrack.model.structure.SearchRequest
-import net.nemerosa.ontrack.model.structure.SearchResult
-import net.nemerosa.ontrack.model.structure.SearchService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -23,6 +20,11 @@ import org.springframework.transaction.annotation.Transactional
 class SearchServiceImpl(
         val providers: List<SearchProvider>
 ) : SearchService {
+
+    /**
+     * Not available for this type of service
+     */
+    override val searchResultTypes: List<SearchResultType> = emptyList()
 
     override fun search(request: SearchRequest): Collection<SearchResult> = providers
             .filter { it.isTokenSearchable(request.token) }

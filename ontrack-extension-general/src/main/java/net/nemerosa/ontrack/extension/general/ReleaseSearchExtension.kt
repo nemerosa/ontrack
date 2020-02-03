@@ -19,7 +19,7 @@ class ReleaseSearchExtension(
         extensionFeature
 ), SearchExtension, SearchIndexer<ReleaseSearchItem> {
 
-    private val resultType = SearchResultType(
+    override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
             "build-release",
             "Build with Release"
@@ -46,7 +46,7 @@ class ReleaseSearchExtension(
                             uriBuilder.getEntityURI(build),
                             uriBuilder.getEntityPage(build),
                             100.0,
-                            resultType
+                            searchResultType
                     )
                 }
 
@@ -93,7 +93,7 @@ class ReleaseSearchExtension(
                     uri = uriBuilder.getEntityURI(entity),
                     page = uriBuilder.getEntityPage(entity),
                     accuracy = score,
-                    type = resultType
+                    type = searchResultType
             )
         }
     }

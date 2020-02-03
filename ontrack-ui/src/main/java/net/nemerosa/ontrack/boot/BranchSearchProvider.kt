@@ -18,7 +18,7 @@ class BranchSearchProvider(
         private val searchIndexService: SearchIndexService
 ) : AbstractSearchProvider(uriBuilder), SearchIndexer<BranchSearchItem>, EventListener {
 
-    private val resultType = SearchResultType(
+    override val searchResultType = SearchResultType(
             feature = CoreExtensionFeature.INSTANCE.featureDescription,
             id = BRANCH_SEARCH_RESULT_TYPE,
             name = "Branch"
@@ -42,7 +42,7 @@ class BranchSearchProvider(
                                 uri = uriBuilder.getEntityURI(branch),
                                 page = uriBuilder.getEntityPage(branch),
                                 accuracy = 100.0,
-                                type = resultType
+                                type = searchResultType
                         )
                     }
 
@@ -74,7 +74,7 @@ class BranchSearchProvider(
                         uri = uriBuilder.getEntityURI(this),
                         page = uriBuilder.getEntityPage(this),
                         accuracy = score,
-                        type = resultType
+                        type = searchResultType
                 )
             }
 

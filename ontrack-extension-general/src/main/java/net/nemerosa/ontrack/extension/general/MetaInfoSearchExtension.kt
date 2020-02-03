@@ -25,7 +25,7 @@ class MetaInfoSearchExtension(
         private val securityService: SecurityService
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<MetaInfoSearchItem> {
 
-    private val resultType = SearchResultType(
+    override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
             "build-meta-info",
             "Build with Meta Info"
@@ -79,7 +79,7 @@ class MetaInfoSearchExtension(
                     uriBuilder.getEntityURI(entity),
                     uriBuilder.getEntityPage(entity),
                     100.0,
-                    resultType
+                    searchResultType
             )
         }
     }
@@ -124,7 +124,7 @@ class MetaInfoSearchExtension(
                     uri = uriBuilder.getEntityURI(entity),
                     page = uriBuilder.getEntityPage(entity),
                     accuracy = score,
-                    type = resultType
+                    type = searchResultType
             )
         }
     }

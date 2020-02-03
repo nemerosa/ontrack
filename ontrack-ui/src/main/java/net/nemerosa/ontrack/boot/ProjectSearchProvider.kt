@@ -36,7 +36,7 @@ class ProjectSearchProvider(
         private val searchIndexService: SearchIndexService
 ) : AbstractSearchProvider(uriBuilder), SearchIndexer<ProjectSearchItem>, EventListener {
 
-    private val resultType = SearchResultType(
+    override val searchResultType = SearchResultType(
             feature = CoreExtensionFeature.INSTANCE.featureDescription,
             id = PROJECT_SEARCH_RESULT_TYPE,
             name = "Project"
@@ -61,7 +61,7 @@ class ProjectSearchProvider(
                             uri = uriBuilder.getEntityURI(project),
                             page = uriBuilder.getEntityPage(project),
                             accuracy = 100.0,
-                            type = resultType
+                            type = searchResultType
                     )
                 }
     }
@@ -91,7 +91,7 @@ class ProjectSearchProvider(
                     uri = uriBuilder.getEntityURI(this),
                     page = uriBuilder.getEntityPage(this),
                     accuracy = score,
-                    type = resultType
+                    type = searchResultType
             )
         }
     }

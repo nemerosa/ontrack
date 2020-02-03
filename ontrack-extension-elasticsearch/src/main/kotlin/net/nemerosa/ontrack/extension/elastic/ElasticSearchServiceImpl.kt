@@ -54,6 +54,11 @@ class ElasticSearchServiceImpl(
         return hits.mapNotNull { toResult(it) }
     }
 
+    override val searchResultTypes: List<SearchResultType> get() =
+        indexers
+                .map { (_, indexer) -> indexer.searchResultType }
+                .sortedBy { it.name }
+
     override fun indexReset(reindex: Boolean): Ack {
         val ok = indexers.all { (_, indexer) ->
             searchIndexService.resetIndex(indexer, reindex)

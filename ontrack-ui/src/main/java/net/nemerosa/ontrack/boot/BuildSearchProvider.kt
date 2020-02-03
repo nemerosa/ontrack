@@ -18,7 +18,7 @@ class BuildSearchProvider(
         private val searchIndexService: SearchIndexService
 ) : AbstractSearchProvider(uriBuilder), SearchIndexer<BuildSearchItem>, EventListener {
 
-    private val resultType = SearchResultType(
+    override val searchResultType = SearchResultType(
             feature = CoreExtensionFeature.INSTANCE.featureDescription,
             id = BUILD_SEARCH_RESULT_TYPE,
             name = "Build"
@@ -44,7 +44,7 @@ class BuildSearchProvider(
                             uri = uriBuilder.getEntityURI(build),
                             page = uriBuilder.getEntityPage(build),
                             accuracy = 100.0,
-                            type = resultType
+                            type = searchResultType
                     )
                 }
     }
@@ -78,7 +78,7 @@ class BuildSearchProvider(
                         uri = uriBuilder.getEntityURI(this),
                         page = uriBuilder.getEntityPage(this),
                         accuracy = score,
-                        type = resultType
+                        type = searchResultType
                 )
             }
 

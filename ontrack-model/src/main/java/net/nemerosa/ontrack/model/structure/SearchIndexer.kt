@@ -50,6 +50,11 @@ interface SearchIndexer<T : SearchItem> {
     fun indexAll(processor: (T) -> Unit)
 
     /**
+     * Search result type
+     */
+    val searchResultType: SearchResultType
+
+    /**
      * Given some raw search results, transform them into a [SearchResult] for display.
      *
      * @param id ID of the entity having being found

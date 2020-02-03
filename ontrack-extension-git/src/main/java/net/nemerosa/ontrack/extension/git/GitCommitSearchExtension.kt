@@ -31,7 +31,7 @@ class GitCommitSearchExtension(
 
     private val shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}")
 
-    private val resultType = SearchResultType(
+    override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
             "git-commit",
             "Git Commit"
@@ -67,7 +67,7 @@ class GitCommitSearchExtension(
                                             project.id(),
                                             commit.id),
                                     100.0,
-                                    resultType
+                                    searchResultType
                             )
                     )
                 }
@@ -129,7 +129,7 @@ class GitCommitSearchExtension(
                     ),
                     page = uriBuilder.page("extension/git/${project.id}/commit/${item.commit}"),
                     accuracy = score,
-                    type = resultType
+                    type = searchResultType
             )
         } else null
     }

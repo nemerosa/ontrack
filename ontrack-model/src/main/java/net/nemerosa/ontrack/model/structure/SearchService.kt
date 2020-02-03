@@ -8,6 +8,11 @@ import net.nemerosa.ontrack.model.Ack
 interface SearchService {
 
     /**
+     * Gets the list of types of search
+     */
+    val searchResultTypes: List<SearchResultType>
+
+    /**
      * Seach entry point
      */
     fun search(request: SearchRequest): Collection<SearchResult>
