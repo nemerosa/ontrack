@@ -20,6 +20,10 @@ class SearchIndexMappingBuilder<T : SearchItem> {
         return builder
     }
 
+    fun type(typeName: String, typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = SearchIndexMappingFieldTypeBuilder(typeName).apply { typeInit() }
+
+    fun keyword(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("keyword", typeInit)
+
     fun createMapping() = SearchIndexMapping(
             fields = fields.map { it.createField() }
     )
@@ -30,32 +34,29 @@ class SearchIndexMappingFieldBuilder<T : SearchItem>(
         private val property: KProperty1<T, Any>
 ) {
 
-    private val types = mutableListOf<SearchIndexMappingFieldTypeBuilder>()
+    private val types = mutableListOf<SearchIndexMappingFieldType>()
 
-    infix fun to(code: SearchIndexMappingFieldTypeBuilder.() -> Unit): SearchIndexMappingFieldBuilder<T> {
-        val type = SearchIndexMappingFieldTypeBuilder()
-        types.add(type)
-        type.code()
+    infix fun to(typeBuilder: SearchIndexMappingFieldTypeBuilder): SearchIndexMappingFieldBuilder<T> {
+        types.add(typeBuilder.createType())
         return this
     }
 
     fun createField() = SearchIndexMappingField(
             name = property.name,
-            types = types.map { it.createType() }
+            types = types.toList()
     )
 
 }
 
 @SearchIndexMappingMarker
-class SearchIndexMappingFieldTypeBuilder {
+class SearchIndexMappingFieldTypeBuilder(private val typeName: String) {
 
-    var type: String? = null
     var index: Boolean? = null
     var scoreBoost: Double? = null
 
     fun createType(): SearchIndexMappingFieldType {
         return SearchIndexMappingFieldType(
-                type = type,
+                type = typeName,
                 index = index,
                 scoreBoost = scoreBoost
         )
