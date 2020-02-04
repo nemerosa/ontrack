@@ -23,6 +23,8 @@ services:
             condition: service_started
          influxdb:
            condition: service_started
+         elasticsearch:
+           condition: service_started
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
@@ -34,7 +36,7 @@ services:
          # Elastic search
          ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
-         SPRING_ELASTICSEARCH_JEST_URIS: "http://elasticsearch:9200"
+         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
       environment:
