@@ -60,7 +60,7 @@ class ReleaseSearchExtension(
     override val indexMapping: SearchIndexMapping = indexMappings<ReleaseSearchItem> {
         +ReleaseSearchItem::entityId to id { index = false }
         +ReleaseSearchItem::entityType to keyword { index = false }
-        +ReleaseSearchItem::release to keyword { scoreBoost = 5.0 }
+        +ReleaseSearchItem::release to keyword { scoreBoost = 5.0 } to text()
     }
 
     override fun indexAll(processor: (ReleaseSearchItem) -> Unit) {

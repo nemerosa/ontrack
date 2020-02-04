@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ReleaseSearchIT : AbstractSearchTestSupport() {
