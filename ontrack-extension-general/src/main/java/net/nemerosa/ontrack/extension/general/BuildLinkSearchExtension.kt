@@ -133,7 +133,7 @@ class BuildLinkSearchItem(
 
     override val id: String = "$fromBuildId::$targetBuildId"
 
-    val targetKey = "$targetProject::$targetBuild"
+    val targetKey = "$targetProject:$targetBuild"
 
     override val fields: Map<String, Any?> = asMap(
             this::fromBuildId,
