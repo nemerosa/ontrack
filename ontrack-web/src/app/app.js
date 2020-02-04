@@ -31,6 +31,7 @@ const ontrack = angular.module('ontrack', [
         'ot.service.configuration',
         'ot.service.graphql',
         'ot.service.label',
+        'ot.service.search',
         // Views
         'ot.view.api',
         'ot.view.api-doc',
@@ -91,7 +92,7 @@ const ontrack = angular.module('ontrack', [
             $urlRouterProvider.deferIntercept();
         })
         // Initialisation work
-        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService) {
+        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService, otSearchService) {
             /**
              * Loading the extensions
              */
@@ -156,6 +157,11 @@ const ontrack = angular.module('ontrack', [
              */
 
             otInfoService.init();
+
+            /**
+             * Search mgt
+             */
+            otSearchService.init();
         })
         // Main controller
         .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
