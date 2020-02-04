@@ -53,7 +53,7 @@ class BranchSearchProvider(
     override val indexName: String = BRANCH_SEARCH_INDEX
 
     override val indexMapping: SearchIndexMapping = indexMappings<BranchSearchItem> {
-        +BranchSearchItem::name to keyword { scoreBoost = 3.0 }
+        +BranchSearchItem::name to keyword { scoreBoost = 3.0 } to text()
         +BranchSearchItem::description to text()
         +BranchSearchItem::project to keyword()
     }
