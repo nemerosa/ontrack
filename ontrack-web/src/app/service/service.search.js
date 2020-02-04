@@ -6,6 +6,20 @@ angular.module('ot.service.search', [
 
         self.init = () => {
             $log.debug('[search] init');
+            $rootScope.selectedSearchResultType = {
+                id: "",
+                name: "Any"
+            };
+            $rootScope.selectAllSearchType = () => {
+                $rootScope.selectedSearchResultType.id = "";
+                $rootScope.selectedSearchResultType.name = "Any";
+                $rootScope.selectedSearchResultType.feature = undefined;
+            };
+            $rootScope.selectSearchType = (type) => {
+                $rootScope.selectedSearchResultType.id = type.id;
+                $rootScope.selectedSearchResultType.name = type.name;
+                $rootScope.selectedSearchResultType.feature = type.feature;
+            };
             ot.call($http.get('search/types')).then(
                 function success(searchResultTypes) {
                     $log.debug('[search] result types: ', searchResultTypes);
