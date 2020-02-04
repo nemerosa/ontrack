@@ -92,8 +92,8 @@
                                     aria-haspopup="true"
                                     aria-expanded="false"><span ng-if="selectedSearchResultType.feature"><img class="ot-icon-mini" src="extension/{{selectedSearchResultType.feature.id}}/search-icon/{{selectedSearchResultType.id}}.png" />&nbsp;</span>{{selectedSearchResultType.name}}&nbsp;<span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                                <li><a ng-click="selectAllSearchType()">Any</a></li>
-                                <li ng-repeat="type in searchResultTypes"><a ng-click="selectSearchType(type)"><img class="ot-icon" src="extension/{{type.feature.id}}/search-icon/{{type.id}}.png"/>&nbsp;{{type.name}}</a></li>
+                                <li><a class="ot-action" ng-click="selectAllSearchType()">Any</a></li>
+                                <li ng-repeat="type in searchResultTypes"><a class="ot-action" ng-click="selectSearchType(type)"><img class="ot-icon" src="extension/{{type.feature.id}}/search-icon/{{type.id}}.png"/>&nbsp;{{type.name}}</a></li>
                             </ul>
                         </div><!-- /btn-group -->
                         <input type="text" class="form-control" placeholder="Search..." aria-label="Search box" ng-model="searchToken">

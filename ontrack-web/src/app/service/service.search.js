@@ -4,6 +4,15 @@ angular.module('ot.service.search', [
     .service('otSearchService', function ($http, $log, $rootScope, ot, otNotificationService) {
         let self = {};
 
+        self.launchSearch = (token) => {
+            let request = {token: token};
+            let uri = `#/search?token=${encodeURIComponent(token)}`;
+            if ($rootScope.selectedSearchResultType.id) {
+                uri += `&type=${encodeURIComponent($rootScope.selectedSearchResultType.id)}`;
+            }
+            location.href = uri;
+        };
+
         self.init = () => {
             $log.debug('[search] init');
             $rootScope.selectedSearchResultType = {

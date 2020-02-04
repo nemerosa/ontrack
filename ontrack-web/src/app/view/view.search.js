@@ -4,15 +4,26 @@ angular.module('ot.view.search', [
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('search', {
-            url: '/search/{token}',
+            url: '/search',
             templateUrl: 'app/view/view.search.tpl.html',
             controller: 'SearchCtrl'
         });
     })
-    .controller('SearchCtrl', function ($location, $stateParams, $scope, $http, $log, ot) {
+    .controller('SearchCtrl', function ($location, $stateParams, $scope, $rootScope, $http, $log, ot) {
 
         // Search token
-        $scope.token = $stateParams.token;
+        $scope.token = $location.search().token;
+
+        // Search type
+        $scope.type = $location.search().type;
+
+        // Request
+        let request = {
+            token: $scope.token
+        };
+        if ($scope.type) {
+            request.type = $scope.type;
+        }
 
         // View definition
         var view = ot.view();
@@ -20,11 +31,11 @@ angular.module('ot.view.search', [
         view.commands = [ot.viewCloseCommand('/home')];
 
         // Launching the search
-        ot.pageCall($http.post('search', {token: $scope.token})).then(function (results) {
+        ot.pageCall($http.post('search', request)).then(function (results) {
             $scope.searchDone = true;
             $scope.results = results;
             // If only one result, switches directly to the correct page
-            if (results.length == 1) {
+            if (results.length === 1) {
                 var result = results[0];
                 $log.info('[search] Autoredirect for 1 result: ', result);
                 if (result.page) {

@@ -164,7 +164,7 @@ const ontrack = angular.module('ontrack', [
             otSearchService.init();
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
+        .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService, otSearchService) {
 
             $log.debug('[app] Initialising the app controller...');
 
@@ -244,7 +244,7 @@ const ontrack = angular.module('ontrack', [
 
             $scope.search = function () {
                 if ($scope.searchToken) {
-                    $state.go('search', {token: $scope.searchToken});
+                    otSearchService.launchSearch($scope.searchToken);
                     $scope.searchToken = '';
                 }
             };
