@@ -42,7 +42,7 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
         // Performs a search
         def results = ontrack.search("${p2}:2*")
         // Gets the results
-        assert results.size() == 1
+        assert results.size() >= 1
         SearchResult result = results[0]
         assert result.title == "Build ${p1}/B1/1.1"
         assert result.description == "${p1} -> 1.1"

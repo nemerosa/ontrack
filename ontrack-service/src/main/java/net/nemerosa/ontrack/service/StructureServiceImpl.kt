@@ -32,6 +32,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Predicate
 import java.util.function.Supplier
@@ -560,6 +561,11 @@ class StructureServiceImpl(
     override fun isLinkedTo(build: Build, project: String, buildPattern: String): Boolean {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.isLinkedTo(build.id, project, buildPattern)
+    }
+
+    override fun forEachBuildLink(code: (from: Build, to: Build) -> Unit) {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        structureRepository.forEachBuildLink(code)
     }
 
     override fun getValidationStampRunViewsForBuild(build: Build): List<ValidationStampRunView> {

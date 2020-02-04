@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -148,6 +149,11 @@ public interface StructureRepository {
     boolean isLinkedFrom(ID id, String project, String buildPattern);
 
     boolean isLinkedTo(ID id, String project, String buildPattern);
+
+    /**
+     * Loops over ALL the build links. Use this method with care, mostly for external indexation.
+     */
+    void forEachBuildLink(BiConsumer<Build,Build> code);
 
     // Promotion levels
 

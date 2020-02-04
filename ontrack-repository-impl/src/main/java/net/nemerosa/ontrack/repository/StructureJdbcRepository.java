@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -19,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -395,6 +397,22 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         .addValue("projectName", project),
                 Integer.class
         ).isPresent();
+    }
+
+    @Override
+    public void forEachBuildLink(BiConsumer<Build, Build> code) {
+        getJdbcTemplate().query(
+                "SELECT * FROM BUILD_LINKS ORDER BY ID ASC",
+                rs -> {
+                    int buildId = rs.getInt("buildId");
+                    int targetBuildId = rs.getInt("targetBuildId");
+                    // Loads the build
+                    Build build = getBuild(ID.of(buildId));
+                    Build targetBuild = getBuild(ID.of(targetBuildId));
+                    // Processing
+                    code.accept(build, targetBuild);
+                }
+        );
     }
 
     protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {

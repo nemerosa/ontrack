@@ -159,6 +159,11 @@ interface StructureService {
     fun isLinkedTo(build: Build, project: String, buildPattern: String): Boolean
 
     /**
+     * Loops over ALL the build links. Use this method with care, mostly for external indexation.
+     */
+    fun forEachBuildLink(code: (from: Build, to: Build) -> Unit)
+
+    /**
      * Looks for the first build which matches a given predicate.
      *
      * @param branchId       Branch to look builds into
