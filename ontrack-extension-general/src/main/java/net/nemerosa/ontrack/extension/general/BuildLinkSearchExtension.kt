@@ -107,7 +107,7 @@ class BuildLinkSearchExtension(
         }?.run {
             SearchResult(
                     entityDisplayName,
-                    "Linked to ${item.targetProject}::${item.targetBuild}",
+                    "Linked to ${item.targetProject}:${item.targetBuild}",
                     uriBuilder.getEntityURI(this),
                     uriBuilder.getEntityPage(this),
                     score,
