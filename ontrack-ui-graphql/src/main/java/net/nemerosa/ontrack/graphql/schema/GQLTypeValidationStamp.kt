@@ -110,7 +110,7 @@ class GQLTypeValidationStamp(
                                         }
                                     } else if (statuses != null) {
                                         structureService.getValidationRunsForValidationStampAndStatus(
-                                                validationStamp.id,
+                                                validationStamp,
                                                 statuses,
                                                 offset,
                                                 size
