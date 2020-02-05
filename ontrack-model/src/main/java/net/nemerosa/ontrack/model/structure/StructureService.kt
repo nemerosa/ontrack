@@ -329,6 +329,8 @@ interface StructureService {
             count: Int
     ): List<ValidationRun>
 
+    fun getValidationRunsForValidationStamp(validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun>
+
     fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
 
     /**
