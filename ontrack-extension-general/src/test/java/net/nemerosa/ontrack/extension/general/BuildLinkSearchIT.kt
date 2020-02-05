@@ -36,7 +36,7 @@ class BuildLinkSearchIT : AbstractDSLTestSupport() {
             assertEquals(100.0, accuracy)
             assertEquals("general", type.feature.id)
             assertEquals("build-link", type.id)
-            assertEquals("Build Link", type.name)
+            assertEquals("Linked Build", type.name)
         }
     }
 
@@ -76,7 +76,7 @@ class BuildLinkSearchIT : AbstractDSLTestSupport() {
             assertEquals(100.0, accuracy)
             assertEquals("general", type.feature.id)
             assertEquals("build-link", type.id)
-            assertEquals("Build Link", type.name)
+            assertEquals("Linked Build", type.name)
         }
         results[1].apply {
             assertEquals(build1.entityDisplayName, title)
@@ -86,7 +86,7 @@ class BuildLinkSearchIT : AbstractDSLTestSupport() {
             assertEquals(100.0, accuracy)
             assertEquals("general", type.feature.id)
             assertEquals("build-link", type.id)
-            assertEquals("Build Link", type.name)
+            assertEquals("Linked Build", type.name)
         }
     }
 
@@ -117,7 +117,7 @@ class BuildLinkSearchIT : AbstractDSLTestSupport() {
             assertEquals(100.0, accuracy)
             assertEquals("general", type.feature.id)
             assertEquals("build-link", type.id)
-            assertEquals("Build Link", type.name)
+            assertEquals("Linked Build", type.name)
         }
     }
 
