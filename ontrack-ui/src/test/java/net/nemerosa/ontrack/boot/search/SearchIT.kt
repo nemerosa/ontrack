@@ -13,7 +13,7 @@ class SearchIT : AbstractSearchTestSupport() {
                 sortedSetOf(
                         "Project", "Branch", "Build",
                         "Git Commit",
-                        "Build with Release", "Build with Meta Info"
+                        "Build with Release", "Build with Meta Info", "Linked Build"
                 ).toList(),
                 names
         )
