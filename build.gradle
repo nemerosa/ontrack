@@ -73,6 +73,7 @@ task preIntegrationTest(type: ComposeUp) {
     projectName = project.properties.itProject
     forceRecreate = false
     host = project.properties.itJdbcHost
+    verbose = true
     // When done
     doLast {
         def jdbcUrl = "jdbc:postgresql://${host}:${getPublishedPort('db', 5432)}/ontrack"
