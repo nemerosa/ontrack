@@ -45,7 +45,7 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
         assert results.size() >= 1
         SearchResult result = results[0]
         assert result.title == "Build ${p1}/B1/1.1"
-        assert result.description == "${p1} -> 1.1"
+        assert result.description == "Linked to ${p2}:2.0"
         assert result.uri == "/structure/builds/${id}"
         assert result.page == "/#/build/${id}"
     }

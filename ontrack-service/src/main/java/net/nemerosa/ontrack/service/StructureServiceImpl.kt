@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.events.BuildLinkListenerService
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.exceptions.*
@@ -54,7 +55,8 @@ class StructureServiceImpl(
         private val decorationService: DecorationService,
         private val projectFavouriteService: ProjectFavouriteService,
         private val promotionRunCheckService: PromotionRunCheckService,
-        private val statsRepository: StatsRepository
+        private val statsRepository: StatsRepository,
+        private val buildLinkListenerService: BuildLinkListenerService
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -470,12 +472,14 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
         structureRepository.addBuildLink(fromBuild.id, toBuild.id)
+        buildLinkListenerService.onBuildLinkAdded(fromBuild, toBuild)
     }
 
     override fun deleteBuildLink(fromBuild: Build, toBuild: Build) {
         securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
         structureRepository.deleteBuildLink(fromBuild.id, toBuild.id)
+        buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild)
     }
 
     override fun getBuildLinksFrom(build: Build): List<Build> {

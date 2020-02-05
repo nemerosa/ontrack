@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
+import net.nemerosa.ontrack.model.events.BuildLinkListener
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
@@ -20,8 +21,9 @@ class BuildLinkSearchExtension(
         extensionFeature: GeneralExtensionFeature,
         private val uriBuilder: URIBuilder,
         private val structureService: StructureService,
-        private val buildDisplayNameService: BuildDisplayNameService
-) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<BuildLinkSearchItem> {
+        private val buildDisplayNameService: BuildDisplayNameService,
+        private val searchIndexService: SearchIndexService
+) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<BuildLinkSearchItem>, BuildLinkListener {
 
     override fun getSearchProvider(): SearchProvider {
         return object : AbstractSearchProvider(uriBuilder) {
@@ -88,12 +90,7 @@ class BuildLinkSearchExtension(
 
     override fun indexAll(processor: (BuildLinkSearchItem) -> Unit) {
         structureService.forEachBuildLink { from, to ->
-            processor(BuildLinkSearchItem(from, to))
-            // Alternative name
-            val otherName = buildDisplayNameService.getBuildDisplayName(to)
-            if (otherName != to.name) {
-                processor(BuildLinkSearchItem(from, to, otherName))
-            }
+            process(from, to, processor)
         }
     }
 
@@ -115,6 +112,27 @@ class BuildLinkSearchExtension(
             )
         }
     }
+
+    override fun onBuildLinkAdded(from: Build, to: Build) {
+        process(from, to) { item ->
+            searchIndexService.createSearchIndex(this, item)
+        }
+    }
+
+    override fun onBuildLinkDeleted(from: Build, to: Build) {
+        process(from, to) { item ->
+            searchIndexService.deleteSearchIndex(this, item.id)
+        }
+    }
+
+    private fun process(from: Build, to: Build, processor: (BuildLinkSearchItem) -> Unit) {
+        processor(BuildLinkSearchItem(from, to))
+        // Alternative name
+        val otherName = buildDisplayNameService.getBuildDisplayName(to)
+        if (otherName != to.name) {
+            processor(BuildLinkSearchItem(from, to, otherName))
+        }
+    }
 }
 
 /**
@@ -129,7 +147,7 @@ class BuildLinkSearchItem(
         val targetBuild: String
 ) : SearchItem {
 
-    constructor(from: Build, to: Build, targetBuildName: String = to.name): this(
+    constructor(from: Build, to: Build, targetBuildName: String = to.name) : this(
             fromBuildId = from.id(),
             targetBuildId = to.id(),
             targetProject = to.project.name,
