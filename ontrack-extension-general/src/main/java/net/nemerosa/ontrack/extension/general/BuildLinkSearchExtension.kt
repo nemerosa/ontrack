@@ -68,7 +68,7 @@ class BuildLinkSearchExtension(
 
     override val indexerName: String = "Build links"
 
-    override val indexName: String = "build-links"
+    override val indexName: String = BUILD_LINK_SEARCH_INDEX
 
     override val indexerSchedule: Schedule = Schedule.EVERY_DAY
 
@@ -116,6 +116,11 @@ class BuildLinkSearchExtension(
         }
     }
 }
+
+/**
+ * Index name for the build links
+ */
+const val BUILD_LINK_SEARCH_INDEX = "build-links"
 
 class BuildLinkSearchItem(
         val fromBuildId: Int,

@@ -1,12 +1,11 @@
 package net.nemerosa.ontrack.boot.search
 
-import net.nemerosa.ontrack.extension.general.*
-import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.extension.general.RELEASE_SEARCH_INDEX
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ReleaseSearchIT : AbstractSearchTestSupport() {
@@ -125,10 +124,6 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                 }
             }
         }
-    }
-
-    private fun Build.release(value: String) {
-        setProperty(this, ReleasePropertyType::class.java, ReleaseProperty(value))
     }
 
 }

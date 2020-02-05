@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.boot.search
 
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchProvider
 import net.nemerosa.ontrack.model.structure.SearchService
@@ -25,13 +28,19 @@ abstract class AbstractSearchTestSupport : AbstractDSLTestSupport() {
     protected lateinit var providers: List<SearchProvider>
 
     protected fun index(indexName: String) {
-        providers.forEach { provider ->
-            provider.searchIndexers.forEach { indexer ->
-                if (indexer.indexName == indexName) {
-                    searchIndexService.index(indexer)
+        asAdmin {
+            providers.forEach { provider ->
+                provider.searchIndexers.forEach { indexer ->
+                    if (indexer.indexName == indexName) {
+                        searchIndexService.index(indexer)
+                    }
                 }
             }
         }
+    }
+
+    protected fun Build.release(value: String) {
+        setProperty(this, ReleasePropertyType::class.java, ReleaseProperty(value))
     }
 
 }
