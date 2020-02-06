@@ -246,6 +246,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
+    /**
+     * Deletes a build
+     */
+    fun Build.delete() {
+        asAdmin {
+            structureService.deleteBuild(id)
+        }
+    }
+
     fun Build.linkTo(project: Project, buildName: String) {
         val build = structureService.buildSearch(
                 project.id,

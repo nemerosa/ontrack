@@ -12,28 +12,16 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
 
     @Test
     fun `Looking for linked build base on target project and name`() {
-        // Target build
-        val target = project<Build> {
-            branch<Build> {
-                build()
+        simpleTest { source, target ->
+            // Indexation
+            index(BUILD_LINK_SEARCH_INDEX)
+            // Looks for the source using target complete reference
+            val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
+            assertTrue(results.isNotEmpty())
+            results[0].apply {
+                assertEquals(source.entityDisplayName, title)
+                assertEquals("Linked to ${target.project.name}:${target.name}", description)
             }
-        }
-        // Source build
-        val source = project<Build> {
-            branch<Build> {
-                build {
-                    linkTo(target)
-                }
-            }
-        }
-        // Indexation
-        index(BUILD_LINK_SEARCH_INDEX)
-        // Looks for the source using target complete reference
-        val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
-        assertTrue(results.isNotEmpty())
-        results[0].apply {
-            assertEquals(source.entityDisplayName, title)
-            assertEquals("Linked to ${target.project.name}:${target.name}", description)
         }
     }
 
@@ -69,28 +57,16 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
 
     @Test
     fun `Looking for linked build base on target project only`() {
-        // Target build
-        val target = project<Build> {
-            branch<Build> {
-                build()
+        simpleTest { source, target ->
+            // Indexation
+            index(BUILD_LINK_SEARCH_INDEX)
+            // Looks for the source using target project only
+            val results = searchService.search(SearchRequest(target.project.name, "build-link")).toList()
+            assertTrue(results.isNotEmpty())
+            results[0].apply {
+                assertEquals(source.entityDisplayName, title)
+                assertEquals("Linked to ${target.project.name}:${target.name}", description)
             }
-        }
-        // Source build
-        val source = project<Build> {
-            branch<Build> {
-                build {
-                    linkTo(target)
-                }
-            }
-        }
-        // Indexation
-        index(BUILD_LINK_SEARCH_INDEX)
-        // Looks for the source using target project only
-        val results = searchService.search(SearchRequest(target.project.name, "build-link")).toList()
-        assertTrue(results.isNotEmpty())
-        results[0].apply {
-            assertEquals(source.entityDisplayName, title)
-            assertEquals("Linked to ${target.project.name}:${target.name}", description)
         }
     }
 
@@ -142,6 +118,66 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
 
     @Test
     fun `Looking for a build link after it has been created`() {
+        simpleTest { source, target ->
+            // Looks for the build based on the link
+            assertBuildFoundOnLink(source, target)
+            // Deletes the link
+            asAdmin {
+                source.unlinkTo(target)
+            }
+            // Looks for the build based on the link
+            withNoGrantViewToAll {
+                asUserWithView(source, target) {
+                    val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
+                    assertTrue(results.none { it.title == source.entityDisplayName }, "Build with link shound not be found any longer")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Looking for a build link after its source build has been deleted`() {
+        simpleTest { source, target ->
+            // Looks for the build based on the link
+            assertBuildFoundOnLink(source, target)
+            // Deletes the source build
+            source.delete()
+            // Looks for the build based on the link
+            assertBuildNotFoundOnLink(source, target)
+        }
+    }
+
+    @Test
+    fun `Looking for a build link after its target build has been deleted`() {
+        simpleTest { source, target ->
+            // Looks for the build based on the link
+            assertBuildFoundOnLink(source, target)
+            // Deletes the target build
+            target.delete()
+            // Looks for the build based on the link
+            assertBuildNotFoundOnLink(source, target)
+        }
+    }
+
+    private fun assertBuildNotFoundOnLink(source: Build, target: Build) {
+        withNoGrantViewToAll {
+            asUserWithView(source, target) {
+                val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
+                assertTrue(results.none { it.title == source.entityDisplayName }, "Build with link shound not be found any longer")
+            }
+        }
+    }
+
+    private fun assertBuildFoundOnLink(source: Build, target: Build) {
+        withNoGrantViewToAll {
+            asUserWithView(source, target) {
+                val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
+                assertTrue(results.any { it.title == source.entityDisplayName }, "Build with link immediately found")
+            }
+        }
+    }
+
+    private fun simpleTest(code: (source: Build, target: Build) -> Unit) {
         // Target build
         val target = project<Build> {
             branch<Build> {
@@ -156,24 +192,8 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
                 }
             }
         }
-        // Looks for the build based on the link
-        withNoGrantViewToAll {
-            asUserWithView(source, target) {
-                val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
-                assertTrue(results.any { it.title == source.entityDisplayName }, "Build with link immediately found")
-            }
-        }
-        // Deletes the link
-        asAdmin {
-            source.unlinkTo(target)
-        }
-        // Looks for the build based on the link
-        withNoGrantViewToAll {
-            asUserWithView(source, target) {
-                val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
-                assertTrue(results.none { it.title == source.entityDisplayName }, "Build with link shound not be found any longer")
-            }
-        }
+        // Test code
+        code(source, target)
     }
 
 }

@@ -101,6 +101,9 @@ class BuildLinkSearchExtension(
         return item?.run {
             // Loads the source build
             structureService.findBuildByID(ID.of(item.fromBuildId))
+        }?.takeIf {
+            // The target build must still exist
+            structureService.findBuildByID(ID.of(item.targetBuildId)) != null
         }?.run {
             SearchResult(
                     entityDisplayName,
