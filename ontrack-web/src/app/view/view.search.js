@@ -26,7 +26,7 @@ angular.module('ot.view.search', [
         }
 
         // View definition
-        var view = ot.view();
+        let view = ot.view();
         view.title = "Search results for \"" + $scope.token + "\"";
         view.commands = [ot.viewCloseCommand('/home')];
 

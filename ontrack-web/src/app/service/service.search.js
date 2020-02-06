@@ -20,7 +20,7 @@ angular.module('ot.service.search', [
                 description: "Searching in all entities",
                 feature: undefined
             };
-            $rootScope.selectedSearchResultType = $rootScope.defaultResultType;
+            $rootScope.selectedSearchResultType = angular.copy($rootScope.defaultResultType);
             $rootScope.selectAllSearchType = () => {
                 $rootScope.selectSearchType($rootScope.defaultResultType);
             };
