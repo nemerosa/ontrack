@@ -32,7 +32,7 @@ public class ValidationStampWeatherDecorationExtension extends AbstractExtension
         // Argument check
         Validate.isTrue(entity instanceof ValidationStamp, "Expecting validation stamp");
         // List of last five runs for this validation stamp
-        List<ValidationRun> runs = structureService.getValidationRunsForValidationStamp(entity.getId(), 0, 5);
+        List<ValidationRun> runs = structureService.getValidationRunsForValidationStamp((ValidationStamp) entity, 0, 5);
         // Keeps only the ones which are not passed
         long notPassed = runs.stream().filter(run -> !run.isPassed()).count();
         // Result

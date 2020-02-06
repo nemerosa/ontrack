@@ -7,7 +7,7 @@ String projectName = 'ontrack'
 
 boolean pr = false
 
-String buildImageVersion = "nemerosa/ontrack-build:1.0.0"
+String buildImageVersion = "nemerosa/ontrack-build:1.0.2"
 
 pipeline {
 
@@ -584,17 +584,10 @@ docker image push nemerosa/ontrack:${ONTRACK_VERSION}
                         echo "Maven publication"
 
                         unstash name: "delivery"
-                        sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
+                        unzip zipFile: "build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip", dir: "${WORKSPACE}"
+                        unzip zipFile: "${WORKSPACE}/ontrack-publication.zip", dir: "publication"
 
-                        sh '''\
-#!/bin/bash
-set -e
-
+                        sh '''
 ./gradlew \\
     --build-file publication.gradle \\
     --info \\
@@ -652,12 +645,8 @@ set -e
                 unstash name: "delivery"
                 unstash name: "rpm"
                 unstash name: "debian"
-                sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
+                unzip zipFile: "build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip", dir: "${WORKSPACE}"
+                unzip zipFile: "${WORKSPACE}/ontrack-publication.zip", dir: "publication"
 
                 sh '''\
 #!/bin/bash
@@ -719,10 +708,8 @@ set -e
                 echo "Release"
 
                 unstash name: "delivery"
-                sh '''\
-                    unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-                    unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-                '''
+                unzip zipFile: "build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip", dir: "${WORKSPACE}"
+                unzip zipFile: "${WORKSPACE}/ontrack-publication.zip", dir: "publication"
 
                 sh '''\
                     ./gradlew \\

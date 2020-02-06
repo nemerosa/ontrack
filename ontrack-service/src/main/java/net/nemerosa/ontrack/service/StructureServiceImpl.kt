@@ -1277,14 +1277,17 @@ class StructureServiceImpl(
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
-        val validationStamp = getValidationStamp(validationStampId)
+    override fun getValidationRunsForValidationStamp(validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun> {
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return structureRepository.getValidationRunsForValidationStamp(validationStamp, offset, count) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForValidationStampAndStatus(validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
         val validationStamp = getValidationStamp(validationStampId)
+        return getValidationRunsForValidationStamp(validationStamp, offset, count)
+    }
+
+    override fun getValidationRunsForValidationStampAndStatus(validationStamp: ValidationStamp, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return structureRepository.getValidationRunsForValidationStampAndStatus(
                 validationStamp,
@@ -1294,6 +1297,11 @@ class StructureServiceImpl(
         ) {
             validationRunStatusService.getValidationRunStatus(it)
         }
+    }
+
+    override fun getValidationRunsForValidationStampAndStatus(validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+        val validationStamp = getValidationStamp(validationStampId)
+        return getValidationRunsForValidationStampAndStatus(validationStamp, statuses, offset, count)
     }
 
     override fun getValidationRunsForStatus(branchId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
