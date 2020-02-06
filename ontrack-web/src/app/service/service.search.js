@@ -5,7 +5,6 @@ angular.module('ot.service.search', [
         let self = {};
 
         self.launchSearch = (token) => {
-            let request = {token: token};
             let uri = `#/search?token=${encodeURIComponent(token)}`;
             if ($rootScope.selectedSearchResultType.id) {
                 uri += `&type=${encodeURIComponent($rootScope.selectedSearchResultType.id)}`;
@@ -15,18 +14,20 @@ angular.module('ot.service.search', [
 
         self.init = () => {
             $log.debug('[search] init');
-            $rootScope.selectedSearchResultType = {
+            $rootScope.defaultResultType = {
                 id: "",
-                name: "Any"
+                name: "Any",
+                description: "Searching in all entities",
+                feature: undefined
             };
+            $rootScope.selectedSearchResultType = $rootScope.defaultResultType;
             $rootScope.selectAllSearchType = () => {
-                $rootScope.selectedSearchResultType.id = "";
-                $rootScope.selectedSearchResultType.name = "Any";
-                $rootScope.selectedSearchResultType.feature = undefined;
+                $rootScope.selectSearchType($rootScope.defaultResultType);
             };
             $rootScope.selectSearchType = (type) => {
                 $rootScope.selectedSearchResultType.id = type.id;
                 $rootScope.selectedSearchResultType.name = type.name;
+                $rootScope.selectedSearchResultType.description = type.description;
                 $rootScope.selectedSearchResultType.feature = type.feature;
             };
             ot.call($http.get('search/types')).then(
