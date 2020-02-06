@@ -7,7 +7,7 @@ String projectName = 'ontrack'
 
 boolean pr = false
 
-String buildImageVersion = "nemerosa/ontrack-build:1.0.1"
+String buildImageVersion = "nemerosa/ontrack-build:1.0.2"
 
 pipeline {
 
