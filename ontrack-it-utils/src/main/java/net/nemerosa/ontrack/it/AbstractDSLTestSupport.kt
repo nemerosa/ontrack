@@ -130,6 +130,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return branch.init()
     }
 
+    /**
+     * Deletes a branch
+     */
+    fun Branch.delete() {
+        asAdmin {
+            structureService.deleteBranch(id)
+        }
+    }
+
     fun Branch.promotionLevel(name: String = uid("P"), init: PromotionLevel.() -> Unit = {}): PromotionLevel =
             doCreatePromotionLevel(this, NameDescription.nd(name, "")).apply {
                 init()

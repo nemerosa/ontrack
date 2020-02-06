@@ -159,6 +159,30 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
         }
     }
 
+    @Test
+    fun `Looking for a build link after its source branch has been deleted`() {
+        simpleTest { source, target ->
+            // Looks for the build based on the link
+            assertBuildFoundOnLink(source, target)
+            // Deletes the source branch has been deleted
+            source.branch.delete()
+            // Looks for the build based on the link
+            assertBuildNotFoundOnLink(source, target)
+        }
+    }
+
+    @Test
+    fun `Looking for a build link after its target branch has been deleted`() {
+        simpleTest { source, target ->
+            // Looks for the build based on the link
+            assertBuildFoundOnLink(source, target)
+            // Deletes the source branch has been deleted
+            target.branch.delete()
+            // Looks for the build based on the link
+            assertBuildNotFoundOnLink(source, target)
+        }
+    }
+
     private fun assertBuildNotFoundOnLink(source: Build, target: Build) {
         withNoGrantViewToAll {
             asUserWithView(source, target) {
