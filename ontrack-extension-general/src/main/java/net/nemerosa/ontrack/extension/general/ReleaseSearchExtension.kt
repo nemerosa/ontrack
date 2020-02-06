@@ -22,7 +22,8 @@ class ReleaseSearchExtension(
     override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
             "build-release",
-            "Build with Release"
+            "Build with Release",
+            "Release, label or version attached to a build"
     )
 
     override fun getSearchProvider() = object : AbstractSearchProvider(uriBuilder) {

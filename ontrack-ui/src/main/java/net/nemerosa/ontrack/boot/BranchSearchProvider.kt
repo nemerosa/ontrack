@@ -21,7 +21,8 @@ class BranchSearchProvider(
     override val searchResultType = SearchResultType(
             feature = CoreExtensionFeature.INSTANCE.featureDescription,
             id = BRANCH_SEARCH_RESULT_TYPE,
-            name = "Branch"
+            name = "Branch",
+            description = "Branch name in Ontrack"
     )
 
     override fun isTokenSearchable(token: String): Boolean = Pattern.matches(NameDescription.NAME, token)

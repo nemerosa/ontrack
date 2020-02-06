@@ -26,7 +26,8 @@ class GitIssueSearchExtension(
     private val resultType = SearchResultType(
             extensionFeature.featureDescription,
             "git-issue",
-            "Git Issue"
+            "Git Issue",
+            "Issue reference as they appear in commit messages"
     )
 
     override fun getSearchProvider(): SearchProvider {

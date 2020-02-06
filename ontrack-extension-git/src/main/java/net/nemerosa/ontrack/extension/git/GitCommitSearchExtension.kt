@@ -34,7 +34,8 @@ class GitCommitSearchExtension(
     override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
             "git-commit",
-            "Git Commit"
+            "Git Commit",
+            "Commit hash (abbreviated or not)"
     )
 
     override fun getSearchProvider(): SearchProvider {

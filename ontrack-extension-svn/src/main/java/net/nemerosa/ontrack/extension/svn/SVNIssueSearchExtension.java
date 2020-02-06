@@ -46,7 +46,8 @@ public class SVNIssueSearchExtension extends AbstractExtension implements Search
         this.resultType = new SearchResultType(
                 extensionFeature.getFeatureDescription(),
                 "svn-issue",
-                "SVN Issue"
+                "SVN Issue",
+                "Issue key as they appear in commit messages for Subversion repositories"
         );
     }
 

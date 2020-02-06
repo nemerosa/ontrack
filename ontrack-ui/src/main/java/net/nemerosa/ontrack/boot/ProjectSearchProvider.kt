@@ -39,7 +39,8 @@ class ProjectSearchProvider(
     override val searchResultType = SearchResultType(
             feature = CoreExtensionFeature.INSTANCE.featureDescription,
             id = PROJECT_SEARCH_RESULT_TYPE,
-            name = "Project"
+            name = "Project",
+            description = "Project name in Ontrack"
     )
 
     override fun isTokenSearchable(token: String): Boolean {

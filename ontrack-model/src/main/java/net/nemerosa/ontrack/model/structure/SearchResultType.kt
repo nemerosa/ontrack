@@ -17,5 +17,9 @@ data class SearchResultType(
         /**
          * Display name for the search result
          */
-        val name: String
+        val name: String,
+        /**
+         * Short help text explaining the format of the token.
+         */
+        val description: String
 )

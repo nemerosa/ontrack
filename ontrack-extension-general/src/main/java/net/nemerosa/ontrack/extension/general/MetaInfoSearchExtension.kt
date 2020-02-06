@@ -28,7 +28,8 @@ class MetaInfoSearchExtension(
     override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
             "build-meta-info",
-            "Build with Meta Info"
+            "Build with Meta Info",
+            "Meta information pair using format name:[value] or value"
     )
 
     override fun getSearchProvider(): SearchProvider {

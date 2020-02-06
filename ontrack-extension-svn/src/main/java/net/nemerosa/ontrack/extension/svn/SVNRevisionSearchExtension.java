@@ -43,7 +43,8 @@ public class SVNRevisionSearchExtension extends AbstractExtension implements Sea
         this.resultType = new SearchResultType(
                 extensionFeature.getFeatureDescription(),
                 "svn-revision",
-                "SVN Revision"
+                "SVN Revision",
+                "SVN Revision number"
         );
     }
 

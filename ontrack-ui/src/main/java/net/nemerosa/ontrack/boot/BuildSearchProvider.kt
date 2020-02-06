@@ -21,7 +21,8 @@ class BuildSearchProvider(
     override val searchResultType = SearchResultType(
             feature = CoreExtensionFeature.INSTANCE.featureDescription,
             id = BUILD_SEARCH_RESULT_TYPE,
-            name = "Build"
+            name = "Build",
+            description = "Build name in Ontrack"
     )
 
     override fun isTokenSearchable(token: String): Boolean {
