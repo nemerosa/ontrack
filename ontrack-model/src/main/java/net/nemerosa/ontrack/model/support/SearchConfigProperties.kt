@@ -28,5 +28,11 @@ class SearchConfigProperties {
          * for testing).
          */
         var immediate = false
+        /**
+         * Number of items to include in a batch when re-indexing a whole collection.
+         *
+         * Note that this can be overridden by the individual search indexers.
+         */
+        var batch = 1000
     }
 }

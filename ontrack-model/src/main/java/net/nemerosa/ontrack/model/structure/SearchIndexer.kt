@@ -45,6 +45,15 @@ interface SearchIndexer<T : SearchItem> {
     val indexMapping: SearchIndexMapping? get() = null
 
     /**
+     * Number of items to include in a batch when re-indexing a whole collection.
+     *
+     * If not defined, the default settings will be used instead
+     *
+     * @see net.nemerosa.ontrack.model.support.SearchConfigProperties.SearchIndexProperties.batch
+     */
+    val indexBatch: Int? get() = null
+
+    /**
      * Index all elements.
      */
     fun indexAll(processor: (T) -> Unit)

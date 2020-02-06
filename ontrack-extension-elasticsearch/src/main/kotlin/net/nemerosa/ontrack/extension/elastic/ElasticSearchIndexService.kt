@@ -38,7 +38,7 @@ class ElasticSearchIndexService(
     }
 
     override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {
-        val batchSize = 1000 // TODO Make the batch size configurable
+        val batchSize = indexer.indexBatch ?: ontrackConfigProperties.search.index.batch
         logger.debug("Full indexation for ${indexer.indexName} with batch size = $batchSize")
         val buffer = mutableListOf<T>()
         indexer.indexAll { item ->
