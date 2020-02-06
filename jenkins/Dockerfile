@@ -24,7 +24,7 @@ RUN mv docker/* /usr/bin/
 RUN chmod +x /usr/bin/docker
 
 # Installs Docker Compose
-RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
+RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
 RUN chmod +x /usr/bin/docker-compose
 
 # Installs Docker Machine
