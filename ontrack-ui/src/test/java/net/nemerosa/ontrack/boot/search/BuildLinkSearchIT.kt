@@ -140,4 +140,40 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
         }
     }
 
+    @Test
+    fun `Looking for a build link after it has been created`() {
+        // Target build
+        val target = project<Build> {
+            branch<Build> {
+                build()
+            }
+        }
+        // Source build
+        val source = project<Build> {
+            branch<Build> {
+                build {
+                    linkTo(target)
+                }
+            }
+        }
+        // Looks for the build based on the link
+        withNoGrantViewToAll {
+            asUserWithView(source, target) {
+                val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
+                assertTrue(results.any { it.title == source.entityDisplayName }, "Build with link immediately found")
+            }
+        }
+        // Deletes the link
+        asAdmin {
+            source.unlinkTo(target)
+        }
+        // Looks for the build based on the link
+        withNoGrantViewToAll {
+            asUserWithView(source, target) {
+                val results = searchService.search(SearchRequest("${target.project.name}:${target.name}", "build-link")).toList()
+                assertTrue(results.none { it.title == source.entityDisplayName }, "Build with link shound not be found any longer")
+            }
+        }
+    }
+
 }

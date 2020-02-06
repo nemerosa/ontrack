@@ -261,6 +261,13 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         )
     }
 
+    fun Build.unlinkTo(build: Build) {
+        structureService.deleteBuildLink(
+                this,
+                build
+        )
+    }
+
     /**
      * Change of status for a validation run
      */
