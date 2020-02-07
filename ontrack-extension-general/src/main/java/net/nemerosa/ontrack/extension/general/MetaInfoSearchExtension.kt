@@ -41,8 +41,6 @@ class MetaInfoSearchExtension(
             override fun search(token: String): Collection<SearchResult> {
                 return this@MetaInfoSearchExtension.search(token)
             }
-
-            override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this@MetaInfoSearchExtension)
         }
     }
 

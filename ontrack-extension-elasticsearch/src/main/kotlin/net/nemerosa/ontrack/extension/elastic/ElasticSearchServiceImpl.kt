@@ -22,16 +22,16 @@ typealias ESSearchRequest = org.elasticsearch.action.search.SearchRequest
 )
 class ElasticSearchServiceImpl(
         private val client: RestHighLevelClient,
-        private val searchProviders: List<SearchProvider>,
+        private val searchIndexers: List<SearchIndexer<*>>,
         private val searchIndexService: SearchIndexService
 ) : SearchService {
 
     val indexers: Map<String, SearchIndexer<*>> by lazy {
-        searchProviders.flatMap { it.searchIndexers }.associateBy { it.indexName }
+        searchIndexers.associateBy { it.indexName }
     }
 
     val indexerByResultType: Map<String, SearchIndexer<*>> by lazy {
-        searchProviders.flatMap { it.searchIndexers }.associateBy { it.searchResultType.id }
+        searchIndexers.associateBy { it.searchResultType.id }
     }
 
     override fun search(request: SearchRequest): Collection<SearchResult> {

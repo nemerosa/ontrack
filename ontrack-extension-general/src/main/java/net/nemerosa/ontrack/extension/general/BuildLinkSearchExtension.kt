@@ -35,9 +35,6 @@ class BuildLinkSearchExtension(
                 return this@BuildLinkSearchExtension.search(token)
             }
 
-            override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(
-                    this@BuildLinkSearchExtension
-            )
         }
     }
 

@@ -51,7 +51,6 @@ class ReleaseSearchExtension(
                     )
                 }
 
-        override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this@ReleaseSearchExtension)
     }
 
     override val indexerName: String = "Release property"

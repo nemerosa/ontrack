@@ -77,7 +77,6 @@ class GitCommitSearchExtension(
             return results
         }
 
-        override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this@GitCommitSearchExtension)
     }
 
     override val indexerName: String = "Git commits"

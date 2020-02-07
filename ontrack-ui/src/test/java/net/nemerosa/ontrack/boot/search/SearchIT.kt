@@ -12,7 +12,7 @@ class SearchIT : AbstractSearchTestSupport() {
         assertEquals(
                 sortedSetOf(
                         "Project", "Branch", "Build",
-                        "Git Commit",
+                        "Git Commit", "Git Branch",
                         "Build with Release", "Build with Meta Info", "Linked Build"
                 ).toList(),
                 names

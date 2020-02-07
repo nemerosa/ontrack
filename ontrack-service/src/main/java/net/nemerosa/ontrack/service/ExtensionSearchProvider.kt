@@ -34,9 +34,4 @@ class ExtensionSearchProvider(
                 .flatMap { p: SearchProvider -> p.search(token) }
     }
 
-    override fun getSearchIndexers(): Collection<SearchIndexer<*>> =
-            providers.flatMap {
-                it.searchIndexers
-            }
-
 }

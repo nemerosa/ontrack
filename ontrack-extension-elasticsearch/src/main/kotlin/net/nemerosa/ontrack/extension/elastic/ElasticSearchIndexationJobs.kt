@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchItem
-import net.nemerosa.ontrack.model.structure.SearchProvider
 import net.nemerosa.ontrack.model.support.JobProvider
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -21,17 +20,15 @@ import org.springframework.stereotype.Component
         havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
 )
 class ElasticSearchIndexationJobs(
-        private val providers: List<SearchProvider>,
+        private val searchIndexers: List<SearchIndexer<*>>,
         private val elasticSearchService: SearchIndexService,
         private val jobScheduler: JobScheduler
 ) : JobProvider {
 
 
     override fun getStartingJobs(): Collection<JobRegistration> =
-            providers.flatMap { provider ->
-                provider.searchIndexers.map { indexer ->
-                    createIndexationJobRegistration(indexer)
-                }
+            searchIndexers.map { indexer ->
+                createIndexationJobRegistration(indexer)
             } + createGlobalIndexationJob()
 
     private fun createGlobalIndexationJob() = JobRegistration(
@@ -45,11 +42,9 @@ class ElasticSearchIndexationJobs(
 
                 override fun getTask() = JobRun { listener ->
                     listener.message("Launching all indexations")
-                    providers.flatMap { provider ->
-                        provider.searchIndexers.map { indexer ->
-                            val key = indexationJobType.getKey(indexer.indexerId)
-                            jobScheduler.fireImmediately(key)
-                        }
+                    searchIndexers.map { indexer ->
+                        val key = indexationJobType.getKey(indexer.indexerId)
+                        jobScheduler.fireImmediately(key)
                     }
                 }
             }
