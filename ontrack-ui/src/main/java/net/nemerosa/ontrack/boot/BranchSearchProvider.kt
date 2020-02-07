@@ -47,8 +47,6 @@ class BranchSearchProvider(
                         )
                     }
 
-    override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this)
-
     override val indexerName: String = "Branches"
 
     override val indexName: String = BRANCH_SEARCH_INDEX

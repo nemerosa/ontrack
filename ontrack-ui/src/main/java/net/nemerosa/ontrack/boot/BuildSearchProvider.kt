@@ -50,8 +50,6 @@ class BuildSearchProvider(
                 }
     }
 
-    override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this)
-
     override val indexerName: String = "Builds"
     override val indexName: String = BUILD_SEARCH_INDEX
 

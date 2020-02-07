@@ -67,8 +67,6 @@ class ProjectSearchProvider(
                 }
     }
 
-    override fun getSearchIndexers(): Collection<SearchIndexer<*>> = listOf(this)
-
     override val indexerName: String = "Projects"
 
     override val indexName: String = PROJECT_SEARCH_INDEX
