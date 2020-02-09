@@ -33,11 +33,9 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Predicate
 import java.util.function.Supplier
-import kotlin.streams.toList
 
 @Service
 @Transactional
@@ -645,8 +643,8 @@ class StructureServiceImpl(
         return promotionLevel
     }
 
-    override fun findPromotionLevelByID(promotionLevel: ID): PromotionLevel? =
-            structureRepository.findPromotionLevelByID(promotionLevel)?.takeIf {
+    override fun findPromotionLevelByID(promotionLevelId: ID): PromotionLevel? =
+            structureRepository.findPromotionLevelByID(promotionLevelId)?.takeIf {
                 securityService.isProjectFunctionGranted(it, ProjectView::class.java)
             }
 
@@ -902,6 +900,11 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return validationStamp
     }
+
+    override fun findValidationStampByID(validationStampId: ID): ValidationStamp? =
+            structureRepository.findValidationStampByID(validationStampId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
 
     override fun findValidationStampByName(project: String, branch: String, validationStamp: String): Optional<ValidationStamp> {
         return structureRepository.getValidationStampByName(project, branch, validationStamp)

@@ -275,6 +275,13 @@ interface StructureService {
 
     fun getValidationStamp(validationStampId: ID): ValidationStamp
 
+    /**
+     * Looks for a validation stamp using its ID.
+     * @param validationStampId ID of the validation stamp
+     * @return Validation stamp or `null` if not found
+     */
+    fun findValidationStampByID(validationStampId: ID): ValidationStamp?
+
     // TODO Replace by ValidationStamp?
     fun findValidationStampByName(project: String, branch: String, validationStamp: String): Optional<ValidationStamp>
 

@@ -15,7 +15,7 @@ public enum ProjectEntityType {
 
     PROMOTION_LEVEL("promotion level", StructureService::getPromotionLevel, StructureService::findPromotionLevelByID),
 
-    VALIDATION_STAMP("validation stamp", StructureService::getValidationStamp),
+    VALIDATION_STAMP("validation stamp", StructureService::getValidationStamp, StructureService::findValidationStampByID),
 
     BUILD("build", StructureService::getBuild, StructureService::findBuildByID),
 

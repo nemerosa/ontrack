@@ -579,7 +579,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         }
     }
 
-
     @Nullable
     @Override
     public PromotionLevel findPromotionLevelByID(ID promotionLevelId) {
@@ -850,15 +849,22 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public ValidationStamp getValidationStamp(ID validationStampId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM VALIDATION_STAMPS WHERE ID = :id",
-                    params("id", validationStampId.getValue()),
-                    (rs, rowNum) -> toValidationStamp(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        ValidationStamp validationStamp = findValidationStampByID(validationStampId);
+        if (validationStamp != null) {
+            return validationStamp;
+        } else {
             throw new ValidationStampNotFoundException(validationStampId);
         }
+    }
+
+    @Nullable
+    @Override
+    public ValidationStamp findValidationStampByID(ID validationStampId) {
+        return getFirstItem(
+                "SELECT * FROM VALIDATION_STAMPS WHERE ID = :id",
+                params("id", validationStampId.getValue()),
+                (rs, rowNum) -> toValidationStamp(rs, this::getBranch)
+        );
     }
 
     @Override

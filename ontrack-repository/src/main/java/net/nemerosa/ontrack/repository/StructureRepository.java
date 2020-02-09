@@ -223,6 +223,14 @@ public interface StructureRepository {
 
     ValidationStamp getValidationStamp(ID validationStampId);
 
+    /**
+     * Looks for a validation stamp using its ID.
+     * @param validationStampId ID of the validation stamp
+     * @return Validation stamp or `null` if not found
+     */
+    @Nullable
+    ValidationStamp findValidationStampByID(ID validationStampId);
+
     Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp);
 
     Optional<ValidationStamp> getValidationStampByName(Branch branch, String validationStamp);
