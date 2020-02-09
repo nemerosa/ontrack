@@ -321,6 +321,13 @@ interface StructureService {
 
     fun getValidationRun(validationRunId: ID): ValidationRun
 
+    /**
+     * Looks for a validation run using its ID.
+     * @param validationRunId ID of the validation run
+     * @return Validation run or `null` if not found
+     */
+    fun findValidationRunByID(validationRunId: ID): ValidationRun?
+
 
     @Deprecated("Use {@link #getValidationRunsForBuild(ID, int, int)} instead.")
     fun getValidationRunsForBuild(buildId: ID): List<ValidationRun>

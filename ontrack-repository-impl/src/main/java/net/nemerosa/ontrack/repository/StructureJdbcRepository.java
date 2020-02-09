@@ -1045,7 +1045,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService) {
-        return getNamedParameterJdbcTemplate().queryForObject(
+        ValidationRun validationRun = findValidationRunByID(validationRunId, validationRunStatusService);
+        if (validationRun != null) {
+            return validationRun;
+        } else {
+            throw new ValidationRunNotFoundException(validationRunId);
+        }
+    }
+
+    @Nullable
+    @Override
+    public ValidationRun findValidationRunByID(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getFirstItem(
                 "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
                         "FROM VALIDATION_RUNS VR " +
                         "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +

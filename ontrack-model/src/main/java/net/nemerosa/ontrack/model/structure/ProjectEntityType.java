@@ -21,16 +21,11 @@ public enum ProjectEntityType {
 
     PROMOTION_RUN("promotion run", StructureService::getPromotionRun, StructureService::findPromotionRunByID),
 
-    VALIDATION_RUN("validation run", StructureService::getValidationRun);
+    VALIDATION_RUN("validation run", StructureService::getValidationRun, StructureService::findValidationRunByID);
 
     private final String displayName;
     private final BiFunction<StructureService, ID, ProjectEntity> entityFn;
     private final BiFunction<StructureService, ID, ProjectEntity> findEntityFn;
-
-    @Deprecated
-    ProjectEntityType(String displayName, BiFunction<StructureService, ID, ProjectEntity> entityFn) {
-        this(displayName, entityFn, entityFn);
-    }
 
     ProjectEntityType(String displayName, BiFunction<StructureService, ID, ProjectEntity> entityFn, BiFunction<StructureService, ID, ProjectEntity> findEntityFn) {
         this.displayName = displayName;

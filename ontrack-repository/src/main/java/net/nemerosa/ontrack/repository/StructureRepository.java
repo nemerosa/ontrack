@@ -269,6 +269,15 @@ public interface StructureRepository {
     ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     /**
+     * Looks for a validation run using its ID.
+     *
+     * @param validationRunId ID of the validation run
+     * @return Validation run or `null` if not found
+     */
+    @Nullable
+    ValidationRun findValidationRunByID(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
      * @deprecated Use {@link #getValidationRunsForBuild(Build, int, int, Function)} instead.
      */
     @Deprecated
