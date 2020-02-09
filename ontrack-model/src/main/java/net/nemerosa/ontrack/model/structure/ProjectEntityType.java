@@ -13,7 +13,7 @@ public enum ProjectEntityType {
 
     BRANCH("branch", StructureService::getBranch, StructureService::findBranchByID),
 
-    PROMOTION_LEVEL("promotion level", StructureService::getPromotionLevel),
+    PROMOTION_LEVEL("promotion level", StructureService::getPromotionLevel, StructureService::findPromotionLevelByID),
 
     VALIDATION_STAMP("validation stamp", StructureService::getValidationStamp),
 
@@ -27,6 +27,7 @@ public enum ProjectEntityType {
     private final BiFunction<StructureService, ID, ProjectEntity> entityFn;
     private final BiFunction<StructureService, ID, ProjectEntity> findEntityFn;
 
+    @Deprecated
     ProjectEntityType(String displayName, BiFunction<StructureService, ID, ProjectEntity> entityFn) {
         this(displayName, entityFn, entityFn);
     }

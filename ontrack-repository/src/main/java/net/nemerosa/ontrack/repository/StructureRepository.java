@@ -163,6 +163,14 @@ public interface StructureRepository {
 
     PromotionLevel getPromotionLevel(ID promotionLevelId);
 
+    /**
+     * Looks for a promotion level using its ID.
+     * @param promotionLevelId ID of the promotion level
+     * @return Promotion level or `null` if not found
+     */
+    @Nullable
+    PromotionLevel findPromotionLevelByID(ID promotionLevelId);
+
     Optional<PromotionLevel> getPromotionLevelByName(String project, String branch, String promotionLevel);
 
     Optional<PromotionLevel> getPromotionLevelByName(Branch branch, String promotionLevel);

@@ -645,6 +645,11 @@ class StructureServiceImpl(
         return promotionLevel
     }
 
+    override fun findPromotionLevelByID(promotionLevel: ID): PromotionLevel? =
+            structureRepository.findPromotionLevelByID(promotionLevel)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
+
     override fun getPromotionLevelImage(promotionLevelId: ID): Document {
         // Checks access
         getPromotionLevel(promotionLevelId)

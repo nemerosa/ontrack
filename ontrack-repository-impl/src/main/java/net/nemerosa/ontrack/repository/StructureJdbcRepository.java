@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -572,15 +571,23 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public PromotionLevel getPromotionLevel(ID promotionLevelId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM PROMOTION_LEVELS WHERE ID = :id",
-                    params("id", promotionLevelId.getValue()),
-                    (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        PromotionLevel promotionLevel = findPromotionLevelByID(promotionLevelId);
+        if (promotionLevel != null) {
+            return promotionLevel;
+        } else {
             throw new PromotionLevelNotFoundException(promotionLevelId);
         }
+    }
+
+
+    @Nullable
+    @Override
+    public PromotionLevel findPromotionLevelByID(ID promotionLevelId) {
+        return getFirstItem(
+                "SELECT * FROM PROMOTION_LEVELS WHERE ID = :id",
+                params("id", promotionLevelId.getValue()),
+                (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
+        );
     }
 
     @Override
