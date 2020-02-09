@@ -1,30 +1,15 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchRequest
-import net.nemerosa.ontrack.model.structure.SearchService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertTrue
 
 /**
  * Testing the search on Git branches.
  */
-@TestPropertySource(
-        properties = [
-            "ontrack.config.search.engine=elasticsearch",
-            "ontrack.config.search.index.immediate=true"
-        ]
-)
-class GitBranchSearchIndexerIT : AbstractGitTestSupport() {
-
-    @Autowired
-    protected lateinit var searchIndexService: SearchIndexService
-
-    @Autowired
-    protected lateinit var searchService: SearchService
+class GitBranchSearchIndexerIT : AbstractGitSearchTestSupport() {
 
     @Autowired
     protected lateinit var gitBranchSearchIndexer: GitBranchSearchIndexer

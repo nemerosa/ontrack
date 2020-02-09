@@ -103,7 +103,8 @@ class GitIssueSearchExtension(
 
     override val indexMapping: SearchIndexMapping? = indexMappings<GitIssueSearchItem> {
         +GitIssueSearchItem::projectId to id { index = false }
-        +GitIssueSearchItem::key to keyword { scoreBoost = 3.0 }
+        +GitIssueSearchItem::key to keyword { index = false }
+        +GitIssueSearchItem::displayKey to keyword { scoreBoost = 3.0 }
         +GitIssueSearchItem::summary to text()
     }
 
@@ -160,8 +161,8 @@ class GitIssueSearchExtension(
         // OK
         return if (project != null && issueConfig != null) {
             SearchResult(
-                    title = "${item.key} - ${item.summary}",
-                    description = "Issue ${item.key} found in project ${project.name}",
+                    title = "${item.displayKey} - ${item.summary}",
+                    description = "Issue ${item.displayKey} found in project ${project.name}",
                     uri = uriBuilder.build(on(GitController::class.java).issueProjectInfo(project.id, item.key)),
                     page = uriBuilder.page("extension/git/${project.id}/issue/${item.key}"),
                     accuracy = score,
@@ -184,12 +185,14 @@ const val GIT_ISSUE_SEARCH_INDEX = "git-issues"
 class GitIssueSearchItem(
         val projectId: Int,
         val key: String,
+        val displayKey: String,
         val summary: String
 ) : SearchItem {
 
     constructor(project: Project, issue: Issue) : this(
             projectId = project.id(),
-            key = issue.displayKey,
+            key = issue.key,
+            displayKey = issue.displayKey,
             summary = issue.summary
     )
 
@@ -198,6 +201,7 @@ class GitIssueSearchItem(
     override val fields: Map<String, Any?> = asMap(
             this::projectId,
             this::key,
+            this::displayKey,
             this::summary
     )
 

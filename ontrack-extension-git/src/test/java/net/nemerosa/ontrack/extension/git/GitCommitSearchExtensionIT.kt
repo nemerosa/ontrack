@@ -12,19 +12,7 @@ import kotlin.test.assertNull
 /**
  * Testing the search on Git commits.
  */
-@TestPropertySource(
-        properties = [
-            "ontrack.config.search.engine=elasticsearch",
-            "ontrack.config.search.index.immediate=true"
-        ]
-)
-class GitCommitSearchExtensionIT : AbstractGitTestSupport() {
-
-    @Autowired
-    protected lateinit var searchIndexService: SearchIndexService
-
-    @Autowired
-    protected lateinit var searchService: SearchService
+class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
 
     @Autowired
     protected lateinit var gitCommitSearchExtension: GitCommitSearchExtension
