@@ -1,14 +1,16 @@
 package net.nemerosa.ontrack.extension.git
 
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.asMap
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.SearchProvider
-import net.nemerosa.ontrack.model.structure.SearchResult
-import net.nemerosa.ontrack.model.structure.SearchResultType
+import net.nemerosa.ontrack.job.Schedule
+import net.nemerosa.ontrack.json.parseOrNull
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
@@ -20,15 +22,9 @@ import java.util.function.BiConsumer
 class GitIssueSearchExtension(
         extensionFeature: GitExtensionFeature,
         private val gitService: GitService,
-        private val uriBuilder: URIBuilder
-) : AbstractExtension(extensionFeature), SearchExtension {
-
-    private val resultType = SearchResultType(
-            extensionFeature.featureDescription,
-            "git-issue",
-            "Git Issue",
-            "Issue reference as they appear in commit messages"
-    )
+        private val uriBuilder: URIBuilder,
+        private val structureService: StructureService
+) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitIssueSearchItem> {
 
     override fun getSearchProvider(): SearchProvider {
         return GitIssueSearchProvider(uriBuilder)
@@ -85,7 +81,7 @@ class GitIssueSearchExtension(
                                                 project.id(),
                                                 issue.key),
                                         100.0,
-                                        resultType
+                                        searchResultType
                                 )
                             }
                         }
@@ -97,4 +93,77 @@ class GitIssueSearchExtension(
         }
 
     }
+
+    override val indexerName: String = "Git Issues"
+
+    override val indexName: String = GIT_ISSUE_SEARCH_INDEX
+
+    /**
+     * Done in the context of [GitCommitSearchExtension.indexAll].
+     */
+    override val indexerSchedule: Schedule = Schedule.NONE
+
+    override val indexMapping: SearchIndexMapping? = indexMappings<GitIssueSearchItem> {
+        +GitIssueSearchItem::projectId to id { index = false }
+        +GitIssueSearchItem::key to keyword { scoreBoost = 3.0 }
+        +GitIssueSearchItem::summary to text()
+    }
+
+    /**
+     * Done in the context of [GitCommitSearchExtension.indexAll].
+     */
+    override fun indexAll(processor: (GitIssueSearchItem) -> Unit) {}
+
+    override val searchResultType = SearchResultType(
+            feature = extensionFeature.featureDescription,
+            id = "git-issue",
+            name = "Git Issue",
+            description = "Issue key, as present in Git commit messages"
+    )
+
+    override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
+        // Parsing of item
+        val item = source.parseOrNull<GitIssueSearchItem>()
+        // Getting the project
+        val project = item?.let { structureService.findProjectByID(ID.of(item.projectId)) }
+        // Getting the project configuration
+        val projectConfig = project?.let { gitService.getProjectConfiguration(project) }
+        // Getting the associated issue service
+        val issueConfig = projectConfig?.configuredIssueService?.getOrNull()
+        // Note: for performances reasons, we don't control if the issue exists or not
+        // OK
+        return if (project != null && issueConfig != null) {
+            SearchResult(
+                    title = "${item.key} - ${item.summary}",
+                    description = "Issue ${item.key} found in project ${project.name}",
+                    uri = uriBuilder.build(on(GitController::class.java).issueProjectInfo(project.id, item.key)),
+                    page = uriBuilder.page("extension/git/${project.id}/issue/${item.key}"),
+                    accuracy = score,
+                    type = searchResultType
+            )
+        } else null
+    }
+}
+
+/**
+ * Name of the search index for Git issues
+ */
+const val GIT_ISSUE_SEARCH_INDEX = "git-issues"
+
+/**
+ * Item being indexed for searches on Git issues.
+ */
+class GitIssueSearchItem(
+        val projectId: Int,
+        val key: String,
+        val summary: String
+) : SearchItem {
+    override val id: String = "$projectId::$key"
+
+    override val fields: Map<String, Any?> = asMap(
+            this::projectId,
+            this::key,
+            this::summary
+    )
+
 }
