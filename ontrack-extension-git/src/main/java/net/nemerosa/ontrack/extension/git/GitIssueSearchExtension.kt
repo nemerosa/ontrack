@@ -124,7 +124,13 @@ class GitIssueSearchExtension(
                         keys.forEach { key ->
                             // Loads the issue when needed
                             val loadedIssue = issueCache.getOrPut(key) {
-                                LoadedIssue(issueConfig.getIssue(key))
+                                val issue = try {
+                                    issueConfig.getIssue(key)
+                                } catch (_: Exception) {
+                                    // Ignoring issues we cannot load
+                                    null
+                                }
+                                LoadedIssue(issue)
                             }
                             // Gets the search item for this issue
                             val item = loadedIssue.issue?.let { GitIssueSearchItem(project, it) }
