@@ -19,7 +19,7 @@ public enum ProjectEntityType {
 
     BUILD("build", StructureService::getBuild, StructureService::findBuildByID),
 
-    PROMOTION_RUN("promotion run", StructureService::getPromotionRun),
+    PROMOTION_RUN("promotion run", StructureService::getPromotionRun, StructureService::findPromotionRunByID),
 
     VALIDATION_RUN("validation run", StructureService::getValidationRun);
 

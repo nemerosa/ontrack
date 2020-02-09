@@ -191,6 +191,14 @@ public interface StructureRepository {
 
     PromotionRun getPromotionRun(ID promotionRunId);
 
+    /**
+     * Looks for a promotion run using its ID.
+     * @param promotionRunId ID of the promotion run
+     * @return Promotion run or `null` if not found
+     */
+    @Nullable
+    PromotionRun findPromotionRunByID(ID promotionRunId);
+
     Ack deletePromotionRun(ID promotionRunId);
 
     List<PromotionRun> getPromotionRunsForBuild(Build build);

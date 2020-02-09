@@ -822,6 +822,11 @@ class StructureServiceImpl(
         return promotionRun
     }
 
+    override fun findPromotionRunByID(promotionRunId: ID): PromotionRun? =
+            structureRepository.findPromotionRunByID(promotionRunId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
+
     override fun getPromotionRunsForBuild(buildId: ID): List<PromotionRun> {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)

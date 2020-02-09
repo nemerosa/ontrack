@@ -235,6 +235,13 @@ interface StructureService {
 
     fun getPromotionRun(promotionRunId: ID): PromotionRun
 
+    /**
+     * Looks for a promotion run using its ID.
+     * @param promotionRunId ID of the promotion run
+     * @return Promotion run or `null` if not found
+     */
+    fun findPromotionRunByID(promotionRunId: ID): PromotionRun?
+
     // TODO Replace by PromotionLevel?
     fun findPromotionLevelByName(project: String, branch: String, promotionLevel: String): Optional<PromotionLevel>
 
