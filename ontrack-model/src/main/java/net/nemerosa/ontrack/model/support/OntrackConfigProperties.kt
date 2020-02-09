@@ -75,7 +75,7 @@ class OntrackConfigProperties {
         /**
          * Search complete key
          */
-        private const val SEARCH_PROPERTY = "$PREFIX.$SEARCH"
+        const val SEARCH_PROPERTY = "$PREFIX.$SEARCH"
         /**
          * Search engine property
          */

@@ -24,7 +24,8 @@ class GitIssueSearchExtension(
         extensionFeature: GitExtensionFeature,
         private val gitService: GitService,
         private val uriBuilder: URIBuilder,
-        private val structureService: StructureService
+        private val structureService: StructureService,
+        private val gitSearchConfigProperties: GitSearchConfigProperties
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitIssueSearchItem> {
 
     override fun getSearchProvider(): SearchProvider {
@@ -99,7 +100,7 @@ class GitIssueSearchExtension(
 
     override val indexName: String = GIT_ISSUE_SEARCH_INDEX
 
-    override val indexerSchedule: Schedule = Schedule.EVERY_HOUR
+    override val indexerSchedule: Schedule = gitSearchConfigProperties.issues.toSchedule()
 
     override val indexMapping: SearchIndexMapping? = indexMappings<GitIssueSearchItem> {
         +GitIssueSearchItem::projectId to id { index = false }

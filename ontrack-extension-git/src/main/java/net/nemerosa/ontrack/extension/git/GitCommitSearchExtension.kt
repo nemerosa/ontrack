@@ -26,7 +26,8 @@ class GitCommitSearchExtension(
         private val gitService: GitService,
         private val uriBuilder: URIBuilder,
         private val securityService: SecurityService,
-        private val structureService: StructureService
+        private val structureService: StructureService,
+        private val gitSearchConfigProperties: GitSearchConfigProperties
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitCommitSearchItem> {
 
     private val shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}")
@@ -83,7 +84,7 @@ class GitCommitSearchExtension(
 
     override val indexName: String = GIT_COMMIT_SEARCH_INDEX
 
-    override val indexerSchedule: Schedule = Schedule.EVERY_HOUR
+    override val indexerSchedule: Schedule = gitSearchConfigProperties.commits.toSchedule()
 
     override val indexMapping: SearchIndexMapping? = indexMappings<GitCommitSearchItem> {
         +GitCommitSearchItem::projectId to id { index = false }
