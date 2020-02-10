@@ -1,6 +1,7 @@
 angular.module('ot.view.search', [
     'ui.router',
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('search', {
@@ -9,7 +10,29 @@ angular.module('ot.view.search', [
             controller: 'SearchCtrl'
         });
     })
-    .controller('SearchCtrl', function ($location, $stateParams, $scope, $rootScope, $http, $log, ot) {
+    .controller('SearchCtrl', function ($location, $stateParams, $scope, $rootScope, $http, $log, ot, otGraphqlService) {
+
+        // GraphQL query
+        let query = `
+            query Search($token: String!, $type: String) {
+                search(token: $token, type: $type, offset: 0, size: 20) {
+                    pageItems {
+                        title
+                        description
+                        accuracy
+                        uri
+                        page
+                        type {
+                            id
+                            name
+                            feature {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
+        `;
 
         // View definition
         let view = ot.view();
@@ -18,29 +41,29 @@ angular.module('ot.view.search', [
         let search = () => {
 
             // Search token
-            $scope.token = $location.search().token;
+            let token = $location.search().token;
 
             // Search type
-            $scope.type = $location.search().type;
+            let type = $location.search().type;
 
             // Request
             let request = {
-                token: $scope.token
+                token: token
             };
-            if ($scope.type) {
-                request.type = $scope.type;
+            if (type) {
+                request.type = type;
             }
 
             // View definition
-            view.title = "Search results for \"" + $scope.token + "\"";
+            view.title = `Search results for "${token}"`;
 
             // Launching the search
-            ot.pageCall($http.post('search', request)).then(function (results) {
+            otGraphqlService.pageGraphQLCall(query, request).then(function (data) {
                 $scope.searchDone = true;
-                $scope.results = results;
+                $scope.results = data.search.pageItems;
                 // If only one result, switches directly to the correct page
-                if (results.length === 1) {
-                    var result = results[0];
+                if ($scope.results.length === 1) {
+                    var result = $scope.results[0];
                     $log.info('[search] Autoredirect for 1 result: ', result);
                     if (result.page) {
                         window.location = result.page;
