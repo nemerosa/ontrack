@@ -83,23 +83,7 @@
                 </ul>
 
                 <!-- Search box -->
-                <form class="navbar-form navbar-right" ng-submit="search(searchToken)" ng-hide="view.disableSearch">
-                    <div class="input-group">
-                        <div class="input-group-btn">
-                            <button type="button"
-                                    class="btn btn-default dropdown-toggle"
-                                    title="{{selectedSearchResultType.description}}"
-                                    data-toggle="dropdown"
-                                    aria-haspopup="true"
-                                    aria-expanded="false"><span ng-if="selectedSearchResultType.feature"><img class="ot-icon-mini" src="extension/{{selectedSearchResultType.feature.id}}/search-icon/{{selectedSearchResultType.id}}.png" />&nbsp;</span>{{selectedSearchResultType.name}}&nbsp;<span class="caret"></span></button>
-                            <ul class="dropdown-menu">
-                                <li><a class="ot-action" ng-click="selectAllSearchType()" title="{{defaultResultType.description}}">Any</a></li>
-                                <li ng-repeat="type in searchResultTypes"><a class="ot-action" ng-click="selectSearchType(type)" title="{{type.description}}"><img class="ot-icon" src="extension/{{type.feature.id}}/search-icon/{{type.id}}.png"/>&nbsp;{{type.name}}</a></li>
-                            </ul>
-                        </div><!-- /btn-group -->
-                        <input type="text" class="form-control" placeholder="Search..." aria-label="Search box" ng-model="searchToken">
-                    </div>
-                </form>
+                <ot-search-box config="globalSearchConfig"></ot-search-box>
 
                 <!-- Loading indicator -->
                 <ul class="nav navbar-nav navbar-right">

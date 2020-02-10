@@ -159,6 +159,13 @@ const ontrack = angular.module('ontrack', [
 
             otInfoService.init();
 
+            /**
+             * Global search
+             */
+            $rootScope.globalSearchConfig = {
+                css: "navbar-form navbar-right"
+            };
+
         })
         // Main controller
         .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService, otSearchService) {
