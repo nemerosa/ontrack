@@ -85,7 +85,7 @@ angular.module('ot.view.search', [
 
         // Listening for the location
         $scope.$watch(() => $location.search(), (newValue, oldValue) => {
-            if (oldValue !== newValue) {
+            if (oldValue !== newValue && newValue.token) {
                 search();
             }
         });
