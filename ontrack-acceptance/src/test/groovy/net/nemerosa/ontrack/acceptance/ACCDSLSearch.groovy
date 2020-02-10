@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import net.nemerosa.ontrack.dsl.SearchResult
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -260,6 +261,28 @@ class ACCDSLSearch extends AbstractACCDSL {
         def newResults = ontrack.search("$name:$value")
         assert !newResults.find { it.title == "Project ${projectName}" }: "Project not found"
 
+    }
+
+    @Test
+    void 'Searching and paginating for builds based on their release information'() {
+        def projectName = uid('P')
+        def prefix = uid('v')
+        // Creates 25 builds
+        ontrack.project(projectName) {
+            branch("master") {
+                (1..25).each { no ->
+                    build("$no") {
+                        config {
+                            label("$prefix-$no")
+                        }
+                    }
+                }
+            }
+        }
+        // Looking for the prefix
+        List<SearchResult> results = ontrack.search(prefix, "build-release", 10, 5)
+        // Checks the results
+        assert results.size() == 5
     }
 
 }
