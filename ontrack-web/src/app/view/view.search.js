@@ -37,6 +37,7 @@ angular.module('ot.view.search', [
         // View definition
         let view = ot.view();
         view.commands = [ot.viewCloseCommand('/home')];
+        view.disableSearch = true; // Managed in the page itself
 
         let search = () => {
 
