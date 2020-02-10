@@ -14,8 +14,11 @@ angular.module('ot.view.search', [
 
         // GraphQL query
         let query = `
-            query Search($token: String!, $type: String) {
-                search(token: $token, type: $type, offset: 0, size: 20) {
+            query Search($token: String!, $type: String, $offset: Int!, $size: Int!) {
+                search(token: $token, type: $type, offset: $offset, size: $size) {
+                    pageInfo {
+                        nextPage { offset size }
+                    }
                     pageItems {
                         title
                         description
@@ -46,6 +49,15 @@ angular.module('ot.view.search', [
             type: $location.search().type
         };
 
+        // Initial list of results
+        $scope.results = [];
+
+        // Initial request
+        let request = {
+            offset: 0,
+            size: 10
+        };
+
         let search = () => {
 
             // Search token
@@ -55,9 +67,7 @@ angular.module('ot.view.search', [
             let type = $location.search().type;
 
             // Request
-            let request = {
-                token: token
-            };
+            request.token = token;
             if (type) {
                 request.type = type;
             }
@@ -65,7 +75,8 @@ angular.module('ot.view.search', [
             // Launching the search
             otGraphqlService.pageGraphQLCall(query, request).then(function (data) {
                 $scope.searchDone = true;
-                $scope.results = data.search.pageItems;
+                $scope.pageInfo = data.search.pageInfo;
+                $scope.results = $scope.results.concat(data.search.pageItems);
                 // If only one result, switches directly to the correct page
                 if ($scope.results.length === 1) {
                     let result = $scope.results[0];
@@ -82,6 +93,13 @@ angular.module('ot.view.search', [
 
         // Initial loading
         search();
+
+        // Load more results
+        $scope.searchMore = (page) => {
+            request.offset = page.offset;
+            request.size = page.size;
+            search();
+        };
 
         // Listening for the location
         $scope.$watch(() => $location.search(), (newValue, oldValue) => {
