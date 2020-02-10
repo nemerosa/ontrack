@@ -15,6 +15,7 @@ interface SearchService {
     /**
      * Search entry point
      */
+    @Deprecated("Use the paginated search", replaceWith = ReplaceWith("paginatedSearch"))
     fun search(request: SearchRequest): Collection<SearchResult> = paginatedSearch(request).items
 
     /**

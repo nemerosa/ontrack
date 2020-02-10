@@ -34,13 +34,16 @@ class GQLPaginatedListFactory(
      * @param itemType Type of the items being paginated
      * @param itemPaginatedListProvider Function to provide the paginated list directly.
      * @param arguments Optional list of arguments to add to the field
+     *
+     * @param P Type of the context (see [DataFetchingEnvironment.getSource])
+     * @param T Type of item in the list
      */
     fun <P, T> createPaginatedField(
             cache: GQLTypeCache,
             fieldName: String,
             fieldDescription: String,
             itemType: GQLType,
-            itemPaginatedListProvider: (DataFetchingEnvironment, P, Int, Int) -> PaginatedList<T>,
+            itemPaginatedListProvider: (env: DataFetchingEnvironment, source: P, offset: Int, size: Int) -> PaginatedList<T>,
             arguments: List<GraphQLArgument> = emptyList()
     ): GraphQLFieldDefinition =
             createBasePaginatedListField(
@@ -70,6 +73,9 @@ class GQLPaginatedListFactory(
      * @param itemListCounter Function to provide the _total_ number of items, regardless of pagination
      * @param itemListProvider Function to provide a list of items restricted by pagination
      * @param arguments Optional list of arguments to add to the field
+     *
+     * @param P Type of the context (see [DataFetchingEnvironment.getSource])
+     * @param T Type of item in the list
      */
     fun <P, T> createPaginatedField(
             cache: GQLTypeCache,

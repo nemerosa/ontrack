@@ -20,18 +20,20 @@ class SearchGraphQLIT : AbstractQLKTITSupport() {
             branch {
                 val data = run("""{
                     search(type: "branch", token: "$name") {
-                        title
-                        description
-                        uri
-                        page
-                        accuracy
-                        type {
-                            id 
-                            name 
+                        pageItems {
+                            title
+                            description
+                            uri
+                            page
+                            accuracy
+                            type {
+                                id 
+                                name 
+                            }
                         }
                     }
                 }""")
-                val results = data["search"]
+                val results = data["search"]["pageItems"]
                 val result = results.find { it["title"].asText() == entityDisplayName }
                 assertNotNull(result, "Branch found") { node ->
                     assertEquals("branch", node["type"]["id"].asText())
