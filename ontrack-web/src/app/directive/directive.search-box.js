@@ -11,6 +11,7 @@ angular.module('ot.directive.search-box', [
             },
             controller: ($scope) => {
                 let config = $scope.config;
+                let resetOnSearch = config.resetOnSearch === undefined ? false : config.resetOnSearch;
                 let otSearchBox = {
                     searchToken: config.token
                 };
@@ -43,6 +44,9 @@ angular.module('ot.directive.search-box', [
                 $scope.performSearch = () => {
                     if ($scope.otSearchBox.searchToken) {
                         otSearchService.launchSearch($scope.otSearchBox.searchToken, otSearchBox.selectedSearchResultType.id);
+                        if (resetOnSearch) {
+                            $scope.otSearchBox.searchToken = "";
+                        }
                     }
                 };
             }

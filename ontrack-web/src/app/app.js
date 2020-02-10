@@ -163,7 +163,8 @@ const ontrack = angular.module('ontrack', [
              * Global search
              */
             $rootScope.globalSearchConfig = {
-                css: "navbar-form navbar-right"
+                css: "navbar-form navbar-right",
+                resetOnSearch: true
             };
 
         })
@@ -243,18 +244,7 @@ const ontrack = angular.module('ontrack', [
             };
 
             /**
-             * Search
-             */
-
-            $scope.search = function () {
-                if ($scope.searchToken) {
-                    otSearchService.launchSearch($scope.searchToken);
-                    $scope.searchToken = '';
-                }
-            };
-
-            /**
-             * Cancel running tasks when chaning page
+             * Cancel running tasks when changing page
              */
 
             $scope.$on('$stateChangeStart', function () {
