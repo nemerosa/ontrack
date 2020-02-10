@@ -1,6 +1,8 @@
 [[integration]]
 == Integration
 
+include::integration-elasticsearch.adoc[]
+
 include::integration-jenkins.adoc[]
 
 include::integration-metrics.adoc[]

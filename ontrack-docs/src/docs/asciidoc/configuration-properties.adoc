@@ -77,4 +77,10 @@ ontrack.config.key-store = file
 # See http://static.javadoc.io/com.github.ben-manes.caffeine/caffeine/2.6.0/com/github/benmanes/caffeine/cache/CaffeineSpec.html
 # For example, for the `properties` cache:
 ontrack.config.cache.specs.properties = maximumSize=1000,expireAfterWrite=1d,recordStats
+
+# Search configuration properties
+
+# Search engine to use
+# Use `elasticsearch` to switch to ElasticSearch based search
+ontrack.config.search.engine = default
 ----
