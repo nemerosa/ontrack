@@ -13,9 +13,14 @@ interface SearchService {
     val searchResultTypes: List<SearchResultType>
 
     /**
-     * Seach entry point
+     * Search entry point
      */
-    fun search(request: SearchRequest): Collection<SearchResult>
+    fun search(request: SearchRequest): Collection<SearchResult> = paginatedSearch(request).items
+
+    /**
+     * Paginated search entry point
+     */
+    fun paginatedSearch(request: SearchRequest): SearchResults
 
     /**
      * Makes sure all search indexes are initialized.

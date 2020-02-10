@@ -34,10 +34,14 @@ class ElasticSearchServiceImpl(
         searchIndexers.associateBy { it.searchResultType.id }
     }
 
-    override fun search(request: SearchRequest): Collection<SearchResult> {
+    override fun paginatedSearch(request: SearchRequest): SearchResults {
         val esRequest = ESSearchRequest().source(
                 SearchSourceBuilder().query(
                         MultiMatchQueryBuilder(request.token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+                ).from(
+                        request.offset
+                ).size(
+                        request.size
                 )
         ).run {
             request.type?.let { type ->
@@ -48,8 +52,12 @@ class ElasticSearchServiceImpl(
         // Getting the result of the search
         val response = client.search(esRequest, RequestOptions.DEFAULT)
 
+        // Pagination information
+        val responseHits = response.hits
+        val totalHits = responseHits.totalHits?.value ?: 0
+
         // Hits as JSON nodes
-        val hits = response.hits.hits.map {
+        val hits = responseHits.hits.map {
             HitNode(
                     it.index,
                     it.id,
@@ -59,7 +67,15 @@ class ElasticSearchServiceImpl(
         }
 
         // Transforming into search results
-        return hits.mapNotNull { toResult(it) }
+        return SearchResults(
+                items = hits.mapNotNull { toResult(it) },
+                offset = request.offset,
+                total = totalHits.toInt(),
+                message = when {
+                    totalHits <= 0 -> "The number of total matches is not known and pagination is not possible."
+                    else -> null
+                }
+        )
     }
 
     override val searchResultTypes: List<SearchResultType>

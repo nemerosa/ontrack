@@ -26,9 +26,12 @@ class SearchServiceImpl(
      */
     override val searchResultTypes: List<SearchResultType> = emptyList()
 
-    override fun search(request: SearchRequest): Collection<SearchResult> = providers
+    override fun paginatedSearch(request: SearchRequest): SearchResults = providers
             .filter { it.isTokenSearchable(request.token) }
             .flatMap { it.search(request.token) }
+            .let {
+                SearchResults(it, offset = 0, total = it.size, message = "Search based on direct access to data (non-ElasticSearch) is deprecated and will be removed in version 4.0. Ask your administrator to switch to ElasticSearch-based research.")
+            }
 
     /**
      * Not supported in legacy search.
