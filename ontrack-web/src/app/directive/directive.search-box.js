@@ -41,7 +41,6 @@ angular.module('ot.directive.search-box', [
                 $scope.otSearchBox = otSearchBox;
                 // Performing the search
                 $scope.performSearch = () => {
-                    console.log("otSearchBox=", $scope.otSearchBox);
                     if ($scope.otSearchBox.searchToken) {
                         otSearchService.launchSearch($scope.otSearchBox.searchToken, otSearchBox.selectedSearchResultType.id);
                     }

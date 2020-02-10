@@ -66,16 +66,16 @@ angular.module('ot.view.search', [
             otGraphqlService.pageGraphQLCall(query, request).then(function (data) {
                 $scope.searchDone = true;
                 $scope.results = data.search.pageItems;
-                // FIXME If only one result, switches directly to the correct page
-                // if ($scope.results.length === 1) {
-                //     var result = $scope.results[0];
-                //     $log.info('[search] Autoredirect for 1 result: ', result);
-                //     if (result.page) {
-                //         window.location = result.page;
-                //     } else {
-                //         $log.error('[search] Could not find any page in the result:', result);
-                //     }
-                // }
+                // If only one result, switches directly to the correct page
+                if ($scope.results.length === 1) {
+                    let result = $scope.results[0];
+                    $log.info('[search] Autoredirect for 1 result: ', result);
+                    if (result.page) {
+                        window.location = result.page;
+                    } else {
+                        $log.error('[search] Could not find any page in the result:', result);
+                    }
+                }
             });
 
         };
