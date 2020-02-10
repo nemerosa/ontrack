@@ -36,8 +36,15 @@ angular.module('ot.view.search', [
 
         // View definition
         let view = ot.view();
+        view.title = "";
         view.commands = [ot.viewCloseCommand('/home')];
         view.disableSearch = true; // Managed in the page itself
+
+        // Search configuration
+        $scope.searchConfig = {
+            token: $location.search().token,
+            type: $location.search().type
+        };
 
         let search = () => {
 
@@ -55,23 +62,20 @@ angular.module('ot.view.search', [
                 request.type = type;
             }
 
-            // View definition
-            view.title = `Search results for "${token}"`;
-
             // Launching the search
             otGraphqlService.pageGraphQLCall(query, request).then(function (data) {
                 $scope.searchDone = true;
                 $scope.results = data.search.pageItems;
-                // If only one result, switches directly to the correct page
-                if ($scope.results.length === 1) {
-                    var result = $scope.results[0];
-                    $log.info('[search] Autoredirect for 1 result: ', result);
-                    if (result.page) {
-                        window.location = result.page;
-                    } else {
-                        $log.error('[search] Could not find any page in the result:', result);
-                    }
-                }
+                // FIXME If only one result, switches directly to the correct page
+                // if ($scope.results.length === 1) {
+                //     var result = $scope.results[0];
+                //     $log.info('[search] Autoredirect for 1 result: ', result);
+                //     if (result.page) {
+                //         window.location = result.page;
+                //     } else {
+                //         $log.error('[search] Could not find any page in the result:', result);
+                //     }
+                // }
             });
 
         };

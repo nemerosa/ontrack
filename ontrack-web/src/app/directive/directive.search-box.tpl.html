@@ -1,0 +1,17 @@
+<form class="{{config.cls}}" ng-submit="otSearchBox.performSearch()">
+    <div class="input-group">
+        <div class="input-group-btn">
+            <button type="button"
+                    class="btn btn-default dropdown-toggle"
+                    title="{{otSearchBox.selectedSearchResultType.description}}"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"><span ng-if="otSearchBox.selectedSearchResultType.feature"><img class="ot-icon-mini" src="extension/{{otSearchBox.selectedSearchResultType.feature.id}}/search-icon/{{otSearchBox.selectedSearchResultType.id}}.png" />&nbsp;</span>{{otSearchBox.selectedSearchResultType.name}}&nbsp;<span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li><a class="ot-action" ng-click="otSearchBox.selectAllSearchType()" title="{{otSearchBox.defaultResultType.description}}">Any</a></li>
+                <li ng-repeat="type in otSearchBox.searchResultTypes"><a class="ot-action" ng-click="otSearchBox.selectSearchType(type)" title="{{type.description}}"><img class="ot-icon" src="extension/{{type.feature.id}}/search-icon/{{type.id}}.png"/>&nbsp;{{type.name}}</a></li>
+            </ul>
+        </div>
+        <input type="text" class="form-control" placeholder="Search..." aria-label="Search box" ng-model="otSearchBox.searchToken">
+    </div>
+</form>

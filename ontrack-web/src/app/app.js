@@ -20,6 +20,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.validationDataTypeDecoration',
         'ot.directive.projectLabel',
         'ot.directive.validationRunStatusComment',
+        'ot.directive.search-box',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services
@@ -158,10 +159,6 @@ const ontrack = angular.module('ontrack', [
 
             otInfoService.init();
 
-            /**
-             * Search mgt
-             */
-            otSearchService.init();
         })
         // Main controller
         .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService, otSearchService) {

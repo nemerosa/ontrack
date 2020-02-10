@@ -1,51 +1,39 @@
 angular.module('ot.service.search', [
     'ot.service.core'
 ])
-    .service('otSearchService', function ($http, $location, $log, $rootScope, ot, otNotificationService) {
+    .service('otSearchService', function ($http, $location, $log, $q, $rootScope, ot, otNotificationService) {
         let self = {};
 
-        self.launchSearch = (token) => {
+        self.launchSearch = (token, type) => {
             let request = {token: token};
-            if ($rootScope.selectedSearchResultType.id) {
-                request.type = $rootScope.selectedSearchResultType.id;
+            if (type) {
+                request.type = type;
             }
             $location.path("/search").search(request);
         };
 
-        self.init = () => {
-            $log.debug('[search] init');
-            $rootScope.defaultResultType = {
-                id: "",
-                name: "Any",
-                description: "Searching in all entities",
-                feature: undefined
-            };
-            $rootScope.selectedSearchResultType = angular.copy($rootScope.defaultResultType);
-            $rootScope.selectAllSearchType = () => {
-                $rootScope.selectSearchType($rootScope.defaultResultType);
-            };
-            $rootScope.selectSearchType = (type) => {
-                $rootScope.selectedSearchResultType.id = type.id;
-                $rootScope.selectedSearchResultType.name = type.name;
-                $rootScope.selectedSearchResultType.description = type.description;
-                $rootScope.selectedSearchResultType.feature = type.feature;
-            };
+        self.defaultResultType = {
+            id: "",
+            name: "Any",
+            description: "Searching in all entities",
+            feature: undefined
+        };
+
+        self.loadSearchResultTypes = () => {
+            let d = $q.defer();
             ot.call($http.get('search/types')).then(
                 function success(searchResultTypes) {
                     $log.debug('[search] result types: ', searchResultTypes);
-                    // Saves the search result types into the scope
-                    $rootScope.searchResultTypes = searchResultTypes;
-                    // Clears the error
                     otNotificationService.clear();
+                    d.resolve(searchResultTypes);
                 },
                 function error(message) {
                     $log.debug('[search] init - no search result type', message);
-                    // Empty result types
-                    $rootScope.searchResultTypes = [];
-                    // Displays a general error
                     otNotificationService.error("Cannot load the search result types. Please try later.");
+                    d.reject();
                 }
             );
+            return d.promise;
         };
 
         return self;
