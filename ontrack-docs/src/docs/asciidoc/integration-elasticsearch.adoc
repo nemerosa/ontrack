@@ -9,3 +9,8 @@ Additionally, the `spring.elasticsearch.rest.uris` property must be set
 to specify where ElasticSearch is deployed, additionally to any credentials
 being needed (see the
 https://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsingle/#boot-features-connecting-to-elasticsearch-rest[Spring Boot documentation]).
+
+[[integration-elasticsearch-configuration]]
+==== ElasticSearch configuration properties
+
+See <<configuration-properties>> for more search configuration properties.
