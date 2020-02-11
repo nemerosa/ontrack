@@ -143,7 +143,9 @@ class GitIssueSearchExtension(
                     // New item
                     val newItem = issue?.let { GitIssueSearchItem(project, it) }
                     // Processing
-                    newItem?.let(processor)
+                    if (newItem != null) {
+                        processor(newItem)
+                    }
                 }
             }
         }
