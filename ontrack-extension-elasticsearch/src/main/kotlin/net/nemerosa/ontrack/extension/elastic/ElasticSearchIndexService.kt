@@ -145,10 +145,12 @@ class ElasticSearchIndexService(
         val bulk = items.fold(BulkRequest(indexer.indexName)) { acc, item ->
             acc.add(IndexRequest().id(item.id).source(item.fields))
         }
-        // Launching the indexation of this batch
-        client.bulk(bulk, RequestOptions.DEFAULT)
-        // Refreshes the index
-        immediateRefreshIfRequested(indexer)
+        if (bulk.numberOfActions() > 0) {
+            // Launching the indexation of this batch
+            client.bulk(bulk, RequestOptions.DEFAULT)
+            // Refreshes the index
+            immediateRefreshIfRequested(indexer)
+        }
     }
 
     private fun <T : SearchItem> immediateRefreshIfRequested(indexer: SearchIndexer<T>) {

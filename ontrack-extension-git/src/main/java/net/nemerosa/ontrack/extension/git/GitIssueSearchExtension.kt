@@ -215,7 +215,7 @@ class GitIssueSearchItem(
             projectId = project.id(),
             key = key,
             collected = false,
-            collection = 0,
+            collection = Int.MAX_VALUE.toLong(),
             displayKey = "",
             summary = ""
     )
