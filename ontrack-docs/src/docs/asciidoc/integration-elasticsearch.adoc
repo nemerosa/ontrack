@@ -14,3 +14,8 @@ https://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsing
 ==== ElasticSearch configuration properties
 
 See <<configuration-properties>> for more search configuration properties.
+
+[[integration-elasticsearch-indexers]]
+==== ElasticSearch indexers
+
+See <<extending-search>> for extending search capabilities of Ontrack.
