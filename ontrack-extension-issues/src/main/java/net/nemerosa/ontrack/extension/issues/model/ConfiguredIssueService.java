@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -29,6 +30,7 @@ public class ConfiguredIssueService {
         return issueServiceExtension.getLinkForAllIssues(issueServiceConfiguration, issues);
     }
 
+    @Nullable
     public Issue getIssue(String issueKey) {
         return issueServiceExtension.getIssue(issueServiceConfiguration, issueKey);
     }

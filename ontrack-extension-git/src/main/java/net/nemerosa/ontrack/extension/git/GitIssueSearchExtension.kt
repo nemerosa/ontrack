@@ -113,6 +113,10 @@ class GitIssueSearchExtension(
     }
 
     override fun indexAll(processor: (GitIssueSearchItem) -> Unit) {
+        // Cache for project and issue configuration
+        val projectConfigCache = mutableMapOf<Int, Pair<Project?, ConfiguredIssueService?>>()
+        // Cache for issues in project
+        val projectIssueCache = mutableMapOf<Pair<Int, String>, LoadedIssue>()
         // Updates all items (by batch of 1000)
         // FIXME Which have not been collected OR collected BEFORE 1 week ago
         // And update them with new data
@@ -121,39 +125,28 @@ class GitIssueSearchExtension(
                 size = 1000,
                 query = query { ("collected" eq false) or ("collection" gt 0) }
         ) { source ->
-            TODO("Update the source item back using the processor")
+            val item = source.parseOrNull<GitIssueSearchItem>()
+            if (item != null) {
+                // Cache for project configuration
+                val (project, issueConfig) = projectConfigCache.getOrPut(item.projectId) {
+                    val project = structureService.findProjectByID(ID.of(item.projectId))
+                    val projectConfig = project?.let { gitService.getProjectConfiguration(project) }
+                    val issueConfig = projectConfig?.configuredIssueService?.getOrNull()
+                    project to issueConfig
+                }
+                if (project != null && issueConfig != null) {
+                    // Loads the issue
+                    val issue = projectIssueCache.getOrPut(project.id() to item.key) {
+                        LoadedIssue(issueConfig.getIssue(item.key))
+                    }.issue
+                    // New item
+                    val newItem = issue?.let { GitIssueSearchItem(project, it) }
+                    // Processing
+                    newItem?.let(processor)
+                }
+            }
         }
     }
-
-    /**
-     * TODO GET /git-issues/_search
-     * ```
-     *    {
-     *      "from": 0,
-     *      "size": 2,
-     *      "query": {
-     *        "dis_max": {
-     *          "queries": [
-     *            {
-     *              "term": {
-     *                "collected": {
-     *                  "value": false
-     *                }
-     *              }
-     *            },
-     *            {
-     *              "range": {
-     *                "collection": {
-     *                  "gt": 0
-     *                }
-     *              }
-     *            }
-     *          ]
-     *        }
-     *      }
-     *    }
-     * ```
-     */
 
     fun processIssueKeys(project: Project, issueConfig: ConfiguredIssueService, projectIssueKeys: Set<String>) {
         // Batch size
@@ -195,6 +188,8 @@ class GitIssueSearchExtension(
             )
         } else null
     }
+
+    private class LoadedIssue(val issue: Issue?)
 
 }
 
