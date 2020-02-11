@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.elastic
 
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.search.SearchQuery
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.elasticsearch.action.DocWriteRequest
@@ -9,11 +12,13 @@ import org.elasticsearch.action.bulk.BulkRequest
 import org.elasticsearch.action.delete.DeleteRequest
 import org.elasticsearch.action.get.GetRequest
 import org.elasticsearch.action.index.IndexRequest
+import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.client.indices.CreateIndexRequest
 import org.elasticsearch.client.indices.GetIndexRequest
 import org.elasticsearch.client.indices.PutMappingRequest
+import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -194,6 +199,26 @@ class ElasticSearchIndexService(
         immediateRefreshIfRequested(indexer)
         // OK
         return bulk.results
+    }
+
+    override fun <T : SearchItem> query(indexer: SearchIndexer<T>, size: Int, query: SearchQuery, handler: (source: JsonNode) -> Unit) {
+        val source = SearchSourceBuilder().query(ElasticSearchQuery().of(query)).size(size)
+        // Starts the pagination
+        var next = true
+        var offset = 0
+        while (next) {
+            // Gets current page
+            val request = SearchRequest(indexer.indexName).source(source.from(offset))
+            val response = client.search(request, RequestOptions.DEFAULT)
+            // Processing the hits as JSON nodes
+            val hits = response.hits.hits
+            hits.forEach { hit ->
+                handler(hit.sourceAsMap.asJson())
+            }
+            // Next page if hits' count >= size
+            next = hits.size >= size
+            offset += size
+        }
     }
 
     private fun <T : SearchItem> batchSearchIndexAction(indexer: SearchIndexer<T>, item: T, mode: BatchIndexMode): BatchSearchIndexAction {

@@ -10,13 +10,13 @@ import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
+import net.nemerosa.ontrack.model.search.dsl.query
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import java.time.LocalDateTime
 import java.util.*
 import java.util.function.BiConsumer
 
@@ -112,7 +112,48 @@ class GitIssueSearchExtension(
         +GitIssueSearchItem::summary to text()
     }
 
-    override fun indexAll(processor: (GitIssueSearchItem) -> Unit) {}
+    override fun indexAll(processor: (GitIssueSearchItem) -> Unit) {
+        // Updates all items (by batch of 1000)
+        // FIXME Which have not been collected OR collected BEFORE 1 week ago
+        // And update them with new data
+        searchIndexService.query(
+                indexer = this,
+                size = 1000,
+                query = query { ("collected" eq false) or ("collection" gt 0) }
+        ) { source ->
+            TODO("Update the source item back using the processor")
+        }
+    }
+
+    /**
+     * TODO GET /git-issues/_search
+     * ```
+     *    {
+     *      "from": 0,
+     *      "size": 2,
+     *      "query": {
+     *        "dis_max": {
+     *          "queries": [
+     *            {
+     *              "term": {
+     *                "collected": {
+     *                  "value": false
+     *                }
+     *              }
+     *            },
+     *            {
+     *              "range": {
+     *                "collection": {
+     *                  "gt": 0
+     *                }
+     *              }
+     *            }
+     *          ]
+     *        }
+     *      }
+     *    }
+     * ```
+     */
 
     fun processIssueKeys(project: Project, issueConfig: ConfiguredIssueService, projectIssueKeys: Set<String>) {
         // Batch size
@@ -174,7 +215,7 @@ class GitIssueSearchItem(
         val summary: String
 ) : SearchItem {
 
-    constructor(project: Project, key: String): this(
+    constructor(project: Project, key: String) : this(
             projectId = project.id(),
             key = key,
             collected = false,

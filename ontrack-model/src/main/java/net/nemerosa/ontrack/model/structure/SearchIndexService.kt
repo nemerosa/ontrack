@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.search.SearchQuery
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -27,6 +29,8 @@ interface SearchIndexService {
     fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String)
 
     fun <T : SearchItem> batchSearchIndex(indexer: SearchIndexer<T>, items: Collection<T>, mode: BatchIndexMode): BatchIndexResults
+
+    fun <T : SearchItem> query(indexer: SearchIndexer<T>, size: Int, query: SearchQuery, handler: (source: JsonNode) -> Unit)
 
 }
 
@@ -101,6 +105,7 @@ class NOPSearchIndexService : SearchIndexService {
     override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {}
 
     override fun <T : SearchItem> batchSearchIndex(indexer: SearchIndexer<T>, items: Collection<T>, mode: BatchIndexMode): BatchIndexResults =
-            BatchIndexResults(added = 0, updated = 0, kept = 0, deleted = 0)
+            BatchIndexResults.NONE
 
+    override fun <T : SearchItem> query(indexer: SearchIndexer<T>, size: Int, query: SearchQuery, handler: (source: JsonNode) -> Unit) {}
 }
