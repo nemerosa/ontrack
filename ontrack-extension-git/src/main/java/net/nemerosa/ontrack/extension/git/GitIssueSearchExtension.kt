@@ -127,7 +127,7 @@ class GitIssueSearchExtension(
                 query = query { ("collected" eq false) or ("collection" lt timestamp) }
         ) { source ->
             val item = source.parseOrNull<GitIssueSearchItem>()
-            if (item != null) {
+            if (item != null && (gitSearchConfigProperties.issues.refresh || !item.collected)) {
                 // Cache for project configuration
                 val (project, issueConfig) = projectConfigCache.getOrPut(item.projectId) {
                     val project = structureService.findProjectByID(ID.of(item.projectId))

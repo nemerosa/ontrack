@@ -71,6 +71,14 @@ class GitSearchConfigProperties {
         @DurationUnit(ChronoUnit.DAYS)
         var validity: Duration = Duration.ofDays(7)
 
+        /**
+         * Refreshing existing issues
+         */
+        var refresh: Boolean = true
+
+        /**
+         * Default schedule set to 1 week
+         */
         init {
             schedule = Duration.ofDays(7) // Every week for checking the issues
         }
