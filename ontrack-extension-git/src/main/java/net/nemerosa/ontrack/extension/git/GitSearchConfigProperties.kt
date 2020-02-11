@@ -64,6 +64,13 @@ class GitSearchConfigProperties {
      * Issue search configuration properties
      */
     class GitIssueSearchConfigProperties : AbstractGitSearchConfigProperties() {
+
+        /**
+         * Time issue information remains valid in search index
+         */
+        @DurationUnit(ChronoUnit.DAYS)
+        var validity: Duration = Duration.ofDays(7)
+
         init {
             schedule = Duration.ofDays(7) // Every week for checking the issues
         }

@@ -117,13 +117,14 @@ class GitIssueSearchExtension(
         val projectConfigCache = mutableMapOf<Int, Pair<Project?, ConfiguredIssueService?>>()
         // Cache for issues in project
         val projectIssueCache = mutableMapOf<Pair<Int, String>, LoadedIssue>()
-        // Updates all items (by batch of 1000)
-        // FIXME Which have not been collected OR collected BEFORE 1 week ago
+        // Updates all items (by batch)
+        // Which have not been collected OR collected BEFORE 1 week ago
+        val timestamp = System.currentTimeMillis() - gitSearchConfigProperties.issues.validity.toMillis()
         // And update them with new data
         searchIndexService.query(
                 indexer = this,
-                size = 1000,
-                query = query { ("collected" eq false) or ("collection" gt 0) }
+                size = ontrackConfigProperties.search.index.batch,
+                query = query { ("collected" eq false) or ("collection" lt timestamp) }
         ) { source ->
             val item = source.parseOrNull<GitIssueSearchItem>()
             if (item != null) {

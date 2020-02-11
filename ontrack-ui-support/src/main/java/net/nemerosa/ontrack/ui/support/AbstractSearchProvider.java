@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.ui.controller.URIBuilder;
 
 import java.net.URI;
 
+@Deprecated
 public abstract class AbstractSearchProvider implements SearchProvider {
 
     protected final URIBuilder uriBuilder;
