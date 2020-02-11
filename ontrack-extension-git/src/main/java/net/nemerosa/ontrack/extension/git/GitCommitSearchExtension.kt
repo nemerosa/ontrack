@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.git.model.GitCommit
 import net.nemerosa.ontrack.job.Schedule
@@ -27,7 +28,8 @@ class GitCommitSearchExtension(
         private val uriBuilder: URIBuilder,
         private val securityService: SecurityService,
         private val structureService: StructureService,
-        private val gitSearchConfigProperties: GitSearchConfigProperties
+        gitSearchConfigProperties: GitSearchConfigProperties,
+        private val gitIssueSearchExtension: GitIssueSearchExtension
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitCommitSearchItem> {
 
     private val shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}")
@@ -98,10 +100,22 @@ class GitCommitSearchExtension(
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
+            val issueConfig: ConfiguredIssueService? = gitConfiguration.configuredIssueService.orElse(null)
             try {
+                val projectIssueKeys = mutableSetOf<String>()
                 gitService.forEachCommit(gitConfiguration) { commit: GitCommit ->
+                    // Indexation of the message
                     val item = GitCommitSearchItem(project, gitConfiguration, commit)
                     processor(item)
+                    // Gets the list of issues
+                    if (issueConfig != null) {
+                        val keys = issueConfig.extractIssueKeysFromMessage(commit.fullMessage)
+                        projectIssueKeys.addAll(keys)
+                    }
+                }
+                // Processing of issues
+                if (issueConfig != null) {
+                    gitIssueSearchExtension.processIssueKeys(project, issueConfig, projectIssueKeys)
                 }
             } catch (_: Exception) {
                 // Ignoring any error linked to missing indexation

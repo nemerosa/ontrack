@@ -63,6 +63,10 @@ class GitSearchConfigProperties {
     /**
      * Issue search configuration properties
      */
-    class GitIssueSearchConfigProperties : AbstractGitSearchConfigProperties()
+    class GitIssueSearchConfigProperties : AbstractGitSearchConfigProperties() {
+        init {
+            schedule = Duration.ofDays(7) // Every week for checking the issues
+        }
+    }
 
 }

@@ -8,14 +8,15 @@ import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.git.model.GitCommit
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+import java.time.LocalDateTime
 import java.util.*
 import java.util.function.BiConsumer
 
@@ -25,7 +26,9 @@ class GitIssueSearchExtension(
         private val gitService: GitService,
         private val uriBuilder: URIBuilder,
         private val structureService: StructureService,
-        private val gitSearchConfigProperties: GitSearchConfigProperties
+        private val ontrackConfigProperties: OntrackConfigProperties,
+        private val gitSearchConfigProperties: GitSearchConfigProperties,
+        private val searchIndexService: SearchIndexService
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitIssueSearchItem> {
 
     override fun getSearchProvider(): SearchProvider {
@@ -109,43 +112,17 @@ class GitIssueSearchExtension(
         +GitIssueSearchItem::summary to text()
     }
 
-    override fun indexAll(processor: (GitIssueSearchItem) -> Unit) {
-        gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
-            val issueConfig = gitConfiguration.configuredIssueService.getOrNull()
-            if (issueConfig != null) {
-                try {
-                    // Cache for issues
-                    val issueCache = mutableMapOf<String, LoadedIssue>()
-                    // For every commit
-                    gitService.forEachCommit(gitConfiguration) { commit: GitCommit ->
-                        // Gets the list of issues
-                        val keys = issueConfig.extractIssueKeysFromMessage(commit.fullMessage)
-                        // For each key
-                        keys.forEach { key ->
-                            // Loads the issue when needed
-                            val loadedIssue = issueCache.getOrPut(key) {
-                                val issue = try {
-                                    issueConfig.getIssue(key)
-                                } catch (_: Exception) {
-                                    // Ignoring issues we cannot load
-                                    null
-                                }
-                                LoadedIssue(issue)
-                            }
-                            // Gets the search item for this issue
-                            val item = loadedIssue.issue?.let { GitIssueSearchItem(project, it) }
-                            // Indexation
-                            if (item != null) {
-                                processor(item)
-                            }
-                        }
-                    }
-                } catch (_: Exception) {
-                    // Ignoring any error linked to missing indexation
-                    // They will be caught be the indexation itself
-                }
-            }
-        })
+    override fun indexAll(processor: (GitIssueSearchItem) -> Unit) {}
+
+    fun processIssueKeys(project: Project, issueConfig: ConfiguredIssueService, projectIssueKeys: Set<String>) {
+        // Batch size
+        val batchSize = ontrackConfigProperties.search.index.batch
+        // Split the keys in batches
+        val chunks = projectIssueKeys.chunked(batchSize)
+        // For each batch
+        chunks.forEach { batch ->
+            searchIndexService.batchSearchIndex(this, batch.map { GitIssueSearchItem(project, it) }, BatchIndexMode.KEEP)
+        }
     }
 
     override val searchResultType = SearchResultType(
@@ -178,7 +155,6 @@ class GitIssueSearchExtension(
         } else null
     }
 
-    private class LoadedIssue(val issue: Issue?)
 }
 
 /**
@@ -192,13 +168,26 @@ const val GIT_ISSUE_SEARCH_INDEX = "git-issues"
 class GitIssueSearchItem(
         val projectId: Int,
         val key: String,
+        val collected: Boolean,
+        val collection: Long,
         val displayKey: String,
         val summary: String
 ) : SearchItem {
 
+    constructor(project: Project, key: String): this(
+            projectId = project.id(),
+            key = key,
+            collected = false,
+            collection = 0,
+            displayKey = "",
+            summary = ""
+    )
+
     constructor(project: Project, issue: Issue) : this(
             projectId = project.id(),
             key = issue.key,
+            collected = true,
+            collection = System.currentTimeMillis(),
             displayKey = issue.displayKey,
             summary = issue.summary
     )
@@ -208,6 +197,8 @@ class GitIssueSearchItem(
     override val fields: Map<String, Any?> = asMap(
             this::projectId,
             this::key,
+            this::collected,
+            this::collection,
             this::displayKey,
             this::summary
     )

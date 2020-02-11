@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.elastic
 
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.elasticsearch.action.DocWriteRequest
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
 import org.elasticsearch.action.bulk.BulkRequest
 import org.elasticsearch.action.delete.DeleteRequest
+import org.elasticsearch.action.get.GetRequest
 import org.elasticsearch.action.index.IndexRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestHighLevelClient
@@ -179,5 +181,56 @@ class ElasticSearchIndexService(
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
     }
+
+    override fun <T : SearchItem> batchSearchIndex(indexer: SearchIndexer<T>, items: Collection<T>, mode: BatchIndexMode): BatchIndexResults {
+        // Building the list of actions to take
+        val bulk = items.fold(BatchSearchIndexBulk(indexer.indexName)) { acc, item ->
+            val action = batchSearchIndexAction(indexer, item, mode)
+            acc + action
+        }
+        // Launching the indexation of this batch
+        client.bulk(bulk.bulk, RequestOptions.DEFAULT)
+        // Refreshes the index
+        immediateRefreshIfRequested(indexer)
+        // OK
+        return bulk.results
+    }
+
+    private fun <T : SearchItem> batchSearchIndexAction(indexer: SearchIndexer<T>, item: T, mode: BatchIndexMode): BatchSearchIndexAction {
+        // Gets the existing item using its ID
+        val response = client.get(GetRequest(indexer.indexName).id(item.id), RequestOptions.DEFAULT)
+        // If item exists
+        return if (response.isExists) {
+            when (mode) {
+                BatchIndexMode.KEEP -> BatchSearchIndexAction(null, BatchIndexResults.KEEP)
+                BatchIndexMode.UPDATE -> BatchSearchIndexAction(IndexRequest(indexer.indexName).id(item.id).source(item.fields), BatchIndexResults.UPDATE)
+            }
+        }
+        // If not existing
+        else {
+            BatchSearchIndexAction(IndexRequest(indexer.indexName).id(item.id).source(item.fields), BatchIndexResults.ADD)
+        }
+    }
+
+    private class BatchSearchIndexBulk private constructor(
+            val bulk: BulkRequest,
+            val results: BatchIndexResults
+    ) {
+        constructor(indexName: String) : this(
+                BulkRequest(indexName),
+                BatchIndexResults.NONE
+        )
+
+        operator fun plus(action: BatchSearchIndexAction) =
+                BatchSearchIndexBulk(
+                        bulk = action.action?.let { bulk.add(it) } ?: bulk,
+                        results = results + action.results
+                )
+    }
+
+    private class BatchSearchIndexAction(
+            val action: DocWriteRequest<*>?,
+            val results: BatchIndexResults
+    )
 
 }
