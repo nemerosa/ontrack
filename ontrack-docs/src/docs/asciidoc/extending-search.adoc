@@ -1,0 +1,198 @@
+[[extending-search]]
+==== Extending the search
+
+The Search capabilities of Ontrack can be extended through extensions
+and the core capabilities are also coded through extensions.
+
+A Search extension is a component which implements the `SearchIndexer` interface.
+
+[NOTE]
+====
+In versions 3.40 and before, search extensions were done using `SearchProvider`
+implementations. Search was always done dynamically, without going through
+an index, making it particularly slow on big volumes or when scanning
+external systems.
+
+The `SearchProvider` is now deprecated and will be removed in version 4 of
+Ontrack, to be replaced exclusively by ElasticSearch.
+====
+
+[[extending-search-overview]]
+===== Search indexer overview
+
+A `SearchIndexer` is responsible for two things:
+
+* feeding a search index
+* transforming found index entries into displayable search results
+
+The `SearchIndexer` must be parameterized by a `SearchItem` class -
+see
+
+The `indexerName` is the display name for the indexer, used to log
+information or to name the <<extending-search-indexation-jobs,indexation jobs>>.
+
+Indexation jobs can be totally disabled by setting `true` as
+the `isIndexationDisabled` property. They cannot even be triggered
+manually - set `isIndexationDisabled` to `true` when search indexes
+are not applicable. For example, some `SearchIndexer` instances
+might be fed by other indexers.
+
+The `indexerSchedule` is used to set a schedule to the
+<<architecture-jobs,indexation job>>. It defaults to `Schedule.NONE`
+meaning that the job can be run only manually. Set another
+schedule for an automated job.
+
+The `indexName` defines the name of the technical index used
+by this `SearchIndexer` - when using ElasticSearch, it corresponds
+to the name of ElasticSearch index to use. The index can be configured
+by setting the `indexMapping` property - see <<extending-search-indexation-mapping>>
+for more information on this subject.
+
+[NOTE]
+====
+At Ontrack startup time, all indexes are created (in ElasticSearch)
+and their mapping updated.
+====
+
+The `searchResultType` defines the type of result returned by an index
+search capability. It's used:
+
+1. to provide a user a way to filter on the types of results
+2. a way for the front-end to associate an <<extending-search-result-icon,icon>>
+   to the type of result
+
+For example:
+
+[source,kotlin]
+----
+@Component
+class MySearchIndexer: SearchIndexer<MySearchItem> {
+    override val searchResultType = SearchResultType(
+            feature = feature.featureDescription,
+            id = "my-result",
+            name = "My result",
+            description = "Use a comma-separated list of tokens"
+    )
+}
+----
+
+The `feature` is the `ExtensionFeature` associated with this
+`SearchIndexer` (see <<extending-coding>>).
+
+The `description` property is used to describe the type of search
+token one should use to find this type of result (when
+applicable).
+
+[[extending-search-indexation-process]]
+===== Search indexation
+
+The `indexAll` method is called by the system when indexation
+job for this indexer is enabled (it is by default, unless
+`isIndexationDisabled` returns `true`).
+
+It must:
+
+* loop over all items to be indexed for a search (for example: all projects for the project indexer)
+* transform all those items into instances of the `SearchItem` class associaed
+  with this indexer (for example: keeping only the project ID, its name and description)
+* call the the provided `processor` function
+
+[TIP]
+====
+The `indexAll` method is called by the system user.
+====
+
+For example:
+
+[source,kotlin]
+----
+override fun indexAll(processor: (ProjectSearchItem) -> Unit) {
+    structureService.projectList.forEach { project ->
+        processor(ProjectSearchItem(project))
+    }
+}
+----
+
+Behind the scene, the indexation job will send the items to index
+to an index service in batches (which makes the indexation quite
+performant).
+
+The batch size is set by default to `1000` but can be:
+
+1. configured using the `ontrack.config.search.index.batch` <<configuration-properties,property>>
+2. set explicitly using the `indexBatch` property of the `SearchIndexer` (this takes
+   precedence)
+
+[[extending-search-indexation-result]]
+===== Search results
+
+When a search is performed, the `SearchService` will call
+the `toSearchResult` method of the `SearchIndexer` in order
+to transform an indexed item into a result which can be displayed
+to the user.
+
+[TIP]
+====
+See the documentation of the `SearchIndexer.toSearchResult`
+and of `SearchResult` for a complete information.
+====
+
+Usually, the indexer will:
+
+* load the actual Ontrack object or extract information from the indexed item
+  (this latter method is preferred for performance reasons)
+* in particular, it'll check if the target object makes sense: does
+  it still exist? Is it authorized to the current user?
+* setup a `SearchResult` instance to describe the result
+
+For example, for the build indexer:
+
+[source,kotlin]
+----
+override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchRe
+        structureService.findBuildByID(ID.of(id.toInt()))?.run {
+            SearchResult(
+                    title = entityDisplayName,
+                    description = description ?: "",
+                    uri = uriBuilder.getEntityURI(this),
+                    page = uriBuilder.getEntityPage(this),
+                    accuracy = score,
+                    type = searchResultType
+            )
+        }
+----
+
+In this example:
+
+* `findBuildByID` checks both the existence of the build
+  and if it is accessible by the current user, returning `null`
+  when not available
+* the `title` of the result is set of the complete build name (including project and branch name)
+* the `uri` and `page` can be computed using an injected `URIBuilder`
+* the `accuracy` is the score returned by ElasticSearch
+* for the `type` just use the `searchResultType` of the indexer
+
+NOTE: As of now, the `accuracy` is used for sorting results, but is not displayed
+
+[CAUTION]
+====
+The `toSearchResult` runs with the authorizations of the
+user who is performing the search. Results should be filtered
+accordingly using an injected `SecurityService`. If not, either
+the search will fail because of forbidden accesses or the final
+access will be rejected.
+====
+
+[[extending-search-item]]
+===== Search index items
+
+[[extending-search-indexation-mapping]]
+===== Search indexation mapping
+
+[[extending-search-indexation-jobs]]
+===== Search indexation jobs
+
+[[extending-search-result-icon]]
+===== Search result icon
+
+
