@@ -329,4 +329,22 @@ to a deployment using ElasticSearch or to reset all indexes.
 [[extending-search-result-icon]]
 ===== Search result icon
 
+The `searchResultType` returned by a `SearchIndexer` contains
+a feature description and an ID. Both are used to identify the
+path to an icon which is used on client side:
 
+* in the search box dropdown to select and restrict the type of result
+* in the list of results
+
+The icon (PNG, square, will be rescaled at client side) must be put in
+the `resources` at:
+
+[source]
+----
+static/extension/<feature>/search-icon/<id>.png
+----
+
+where:
+
+* `<feature>` is the feature ID
+* `<id>` is the search result type id
