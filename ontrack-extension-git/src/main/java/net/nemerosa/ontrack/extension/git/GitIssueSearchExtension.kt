@@ -103,6 +103,8 @@ class GitIssueSearchExtension(
 
     override val indexerSchedule: Schedule = Schedule.NONE
 
+    override val isIndexationDisabled: Boolean = true
+
     override val indexMapping: SearchIndexMapping? = indexMappings<GitIssueSearchItem> {
         +GitIssueSearchItem::projectId to id { index = false }
         +GitIssueSearchItem::key to keyword { index = false }

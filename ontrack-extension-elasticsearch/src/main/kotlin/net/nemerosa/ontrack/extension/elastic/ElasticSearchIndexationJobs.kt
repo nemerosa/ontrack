@@ -27,7 +27,9 @@ class ElasticSearchIndexationJobs(
 
 
     override fun getStartingJobs(): Collection<JobRegistration> =
-            searchIndexers.map { indexer ->
+            searchIndexers.filter { indexer ->
+                !indexer.isIndexationDisabled
+            }.map { indexer ->
                 createIndexationJobRegistration(indexer)
             } + createGlobalIndexationJob()
 
@@ -42,7 +44,9 @@ class ElasticSearchIndexationJobs(
 
                 override fun getTask() = JobRun { listener ->
                     listener.message("Launching all indexations")
-                    searchIndexers.map { indexer ->
+                    searchIndexers.filter { indexer ->
+                        !indexer.isIndexationDisabled
+                    }.map { indexer ->
                         val key = indexationJobType.getKey(indexer.indexerId)
                         jobScheduler.fireImmediately(key)
                     }
@@ -56,7 +60,7 @@ class ElasticSearchIndexationJobs(
     )
 
     private fun <T : SearchItem> createIndexationJob(indexer: SearchIndexer<T>) = object : Job {
-        override fun isDisabled(): Boolean = indexer.isIndexerDisabled
+        override fun isDisabled(): Boolean = false
 
         override fun getKey(): JobKey =
                 indexationJobType.getKey(indexer.indexerId)

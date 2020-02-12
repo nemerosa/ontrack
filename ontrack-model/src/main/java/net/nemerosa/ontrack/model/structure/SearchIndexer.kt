@@ -21,11 +21,11 @@ interface SearchIndexer<T : SearchItem> {
     val indexerName: String
 
     /**
-     * Is this indexer disabled?
+     * Is the automated indexation disabled?
      *
      * By default, `false`, enabled.
      */
-    val isIndexerDisabled: Boolean get() = false
+    val isIndexationDisabled: Boolean get() = false
 
     /**
      * Gets the indexation schedule for this indexer.
