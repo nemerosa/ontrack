@@ -66,17 +66,24 @@ angular.module('ot.view.search', [
             // Search type
             let type = $location.search().type;
 
+            // Offset reset
+            if (request.token !== token || request.type !== type) {
+                request.offset = 0;
+            }
+
             // Request
             request.token = token;
-            if (type) {
-                request.type = type;
-            }
+            request.type = type;
 
             // Launching the search
             otGraphqlService.pageGraphQLCall(query, request).then(function (data) {
                 $scope.searchDone = true;
                 $scope.pageInfo = data.search.pageInfo;
-                $scope.results = $scope.results.concat(data.search.pageItems);
+                if (request.offset > 0) {
+                    $scope.results = $scope.results.concat(data.search.pageItems);
+                } else {
+                    $scope.results = data.search.pageItems;
+                }
                 // If only one result, switches directly to the correct page
                 if ($scope.results.length === 1) {
                     let result = $scope.results[0];
