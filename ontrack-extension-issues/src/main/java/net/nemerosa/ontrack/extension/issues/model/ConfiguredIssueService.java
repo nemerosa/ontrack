@@ -54,6 +54,15 @@ public class ConfiguredIssueService {
         return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
     }
 
+    /**
+     * Given an issue key, returns its display form.
+     * @param key Key ID
+     * @return Display key
+     */
+    public String getDisplayKey(String key) {
+        return issueServiceExtension.getDisplayKey(issueServiceConfiguration, key);
+    }
+
     public Collection<? extends Issue> getLinkedIssues(Project project, Issue issue) {
         return issueServiceExtension.getLinkedIssues(project, issueServiceConfiguration, issue);
     }

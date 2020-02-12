@@ -138,4 +138,18 @@ public interface IssueServiceExtension extends Extension {
      * @return Regular expression
      */
     String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
+
+
+    /**
+     * Given an issue key, returns its display form.
+     * <p>
+     * By default, returns the <code>key</code>.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param key                       Key ID
+     * @return Display key
+     */
+    default String getDisplayKey(IssueServiceConfiguration issueServiceConfiguration, String key) {
+        return key;
+    }
 }

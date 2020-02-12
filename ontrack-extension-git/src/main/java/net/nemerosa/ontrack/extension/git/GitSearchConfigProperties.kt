@@ -25,14 +25,9 @@ class GitSearchConfigProperties {
     var commits = GitCommitSearchConfigProperties()
 
     /**
-     * Issue search configuration properties
+     * Commit search configuration properties
      */
-    var issues = GitIssueSearchConfigProperties()
-
-    /**
-     * General search configuration properties
-     */
-    abstract class AbstractGitSearchConfigProperties {
+    class GitCommitSearchConfigProperties {
         /**
          * Interval between two indexations, in minutes
          */
@@ -53,35 +48,6 @@ class GitSearchConfigProperties {
                 } else {
                     Schedule.NONE
                 }
-    }
-
-    /**
-     * Commit search configuration properties
-     */
-    class GitCommitSearchConfigProperties : AbstractGitSearchConfigProperties()
-
-    /**
-     * Issue search configuration properties
-     */
-    class GitIssueSearchConfigProperties : AbstractGitSearchConfigProperties() {
-
-        /**
-         * Time issue information remains valid in search index
-         */
-        @DurationUnit(ChronoUnit.DAYS)
-        var validity: Duration = Duration.ofDays(7)
-
-        /**
-         * Refreshing existing issues
-         */
-        var refresh: Boolean = true
-
-        /**
-         * Default schedule set to 1 week
-         */
-        init {
-            schedule = Duration.ofDays(7) // Every week for checking the issues
-        }
     }
 
 }
