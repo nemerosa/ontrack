@@ -110,14 +110,14 @@ class GQLTypeValidationStamp(
                                         }
                                     } else if (statuses != null) {
                                         structureService.getValidationRunsForValidationStampAndStatus(
-                                                validationStamp.id,
+                                                validationStamp,
                                                 statuses,
                                                 offset,
                                                 size
                                         )
                                     } else {
                                         structureService.getValidationRunsForValidationStamp(
-                                                validationStamp.id,
+                                                validationStamp,
                                                 offset,
                                                 size
                                         )
@@ -162,7 +162,7 @@ class GQLTypeValidationStamp(
                 val validationStamp: ValidationStamp = environment.getSource()
                 // Gets all the validation runs
                 return@DataFetcher structureService.getValidationRunsForValidationStamp(
-                        validationStamp.id,
+                        validationStamp,
                         0,
                         environment.getArgument<Int?>("count") ?: 50
                 )

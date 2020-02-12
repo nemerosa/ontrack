@@ -74,9 +74,9 @@ class RunInfoServiceImpl(
     @Transactional(readOnly = true)
     override fun restore(logger: (String) -> Unit) {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        var count = 0
         RunnableEntityType.values().forEach { type ->
             logger("Restoring all runnable entities for $type...")
+            var count = 0
             val total = runInfoRepository.getCountByRunnableEntityType(type)
             runInfoRepository.forEachRunnableEntityType(type) { id, runInfo ->
                 val entity = type.load(structureService, id)
