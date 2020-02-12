@@ -12,6 +12,9 @@ class GitIssueSearchIndexerIT : AbstractGitSearchTestSupport() {
     @Autowired
     private lateinit var gitIssueSearchExtension: GitIssueSearchExtension
 
+    @Autowired
+    private lateinit var gitCommitSearchExtension: GitCommitSearchExtension
+
     @Test
     fun `Looking for Git issues referred to in messages`() {
         createRepo {
@@ -24,20 +27,20 @@ class GitIssueSearchIndexerIT : AbstractGitSearchTestSupport() {
             val project = project {
                 gitProject(repo)
             }
-            // Indexation of issues
-            searchIndexService.index(gitIssueSearchExtension)
+            // Indexation of issues (this goes through commit indexation)
+            searchIndexService.index(gitCommitSearchExtension)
             // Looks for issue 1..3
             (1..3).forEach { no ->
-                val results = searchService.search(SearchRequest("#$no", gitIssueSearchExtension.searchResultType.id))
-                val result = results.find { it.title.startsWith("#$no -") }
+                val results = searchService.paginatedSearch(SearchRequest("#$no", gitIssueSearchExtension.searchResultType.id)).items
+                val result = results.find { it.title == "Issue #$no" }
                 assertNotNull(result) {
-                    assertEquals("#$no - Issue #$no", it.title)
+                    assertEquals("Issue #$no", it.title)
                     assertEquals("Issue #$no found in project ${project.name}", it.description)
                 }
             }
             // Issue 4 not found
             val results = searchService.search(SearchRequest("#4", gitIssueSearchExtension.searchResultType.id))
-            assertTrue(results.none { it.title.startsWith("#4 -") })
+            assertTrue(results.none { "#4" in it.title })
         }
     }
 

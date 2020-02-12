@@ -65,6 +65,15 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
+    String getDisplayKey(IssueServiceConfiguration issueServiceConfiguration, String key) {
+        if (key.startsWith("#")) {
+            return key
+        } else {
+            return "#$key"
+        }
+    }
+
+    @Override
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         Set<String> result = new HashSet<>()
         if (StringUtils.isNotBlank(message)) {
