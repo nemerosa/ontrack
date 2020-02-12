@@ -186,6 +186,62 @@ access will be rejected.
 [[extending-search-item]]
 ===== Search index items
 
+The `SearchItem` class used to parameterize the `SearchIndexer`
+must return two values:
+
+* `id` - the unique ID of this item in the index
+* `fields` - a map of values to store together with the index
+
+Most of the times, you can define:
+
+* a primary constructor listing the properties who want to store
+* a secondary constructor using the domain model of Ontrack
+
+Example for the Git commit indexer:
+
+[source,kotlin]
+----
+class GitCommitSearchItem(
+        val projectId: Int,
+        val gitType: String,
+        val gitName: String,
+        val commit: String,
+        val commitShort: String,
+        val commitAuthor: String,
+        val commitMessage: String
+) : SearchItem {
+
+    constructor(project: Project, gitConfiguration: GitConfiguration, commit: GitCommit) : this(
+            projectId = project.id(),
+            gitType = gitConfiguration.type,
+            gitName = gitConfiguration.name,
+            commit = commit.id,
+            commitShort = commit.shortId,
+            commitAuthor = commit.author.name,
+            commitMessage = commit.shortMessage
+    )
+
+    override val id: String = "$gitName::$commit"
+
+    override val fields: Map<String, Any?> = asMap(
+            this::projectId,
+            this::gitType,
+            this::gitName,
+            this::commit,
+            this::commitAuthor,
+            this::commitShort,
+            this::commitMessage
+    )
+}
+----
+
+For the `fields` of the item, try to get only simple types
+or list of simple types.
+
+The `asMap` utility method is optional and can be replaced by
+a direct map construction. However, it avoids to hard-code
+the field names and uses the property references instead.
+
 [[extending-search-indexation-mapping]]
 ===== Search indexation mapping
 
