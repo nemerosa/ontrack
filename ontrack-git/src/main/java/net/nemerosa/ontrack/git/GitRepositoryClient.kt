@@ -167,6 +167,11 @@ interface GitRepositoryClient {
     fun reset()
 
     /**
+     * Checks if the repository is ready to be used
+     */
+    val isReady: Boolean
+
+    /**
      * Checks the log history and returns `true` if the token can be found.
      *
      * @param token Expression to be searched for

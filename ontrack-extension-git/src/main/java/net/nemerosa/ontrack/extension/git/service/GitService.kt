@@ -207,4 +207,9 @@ interface GitService : SCMService {
      * Loops over the commits of a configuration
      */
     fun forEachCommit(gitConfiguration: GitConfiguration, code: (GitCommit) -> Unit)
+
+    /**
+     * Checks if the repository is ready to be used.
+     */
+    fun isRepositorySynched(gitConfiguration: GitConfiguration): Boolean
 }

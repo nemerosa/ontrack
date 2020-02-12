@@ -52,6 +52,8 @@ class GitRepositoryClientImpl(
     private val isClonedOrCloning: Boolean
         get() = File(repositoryDir, ".git").exists()
 
+    override val isReady: Boolean get() = isClonedOrCloning && !sync.isLocked
+
     override val remoteBranches: List<String>
         get() {
             try {

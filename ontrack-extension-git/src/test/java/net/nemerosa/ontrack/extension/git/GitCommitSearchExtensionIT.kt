@@ -18,6 +18,48 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
     protected lateinit var gitCommitSearchExtension: GitCommitSearchExtension
 
     @Test
+    fun `Looking for a commit on a project when Git repo is not indexed yet`() {
+        createRepo {
+            commits(10)
+        } and { repo, commits ->
+            project {
+                gitProject(repo, sync = false)
+                // Re-indexes the commits
+                searchIndexService.index(gitCommitSearchExtension)
+                // Looks for every commit, they must not be found
+                commits.forEach { (_, commit) ->
+                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                    val title = "$name $commit"
+                    val result = results.find { it.title == title }
+                    assertNull(result, "No commit is indexed yet")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Looking for a commit on a project when Git repo has been removed`() {
+        createRepo {
+            commits(10)
+        } and { repo, commits ->
+            project {
+                gitProject(repo, sync = false)
+                // Destroys the repository
+                repo.close()
+                // Re-indexes the commits
+                searchIndexService.index(gitCommitSearchExtension)
+                // Looks for every commit, they must not be found
+                commits.forEach { (_, commit) ->
+                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                    val title = "$name $commit"
+                    val result = results.find { it.title == title }
+                    assertNull(result, "No commit is indexed yet")
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Looking for a commit on a project`() {
         createRepo {
             commits(10)

@@ -350,6 +350,13 @@ class GitServiceImpl(
         gitClient.forEachCommit(code)
     }
 
+    override fun isRepositorySynched(gitConfiguration: GitConfiguration): Boolean {
+        // Gets the client client for this configuration
+        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+        // Test
+        return gitClient.isReady
+    }
+
     override fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo {
         return getOntrackGitCommitInfo(structureService.getProject(projectId), commit)
     }

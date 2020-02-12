@@ -101,8 +101,8 @@ class GitCommitSearchExtension(
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
             val issueConfig: ConfiguredIssueService? = gitConfiguration.configuredIssueService.orElse(null)
-            try {
-                val projectIssueKeys = mutableSetOf<String>()
+            val projectIssueKeys = mutableSetOf<String>()
+            if (gitService.isRepositorySynched(gitConfiguration)) {
                 gitService.forEachCommit(gitConfiguration) { commit: GitCommit ->
                     // Indexation of the message
                     val item = GitCommitSearchItem(project, gitConfiguration, commit)
@@ -113,13 +113,10 @@ class GitCommitSearchExtension(
                         projectIssueKeys.addAll(keys)
                     }
                 }
-                // Processing of issues
-                if (issueConfig != null) {
-                    gitIssueSearchExtension.processIssueKeys(project, issueConfig, projectIssueKeys)
-                }
-            } catch (_: Exception) {
-                // Ignoring any error linked to missing indexation
-                // They will be caught be the indexation itself
+            }
+            // Processing of issues
+            if (issueConfig != null && projectIssueKeys.isNotEmpty()) {
+                gitIssueSearchExtension.processIssueKeys(project, issueConfig, projectIssueKeys)
             }
         })
     }
