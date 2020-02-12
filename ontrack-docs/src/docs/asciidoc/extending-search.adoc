@@ -348,3 +348,40 @@ where:
 
 * `<feature>` is the feature ID
 * `<id>` is the search result type id
+
+[[extending-search-events]]
+===== Search indexing on events
+
+Re-indexation of a complete index is costly. While some indexes
+don't have any other choice but to recompute the index regularly,
+it's more efficient to have the following steps:
+
+* re-indexation once (when Ontrack is migrated to ElasticSearch)
+* populating the index on events
+
+Example: the project index is updated when a project is created,
+updated or deleted.
+
+The type of event to listen to depends on the type of indexed item,
+but most of the cases are covered by:
+
+* implement `EventListener` - when you want to listen to events on
+  <<model,project entities>> like projects, branches, validation
+  runs, etc.
+* `PropertyType.onPropertyChanged/onPropertyDeleted` to react
+  on properties being created, updated or deleted
+* other types of listeners, more specialized, are also available in
+  Ontrack
+
+In all cases, you have to inject the `SearchIndexService` and
+call the appropriate methods, typically `createSearchIndex`,
+`updateSearchIndex` and `deleteSearchIndex`, to update the index.
+
+[TIP]
+====
+Don't try to cover all the cases. For example, if your index is linked
+to a build property, listen only to the property change, and not to
+the events occurring to the build, its branch or its project. It's
+better to check in the `toSearchResult` method if the indexed object
+is still available or not.
+====
