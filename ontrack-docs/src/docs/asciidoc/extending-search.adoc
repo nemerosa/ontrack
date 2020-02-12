@@ -314,6 +314,18 @@ can be both considered as a keyword or as plain text.
 [[extending-search-indexation-jobs]]
 ===== Search indexation jobs
 
+Unless its `isIndexationDisabled` property returns `true`, every
+`SearchIndexer` is associated with a <<architecture-jobs,job>> which
+runs the <<extending-search-indexation-process,indexation>> of all
+items.
+
+By default, those jobs must be launched manually but the `indexSchedule`
+can be used to define a run schedule.
+
+Additionally, there is "All re-indexations" job which launches
+all re-indexations ; this is useful when migrating Ontrack
+to a deployment using ElasticSearch or to reset all indexes.
+
 [[extending-search-result-icon]]
 ===== Search result icon
 
