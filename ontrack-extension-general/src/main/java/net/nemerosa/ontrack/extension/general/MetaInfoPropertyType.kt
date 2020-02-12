@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
+import net.nemerosa.ontrack.model.structure.SearchIndexService
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.*
@@ -17,7 +18,9 @@ import java.util.function.Function
 
 @Component
 class MetaInfoPropertyType(
-        extensionFeature: GeneralExtensionFeature
+        extensionFeature: GeneralExtensionFeature,
+        private val searchIndexService: SearchIndexService,
+        private val metaInfoSearchExtension: MetaInfoSearchExtension
 ) : AbstractPropertyType<MetaInfoProperty>(extensionFeature) {
 
     override fun getName(): String = "Meta information"
@@ -31,6 +34,14 @@ class MetaInfoPropertyType(
     }
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
+
+    override fun onPropertyChanged(entity: ProjectEntity, value: MetaInfoProperty) {
+        searchIndexService.createSearchIndex(metaInfoSearchExtension, MetaInfoSearchItem(entity, value))
+    }
+
+    override fun onPropertyDeleted(entity: ProjectEntity, oldValue: MetaInfoProperty) {
+        searchIndexService.deleteSearchIndex(metaInfoSearchExtension, MetaInfoSearchItem(entity, oldValue).id)
+    }
 
     override fun getEditionForm(entity: ProjectEntity, value: MetaInfoProperty?): Form = Form.create()
             .with(

@@ -22,7 +22,7 @@ public class StashConfigurationServiceIT extends AbstractServiceTestSupport {
      */
     @Test
     public void deleteBitbucketOrg() throws Exception {
-        boolean configurationTest = ontrackConfigProperties.isConfigurationTest();
+        boolean configurationTest = ontrackConfigProperties.getConfigurationTest();
         ontrackConfigProperties.setConfigurationTest(false);
         try {
             String confName = "bitbucket.org";

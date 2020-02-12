@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -23,8 +22,9 @@ import java.util.function.Predicate
 import javax.sql.DataSource
 
 @Repository
-class PropertyJdbcRepository @Autowired
-constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), PropertyRepository {
+class PropertyJdbcRepository(
+        dataSource: DataSource
+) : AbstractJdbcRepository(dataSource), PropertyRepository {
 
     @Cacheable(cacheNames = ["properties"], key = "#typeName + #entityType.name() + #entityId.value")
     override fun loadProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): TProperty? {
@@ -53,12 +53,12 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
         params.addValue("json", writeJson(data))
         // Update
         if (propertyId != null) {
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     "UPDATE PROPERTIES SET JSON = CAST(:json AS JSONB) WHERE ID = :id",
                     params.addValue("id", propertyId)
             )
         } else {
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     String.format(
                             "INSERT INTO PROPERTIES(TYPE, %s, JSON) " + "VALUES(:type, :entityId, CAST(:json AS JSONB))",
                             entityType.name
@@ -71,7 +71,7 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
     @CacheEvict(cacheNames = ["properties"], key = "#typeName + #entityType.name() + #entityId.value")
     override fun deleteProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): Ack {
         return Ack.one(
-                namedParameterJdbcTemplate.update(
+                namedParameterJdbcTemplate!!.update(
                         String.format(
                                 "DELETE FROM PROPERTIES WHERE TYPE = :type AND %s = :entityId",
                                 entityType.name
@@ -84,7 +84,7 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
     override fun searchByProperty(typeName: String,
                                   entityLoader: BiFunction<ProjectEntityType, ID, ProjectEntity>,
                                   predicate: Predicate<TProperty>): Collection<ProjectEntity> {
-        return namedParameterJdbcTemplate.execute<Collection<ProjectEntity>>(
+        return namedParameterJdbcTemplate!!.execute<Collection<ProjectEntity>>(
                 "SELECT * FROM PROPERTIES WHERE TYPE = :type ORDER BY ID DESC",
                 params("type", typeName)
         ) { ps: PreparedStatement ->
@@ -97,6 +97,16 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
                 }
             }
             entities
+        }!!
+    }
+
+    override fun forEachEntityWithProperty(typeName: String, consumer: (TProperty) -> Unit) {
+        namedParameterJdbcTemplate!!.query(
+                "SELECT * FROM PROPERTIES WHERE TYPE = :type ORDER BY ID DESC",
+                params("type", typeName)
+        ) { rs ->
+            val property = toProperty(rs)
+            consumer(property)
         }
     }
 
@@ -146,7 +156,7 @@ constructor(dataSource: DataSource) : AbstractJdbcRepository(dataSource), Proper
             )
         }
         val sql = "$tables $criteria"
-        return namedParameterJdbcTemplate.queryForList(
+        return namedParameterJdbcTemplate!!.queryForList(
                 sql,
                 params,
                 Int::class.java

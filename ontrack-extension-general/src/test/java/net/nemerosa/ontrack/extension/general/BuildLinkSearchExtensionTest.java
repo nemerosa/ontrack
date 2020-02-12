@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.general;
 
+import net.nemerosa.ontrack.model.structure.BuildDisplayNameService;
+import net.nemerosa.ontrack.model.structure.SearchIndexService;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
 import org.junit.Before;
@@ -19,7 +21,10 @@ public class BuildLinkSearchExtensionTest {
         extension = new BuildLinkSearchExtension(
                 new GeneralExtensionFeature(),
                 new MockURIBuilder(),
-                structureService);
+                structureService,
+                mock(BuildDisplayNameService.class),
+                mock(SearchIndexService.class)
+        );
     }
 
     @Test

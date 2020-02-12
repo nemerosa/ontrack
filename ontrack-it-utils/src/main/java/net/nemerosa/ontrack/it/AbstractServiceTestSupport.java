@@ -113,6 +113,15 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         );
     }
 
+    protected <T> void deleteProperty(ProjectEntity projectEntity, Class<? extends PropertyType<T>> propertyTypeClass) throws Exception {
+        asUser().with(projectEntity, ProjectEdit.class).execute(() ->
+                propertyService.deleteProperty(
+                        projectEntity,
+                        propertyTypeClass
+                )
+        );
+    }
+
     protected <T> T getProperty(ProjectEntity projectEntity, Class<? extends PropertyType<T>> propertyTypeClass) throws Exception {
         return asUser().with(projectEntity, ProjectEdit.class).call(() ->
                 propertyService.getProperty(

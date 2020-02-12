@@ -83,9 +83,7 @@
                 </ul>
 
                 <!-- Search box -->
-                <form class="navbar-form navbar-right" ng-submit="search(searchToken)">
-                    <input type="text" class="form-control" placeholder="Search..." ng-model="searchToken">
-                </form>
+                <ot-search-box config="globalSearchConfig" ng-hide="view.disableSearch"></ot-search-box>
 
                 <!-- Loading indicator -->
                 <ul class="nav navbar-nav navbar-right">

@@ -9,13 +9,17 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
+import net.nemerosa.ontrack.model.structure.SearchIndexService
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.function.Function
 
 @Component
 class ReleasePropertyType(
-        extensionFeature: GeneralExtensionFeature) : AbstractPropertyType<ReleaseProperty>(extensionFeature) {
+        extensionFeature: GeneralExtensionFeature,
+        private val searchIndexService: SearchIndexService,
+        private val releaseSearchExtension: ReleaseSearchExtension
+) : AbstractPropertyType<ReleaseProperty>(extensionFeature) {
 
     override fun getName(): String = "Release"
 
@@ -31,6 +35,14 @@ class ReleasePropertyType(
     }
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
+
+    override fun onPropertyChanged(entity: ProjectEntity, value: ReleaseProperty) {
+        searchIndexService.createSearchIndex(releaseSearchExtension, ReleaseSearchItem(entity, value))
+    }
+
+    override fun onPropertyDeleted(entity: ProjectEntity, oldValue: ReleaseProperty) {
+        searchIndexService.deleteSearchIndex(releaseSearchExtension, ReleaseSearchItem(entity, oldValue).id)
+    }
 
     override fun getEditionForm(entity: ProjectEntity, value: ReleaseProperty?): Form {
         return Form.create()
@@ -61,12 +73,12 @@ class ReleasePropertyType(
     }
 
     override fun containsValue(value: ReleaseProperty, propertyValue: String): Boolean =
-        if ("*" in propertyValue) {
-            val regex = propertyValue.replace("*", ".*").toRegex(RegexOption.IGNORE_CASE)
-            regex.matches(value.name)
-        } else {
-            value.name.equals(propertyValue, ignoreCase = true)
-        }
+            if ("*" in propertyValue) {
+                val regex = propertyValue.replace("*", ".*").toRegex(RegexOption.IGNORE_CASE)
+                regex.matches(value.name)
+            } else {
+                value.name.equals(propertyValue, ignoreCase = true)
+            }
 
     override fun getSearchArguments(token: String): PropertySearchArguments? {
         return if (!token.isBlank()) {

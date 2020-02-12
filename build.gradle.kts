@@ -28,6 +28,9 @@ buildscript {
 // FIXME Try to use version in gradle.properties
 // val springBootVersion: String by project
 val kotlinVersion: String by project
+val elasticSearchVersion: String by project
+
+extra["elasticsearch.version"] = elasticSearchVersion
 
 plugins {
     java
@@ -210,6 +213,7 @@ configure(coreProjects) p@{
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", kotlinVersion)
+                bomProperty("elasticsearch.version", elasticSearchVersion)
             }
         }
         dependencies {
@@ -231,6 +235,7 @@ configure(coreProjects) p@{
     dependencies {
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
         "implementation"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
         // Lombok
         "compileOnly"("org.projectlombok:lombok:1.18.10")
         "annotationProcessor"("org.projectlombok:lombok:1.18.10")

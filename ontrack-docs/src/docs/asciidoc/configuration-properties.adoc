@@ -77,4 +77,26 @@ ontrack.config.key-store = file
 # See http://static.javadoc.io/com.github.ben-manes.caffeine/caffeine/2.6.0/com/github/benmanes/caffeine/cache/CaffeineSpec.html
 # For example, for the `properties` cache:
 ontrack.config.cache.specs.properties = maximumSize=1000,expireAfterWrite=1d,recordStats
+
+#################################
+# Search configuration properties
+#################################
+
+# Search engine to use
+# Use `elasticsearch` to switch to ElasticSearch based search
+ontrack.config.search.engine = default
+
+# By default, indexation is ElasticSearch is done after some
+# time after the index has been requested. The flag below
+# forces the index to be refreshed immediately.
+# This SHOULD NOT be used in production but is very useful
+# when testing Ontrack search capabilities
+ontrack.config.search.index.immediate = false
+
+# When performing full indexation, the indexation is performed
+# by batch. The parameter below allows to set the size
+# of this batch processing.
+# Note: this is a default batch size. Custom indexers can
+# override it.
+ontrack.config.search.index.batch = 1000
 ----

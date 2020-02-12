@@ -7,6 +7,13 @@ services:
       POSTGRES_DB      : ontrack
       POSTGRES_USER    : ontrack
       POSTGRES_PASSWORD: ontrack
+   elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+      ports:
+         - "9200:9200"
+         - "9300:9300"
+      environment:
+         - "discovery.type=single-node"
    influxdb:
     image: influxdb:1.5.2
    ontrack:
@@ -16,6 +23,8 @@ services:
             condition: service_started
          influxdb:
            condition: service_started
+         elasticsearch:
+           condition: service_started
       environment:
          PROFILE: acceptance
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
@@ -24,6 +33,10 @@ services:
          # InfluxDB being enabled
          ONTRACK_INFLUXDB_ENABLED: "true"
          ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
+         # Elastic search
+         ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
+         ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
+         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
       environment:

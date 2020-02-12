@@ -1035,40 +1035,6 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
-    void 'Global search on meta info property'() {
-        def project = uid('P')
-        def value = uid('V')
-        ontrack.project(project) {
-            branch('test') {
-                build('1', 'Build 1') {
-                    config {
-                        metaInfo 'name', "${value}1", 'link/1'
-                    }
-                }
-                build('2', 'Build 2') {
-                    config {
-                        metaInfo 'name', "${value}2", 'link/2'
-                    }
-                }
-            }
-        }
-
-        def build1 = ontrack.build(project, 'test', '1')
-        def build2 = ontrack.build(project, 'test', '2')
-
-        def result1 = ["Build ${project}/test/1" as String, "name -> ${value}1" as String, "/#/build/${build1.id}" as String]
-        def result2 = ["Build ${project}/test/2" as String, "name -> ${value}2" as String, "/#/build/${build2.id}" as String]
-
-        assert ontrack.search("name:${value}1").collect { [it.title, it.description, it.page] } == [
-                result1
-        ]
-
-        assert ontrack.search("name:${value}*").collect { [it.title, it.description, it.page] } == [
-                result2, result1
-        ]
-    }
-
-    @Test
     void 'Build Git commit property'() {
         def name = uid('P')
         ontrack.project(name) {

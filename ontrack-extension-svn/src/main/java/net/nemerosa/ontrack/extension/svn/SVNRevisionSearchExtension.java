@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
+import net.nemerosa.ontrack.model.structure.SearchResultType;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,8 @@ public class SVNRevisionSearchExtension extends AbstractExtension implements Sea
     private final SVNConfigurationService configurationService;
     private final SVNService svnService;
 
+    private final SearchResultType resultType;
+
     @Autowired
     public SVNRevisionSearchExtension(
             SVNExtensionFeature extensionFeature,
@@ -37,6 +40,12 @@ public class SVNRevisionSearchExtension extends AbstractExtension implements Sea
         this.uriBuilder = uriBuilder;
         this.configurationService = configurationService;
         this.svnService = svnService;
+        this.resultType = new SearchResultType(
+                extensionFeature.getFeatureDescription(),
+                "svn-revision",
+                "SVN Revision",
+                "SVN Revision number"
+        );
     }
 
     @Override
@@ -78,7 +87,8 @@ public class SVNRevisionSearchExtension extends AbstractExtension implements Sea
                                 uriBuilder.page("extension/svn/revision/%s/%d",
                                         repositoryRevision.getRepository().getConfiguration().getName(),
                                         repositoryRevision.getRevisionInfo().getRevision()),
-                                100
+                                100,
+                                resultType
                         ))
                         .collect(Collectors.toList());
             }

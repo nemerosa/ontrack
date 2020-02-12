@@ -29,10 +29,14 @@ services:
         PROFILE: prod
         JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
         SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+        ONTRACK_CONFIG_SEARCH: "elasticsearch"
+        SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
     depends_on:
       influxdb:
         condition: service_started
       postgres:
+        condition: service_started
+      elasticsearch:
         condition: service_started
     volumes:
       - "/var/ontrack/conf:/var/ontrack/conf"
@@ -52,3 +56,12 @@ services:
       POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD}
     volumes:
       - "/var/lib/postgresql/data:/var/lib/postgresql/data"
+
+  # ElasticSearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "discovery.type=single-node"

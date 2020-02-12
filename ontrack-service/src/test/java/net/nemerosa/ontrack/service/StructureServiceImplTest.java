@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.model.events.BuildLinkListenerService;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -55,7 +56,8 @@ public class StructureServiceImplTest {
                 decorationService,
                 projectFavouriteService,
                 promotionRunCheckService,
-                statsRepository
+                statsRepository,
+                mock(BuildLinkListenerService.class)
         );
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));

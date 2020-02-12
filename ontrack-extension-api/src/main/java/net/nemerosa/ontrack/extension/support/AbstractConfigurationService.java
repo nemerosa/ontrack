@@ -132,7 +132,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     }
 
     protected void validateAndCheck(T configuration) {
-        if (ontrackConfigProperties.isConfigurationTest()) {
+        if (ontrackConfigProperties.getConfigurationTest()) {
             ConnectionResult result = validate(configuration);
             if (result.getType() == ConnectionResult.ConnectionResultType.ERROR) {
                 throw new ConfigurationValidationException(configuration, result.getMessage());

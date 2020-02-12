@@ -402,3 +402,5 @@ include::extension-free-text-annotations.adoc[]
 include::extension-label-provider.adoc[]
 
 include::extending-promotion-checks.adoc[]
+
+include::extending-search.adoc[]

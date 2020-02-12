@@ -3,6 +3,11 @@ package net.nemerosa.ontrack.json
 import com.fasterxml.jackson.databind.JsonNode
 
 /**
+ * Parses a string as JSON
+ */
+fun String.parseAsJson(): JsonNode = JsonUtils.parseAsNode(this)
+
+/**
  * Map as JSON
  */
 fun jsonOf(vararg pairs: Pair<*, *>) =
@@ -20,10 +25,25 @@ fun <T> T?.toJson(): JsonNode? =
 fun <T> T.asJson(): JsonNode = JsonUtils.format(this)!!
 
 /**
+ * Format as a string
+ */
+fun JsonNode.asJsonString(): String = JsonUtils.toJSONString(this)
+
+/**
  * Parses any node into an object.
  */
 inline fun <reified T> JsonNode.parse(): T =
         JsonUtils.parse(this, T::class.java)
+
+/**
+ * Parses any node into an object or returns `null` if parsing fails
+ */
+inline fun <reified T> JsonNode.parseOrNull(): T? =
+        try {
+            parse()
+        } catch (_: JsonParseException) {
+            null
+        }
 
 /**
  * Gets a field as enum

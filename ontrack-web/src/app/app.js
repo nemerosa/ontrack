@@ -20,6 +20,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.validationDataTypeDecoration',
         'ot.directive.projectLabel',
         'ot.directive.validationRunStatusComment',
+        'ot.directive.search-box',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services
@@ -31,6 +32,7 @@ const ontrack = angular.module('ontrack', [
         'ot.service.configuration',
         'ot.service.graphql',
         'ot.service.label',
+        'ot.service.search',
         // Views
         'ot.view.api',
         'ot.view.api-doc',
@@ -91,7 +93,7 @@ const ontrack = angular.module('ontrack', [
             $urlRouterProvider.deferIntercept();
         })
         // Initialisation work
-        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService) {
+        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService, otSearchService) {
             /**
              * Loading the extensions
              */
@@ -156,9 +158,18 @@ const ontrack = angular.module('ontrack', [
              */
 
             otInfoService.init();
+
+            /**
+             * Global search
+             */
+            $rootScope.globalSearchConfig = {
+                css: "navbar-form navbar-right",
+                resetOnSearch: true
+            };
+
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
+        .controller('AppCtrl', function ($log, $modal, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService, otSearchService) {
 
             $log.debug('[app] Initialising the app controller...');
 
@@ -233,18 +244,7 @@ const ontrack = angular.module('ontrack', [
             };
 
             /**
-             * Search
-             */
-
-            $scope.search = function () {
-                if ($scope.searchToken) {
-                    $state.go('search', {token: $scope.searchToken});
-                    $scope.searchToken = '';
-                }
-            };
-
-            /**
-             * Cancel running tasks when chaning page
+             * Cancel running tasks when changing page
              */
 
             $scope.$on('$stateChangeStart', function () {

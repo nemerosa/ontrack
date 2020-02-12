@@ -141,6 +141,15 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
         }
     }
 
+    @Override
+    public String getDisplayKey(IssueServiceConfiguration issueServiceConfiguration, String key) {
+        if (key.startsWith("#")) {
+            return key;
+        } else {
+            return "#" + key;
+        }
+    }
+
     protected int getIssueId(String token) {
         return Integer.parseInt(StringUtils.stripStart(token, "#"), 10);
     }

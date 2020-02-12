@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -72,14 +73,22 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    @Nullable
+    public Project findProjectByID(ID projectId) {
+        return getFirstItem(
+                "SELECT * FROM PROJECTS WHERE ID = :id",
+                params("id", projectId.getValue()),
+                (rs, rowNum) -> toProject(rs)
+        );
+    }
+
+    @Override
+    @NotNull
     public Project getProject(ID projectId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM PROJECTS WHERE ID = :id",
-                    params("id", projectId.getValue()),
-                    (rs, rowNum) -> toProject(rs)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        Project project = findProjectByID(projectId);
+        if (project != null) {
+            return project;
+        } else {
             throw new ProjectNotFoundException(projectId);
         }
     }
@@ -116,15 +125,23 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Nullable
     @Override
+    public Branch findBranchByID(ID branchId) {
+        return getFirstItem(
+                "SELECT * FROM BRANCHES WHERE ID = :id",
+                params("id", branchId.getValue()),
+                (rs, rowNum) -> toBranch(rs, this::getProject)
+        );
+    }
+
+    @Override
+    @NotNull
     public Branch getBranch(ID branchId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM BRANCHES WHERE ID = :id",
-                    params("id", branchId.getValue()),
-                    (rs, rowNum) -> toBranch(rs, this::getProject)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        Branch branch = findBranchByID(branchId);
+        if (branch != null) {
+            return branch;
+        } else {
             throw new BranchNotFoundException(branchId);
         }
     }
@@ -381,6 +398,22 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         ).isPresent();
     }
 
+    @Override
+    public void forEachBuildLink(BiConsumer<Build, Build> code) {
+        getJdbcTemplate().query(
+                "SELECT * FROM BUILD_LINKS ORDER BY ID ASC",
+                rs -> {
+                    int buildId = rs.getInt("buildId");
+                    int targetBuildId = rs.getInt("targetBuildId");
+                    // Loads the build
+                    Build build = getBuild(ID.of(buildId));
+                    Build targetBuild = getBuild(ID.of(targetBuildId));
+                    // Processing
+                    code.accept(build, targetBuild);
+                }
+        );
+    }
+
     protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return Build.of(
                 branchSupplier.apply(id(rs, "branchId")),
@@ -428,15 +461,23 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         }
     }
 
+    @Nullable
     @Override
+    public Build findBuildByID(ID buildId) {
+        return getFirstItem(
+                "SELECT * FROM BUILDS WHERE ID = :id",
+                params("id", buildId.getValue()),
+                (rs, rowNum) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    @NotNull
     public Build getBuild(ID buildId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM BUILDS WHERE ID = :id",
-                    params("id", buildId.getValue()),
-                    (rs, rowNum) -> toBuild(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        Build build = findBuildByID(buildId);
+        if (build != null) {
+            return build;
+        } else {
             throw new BuildNotFoundException(buildId);
         }
     }
@@ -530,15 +571,22 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public PromotionLevel getPromotionLevel(ID promotionLevelId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM PROMOTION_LEVELS WHERE ID = :id",
-                    params("id", promotionLevelId.getValue()),
-                    (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        PromotionLevel promotionLevel = findPromotionLevelByID(promotionLevelId);
+        if (promotionLevel != null) {
+            return promotionLevel;
+        } else {
             throw new PromotionLevelNotFoundException(promotionLevelId);
         }
+    }
+
+    @Nullable
+    @Override
+    public PromotionLevel findPromotionLevelByID(ID promotionLevelId) {
+        return getFirstItem(
+                "SELECT * FROM PROMOTION_LEVELS WHERE ID = :id",
+                params("id", promotionLevelId.getValue()),
+                (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
+        );
     }
 
     @Override
@@ -629,14 +677,21 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public PromotionRun getPromotionRun(ID promotionRunId) {
-        return getNamedParameterJdbcTemplate().queryForObject(
+        PromotionRun promotionRun = findPromotionRunByID(promotionRunId);
+        if (promotionRun != null) {
+            return promotionRun;
+        } else {
+            throw new PromotionRunNotFoundException(promotionRunId);
+        }
+    }
+
+    @Nullable
+    @Override
+    public PromotionRun findPromotionRunByID(ID promotionRunId) {
+        return getFirstItem(
                 "SELECT * FROM PROMOTION_RUNS WHERE ID = :id",
                 params("id", promotionRunId.getValue()),
-                (rs, rowNum) -> toPromotionRun(
-                        rs,
-                        this::getBuild,
-                        this::getPromotionLevel
-                )
+                (rs, rowNum) -> toPromotionRun(rs, this::getBuild, this::getPromotionLevel)
         );
     }
 
@@ -801,15 +856,22 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public ValidationStamp getValidationStamp(ID validationStampId) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM VALIDATION_STAMPS WHERE ID = :id",
-                    params("id", validationStampId.getValue()),
-                    (rs, rowNum) -> toValidationStamp(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
+        ValidationStamp validationStamp = findValidationStampByID(validationStampId);
+        if (validationStamp != null) {
+            return validationStamp;
+        } else {
             throw new ValidationStampNotFoundException(validationStampId);
         }
+    }
+
+    @Nullable
+    @Override
+    public ValidationStamp findValidationStampByID(ID validationStampId) {
+        return getFirstItem(
+                "SELECT * FROM VALIDATION_STAMPS WHERE ID = :id",
+                params("id", validationStampId.getValue()),
+                (rs, rowNum) -> toValidationStamp(rs, this::getBranch)
+        );
     }
 
     @Override
@@ -983,7 +1045,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService) {
-        return getNamedParameterJdbcTemplate().queryForObject(
+        ValidationRun validationRun = findValidationRunByID(validationRunId, validationRunStatusService);
+        if (validationRun != null) {
+            return validationRun;
+        } else {
+            throw new ValidationRunNotFoundException(validationRunId);
+        }
+    }
+
+    @Nullable
+    @Override
+    public ValidationRun findValidationRunByID(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService) {
+        return getFirstItem(
                 "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
                         "FROM VALIDATION_RUNS VR " +
                         "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +

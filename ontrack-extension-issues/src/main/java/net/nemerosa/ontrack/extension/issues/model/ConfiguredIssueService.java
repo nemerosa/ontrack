@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -29,6 +30,7 @@ public class ConfiguredIssueService {
         return issueServiceExtension.getLinkForAllIssues(issueServiceConfiguration, issues);
     }
 
+    @Nullable
     public Issue getIssue(String issueKey) {
         return issueServiceExtension.getIssue(issueServiceConfiguration, issueKey);
     }
@@ -50,6 +52,15 @@ public class ConfiguredIssueService {
 
     public Optional<String> getIssueId(String token) {
         return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
+    }
+
+    /**
+     * Given an issue key, returns its display form.
+     * @param key Key ID
+     * @return Display key
+     */
+    public String getDisplayKey(String key) {
+        return issueServiceExtension.getDisplayKey(issueServiceConfiguration, key);
     }
 
     public Collection<? extends Issue> getLinkedIssues(Project project, Issue issue) {
