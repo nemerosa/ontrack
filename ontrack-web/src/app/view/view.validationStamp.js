@@ -25,6 +25,9 @@ angular.module('ot.view.validationStamp', [
             size: pageSize
         };
 
+        // Range of validation runs
+        $scope.selectedValidationRuns = {};
+
         // Query for the validation stamp
         const query = `
             query PaginatedValidationRuns($validationStampId: Int!, $offset: Int = 0, $size: Int = 20) {

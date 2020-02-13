@@ -21,6 +21,7 @@ const ontrack = angular.module('ontrack', [
         'ot.directive.projectLabel',
         'ot.directive.validationRunStatusComment',
         'ot.directive.search-box',
+        'ot.directive.range-selector',
         // Dialogs
         'ot.dialog.applicationInfo',
         // Services

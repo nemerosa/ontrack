@@ -1,0 +1,43 @@
+@import 'main';
+
+@otRangeSelectorWidth: 32px;
+@otRangeSelectorHeight: 16px;
+
+@otRangeSelectorImageFirst: url("../assets/range-selector/range-selector-first.png");
+@otRangeSelectorImageSecond: url("../assets/range-selector/range-selector-second.png");
+@otRangeSelectorImageDelete: url("../assets/range-selector/range-selector-delete.png");
+
+.ot-range-selector {
+  width: @otRangeSelectorWidth;
+  height: @otRangeSelectorHeight;
+  display: block;
+  .ot-action;
+  background-size: @otRangeSelectorWidth @otRangeSelectorHeight;
+  background-clip: content-box;
+  background-repeat: no-repeat;
+
+  &.ot-range-selector-selected-first {
+    background-image: @otRangeSelectorImageFirst;
+    &:hover {
+      background-image: @otRangeSelectorImageDelete;
+    }
+  }
+
+  &.ot-range-selector-selected-second {
+    background-image: @otRangeSelectorImageSecond;
+    &:hover {
+      background-image: @otRangeSelectorImageDelete;
+    }
+  }
+
+  &.ot-range-selector-unselected-first:hover {
+    background-image: @otRangeSelectorImageFirst;
+  }
+
+  &.ot-range-selector-unselected-second:hover {
+    background-image: @otRangeSelectorImageSecond;
+  }
+
+  &.ot-range-selector-unselected-none {
+  }
+}

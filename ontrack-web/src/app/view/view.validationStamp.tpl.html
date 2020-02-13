@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
 
             <div ng-if="validationStamp.dataType">
                 <ot-section-title>Data type</ot-section-title>
@@ -28,6 +28,7 @@
             <table class="table table-condensed table-hover" ng-show="validationStamp.validationRunsPaginated.pageInfo.totalSize != 0">
                 <thead>
                 <tr>
+                    <th>&nbsp;</th>
                     <th>Build</th>
                     <th>Run</th>
                     <th>Last status</th>
@@ -41,6 +42,9 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="validationRun in validationStamp.validationRunsPaginated.pageItems">
+                        <td>
+                            <ot-range-selector model="selectedValidationRuns" item="validationRun" id="id"></ot-range-selector>
+                        </td>
                         <td>
                             <a href="#/build/{{validationRun.build.id}}">
                                 {{validationRun.build.name}}
@@ -103,7 +107,9 @@
                 </tfoot>
             </table>
         </div>
-        <div class="col-md-3">
+    </div>
+    <div class="row">
+        <div class="col-md-12">
             <ot-section-title>Properties</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
