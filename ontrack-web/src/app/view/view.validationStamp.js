@@ -62,6 +62,12 @@ angular.module('ot.view.validationStamp', [
                         id
                         name
                       }
+                      buildDiffActions {
+                        id
+                        name
+                        type
+                        uri
+                      }
                     }
                     links {
                       _self
@@ -219,9 +225,22 @@ angular.module('ot.view.validationStamp', [
 
         // Switching the page
         $scope.switchPage = function (pageRequest) {
+            $scope.selectedValidationRuns.first = undefined;
+            $scope.selectedValidationRuns.second = undefined;
             queryVariables.offset = pageRequest.offset;
             queryVariables.size = pageSize;
             loadValidationStamp();
+        };
+
+        // Diff between two validation runs
+        $scope.validationRunDiff = function (action) {
+            if ($scope.selectedValidationRuns.first && $scope.selectedValidationRuns.second) {
+                $state.go(action.id, {
+                    branch: $scope.validationStamp.branch.id,
+                    from: $scope.selectedValidationRuns.first.build.id,
+                    to: $scope.selectedValidationRuns.second.build.id
+                });
+            }
         };
 
     })

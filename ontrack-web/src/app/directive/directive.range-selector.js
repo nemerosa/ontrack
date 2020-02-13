@@ -11,13 +11,13 @@ angular.module('ot.directive.range-selector', [])
             controller: ($scope) => {
                 $scope.rangeSelectorClass = () => {
                     let itemId = id();
-                    if (itemId === $scope.model.firstId) {
+                    if (itemId === firstId()) {
                         return "ot-range-selector-selected-first";
-                    } else if (itemId === $scope.model.secondId) {
+                    } else if (itemId === secondId()) {
                         return "ot-range-selector-selected-second";
-                    } else if (!$scope.model.firstId) {
+                    } else if (!firstId()) {
                         return "ot-range-selector-unselected-first";
-                    } else if (!$scope.model.secondId) {
+                    } else if (!secondId()) {
                         return "ot-range-selector-unselected-second";
                     } else {
                         return "ot-range-selector-unselected-none";
@@ -25,23 +25,26 @@ angular.module('ot.directive.range-selector', [])
                 };
 
                 $scope.rangeSelectorTitle = () => {
-                    if (!selected() && (!$scope.model.firstId || !$scope.model.secondId)) {
-                        return "Compare this item with another item";
+                    let itemId = id();
+                    if (itemId === firstId() || itemId === secondId()) {
+                        return "Click to not compare to this item";
+                    } else if (!firstId() || !secondId()) {
+                        return "Compare this item with another one";
                     } else {
-                        return "";
+                        return "Unselect other items to change the range";
                     }
                 };
 
                 $scope.rangeSelection = () => {
                     let itemId = id();
-                    if (itemId === $scope.model.firstId) {
-                        $scope.model.firstId = undefined;
-                    } else if (itemId === $scope.model.secondId) {
-                        $scope.model.secondId = undefined;
-                    } else if (!$scope.model.firstId) {
-                        $scope.model.firstId = itemId;
-                    } else if (!$scope.model.secondId) {
-                        $scope.model.secondId = itemId;
+                    if (itemId === firstId()) {
+                        $scope.model.first = undefined;
+                    } else if (itemId === secondId()) {
+                        $scope.model.second = undefined;
+                    } else if (!firstId()) {
+                        $scope.model.first = $scope.item;
+                    } else if (!secondId()) {
+                        $scope.model.second = $scope.item;
                     } else {
                         // Nothing to do
                     }
@@ -49,9 +52,25 @@ angular.module('ot.directive.range-selector', [])
 
                 const id = () => $scope.item[$scope.id];
 
+                const firstId = () => {
+                    if ($scope.model.first) {
+                        return $scope.model.first[$scope.id];
+                    } else {
+                        return undefined;
+                    }
+                };
+
+                const secondId = () => {
+                    if ($scope.model.second) {
+                        return $scope.model.second[$scope.id];
+                    } else {
+                        return undefined;
+                    }
+                };
+
                 const selected = () => {
                     let itemId = id();
-                    return itemId === $scope.model.firstId || itemId === $scope.model.secondId;
+                    return itemId === firstId() || itemId === secondId();
                 };
             }
         };

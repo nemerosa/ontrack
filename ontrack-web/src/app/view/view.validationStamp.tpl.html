@@ -91,16 +91,25 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="4" align="left">
+                    <td colspan="5" align="left">
                         <button class="btn btn-link" ng-show="validationStamp.validationRunsPaginated.pageInfo.previousPage" ng-click="switchPage(validationStamp.validationRunsPaginated.pageInfo.previousPage)">
                             <span class="fa fa-step-backward"></span>
                             Newer ones
                         </button>
                     </td>
-                    <td colspan="4" align="right">
+                    <td colspan="5" align="right">
                         <button class="btn btn-link" ng-show="validationStamp.validationRunsPaginated.pageInfo.nextPage" ng-click="switchPage(validationStamp.validationRunsPaginated.pageInfo.nextPage)">
                             <span class="fa fa-step-forward"></span>
                             Older ones
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="10">
+                        <button ng-disabled="!selectedValidationRuns.first || !selectedValidationRuns.second" ng-repeat="action in validationStamp.branch.buildDiffActions" class="btn btn-default"
+                                id="{{action.id}}-top"
+                                ng-click="validationRunDiff(action)">
+                            {{action.name}}
                         </button>
                     </td>
                 </tr>
