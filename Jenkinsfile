@@ -171,7 +171,7 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
             agent {
                 docker {
                     image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
                 }
             }
             when {
@@ -213,7 +213,6 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
-                            -x classes \\
                             -PjacocoExecFile=build/jacoco/acceptance.exec \\
                             -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
                             --stacktrace \\
@@ -224,7 +223,6 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
-                            -x classes \\
                             -PjacocoExecFile=build/jacoco/dsl.exec \\
                             -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
                             --stacktrace \\
@@ -313,7 +311,6 @@ docker-compose --project-name ext --file docker-compose-ext.yml --file docker-co
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
-                            -x classes \\
                             -PjacocoExecFile=build/jacoco/extension.exec \\
                             -PjacocoReportFile=build/reports/jacoco/extension.xml \\
                             --stacktrace \\
