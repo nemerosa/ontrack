@@ -819,6 +819,10 @@ set -e
                 beforeAgent true
                 allOf {
                     branch "release/3.*"
+                    not {
+                        // Beta branches are not to be merged
+                        branch "*beta*"
+                    }
                     expression {
                         ontrackGetLastBranch(project: projectName, pattern: 'release-3\\..*') == branchName
                     }
