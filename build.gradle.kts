@@ -521,8 +521,8 @@ tasks.withType(SystemPackagingTask::class) {
     version = packageVersion
     os = Os.LINUX // only applied to RPM
 
-    preInstall("gradle/os-package/preInstall.sh")
-    postInstall("gradle/os-package/postInstall.sh")
+    preInstallFile(file("gradle/os-package/preInstall.sh"))
+    postInstallFile(file("gradle/os-package/postInstall.sh"))
 
     from(project(":ontrack-ui").file("build/libs"), closureOf<CopySpec> {
         include("ontrack-ui-${project.version}.jar")
