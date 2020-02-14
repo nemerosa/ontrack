@@ -49,42 +49,7 @@ angular.module('ot.view.branch', [
         };
 
         // Selected builds
-        $scope.selectedBuild = {
-            from: undefined,
-            to: undefined,
-            current: undefined
-        };
-
-        // Selection of a build
-        $scope.onBuildRowSelected = function (event, build) {
-            // Normal click
-            if (!event.shiftKey) {
-                // Reinitialise the selection to one element only
-                $scope.selectedBuild.from = build.id;
-                $scope.selectedBuild.to = build.id;
-                $scope.selectedBuild.current = build.id;
-            }
-            // Shift click to extend the selection
-            else {
-                // In the current selection...
-                if (build.id >= $scope.selectedBuild.to && build.id < $scope.selectedBuild.from) {
-                    // Extend from last single selection
-                    if ($scope.selectedBuild.current) {
-                        if (build.id > $scope.selectedBuild.current) {
-                            $scope.selectedBuild.from = build.id;
-                        }
-                        if (build.id < $scope.selectedBuild.current) {
-                            $scope.selectedBuild.to = build.id;
-                        }
-                    }
-                } else if (build.id < $scope.selectedBuild.to) {
-                    $scope.selectedBuild.to = build.id;
-                } else if (build.id > $scope.selectedBuild.from) {
-                    $scope.selectedBuild.from = build.id;
-                }
-                event.stopPropagation();
-            }
-        };
+        $scope.selectedBuilds = {};
 
         // Loading the build filters
         function loadBuildFilters() {
@@ -275,11 +240,6 @@ angular.module('ot.view.branch', [
                                 };
                             })
                     });
-                }
-                // Selection of build boundaries
-                if ($scope.builds.length > 0) {
-                    $scope.selectedBuild.from = $scope.builds[0].id;
-                    $scope.selectedBuild.to = $scope.builds[$scope.builds.length - 1].id;
                 }
             }).finally(function () {
                 $scope.loadingBuildView = false;
@@ -650,12 +610,11 @@ angular.module('ot.view.branch', [
          * Build diff action
          */
         $scope.buildDiff = function (action) {
-            const selectedBuild = $scope.selectedBuild;
-            if (selectedBuild.from && selectedBuild.to && selectedBuild.from !== selectedBuild.to) {
+            if ($scope.selectedBuilds.first && $scope.selectedBuilds.second) {
                 $state.go(action.id, {
                     branch: branchId,
-                    from: selectedBuild.from,
-                    to: selectedBuild.to
+                    from: $scope.selectedBuilds.first.id,
+                    to: $scope.selectedBuilds.second.id
                 });
             }
         };

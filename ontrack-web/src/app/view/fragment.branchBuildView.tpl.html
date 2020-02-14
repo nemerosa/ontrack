@@ -47,6 +47,7 @@
             <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
             <!-- Build diff extension commands -->
             <button ng-repeat="action in branchView.buildDiffActions" class="btn btn-default"
+                    ng-disabled="!selectedBuilds.first || !selectedBuilds.second"
                     id="{{action.id}}-top"
                     ng-click="buildDiff(action)">
                 {{action.name}}
@@ -194,14 +195,10 @@
     </thead>
     <tbody>
     <tr ng-repeat="build in builds"
-        ng-click="onBuildRowSelected($event, build)"
         class="ot-disable-select"
     >
         <td>
-            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.from == build.id" class="fa fa-chevron-down"></span>
-            <span ng-if="selectedBuild.from != selectedBuild.to && selectedBuild.to == build.id" class="fa fa-chevron-up"></span>
-            <span ng-if="selectedBuild.from == selectedBuild.to && selectedBuild.to == build.id" class="fa fa-chevron-right"></span>
-            <span ng-if="selectedBuild.to != build.id && selectedBuild.from != build.id">&nbsp;</span>
+            <ot-range-selector model="selectedBuilds" item="build" id="id"></ot-range-selector>
         </td>
         <td>
             <!-- Build name and link -->
@@ -263,6 +260,7 @@
             <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
             <!-- Build diff extension commands -->
             <button ng-repeat="action in branchView.buildDiffActions" class="btn btn-default"
+                    ng-disabled="!selectedBuilds.first || !selectedBuilds.second"
                     id="{{action.id}}"
                     ng-click="buildDiff(action)">
                 {{action.name}}
