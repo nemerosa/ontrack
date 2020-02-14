@@ -726,11 +726,12 @@ angular.module('ot.view.branch', [
                 $scope.branchValidationStampFilterResources = resources;
                 // Gets the validation stamp filter in the URL
                 const search = $location.search();
-                if (search.vsFilter) {
+                const vsFilterName = search.vsFilter || localStorage.getItem(`validationStampFilter_${$scope.branch.id}`);
+                if (vsFilterName) {
                     // Gets the filter with same name
                     const existingFilter = $scope.branchValidationStampFilterResources.resources.find(function (vsf) {
                         //noinspection EqualityComparisonWithCoercionJS
-                        return vsf.name == search.vsFilter;
+                        return vsf.name === vsFilterName;
                     });
                     if (existingFilter) {
                         $scope.selectBranchValidationStampFilter(existingFilter);
@@ -745,8 +746,10 @@ angular.module('ot.view.branch', [
             const search = $location.search();
             if (validationStampFilter) {
                 search.vsFilter = validationStampFilter.name;
+                localStorage.setItem(`validationStampFilter_${$scope.branch.id}`, validationStampFilter.name);
             } else {
                 delete search.vsFilter;
+                localStorage.removeItem(`validationStampFilter_${$scope.branch.id}`);
             }
             $location.search(search);
         };
