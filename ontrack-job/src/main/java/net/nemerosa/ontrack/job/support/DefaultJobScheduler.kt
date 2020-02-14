@@ -98,11 +98,11 @@ constructor(
     }
 
     override fun schedule(job: Job, schedule: Schedule) {
-        logger.info("[scheduler][job]{} Scheduling with {}", job.key, schedule)
+        logger.debug("[scheduler][job]{} Scheduling with {}", job.key, schedule)
         // Manages existing schedule
         val existingService = services[job.key]
         if (existingService != null) {
-            logger.info("[scheduler][job]{} Modifying existing schedule", job.key)
+            logger.debug("[scheduler][job]{} Modifying existing schedule", job.key)
             existingService.update(
                     job,
                     schedule
@@ -110,7 +110,7 @@ constructor(
         }
         // Creates and starts the scheduled service
         else {
-            logger.info("[scheduler][job]{} Starting scheduled service", job.key)
+            logger.debug("[scheduler][job]{} Starting scheduled service", job.key)
             // Copy stats from old schedule
             val jobScheduledService = JobScheduledService(
                     job,
