@@ -11,7 +11,13 @@ String buildImageVersion = "nemerosa/ontrack-build:1.0.2"
 
 pipeline {
 
-    agent none
+    agent {
+        docker {
+            image buildImageVersion
+            reuseNode true
+            args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
+        }
+    }
 
     options {
         // General Jenkins job properties
@@ -29,11 +35,6 @@ pipeline {
     stages {
 
         stage('Setup') {
-            agent {
-                docker {
-                    image buildImageVersion
-                }
-            }
             when {
                 beforeAgent true
                 not {
@@ -66,12 +67,6 @@ pipeline {
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
-                }
-            }
             when {
                 beforeAgent true
                 not {
@@ -168,12 +163,6 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
         }
 
         stage('Local acceptance tests') {
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
-                }
-            }
             when {
                 beforeAgent true
                 not {
@@ -269,12 +258,6 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                 }
                 beforeAgent true
             }
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 CODECOV_TOKEN = credentials("CODECOV_TOKEN")
@@ -358,17 +341,10 @@ docker-compose --project-name ext --file docker-compose-ext.yml --file docker-co
                 beforeAgent true
                 branch 'release/*'
             }
-            parallel {
+            stages {
                 // CentOS7
                 stage('CentOS7') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
                     steps {
-                        unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
 #!/bin/bash
@@ -421,14 +397,7 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                 }
                 // Debian
                 stage('Debian') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
                     steps {
-                        unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
                             sh """\
 #!/bin/bash
@@ -479,103 +448,6 @@ docker-compose --project-name debian --file docker-compose-debian.yml down --vol
                         }
                     }
                 }
-                // Digital Ocean
-                stage('Digital Ocean') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
-                    when {
-                        // FIXME #683 Disabled until fixed
-                        expression { false }
-                    }
-                    environment {
-                        DROPLET_NAME = "ontrack-acceptance-${version}"
-                        DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
-                    }
-                    steps {
-                        timeout(time: 60, unit: 'MINUTES') {
-                            sh '''\
-#!/bin/bash
-
-echo "(*) Cleanup..."
-rm -rf ontrack-acceptance/src/main/compose/build
-
-echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-docker-machine rm --force ${DROPLET_NAME} > /dev/null
-
-# Failing on first error from now on
-set -e
-
-echo "(*) Creating ${DROPLET_NAME} droplet..."
-docker-machine create \\
-    --driver=digitalocean \\
-    --digitalocean-access-token=${DO_TOKEN} \\
-    --digitalocean-region=ams3 \\
-    --digitalocean-size=1gb \\
-    --digitalocean-backups=false \\
-    ${DROPLET_NAME}
-
-echo "(*) Gets ${DROPLET_NAME} droplet IP..."
-DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
-echo "Droplet IP = ${DROPLET_IP}"
-
-echo "(*) Target Ontrack application..."
-export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
-
-echo "(*) Launching the remote Ontrack ecosystem..."
-eval $(docker-machine env --shell bash ${DROPLET_NAME})
-echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
-    --project-name ontrack \\
-    up -d
-
-echo "(*) Running the tests..."
-eval $(docker-machine env --shell bash --unset)
-echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name do \\
-    up --exit-code-from ontrack_acceptance
-
-'''
-                        }
-                    }
-                    post {
-                        always {
-                            sh '''\
-#!/bin/bash
-
-echo "(*) Copying the test results..."
-mkdir -p build
-rm -rf build/do
-cp -r ontrack-acceptance/src/main/compose/build build/do
-
-echo "(*) Removing the test environment..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name do \\
-    down
-
-echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-docker-machine rm --force ${DROPLET_NAME}
-'''
-                            script {
-                                def results = junit 'build/do/*.xml'
-                                ontrackValidate(
-                                        project: projectName,
-                                        branch: branchName,
-                                        build: version,
-                                        validationStamp: 'ACCEPTANCE.DO',
-                                        testResults: results,
-                                )
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -589,14 +461,8 @@ docker-machine rm --force ${DROPLET_NAME}
             environment {
                 ONTRACK_VERSION = "${version}"
             }
-            parallel {
+            stages {
                 stage('Docker Hub') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
                     environment {
                         DOCKER_HUB = credentials("DOCKER_HUB")
                     }
@@ -633,12 +499,6 @@ docker image push nemerosa/ontrack:${ONTRACK_VERSION}
                     }
                 }
                 stage('Maven publication') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
                     environment {
                         ONTRACK_COMMIT = "${gitCommit}"
                         ONTRACK_BRANCH = "${branchName}"
@@ -689,12 +549,6 @@ docker image push nemerosa/ontrack:${ONTRACK_VERSION}
         // Release
 
         stage('Release') {
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 ONTRACK_COMMIT = "${gitCommit}"
@@ -756,12 +610,6 @@ set -e
         // Documentation
 
         stage('Documentation') {
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
             environment {
                 ONTRACK_VERSION = "${version}"
                 AMS3_DELIVERY = credentials("AMS3_DELIVERY")
@@ -814,7 +662,6 @@ set -e
         // Merge to master (for latest release only)
 
         stage('Merge to master') {
-            agent any
             when {
                 beforeAgent true
                 allOf {
@@ -856,7 +703,6 @@ set -e
         // Master setup
 
         stage('Master setup') {
-            agent any
             when {
                 beforeAgent true
                 branch 'master'
@@ -901,11 +747,6 @@ set -e
         // Latest documentation
 
         stage('Latest documentation') {
-            agent {
-                docker {
-                    image buildImageVersion
-                }
-            }
             when {
                 beforeAgent true
                 branch 'master'
@@ -942,12 +783,6 @@ set -e
         // Docker latest images
 
         stage('Docker Latest') {
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
             when {
                 branch "master"
             }
@@ -989,11 +824,6 @@ set -e
         // Site generation
 
         stage('Site generation') {
-            agent {
-                docker {
-                    image buildImageVersion
-                }
-            }
             environment {
                 // GitHub OAuth token
                 GRGIT_USER = credentials("JENKINS_GITHUB_TOKEN")
@@ -1031,11 +861,6 @@ set -e
         // Production
 
         stage('Production') {
-            agent {
-                docker {
-                    image buildImageVersion
-                }
-            }
             when {
                 beforeAgent true
                 branch "master"
@@ -1071,12 +896,6 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
         // Production tests
 
         stage('Production tests') {
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
             when {
                 beforeAgent true
                 branch "master"
