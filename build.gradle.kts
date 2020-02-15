@@ -36,8 +36,8 @@ plugins {
     java
     jacoco
     id("net.nemerosa.versioning") version "2.8.2" apply false
-    id("nebula.deb") version "6.2.1"
-    id("nebula.rpm") version "6.2.1"
+    id("nebula.deb") version "8.1.0"
+    id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
     id("com.avast.gradle.docker-compose") version "0.9.5"
     id("com.bmuschko.docker-remote-api") version "4.1.0"
@@ -521,8 +521,8 @@ tasks.withType(SystemPackagingTask::class) {
     version = packageVersion
     os = Os.LINUX // only applied to RPM
 
-    preInstallFile(file("gradle/os-package/preInstall.sh"))
-    postInstallFile(file("gradle/os-package/postInstall.sh"))
+    preInstall(file("gradle/os-package/preInstall.sh"))
+    postInstall(file("gradle/os-package/postInstall.sh"))
 
     from(project(":ontrack-ui").file("build/libs"), closureOf<CopySpec> {
         include("ontrack-ui-${project.version}.jar")
