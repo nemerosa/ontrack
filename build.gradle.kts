@@ -410,9 +410,19 @@ val publicationPackage by tasks.registering(Zip::class) {
 subprojects {
     afterEvaluate p@{
         val jar = tasks.findByName("jar") as? Jar?
-        if (jar != null && jar.isEnabled) {
-            publicationPackage {
-                from(jar)
+        val bootJar = tasks.findByName("bootJar")
+        val testJar = tasks.findByName("testJar") as? Jar?
+        val producesJar = (bootJar != null) || (jar != null && jar.isEnabled) || (testJar != null && testJar.isEnabled)
+        if (producesJar) {
+            if (jar != null && jar.isEnabled) {
+                publicationPackage {
+                    from(jar)
+                }
+            }
+            if (testJar != null && testJar.isEnabled) {
+                publicationPackage {
+                    from(testJar)
+                }
             }
             if (rootProject.hasProperty("documentation")) {
                 val javadoc = tasks.findByName("javadocJar")
@@ -426,12 +436,6 @@ subprojects {
                     publicationPackage {
                         from(sources)
                     }
-                }
-            }
-            val testJar = tasks.findByName("testJar")
-            if (testJar != null) {
-                publicationPackage {
-                    from(testJar)
                 }
             }
             // POM file
