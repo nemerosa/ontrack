@@ -676,8 +676,8 @@ set -e
                     // Trace
                     echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
                     // Version components
-                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)\.\d.*/)
-                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)(?:-beta)?\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+(?:-beta)?\.\d.*/)
                     echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
                     echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
                     // Gets the corresponding branch
@@ -928,6 +928,6 @@ String extractFromVersion(String version, String pattern) {
     if (matcher.matches()) {
         return matcher.group(1)
     } else {
-        throw new IllegalAccessException("Version $version does not match pattern: $pattern")
+        error("Version $version does not match pattern: $pattern")
     }
 }
