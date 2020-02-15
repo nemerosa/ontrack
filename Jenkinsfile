@@ -659,47 +659,6 @@ set -e
             }
         }
 
-        // Merge to master (for latest release only)
-
-        stage('Merge to master') {
-            when {
-                beforeAgent true
-                allOf {
-                    branch "release/3.*"
-                    not {
-                        // Beta branches are not to be merged
-                        branch "*beta"
-                    }
-                    expression {
-                        ontrackGetLastBranch(project: projectName, pattern: 'release-3\\..*') == branchName
-                    }
-                }
-            }
-            steps {
-                // Merge to master
-                sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
-                    sh '''
-                        git config --local user.email "jenkins@nemerosa.net"
-                        git config --local user.name "Jenkins"
-                        git checkout master
-                        git pull origin master
-                        git merge $BRANCH_NAME
-                        git push origin master
-                    '''
-                }
-            }
-            post {
-                always {
-                    ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
-                            validationStamp: 'MERGE',
-                    )
-                }
-            }
-        }
-
         // Master setup
 
         stage('Master setup') {
