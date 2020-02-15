@@ -418,6 +418,10 @@ subprojects {
                 publicationPackage {
                     from(jar)
                 }
+            } else if (bootJar != null) {
+                publicationPackage {
+                    from(bootJar)
+                }
             }
             if (testJar != null && testJar.isEnabled) {
                 publicationPackage {
