@@ -164,9 +164,16 @@ configure(javaProjects) p@{
                     artifact(tasks["sourcesJar"])
                     artifact(tasks["javadocJar"])
                 }
-                pom {
+                pom pom@{
                     name.set(this@p.name)
-                    description.set(this@p.description)
+                    this@p.afterEvaluate {
+                        val description = if (this.description.isNullOrBlank()) {
+                            "Ontrack module: ${this.name}"
+                        } else {
+                            this.description
+                        }
+                        this@pom.description.set(description)
+                    }
                     url.set("http://nemerosa.github.io/ontrack")
                     licenses {
                         license {
