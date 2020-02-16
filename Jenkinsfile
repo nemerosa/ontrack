@@ -264,9 +264,9 @@ pipeline {
                     script {
                         def results = junit 'build/extension/*.xml'
                         ontrackValidate(
-                                project: projectName,
-                                branch: branchName,
-                                build: version,
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: ONTRACK_BRANCH_NAME,
+                                build: VERSION,
                                 validationStamp: 'EXTENSIONS',
                                 testResults: results,
                         )
