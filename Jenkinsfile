@@ -464,13 +464,14 @@ pipeline {
                         OSSRH = credentials("OSSRH")
                         BINTRAY = credentials("BINTRAY")
                     }
+                    // FIXME Maven Central sync
                     steps {
                         sh '''
                             ./gradlew \\
                                 bintrayUpload \\
                                 -PbintrayUser=${BINTRAY_USR} \\
                                 -PbintrayKey=${BINTRAY_PSW} \\
-                                -PossrhPublication=true \\
+                                -PossrhPublication=false \\
                                 -PossrhUser=${OSSRH_USR} \\
                                 -PossrhPassword=${OSSRH_PSW} \\
                                 --info \\
@@ -492,67 +493,51 @@ pipeline {
             }
         }
 
-//        // Release
-//
-//        stage('Release') {
-//            environment {
-//                ONTRACK_VERSION = "${version}"
-//                ONTRACK_COMMIT = "${gitCommit}"
-//                ONTRACK_BRANCH = "${branchName}"
-//                GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
-//            }
-//            when {
-//                beforeAgent true
-//                branch 'release/*'
-//            }
-//            steps {
-//                echo "Release"
-//
-//                unstash name: "delivery"
-//                unstash name: "rpm"
-//                unstash name: "debian"
-//                unzip zipFile: "build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip", dir: "${WORKSPACE}"
-//                unzip zipFile: "${WORKSPACE}/ontrack-publication.zip", dir: "publication"
-//
-//                sh '''\
-//#!/bin/bash
-//set -e
-//
-//./gradlew \\
-//    --build-file publication.gradle \\
-//    --info \\
-//    --profile \\
-//    --console plain \\
-//    --stacktrace \\
-//    -PontrackVersion=${ONTRACK_VERSION} \\
-//    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
-//    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
-//    -PgitHubUser=${GITHUB_USR} \\
-//    -PgitHubPassword=${GITHUB_PSW} \\
-//    publicationRelease
-//'''
-//
-//            }
-//            post {
-//                always {
-//                    ontrackValidate(
-//                            project: projectName,
-//                            branch: branchName,
-//                            build: version,
-//                            validationStamp: 'GITHUB.RELEASE',
-//                    )
-//                }
-//                success {
-//                    ontrackPromote(
-//                            project: projectName,
-//                            branch: branchName,
-//                            build: version,
-//                            promotionLevel: 'RELEASE',
-//                    )
-//                }
-//            }
-//        }
-//
+        // Release
+
+        stage('Release') {
+            environment {
+                GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
+            }
+            when {
+                anyOf {
+                    branch 'release/*'
+                    // FIXME Cleanup
+                    branch 'feature/732-bintray'
+                }
+            }
+            steps {
+                sh '''
+                    ./gradlew \\
+                        --info \\
+                        --console plain \\
+                        --stacktrace \\
+                        -PgitHubToken=${GITHUB_TOKEN} \\
+                        -PgitHubCommit=${GIT_COMMIT} \\
+                        githubRelease
+                '''
+
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
+                            validationStamp: 'GITHUB.RELEASE',
+                    )
+                }
+                success {
+                    ontrackPromote(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
+                            promotionLevel: 'RELEASE',
+                    )
+                }
+            }
+        }
+
 //        // Documentation
 //
 //        stage('Documentation') {

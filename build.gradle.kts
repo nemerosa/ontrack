@@ -46,6 +46,7 @@ plugins {
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.jfrog.bintray") version "1.8.4" apply false
+    id("com.github.breadmoirai.github-release") version "2.2.10"
     // Site
     id("org.ajoberstar.git-publish") version "2.1.1"
 }
@@ -580,14 +581,71 @@ if (hasProperty("documentation")) {
 }
 
 /**
+ * GitHub release
+ */
+
+val gitHubToken: String by project
+val gitHubOwner: String by project
+val gitHubRepo: String by project
+val gitHubCommit: String by project
+
+val prepareGitHubRelease by tasks.registering(Copy::class) {
+    from("ontrack-docs/build/docs/asciidocPdf") {
+        include("index.pdf")
+        rename { "ontrack.pdf" }
+    }
+    from("ontrack-ui/build/libs") {
+        include("ontrack-ui-${version}.jar")
+        rename { "ontrack.jar" }
+    }
+    from("ontrack-postgresql-migration/build/libs") {
+        include("ontrack-postgresql-migration-${version}.jar")
+        rename { "ontrack-postgresql-migration.jar" }
+    }
+    from("ontrack-dsl-shell/build/libs") {
+        include("ontrack-dsl-shell-${version}-executable.jar")
+        rename { "ontrack-dsl-shell.jar" }
+    }
+    from("build/distributions") {
+        include("ontrack*.deb")
+        rename { "ontrack.deb" }
+    }
+    from("build/distributions") {
+        include("ontrack*.rpm")
+        rename { "ontrack.rpm" }
+    }
+    into("build/release")
+}
+
+githubRelease {
+    token(gitHubToken)
+    owner(gitHubOwner)
+    repo(gitHubRepo)
+    tagName(version.toString())
+    releaseName(version.toString())
+    targetCommitish(gitHubCommit)
+    overwrite(true)
+    releaseAssets(
+            "build/release/ontrack.jar",
+            "build/release/ontrack-dsl-shell.jar",
+            "build/release/ontrack-postgresql-migration.jar",
+            "build/release/ontrack.pdf",
+            "build/release/ontrack.deb",
+            "build/release/ontrack.rpm"
+    )
+}
+
+tasks.named("githubRelease") {
+    dependsOn(prepareGitHubRelease)
+}
+
+/**
  * Site generation
  *
  * Must be called AFTER the current version has been promoted in Ontrack to the RELEASE promotion level.
  *
  * This means having a Site job in the pipeline, after the Publish one, calling the `site` task.
  */
-
-val ontrackVersion: String by project
 
 val siteOntrackLast2Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 2
@@ -623,7 +681,7 @@ configure<GitPublishExtension> {
             into("javascripts/doc/")
         }
     }
-    commitMessage.set("GitHub pages for version $ontrackVersion")
+    commitMessage.set("GitHub pages for version $version")
 }
 
 tasks.named("gitPublishCopy") {
