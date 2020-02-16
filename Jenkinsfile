@@ -138,15 +138,17 @@ pipeline {
             }
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            --file docker-compose-jacoco.yml \\
-                            up \\
-                            --exit-code-from ontrack_acceptance
-                    '''
+                    ansiColor('xterm') {
+                        sh '''
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose \\
+                                --project-name local \\
+                                --file docker-compose.yml \\
+                                --file docker-compose-jacoco.yml \\
+                                up \\
+                                --exit-code-from ontrack_acceptance
+                            '''
+                    }
                 }
             }
             post {
@@ -221,17 +223,19 @@ pipeline {
             }
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
-                    // Cleanup
-                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
-                    // Launches the tests
-                    sh '''
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose \\
-                            --project-name ext \\
-                            --file docker-compose-ext.yml \\
-                            --file docker-compose-jacoco.yml up \\
-                            --exit-code-from ontrack_acceptance
-                    '''
+                    ansiColor('xterm') {
+                        // Cleanup
+                        sh ' rm -rf ontrack-acceptance/src/main/compose/build '
+                        // Launches the tests
+                        sh '''
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose \\
+                                --project-name ext \\
+                                --file docker-compose-ext.yml \\
+                                --file docker-compose-jacoco.yml up \\
+                                --exit-code-from ontrack_acceptance
+                        '''
+                    }
                 }
             }
             post {
@@ -301,24 +305,26 @@ pipeline {
                 stage('CentOS7') {
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
-                            sh '''
-                                echo "Preparing environment..."
-                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-                                rm -f ${DOCKER_DIR}/*.rpm
-                                cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
-                                
-                                echo "Launching test environment..."
-                                cd ontrack-acceptance/src/main/compose
-                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-                                
-                                echo "Launching Ontrack in CentOS environment..."
-                                CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-                                echo "... for container ${CONTAINER}"
-                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                
-                                echo "Launching tests..."
-                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
-                            '''
+                            ansiColor('xterm') {
+                                sh '''
+                                    echo "Preparing environment..."
+                                    DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+                                    rm -f ${DOCKER_DIR}/*.rpm
+                                    cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
+                                    
+                                    echo "Launching test environment..."
+                                    cd ontrack-acceptance/src/main/compose
+                                    docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+                                    
+                                    echo "Launching Ontrack in CentOS environment..."
+                                    CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+                                    echo "... for container ${CONTAINER}"
+                                    docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                    
+                                    echo "Launching tests..."
+                                    docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
+                                '''
+                            }
                         }
                     }
                     post {
@@ -350,24 +356,26 @@ pipeline {
                 stage('Debian') {
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
-                            sh '''
-                                echo "Preparing environment..."
-                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-                                rm -f ${DOCKER_DIR}/*.deb
-                                cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
-                                
-                                echo "Launching test environment..."
-                                cd ontrack-acceptance/src/main/compose
-                                docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-                                
-                                echo "Launching Ontrack in Debian environment..."
-                                CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
-                                echo "... for container ${CONTAINER}"
-                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                
-                                echo "Launching tests..."
-                                docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
-                                '''
+                            ansiColor('xterm') {
+                                sh '''
+                                    echo "Preparing environment..."
+                                    DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
+                                    rm -f ${DOCKER_DIR}/*.deb
+                                    cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
+                                    
+                                    echo "Launching test environment..."
+                                    cd ontrack-acceptance/src/main/compose
+                                    docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+                                    
+                                    echo "Launching Ontrack in Debian environment..."
+                                    CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+                                    echo "... for container ${CONTAINER}"
+                                    docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                    
+                                    echo "Launching tests..."
+                                    docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
+                                    '''
+                            }
                         }
                     }
                     post {
