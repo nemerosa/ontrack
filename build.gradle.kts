@@ -213,6 +213,7 @@ configure(javaProjects) p@{
 
     val bintrayUser: String by project
     val bintrayKey: String by project
+    val ossrhPublication: Boolean by project
     val ossrhUser: String by project
     val ossrhPassword: String by project
 
@@ -231,8 +232,7 @@ configure(javaProjects) p@{
                 name = rootProject.version.toString()
                 desc = "v${rootProject.version}"
                 mavenCentralSync(closureOf<MavenCentralSyncConfig> {
-                    // FIXME Maven Central
-                    sync = false
+                    sync = ossrhPublication
                     user = ossrhUser
                     password = ossrhPassword
                     close = "1"

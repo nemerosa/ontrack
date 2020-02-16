@@ -459,51 +459,44 @@ pipeline {
                         }
                     }
                 }
-//                stage('Maven publication') {
-//                    environment {
-//                        ONTRACK_COMMIT = "${gitCommit}"
-//                        ONTRACK_BRANCH = "${branchName}"
-//                        GPG_KEY = credentials("GPG_KEY")
-//                        GPG_KEY_RING = credentials("GPG_KEY_RING")
-//                        OSSRH = credentials("OSSRH")
-//                    }
-//                    steps {
-//                        echo "Maven publication"
-//
-//                        unstash name: "delivery"
-//                        unzip zipFile: "build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip", dir: "${WORKSPACE}"
-//                        unzip zipFile: "${WORKSPACE}/ontrack-publication.zip", dir: "publication"
-//
-//                        sh '''
-//./gradlew \\
-//    --build-file publication.gradle \\
-//    --info \\
-//    --profile \\
-//    --console plain \\
-//    --stacktrace \\
-//    -PontrackVersion=${ONTRACK_VERSION} \\
-//    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
-//    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
-//    -Psigning.keyId=${GPG_KEY_USR} \\
-//    -Psigning.password=${GPG_KEY_PSW} \\
-//    -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-//    -PossrhUser=${OSSRH_USR} \\
-//    -PossrhPassword=${OSSRH_PSW} \\
-//    publicationMaven
-//'''
-//                    }
-//                    post {
-//                        always {
-//                            ontrackValidate(
-//                                    project: projectName,
-//                                    branch: branchName,
-//                                    build: version,
-//                                    validationStamp: 'MAVEN.CENTRAL',
-//                                    buildResult: currentBuild.result,
-//                            )
-//                        }
-//                    }
-//                }
+                stage('Bintray publication') {
+                    environment {
+                        OSSRH = credentials("OSSRH")
+                        OSSRH = credentials("BINTRAY")
+                    }
+                    steps {
+                        script {
+                            // FIXME Branch cleanup
+                            if (BRANCH_NAME ==~ /release\/.*|feature\/732-bintray/) {
+                                env.OSSRH_PUBLICATION = "true"
+                            } else {
+                                env.OSSRH_PUBLICATION = "false"
+                            }
+                        }
+                        sh '''
+                            ./gradlew \\
+                                bintrayUpload \\
+                                -PbintrayUser=${BINTRAY_USR} \\
+                                -PbintrayKey=${BINTRAY_PSW} \\
+                                -PossrhPublication=${OSSRH_PUBLICATION} \\
+                                -PossrhUser=${OSSRH_USR} \\
+                                -PossrhPassword=${OSSRH_PSW} \\
+                                --info \\
+                                --console plain \\
+                                --stacktrace
+                        '''
+                    }
+                    post {
+                        always {
+                            ontrackValidate(
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
+                                    validationStamp: 'MAVEN.CENTRAL'
+                            )
+                        }
+                    }
+                }
             }
         }
 
