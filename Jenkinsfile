@@ -182,6 +182,11 @@ pipeline {
                     '''
                 }
                 always {
+                    sh '''
+                        rm -rf build/acceptance
+                        mkdir -p build
+                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                        '''
                     script {
                         def results = junit('build/acceptance/*.xml')
                         if (!(BRANCH_NAME ==~ /PR-.*/)) {
@@ -197,9 +202,6 @@ pipeline {
                 }
                 cleanup {
                     sh '''
-                        rm -rf build/acceptance
-                        mkdir -p build
-                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
                         cd ontrack-acceptance/src/main/compose
                         docker-compose \\
                             --project-name local \\
@@ -254,6 +256,11 @@ pipeline {
                     '''
                 }
                 always {
+                    sh '''
+                        mkdir -p build
+                        rm -rf build/extension
+                        cp -r ontrack-acceptance/src/main/compose/build build/extension
+                    '''
                     script {
                         def results = junit 'build/extension/*.xml'
                         ontrackValidate(
@@ -267,9 +274,6 @@ pipeline {
                 }
                 cleanup {
                     sh '''
-                        mkdir -p build
-                        rm -rf build/extension
-                        cp -r ontrack-acceptance/src/main/compose/build build/extension
                         cd ontrack-acceptance/src/main/compose
                         docker-compose \\
                             --project-name ext \\
@@ -319,6 +323,10 @@ pipeline {
                     }
                     post {
                         always {
+                            sh '''
+                                mkdir -p build
+                                cp -r ontrack-acceptance/src/main/compose/build build/centos
+                                '''
                             script {
                                 def results = junit 'build/centos/*.xml'
                                 ontrackValidate(
@@ -332,9 +340,6 @@ pipeline {
                         }
                         cleanup {
                             sh '''
-                                echo "Cleanup..."
-                                mkdir -p build
-                                cp -r ontrack-acceptance/src/main/compose/build build/centos
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
                                 '''
@@ -367,6 +372,10 @@ pipeline {
                     }
                     post {
                         always {
+                            sh '''
+                                mkdir -p build/debian
+                                cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
+                                '''
                             script {
                                 def results = junit 'build/debian/*.xml'
                                 ontrackValidate(
@@ -380,9 +389,6 @@ pipeline {
                         }
                         cleanup {
                             sh '''
-                                echo "Cleanup..."
-                                mkdir -p build/debian
-                                cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
                                 cd ontrack-acceptance/src/main/compose
                                 docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
                                 '''
