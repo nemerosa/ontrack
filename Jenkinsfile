@@ -289,128 +289,120 @@ pipeline {
             }
         }
 
-
         // We stop here for pull requests and feature branches
 
         // OS tests
-//
-//        stage('Platform tests') {
-//            environment {
-//                ONTRACK_VERSION = "${version}"
-//            }
-//            when {
-//                beforeAgent true
-//                branch 'release/*'
-//            }
-//            stages {
-//                // CentOS7
-//                stage('CentOS7') {
-//                    steps {
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//
-//echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//echo "Preparing environment..."
-//DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-//rm -f \${DOCKER_DIR}/*.rpm
-//cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
-//
-//echo "Launching test environment..."
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-//
-//echo "Launching Ontrack in CentOS environment..."
-//CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-//echo "... for container \${CONTAINER}"
-//docker container exec \${CONTAINER} /etc/init.d/ontrack start
-//
-//echo "Launching tests..."
-//docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
-//"""
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//echo "Cleanup..."
-//mkdir -p build
-//cp -r ontrack-acceptance/src/main/compose/build build/centos
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
-//"""
-//                            script {
-//                                def results = junit 'build/centos/*.xml'
-//                                ontrackValidate(
-//                                        project: projectName,
-//                                        branch: branchName,
-//                                        build: version,
-//                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
-//                                        testResults: results,
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//                // Debian
-//                stage('Debian') {
-//                    steps {
-//                        timeout(time: 25, unit: 'MINUTES') {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//
-//echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//echo "Preparing environment..."
-//DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-//rm -f \${DOCKER_DIR}/*.deb
-//cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
-//
-//echo "Launching test environment..."
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-//
-//echo "Launching Ontrack in Debian environment..."
-//CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
-//echo "... for container \${CONTAINER}"
-//docker container exec \${CONTAINER} /etc/init.d/ontrack start
-//
-//echo "Launching tests..."
-//docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
-//"""
-//                        }
-//                    }
-//                    post {
-//                        always {
-//                            sh """\
-//#!/bin/bash
-//set -e
-//echo "Cleanup..."
-//mkdir -p build/debian
-//cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
-//"""
-//                            script {
-//                                def results = junit 'build/debian/*.xml'
-//                                ontrackValidate(
-//                                        project: projectName,
-//                                        branch: branchName,
-//                                        build: version,
-//                                        validationStamp: 'ACCEPTANCE.DEBIAN',
-//                                        testResults: results,
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
+
+        stage('Platform tests') {
+            when {
+                anyOf {
+                    branch 'release/*'
+                    // FIXME Cleanup
+                    branch 'feature/732-bintray'
+                }
+            }
+            stages {
+                stage('CentOS7') {
+                    steps {
+                        timeout(time: 25, unit: 'MINUTES') {
+                            sh '''
+                            echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                            
+                            echo "Preparing environment..."
+                            DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+                            rm -f ${DOCKER_DIR}/*.rpm
+                            cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
+                            
+                            echo "Launching test environment..."
+                            cd ontrack-acceptance/src/main/compose
+                            docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+                            
+                            echo "Launching Ontrack in CentOS environment..."
+                            CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+                            echo "... for container ${CONTAINER}"
+                            docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                            
+                            echo "Launching tests..."
+                            docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
+                            '''
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                def results = junit 'build/centos/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.CENTOS.7',
+                                        testResults: results,
+                                )
+                            }
+                        }
+                        cleanup {
+                            sh '''
+                                echo "Cleanup..."
+                                mkdir -p build
+                                cp -r ontrack-acceptance/src/main/compose/build build/centos
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
+                                '''
+                        }
+                    }
+                }
+                // Debian
+                stage('Debian') {
+                    steps {
+                        timeout(time: 25, unit: 'MINUTES') {
+                            sh '''
+                                echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                                
+                                echo "Preparing environment..."
+                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
+                                rm -f ${DOCKER_DIR}/*.deb
+                                cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
+                                
+                                echo "Launching test environment..."
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+                                
+                                echo "Launching Ontrack in Debian environment..."
+                                CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+                                echo "... for container ${CONTAINER}"
+                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                
+                                echo "Launching tests..."
+                                docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
+                                '''
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                def results = junit 'build/debian/*.xml'
+                                ontrackValidate(
+                                        project: projectName,
+                                        branch: branchName,
+                                        build: version,
+                                        validationStamp: 'ACCEPTANCE.DEBIAN',
+                                        testResults: results,
+                                )
+                            }
+                        }
+                        cleanup {
+                            sh '''
+                                echo "Cleanup..."
+                                mkdir -p build/debian
+                                cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
+                                '''
+                        }
+                    }
+                }
+            }
+        }
 
         // Publication
 
