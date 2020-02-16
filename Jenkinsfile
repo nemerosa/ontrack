@@ -215,88 +215,82 @@ pipeline {
                 }
             }
         }
-//
-//        stage('Local extension tests') {
-//            when {
-//                not {
-//                    branch "master"
-//                }
-//                beforeAgent true
-//            }
-//            environment {
-//                ONTRACK_VERSION = "${version}"
-//                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
-//            }
-//            steps {
-//                timeout(time: 25, unit: 'MINUTES') {
-//                    // Cleanup
-//                    sh """\
-//rm -rf ontrack-acceptance/src/main/compose/build
-//"""
-//                    // Launches the tests
-//                    sh """\
-//#!/bin/bash
-//set -e
-//
-//echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//echo "Launching tests..."
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name ext --file docker-compose-ext.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
-//"""
-//                }
-//            }
-//            post {
-//                success {
-//                    sh '''
-//                        #!/bin/bash
-//                        set -e
-//                        echo "Getting Jacoco coverage"
-//                        mkdir -p build/jacoco/
-//                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/extension.exec
-//                    '''
-//                    // Collection of coverage in Docker
-//                    sh '''
-//                        ./gradlew \\
-//                            codeDockerCoverageReport \\
-//                            -PjacocoExecFile=build/jacoco/extension.exec \\
-//                            -PjacocoReportFile=build/reports/jacoco/extension.xml \\
-//                            --stacktrace \\
-//                            --profile \\
-//                            --console plain
-//                    '''
-//                    // Upload to Codecov
-//                    sh '''
-//                        curl -s https://codecov.io/bash | bash -s -- -c -F extension -f build/reports/jacoco/extension.xml
-//                    '''
-//                }
-//                always {
-//                    sh """\
-//echo "Cleanup..."
-//mkdir -p build
-//rm -rf build/extension
-//cp -r ontrack-acceptance/src/main/compose/build build/extension
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name ext --file docker-compose-ext.yml --file docker-compose-jacoco.yml down --volumes
-//"""
-//                    script {
-//                        def results = junit 'build/extension/*.xml'
-//                        ontrackValidate(
-//                                project: projectName,
-//                                branch: branchName,
-//                                build: version,
-//                                validationStamp: 'EXTENSIONS',
-//                                testResults: results,
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//        // We stop here for pull requests and feature branches
-//
-//        // OS tests + DO tests in parallel
+
+        stage('Local extension tests') {
+            when {
+                not {
+                    branch "master"
+                }
+            }
+            steps {
+                timeout(time: 25, unit: 'MINUTES') {
+                    // Cleanup
+                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
+                    // Launches the tests
+                    sh '''
+                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name ext \\
+                            --file docker-compose-ext.yml \\
+                            --file docker-compose-jacoco.yml up \\
+                            --exit-code-from ontrack_acceptance
+                    '''
+                }
+            }
+            post {
+                success {
+                    sh '''
+                        echo "Getting Jacoco coverage"
+                        mkdir -p build/jacoco/
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/extension.exec
+                    '''
+                    // Collection of coverage in Docker
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -PjacocoExecFile=build/jacoco/extension.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/extension.xml \\
+                            --stacktrace \\
+                            --console plain
+                    '''
+                    // Upload to Codecov
+                    sh '''
+                        curl -s https://codecov.io/bash | bash -s -- -c -F extension -f build/reports/jacoco/extension.xml
+                    '''
+                }
+                always {
+                    script {
+                        def results = junit 'build/extension/*.xml'
+                        ontrackValidate(
+                                project: projectName,
+                                branch: branchName,
+                                build: version,
+                                validationStamp: 'EXTENSIONS',
+                                testResults: results,
+                        )
+                    }
+                }
+                cleanup {
+                    sh '''
+                        mkdir -p build
+                        rm -rf build/extension
+                        cp -r ontrack-acceptance/src/main/compose/build build/extension
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name ext \\
+                            --file docker-compose-ext.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            down --volumes
+                    '''
+                }
+            }
+        }
+
+
+        // We stop here for pull requests and feature branches
+
+        // OS tests
 //
 //        stage('Platform tests') {
 //            environment {
