@@ -10,7 +10,7 @@ pipeline {
 
     agent {
         docker {
-            image BUILD_IMAGE_VERSION
+            image env.BUILD_IMAGE_VERSION
             reuseNode true
             args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
         }
