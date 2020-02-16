@@ -88,7 +88,7 @@ pipeline {
                             --parallel \\
                             --console plain
                     '''
-                    // FIXME sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
+                    sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
                     sh '''
                         echo "(*) Building the test extension..."
                         cd ontrack-extension-test
