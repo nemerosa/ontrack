@@ -5,6 +5,7 @@ pipeline {
     environment {
         ONTRACK_PROJECT_NAME = "ontrack"
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
+        CODECOV_TOKEN = credentials("CODECOV_TOKEN")
     }
 
     agent {
@@ -51,103 +52,89 @@ pipeline {
                         """)
             }
         }
-//
-//        stage('Build') {
-//            when {
-//                beforeAgent true
-//                not {
-//                    branch 'master'
-//                }
-//            }
-//            environment {
-//                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
-//            }
-//            steps {
-//                sh '''\
-//git checkout -B ${BRANCH_NAME}
-//git clean -xfd
-//'''
-//                sh ''' ./gradlew clean versionDisplay versionFile'''
-//                script {
-//                    // Reads version information
-//                    def props = readProperties(file: 'build/version.properties')
-//                    version = props.VERSION_DISPLAY
-//                    gitCommit = props.VERSION_COMMIT
-//                    // If not a PR, create a build
-//                    if (!pr) {
-//                        ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
-//                    }
-//                }
-//                echo "Version = ${version}"
-//                sh '''\
-//./gradlew \\
-//    test \\
-//    build \\
-//    integrationTest \\
-//    codeCoverageReport \\
-//    publishToMavenLocal \\
-//    osPackages \\
-//    dockerBuild \\
-//    -Pdocumentation \\
-//    -PbowerOptions='--allow-root' \\
-//    -Dorg.gradle.jvmargs=-Xmx4096m \\
-//    --stacktrace \\
-//    --profile \\
-//    --parallel \\
-//    --console plain
-//'''
-//                sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
-//                sh """\
-//echo "(*) Building the test extension..."
-//cd ontrack-extension-test
-//./gradlew \\
-//    clean \\
-//    build \\
-//    -PontrackVersion=${version} \\
-//    -PbowerOptions='--allow-root' \\
-//    -Dorg.gradle.jvmargs=-Xmx2048m \\
-//    --stacktrace \\
-//    --profile \\
-//    --console plain
-//"""
-//                echo "Pushing image to registry..."
-//                sh """\
-//echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//docker tag nemerosa/ontrack:${version} docker.nemerosa.net/nemerosa/ontrack:${version}
-//docker tag nemerosa/ontrack-acceptance:${version} docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
-//docker tag nemerosa/ontrack-extension-test:${version} docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
-//
-//docker push docker.nemerosa.net/nemerosa/ontrack:${version}
-//docker push docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
-//docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
-//"""
-//            }
-//            post {
-//                always {
-//                    script {
-//                        def results = junit '**/build/test-results/**/*.xml'
-//                        // If not a PR, create a build validation stamp
-//                        if (!pr) {
-//                            ontrackValidate(
-//                                    project: projectName,
-//                                    branch: branchName,
-//                                    build: version,
-//                                    validationStamp: 'BUILD',
-//                                    testResults: results,
-//                            )
-//                        }
-//                    }
-//                }
-//                success {
-//                    stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
-//                    stash name: "rpm", includes: "build/distributions/*.rpm"
-//                    stash name: "debian", includes: "build/distributions/*.deb"
-//                    stash name: "site", includes: "build/site/**"
-//                }
-//            }
-//        }
-//
+
+        stage('Build') {
+            when {
+                not {
+                    branch 'master'
+                }
+            }
+            steps {
+                ansiColor('xterm') {
+                    sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
+                    sh ''' ./gradlew clean versionDisplay versionFile'''
+                    script {
+                        // Reads version information
+                        def props = readProperties(file: 'build/version.properties')
+                        env.VERSION = props.VERSION_DISPLAY
+                        env.GIT_COMMIT = props.VERSION_COMMIT
+                        // If not a PR, create a build
+                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
+                            ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
+                        }
+                    }
+                    echo "Version = ${VERSION}"
+                    sh '''
+                        ./gradlew \\
+                            test \\
+                            build \\
+                            integrationTest \\
+                            codeCoverageReport \\
+                            osPackages \\
+                            dockerBuild \\
+                            -Pdocumentation \\
+                            -PbowerOptions='--allow-root' \\
+                            -Dorg.gradle.jvmargs=-Xmx4096m \\
+                            --stacktrace \\
+                            --parallel \\
+                            --console plain
+                    '''
+                    sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
+                    sh '''
+                        echo "(*) Building the test extension..."
+                        cd ontrack-extension-test
+                        ./gradlew \\
+                            clean \\
+                            build \\
+                            -PontrackVersion=${VERSION} \\
+                            -PbowerOptions='--allow-root' \\
+                            -Dorg.gradle.jvmargs=-Xmx2048m \\
+                            --stacktrace \\
+                            --console plain
+                    '''
+                    echo "Pushing image to registry..."
+                    sh '''
+                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                        
+                        docker tag nemerosa/ontrack:${VERSION} docker.nemerosa.net/nemerosa/ontrack:${VERSION}
+                        docker tag nemerosa/ontrack-acceptance:${VERSION} docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
+                        docker tag nemerosa/ontrack-extension-test:${VERSION} docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
+                        
+                        docker push docker.nemerosa.net/nemerosa/ontrack:${VERSION}
+                        docker push docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
+                        docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
+                    '''
+                }
+            }
+            post {
+                always {
+                    script {
+                        def results = junit '**/build/test-results/**/*.xml'
+                        // If not a PR, create a build validation stamp
+                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
+                            ontrackValidate(
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
+                                    validationStamp: 'BUILD',
+                                    testResults: results,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
 //        stage('Local acceptance tests') {
 //            when {
 //                beforeAgent true
