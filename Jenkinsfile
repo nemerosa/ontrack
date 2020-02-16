@@ -4,13 +4,12 @@ pipeline {
 
     environment {
         ONTRACK_PROJECT_NAME = "ontrack"
-        BUILD_IMAGE_VERSION = "nemerosa/ontrack-build:1.0.2"
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
     }
 
     agent {
         docker {
-            image env.BUILD_IMAGE_VERSION
+            image "nemerosa/ontrack-build:1.0.2"
             reuseNode true
             args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
         }
