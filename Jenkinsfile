@@ -105,15 +105,9 @@ pipeline {
                     '''
                     echo "Pushing image to registry..."
                     sh '''
-                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-                        
                         docker tag nemerosa/ontrack:${VERSION} docker.nemerosa.net/nemerosa/ontrack:${VERSION}
                         docker tag nemerosa/ontrack-acceptance:${VERSION} docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
                         docker tag nemerosa/ontrack-extension-test:${VERSION} docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
-                        
-                        docker push docker.nemerosa.net/nemerosa/ontrack:${VERSION}
-                        docker push docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
-                        docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
                     '''
                 }
             }
@@ -145,7 +139,6 @@ pipeline {
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
                     sh '''
-                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
                         cd ontrack-acceptance/src/main/compose
                         docker-compose \\
                             --project-name local \\
@@ -230,7 +223,6 @@ pipeline {
                     sh ' rm -rf ontrack-acceptance/src/main/compose/build '
                     // Launches the tests
                     sh '''
-                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
                         cd ontrack-acceptance/src/main/compose
                         docker-compose \\
                             --project-name ext \\
@@ -306,24 +298,22 @@ pipeline {
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             sh '''
-                            echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-                            
-                            echo "Preparing environment..."
-                            DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-                            rm -f ${DOCKER_DIR}/*.rpm
-                            cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
-                            
-                            echo "Launching test environment..."
-                            cd ontrack-acceptance/src/main/compose
-                            docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-                            
-                            echo "Launching Ontrack in CentOS environment..."
-                            CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-                            echo "... for container ${CONTAINER}"
-                            docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                            
-                            echo "Launching tests..."
-                            docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
+                                echo "Preparing environment..."
+                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+                                rm -f ${DOCKER_DIR}/*.rpm
+                                cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
+                                
+                                echo "Launching test environment..."
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+                                
+                                echo "Launching Ontrack in CentOS environment..."
+                                CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+                                echo "... for container ${CONTAINER}"
+                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                
+                                echo "Launching tests..."
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
                             '''
                         }
                     }
@@ -356,8 +346,6 @@ pipeline {
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
                             sh '''
-                                echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-                                
                                 echo "Preparing environment..."
                                 DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
                                 rm -f ${DOCKER_DIR}/*.deb
@@ -424,7 +412,6 @@ pipeline {
                         ansiColor('xterm') {
                             sh '''
                                 echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-                                docker image tag docker.nemerosa.net/nemerosa/ontrack:${VERSION} nemerosa/ontrack:${VERSION}
                                 docker image push nemerosa/ontrack:${VERSION}
                             '''
                         }
