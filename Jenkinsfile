@@ -427,9 +427,11 @@ pipeline {
 
         stage('Publication') {
             when {
-                branch 'release/*'
-                // FIXME
-                branch 'feature/732-bintray'
+                anyOf {
+                    branch 'release/*'
+                    // FIXME
+                    branch 'feature/732-bintray'
+                }
             }
             stages {
                 stage('Docker Hub') {
