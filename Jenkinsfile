@@ -25,7 +25,7 @@ pipeline {
         // No durability
         durabilityHint('PERFORMANCE_OPTIMIZED')
         // No concurrent builds
-        disableConcurrentBuilds()
+        // disableConcurrentBuilds()
     }
 
     stages {
