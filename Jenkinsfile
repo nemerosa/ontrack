@@ -462,23 +462,15 @@ pipeline {
                 stage('Bintray publication') {
                     environment {
                         OSSRH = credentials("OSSRH")
-                        OSSRH = credentials("BINTRAY")
+                        BINTRAY = credentials("BINTRAY")
                     }
                     steps {
-                        script {
-                            // FIXME Branch cleanup
-                            if (BRANCH_NAME ==~ /release\/.*|feature\/732-bintray/) {
-                                env.OSSRH_PUBLICATION = "true"
-                            } else {
-                                env.OSSRH_PUBLICATION = "false"
-                            }
-                        }
                         sh '''
                             ./gradlew \\
                                 bintrayUpload \\
                                 -PbintrayUser=${BINTRAY_USR} \\
                                 -PbintrayKey=${BINTRAY_PSW} \\
-                                -PossrhPublication=${OSSRH_PUBLICATION} \\
+                                -PossrhPublication=true \\
                                 -PossrhUser=${OSSRH_USR} \\
                                 -PossrhPassword=${OSSRH_PSW} \\
                                 --info \\
