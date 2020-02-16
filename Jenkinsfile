@@ -134,94 +134,87 @@ pipeline {
             }
         }
 
-//        stage('Local acceptance tests') {
-//            when {
-//                beforeAgent true
-//                not {
-//                    branch 'master'
-//                }
-//            }
-//            environment {
-//                ONTRACK_VERSION = "${version}"
-//                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
-//            }
-//            steps {
-//                // Runs the acceptance tests
-//                timeout(time: 25, unit: 'MINUTES') {
-//                    sh """\
-//#!/bin/bash
-//set -e
-//
-//echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//echo "Launching tests..."
-//cd ontrack-acceptance/src/main/compose
-//docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
-//"""
-//                }
-//            }
-//            post {
-//                success {
-//                    sh '''
-//                        #!/bin/bash
-//                        set -e
-//                        echo "Getting Jacoco coverage"
-//                        mkdir -p build/jacoco/
-//                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/acceptance.exec
-//                        cp ontrack-acceptance/src/main/compose/jacoco-dsl/jacoco.exec build/jacoco/dsl.exec
-//                    '''
-//                    // Collection of coverage in Docker
-//                    sh '''
-//                        ./gradlew \\
-//                            codeDockerCoverageReport \\
-//                            -PjacocoExecFile=build/jacoco/acceptance.exec \\
-//                            -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
-//                            --stacktrace \\
-//                            --profile \\
-//                            --console plain
-//                    '''
-//                    // Collection of coverage in DSL
-//                    sh '''
-//                        ./gradlew \\
-//                            codeDockerCoverageReport \\
-//                            -PjacocoExecFile=build/jacoco/dsl.exec \\
-//                            -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
-//                            --stacktrace \\
-//                            --profile \\
-//                            --console plain
-//                    '''
-//                    // Upload to Codecov
-//                    sh '''
-//                        curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
-//                        curl -s https://codecov.io/bash | bash -s -- -c -F dsl -f build/reports/jacoco/dsl.xml
-//                    '''
-//                }
-//                always {
-//                    sh '''
-//                        #!/bin/bash
-//                        set -e
-//                        echo "Cleanup..."
-//                        rm -rf build/acceptance
-//                        mkdir -p build
-//                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-//                        cd ontrack-acceptance/src/main/compose
-//                        docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml down --volumes
-//                    '''
-//                    script {
-//                        def results = junit('build/acceptance/*.xml')
-//                        if (!pr) {
-//                            ontrackValidate(
-//                                    project: projectName,
-//                                    branch: branchName,
-//                                    build: version,
-//                                    validationStamp: 'ACCEPTANCE',
-//                                    testResults: results,
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        stage('Local acceptance tests') {
+            when {
+                not {
+                    branch 'master'
+                }
+            }
+            steps {
+                timeout(time: 25, unit: 'MINUTES') {
+                    sh '''
+                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            up \\
+                            --exit-code-from ontrack_acceptance
+                    '''
+                }
+            }
+            post {
+                success {
+                    sh '''
+                        echo "Getting Jacoco coverage"
+                        mkdir -p build/jacoco/
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/acceptance.exec
+                        cp ontrack-acceptance/src/main/compose/jacoco-dsl/jacoco.exec build/jacoco/dsl.exec
+                    '''
+                    // Collection of coverage in Docker
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -PjacocoExecFile=build/jacoco/acceptance.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
+                            --stacktrace \\
+                            --console plain
+                    '''
+                    // Collection of coverage in DSL
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -PjacocoExecFile=build/jacoco/dsl.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
+                            --stacktrace \\
+                            --console plain
+                    '''
+                    // Upload to Codecov
+                    sh '''
+                        curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
+                        curl -s https://codecov.io/bash | bash -s -- -c -F dsl -f build/reports/jacoco/dsl.xml
+                    '''
+                }
+                always {
+                    script {
+                        def results = junit('build/acceptance/*.xml')
+                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
+                            ontrackValidate(
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
+                                    validationStamp: 'ACCEPTANCE',
+                                    testResults: results,
+                            )
+                        }
+                    }
+                }
+                cleanup {
+                    sh '''
+                        rm -rf build/acceptance
+                        mkdir -p build
+                        cp -r ontrack-acceptance/src/main/compose/build build/acceptance
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            down --volumes
+                    '''
+                }
+            }
+        }
 //
 //        stage('Local extension tests') {
 //            when {
