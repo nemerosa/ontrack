@@ -7,6 +7,7 @@ import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 import net.nemerosa.versioning.VersioningExtension
@@ -617,6 +618,14 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
     into("build/release")
 }
 
+val gitHubChangeLogReleaseBranch: String by project
+val gitHubChangeLogReleaseBranchFilter: String by project
+
+val githubReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
+    ontrackReleaseBranch = gitHubChangeLogReleaseBranch
+    ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+}
+
 githubRelease {
     token(gitHubToken)
     owner(gitHubOwner)
@@ -633,10 +642,14 @@ githubRelease {
             "build/release/ontrack.deb",
             "build/release/ontrack.rpm"
     )
+    body {
+        githubReleaseChangeLog.get().changeLog
+    }
 }
 
 tasks.named("githubRelease") {
     dependsOn(prepareGitHubRelease)
+    dependsOn(githubReleaseChangeLog)
 }
 
 /**

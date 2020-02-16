@@ -514,6 +514,7 @@ pipeline {
                         --stacktrace \\
                         -PgitHubToken=${GITHUB_TOKEN} \\
                         -PgitHubCommit=${GIT_COMMIT} \\
+                        -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
                         githubRelease
                 '''
 
