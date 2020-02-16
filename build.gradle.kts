@@ -224,6 +224,7 @@ configure(javaProjects) p@{
         pkg(closureOf<PackageConfig> {
             repo = "nemerosa"
             name = "ontrack"
+            publish = true
             setLicenses("MIT")
             vcsUrl = "https://github.com/nemerosa/ontrack"
             version(closureOf<VersionConfig> {
