@@ -336,9 +336,9 @@ pipeline {
                             script {
                                 def results = junit 'build/centos/*.xml'
                                 ontrackValidate(
-                                        project: projectName,
-                                        branch: branchName,
-                                        build: version,
+                                        project: ONTRACK_PROJECT_NAME,
+                                        branch: ONTRACK_BRANCH_NAME,
+                                        build: VERSION,
                                         validationStamp: 'ACCEPTANCE.CENTOS.7',
                                         testResults: results,
                                 )
@@ -387,9 +387,9 @@ pipeline {
                             script {
                                 def results = junit 'build/debian/*.xml'
                                 ontrackValidate(
-                                        project: projectName,
-                                        branch: branchName,
-                                        build: version,
+                                        project: ONTRACK_PROJECT_NAME,
+                                        branch: ONTRACK_BRANCH_NAME,
+                                        build: VERSION,
                                         validationStamp: 'ACCEPTANCE.DEBIAN',
                                         testResults: results,
                                 )
