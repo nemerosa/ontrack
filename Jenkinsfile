@@ -421,54 +421,41 @@ pipeline {
 //                }
 //            }
 //        }
-//
-//        // Publication
-//
-//        stage('Publication') {
-//            when {
-//                beforeAgent true
-//                branch 'release/*'
-//            }
-//            environment {
-//                ONTRACK_VERSION = "${version}"
-//            }
-//            stages {
-//                stage('Docker Hub') {
-//                    environment {
-//                        DOCKER_HUB = credentials("DOCKER_HUB")
-//                    }
-//                    steps {
-//                        echo "Docker push"
-//                        sh '''\
-//#!/bin/bash
-//set -e
-//
-//echo "Making sure the images are available on this node..."
-//
-//echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
-//
-//echo "Publishing in Docker Hub..."
-//
-//echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-//
-//docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION}
-//
-//docker image push nemerosa/ontrack:${ONTRACK_VERSION}
-//'''
-//                    }
-//                    post {
-//                        always {
-//                            ontrackValidate(
-//                                    project: projectName,
-//                                    branch: branchName,
-//                                    build: version,
-//                                    validationStamp: 'DOCKER.HUB',
-//                                    buildResult: currentBuild.result,
-//                            )
-//                        }
-//                    }
-//                }
+
+        // Publication
+
+        stage('Publication') {
+            when {
+                branch 'release/*'
+                // FIXME
+                branch 'feature/732-bintray'
+            }
+            stages {
+                stage('Docker Hub') {
+                    environment {
+                        DOCKER_HUB = credentials("DOCKER_HUB")
+                    }
+                    steps {
+                        echo "Docker push"
+                        ansiColor('xterm') {
+                            sh '''
+                                echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
+                                docker image tag docker.nemerosa.net/nemerosa/ontrack:${VERSION} nemerosa/ontrack:${VERSION}
+                                docker image push nemerosa/ontrack:${VERSION}
+                            '''
+                        }
+                    }
+                    post {
+                        always {
+                            ontrackValidate(
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
+                                    validationStamp: 'DOCKER.HUB'
+                            )
+                        }
+                    }
+                }
 //                stage('Maven publication') {
 //                    environment {
 //                        ONTRACK_COMMIT = "${gitCommit}"
@@ -514,9 +501,9 @@ pipeline {
 //                        }
 //                    }
 //                }
-//            }
-//        }
-//
+            }
+        }
+
 //        // Release
 //
 //        stage('Release') {
