@@ -78,6 +78,7 @@ pipeline {
                             build \\
                             integrationTest \\
                             codeCoverageReport \\
+                            publishToMavenLocal \\
                             osPackages \\
                             dockerBuild \\
                             -Pdocumentation \\
