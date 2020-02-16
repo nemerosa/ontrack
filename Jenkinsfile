@@ -4,6 +4,7 @@ pipeline {
 
     environment {
         ONTRACK_PROJECT_NAME = "ontrack"
+        ONTRACK_BRANCH_NAME = ontrackBranchName(BRANCH_NAME)
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
         CODECOV_TOKEN = credentials("CODECOV_TOKEN")
     }
@@ -28,9 +29,6 @@ pipeline {
     stages {
 
         stage('Setup') {
-            environment {
-                ONTRACK_BRANCH_NAME = ontrackBranchName(BRANCH_NAME)
-            }
             when {
                 not {
                     anyOf {
