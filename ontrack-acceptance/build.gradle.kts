@@ -75,10 +75,6 @@ val dockerBuild by tasks.registering(DockerBuildImage::class) {
     tags.add("nemerosa/ontrack-acceptance:latest")
 }
 
-rootProject.tasks.named<Zip>("publicationPackage") {
-    from(bootJar)
-}
-
 /**
  * Local test definitions
  */

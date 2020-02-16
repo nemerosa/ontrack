@@ -89,15 +89,4 @@ if (project.hasProperty("documentation")) {
         dependsOn("asciidoctorPdf")
     }
 
-    rootProject.tasks.named<Zip>("publicationPackage") {
-        dependsOn(":ontrack-docs:asciidoctor")
-        dependsOn(":ontrack-docs:asciidoctorPdf")
-        from(project(":ontrack-docs").file("build/docs/asciidoc")) {
-            into("html5")
-        }
-        from(project(":ontrack-docs").file("build/docs/asciidocPdf")) {
-            include("*.pdf")
-            into("pdf")
-        }
-    }
 }
