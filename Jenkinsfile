@@ -5,6 +5,7 @@ pipeline {
     environment {
         ONTRACK_PROJECT_NAME = "ontrack"
         BUILD_IMAGE_VERSION = "nemerosa/ontrack-build:1.0.2"
+        DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
     }
 
     agent {
@@ -22,10 +23,6 @@ pipeline {
         timestamps()
         // No durability
         durabilityHint('PERFORMANCE_OPTIMIZED')
-    }
-
-    environment {
-        DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
     }
 
     stages {
