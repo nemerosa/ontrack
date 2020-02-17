@@ -438,6 +438,8 @@ pipeline {
                     }
                     // FIXME Maven Central sync
                     steps {
+                        // FIXME Cleanup
+                        sh ' git status '
                         sh '''
                             ./gradlew \\
                                 bintrayUpload \\
@@ -479,8 +481,6 @@ pipeline {
                 }
             }
             steps {
-                // FIXME Cleanup
-                sh ' git status '
                 sh '''
                     ./gradlew \\
                         --info \\
