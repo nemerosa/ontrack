@@ -513,58 +513,56 @@ pipeline {
             }
         }
 
-//        // Documentation
-//
-//        stage('Documentation') {
-//            environment {
-//                ONTRACK_VERSION = "${version}"
-//                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
-//            }
-//            when {
-//                beforeAgent true
-//                anyOf {
-//                    branch 'release/*'
-//                    branch 'develop'
-//                }
-//            }
-//            steps {
-//                unstash name: "site"
-//
-//                script {
-//                    if (BRANCH_NAME == 'develop') {
-//                        env.DOC_DIR = 'develop'
-//                    } else {
-//                        env.DOC_DIR = env.ONTRACK_VERSION
-//                    }
-//                }
-//
-//                sh '''
-//                    s3cmd \\
-//                        --access_key=${AMS3_DELIVERY_USR} \\
-//                        --secret_key=${AMS3_DELIVERY_PSW} \\
-//                        --host=ams3.digitaloceanspaces.com \\
-//                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-//                        put \\
-//                        build/site/release/* \\
-//                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
-//                        --acl-public \\
-//                        --add-header=Cache-Control:max-age=86400 \\
-//                        --recursive
-//                '''
-//
-//            }
-//            post {
-//                always {
-//                    ontrackValidate(
-//                            project: projectName,
-//                            branch: branchName,
-//                            build: version,
-//                            validationStamp: 'DOCUMENTATION',
-//                    )
-//                }
-//            }
-//        }
-//
+        // Documentation
+
+        stage('Documentation') {
+            environment {
+                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
+            }
+            when {
+                anyOf {
+                    branch 'release/*'
+                    branch 'develop'
+                    // FIXME Cleanup
+                    branch 'feature/732-bintray'
+                }
+            }
+            steps {
+                script {
+                    if (BRANCH_NAME == 'develop') {
+                        env.DOC_DIR = 'develop'
+                    } else {
+                        env.DOC_DIR = env.VERSION
+                    }
+                }
+
+                sh '''
+                    s3cmd \\
+                        --access_key=${AMS3_DELIVERY_USR} \\
+                        --secret_key=${AMS3_DELIVERY_PSW} \\
+                        --host=ams3.digitaloceanspaces.com \\
+                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+                        put \\
+                        build/site/release/* \\
+                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
+                        --acl-public \\
+                        --add-header=Cache-Control:max-age=86400 \\
+                        --recursive
+                '''
+
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
+                            validationStamp: 'DOCUMENTATION',
+                    )
+                }
+            }
+        }
+
 //        // Master setup
 //
 //        stage('Master setup') {
