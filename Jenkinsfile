@@ -479,6 +479,8 @@ pipeline {
                 }
             }
             steps {
+                // FIXME Cleanup
+                sh ' git status '
                 sh '''
                     ./gradlew \\
                         --info \\
