@@ -24,6 +24,8 @@ pipeline {
         timestamps()
         // No durability
         durabilityHint('PERFORMANCE_OPTIMIZED')
+        // ANSI colours
+        ansiColor('xterm')
         // No concurrent builds
         // disableConcurrentBuilds()
     }
@@ -60,56 +62,54 @@ pipeline {
                 }
             }
             steps {
-                ansiColor('xterm') {
-                    sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
-                    sh ''' ./gradlew clean versionDisplay versionFile'''
-                    script {
-                        // Reads version information
-                        def props = readProperties(file: 'build/version.properties')
-                        env.VERSION = props.VERSION_DISPLAY
-                        env.GIT_COMMIT = props.VERSION_COMMIT
-                        // If not a PR, create a build
-                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
-                            ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
-                        }
+                sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
+                sh ''' ./gradlew clean versionDisplay versionFile'''
+                script {
+                    // Reads version information
+                    def props = readProperties(file: 'build/version.properties')
+                    env.VERSION = props.VERSION_DISPLAY
+                    env.GIT_COMMIT = props.VERSION_COMMIT
+                    // If not a PR, create a build
+                    if (!(BRANCH_NAME ==~ /PR-.*/)) {
+                        ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
                     }
-                    echo "Version = ${VERSION}"
-                    sh '''
-                        ./gradlew \\
-                            test \\
-                            build \\
-                            integrationTest \\
-                            codeCoverageReport \\
-                            publishToMavenLocal \\
-                            osPackages \\
-                            dockerBuild \\
-                            -Pdocumentation \\
-                            -PbowerOptions='--allow-root' \\
-                            -Dorg.gradle.jvmargs=-Xmx4096m \\
-                            --stacktrace \\
-                            --parallel \\
-                            --console plain
-                    '''
-                    sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
-                    sh '''
-                        echo "(*) Building the test extension..."
-                        cd ontrack-extension-test
-                        ./gradlew \\
-                            clean \\
-                            build \\
-                            -PontrackVersion=${VERSION} \\
-                            -PbowerOptions='--allow-root' \\
-                            -Dorg.gradle.jvmargs=-Xmx2048m \\
-                            --stacktrace \\
-                            --console plain
-                    '''
-                    echo "Pushing image to registry..."
-                    sh '''
-                        docker tag nemerosa/ontrack:${VERSION} docker.nemerosa.net/nemerosa/ontrack:${VERSION}
-                        docker tag nemerosa/ontrack-acceptance:${VERSION} docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
-                        docker tag nemerosa/ontrack-extension-test:${VERSION} docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
-                    '''
                 }
+                echo "Version = ${VERSION}"
+                sh '''
+                    ./gradlew \\
+                        test \\
+                        build \\
+                        integrationTest \\
+                        codeCoverageReport \\
+                        publishToMavenLocal \\
+                        osPackages \\
+                        dockerBuild \\
+                        -Pdocumentation \\
+                        -PbowerOptions='--allow-root' \\
+                        -Dorg.gradle.jvmargs=-Xmx4096m \\
+                        --stacktrace \\
+                        --parallel \\
+                        --console plain
+                '''
+                sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
+                sh '''
+                    echo "(*) Building the test extension..."
+                    cd ontrack-extension-test
+                    ./gradlew \\
+                        clean \\
+                        build \\
+                        -PontrackVersion=${VERSION} \\
+                        -PbowerOptions='--allow-root' \\
+                        -Dorg.gradle.jvmargs=-Xmx2048m \\
+                        --stacktrace \\
+                        --console plain
+                '''
+                echo "Pushing image to registry..."
+                sh '''
+                    docker tag nemerosa/ontrack:${VERSION} docker.nemerosa.net/nemerosa/ontrack:${VERSION}
+                    docker tag nemerosa/ontrack-acceptance:${VERSION} docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
+                    docker tag nemerosa/ontrack-extension-test:${VERSION} docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
+                '''
             }
             post {
                 always {
@@ -138,17 +138,15 @@ pipeline {
             }
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
-                    ansiColor('xterm') {
-                        sh '''
-                            cd ontrack-acceptance/src/main/compose
-                            docker-compose \\
-                                --project-name local \\
-                                --file docker-compose.yml \\
-                                --file docker-compose-jacoco.yml \\
-                                up \\
-                                --exit-code-from ontrack_acceptance
-                            '''
-                    }
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            up \\
+                            --exit-code-from ontrack_acceptance
+                        '''
                 }
             }
             post {
@@ -223,19 +221,17 @@ pipeline {
             }
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
-                    ansiColor('xterm') {
-                        // Cleanup
-                        sh ' rm -rf ontrack-acceptance/src/main/compose/build '
-                        // Launches the tests
-                        sh '''
-                            cd ontrack-acceptance/src/main/compose
-                            docker-compose \\
-                                --project-name ext \\
-                                --file docker-compose-ext.yml \\
-                                --file docker-compose-jacoco.yml up \\
-                                --exit-code-from ontrack_acceptance
-                        '''
-                    }
+                    // Cleanup
+                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
+                    // Launches the tests
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name ext \\
+                            --file docker-compose-ext.yml \\
+                            --file docker-compose-jacoco.yml up \\
+                            --exit-code-from ontrack_acceptance
+                    '''
                 }
             }
             post {
@@ -305,26 +301,24 @@ pipeline {
                 stage('CentOS7') {
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
-                            ansiColor('xterm') {
-                                sh '''
-                                    echo "Preparing environment..."
-                                    DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-                                    rm -f ${DOCKER_DIR}/*.rpm
-                                    cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
-                                    
-                                    echo "Launching test environment..."
-                                    cd ontrack-acceptance/src/main/compose
-                                    docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-                                    
-                                    echo "Launching Ontrack in CentOS environment..."
-                                    CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-                                    echo "... for container ${CONTAINER}"
-                                    docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                    
-                                    echo "Launching tests..."
-                                    docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
-                                '''
-                            }
+                            sh '''
+                                echo "Preparing environment..."
+                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+                                rm -f ${DOCKER_DIR}/*.rpm
+                                cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
+                                
+                                echo "Launching test environment..."
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+                                
+                                echo "Launching Ontrack in CentOS environment..."
+                                CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+                                echo "... for container ${CONTAINER}"
+                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                
+                                echo "Launching tests..."
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
+                            '''
                         }
                     }
                     post {
@@ -356,26 +350,24 @@ pipeline {
                 stage('Debian') {
                     steps {
                         timeout(time: 25, unit: 'MINUTES') {
-                            ansiColor('xterm') {
-                                sh '''
-                                    echo "Preparing environment..."
-                                    DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-                                    rm -f ${DOCKER_DIR}/*.deb
-                                    cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
-                                    
-                                    echo "Launching test environment..."
-                                    cd ontrack-acceptance/src/main/compose
-                                    docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-                                    
-                                    echo "Launching Ontrack in Debian environment..."
-                                    CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
-                                    echo "... for container ${CONTAINER}"
-                                    docker container exec ${CONTAINER} /etc/init.d/ontrack start
-                                    
-                                    echo "Launching tests..."
-                                    docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
-                                    '''
-                            }
+                            sh '''
+                                echo "Preparing environment..."
+                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
+                                rm -f ${DOCKER_DIR}/*.deb
+                                cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
+                                
+                                echo "Launching test environment..."
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+                                
+                                echo "Launching Ontrack in Debian environment..."
+                                CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+                                echo "... for container ${CONTAINER}"
+                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                
+                                echo "Launching tests..."
+                                docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
+                                '''
                         }
                     }
                     post {
@@ -423,12 +415,10 @@ pipeline {
                     }
                     steps {
                         echo "Docker push"
-                        ansiColor('xterm') {
-                            sh '''
-                                echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-                                docker image push nemerosa/ontrack:${VERSION}
-                            '''
-                        }
+                        sh '''
+                            echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
+                            docker image push nemerosa/ontrack:${VERSION}
+                        '''
                     }
                     post {
                         always {
