@@ -1,8 +1,6 @@
 import com.avast.gradle.dockercompose.ComposeExtension
 import com.avast.gradle.dockercompose.tasks.ComposeUp
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.jfrog.bintray.gradle.BintrayExtension
-import com.jfrog.bintray.gradle.BintrayExtension.*
 import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
@@ -33,6 +31,12 @@ buildscript {
 val kotlinVersion: String by project
 val elasticSearchVersion: String by project
 
+// GitHub
+val gitHubUser: String by project
+val gitHubToken: String by project
+val gitHubOwner: String by project
+val gitHubRepo: String by project
+
 extra["elasticsearch.version"] = elasticSearchVersion
 
 plugins {
@@ -46,7 +50,6 @@ plugins {
     id("com.bmuschko.docker-remote-api") version "4.1.0"
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
-    id("com.jfrog.bintray") version "1.8.4" apply false
     id("com.github.breadmoirai.github-release") version "2.2.10"
     // Site
     id("org.ajoberstar.git-publish") version "2.1.1"
@@ -132,7 +135,6 @@ configure(javaProjects) p@{
 
     apply(plugin = "java")
     apply(plugin = "maven-publish")
-    apply(plugin = "com.jfrog.bintray")
 
     // Documentation
 
@@ -202,6 +204,16 @@ configure(javaProjects) p@{
                     }
                 }
             }
+            repositories {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/${gitHubOwner}/${gitHubRepo}")
+                    credentials {
+                        username = gitHubUser
+                        password = gitHubToken
+                    }
+                }
+            }
         }
     }
 
@@ -209,44 +221,6 @@ configure(javaProjects) p@{
         dependsOn("generatePomFileForMavenCustomPublication")
     }
 
-    /**
-     * Bintray publication
-     */
-
-    val bintrayUser: String by project
-    val bintrayKey: String by project
-    val ossrhPublication: String by project
-    val ossrhUser: String by project
-    val ossrhPassword: String by project
-
-    configure<BintrayExtension> {
-        user = bintrayUser
-        key = bintrayKey
-        setPublications("mavenCustom")
-
-        pkg(closureOf<PackageConfig> {
-            repo = "nemerosa"
-            name = "ontrack"
-            publish = true
-            setLicenses("MIT")
-            vcsUrl = "https://github.com/nemerosa/ontrack"
-            version(closureOf<VersionConfig> {
-                name = rootProject.version.toString()
-                desc = "v${rootProject.version}"
-                mavenCentralSync(closureOf<MavenCentralSyncConfig> {
-                    sync = ossrhPublication.toBoolean()
-                    user = ossrhUser
-                    password = ossrhPassword
-                    close = "1"
-                })
-            })
-        })
-    }
-
-}
-
-tasks.named("bintrayUpload") {
-    dependsOn("assemble")
 }
 
 configure(coreProjects) p@{
@@ -585,9 +559,6 @@ if (hasProperty("documentation")) {
  * GitHub release
  */
 
-val gitHubToken: String by project
-val gitHubOwner: String by project
-val gitHubRepo: String by project
 val gitHubCommit: String by project
 
 val prepareGitHubRelease by tasks.registering(Copy::class) {
