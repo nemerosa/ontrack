@@ -294,7 +294,7 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     // FIXME Cleanup
-                    branch 'feature/732-bintray'
+                    branch 'feature/732-pipeline-github-repo'
                 }
             }
             stages {
@@ -405,7 +405,7 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     // FIXME
-                    branch 'feature/732-bintray'
+                    branch 'feature/732-pipeline-github-repo'
                 }
             }
             stages {
@@ -431,23 +431,17 @@ pipeline {
                         }
                     }
                 }
-                stage('Bintray publication') {
+                stage('GitHub Maven publication') {
                     environment {
-                        OSSRH = credentials("OSSRH")
-                        BINTRAY = credentials("BINTRAY")
+                        GITHUB_USER = "dcoraboeuf"
+                        GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
                     }
-                    // FIXME Maven Central sync
                     steps {
-                        // FIXME Cleanup
-                        sh ' git status '
                         sh '''
                             ./gradlew \\
-                                bintrayUpload \\
-                                -PbintrayUser=${BINTRAY_USR} \\
-                                -PbintrayKey=${BINTRAY_PSW} \\
-                                -PossrhPublication=false \\
-                                -PossrhUser=${OSSRH_USR} \\
-                                -PossrhPassword=${OSSRH_PSW} \\
+                                publish \\
+                                -PgitHubUser=${GITHUB_USER} \\
+                                -PgitHubToken=${GITHUB_TOKEN} \\
                                 --info \\
                                 --console plain \\
                                 --stacktrace
@@ -459,7 +453,7 @@ pipeline {
                                     project: ONTRACK_PROJECT_NAME,
                                     branch: ONTRACK_BRANCH_NAME,
                                     build: VERSION,
-                                    validationStamp: 'MAVEN.CENTRAL'
+                                    validationStamp: 'GITHUB.PACKAGE'
                             )
                         }
                     }
@@ -477,7 +471,7 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     // FIXME Cleanup
-                    branch 'feature/732-bintray'
+                    branch 'feature/732-pipeline-github-repo'
                 }
             }
             steps {
@@ -524,7 +518,7 @@ pipeline {
                     branch 'release/*'
                     branch 'develop'
                     // FIXME Cleanup
-                    branch 'feature/732-bintray'
+                    branch 'feature/732-pipeline-github-repo'
                 }
             }
             steps {
