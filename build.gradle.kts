@@ -135,6 +135,7 @@ configure(javaProjects) p@{
 
     apply(plugin = "java")
     apply(plugin = "maven-publish")
+    apply(plugin = "signing")
 
     // Documentation
 
@@ -219,6 +220,12 @@ configure(javaProjects) p@{
 
     tasks.named("assemble") {
         dependsOn("generatePomFileForMavenCustomPublication")
+    }
+
+    // Signature
+
+    configure<SigningExtension> {
+        sign(extensions.getByType(PublishingExtension::class).publications["mavenCustom"])
     }
 
 }
