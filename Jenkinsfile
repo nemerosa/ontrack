@@ -298,8 +298,6 @@ pipeline {
             when {
                 anyOf {
                     branch 'release/*'
-                    // FIXME Cleanup
-                    branch 'feature/732-back-to-central'
                 }
             }
             stages {
@@ -409,8 +407,6 @@ pipeline {
             when {
                 anyOf {
                     branch 'release/*'
-                    // FIXME
-                    branch 'feature/732-back-to-central'
                 }
             }
             stages {
@@ -478,8 +474,6 @@ pipeline {
             when {
                 anyOf {
                     branch 'release/*'
-                    // FIXME Cleanup
-                    branch 'feature/732-back-to-central'
                 }
             }
             steps {
@@ -525,8 +519,6 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     branch 'develop'
-                    // FIXME Cleanup
-                    branch 'feature/732-back-to-central'
                 }
             }
             steps {
