@@ -29,9 +29,7 @@ pipeline {
         // ANSI colours
         ansiColor('xterm')
         // No concurrent builds
-        if (BRANCH_NAME ==~ /release\/.*/) {
-            disableConcurrentBuilds()
-        }
+        disableConcurrentBuilds()
     }
 
     stages {
