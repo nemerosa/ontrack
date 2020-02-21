@@ -595,6 +595,9 @@ configure(javaProjects) {
     }
 }
 
+val publishToMavenCentral by tasks.registering {
+    dependsOn(tasks.closeAndReleaseRepository)
+}
 
 /**
  * GitHub release
