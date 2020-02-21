@@ -590,7 +590,7 @@ nexusStaging {
 }
 
 configure(javaProjects) {
-    rootProject.tasks.closeAndReleaseRepository {
+    rootProject.tasks.closeRepository {
         dependsOn(tasks.named("publishMavenCustomPublicationToMavenCentralRepository"))
     }
 }
