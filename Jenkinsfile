@@ -294,7 +294,7 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     // FIXME Cleanup
-                    branch 'feature/732-pipeline-github-repo'
+                    branch 'feature/732-back-to-central'
                 }
             }
             stages {
@@ -405,7 +405,7 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     // FIXME
-                    branch 'feature/732-pipeline-github-repo'
+                    branch 'feature/732-back-to-central'
                 }
             }
             stages {
@@ -431,17 +431,22 @@ pipeline {
                         }
                     }
                 }
-                stage('GitHub Maven publication') {
+                stage('Maven Central') {
                     environment {
-                        GITHUB_USER = "dcoraboeuf"
-                        GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
+                        GPG_KEY = credentials("GPG_KEY")
+                        GPG_KEY_RING = credentials("GPG_KEY_RING")
+                        OSSRH = credentials("OSSRH")
                     }
                     steps {
                         sh '''
                             ./gradlew \\
-                                publish \\
-                                -PgitHubUser=${GITHUB_USER} \\
-                                -PgitHubToken=${GITHUB_TOKEN} \\
+                                publishToMavenCentral \\
+                                -Pdocumentation \\
+                                -Psigning.keyId=${GPG_KEY_USR} \\
+                                -Psigning.password=${GPG_KEY_PSW} \\
+                                -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
+                                -PossrhUser=${OSSRH_USR} \\
+                                -PossrhPassword=${OSSRH_PSW} \\
                                 --info \\
                                 --console plain \\
                                 --stacktrace
@@ -453,7 +458,7 @@ pipeline {
                                     project: ONTRACK_PROJECT_NAME,
                                     branch: ONTRACK_BRANCH_NAME,
                                     build: VERSION,
-                                    validationStamp: 'GITHUB.PACKAGE'
+                                    validationStamp: 'MAVEN.CENTRAL'
                             )
                         }
                     }
@@ -471,7 +476,7 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     // FIXME Cleanup
-                    branch 'feature/732-pipeline-github-repo'
+                    branch 'feature/732-back-to-central'
                 }
             }
             steps {
@@ -518,7 +523,7 @@ pipeline {
                     branch 'release/*'
                     branch 'develop'
                     // FIXME Cleanup
-                    branch 'feature/732-pipeline-github-repo'
+                    branch 'feature/732-back-to-central'
                 }
             }
             steps {
