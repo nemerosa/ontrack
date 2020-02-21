@@ -448,7 +448,7 @@ pipeline {
                                 -Psigning.keyId=${GPG_KEY_USR} \\
                                 -Psigning.password=${GPG_KEY_PSW} \\
                                 -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-                                -PossrhUser=${OSSRH_USR} \\
+                                -PossrhUsername=${OSSRH_USR} \\
                                 -PossrhPassword=${OSSRH_PSW} \\
                                 --info \\
                                 --console plain \\
