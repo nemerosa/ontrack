@@ -54,6 +54,7 @@ plugins {
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.10"
+    id("io.codearte.nexus-staging") version "0.21.2"
     // Site
     id("org.ajoberstar.git-publish") version "2.1.1"
 }
@@ -575,6 +576,25 @@ if (hasProperty("documentation")) {
     }
 
 }
+
+/**
+ * Maven Central staging
+ */
+
+nexusStaging {
+    packageGroup = "net.nemerosa"
+    username = ossrhUsername
+    password = ossrhPassword
+    numberOfRetries = 60
+    delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
+}
+
+configure(javaProjects) {
+    rootProject.tasks.closeAndReleaseRepository {
+        dependsOn(tasks.named("publishMavenCustomPublicationToMavenCentralRepository"))
+    }
+}
+
 
 /**
  * GitHub release
