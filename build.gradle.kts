@@ -164,6 +164,12 @@ configure(javaProjects) p@{
             add("archives", sourcesJar)
         }
 
+        // Assembly for Javadoc & Sources
+        tasks.named("assemble") {
+            dependsOn(javadocJar)
+            dependsOn(sourcesJar)
+        }
+
     }
 
     // POM file
