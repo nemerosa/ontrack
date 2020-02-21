@@ -32,10 +32,13 @@ val kotlinVersion: String by project
 val elasticSearchVersion: String by project
 
 // GitHub
-val gitHubUser: String by project
 val gitHubToken: String by project
 val gitHubOwner: String by project
 val gitHubRepo: String by project
+
+// Maven Central
+val ossrhUsername: String by project
+val ossrhPassword: String by project
 
 extra["elasticsearch.version"] = elasticSearchVersion
 
@@ -207,11 +210,11 @@ configure(javaProjects) p@{
             }
             repositories {
                 maven {
-                    name = "GitHubPackages"
-                    url = uri("https://maven.pkg.github.com/${gitHubOwner}/${gitHubRepo}")
+                    name = "MavenCentral"
+                    url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                     credentials {
-                        username = gitHubUser
-                        password = gitHubToken
+                        username = ossrhUsername
+                        password = ossrhPassword
                     }
                 }
             }
@@ -220,6 +223,11 @@ configure(javaProjects) p@{
 
     tasks.named("assemble") {
         dependsOn("generatePomFileForMavenCustomPublication")
+    }
+
+    tasks.named("publishMavenCustomPublicationToMavenCentralRepository") {
+        dependsOn(tasks.named("signMavenCustomPublication"))
+        dependsOn(tasks.named("assemble"))
     }
 
     // Signature
