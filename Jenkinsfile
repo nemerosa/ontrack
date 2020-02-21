@@ -7,6 +7,8 @@ pipeline {
         ONTRACK_BRANCH_NAME = ontrackBranchName(BRANCH_NAME)
         DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
         CODECOV_TOKEN = credentials("CODECOV_TOKEN")
+        GPG_KEY = credentials("GPG_KEY")
+        GPG_KEY_RING = credentials("GPG_KEY_RING")
     }
 
     agent {
@@ -86,6 +88,9 @@ pipeline {
                         dockerBuild \\
                         -Pdocumentation \\
                         -PbowerOptions='--allow-root' \\
+                        -Psigning.keyId=${GPG_KEY_USR} \\
+                        -Psigning.password=${GPG_KEY_PSW} \\
+                        -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
                         -Dorg.gradle.jvmargs=-Xmx4096m \\
                         --stacktrace \\
                         --parallel \\
@@ -433,8 +438,6 @@ pipeline {
                 }
                 stage('Maven Central') {
                     environment {
-                        GPG_KEY = credentials("GPG_KEY")
-                        GPG_KEY_RING = credentials("GPG_KEY_RING")
                         OSSRH = credentials("OSSRH")
                     }
                     steps {
@@ -442,9 +445,6 @@ pipeline {
                             ./gradlew \\
                                 publishToMavenCentral \\
                                 -Pdocumentation \\
-                                -Psigning.keyId=${GPG_KEY_USR} \\
-                                -Psigning.password=${GPG_KEY_PSW} \\
-                                -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
                                 -PossrhUser=${OSSRH_USR} \\
                                 -PossrhPassword=${OSSRH_PSW} \\
                                 --info \\
