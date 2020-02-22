@@ -54,7 +54,7 @@ plugins {
     id("com.bmuschko.docker-remote-api") version "4.1.0"
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
-    id("com.github.breadmoirai.github-release") version "2.2.10"
+    id("com.github.breadmoirai.github-release") version "2.2.11"
     id("io.codearte.nexus-staging") version "0.21.2"
     id("de.marcphilipp.nexus-publish") version "0.4.0" apply false
     // Site
