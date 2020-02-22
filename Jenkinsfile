@@ -560,7 +560,6 @@ pipeline {
         // Merge to master (for latest release only)
 
         stage('Merge to master') {
-            agent any
             when {
                 allOf {
                     branch "release/3.*"
