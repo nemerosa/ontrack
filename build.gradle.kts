@@ -4,6 +4,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
+import de.marcphilipp.gradle.nexus.NexusPublishExtension
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
@@ -55,6 +56,7 @@ plugins {
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.10"
     id("io.codearte.nexus-staging") version "0.21.2"
+    id("de.marcphilipp.nexus-publish") version "0.4.0" apply false
     // Site
     id("org.ajoberstar.git-publish") version "2.1.1"
 }
@@ -140,6 +142,7 @@ configure(javaProjects) p@{
     apply(plugin = "java")
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
+    apply(plugin = "de.marcphilipp.nexus-publish")
 
     // Documentation
 
@@ -215,15 +218,14 @@ configure(javaProjects) p@{
                     }
                 }
             }
-            repositories {
-                maven {
-                    name = "MavenCentral"
-                    url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                    credentials {
-                        username = ossrhUsername
-                        password = ossrhPassword
-                    }
-                }
+        }
+    }
+
+    configure<NexusPublishExtension> {
+        repositories {
+            sonatype {
+                username.set(ossrhUsername)
+                password.set(ossrhPassword)
             }
         }
     }
@@ -232,7 +234,7 @@ configure(javaProjects) p@{
         dependsOn("generatePomFileForMavenCustomPublication")
     }
 
-    tasks.named("publishMavenCustomPublicationToMavenCentralRepository") {
+    tasks.named("publishToSonatype") {
         dependsOn(tasks.named("signMavenCustomPublication"))
         dependsOn(tasks.named("assemble"))
     }
@@ -589,14 +591,18 @@ nexusStaging {
     delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
 }
 
-configure(javaProjects) {
-    rootProject.tasks.closeRepository {
-        dependsOn(tasks.named("publishMavenCustomPublicationToMavenCentralRepository"))
-    }
-}
-
 val publishToMavenCentral by tasks.registering {
     dependsOn(tasks.closeAndReleaseRepository)
+}
+
+configure(javaProjects) {
+    val publishToSonatype = tasks.named("publishToSonatype")
+    rootProject.tasks.closeRepository {
+        dependsOn(publishToSonatype)
+    }
+    publishToMavenCentral {
+        dependsOn(publishToSonatype)
+    }
 }
 
 /**
