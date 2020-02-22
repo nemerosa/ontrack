@@ -564,7 +564,7 @@ pipeline {
                 allOf {
                     branch "release/3.*"
                     expression {
-                        ontrackGetLastBranch(project: projectName, pattern: 'release-3\\..*') == branchName
+                        ontrackGetLastBranch(project: ONTRACK_PROJECT_NAME, pattern: 'release-3\\..*') == ONTRACK_BRANCH_NAME
                     }
                 }
             }
