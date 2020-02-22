@@ -585,284 +585,270 @@ pipeline {
             post {
                 always {
                     ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
                             validationStamp: 'MERGE',
                     )
                 }
             }
         }
 
-//        // Master setup
-//
-//        stage('Master setup') {
-//            when {
-//                beforeAgent true
-//                branch 'master'
-//            }
-//            steps {
-//                script {
-//                    // Gets the latest tag
-//                    env.ONTRACK_VERSION = sh(
-//                            returnStdout: true,
-//                            script: 'git describe --tags --abbrev=0'
-//                    ).trim()
-//                    // Trace
-//                    echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
-//                    // Version components
-//                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)\.\d.*/)
-//                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+\.\d.*/)
-//                    echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
-//                    echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
-//                    // Gets the corresponding branch
-//                    def result = ontrackGraphQL(
-//                            script: '''
-//                                query BranchLookup($project: String!, $build: String!) {
-//                                  builds(project: $project, buildProjectFilter: {buildExactMatch: true, buildName: $build}) {
-//                                    branch {
-//                                      name
-//                                    }
-//                                  }
-//                                }
-//                            ''',
-//                            bindings: [
-//                                    'project': projectName,
-//                                    'build'  : env.ONTRACK_VERSION as String
-//                            ],
-//                    )
-//                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
-//                    // Trace
-//                    echo "ONTRACK_BRANCH_NAME=${env.ONTRACK_BRANCH_NAME}"
-//                }
-//            }
-//        }
-//
-//        // Latest documentation
-//
-//        stage('Latest documentation') {
-//            when {
-//                beforeAgent true
-//                branch 'master'
-//            }
-//            environment {
-//                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
-//            }
-//            steps {
-//                sh '''
-//                    s3cmd \\
-//                        --access_key=${AMS3_DELIVERY_USR} \\
-//                        --secret_key=${AMS3_DELIVERY_PSW} \\
-//                        --host=ams3.digitaloceanspaces.com \\
-//                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-//                        --recursive \\
-//                        --force \\
-//                        cp \\
-//                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
-//                        s3://ams3-delivery-space/ontrack/release/latest/docs/
-//                '''
-//            }
-//            post {
-//                always {
-//                    ontrackValidate(
-//                            project: projectName,
-//                            branch: env.ONTRACK_BRANCH_NAME as String,
-//                            build: env.ONTRACK_VERSION as String,
-//                            validationStamp: 'DOCUMENTATION.LATEST',
-//                    )
-//                }
-//            }
-//        }
-//
-//        // Docker latest images
-//
-//        stage('Docker Latest') {
-//            when {
-//                branch "master"
-//            }
-//            environment {
-//                DOCKER_HUB = credentials("DOCKER_HUB")
-//            }
-//            steps {
-//                sh '''\
-//                    echo "Making sure the images are available on this node..."
-//
-//                    echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//                    docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
-//
-//                    echo "Tagging..."
-//
-//                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-//                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-//
-//                    echo "Publishing latest versions in Docker Hub..."
-//
-//                    echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-//
-//                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-//                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-//                '''
-//            }
-//            post {
-//                always {
-//                    ontrackValidate(
-//                            project: projectName,
-//                            branch: env.ONTRACK_BRANCH_NAME as String,
-//                            build: env.ONTRACK_VERSION as String,
-//                            validationStamp: 'DOCKER.LATEST',
-//                    )
-//                }
-//            }
-//        }
-//
-//        // Site generation
-//
-//        stage('Site generation') {
-//            environment {
-//                // GitHub OAuth token
-//                GRGIT_USER = credentials("JENKINS_GITHUB_TOKEN")
-//                GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
-//            }
-//            when {
-//                beforeAgent true
-//                branch 'master'
-//            }
-//            steps {
-//                echo "Getting list of releases and publishing the site..."
-//                sh '''\
-//                    ./gradlew \\
-//                        --info \\
-//                        --profile \\
-//                        --console plain \\
-//                        --stacktrace \\
-//                        -PontrackVersion=${ONTRACK_VERSION} \\
-//                        -PontrackGitHubUri=${GITHUB_URI} \\
-//                        site
-//                '''
-//            }
-//            post {
-//                always {
-//                    ontrackValidate(
-//                            project: projectName,
-//                            branch: env.ONTRACK_BRANCH_NAME as String,
-//                            build: env.ONTRACK_VERSION as String,
-//                            validationStamp: 'SITE',
-//                    )
-//                }
-//            }
-//        }
-//
-//        // Production
-//
-//        stage('Production') {
-//            when {
-//                beforeAgent true
-//                branch "master"
-//            }
-//            environment {
-//                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
-//            }
-//            steps {
-//                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
-//                // Running the deployment
-//                timeout(time: 15, unit: 'MINUTES') {
-//                    script {
-//                        sshagent(credentials: ['ONTRACK_SSH_KEY']) {
-//                            sh '''\
-//#!/bin/bash
-//
-//set -e
-//
-//SSH_OPTIONS=StrictHostKeyChecking=no
-//
-//SSH_HOST=${ONTRACK_IP}
-//
-//scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
-//ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
-//
-//'''
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        // Production tests
-//
-//        stage('Production tests') {
-//            when {
-//                beforeAgent true
-//                branch "master"
-//            }
-//            environment {
-//                ONTRACK_ACCEPTANCE_ADMIN = credentials("ONTRACK_ACCEPTANCE_ADMIN")
-//            }
-//            steps {
-//                timeout(time: 30, unit: 'MINUTES') {
-//                    sh '''\
-//#!/bin/bash
-//set -e
-//
-//echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-//
-//echo "(*) Launching the tests..."
-//docker-compose \\
-//    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-//    --project-name production \\
-//    up --exit-code-from ontrack_acceptance
-//'''
-//                }
-//            }
-//            post {
-//                always {
-//                    sh '''\
-//#!/bin/bash
-//
-//echo "(*) Copying the test results..."
-//mkdir -p build
-//cp -r ontrack-acceptance/src/main/compose/build build/production
-//
-//echo "(*) Removing the test environment..."
-//docker-compose \\
-//    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-//    --project-name production \\
-//    down
-//
-//'''
-//                    archiveArtifacts 'build/production/**'
-//                    script {
-//                        def results = junit 'build/production/*.xml'
-//                        ontrackValidate(
-//                                project: projectName,
-//                                branch: env.ONTRACK_BRANCH_NAME as String,
-//                                build: env.ONTRACK_VERSION as String,
-//                                validationStamp: 'ONTRACK.SMOKE',
-//                                testResults: results,
-//                        )
-//                    }
-//                }
-//                success {
-//                    ontrackPromote(
-//                            project: projectName,
-//                            branch: env.ONTRACK_BRANCH_NAME as String,
-//                            build: env.ONTRACK_VERSION as String,
-//                            promotionLevel: 'ONTRACK',
-//                    )
-//                }
-//            }
-//        }
+        // Master setup
+
+        stage('Master setup') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    // Gets the latest tag
+                    env.ONTRACK_VERSION = sh(
+                            returnStdout: true,
+                            script: 'git describe --tags --abbrev=0'
+                    ).trim()
+                    // Trace
+                    echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
+                    // Version components
+                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+\.\d.*/)
+                    echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
+                    echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
+                    // Gets the corresponding branch
+                    def result = ontrackGraphQL(
+                            script: '''
+                                query BranchLookup($project: String!, $build: String!) {
+                                  builds(project: $project, buildProjectFilter: {buildExactMatch: true, buildName: $build}) {
+                                    branch {
+                                      name
+                                    }
+                                  }
+                                }
+                            ''',
+                            bindings: [
+                                    'project': projectName,
+                                    'build'  : env.ONTRACK_VERSION as String
+                            ],
+                    )
+                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
+                    // Trace
+                    echo "ONTRACK_BRANCH_NAME=${env.ONTRACK_BRANCH_NAME}"
+                }
+            }
+        }
+
+        // Latest documentation
+
+        stage('Latest documentation') {
+            when {
+                branch 'master'
+            }
+            environment {
+                AMS3_DELIVERY = credentials("AMS3_DELIVERY")
+            }
+            steps {
+                sh '''
+                    s3cmd \\
+                        --access_key=${AMS3_DELIVERY_USR} \\
+                        --secret_key=${AMS3_DELIVERY_PSW} \\
+                        --host=ams3.digitaloceanspaces.com \\
+                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+                        --recursive \\
+                        --force \\
+                        cp \\
+                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
+                        s3://ams3-delivery-space/ontrack/release/latest/docs/
+                '''
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
+                            validationStamp: 'DOCUMENTATION.LATEST',
+                    )
+                }
+            }
+        }
+
+        // Docker latest images
+
+        stage('Docker Latest') {
+            when {
+                branch "master"
+            }
+            environment {
+                DOCKER_HUB = credentials("DOCKER_HUB")
+            }
+            steps {
+                sh '''\
+                    echo "Making sure the images are available on this node..."
+
+                    echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                    docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
+
+                    echo "Tagging..."
+
+                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
+                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
+
+                    echo "Publishing latest versions in Docker Hub..."
+
+                    echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
+
+                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
+                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
+                '''
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
+                            validationStamp: 'DOCKER.LATEST',
+                    )
+                }
+            }
+        }
+
+        // Site generation
+
+        stage('Site generation') {
+            environment {
+                // GitHub OAuth token
+                GRGIT_USER = credentials("JENKINS_GITHUB_TOKEN")
+                GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
+            }
+            when {
+                branch 'master'
+            }
+            steps {
+                echo "Getting list of releases and publishing the site..."
+                sh '''\
+                    ./gradlew \\
+                        --info \\
+                        --profile \\
+                        --console plain \\
+                        --stacktrace \\
+                        -PontrackVersion=${ONTRACK_VERSION} \\
+                        -PontrackGitHubUri=${GITHUB_URI} \\
+                        site
+                '''
+            }
+            post {
+                always {
+                    ontrackValidate(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
+                            validationStamp: 'SITE',
+                    )
+                }
+            }
+        }
+
+        // Production
+
+        stage('Production') {
+            when {
+                branch "master"
+            }
+            environment {
+                ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
+            }
+            steps {
+                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
+                // Running the deployment
+                timeout(time: 15, unit: 'MINUTES') {
+                    script {
+                        sshagent(credentials: ['ONTRACK_SSH_KEY']) {
+                            sh '''
+                                SSH_OPTIONS=StrictHostKeyChecking=no
+                                
+                                SSH_HOST=${ONTRACK_IP}
+                                
+                                scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
+                                ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
+                                
+                                '''
+                        }
+                    }
+                }
+            }
+        }
+
+        // Production tests
+
+        stage('Production tests') {
+            when {
+                branch "master"
+            }
+            environment {
+                ONTRACK_ACCEPTANCE_ADMIN = credentials("ONTRACK_ACCEPTANCE_ADMIN")
+            }
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh '''
+                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                        
+                        echo "(*) Launching the tests..."
+                        docker-compose \\
+                            --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+                            --project-name production \\
+                            up --exit-code-from ontrack_acceptance
+                        '''
+                }
+            }
+            post {
+                always {
+                    sh '''
+                        echo "(*) Copying the test results..."
+                        mkdir -p build
+                        cp -r ontrack-acceptance/src/main/compose/build build/production
+                        
+                        echo "(*) Removing the test environment..."
+                        docker-compose \\
+                            --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+                            --project-name production \\
+                            down
+                        
+                        '''
+                    archiveArtifacts 'build/production/**'
+                    script {
+                        def results = junit 'build/production/*.xml'
+                        ontrackValidate(
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: env.ONTRACK_BRANCH_NAME as String,
+                                build: env.ONTRACK_VERSION as String,
+                                validationStamp: 'ONTRACK.SMOKE',
+                                testResults: results,
+                        )
+                    }
+                }
+                success {
+                    ontrackPromote(
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            build: env.ONTRACK_VERSION as String,
+                            promotionLevel: 'ONTRACK',
+                    )
+                }
+            }
+        }
 
     }
 
 }
 
-//@SuppressWarnings("GrMethodMayBeStatic")
-//@NonCPS
-//String extractFromVersion(String version, String pattern) {
-//    def matcher = (version =~ pattern)
-//    if (matcher.matches()) {
-//        return matcher.group(1)
-//    } else {
-//        throw new IllegalAccessException("Version $version does not match pattern: $pattern")
-//    }
-//}
+@SuppressWarnings("GrMethodMayBeStatic")
+@NonCPS
+String extractFromVersion(String version, String pattern) {
+    def matcher = (version =~ pattern)
+    if (matcher.matches()) {
+        return matcher.group(1)
+    } else {
+        throw new IllegalAccessException("Version $version does not match pattern: $pattern")
+    }
+}
