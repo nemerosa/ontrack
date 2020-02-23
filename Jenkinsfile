@@ -625,7 +625,7 @@ pipeline {
                                 }
                             ''',
                             bindings: [
-                                    'project': projectName,
+                                    'project': ONTRACK_PROJECT_NAME,
                                     'build'  : env.ONTRACK_VERSION as String
                             ],
                     )
