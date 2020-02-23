@@ -717,9 +717,7 @@ pipeline {
             }
             when {
                 beforeAgent true
-                // FIXME Cleanup
-                expression { false }
-                // branch 'master'
+                branch 'master'
             }
             environment {
                 AMS3_DELIVERY = credentials("AMS3_DELIVERY")
