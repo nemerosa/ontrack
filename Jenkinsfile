@@ -771,13 +771,12 @@ pipeline {
                 sh '''\
                     echo "Making sure the images are available on this node..."
 
-                    echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-                    docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
+                    docker image pull nemerosa/ontrack:${ONTRACK_VERSION}
 
                     echo "Tagging..."
 
-                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
+                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
+                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
 
                     echo "Publishing latest versions in Docker Hub..."
 
