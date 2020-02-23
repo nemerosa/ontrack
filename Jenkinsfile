@@ -29,10 +29,18 @@ pipeline {
     stages {
 
         stage("Test") {
+            agent {
+                docker {
+                    image "nemerosa/ontrack-build:1.0.2"
+                    reuseNode true
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
+                }
+            }
             steps {
                 // FIXME #732 Cleanup
                 sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
                     sh '''
+                        ssh-keyscan github.com >> ~/.ssh/known_hosts
                         git branch -a
                         git remote -v
                         git config --local user.email "jenkins@nemerosa.net"
