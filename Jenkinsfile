@@ -11,13 +11,7 @@ pipeline {
         GPG_KEY_RING = credentials("GPG_KEY_RING")
     }
 
-    agent {
-        docker {
-            image "nemerosa/ontrack-build:1.0.2"
-            reuseNode true
-            args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
-        }
-    }
+    agent any
 
     options {
         // General Jenkins job properties
@@ -34,13 +28,12 @@ pipeline {
 
     stages {
 
-        stage('Setup') {
-            when {
-                not {
-                    anyOf {
-                        branch 'master'
-                        changeRequest()
-                    }
+        stage("Test") {
+            agent {
+                docker {
+                    image "nemerosa/ontrack-build:1.0.2"
+                    reuseNode true
+                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
                 }
             }
             steps {
@@ -58,6 +51,19 @@ pipeline {
                     '''
                 }
                 error("To be cleaned up")
+            }
+        }
+
+        stage('Setup') {
+            when {
+                not {
+                    anyOf {
+                        branch 'master'
+                        changeRequest()
+                    }
+                }
+            }
+            steps {
                 echo "Ontrack setup for ${ONTRACK_BRANCH_NAME}"
                 ontrackBranchSetup(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, script: """
                             branch.config {
