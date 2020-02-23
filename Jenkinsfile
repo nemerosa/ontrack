@@ -51,7 +51,7 @@ pipeline {
                         git remote -v
                         git config --local user.email "jenkins@nemerosa.net"
                         git config --local user.name "Jenkins"
-                        git checkout -b master origin/master
+                        git checkout master
                         git pull origin master
                         git merge $BRANCH_NAME
                         # git push origin master
