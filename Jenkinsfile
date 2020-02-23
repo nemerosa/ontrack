@@ -45,10 +45,17 @@ pipeline {
             }
             steps {
                 // FIXME #732 Cleanup
-                sh 'git remote -v'
-                sh 'git branch -a'
-                sh 'git checkout -b master origin/master'
-                sh 'git pull origin master'
+                sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
+                    sh '''
+                        git remote -v
+                        git config --local user.email "jenkins@nemerosa.net"
+                        git config --local user.name "Jenkins"
+                        git checkout -b master origin/master
+                        git pull origin master
+                        git merge $BRANCH_NAME
+                        # git push origin master
+                    '''
+                }
                 error("To be cleaned up")
                 echo "Ontrack setup for ${ONTRACK_BRANCH_NAME}"
                 ontrackBranchSetup(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, script: """
