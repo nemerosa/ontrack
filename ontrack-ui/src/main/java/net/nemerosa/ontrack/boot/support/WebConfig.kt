@@ -58,7 +58,7 @@ class WebConfig(
     fun shallowEtagHeaderFilter(): FilterRegistrationBean<ShallowEtagHeaderFilter> {
         val registration = FilterRegistrationBean<ShallowEtagHeaderFilter>()
         registration.filter = ShallowEtagHeaderFilter()
-        registration.setDispatcherTypes(DispatcherType.REQUEST, javax.servlet.DispatcherType.ASYNC)
+        registration.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ASYNC)
         registration.addUrlPatterns("/*")
         return registration
     }
@@ -75,27 +75,27 @@ class WebConfig(
 
     override fun addCorsMappings(registry: CorsRegistry) {
         listOf(
-                registry.addMapping("/graphql/**"),
-                registry.addMapping("/rest/**"),
-                registry.addMapping("/accounts/**"),
-                registry.addMapping("/admin/**"),
-                registry.addMapping("/api/**"),
-                registry.addMapping("/structure/**"),
-                registry.addMapping("/branches/**"),
-                registry.addMapping("/events/**"),
-                registry.addMapping("/info/**"),
-                registry.addMapping("/properties/**"),
-                registry.addMapping("/search/**"),
-                registry.addMapping("/settings/**"),
-                registry.addMapping("/user/**"),
-                registry.addMapping("/validation-stamp-filters/**")
+                "/graphql/**",
+                "/rest/**",
+                "/accounts/**",
+                "/admin/**",
+                "/api/**",
+                "/structure/**",
+                "/branches/**",
+                "/events/**",
+                "/info/**",
+                "/properties/**",
+                "/search/**",
+                "/settings/**",
+                "/user/**",
+                "/validation-stamp-filters/**"
         ).forEach {
-            it.allowedHeaders(*ALLOWED_API_HEADERS.toTypedArray())
+            registry.addMapping(it).allowedMethods(*ALLOWED_API_METHODS.toTypedArray())
         }
     }
 
     companion object {
-        private val ALLOWED_API_HEADERS = setOf("GET", "POST", "PUT", "DELETE", "HEAD")
+        private val ALLOWED_API_METHODS = setOf("GET", "POST", "PUT", "DELETE", "HEAD")
     }
 
 }
