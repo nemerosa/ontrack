@@ -44,6 +44,8 @@ pipeline {
                 }
             }
             steps {
+                // FIXME #732 Cleanup
+                sh 'git remote -v'
                 echo "Ontrack setup for ${ONTRACK_BRANCH_NAME}"
                 ontrackBranchSetup(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, script: """
                             branch.config {
