@@ -443,7 +443,7 @@ tasks.withType(SystemPackagingTask::class) {
     postInstall(file("gradle/os-package/postInstall.sh"))
 
     from(project(":ontrack-ui").file("build/libs"), closureOf<CopySpec> {
-        include("ontrack-ui-${project.version}.jar")
+        include("ontrack-ui-${project.version}-app.jar")
         into("/opt/ontrack/lib")
         rename(".*", "ontrack.jar")
     })
@@ -467,9 +467,7 @@ val osPackages by tasks.registering {
 val dockerPrepareEnv by tasks.registering(Copy::class) {
     dependsOn(":ontrack-ui:bootJar")
     from("ontrack-ui/build/libs")
-    include("*.jar")
-    exclude("*-javadoc.jar")
-    exclude("*-sources.jar")
+    include("*-app.jar")
     into(project.file("docker"))
     rename(".*", "ontrack.jar")
 }
@@ -617,7 +615,7 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
         rename { "ontrack.pdf" }
     }
     from("ontrack-ui/build/libs") {
-        include("ontrack-ui-${version}.jar")
+        include("ontrack-ui-${version}-app.jar")
         rename { "ontrack.jar" }
     }
     from("ontrack-postgresql-migration/build/libs") {

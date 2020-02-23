@@ -127,6 +127,7 @@ val generateVersionInfo by tasks.registering {
  */
 
 tasks.named<Jar>("jar") {
+    enabled = true
     dependsOn(copyWebResources)
     dependsOn(generateVersionInfo)
 }
@@ -139,6 +140,7 @@ tasks.named<ProcessResources>("processResources") {
 tasks.named<BootRun>("bootRun") {
     dependsOn("bootJar")
     dependsOn(":ontrack-web:dev")
+
     // Running with `dev` profile by default with `bootRun`
     args("--spring.profiles.active=dev")
 }
@@ -148,8 +150,20 @@ tasks.named<BootRun>("bootRun") {
  */
 
 val bootJar = tasks.getByName<BootJar>("bootJar") {
+    // Specific classifier
+    archiveClassifier.set("app")
     // Allowing the declaration of external extensions, packaged using the Spring Boot Module format
     manifest {
         attributes("Main-Class" to "org.springframework.boot.loader.PropertiesLauncher")
+    }
+}
+
+publishing {
+    publications {
+        named<MavenPublication>("mavenCustom") {
+            artifact(bootJar) {
+                classifier = "app"
+            }
+        }
     }
 }
