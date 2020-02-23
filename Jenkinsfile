@@ -698,9 +698,9 @@ pipeline {
                                     'build'  : env.ONTRACK_VERSION as String
                             ],
                     )
-                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
+                    env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
                     // Trace
-                    echo "ONTRACK_BRANCH_NAME=${env.ONTRACK_BRANCH_NAME}"
+                    echo "ONTRACK_TARGET_BRANCH_NAME=${env.ONTRACK_TARGET_BRANCH_NAME}"
                 }
             }
         }
@@ -740,7 +740,7 @@ pipeline {
                 always {
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'DOCUMENTATION.LATEST',
                     )
@@ -789,7 +789,7 @@ pipeline {
                 always {
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'DOCKER.LATEST',
                     )
@@ -833,7 +833,7 @@ pipeline {
                 always {
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'SITE',
                     )
@@ -859,7 +859,7 @@ pipeline {
                 ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
             }
             steps {
-                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
+                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_TARGET_BRANCH_NAME} in production"
                 // Running the deployment
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
@@ -928,7 +928,7 @@ pipeline {
                         def results = junit 'build/production/*.xml'
                         ontrackValidate(
                                 project: ONTRACK_PROJECT_NAME,
-                                branch: env.ONTRACK_BRANCH_NAME as String,
+                                branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                                 build: env.ONTRACK_VERSION as String,
                                 validationStamp: 'ONTRACK.SMOKE',
                                 testResults: results,
@@ -938,7 +938,7 @@ pipeline {
                 success {
                     ontrackPromote(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             promotionLevel: 'ONTRACK',
                     )
