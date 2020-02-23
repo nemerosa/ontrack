@@ -47,6 +47,7 @@ pipeline {
                 // FIXME #732 Cleanup
                 sshagent (credentials: ['SSH_JENKINS_GITHUB']) {
                     sh '''
+                        git branch -a
                         git remote -v
                         git config --local user.email "jenkins@nemerosa.net"
                         git config --local user.name "Jenkins"
