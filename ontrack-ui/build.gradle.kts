@@ -153,7 +153,3 @@ val bootJar = tasks.getByName<BootJar>("bootJar") {
         attributes("Main-Class" to "org.springframework.boot.loader.PropertiesLauncher")
     }
 }
-
-rootProject.tasks.named<Zip>("publicationPackage") {
-    from(bootJar)
-}

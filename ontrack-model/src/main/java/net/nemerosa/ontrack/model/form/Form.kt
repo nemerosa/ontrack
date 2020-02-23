@@ -46,11 +46,11 @@ open class Form {
 
     val fields: Collection<Field> get() = internalFields.values
 
-    fun name(value: String): Form {
+    fun name(value: String?): Form {
         return fill("name", value)
     }
 
-    fun description(value: String): Form {
+    fun description(value: String?): Form {
         return fill("description", value)
     }
 

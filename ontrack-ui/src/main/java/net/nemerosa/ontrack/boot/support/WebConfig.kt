@@ -74,20 +74,28 @@ class WebConfig(
     }
 
     override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/graphql/**")
-        registry.addMapping("/rest/**")
-        registry.addMapping("/accounts/**")
-        registry.addMapping("/admin/**")
-        registry.addMapping("/api/**")
-        registry.addMapping("/structure/**")
-        registry.addMapping("/branches/**")
-        registry.addMapping("/events/**")
-        registry.addMapping("/info/**")
-        registry.addMapping("/properties/**")
-        registry.addMapping("/search/**")
-        registry.addMapping("/settings/**")
-        registry.addMapping("/user/**")
-        registry.addMapping("/validation-stamp-filters/**")
+        listOf(
+                registry.addMapping("/graphql/**"),
+                registry.addMapping("/rest/**"),
+                registry.addMapping("/accounts/**"),
+                registry.addMapping("/admin/**"),
+                registry.addMapping("/api/**"),
+                registry.addMapping("/structure/**"),
+                registry.addMapping("/branches/**"),
+                registry.addMapping("/events/**"),
+                registry.addMapping("/info/**"),
+                registry.addMapping("/properties/**"),
+                registry.addMapping("/search/**"),
+                registry.addMapping("/settings/**"),
+                registry.addMapping("/user/**"),
+                registry.addMapping("/validation-stamp-filters/**")
+        ).forEach {
+            it.allowedHeaders(*ALLOWED_API_HEADERS.toTypedArray())
+        }
+    }
+
+    companion object {
+        private val ALLOWED_API_HEADERS = setOf("GET", "POST", "PUT", "DELETE", "HEAD")
     }
 
 }

@@ -4,7 +4,9 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.netflix.gradle.plugins.deb.Deb
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import com.netflix.gradle.plugins.rpm.Rpm
+import de.marcphilipp.gradle.nexus.NexusPublishExtension
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 import net.nemerosa.versioning.VersioningExtension
@@ -30,6 +32,15 @@ buildscript {
 val kotlinVersion: String by project
 val elasticSearchVersion: String by project
 
+// GitHub
+val gitHubToken: String by project
+val gitHubOwner: String by project
+val gitHubRepo: String by project
+
+// Maven Central
+val ossrhUsername: String by project
+val ossrhPassword: String by project
+
 extra["elasticsearch.version"] = elasticSearchVersion
 
 plugins {
@@ -43,6 +54,9 @@ plugins {
     id("com.bmuschko.docker-remote-api") version "4.1.0"
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
+    id("com.github.breadmoirai.github-release") version "2.2.11"
+    id("io.codearte.nexus-staging") version "0.21.2"
+    id("de.marcphilipp.nexus-publish") version "0.4.0" apply false
     // Site
     id("org.ajoberstar.git-publish") version "2.1.1"
 }
@@ -127,6 +141,8 @@ configure(javaProjects) p@{
 
     apply(plugin = "java")
     apply(plugin = "maven-publish")
+    apply(plugin = "signing")
+    apply(plugin = "de.marcphilipp.nexus-publish")
 
     // Documentation
 
@@ -150,6 +166,12 @@ configure(javaProjects) p@{
         artifacts {
             add("archives", javadocJar)
             add("archives", sourcesJar)
+        }
+
+        // Assembly for Javadoc & Sources
+        tasks.named("assemble") {
+            dependsOn(javadocJar)
+            dependsOn(sourcesJar)
         }
 
     }
@@ -199,8 +221,28 @@ configure(javaProjects) p@{
         }
     }
 
+    configure<NexusPublishExtension> {
+        repositories {
+            sonatype {
+                username.set(ossrhUsername)
+                password.set(ossrhPassword)
+            }
+        }
+    }
+
     tasks.named("assemble") {
         dependsOn("generatePomFileForMavenCustomPublication")
+    }
+
+    tasks.named("publishToSonatype") {
+        dependsOn(tasks.named("signMavenCustomPublication"))
+        dependsOn(tasks.named("assemble"))
+    }
+
+    // Signature
+
+    configure<SigningExtension> {
+        sign(extensions.getByType(PublishingExtension::class).publications["mavenCustom"])
     }
 
 }
@@ -290,8 +332,6 @@ configure(coreProjects) p@{
 
 }
 
-
-
 /**
  * Code coverage report
  */
@@ -348,46 +388,8 @@ val codeDockerCoverageReport by tasks.registering(JacocoReport::class) {
 }
 
 /**
- * Packaging of Ontrack for the subsequent stages of the validation.
- *
- * This creates a ZIP which contains:
- *
- * - all Gradle files needed for the execution of the pipeline
- * - the `buildSrc` which contains the Gradle helper classes
- * - the UI JAR artifact
- * - the Acceptance JAR artifact
- * - a ZIP containing ALL artifacts (POM files, JAR, Javadoc & Sources)
- * - an `ontrack.properties` file which contains the list of modules & the version information
+ * Global Javadoc
  */
-
-// Ontrack descriptor
-
-val deliveryDescriptor by tasks.registering {
-    val output = project.file("build/ontrack.properties")
-    extra["output"] = output
-    doLast {
-        // Directories
-        output.parentFile.mkdirs()
-        output.writeText("# Ontrack properties\n")
-        // Version information
-        val version = rootProject.extensions.getByType<VersioningExtension>().info
-        output.appendText("# Version information\n")
-        output.appendText("VERSION_BUILD = ${version.build}\n")
-        output.appendText("VERSION_BRANCH = ${version.branch}\n")
-        output.appendText("VERSION_BASE = ${version.base}\n")
-        output.appendText("VERSION_BRANCHID = ${version.branchId}\n")
-        output.appendText("VERSION_BRANCHTYPE = ${version.branchType}\n")
-        output.appendText("VERSION_COMMIT = ${version.commit}\n")
-        output.appendText("VERSION_DISPLAY = ${version.display}\n")
-        output.appendText("VERSION_FULL = ${version.full}\n")
-        output.appendText("VERSION_SCM = ${version.scm}\n")
-        // Modules
-        output.appendText("# Comma-separated list of modules\n")
-        output.appendText("MODULES = ${rootProject.subprojects.filter { it.tasks.findByName("jar") != null }.joinToString(",") { it.name }}\n")
-    }
-}
-
-// Global Javadoc
 
 tasks.named<Javadoc>("aggregateJavadoc") {
     include("net/nemerosa/**")
@@ -401,105 +403,6 @@ if (project.hasProperty("documentation")) {
         dependsOn("aggregateJavadoc")
         from(rootProject.file("$rootProject.buildDir/docs/javadoc"))
     }
-}
-
-// ZIP package which contains all artifacts to be published
-
-val publicationPackage by tasks.registering(Zip::class) {
-    archiveClassifier.set("publication")
-    archiveFileName.set("ontrack-publication.zip")
-    // Extension test module
-    from(rootProject.file("ontrack-extension-test")) {
-        into("ontrack-extension-test")
-    }
-}
-
-subprojects {
-    afterEvaluate p@{
-        val jar = tasks.findByName("jar") as? Jar?
-        val bootJar = tasks.findByName("bootJar")
-        val testJar = tasks.findByName("testJar") as? Jar?
-        val producesJar = (bootJar != null) || (jar != null && jar.isEnabled) || (testJar != null && testJar.isEnabled)
-        if (producesJar) {
-            if (jar != null && jar.isEnabled) {
-                publicationPackage {
-                    from(jar)
-                }
-            } else if (bootJar != null) {
-                publicationPackage {
-                    from(bootJar)
-                }
-            }
-            if (testJar != null && testJar.isEnabled) {
-                publicationPackage {
-                    from(testJar)
-                }
-            }
-            if (rootProject.hasProperty("documentation")) {
-                val javadoc = tasks.findByName("javadocJar")
-                if (javadoc != null) {
-                    publicationPackage {
-                        from(javadoc)
-                    }
-                }
-                val sources = tasks.findByName("sourcesJar")
-                if (sources != null) {
-                    publicationPackage {
-                        from(sources)
-                    }
-                }
-            }
-            // POM file
-            val pomTask = tasks.findByName("generatePomFileForMavenCustomPublication")
-            if (pomTask != null) {
-                publicationPackage {
-                    from(pomTask) {
-                        rename { "${this@p.name}-${this@p.version}.pom" }
-                    }
-                }
-            }
-        }
-    }
-}
-
-if (hasProperty("documentation")) {
-    gradle.projectsEvaluated {
-        val javadocPackage = tasks.named("javadocPackage")
-        publicationPackage {
-            from(javadocPackage)
-        }
-    }
-}
-
-// Delivery package
-
-val deliveryPackage by tasks.registering(Zip::class) {
-    archiveClassifier.set("delivery")
-    // Gradle files
-    from(projectDir) {
-        include("buildSrc/**")
-        include("*.gradle")
-        include("gradlew*")
-        include("gradle/**")
-        include("gradle.properties")
-        exclude("**/.gradle/**")
-        exclude("**/build/**")
-    }
-    // Acceptance
-    dependsOn(":ontrack-acceptance:normaliseJar")
-    from(project(":ontrack-acceptance").file("src/main/compose")) {
-        into("ontrack-acceptance")
-    }
-    // All artifacts
-    dependsOn(publicationPackage)
-    from(publicationPackage)
-    // Descriptor (defined in main build.gradle)
-    dependsOn("deliveryDescriptor")
-    from(tasks.getByName("deliveryDescriptor").extra["output"])
-}
-
-tasks.named("build") {
-    dependsOn(deliveryPackage)
 }
 
 /**
@@ -677,14 +580,106 @@ if (hasProperty("documentation")) {
 }
 
 /**
+ * Maven Central staging
+ */
+
+nexusStaging {
+    packageGroup = "net.nemerosa"
+    username = ossrhUsername
+    password = ossrhPassword
+    numberOfRetries = 60
+    delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
+}
+
+val publishToMavenCentral by tasks.registering {
+    dependsOn(tasks.closeAndReleaseRepository)
+}
+
+configure(javaProjects) {
+    val publishToSonatype = tasks.named("publishToSonatype")
+    rootProject.tasks.closeRepository {
+        dependsOn(publishToSonatype)
+    }
+    publishToMavenCentral {
+        dependsOn(publishToSonatype)
+    }
+}
+
+/**
+ * GitHub release
+ */
+
+val gitHubCommit: String by project
+
+val prepareGitHubRelease by tasks.registering(Copy::class) {
+    from("ontrack-docs/build/docs/asciidocPdf") {
+        include("index.pdf")
+        rename { "ontrack.pdf" }
+    }
+    from("ontrack-ui/build/libs") {
+        include("ontrack-ui-${version}.jar")
+        rename { "ontrack.jar" }
+    }
+    from("ontrack-postgresql-migration/build/libs") {
+        include("ontrack-postgresql-migration-${version}.jar")
+        rename { "ontrack-postgresql-migration.jar" }
+    }
+    from("ontrack-dsl-shell/build/libs") {
+        include("ontrack-dsl-shell-${version}-executable.jar")
+        rename { "ontrack-dsl-shell.jar" }
+    }
+    from("build/distributions") {
+        include("ontrack*.deb")
+        rename { "ontrack.deb" }
+    }
+    from("build/distributions") {
+        include("ontrack*.rpm")
+        rename { "ontrack.rpm" }
+    }
+    into("build/release")
+}
+
+val gitHubChangeLogReleaseBranch: String by project
+val gitHubChangeLogReleaseBranchFilter: String by project
+
+val githubReleaseChangeLog by tasks.registering(OntrackChangeLog::class) {
+    ontrackReleaseBranch = gitHubChangeLogReleaseBranch
+    ontrackReleaseFilter = gitHubChangeLogReleaseBranchFilter
+}
+
+githubRelease {
+    token(gitHubToken)
+    owner(gitHubOwner)
+    repo(gitHubRepo)
+    tagName(version.toString())
+    releaseName(version.toString())
+    targetCommitish(gitHubCommit)
+    overwrite(true)
+    releaseAssets(
+            "build/release/ontrack.jar",
+            "build/release/ontrack-dsl-shell.jar",
+            "build/release/ontrack-postgresql-migration.jar",
+            "build/release/ontrack.pdf",
+            "build/release/ontrack.deb",
+            "build/release/ontrack.rpm"
+    )
+    body {
+        githubReleaseChangeLog.get().changeLog
+    }
+}
+
+tasks.named("githubRelease") {
+    dependsOn(prepareGitHubRelease)
+    dependsOn(githubReleaseChangeLog)
+}
+
+/**
  * Site generation
  *
  * Must be called AFTER the current version has been promoted in Ontrack to the RELEASE promotion level.
  *
  * This means having a Site job in the pipeline, after the Publish one, calling the `site` task.
  */
-
-val ontrackVersion: String by project
 
 val siteOntrackLast2Releases by tasks.registering(OntrackLastReleases::class) {
     releaseCount = 2
@@ -720,7 +715,7 @@ configure<GitPublishExtension> {
             into("javascripts/doc/")
         }
     }
-    commitMessage.set("GitHub pages for version $ontrackVersion")
+    commitMessage.set("GitHub pages for version $version")
 }
 
 tasks.named("gitPublishCopy") {

@@ -196,9 +196,11 @@ class ElasticSearchIndexService(
             acc + action
         }
         // Launching the indexation of this batch
-        client.bulk(bulk.bulk, RequestOptions.DEFAULT)
-        // Refreshes the index
-        immediateRefreshIfRequested(indexer)
+        if (bulk.bulk.numberOfActions() > 0) {
+            client.bulk(bulk.bulk, RequestOptions.DEFAULT)
+            // Refreshes the index
+            immediateRefreshIfRequested(indexer)
+        }
         // OK
         return bulk.results
     }

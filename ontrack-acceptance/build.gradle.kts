@@ -12,13 +12,14 @@ apply(plugin = "com.bmuschko.docker-remote-api")
 val seleniumVersion = "3.11.0"
 
 dependencies {
+    implementation("org.codehaus.groovy:groovy")
+
     testImplementation(project(":ontrack-client"))
     testImplementation(project(":ontrack-dsl"))
     testImplementation(project(":ontrack-dsl-shell"))
     testImplementation(project(":ontrack-test-utils"))
     testImplementation("org.apache.commons:commons-lang3")
     testImplementation("commons-io:commons-io")
-    testImplementation("org.codehaus.groovy:groovy")
     testImplementation("org.codehaus.groovy:groovy-xml")
     testImplementation("org.springframework.boot:spring-boot-starter")
 
@@ -75,10 +76,6 @@ val dockerBuild by tasks.registering(DockerBuildImage::class) {
     tags.add("nemerosa/ontrack-acceptance:latest")
 }
 
-rootProject.tasks.named<Zip>("publicationPackage") {
-    from(bootJar)
-}
-
 /**
  * Local test definitions
  */
@@ -105,10 +102,40 @@ tasks.named<Test>("test") {
     enabled = false
 }
 
+// Javadoc and sources for the tests
+
+val publishedTasks = mutableListOf<Jar>(bootJar)
+
+if (hasProperty("documentation")) {
+
+    val groovydoc = tasks.named<Groovydoc>("groovydoc") {
+        source = project.the<SourceSetContainer>()["test"].allSource
+    }
+
+    val javadoc = tasks.named<Javadoc>("javadoc") {
+        source = project.the<SourceSetContainer>()["test"].allJava
+    }
+
+    val javadocJar = tasks.getByName<Jar>("javadocJar") {
+        from(javadoc)
+        from(groovydoc)
+    }
+
+    val sourcesJar = tasks.getByName<Jar>("sourcesJar") {
+        from(project.the<SourceSetContainer>()["test"].allSource)
+    }
+
+    publishedTasks.add(javadocJar)
+    publishedTasks.add(sourcesJar)
+
+}
+
+// Publications
+
 configure<PublishingExtension> {
     publications {
         named<MavenPublication>("mavenCustom") {
-            setArtifacts(listOf(bootJar))
+            setArtifacts(publishedTasks)
         }
     }
 }
