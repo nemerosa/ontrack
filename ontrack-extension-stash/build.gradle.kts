@@ -7,7 +7,8 @@ plugins {
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    implementation(project(":ontrack-extension-git"))
+    api(project(":ontrack-extension-git"))
+    
     implementation("org.apache.commons:commons-lang3")
 
     testImplementation(project(":ontrack-test-utils"))
