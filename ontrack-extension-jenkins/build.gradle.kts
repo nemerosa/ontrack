@@ -8,7 +8,8 @@ plugins {
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    implementation(project(":ontrack-extension-support"))
+    api(project(":ontrack-extension-support"))
+
     implementation("org.apache.commons:commons-lang3")
 
     testImplementation("org.codehaus.groovy:groovy")

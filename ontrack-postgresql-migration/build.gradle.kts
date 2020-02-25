@@ -23,3 +23,13 @@ val bootJar = tasks.getByName<org.springframework.boot.gradle.tasks.bundling.Boo
 tasks.named("assemble") {
     dependsOn(bootJar)
 }
+
+publishing {
+    publications {
+        named<MavenPublication>("mavenCustom") {
+            artifact(bootJar) {
+                classifier = "app"
+            }
+        }
+    }
+}

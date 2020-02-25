@@ -8,12 +8,13 @@ plugins {
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    implementation(project(":ontrack-extension-scm"))
-    implementation(project(":ontrack-repository-support"))
+    api(project(":ontrack-extension-scm"))
+    api(project(":ontrack-repository-support"))
+    api("org.tmatesoft.svnkit:svnkit:1.8.12")
+
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-tx"))
     implementation("org.springframework:spring-tx")
-    implementation("org.tmatesoft.svnkit:svnkit:1.8.12")
     implementation("org.apache.commons:commons-lang3")
     implementation("commons-io:commons-io")
 

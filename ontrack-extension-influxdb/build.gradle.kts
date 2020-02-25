@@ -8,8 +8,9 @@ plugins {
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    implementation(project(":ontrack-extension-support"))
-    implementation("org.influxdb:influxdb-java")
+    api(project(":ontrack-extension-support"))
+    api("org.influxdb:influxdb-java")
+
     implementation("org.slf4j:slf4j-api")
 
     testImplementation(project(":ontrack-it-utils"))
