@@ -16,6 +16,14 @@ class Admin {
     }
 
     /**
+     * Gets the health/status of the application
+     */
+    @DSLMethod("Gets the health/status of the application")
+    def getStatus() {
+        return ontrack.get("admin/status")
+    }
+
+    /**
      * Gets the list of accounts
      */
     @DSLMethod("Returns the list of all accounts.")
