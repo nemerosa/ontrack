@@ -21,7 +21,7 @@ services:
    # Non production setup
    # See https://hub.docker.com/_/vault/
    vault:
-      image: "vault:0.9.0"
+      image: "vault:1.3.2"
       environment:
          VAULT_DEV_ROOT_TOKEN_ID: "test"
       cap_add:
