@@ -318,6 +318,86 @@ pipeline {
             }
         }
 
+        stage('Local Vault tests') {
+            agent {
+                docker {
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
+                }
+            }
+            when {
+                beforeAgent true
+                not {
+                    branch "master"
+                }
+            }
+            steps {
+                timeout(time: 25, unit: 'MINUTES') {
+                    // Cleanup
+                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
+                    // Launches the tests
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name vault \\
+                            --file docker-compose-vault.yml \\
+                            --file docker-compose-jacoco.yml up \\
+                            --exit-code-from ontrack_acceptance
+                    '''
+                }
+            }
+            post {
+                success {
+                    sh '''
+                        echo "Getting Jacoco coverage"
+                        mkdir -p build/jacoco/
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/vault.exec
+                    '''
+                    // Collection of coverage in Docker
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -PjacocoExecFile=build/jacoco/vault.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/vault.xml \\
+                            --stacktrace \\
+                            --console plain
+                    '''
+                    // Upload to Codecov
+                    sh '''
+                        curl -s https://codecov.io/bash | bash -s -- -c -F vault -f build/reports/jacoco/vault.xml
+                    '''
+                }
+                always {
+                    sh '''
+                        mkdir -p build
+                        rm -rf build/vault
+                        cp -r ontrack-acceptance/src/main/compose/build build/vault
+                    '''
+                    script {
+                        def results = junit 'build/vault/*.xml'
+                        ontrackValidate(
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: ONTRACK_BRANCH_NAME,
+                                build: VERSION,
+                                validationStamp: 'VAULT',
+                                testResults: results,
+                        )
+                    }
+                }
+                cleanup {
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name vault \\
+                            --file docker-compose-vault.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            down --volumes
+                    '''
+                }
+            }
+        }
+
         // We stop here for pull requests and feature branches
 
         // OS tests
