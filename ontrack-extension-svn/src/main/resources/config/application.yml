@@ -1,4 +1,0 @@
-ontrack:
-  config:
-    cache:
-      svnChangeLog: maximumSize=20,expireAfterWrite=1Om,recordStats
