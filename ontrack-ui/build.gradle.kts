@@ -11,16 +11,17 @@ plugins {
 apply(plugin = "org.springframework.boot")
 
 dependencies {
-    implementation(project(":ontrack-ui-support"))
-    implementation(project(":ontrack-ui-graphql"))
-    implementation(project(":ontrack-extension-api"))
-    implementation(project(":ontrack-extension-support"))
+    api("org.springframework.boot:spring-boot-starter-web")
+    api("org.springframework.boot:spring-boot-starter-security")
+    api("org.springframework.boot:spring-boot-starter-actuator")
+    api("org.springframework.boot:spring-boot-starter-aop")
+    api("org.springframework.boot:spring-boot-starter-jdbc")
+    api(project(":ontrack-ui-support"))
+    api(project(":ontrack-ui-graphql"))
+    api(project(":ontrack-extension-api"))
+    api(project(":ontrack-extension-support"))
+
     implementation(project(":ontrack-job"))
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
     implementation("commons-io:commons-io")
@@ -127,6 +128,7 @@ val generateVersionInfo by tasks.registering {
  */
 
 tasks.named<Jar>("jar") {
+    enabled = true
     dependsOn(copyWebResources)
     dependsOn(generateVersionInfo)
 }
@@ -139,6 +141,7 @@ tasks.named<ProcessResources>("processResources") {
 tasks.named<BootRun>("bootRun") {
     dependsOn("bootJar")
     dependsOn(":ontrack-web:dev")
+
     // Running with `dev` profile by default with `bootRun`
     args("--spring.profiles.active=dev")
 }
@@ -148,8 +151,20 @@ tasks.named<BootRun>("bootRun") {
  */
 
 val bootJar = tasks.getByName<BootJar>("bootJar") {
+    // Specific classifier
+    archiveClassifier.set("app")
     // Allowing the declaration of external extensions, packaged using the Spring Boot Module format
     manifest {
         attributes("Main-Class" to "org.springframework.boot.loader.PropertiesLauncher")
+    }
+}
+
+publishing {
+    publications {
+        named<MavenPublication>("mavenCustom") {
+            artifact(bootJar) {
+                classifier = "app"
+            }
+        }
     }
 }

@@ -458,6 +458,7 @@ pipeline {
                 beforeAgent true
                 anyOf {
                     branch 'release/*'
+                    branch 'feature/*publication'
                 }
             }
             stages {

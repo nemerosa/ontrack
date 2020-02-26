@@ -8,8 +8,9 @@ plugins {
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    implementation(project(":ontrack-extension-support"))
-    implementation("org.springframework.vault:spring-vault-core:1.1.1.RELEASE")
+    api(project(":ontrack-extension-support"))
+    api("org.springframework.vault:spring-vault-core:1.1.1.RELEASE")
+
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
 

@@ -8,7 +8,8 @@ plugins {
 apply<OntrackExtensionPlugin>()
 
 dependencies {
-    implementation(project(":ontrack-extension-support"))
+    api(project(":ontrack-extension-support"))
+
     implementation("org.springframework.security:spring-security-ldap")
     implementation("org.apache.commons:commons-lang3")
     implementation("javax.validation:validation-api")
