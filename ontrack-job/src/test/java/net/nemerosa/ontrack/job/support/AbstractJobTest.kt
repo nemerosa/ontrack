@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.test.assertPresent
 import org.junit.After
 import org.junit.Before
 import java.util.*
-import java.util.concurrent.Future
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.function.BiFunction
 
@@ -76,7 +76,7 @@ abstract class AbstractJobTest {
             return job
         }
 
-        fun fireImmediately(job: Job): Optional<Future<*>> = scheduler.fireImmediately(job.key)
+        fun fireImmediately(job: Job): Optional<CompletableFuture<*>> = scheduler.fireImmediately(job.key)
 
         fun fireImmediatelyRequired(job: Job) {
             fireImmediately(job).orElseThrow { IllegalStateException("No future being returned.") }

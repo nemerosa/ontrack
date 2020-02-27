@@ -1,5 +1,10 @@
 package net.nemerosa.ontrack.extension.elastic
 
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import net.nemerosa.ontrack.extension.elastic.ElasticSearchJobs.indexationAllJobKey
 import net.nemerosa.ontrack.extension.elastic.ElasticSearchJobs.indexationJobType
 import net.nemerosa.ontrack.job.*
@@ -10,6 +15,7 @@ import net.nemerosa.ontrack.model.support.JobProvider
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import java.util.concurrent.TimeUnit
 
 /**
  * One job per type of search.
@@ -44,11 +50,21 @@ class ElasticSearchIndexationJobs(
 
                 override fun getTask() = JobRun { listener ->
                     listener.message("Launching all indexations")
-                    searchIndexers.filter { indexer ->
-                        !indexer.isIndexationDisabled
-                    }.map { indexer ->
-                        val key = indexationJobType.getKey(indexer.indexerId)
-                        jobScheduler.fireImmediately(key)
+                    runBlocking {
+                        val jobs = searchIndexers.filter { indexer ->
+                            !indexer.isIndexationDisabled
+                        }.mapNotNull { indexer ->
+                            val key = indexationJobType.getKey(indexer.indexerId)
+                            jobScheduler.fireImmediately(key).orElse(null)
+                        }.map { stage ->
+                            launch {
+                                stage.await()
+                            }
+                        }
+                        // Waits for all jobs to complete
+                        withTimeout(TimeUnit.HOURS.toMillis(1)) {
+                            jobs.joinAll()
+                        }
                     }
                 }
             }

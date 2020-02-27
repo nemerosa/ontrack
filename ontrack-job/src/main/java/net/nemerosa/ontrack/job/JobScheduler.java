@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.job.support.JobNotScheduledException;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public interface JobScheduler {
@@ -99,7 +100,7 @@ public interface JobScheduler {
      * @return Future for the job execution
      * @throws JobNotScheduledException If the job is not scheduled
      */
-    Optional<Future<?>> fireImmediately(JobKey jobKey);
+    Optional<CompletableFuture<?>> fireImmediately(JobKey jobKey);
 
     /**
      * Gets the job key for a job id
