@@ -7,6 +7,7 @@ angular.module('ot.directive.search-box', [
             restrict: 'E',
             templateUrl: 'app/directive/directive.search-box.tpl.html',
             scope: {
+                boxId: '@',
                 config: '='
             },
             controller: ($scope) => {
