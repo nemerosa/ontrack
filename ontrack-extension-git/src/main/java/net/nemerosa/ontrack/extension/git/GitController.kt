@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
+import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest
@@ -32,10 +33,11 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 const val CACHE_GIT_CHANGE_LOG = "gitChangeLog"
+
+class GitChangeLogCacheNotAvailableException: BaseException("Cache for Git change log is not available")
 
 @RestController
 @RequestMapping("extension/git")
@@ -49,7 +51,9 @@ class GitController(
         cacheManager: CacheManager
 ) : AbstractExtensionController<GitExtensionFeature>(feature) {
 
-    private val logCache: Cache? = cacheManager.getCache(CACHE_GIT_CHANGE_LOG)
+    private val logCache: Cache by lazy {
+        cacheManager.getCache(CACHE_GIT_CHANGE_LOG) ?: throw GitChangeLogCacheNotAvailableException()
+    }
 
     /**
      * Gets the configurations
@@ -86,7 +90,7 @@ class GitController(
         @Suppress("RecursivePropertyAccessor")
         return Resource.of(
                 feature.featureDescription,
-                uri(MvcUriComponentsBuilder.on(javaClass).description)
+                uri(on(javaClass).description)
         )
                 .with("configurations", uri(on(javaClass).configurations), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
     }
@@ -157,7 +161,7 @@ class GitController(
     fun changeLog(request: BuildDiffRequest): BuildDiff {
         val changeLog = gitService.changeLog(request)
         // Stores in cache
-        logCache?.put(changeLog.uuid, changeLog)
+        logCache.put(changeLog.uuid, changeLog)
         // OK
         return changeLog
     }
@@ -229,7 +233,7 @@ class GitController(
     }
 
     private fun getChangeLog(uuid: String): GitChangeLog {
-        return logCache?.get(uuid)?.get() as? GitChangeLog? ?: throw SCMChangeLogUUIDException(uuid)
+        return logCache.get(uuid)?.get() as? GitChangeLog? ?: throw SCMChangeLogUUIDException(uuid)
     }
 
     /**
@@ -268,7 +272,7 @@ class GitController(
         // Loads the commits
         val loadedCommits = changeLog.loadCommits(gitService::getChangeLogCommits)
         // Stores in cache
-        logCache?.put(uuid, changeLog)
+        logCache.put(uuid, changeLog)
         // OK
         return loadedCommits
     }
@@ -288,7 +292,7 @@ class GitController(
         // Loads the issues
         issues = gitService.getChangeLogIssues(changeLog)
         // Stores in cache
-        logCache?.put(uuid, changeLog.withIssues(issues))
+        logCache.put(uuid, changeLog.withIssues(issues))
         // OK
         return issues
     }
@@ -319,7 +323,7 @@ class GitController(
         // Loads the files
         files = gitService.getChangeLogFiles(changeLog)
         // Stores in cache
-        logCache?.put(uuid, changeLog.withFiles(files))
+        logCache.put(uuid, changeLog.withFiles(files))
         // OK
         return files
     }
