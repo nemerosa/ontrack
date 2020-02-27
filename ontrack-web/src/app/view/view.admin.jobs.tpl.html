@@ -179,6 +179,11 @@
                                 <span class="fa fa-refresh"></span>
                                 Resume all visible jobs
                             </a></li>
+
+                            <li><a class="ot-action" ng-click="toggleJobKeys()">
+                                <span class="fa fa-key"></span>
+                                Toggle job key visibility
+                            </a></li>
                         </ul>
                     </div>
 
@@ -238,6 +243,9 @@
                     </td>
                     <td>
                         {{job.description}}
+                        <div ng-show="jobKeysVisible">
+                            <code>{{job.key.type.category.key}}/{{job.key.type.key}}/{{job.key.id}}</code>
+                        </div>
                     </td>
                     <td>
                         <span ng-if="job.state == 'IDLE'" class="fa fa-cog fa-2x text-muted" title="Idle"></span>
