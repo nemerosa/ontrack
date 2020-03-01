@@ -10,18 +10,36 @@ Ontrack has been tested on different Linux variants (Ubuntu, Debian, CentOS)
 and should also work on Windows.
 
 Ontrack relies on at least a JDK 8 build 25. More recent versions of the JDK8
-are OK. However, no test has been done yet using early JDK 9 versions.
+are OK. However, no test has been done yet using JDK 9 and older versions.
 
 Ontrack runs fine with 512 Mb of memory. However, think of upgrading to 2 Gb of
 memory if you intend to host a lot of projects. See the different installation
 modes (Docker, RPM, etc.) to know how to setup the memory settings.
 
-Ontrack stores its data in a Postgres database.
+Ontrack stores its data in a Postgres database and can optionally
+use ElasticSearch for search indexes.
 
 [[installation-quick-start]]
 === Quick start
 
-The fastest way to start Ontrack is to use <<installation-docker-compose,Docker Compose>>.
+The fastest way to start Ontrack is to use Docker Compose:
+
+[source,bash]
+----
+curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml
+docker-compose up -d
+----
+
+This sets up:
+
+* a Postgres database
+* an ElasticSearch (single node)
+* Ontrack running on port 8080
+
+Go to http://localhost:8080 and start using Ontrack. The initial
+administrator credentials are `admin` / `admin`.
+
+See <<usage>> to start using Ontrack.
 
 [[installation-postgres]]
 === Postgres database
