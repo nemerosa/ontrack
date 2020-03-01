@@ -681,12 +681,12 @@ tasks.named("githubRelease") {
  */
 
 val siteOntrackLast2Releases by tasks.registering(OntrackLastReleases::class) {
-    releaseCount = 2
+    releaseCount = 1
     releasePattern = "2\\.[\\d]+\\..*"
 }
 
 val siteOntrackLast3Releases by tasks.registering(OntrackLastReleases::class) {
-    releaseCount = 6
+    releaseCount = 4
     releasePattern = "3\\.[\\d]+\\..*"
 }
 
@@ -697,9 +697,8 @@ val sitePagesDocJs by tasks.registering {
     doLast {
         val allReleases = siteOntrackLast3Releases.get().releases + siteOntrackLast2Releases.get().releases
         val allVersions = allReleases.joinToString(",") { "'${it.name}'" }
-        project.file("build/site/page").mkdirs()
-        project.file("build/site/page/doc.js").writeText(
-                """var releases = [$allVersions];"""
+        project.file("ontrack-site/src/main/web/output/assets/web/assets/ontrack/doc.js").writeText(
+                """const releases = [$allVersions];"""
         )
     }
 }
@@ -708,11 +707,7 @@ configure<GitPublishExtension> {
     repoUri.set(project.properties["ontrackGitHubUri"] as String)
     branch.set(project.properties["ontrackGitHubPages"] as String)
     contents {
-        from("ontrack-site/src/main/web")
-        from("build/site/page") {
-            include("doc.js")
-            into("javascripts/doc/")
-        }
+        from("ontrack-site/src/main/web/output")
     }
     commitMessage.set("GitHub pages for version $version")
 }
