@@ -65,3 +65,8 @@ services:
       - "9300:9300"
     environment:
       - "discovery.type=single-node"
+    volumes:
+      - "ontrack_elasticsearch:/usr/share/elasticsearch/data"
+
+volumes:
+  ontrack_elasticsearch:
