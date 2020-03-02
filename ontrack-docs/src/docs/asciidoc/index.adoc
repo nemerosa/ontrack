@@ -3,7 +3,7 @@
 Damien Coraboeuf
 // ========================================================
 :doctype: book
-:toc:
+:toc: left
 :toclevels: 5
 :source-highlighter: prettify
 :numbered:
