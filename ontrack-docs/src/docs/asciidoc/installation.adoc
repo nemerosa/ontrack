@@ -78,7 +78,7 @@ Ontrack is distributed as a Docker image on the https://hub.docker.com[Docker Hu
 [[installation-docker-overview]]
 ==== Overview
 
-The Ontrack image exposes the ports `443` and `8080`.
+The Ontrack image exposes the port `8080`.
 
 Two volumes are defined:
 
