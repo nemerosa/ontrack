@@ -46,9 +46,10 @@ Create a directory, called `${MIGRATION}` in the rest of this section, and
 
 Run the following command:
 
-```bash
+[source,bash]
+----
 java -jar ontrack-postgresql-migration.jar
-```
+----
 
 By default, the tool will look for the H2 database file in the current
 directory, using `ontrack` / `ontrack` as credentials.
@@ -105,7 +106,7 @@ creating a local `application.properties` file.
 
 |===
 
-[[migration-postgres-options]]
+[[migration-postgres-secrets]]
 ==== Secret files
 
 The `master.key` and
