@@ -23,7 +23,7 @@ The access to a BitBucket instance must be configured.
 
 The existing configurations can be updated and deleted.
 
-[[usage-bitbucket-config]]
+[[usage-bitbucket-project]]
 ===== Project configuration
 
 The link between a project and a Stash repository is defined by the _Stash
