@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue
  * Ontrack DSL tests.
  */
 @AcceptanceTestSuite
-@AcceptanceTest(AcceptanceTestContext.SMOKE)
+@AcceptanceTest([AcceptanceTestContext.SMOKE, AcceptanceTestContext.VAULT])
 class ACCDSL extends AbstractACCDSL {
 
     @Test
@@ -1538,6 +1538,16 @@ class ACCDSL extends AbstractACCDSL {
         def name = uid('J')
         ontrack.configure {
             jenkins name, 'http://jenkins'
+        }
+        assert ontrack.config.jenkins.find { it == name } != null
+    }
+
+    @Test
+    @AcceptanceTest(AcceptanceTestContext.VAULT)
+    void 'Configuration of Jenkins with password'() {
+        def name = uid('J')
+        ontrack.configure {
+            jenkins name, 'http://jenkins', 'user', 'secret'
         }
         assert ontrack.config.jenkins.find { it == name } != null
     }
