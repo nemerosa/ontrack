@@ -19,3 +19,15 @@ services:
       - "9300:9300"
     environment:
       - "discovery.type=single-node"
+
+  # Vault
+  # Non production setup
+  # See https://hub.docker.com/_/vault/
+  vault:
+    image: "vault:1.3.2"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "test"
+    cap_add:
+      - "IPC_LOCK"
+    ports:
+      - "8200:8200"
