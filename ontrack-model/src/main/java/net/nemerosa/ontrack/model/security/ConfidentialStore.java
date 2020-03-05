@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.security;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 
 public interface ConfidentialStore {
@@ -14,6 +16,7 @@ public interface ConfidentialStore {
      *
      * @return null the data has not been previously persisted, or if the data was tampered.
      */
+    @Nullable
     byte[] load(String key) throws IOException;
 
     /**

@@ -1,0 +1,76 @@
+version: "2.1"
+
+services:
+
+   postgres:
+    image: postgres:9.5.2
+    environment:
+      POSTGRES_DB      : ontrack
+      POSTGRES_USER    : ontrack
+      POSTGRES_PASSWORD: ontrack
+
+   elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+      ports:
+         - "9200:9200"
+         - "9300:9300"
+      environment:
+         - "discovery.type=single-node"
+
+   # Vault
+   # Non production setup
+   # See https://hub.docker.com/_/vault/
+   vault:
+      image: "vault:1.3.2"
+      environment:
+         VAULT_DEV_ROOT_TOKEN_ID: "test"
+      cap_add:
+         - "IPC_LOCK"
+      ports:
+         - "8200"
+
+   ontrack:
+      image: "nemerosa/ontrack:${VERSION:-latest}"
+      depends_on:
+         postgres:
+            condition: service_started
+         elasticsearch:
+           condition: service_started
+         vault:
+           condition: service_started
+      environment:
+         PROFILE: acceptance
+         ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
+         SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+         # Elastic search
+         ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
+         ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
+         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+         # Using Vault for storing the encryption keys
+         ONTRACK_CONFIG_KEY_STORE: "vault"
+         ONTRACK_CONFIG_VAULT_URI: "http://vault:8200"
+         ONTRACK_CONFIG_VAULT_TOKEN: "test"
+
+   selenium:
+      image: "selenium/standalone-chrome:3.11.0"
+      environment:
+         JAVA_OPTS: "-Xmx3072m -Xms3072m"
+
+   ontrack_acceptance:
+      image: "nemerosa/ontrack-acceptance:${VERSION:-latest}"
+      depends_on:
+         ontrack:
+            condition: service_healthy
+         selenium:
+            condition: service_started
+      environment:
+         ONTRACK_ACCEPTANCE_IMPLICIT_WAIT: 30
+         ONTRACK_ACCEPTANCE_SELENIUM_GRID_URL: http://selenium:4444/wd/hub
+         ONTRACK_ACCEPTANCE_SELENIUM_BROWSER_NAME: chrome
+         ONTRACK_ACCEPTANCE_SELENIUM_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_TARGET_URL: http://ontrack:8080
+         ONTRACK_ACCEPTANCE_CONTEXT: "vault"
+         JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
+      volumes:
+         - "./build:/ontrack/acceptance/output:rw"

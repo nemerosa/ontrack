@@ -10,4 +10,9 @@ public interface AcceptanceTestContext {
      */
     String EXTENSIONS = "extensions";
 
+    /**
+     * For testing Vault integration
+     */
+    String VAULT = "vault";
+
 }
