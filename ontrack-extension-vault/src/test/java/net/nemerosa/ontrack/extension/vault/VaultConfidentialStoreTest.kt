@@ -4,22 +4,31 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert
+import net.nemerosa.ontrack.json.asJson
+import org.junit.Before
 import org.junit.Test
 import org.springframework.vault.core.VaultKeyValueOperations
 import org.springframework.vault.core.VaultKeyValueOperationsSupport
 import org.springframework.vault.core.VaultOperations
 import org.springframework.vault.support.VaultResponseSupport
 import java.nio.charset.Charset
+import kotlin.test.assertEquals
 
 class VaultConfidentialStoreTest {
 
+    private lateinit var vaultKvOps: VaultKeyValueOperations
+    private lateinit var vaultOperations: VaultOperations
+
+    @Before
+    fun before() {
+        vaultKvOps = mock()
+        vaultOperations = mock()
+        whenever(vaultOperations.opsForKeyValue("/secret/data", VaultKeyValueOperationsSupport.KeyValueBackend.unversioned())).thenReturn(vaultKvOps)
+    }
+
     @Test
     fun default_config() {
-        val vaultKvOps = mock<VaultKeyValueOperations>()
-        val vaultOperations = mock<VaultOperations>()
         val configProperties = VaultConfigProperties()
-        whenever(vaultOperations.opsForKeyValue("secret/ontrack/key", VaultKeyValueOperationsSupport.KeyValueBackend.unversioned())).thenReturn(vaultKvOps)
         val store = VaultConfidentialStore(
                 vaultOperations,
                 configProperties
@@ -27,41 +36,42 @@ class VaultConfidentialStoreTest {
 
         store.store(KEY_NAME, KEY_BYTES)
         verify(vaultKvOps, times(1)).put(
-                "my-key",
-                Key(KEY_BYTES)
+                "ontrack/keys/$KEY_NAME",
+                VaultPayload(Key(KEY_BYTES).asJson())
         )
-        val response = VaultResponseSupport<Key>()
-        response.data = Key(KEY_BYTES)
-        whenever(vaultKvOps.get("my-key", Key::class.java)).thenReturn(
+
+        val response = VaultResponseSupport<VaultPayload>()
+        response.data = VaultPayload(Key(KEY_BYTES).asJson())
+        whenever(vaultKvOps.get("ontrack/keys/$KEY_NAME", VaultPayload::class.java)).thenReturn(
                 response
         )
         val bytes = store.load(KEY_NAME)
-        Assert.assertEquals(KEY_BYTES, bytes)
+        assertEquals(KEY_BYTES.toList(), bytes?.toList())
     }
 
     @Test
     fun custom_prefix() {
-        val vaultKvOps = mock<VaultKeyValueOperations>()
-        val vaultOperations = mock<VaultOperations>()
-        whenever(vaultOperations.opsForKeyValue("custom/keys", VaultKeyValueOperationsSupport.KeyValueBackend.unversioned())).thenReturn(vaultKvOps)
-        val configProperties = VaultConfigProperties()
-        configProperties.prefix = "custom/keys"
+        val configProperties = VaultConfigProperties().apply {
+            prefix = "custom/keys"
+        }
         val store = VaultConfidentialStore(
                 vaultOperations,
                 configProperties
         )
+
         store.store(KEY_NAME, KEY_BYTES)
         verify(vaultKvOps, times(1)).put(
-                "my-key",
-                Key(KEY_BYTES)
+                "custom/keys/$KEY_NAME",
+                VaultPayload(Key(KEY_BYTES).asJson())
         )
-        val response = VaultResponseSupport<Key>()
-        response.data = Key(KEY_BYTES)
-        whenever(vaultKvOps.get("my-key", Key::class.java)).thenReturn(
+
+        val response = VaultResponseSupport<VaultPayload>()
+        response.data = VaultPayload(Key(KEY_BYTES).asJson())
+        whenever(vaultKvOps.get("custom/keys/$KEY_NAME", VaultPayload::class.java)).thenReturn(
                 response
         )
         val bytes = store.load(KEY_NAME)
-        Assert.assertEquals(KEY_BYTES, bytes)
+        assertEquals(KEY_BYTES.toList(), bytes?.toList())
     }
 
     companion object {

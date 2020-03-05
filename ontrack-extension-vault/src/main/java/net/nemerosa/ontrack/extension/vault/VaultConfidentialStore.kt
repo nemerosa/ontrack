@@ -19,7 +19,9 @@ class VaultConfidentialStore(
         private val configProperties: VaultConfigProperties
 ) : AbstractConfidentialStore() {
 
-    private fun kvOps() = vaultOperations.opsForKeyValue("/secret/data", VaultKeyValueOperationsSupport.KeyValueBackend.unversioned())
+    private val kvPath = "/secret/data"
+
+    private fun kvOps() = vaultOperations.opsForKeyValue(kvPath, VaultKeyValueOperationsSupport.KeyValueBackend.unversioned())
 
     override fun store(key: String, payload: ByteArray) {
         Validate.notNull(payload, "Key payload must not be null")
