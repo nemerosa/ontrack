@@ -31,12 +31,15 @@ management:
       # Prometheus disabled by default
       prometheus:
         enabled: false
-  # Disable LDAP health indicator
+  # Health indicators
   health:
+    # Disable LDAP health indicator
     ldap:
       enabled: false
+    # Disable the ElasticSearch health indicator by default
+    elasticsearch:
+      enabled: false
 
-# General information
 # The version information is generated in /config/application.properties by the build
 info:
   app:
