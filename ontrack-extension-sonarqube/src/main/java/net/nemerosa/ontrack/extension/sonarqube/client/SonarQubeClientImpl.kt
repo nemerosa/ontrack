@@ -8,6 +8,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.util.DefaultUriBuilderFactory
 
 class SonarQubeClientImpl(
         configuration: SonarQubeConfiguration
@@ -87,9 +88,14 @@ class SonarQubeClientImpl(
 
     }
 
-    private val restTemplate: RestTemplate = RestTemplateBuilder()
+    internal val restTemplate: RestTemplate = RestTemplateBuilder()
             .rootUri(configuration.url)
-            .basicAuthorization(configuration.password, "") // See https://docs.sonarqube.org/latest/extend/web-api/
+            // SonarQube requires a strict encoding per value (esp. for "+" characters which are no longer encoded with Spring 5)
+            // See https://github.com/spring-projects/spring-framework/issues/20750
+            .uriTemplateHandler(DefaultUriBuilderFactory().apply {
+                encodingMode = DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY
+            })
+            .basicAuthentication(configuration.password, "") // See https://docs.sonarqube.org/latest/extend/web-api/
             .build()
 
     private fun <T, R : PagedResult> paginateUntil(
