@@ -13,6 +13,7 @@ import org.eclipse.jgit.api.CloneCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.api.errors.GitAPIException
+import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.lib.*
@@ -112,13 +113,13 @@ class GitRepositoryClientImpl(
                     .setContains(commit)
                     .setListMode(ListBranchCommand.ListMode.REMOTE)
                     .call()
-            return list.map {
+            return list.asSequence().map {
                 StringUtils.removeStart(it.name, "refs/remotes/origin/")
             }.map {
                 StringUtils.removeStart(it, "refs/heads/")
             }.filter {
                 it != "HEAD"
-            }.distinct().sorted()
+            }.distinct().sorted().toList()
         } catch (e: IOException) {
             throw GitRepositoryIOException(repository.remote, e)
         }
@@ -273,6 +274,9 @@ class GitRepositoryClientImpl(
             }
             // Nothing found
             return null
+        } catch (_: NoHeadException) {
+            // Ignoring this error, nothing to scan
+            return null
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         } catch (e: IOException) {
@@ -285,6 +289,8 @@ class GitRepositoryClientImpl(
             git.log().call()
                     .map { toCommit(it) }
                     .forEach(code)
+        } catch (_: NoHeadException) {
+            // Ignoring this error, nothing to scan
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         } catch (e: IOException) {
@@ -306,7 +312,9 @@ class GitRepositoryClientImpl(
                         .map { this.toCommit(it) }
                         .stream()
             }
-
+        } catch (_: NoHeadException) {
+            // Ignoring this error, nothing to scan
+            return Stream.empty()
         } catch (e: GitAPIException) {
             throw GitRepositoryAPIException(repository.remote, e)
         } catch (e: IOException) {
