@@ -194,8 +194,13 @@ class ElasticSearchIndexService(
         // Building the list of actions to take
         val bulk = items.fold(BatchSearchIndexBulk(indexer.indexName)) { acc, item ->
             val action = batchSearchIndexAction(indexer, item, mode)
-            val actionTrace = action.action?.let { it::class.java.simpleName } ?: "-"
-            logger.debug("[search][batch-index] index=${indexer.indexName},item=${item.id},mode=$mode,action=$actionTrace")
+            if (ontrackConfigProperties.search.index.logging && logger.isDebugEnabled) {
+                if (action.action != null) {
+                    logger.debug("[search][batch-index] index=${indexer.indexName},item=${item.id},mode=$mode,action=${action.action::class.java.simpleName}")
+                } else if (ontrackConfigProperties.search.index.tracing) {
+                    logger.debug("[search][batch-index] index=${indexer.indexName},item=${item.id},mode=$mode,action=none")
+                }
+            }
             acc + action
         }
         // Launching the indexation of this batch

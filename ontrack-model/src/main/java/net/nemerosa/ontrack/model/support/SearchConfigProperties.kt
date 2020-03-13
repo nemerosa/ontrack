@@ -34,5 +34,13 @@ class SearchConfigProperties {
          * Note that this can be overridden by the individual search indexers.
          */
         var batch = 1000
+        /**
+         * Logging mode for batch indexing (only actual actions are shown)
+         */
+        var logging = false
+        /**
+         * Tracing mode for batch indexing (generates an awful lot of logging at DEBUG level)
+         */
+        var tracing = false
     }
 }

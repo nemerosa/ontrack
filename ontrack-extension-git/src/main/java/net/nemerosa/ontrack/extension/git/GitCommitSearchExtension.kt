@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.slf4j.Logger
@@ -31,6 +32,7 @@ class GitCommitSearchExtension(
         private val securityService: SecurityService,
         private val structureService: StructureService,
         gitSearchConfigProperties: GitSearchConfigProperties,
+        private val ontrackConfigProperties: OntrackConfigProperties,
         private val gitIssueSearchExtension: GitIssueSearchExtension
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitCommitSearchItem> {
 
@@ -104,6 +106,9 @@ class GitCommitSearchExtension(
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
         logger.info("[search][indexation][git-commits] Indexing all Git commits")
+        val traceCommits = ontrackConfigProperties.search.index.logging &&
+                ontrackConfigProperties.search.index.tracing &&
+                logger.isDebugEnabled
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
             logger.info("[search][indexation][git-commits] project=${project.name}")
             val issueConfig: ConfiguredIssueService? = gitConfiguration.configuredIssueService.orElse(null)
@@ -113,6 +118,10 @@ class GitCommitSearchExtension(
                 var commitCount = 0
                 gitService.forEachCommit(gitConfiguration) { commit: GitCommit ->
                     commitCount++
+                    // Logging
+                    if (traceCommits) {
+                        logger.info("[search][indexation][git-commits] project=${project.name} commit=${commit.shortId} message=${commit.shortMessage}")
+                    }
                     // Indexation of the message
                     val item = GitCommitSearchItem(project, gitConfiguration, commit)
                     processor(item)

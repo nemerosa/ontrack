@@ -286,7 +286,7 @@ class GitRepositoryClientImpl(
 
     override fun forEachCommit(code: (GitCommit) -> Unit) {
         try {
-            git.log().call()
+            git.log().all().call()
                     .map { toCommit(it) }
                     .forEach(code)
         } catch (_: NoHeadException) {

@@ -61,6 +61,8 @@ class OntrackConfigProperties {
         logger.info("[search] Engine = ${search.engine}")
         logger.info("[search] Index immediate refresh = ${search.index.immediate}")
         logger.info("[search] Index batch size = ${search.index.batch}")
+        logger.info("[search] Index batch logging = ${search.index.logging}")
+        logger.info("[search] Index batch tracing = ${search.index.tracing}")
     }
 
     companion object {
