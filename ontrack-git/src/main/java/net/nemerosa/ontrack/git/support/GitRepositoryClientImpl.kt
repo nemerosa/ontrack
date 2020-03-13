@@ -286,6 +286,7 @@ class GitRepositoryClientImpl(
 
     override fun forEachCommit(code: (GitCommit) -> Unit) {
         try {
+            // FIXME #751 Add .all()
             git.log().call()
                     .map { toCommit(it) }
                     .forEach(code)
