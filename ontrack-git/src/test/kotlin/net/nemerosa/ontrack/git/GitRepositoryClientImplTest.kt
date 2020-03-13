@@ -21,6 +21,86 @@ class GitRepositoryClientImplTest {
      * ```
      */
     @Test
+    fun `Iterating over all commits for two branches`() {
+        GitRepo.prepare {
+            gitInit()
+            commit(1)
+            commit(2)
+            commit(3)
+            git("checkout", "-b", "2.1")
+            commit(4)
+            git("checkout", "master")
+            commit(5)
+
+            log()
+        } and { client, _ ->
+            val commits = mutableListOf<String>()
+            client.forEachCommit { commit ->
+                commits.add(commit.fullMessage.trim())
+            }
+            assertEquals(
+                    (1..5).map { "Commit $it" }.toSet(),
+                    commits.toSet()
+            )
+        }
+    }
+
+    /**
+     * ```
+     *     * C8
+     *     * C7
+     *     * M6
+     *     |\
+     *     | * C5 (v2.1, 2.1)
+     *     * | C4
+     *     | * C3
+     *     |/
+     *     * C2
+     *     * C1
+     * ```
+     */
+    @Test
+    fun `Iterating over all commits for two merged branches`() {
+        GitRepo.prepare {
+            gitInit()
+            commit(1)
+            commit(2)
+            git("checkout", "-b", "2.1")
+            commit(3)
+            git("checkout", "master")
+            commit(4)
+            git("checkout", "2.1")
+            commit(5)
+            tag("v2.1")
+            git("checkout", "master")
+            git("merge", "--no-ff", "2.1", "--message", "Merge 2.1") // M6
+            commit(7)
+            commit(8)
+
+            log()
+        } and { client, _ ->
+            val commits = mutableListOf<String>()
+            client.forEachCommit { commit ->
+                commits.add(commit.fullMessage.trim())
+            }
+            assertEquals(
+                    ((8 downTo 7).map { "Commit $it" } + "Merge 2.1" + (5 downTo 1).map { "Commit $it" }).toSet(),
+                    commits.toSet()
+            )
+        }
+    }
+
+    /**
+     * ```
+     *     *   C5 (master)
+     *     | * C4 (2.1)
+     *     |/
+     *     * C3
+     *     * C2
+     *     * C1
+     * ```
+     */
+    @Test
     fun `Iterating over commits on a branch`() {
         GitRepo.prepare {
             gitInit()
