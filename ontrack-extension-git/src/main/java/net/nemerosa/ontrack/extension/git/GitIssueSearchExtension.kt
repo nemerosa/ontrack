@@ -14,6 +14,8 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import java.util.*
@@ -28,6 +30,8 @@ class GitIssueSearchExtension(
         private val ontrackConfigProperties: OntrackConfigProperties,
         private val searchIndexService: SearchIndexService
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitIssueSearchItem> {
+
+    private val logger: Logger = LoggerFactory.getLogger(GitIssueSearchExtension::class.java)
 
     override fun getSearchProvider(): SearchProvider {
         return GitIssueSearchProvider(uriBuilder)
@@ -125,11 +129,16 @@ class GitIssueSearchExtension(
         val chunks = projectIssueKeys.chunked(batchSize)
         // For each batch
         chunks.forEach { batch ->
-            searchIndexService.batchSearchIndex(this, batch.map { key ->
-                key to issueConfig.getDisplayKey(key)
-            }.map { (key, displayKey) ->
-                GitIssueSearchItem(project, key, displayKey)
-            }, BatchIndexMode.KEEP)
+            logger.info("[search][indexation][git-issues] project=${project.name} batch=${batch.size} Git issues to index.")
+            searchIndexService.batchSearchIndex(
+                    indexer = this,
+                    items = batch.map { key ->
+                        key to issueConfig.getDisplayKey(key)
+                    }.map { (key, displayKey) ->
+                        GitIssueSearchItem(project, key, displayKey)
+                    },
+                    mode = BatchIndexMode.KEEP
+            )
         }
     }
 

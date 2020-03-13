@@ -190,12 +190,16 @@ class ElasticSearchIndexService(
     }
 
     override fun <T : SearchItem> batchSearchIndex(indexer: SearchIndexer<T>, items: Collection<T>, mode: BatchIndexMode): BatchIndexResults {
+        logger.debug("[search][batch-index] index=${indexer.indexName},items=${items.size},mode=$mode")
         // Building the list of actions to take
         val bulk = items.fold(BatchSearchIndexBulk(indexer.indexName)) { acc, item ->
             val action = batchSearchIndexAction(indexer, item, mode)
+            val actionTrace = action.action?.let { it::class.java.simpleName } ?: "-"
+            logger.debug("[search][batch-index] index=${indexer.indexName},item=${item.id},mode=$mode,action=$actionTrace")
             acc + action
         }
         // Launching the indexation of this batch
+        logger.info("[search][batch-index] index=${indexer.indexName},items=${items.size},mode=$mode,actions=${bulk.bulk.numberOfActions()}")
         if (bulk.bulk.numberOfActions() > 0) {
             client.bulk(bulk.bulk, RequestOptions.DEFAULT)
             // Refreshes the index

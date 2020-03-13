@@ -15,6 +15,8 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
@@ -31,6 +33,8 @@ class GitCommitSearchExtension(
         gitSearchConfigProperties: GitSearchConfigProperties,
         private val gitIssueSearchExtension: GitIssueSearchExtension
 ) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitCommitSearchItem> {
+
+    private val logger: Logger = LoggerFactory.getLogger(GitCommitSearchExtension::class.java)
 
     private val shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}")
 
@@ -99,11 +103,16 @@ class GitCommitSearchExtension(
     }
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
+        logger.info("[search][indexation][git-commits] Indexing all Git commits")
         gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
+            logger.info("[search][indexation][git-commits] project=${project.name}")
             val issueConfig: ConfiguredIssueService? = gitConfiguration.configuredIssueService.orElse(null)
             val projectIssueKeys = mutableSetOf<String>()
             if (gitService.isRepositorySynched(gitConfiguration)) {
+                logger.info("[search][indexation][git-commits] project=${project.name} Git repository is synched. Indexing all commits...")
+                var commitCount = 0
                 gitService.forEachCommit(gitConfiguration) { commit: GitCommit ->
+                    commitCount++
                     // Indexation of the message
                     val item = GitCommitSearchItem(project, gitConfiguration, commit)
                     processor(item)
@@ -113,9 +122,13 @@ class GitCommitSearchExtension(
                         projectIssueKeys.addAll(keys)
                     }
                 }
+                logger.info("[search][indexation][git-commits] project=${project.name} count=$commitCount commits indexed.")
+            } else {
+                logger.info("[search][indexation][git-commits] project=${project.name} Git repository is not synched. Not indexing any commit.")
             }
             // Processing of issues
             if (issueConfig != null && projectIssueKeys.isNotEmpty()) {
+                logger.info("[search][indexation][git-commits] project=${project.name} issues=${projectIssueKeys.size} Git issues have been found.")
                 gitIssueSearchExtension.processIssueKeys(project, issueConfig, projectIssueKeys)
             }
         })
