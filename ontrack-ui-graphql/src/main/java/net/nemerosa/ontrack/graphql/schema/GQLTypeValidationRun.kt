@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class GQLTypeValidationRun(
@@ -89,8 +88,8 @@ class GQLTypeValidationRun(
                     // OK
                     .build()
 
-    override fun getSignature(entity: ValidationRun): Optional<Signature> {
-        return Optional.ofNullable(entity.lastStatus.signature)
+    override fun getSignature(entity: ValidationRun): Signature? {
+        return entity.lastStatus.signature
     }
 
     companion object {

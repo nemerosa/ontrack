@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class GQLTypeBuild(
@@ -419,8 +418,8 @@ class GQLTypeBuild(
                 }
             }
 
-    override fun getSignature(entity: Build): Optional<Signature> {
-        return Optional.ofNullable(entity.signature)
+    override fun getSignature(entity: Build): Signature? {
+        return entity.signature
     }
 
     companion object {

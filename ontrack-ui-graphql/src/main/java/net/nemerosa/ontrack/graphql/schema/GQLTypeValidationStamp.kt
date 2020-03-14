@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class GQLTypeValidationStamp(
@@ -168,8 +167,8 @@ class GQLTypeValidationStamp(
                 )
             }
 
-    override fun getSignature(entity: ValidationStamp): Optional<Signature> {
-        return Optional.ofNullable(entity.signature)
+    override fun getSignature(entity: ValidationStamp): Signature? {
+        return entity.signature
     }
 
     companion object {

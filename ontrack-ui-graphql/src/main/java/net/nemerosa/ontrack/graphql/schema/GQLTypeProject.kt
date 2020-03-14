@@ -17,7 +17,6 @@ import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
-import java.util.*
 import java.util.regex.Pattern
 
 const val GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG = "useModel"
@@ -173,8 +172,8 @@ class GQLTypeProject(
         }
     }
 
-    override fun getSignature(entity: Project): Optional<Signature> {
-        return Optional.ofNullable(entity.signature)
+    override fun getSignature(entity: Project): Signature? {
+        return entity.signature
     }
 
     companion object {
