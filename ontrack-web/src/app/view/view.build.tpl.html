@@ -2,11 +2,9 @@
     <div class="row">
         <div class="col-md-12 ot-view-title">
             <span id="build-page-title">Build {{build.name}}</span>
-            <ot-entity-embedded-decorations decorations="build.decorations">
-            <div ng-show="build.description" class="ot-description">
-                {{build.description}}
-            </div>
-            <ot-creation creation="build.creation"></ot-creation>
+            <ot-entity-embedded-decorations decorations="build.decorations"></ot-entity-embedded-decorations>
+            <div ng-show="build.description" class="ot-description" ng-bind-html="build.annotatedDescription"></div>
+            <ot-creation class="ot-description" creation="build.creation"></ot-creation>
         </div>
     </div>
     <div class="row">
@@ -23,14 +21,13 @@
                     <tbody>
                     <tr ng-repeat="promotionRun in build.promotionRuns">
                         <td>
-                            <ot-entity-image entity="promotionRun.promotionLevel"></ot-entity-image>
-                            {{promotionRun.promotionLevel.name}}
+                            <ot-entity-image link="{{promotionRun.promotionLevel.links._page}}" entity="promotionRun.promotionLevel">{{promotionRun.promotionLevel.name}}</ot-entity-image>
                         </td>
                         <td>
                             <ot-creation creation="promotionRun.creation"></ot-creation>
                         </td>
                         <td>
-                            {{promotionRun.description}}
+                            <span ng-bind-html="promotionRun.annotatedDescription"></span>
                         </td>
                         <td>
                     <span

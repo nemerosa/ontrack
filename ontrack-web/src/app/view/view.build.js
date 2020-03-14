@@ -27,6 +27,7 @@ angular.module('ot.view.build', [
                     id
                     name
                     description
+                    annotatedDescription
                     creation {
                       user
                       time
@@ -83,6 +84,7 @@ angular.module('ot.view.build', [
                     }
                     promotionRuns {
                       description
+                      annotatedDescription
                       creation {
                         user
                         time

@@ -25,18 +25,18 @@
         <tbody>
         <tr ng-repeat="promotionRun in promotionRuns">
             <td>
-                {{promotionRun.signature.user.name}}
+                {{promotionRun.creation.user}}
             </td>
             <td>
-                {{promotionRun.signature.time | date:'mediumDate' }}
-                {{promotionRun.signature.time | date:'shortTime' }}
+                {{promotionRun.creation.time | date:'mediumDate' }}
+                {{promotionRun.creation.time | date:'shortTime' }}
             </td>
             <td class="ot-description">
-                {{promotionRun.description}}
+                <span ng-bind-html="promotionRun.annotatedDescription"></span>
             </td>
             <td>
                 <span
-                        ng-if="promotionRun._delete"
+                        ng-if="promotionRun.links._delete"
                         ng-click="deletePromotionRun(promotionRun)"
                         title="Delete this promotion."
                         class="ot-command ot-command-delete"></span>

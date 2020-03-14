@@ -10,8 +10,8 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRun
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class GQLTypeValidationRun(
@@ -21,12 +21,14 @@ class GQLTypeValidationRun(
         private val runInfo: GQLTypeRunInfo,
         private val runInfoService: RunInfoService,
         private val validationRunData: GQLTypeValidationRunData,
-        private val projectEntityInterface: GQLProjectEntityInterface
+        private val projectEntityInterface: GQLProjectEntityInterface,
+        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : AbstractGQLProjectEntity<ValidationRun>(
         ValidationRun::class.java,
         ProjectEntityType.VALIDATION_RUN,
         projectEntityFieldContributors,
-        creation
+        creation,
+        freeTextAnnotatorContributors
 ) {
 
     override fun getTypeName() = VALIDATION_RUN
@@ -89,8 +91,8 @@ class GQLTypeValidationRun(
                     // OK
                     .build()
 
-    override fun getSignature(entity: ValidationRun): Optional<Signature> {
-        return Optional.ofNullable(entity.lastStatus.signature)
+    override fun getSignature(entity: ValidationRun): Signature? {
+        return entity.lastStatus.signature
     }
 
     companion object {

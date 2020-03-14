@@ -11,9 +11,7 @@
                     {{templateDefinition.name}}
                 </a>
             </div>
-            <div ng-if="branch.description" class="ot-description">
-                {{branch.description}}
-            </div>
+            <div ng-if="branch.description" class="ot-description" ng-bind-html="branchView.annotatedDescription"></div>
         </div>
     </div>
 

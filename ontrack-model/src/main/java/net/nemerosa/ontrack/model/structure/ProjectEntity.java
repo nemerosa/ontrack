@@ -1,13 +1,20 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.jetbrains.annotations.Nullable;
 
 import static org.apache.commons.lang3.Validate.isTrue;
 
 /**
- * A <b>ProjectEntity</b> is an {@link Entity} that belongs into a {@link Project}.
+ * A <b>ProjectEntity</b> is an {@link Entity} that belongs into a {@link Project}. It has also a {@link #getDescription()}
  */
 public interface ProjectEntity extends Entity {
+
+    /**
+     * Gets the description of this entity.
+     */
+    @Nullable
+    String getDescription();
 
     /**
      * Returns the project this entity is associated with

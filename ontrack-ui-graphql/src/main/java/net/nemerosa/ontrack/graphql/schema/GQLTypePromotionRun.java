@@ -6,11 +6,13 @@ import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
 import net.nemerosa.ontrack.model.structure.Signature;
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -26,9 +28,10 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
     public GQLTypePromotionRun(
             GQLTypeCreation creation,
             List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
-            GQLProjectEntityInterface projectEntityInterface
+            GQLProjectEntityInterface projectEntityInterface,
+            List<FreeTextAnnotatorContributor> freeTextAnnotatorContributors
     ) {
-        super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, projectEntityFieldContributors, creation);
+        super(PromotionRun.class, ProjectEntityType.PROMOTION_RUN, projectEntityFieldContributors, creation, freeTextAnnotatorContributors);
         this.projectEntityInterface = projectEntityInterface;
     }
 
@@ -62,8 +65,9 @@ public class GQLTypePromotionRun extends AbstractGQLProjectEntity<PromotionRun> 
                 .build();
     }
 
+    @Nullable
     @Override
-    protected Optional<Signature> getSignature(PromotionRun entity) {
-        return Optional.ofNullable(entity.getSignature());
+    protected Signature getSignature(@NotNull PromotionRun entity) {
+        return entity.getSignature();
     }
 }

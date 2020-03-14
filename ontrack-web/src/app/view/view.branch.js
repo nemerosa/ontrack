@@ -74,6 +74,8 @@ angular.module('ot.view.branch', [
               branches(id: $branchId) {
                 id
                 name
+                description
+                annotatedDescription
                 otherBranches {
                   id
                   name
@@ -141,9 +143,6 @@ angular.module('ot.view.branch', [
                       name
                       image
                       _image
-                    }
-                    links {
-                      _all
                     }
                   }
                   validations {
@@ -577,8 +576,7 @@ angular.module('ot.view.branch', [
                     config: function () {
                         return {
                             build: build,
-                            promotionLevel: promotionRun.promotionLevel,
-                            uri: promotionRun.links._all
+                            promotionLevel: promotionRun.promotionLevel
                         };
                     }
                 }

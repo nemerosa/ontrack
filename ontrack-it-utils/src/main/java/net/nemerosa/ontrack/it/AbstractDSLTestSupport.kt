@@ -139,8 +139,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun Branch.promotionLevel(name: String = uid("P"), init: PromotionLevel.() -> Unit = {}): PromotionLevel =
-            doCreatePromotionLevel(this, NameDescription.nd(name, "")).apply {
+    fun Branch.promotionLevel(name: String = uid("P"), description: String = "", init: PromotionLevel.() -> Unit = {}): PromotionLevel =
+            doCreatePromotionLevel(this, NameDescription.nd(name, description)).apply {
                 init()
             }
 

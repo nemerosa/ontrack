@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -20,6 +21,16 @@ public class ValidationRun implements RunnableEntity {
     private final Build build;
     @JsonView({ValidationRun.class, Build.class})
     private final ValidationStamp validationStamp;
+
+    /**
+     * The validation run, as such, as no description, because it's managed at validation run status level.
+     */
+    @Nullable
+    @Override
+    public String getDescription() {
+        return null;
+    }
+
     /**
      * The run order is the order of run for the build. It starts with 1 for the first run.
      */

@@ -5,9 +5,7 @@
                 <span id="ot-view-title">{{validationStamp.name}}</span>
             </ot-entity-image>
             <ot-entity-embedded-decorations decorations="validationStamp.decorations"></ot-entity-embedded-decorations>
-            <div ng-show="validationStamp.description" class="ot-description">
-                {{validationStamp.description}}
-            </div>
+            <div ng-show="validationStamp.description" class="ot-description" ng-bind-html="validationStamp.annotatedDescription"></div>
         </div>
     </div>
     <div class="row">

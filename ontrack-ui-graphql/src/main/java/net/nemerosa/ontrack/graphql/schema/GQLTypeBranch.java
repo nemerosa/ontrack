@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,9 +47,10 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                          GQLInputBuildStandardFilter inputBuildStandardFilter,
                          List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
                          GQLInputBuildGenericFilter inputBuildGenericFilter,
-                         GQLProjectEntityInterface projectEntityInterface
+                         GQLProjectEntityInterface projectEntityInterface,
+                         List<FreeTextAnnotatorContributor> freeTextAnnotatorContributors
     ) {
-        super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors, creation);
+        super(Branch.class, ProjectEntityType.BRANCH, projectEntityFieldContributors, creation, freeTextAnnotatorContributors);
         this.structureService = structureService;
         this.buildFilterService = buildFilterService;
         this.build = build;
@@ -218,9 +222,10 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
         };
     }
 
+    @Nullable
     @Override
-    protected Optional<Signature> getSignature(Branch entity) {
-        return Optional.ofNullable(entity.getSignature());
+    protected Signature getSignature(@NotNull Branch entity) {
+        return entity.getSignature();
     }
 
 }

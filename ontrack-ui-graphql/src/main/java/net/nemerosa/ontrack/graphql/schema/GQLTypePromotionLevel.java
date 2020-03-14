@@ -6,12 +6,14 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -30,11 +32,14 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                                  GQLTypeCreation creation,
                                  GQLTypePromotionRun promotionRun,
                                  List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
-                                 GQLProjectEntityInterface projectEntityInterface
+                                 GQLProjectEntityInterface projectEntityInterface,
+                                 List<FreeTextAnnotatorContributor> freeTextAnnotatorContributors
     ) {
         super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL,
                 projectEntityFieldContributors,
-                creation);
+                creation,
+                freeTextAnnotatorContributors
+        );
         this.structureService = structureService;
         this.promotionRun = promotionRun;
         this.projectEntityInterface = projectEntityInterface;
@@ -93,9 +98,10 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
         };
     }
 
+    @Nullable
     @Override
-    protected Optional<Signature> getSignature(PromotionLevel entity) {
-        return Optional.ofNullable(entity.getSignature());
+    protected Signature getSignature(@NotNull PromotionLevel entity) {
+        return entity.getSignature();
     }
 
 }

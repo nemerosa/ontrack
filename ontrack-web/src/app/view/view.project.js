@@ -31,6 +31,7 @@ angular.module('ot.view.project', [
                 id
                 name
                 description
+                annotatedDescription
                 disabled
                 decorations {
                   ...decorationContent

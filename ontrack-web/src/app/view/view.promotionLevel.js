@@ -1,7 +1,8 @@
 angular.module('ot.view.promotionLevel', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('promotionLevel', {
@@ -10,14 +11,65 @@ angular.module('ot.view.promotionLevel', [
             controller: 'PromotionLevelCtrl'
         });
     })
-    .controller('PromotionLevelCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService) {
-        var view = ot.view();
+    .controller('PromotionLevelCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService, otGraphqlService) {
+        const view = ot.view();
         // PromotionLevel's id
-        var promotionLevelId = $stateParams.promotionLevelId;
+        const promotionLevelId = $stateParams.promotionLevelId;
+        // GraphQL query
+        const query = `query PromotionLevel($id: Int!) {
+            promotionLevel(id: $id) {
+                id
+                name
+                description
+                annotatedDescription
+                image
+                _image
+                promotionRuns {
+                    description
+                    annotatedDescription
+                    build {
+                        name
+                        links {
+                            _page
+                        }
+                    }
+                    creation {
+                        user
+                        time
+                    }
+                }
+                decorations {
+                    decorationType
+                    data
+                    error
+                    feature {
+                      id
+                    }
+                }
+                branch {
+                    id
+                    name
+                    project {
+                        id
+                        name
+                    }
+                }
+                links {
+                    _self
+                    _update
+                    _delete
+                    _bulkUpdate
+                    _runs
+                    _properties
+                    _events
+                }
+            }
+        }`;
 
         // Loading the promotion level
         function loadPromotionLevel() {
-            otStructureService.getPromotionLevel(promotionLevelId).then(function (promotionLevel) {
+            otGraphqlService.pageGraphQLCall(query, {id: promotionLevelId}).then((data) => {
+                let promotionLevel = data.promotionLevel;
                 $scope.promotionLevel = promotionLevel;
                 // View breadcrumbs
                 view.breadcrumbs = ot.branchBreadcrumbs(promotionLevel.branch);
@@ -25,7 +77,7 @@ angular.module('ot.view.promotionLevel', [
                 view.commands = [
                     {
                         condition: function () {
-                            return promotionLevel._update;
+                            return promotionLevel.links._update;
                         },
                         id: 'updatePromotionLevelImage',
                         name: "Change image",
@@ -34,21 +86,21 @@ angular.module('ot.view.promotionLevel', [
                     },
                     {
                         condition: function () {
-                            return promotionLevel._update;
+                            return promotionLevel.links._update;
                         },
                         id: 'updatePromotionLevel',
                         name: "Update promotion level",
                         cls: 'ot-command-promotion-level-update',
                         action: function () {
                             otStructureService.update(
-                                promotionLevel._update,
+                                promotionLevel.links._update,
                                 "Update promotion level"
                             ).then(loadPromotionLevel);
                         }
                     },
                     {
                         condition: function () {
-                            return promotionLevel._delete;
+                            return promotionLevel.links._delete;
                         },
                         id: 'deletePromotionLevel',
                         name: "Delete promotion level",
@@ -59,7 +111,7 @@ angular.module('ot.view.promotionLevel', [
                                 message: "Do you really want to delete the promotion level " + promotionLevel.name +
                                     " and all its associated data?"
                             }).then(function () {
-                                return ot.call($http.delete(promotionLevel._delete));
+                                return ot.call($http.delete(promotionLevel.links._delete));
                             }).then(function () {
                                 $state.go('branch', {branchId: promotionLevel.branch.id});
                             });
@@ -67,7 +119,7 @@ angular.module('ot.view.promotionLevel', [
                     },
                     {
                         condition: function () {
-                            return promotionLevel._bulkUpdate;
+                            return promotionLevel.links._bulkUpdate;
                         },
                         id: 'bulkUpdatePromotionLevel',
                         name: "Bulk update",
@@ -77,17 +129,13 @@ angular.module('ot.view.promotionLevel', [
                                 title: "Promotion levels bulk update",
                                 message: "Updates all other promotion levels with the same name?"
                             }).then(function () {
-                                return ot.call($http.put(promotionLevel._bulkUpdate, {}));
+                                return ot.call($http.put(promotionLevel.links._bulkUpdate, {}));
                             }).then(loadPromotionLevel);
                         }
                     },
-                    ot.viewApiCommand($scope.promotionLevel._self),
+                    ot.viewApiCommand($scope.promotionLevel.links._self),
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                 ];
-                // Loads the runs
-                return ot.call($http.get(promotionLevel._runs));
-            }).then(function (promotionRunView) {
-                $scope.promotionRunView = promotionRunView;
             });
         }
 

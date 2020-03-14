@@ -11,8 +11,8 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class GQLTypeBuild(
@@ -24,8 +24,9 @@ class GQLTypeBuild(
         private val runInfoService: RunInfoService,
         private val paginatedListFactory: GQLPaginatedListFactory,
         creation: GQLTypeCreation,
-        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
-) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation) {
+        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+) : AbstractGQLProjectEntity<Build>(Build::class.java, ProjectEntityType.BUILD, projectEntityFieldContributors, creation, freeTextAnnotatorContributors) {
 
     override fun getTypeName() = BUILD
 
@@ -419,8 +420,8 @@ class GQLTypeBuild(
                 }
             }
 
-    override fun getSignature(entity: Build): Optional<Signature> {
-        return Optional.ofNullable(entity.signature)
+    override fun getSignature(entity: Build): Signature? {
+        return entity.signature
     }
 
     companion object {
