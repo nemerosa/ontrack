@@ -16,15 +16,15 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="promotionRun in promotionRunView.promotionRuns">
+        <tr ng-repeat="promotionRun in promotionLevel.promotionRuns">
             <td>
-                <a href="#/build/{{promotionRun.build.id}}">{{promotionRun.build.name}}</a>
+                <a href="#/build/{{promotionRun.build.links._page}}">{{promotionRun.build.name}}</a>
             </td>
             <td>
-                <ot-signature value="promotionRun.signature" user="true" time="true"></ot-signature>
+                <ot-signature value="{time: promotionRun.creation.time, user: {name: promotionRun.creation.user}}" user="true" time="true"></ot-signature>
             </td>
             <td class="ot-description">
-                {{promotionRun.description}}
+                <span ng-bind-html="promotionRun.annotatedDescription"></span>
             </td>
         </tr>
         </tbody>

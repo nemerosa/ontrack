@@ -24,6 +24,20 @@ angular.module('ot.view.promotionLevel', [
                 annotatedDescription
                 image
                 _image
+                promotionRuns {
+                    description
+                    annotatedDescription
+                    build {
+                        name
+                        links {
+                            _page
+                        }
+                    }
+                    creation {
+                        user
+                        time
+                    }
+                }
                 decorations {
                     decorationType
                     data
@@ -122,10 +136,6 @@ angular.module('ot.view.promotionLevel', [
                     ot.viewApiCommand($scope.promotionLevel.links._self),
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                 ];
-                // Loads the runs
-                return ot.call($http.get(promotionLevel.links._runs));
-            }).then((promotionRunView) => {
-                $scope.promotionRunView = promotionRunView;
             });
         }
 
