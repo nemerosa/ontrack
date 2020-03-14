@@ -12,6 +12,7 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
 
 @Component
@@ -23,12 +24,14 @@ class GQLTypeValidationStamp(
         private val validationRun: GQLTypeValidationRun,
         private val validationRunStatusService: ValidationRunStatusService,
         private val validationDataTypeConfig: GQLTypeValidationDataTypeConfig,
-        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>
+        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : AbstractGQLProjectEntity<ValidationStamp>(
         ValidationStamp::class.java,
         ProjectEntityType.VALIDATION_STAMP,
         projectEntityFieldContributors,
-        creation
+        creation,
+        freeTextAnnotatorContributors
 ) {
 
     override fun getTypeName() = VALIDATION_STAMP

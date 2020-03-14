@@ -6,6 +6,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,14 @@ public class GQLTypePromotionLevel extends AbstractGQLProjectEntity<PromotionLev
                                  GQLTypeCreation creation,
                                  GQLTypePromotionRun promotionRun,
                                  List<GQLProjectEntityFieldContributor> projectEntityFieldContributors,
-                                 GQLProjectEntityInterface projectEntityInterface
+                                 GQLProjectEntityInterface projectEntityInterface,
+                                 List<FreeTextAnnotatorContributor> freeTextAnnotatorContributors
     ) {
         super(PromotionLevel.class, ProjectEntityType.PROMOTION_LEVEL,
                 projectEntityFieldContributors,
-                creation);
+                creation,
+                freeTextAnnotatorContributors
+        );
         this.structureService = structureService;
         this.promotionRun = promotionRun;
         this.projectEntityInterface = projectEntityInterface;

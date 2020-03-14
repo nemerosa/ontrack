@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
 
@@ -34,12 +35,14 @@ class GQLTypeProject(
         private val branchFavouriteService: BranchFavouriteService,
         private val branchModelMatcherService: BranchModelMatcherService,
         private val paginatedListFactory: GQLPaginatedListFactory,
-        private val validationRunSearchService: ValidationRunSearchService
+        private val validationRunSearchService: ValidationRunSearchService,
+        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : AbstractGQLProjectEntity<Project>(
         Project::class.java,
         ProjectEntityType.PROJECT,
         projectEntityFieldContributors,
-        creation
+        creation,
+        freeTextAnnotatorContributors
 ) {
 
     override fun getTypeName(): String {
