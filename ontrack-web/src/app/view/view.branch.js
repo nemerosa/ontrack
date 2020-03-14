@@ -74,6 +74,8 @@ angular.module('ot.view.branch', [
               branches(id: $branchId) {
                 id
                 name
+                description
+                annotatedDescription
                 otherBranches {
                   id
                   name
