@@ -4,10 +4,8 @@
             <ot-entity-image entity="promotionLevel">
                 <span id="ot-view-title">{{promotionLevel.name}}</span>
             </ot-entity-image>
-            <ot-entity-decorations entity="promotionLevel"></ot-entity-decorations>
-            <div ng-show="promotionLevel.description" class="ot-description">
-                {{promotionLevel.description}}
-            </div>
+            <ot-entity-embedded-decorations decorations="promotionLevel.decorations"></ot-entity-embedded-decorations>
+            <div ng-show="promotionLevel.description" class="ot-description" ng-bind-html="promotionLevel.annotatedDescription"></div>
         </div>
     </div>
     <table class="table table-condensed table-hover">
@@ -36,12 +34,12 @@
             <ot-section-title>Properties</ot-section-title>
             <div class="row">
                 <div class="col-md-12">
-                    <ot-entity-properties entity="promotionLevel"></ot-entity-properties>
+                    <ot-entity-properties entity="{_properties: promotionLevel.links._properties}"></ot-entity-properties>
                 </div>
             </div>
         </div>
         <div class="col-md-5">
-            <ot-entity-events entity="promotionLevel"></ot-entity-events>
+            <ot-entity-events entity="{_events: promotionLevel.links._events}"></ot-entity-events>
         </div>
     </div>
 </ot-view>
