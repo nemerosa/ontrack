@@ -515,7 +515,7 @@ angular.module('ontrack.extension.scm', [
         };
 
         $scope.filterLinks = {
-            ALL: "All projects",
+            ALL: "All entries",
             LINKED: "Linked entries",
             ORPHAN: "Orphan entries"
         };
@@ -544,13 +544,11 @@ angular.module('ontrack.extension.scm', [
                       repository
                       repositoryPage
                       timestamp
-                      link {
-                        project {
-                          id
-                          name
-                          links {
-                            _page
-                          }
+                      project {
+                        id
+                        name
+                        links {
+                          _page
                         }
                       }
                     }

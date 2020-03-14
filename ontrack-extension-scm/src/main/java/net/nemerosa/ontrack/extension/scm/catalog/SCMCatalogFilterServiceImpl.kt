@@ -20,7 +20,7 @@ class SCMCatalogFilterServiceImpl(
         }.filter { entry ->
             filter.config?.takeIf { it.isNotBlank() }?.let { entry.config == it } ?: true
         }.filter { entry ->
-            repositoryRegex?.let { it.matches(entry.repository) } ?: true
+            repositoryRegex?.matches(entry.repository) ?: true
         }.filter { entry ->
             when (filter.link) {
                 SCMCatalogFilterLink.ALL -> true

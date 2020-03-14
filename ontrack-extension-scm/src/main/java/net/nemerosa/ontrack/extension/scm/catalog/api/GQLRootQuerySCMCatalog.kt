@@ -28,19 +28,19 @@ class GQLRootQuerySCMCatalog(
                     itemListCounter = { env, _ -> loadSCMCatalogEntries(env, 0, Int.MAX_VALUE).size },
                     itemListProvider = { env, _, offset, size -> loadSCMCatalogEntries(env, offset, size) },
                     arguments = listOf(
-                            GraphQLArgument.newArgument().name("scm")
+                            GraphQLArgument.newArgument().name(ARG_SCM)
                                     .description("Filters on SCM type (exact match)")
                                     .type(GraphQLString)
                                     .build(),
-                            GraphQLArgument.newArgument().name("config")
+                            GraphQLArgument.newArgument().name(ARG_CONFIG)
                                     .description("Filters on SCM config name (exact match)")
                                     .type(GraphQLString)
                                     .build(),
-                            GraphQLArgument.newArgument().name("repository")
+                            GraphQLArgument.newArgument().name(ARG_REPOSITORY)
                                     .description("Filters on repository (regular expression)")
                                     .type(GraphQLString)
                                     .build(),
-                            GraphQLArgument.newArgument().name("link")
+                            GraphQLArgument.newArgument().name(ARG_LINK)
                                     .description("Filters on entries which are linked or not to projects (ALL, LINKED, ORPHAN)")
                                     .type(GraphQLString)
                                     .build()
@@ -48,10 +48,11 @@ class GQLRootQuerySCMCatalog(
             )
 
     private fun loadSCMCatalogEntries(env: DataFetchingEnvironment, offset: Int, size: Int): List<SCMCatalogEntry> {
-        val scm: String? = env.getArgument("scm")
-        val config: String? = env.getArgument("config")
-        val repository: String? = env.getArgument<String>("repository")
-        val link: SCMCatalogFilterLink = env.getArgument<String>("link")?.run { SCMCatalogFilterLink.valueOf(this) }
+        val scm: String? = env.getArgument(ARG_SCM)
+        val config: String? = env.getArgument(ARG_CONFIG)
+        val repository: String? = env.getArgument<String>(ARG_REPOSITORY)
+        val link: SCMCatalogFilterLink = env.getArgument<String>(ARG_LINK)
+                ?.run { SCMCatalogFilterLink.valueOf(this) }
                 ?: SCMCatalogFilterLink.ALL
         val filter = SCMCatalogFilter(
                 offset = offset,
@@ -62,6 +63,13 @@ class GQLRootQuerySCMCatalog(
                 link = link
         )
         return scmCatalogFilterService.findCatalogEntries(filter)
+    }
+
+    companion object {
+        private const val ARG_SCM = "scm"
+        private const val ARG_CONFIG = "config"
+        private const val ARG_REPOSITORY = "repository"
+        private const val ARG_LINK = "link"
     }
 
 }

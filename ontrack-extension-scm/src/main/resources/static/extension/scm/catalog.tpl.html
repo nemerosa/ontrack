@@ -98,9 +98,8 @@
             <td>{{item.config}}</td>
             <td><a href="{{item.repositoryPage}}">{{item.repository}}</a></td>
             <td>
-                <span ng-if="!item.link"><span class="fa fa-ban" title="No project associated with this repository."></span></span>
-                <a ng-if="item.link" href="{{item.link.project.links._page}}">{{item.link.project.name}}</a>
-                <span ng-if="item.link"><a class="ot-command" href="#/extension/scm/project/{{item.link.project.id}}/catalog-info"><span class="fa fa-info-circle"></span>&nbsp;catalog info</a></span>
+                <span ng-if="!item.project"><span class="fa fa-ban" title="No project associated with this repository."></span></span>
+                <a ng-if="item.project" href="{{item.project.links._page}}">{{item.project.name}}</a>
             </td>
             <td title="Collection timestamp">
                 {{item.timestamp | date:'mediumDate'}}
