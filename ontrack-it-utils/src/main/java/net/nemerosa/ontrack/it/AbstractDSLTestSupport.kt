@@ -157,6 +157,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     ): ValidationStamp =
             doCreateValidationStamp(this, NameDescription.nd(name, ""), validationDataTypeConfig)
 
+    /**
+     * Deletes a validation stamp
+     */
+    fun ValidationStamp.delete() {
+        asAdmin {
+            structureService.deleteValidationStamp(id)
+        }
+    }
+
     fun Branch.build(name: String = uid("B"), init: (Build.() -> Unit)? = {}): Build {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
         if (init != null) {

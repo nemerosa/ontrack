@@ -13,8 +13,16 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `No validation stamp`() {
+        // Creates a VS and deletes it
+        val vsId = project<Int> {
+            branch<Int> {
+                val vs = validationStamp()
+                vs.delete()
+                vs.id()
+            }
+        }
         val data = run("""{
-            validationStamp(id: 1) {
+            validationStamp(id: $vsId) {
                 name
             }
         }""")

@@ -44,16 +44,6 @@ CatalogLinkService .up.> SCMCatalogProjectLink: manages
 
 CatalogLinkService .up.> SCMCatalogProvider: uses
 
-interface CatalogInfoContributor<? extends CatalogInfo> <<extension>> {
-    collectInfo(project: Project): CatalogInfo
-}
-
-CatalogInfoContributor .left.> Project: associates data
-
-interface CatalogInfoCollector <<service>>
-
-CatalogInfoCollector ..> CatalogInfoContributor: uses "1..*"
-
 package scm {
     interface BitbucketConfigurationService
     class BitbucketCatalogProvider
