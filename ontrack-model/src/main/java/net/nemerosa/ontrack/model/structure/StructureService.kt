@@ -22,6 +22,13 @@ interface StructureService {
 
     fun newProject(project: Project): Project
 
+    /**
+     * Looks for a project using its ID.
+     * @param projectId ID of the project
+     * @return Project or `null` if not found
+     */
+    fun findProjectByID(projectId: ID): Project?
+
     fun getProject(projectId: ID): Project
 
     fun saveProject(project: Project)
@@ -33,6 +40,13 @@ interface StructureService {
     fun deleteProject(projectId: ID): Ack
 
     // Branches
+
+    /**
+     * Looks for a branch using its ID.
+     * @param branchId ID of the branch
+     * @return Branch or `null` if not found
+     */
+    fun findBranchByID(branchId: ID): Branch?
 
     fun getBranch(branchId: ID): Branch
 
@@ -57,6 +71,13 @@ interface StructureService {
     fun newBuild(build: Build): Build
 
     fun saveBuild(build: Build): Build
+
+    /**
+     * Looks for a build using its ID.
+     * @param buildId ID of the build
+     * @return Build or `null` if not found
+     */
+    fun findBuildByID(buildId: ID): Build?
 
     fun getBuild(buildId: ID): Build
 
@@ -138,6 +159,11 @@ interface StructureService {
     fun isLinkedTo(build: Build, project: String, buildPattern: String): Boolean
 
     /**
+     * Loops over ALL the build links. Use this method with care, mostly for external indexation.
+     */
+    fun forEachBuildLink(code: (from: Build, to: Build) -> Unit)
+
+    /**
      * Looks for the first build which matches a given predicate.
      *
      * @param branchId       Branch to look builds into
@@ -182,6 +208,13 @@ interface StructureService {
 
     fun getPromotionLevel(promotionLevelId: ID): PromotionLevel
 
+    /**
+     * Looks for a promotion level using its ID.
+     * @param promotionLevel ID of the promotion level
+     * @return Promotion level or `null` if not found
+     */
+    fun findPromotionLevelByID(promotionLevel: ID): PromotionLevel?
+
     fun getPromotionLevelImage(promotionLevelId: ID): Document
 
     fun setPromotionLevelImage(promotionLevelId: ID, document: Document?)
@@ -201,6 +234,13 @@ interface StructureService {
     fun newPromotionRun(promotionRun: PromotionRun): PromotionRun
 
     fun getPromotionRun(promotionRunId: ID): PromotionRun
+
+    /**
+     * Looks for a promotion run using its ID.
+     * @param promotionRunId ID of the promotion run
+     * @return Promotion run or `null` if not found
+     */
+    fun findPromotionRunByID(promotionRunId: ID): PromotionRun?
 
     // TODO Replace by PromotionLevel?
     fun findPromotionLevelByName(project: String, branch: String, promotionLevel: String): Optional<PromotionLevel>
@@ -242,6 +282,13 @@ interface StructureService {
 
     fun getValidationStamp(validationStampId: ID): ValidationStamp
 
+    /**
+     * Looks for a validation stamp using its ID.
+     * @param validationStampId ID of the validation stamp
+     * @return Validation stamp or `null` if not found
+     */
+    fun findValidationStampByID(validationStampId: ID): ValidationStamp?
+
     // TODO Replace by ValidationStamp?
     fun findValidationStampByName(project: String, branch: String, validationStamp: String): Optional<ValidationStamp>
 
@@ -273,6 +320,13 @@ interface StructureService {
     fun newValidationRun(build: Build, validationRunRequest: ValidationRunRequest): ValidationRun
 
     fun getValidationRun(validationRunId: ID): ValidationRun
+
+    /**
+     * Looks for a validation run using its ID.
+     * @param validationRunId ID of the validation run
+     * @return Validation run or `null` if not found
+     */
+    fun findValidationRunByID(validationRunId: ID): ValidationRun?
 
 
     @Deprecated("Use {@link #getValidationRunsForBuild(ID, int, int)} instead.")
@@ -329,7 +383,24 @@ interface StructureService {
             count: Int
     ): List<ValidationRun>
 
+    fun getValidationRunsForValidationStamp(validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun>
+
     fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
+
+    /**
+     * Gets the list of validation runs for a given validation stamp and a list of statuses.
+     * @param validationStamp   Validation stamp
+     * @param statuses          List of statuses for the last status of the run
+     * @param offset            Offset in the list
+     * @param count             Maximum number of elemnts to return
+     * @return List of validation runs
+     */
+    fun getValidationRunsForValidationStampAndStatus(
+            validationStamp: ValidationStamp,
+            statuses: List<ValidationRunStatusID>,
+            offset: Int,
+            count: Int
+    ): List<ValidationRun>
 
     /**
      * Gets the list of validation runs for a given validation stamp and a list of statuses.
@@ -362,6 +433,11 @@ interface StructureService {
     ): List<ValidationRun>
 
     fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun
+
+    /**
+     * Re-exporting all validation run data metrics.
+     */
+    fun restoreValidationRunDataMetrics(logger: (String) -> Unit = {})
 
     /**
      * Gets the parent validation run for a given validation run status ID

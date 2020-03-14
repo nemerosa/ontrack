@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.BiFunction
+import kotlin.math.abs
 
 /**
  * @property meterRegistry If set, the scheduler will register job metrics
@@ -82,27 +83,27 @@ constructor(
                     emptyList(),
                     services
             )
-            meterRegistry.statusGauge("running", { it.isRunning })
-            meterRegistry.statusGauge("disabled", { it.isDisabled })
-            meterRegistry.statusGauge("paused", { it.isPaused })
-            meterRegistry.statusGauge("error", { it.isError })
-            meterRegistry.statusGauge("invalid", { !it.isValid })
+            meterRegistry.statusGauge("running") { it.isRunning }
+            meterRegistry.statusGauge("disabled") { it.isDisabled }
+            meterRegistry.statusGauge("paused") { it.isPaused }
+            meterRegistry.statusGauge("error") { it.isError }
+            meterRegistry.statusGauge("invalid") { !it.isValid }
             meterRegistry.gauge(
                     "ontrack_job_error_count_total",
                     services,
-                    {
-                        it.values.map { it.jobStatus.lastErrorCount }.sum().toDouble()
+                    { schedulerMap ->
+                        schedulerMap.values.map { it.jobStatus.lastErrorCount }.sum().toDouble()
                     }
             )
         }
     }
 
     override fun schedule(job: Job, schedule: Schedule) {
-        logger.info("[scheduler][job]{} Scheduling with {}", job.key, schedule)
+        logger.debug("[scheduler][job]{} Scheduling with {}", job.key, schedule)
         // Manages existing schedule
         val existingService = services[job.key]
         if (existingService != null) {
-            logger.info("[scheduler][job]{} Modifying existing schedule", job.key)
+            logger.debug("[scheduler][job]{} Modifying existing schedule", job.key)
             existingService.update(
                     job,
                     schedule
@@ -110,7 +111,7 @@ constructor(
         }
         // Creates and starts the scheduled service
         else {
-            logger.info("[scheduler][job]{} Starting scheduled service", job.key)
+            logger.debug("[scheduler][job]{} Starting scheduled service", job.key)
             // Copy stats from old schedule
             val jobScheduledService = JobScheduledService(
                     job,
@@ -215,7 +216,7 @@ constructor(
                 .toList()
     }
 
-    override fun fireImmediately(jobKey: JobKey): Optional<Future<*>> {
+    override fun fireImmediately(jobKey: JobKey): Optional<CompletableFuture<*>> {
         // Gets the existing scheduled service
         val jobScheduledService = services[jobKey] ?: throw JobNotScheduledException(jobKey)
         // Fires the job immediately
@@ -266,7 +267,7 @@ constructor(
             // Scattering
             if (scattering) {
                 // Computes the hash for the job key
-                val hash = Math.abs(job.key.toString().hashCode()) % 10000
+                val hash = abs(job.key.toString().hashCode()) % 10000
                 // Period to consider
                 val scatteringMax = (period * scatteringRatio).toLong()
                 if (scatteringMax > 0) {
@@ -402,7 +403,7 @@ constructor(
             }
         }
 
-        fun doRun(force: Boolean): Optional<Future<*>> {
+        fun doRun(force: Boolean): Optional<CompletableFuture<*>> {
             logger.debug("[job][run]{} Trying to run now - forced = {}", job.key, force)
             if (job.isValid) {
                 if (job.isDisabled) {
@@ -416,12 +417,12 @@ constructor(
                     return Optional.empty()
                 } else {
                     // Task to run
-                    val run = run
+                    val taskRun = run
                     // Gets the executor for this job
                     val executor = getExecutorService(job)
                     // Scheduling
                     logger.debug("[job][run]{} Job task submitted asynchronously", job.key)
-                    val execution = executor.submit(run)
+                    val execution = CompletableFuture.runAsync(taskRun, executor)
                     currentExecution.set(execution)
                     return Optional.of(execution)
                 }

@@ -81,3 +81,9 @@ following elements must be configured:
 It's possible to manage your own export of run info by creating a `RunInfoListener` component.
 
 See <<extending-metrics-run-info-listeners>> for more information.
+
+[[run-info-export-restoration]]
+===== Restoring the exported run info
+
+It's possible to run the "Run info restoration" manual system job in order
+to re-export all run infos to the registered exporters.

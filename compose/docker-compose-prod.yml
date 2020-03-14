@@ -26,18 +26,22 @@ services:
     image: nemerosa/ontrack:${ONTRACK_VERSION}
     restart: always
     environment:
-        PROFILE: prod
-        JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
-        SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+      PROFILE: prod
+      JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+      ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
+      SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
     depends_on:
       influxdb:
         condition: service_started
       postgres:
         condition: service_started
+      elasticsearch:
+        condition: service_started
     volumes:
       - "/var/ontrack/conf:/var/ontrack/conf"
       - "/var/ontrack/data:/var/ontrack/data"
-        # Using the random source from the host
+      # Using the random source from the host
       - "/dev/urandom:/dev/random"
     ports:
       - "8080:8080"
@@ -47,8 +51,23 @@ services:
     image: postgres:9.5.2
     restart: always
     environment:
-      POSTGRES_DB      : ontrack
-      POSTGRES_USER    : ${ONTRACK_POSTGRES_USER}
+      POSTGRES_DB: ontrack
+      POSTGRES_USER: ${ONTRACK_POSTGRES_USER}
       POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD}
     volumes:
       - "/var/lib/postgresql/data:/var/lib/postgresql/data"
+
+  # ElasticSearch
+  elasticsearch:
+    restart: always
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "discovery.type=single-node"
+    volumes:
+      - "ontrack_elasticsearch:/usr/share/elasticsearch/data"
+
+volumes:
+  ontrack_elasticsearch:

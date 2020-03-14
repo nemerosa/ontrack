@@ -11,14 +11,11 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class GQLTypeBuild
-@Autowired
-constructor(
+class GQLTypeBuild(
         private val structureService: StructureService,
         private val projectEntityInterface: GQLProjectEntityInterface,
         private val validation: GQLTypeValidation,
@@ -52,14 +49,14 @@ constructor(
                                 .description("Promotions for this build")
                                 .argument(
                                         newArgument()
-                                                .name("promotion")
+                                                .name(ARG_PROMOTION)
                                                 .description("Name of the promotion level")
                                                 .type(GraphQLString)
                                                 .build()
                                 )
                                 .argument(
                                         newArgument()
-                                                .name("lastPerLevel")
+                                                .name(ARG_LAST_PER_LEVEL)
                                                 .description("Returns the last promotion run per promotion level")
                                                 .type(GraphQLBoolean)
                                                 .build()
@@ -75,14 +72,14 @@ constructor(
                                 .description("Validations for this build")
                                 .argument(
                                         newArgument()
-                                                .name("validationStamp")
+                                                .name(ARG_VALIDATION_STAMP)
                                                 .description("Name of the validation stamp")
                                                 .type(GraphQLString)
                                                 .build()
                                 )
                                 .argument(
                                         newArgument()
-                                                .name("count")
+                                                .name(ARG_COUNT)
                                                 .description("Maximum number of validation runs")
                                                 .type(GraphQLInt)
                                                 .defaultValue(50)
@@ -120,7 +117,7 @@ constructor(
                             .description("Validations per validation stamp")
                             .argument(
                                     newArgument()
-                                            .name("validationStamp")
+                                            .name(ARG_VALIDATION_STAMP)
                                             .description("Name of the validation stamp")
                                             .type(GraphQLString)
                                             .build()
@@ -134,7 +131,7 @@ constructor(
                             .deprecate("Use `using` and `usedBy` fields instead.")
                             .description("Builds this build is linked to")
                             .argument { a ->
-                                a.name("direction")
+                                a.name(ARG_DIRECTION)
                                         .description("Direction of the link to follow.")
                                         .type(
                                                 GraphQLEnumType.newEnum()
@@ -176,36 +173,19 @@ constructor(
                                 fieldDescription = "List of builds being used by this one.",
                                 itemType = this,
                                 arguments = listOf(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("project")
                                                 .description("Keeps only links targeted from this project")
                                                 .type(GraphQLString)
                                                 .build(),
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("branch")
                                                 .description("Keeps only links targeted from this branch. `project` argument is also required.")
                                                 .type(GraphQLString)
                                                 .build()
                                 ),
                                 itemPaginatedListProvider = { environment, build, offset, size ->
-                                    val projectName: String? = environment.getArgument("project")
-                                    val branchName: String? = environment.getArgument("branch")
-                                    val filter: (Build) -> Boolean
-                                    if (branchName != null) {
-                                        if (projectName == null) {
-                                            throw IllegalArgumentException("`project` is required")
-                                        } else {
-                                            filter = {
-                                                it.branch.project.name == projectName && it.branch.name == branchName
-                                            }
-                                        }
-                                    } else if (projectName != null) {
-                                        filter = {
-                                            it.branch.project.name == projectName
-                                        }
-                                    } else {
-                                        filter = { true }
-                                    }
+                                    val filter: (Build) -> Boolean = getFilter(environment)
                                     structureService.getBuildsUsedBy(
                                             build,
                                             offset,
@@ -223,36 +203,19 @@ constructor(
                                 fieldDescription = "List of builds using this one.",
                                 itemType = this,
                                 arguments = listOf(
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("project")
                                                 .description("Keeps only links targeted from this project")
                                                 .type(GraphQLString)
                                                 .build(),
-                                        GraphQLArgument.newArgument()
+                                        newArgument()
                                                 .name("branch")
                                                 .description("Keeps only links targeted from this branch. `project` argument is also required.")
                                                 .type(GraphQLString)
                                                 .build()
                                 ),
                                 itemPaginatedListProvider = { environment, build, offset, size ->
-                                    val projectName: String? = environment.getArgument("project")
-                                    val branchName: String? = environment.getArgument("branch")
-                                    val filter: (Build) -> Boolean
-                                    if (branchName != null) {
-                                        if (projectName == null) {
-                                            throw IllegalArgumentException("`project` is required")
-                                        } else {
-                                            filter = {
-                                                it.branch.project.name == projectName && it.branch.name == branchName
-                                            }
-                                        }
-                                    } else if (projectName != null) {
-                                        filter = {
-                                            it.branch.project.name == projectName
-                                        }
-                                    } else {
-                                        filter = { true }
-                                    }
+                                    val filter = getFilter(environment)
                                     structureService.getBuildsUsing(
                                             build,
                                             offset,
@@ -264,7 +227,7 @@ constructor(
                 )
                 // Link direction (only used for linked builds)
                 .field { f ->
-                    f.name("direction")
+                    f.name(ARG_DIRECTION)
                             .description("Link direction")
                             .deprecate("Use `uses` and `usedBy` fields on the `Build` type instead.")
                             .type(GraphQLString)
@@ -275,10 +238,32 @@ constructor(
                     it.name("runInfo")
                             .description("Run info associated with this build")
                             .type(runInfo.typeRef)
-                            .runInfoFetcher<Build> { runInfoService.getRunInfo(it) }
+                            .runInfoFetcher<Build> { entity -> runInfoService.getRunInfo(entity) }
                 }
                 // OK
                 .build()
+    }
+
+    private fun getFilter(environment: DataFetchingEnvironment): (Build) -> Boolean {
+        val projectName: String? = environment.getArgument("project")
+        val branchName: String? = environment.getArgument("branch")
+        val filter: (Build) -> Boolean
+        if (branchName != null) {
+            if (projectName == null) {
+                throw IllegalArgumentException("`project` is required")
+            } else {
+                filter = {
+                    it.branch.project.name == projectName && it.branch.name == branchName
+                }
+            }
+        } else if (projectName != null) {
+            filter = {
+                it.branch.project.name == projectName
+            }
+        } else {
+            filter = { true }
+        }
+        return filter
     }
 
     private fun buildValidationsFetcher(): DataFetcher<List<GQLTypeValidation.GQLTypeValidationData>> {
@@ -286,7 +271,7 @@ constructor(
                 Build::class.java
         ) { environment: DataFetchingEnvironment, build: Build ->
             // Filter on validation stamp
-            val validationStampName = GraphqlUtils.getStringArgument(environment, "validationStamp")
+            val validationStampName = GraphqlUtils.getStringArgument(environment, ARG_VALIDATION_STAMP)
             if (validationStampName.isPresent) {
                 val validationStamp: ValidationStamp? =
                         structureService.findValidationStampByName(
@@ -352,7 +337,7 @@ constructor(
         return fetcher(
                 Build::class.java
         ) { environment, build ->
-            val direction: String = GraphqlUtils.getStringArgument(environment, "direction")
+            val direction: String = GraphqlUtils.getStringArgument(environment, ARG_DIRECTION)
                     .orElse("TO")
             when (direction) {
                 "TO" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
@@ -371,8 +356,8 @@ constructor(
             DataFetcher<List<ValidationRun>> { environment ->
                 val build: Build = environment.getSource()
                 // Filter
-                val count = GraphqlUtils.getIntArgument(environment, "count").orElse(50)
-                val validation = GraphqlUtils.getStringArgument(environment, "validation").orElse(null)
+                val count = GraphqlUtils.getIntArgument(environment, ARG_COUNT).orElse(50)
+                val validation = GraphqlUtils.getStringArgument(environment, ARG_VALIDATION_STAMP).orElse(null)
                 if (validation != null) {
                     // Gets the validation stamp
                     val validationStamp = structureService.findValidationStampByName(
@@ -402,9 +387,9 @@ constructor(
             DataFetcher<List<PromotionRun>> { environment ->
                 val build: Build = environment.getSource()
                 // Last per promotion filter?
-                val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, "lastPerLevel", false)
+                val lastPerLevel = GraphqlUtils.getBooleanArgument(environment, ARG_LAST_PER_LEVEL, false)
                 // Promotion filter
-                val promotion = GraphqlUtils.getStringArgument(environment, "promotion").orElse(null)
+                val promotion = GraphqlUtils.getStringArgument(environment, ARG_PROMOTION).orElse(null)
                 val promotionLevel: PromotionLevel? = if (promotion != null) {
                     // Gets the promotion level
                     structureService.findPromotionLevelByName(
@@ -439,8 +424,30 @@ constructor(
     }
 
     companion object {
-        @JvmField
-        val BUILD = "Build"
+        /**
+         * Name of the type
+         */
+        const val BUILD = "Build"
+        /**
+         * Filter on the validation runs
+         */
+        const val ARG_VALIDATION_STAMP = "validationStamp"
+        /**
+         * Count argument
+         */
+        const val ARG_COUNT = "count"
+        /**
+         * Promotion level argument
+         */
+        const val ARG_PROMOTION = "promotion"
+        /**
+         * Last per level argument
+         */
+        const val ARG_LAST_PER_LEVEL = "lastPerLevel"
+        /**
+         * Direction argument
+         */
+        const val ARG_DIRECTION = "direction"
     }
 }
 

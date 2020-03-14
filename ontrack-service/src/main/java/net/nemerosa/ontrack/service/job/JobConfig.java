@@ -65,8 +65,8 @@ public class JobConfig {
                 jobDecorator,
                 jobExecutorService(),
                 jobListener(),
-                jobConfigProperties.isPausedAtStartup(),
-                jobConfigProperties.isScattering(),
+                jobConfigProperties.getPausedAtStartup(),
+                jobConfigProperties.getScattering(),
                 jobConfigProperties.getScatteringRatio(),
                 meterRegistry
         );

@@ -1,22 +1,37 @@
 <ot-view>
+
     <div class="row">
-        <div class="col-md-12" ng-show="!searchDone">
-            <div class="alert alert-info">
+        <div class="col-md-12">
+            <ot-search-box box-id="page" config="searchConfig"></ot-search-box>
+            <br/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="alert alert-info" ng-show="!searchDone">
                 <span class="ot-loading-indicator"></span>
                 Loading the search results...
             </div>
-        </div>
-        <div class="col-md-12 alert alert-warning" ng-show="searchDone && results && !results.length">
-            No result matches your search.
-        </div>
-        <div class="col-md-12" ng-show="searchDone && results">
-            <dl ng-repeat="result in results" class="ot-search-result">
-                <dt>
-                    <a href="{{result.page}}">{{result.title}}</a>
-                </dt>
-                <dd ng-bind-html="result.description">
-                </dd>
-            </dl>
+
+            <div class="alert alert-warning" ng-show="searchDone && results && !results.length">
+                No result matches your search.
+            </div>
+
+            <div ng-show="searchDone && results">
+                <dl ng-repeat="result in results" class="ot-search-result">
+                    <dt>
+                        <img class="ot-icon" src="extension/{{result.type.feature.id}}/search-icon/{{result.type.id}}.png" title="{{result.type.name}}"/>
+                        <a href="{{result.page}}">{{result.title}}</a>
+                    </dt>
+                    <dd ng-bind-html="result.description">
+                    </dd>
+                </dl>
+            </div>
+
+            <a ng-show="pageInfo.nextPage" ng-click="searchMore(pageInfo.nextPage)" class="ot-action">More...</a>
+
         </div>
     </div>
 </ot-view>

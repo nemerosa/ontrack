@@ -6,3 +6,5 @@ include::usage-github.adoc[]
 include::usage-gitlab.adoc[]
 
 include::usage-bitbucket.adoc[]
+
+include::usage-git-search.adoc[]

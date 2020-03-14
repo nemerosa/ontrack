@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
-import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.metrics.measure
@@ -12,6 +11,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -30,6 +30,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
         private val cachedSettingsService: CachedSettingsService,
         private val securityService: SecurityService
 ) : SonarQubeMeasuresCollectionService {
+
+    private val logger = LoggerFactory.getLogger(SonarQubeMeasuresCollectionService::class.java)
 
     override fun collect(project: Project, logger: (String) -> Unit) {
         // Gets the SonarQube property of the project
@@ -86,28 +88,34 @@ class SonarQubeMeasuresCollectionServiceImpl(
 
     private fun getBranchPath(branch: Branch): String = branchDisplayNameService.getBranchDisplayName(branch)
 
-    override fun collect(build: Build, property: SonarQubeProperty): Ack {
+    override fun collect(build: Build, property: SonarQubeProperty): SonarQubeMeasuresCollectionResult {
         // Gets the validation stamp for this branch
         val vs = structureService.getValidationStampListForBranch(build.branch.id)
                 .find { it.name == property.validationStamp }
         // Collection for this build, only if there is a validation stamp being defined
         return if (vs != null) {
-            doCollect(build, property, getListOfMetrics(property), vs)
+            val result = doCollect(build, property, getListOfMetrics(property), vs)
+            if (logger.isDebugEnabled) {
+                logger.debug("build=${build.entityDisplayName},scan=${result.ok},result=${result.message}")
+            }
+            result
         } else {
-            Ack.NOK
+            SonarQubeMeasuresCollectionResult.error("Validation stamp ${property.validationStamp} cannot be found in ${build.branch.entityDisplayName}")
         }
     }
 
-    private fun doCollect(build: Build, property: SonarQubeProperty, metrics: List<String>, validationStamp: ValidationStamp): Ack {
-        // Gets the validation runs for this build and the validation stamp
-        val passed = structureService.getValidationRunsForBuildAndValidationStamp(
+    private fun doCollect(build: Build, property: SonarQubeProperty, metrics: List<String>, validationStamp: ValidationStamp): SonarQubeMeasuresCollectionResult {
+        // Gets the last validation run for this build and the validation stamp
+        val lastRun = structureService.getValidationRunsForBuildAndValidationStamp(
                 buildId = build.id,
                 validationStampId = validationStamp.id,
                 offset = 0,
                 count = 1
-        ).any { it.isPassed }
-        // If not passed, we don't want to go further
-        if (!passed) return Ack.NOK
+        ).firstOrNull()
+        // If no run, we don't want to go further
+                ?: return SonarQubeMeasuresCollectionResult.error("No validation run for ${validationStamp.name} can be found for ${build.entityDisplayName}")
+        // Gets the status of the last run
+        val status = lastRun.lastStatus.statusID.id
         // Client
         val client = clientFactory.getClient(property.configuration)
         // Name of the build
@@ -150,6 +158,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
                                 "project" to build.project.name,
                                 "branch" to build.branch.name,
                                 "build" to build.name,
+                                "status" to status,
                                 "version" to version,
                                 "measure" to name
                         ),
@@ -168,9 +177,9 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 )
             }
             // OK
-            return Ack.OK
+            return SonarQubeMeasuresCollectionResult.ok(safeMeasures)
         } else {
-            return Ack.NOK
+            return SonarQubeMeasuresCollectionResult.error("No SonarQube measure can be found for ${build.entityDisplayName}")
         }
     }
 

@@ -1,17 +1,19 @@
-String version = ''
-String gitCommit = ''
-String branchName = ''
-String projectName = 'ontrack'
-
 @Library("ontrack-jenkins-library@1.0.0") _
-
-boolean pr = false
-
-String buildImageVersion = "nemerosa/ontrack-build:1.0.1"
 
 pipeline {
 
-    agent none
+    environment {
+        ONTRACK_PROJECT_NAME = "ontrack"
+        ONTRACK_BRANCH_NAME = ontrackBranchName(BRANCH_NAME)
+        DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
+        CODECOV_TOKEN = credentials("CODECOV_TOKEN")
+        GPG_KEY = credentials("GPG_KEY")
+        GPG_KEY_RING = credentials("GPG_KEY_RING")
+        AGENT_IMAGE = "nemerosa/ontrack-build:1.0.2"
+        AGENT_OPTIONS = "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
+    }
+
+    agent any
 
     options {
         // General Jenkins job properties
@@ -20,10 +22,10 @@ pipeline {
         timestamps()
         // No durability
         durabilityHint('PERFORMANCE_OPTIMIZED')
-    }
-
-    environment {
-        DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
+        // ANSI colours
+        ansiColor('xterm')
+        // No concurrent builds
+        disableConcurrentBuilds()
     }
 
     stages {
@@ -31,27 +33,23 @@ pipeline {
         stage('Setup') {
             agent {
                 docker {
-                    image buildImageVersion
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             when {
                 beforeAgent true
                 not {
-                    branch 'master'
+                    anyOf {
+                        branch 'master'
+                        changeRequest()
+                    }
                 }
             }
             steps {
-                script {
-                    branchName = ontrackBranchName(BRANCH_NAME)
-                    echo "Ontrack branch name = ${branchName}"
-                    pr = BRANCH_NAME ==~ 'PR-.*'
-                }
-                script {
-                    if (pr) {
-                        echo "No Ontrack setup for PR."
-                    } else {
-                        echo "Ontrack setup for ${branchName}"
-                        ontrackBranchSetup(project: projectName, branch: branchName, script: """
+                echo "Ontrack setup for ${ONTRACK_BRANCH_NAME}"
+                ontrackBranchSetup(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, script: """
                             branch.config {
                                 gitBranch '${BRANCH_NAME}', [
                                     buildCommitLink: [
@@ -60,16 +58,15 @@ pipeline {
                                 ]
                             }
                         """)
-                    }
-                }
             }
         }
 
         stage('Build') {
             agent {
                 docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             when {
@@ -78,90 +75,74 @@ pipeline {
                     branch 'master'
                 }
             }
-            environment {
-                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
-            }
             steps {
-                sh '''\
-git checkout -B ${BRANCH_NAME}
-git clean -xfd
-'''
+                sh ''' git checkout -B ${BRANCH_NAME} && git clean -xfd '''
                 sh ''' ./gradlew clean versionDisplay versionFile'''
                 script {
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
-                    version = props.VERSION_DISPLAY
-                    gitCommit = props.VERSION_COMMIT
+                    env.VERSION = props.VERSION_DISPLAY
+                    env.GIT_COMMIT = props.VERSION_COMMIT
                     // If not a PR, create a build
-                    if (!pr) {
-                        ontrackBuild(project: projectName, branch: branchName, build: version, gitCommit: gitCommit)
+                    if (!(BRANCH_NAME ==~ /PR-.*/)) {
+                        ontrackBuild(project: ONTRACK_PROJECT_NAME, branch: ONTRACK_BRANCH_NAME, build: VERSION, gitCommit: GIT_COMMIT)
                     }
                 }
-                echo "Version = ${version}"
-                sh '''\
-./gradlew \\
-    test \\
-    build \\
-    integrationTest \\
-    codeCoverageReport \\
-    publishToMavenLocal \\
-    osPackages \\
-    dockerBuild \\
-    -Pdocumentation \\
-    -PbowerOptions='--allow-root' \\
-    -Dorg.gradle.jvmargs=-Xmx4096m \\
-    --stacktrace \\
-    --profile \\
-    --parallel \\
-    --console plain
-'''
+                echo "Version = ${VERSION}"
+                sh '''
+                    ./gradlew \\
+                        test \\
+                        build \\
+                        integrationTest \\
+                        codeCoverageReport \\
+                        publishToMavenLocal \\
+                        osPackages \\
+                        dockerBuild \\
+                        -Pdocumentation \\
+                        -PbowerOptions='--allow-root' \\
+                        -Psigning.keyId=${GPG_KEY_USR} \\
+                        -Psigning.password=${GPG_KEY_PSW} \\
+                        -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
+                        -Dorg.gradle.jvmargs=-Xmx4096m \\
+                        --stacktrace \\
+                        --parallel \\
+                        --console plain
+                '''
                 sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
-                sh """\
-echo "(*) Building the test extension..."
-cd ontrack-extension-test
-./gradlew \\
-    clean \\
-    build \\
-    -PontrackVersion=${version} \\
-    -PbowerOptions='--allow-root' \\
-    -Dorg.gradle.jvmargs=-Xmx2048m \\
-    --stacktrace \\
-    --profile \\
-    --console plain
-"""
+                sh '''
+                    echo "(*) Building the test extension..."
+                    cd ontrack-extension-test
+                    ./gradlew \\
+                        clean \\
+                        build \\
+                        -PontrackVersion=${VERSION} \\
+                        -PbowerOptions='--allow-root' \\
+                        -Dorg.gradle.jvmargs=-Xmx2048m \\
+                        --stacktrace \\
+                        --console plain
+                '''
                 echo "Pushing image to registry..."
-                sh """\
-echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-
-docker tag nemerosa/ontrack:${version} docker.nemerosa.net/nemerosa/ontrack:${version}
-docker tag nemerosa/ontrack-acceptance:${version} docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
-docker tag nemerosa/ontrack-extension-test:${version} docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
-
-docker push docker.nemerosa.net/nemerosa/ontrack:${version}
-docker push docker.nemerosa.net/nemerosa/ontrack-acceptance:${version}
-docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
-"""
+                sh '''
+                    docker tag nemerosa/ontrack:${VERSION} docker.nemerosa.net/nemerosa/ontrack:${VERSION}
+                    docker tag nemerosa/ontrack-acceptance:${VERSION} docker.nemerosa.net/nemerosa/ontrack-acceptance:${VERSION}
+                    docker tag nemerosa/ontrack-extension-test:${VERSION} docker.nemerosa.net/nemerosa/ontrack-extension-test:${VERSION}
+                '''
             }
             post {
                 always {
                     script {
                         def results = junit '**/build/test-results/**/*.xml'
                         // If not a PR, create a build validation stamp
-                        if (!pr) {
+                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
                             ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
                                     validationStamp: 'BUILD',
                                     testResults: results,
                             )
                         }
                     }
-                }
-                success {
-                    stash name: "delivery", includes: "build/distributions/ontrack-*-delivery.zip"
-                    stash name: "rpm", includes: "build/distributions/*.rpm"
-                    stash name: "debian", includes: "build/distributions/*.deb"
                 }
             }
         }
@@ -169,8 +150,9 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
         stage('Local acceptance tests') {
             agent {
                 docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             when {
@@ -179,30 +161,22 @@ docker push docker.nemerosa.net/nemerosa/ontrack-extension-test:${version}
                     branch 'master'
                 }
             }
-            environment {
-                ONTRACK_VERSION = "${version}"
-                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
-            }
             steps {
-                // Runs the acceptance tests
                 timeout(time: 25, unit: 'MINUTES') {
-                    sh """\
-#!/bin/bash
-set -e
-
-echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-
-echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
-"""
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            up \\
+                            --exit-code-from ontrack_acceptance
+                        '''
                 }
             }
             post {
                 success {
                     sh '''
-                        #!/bin/bash
-                        set -e
                         echo "Getting Jacoco coverage"
                         mkdir -p build/jacoco/
                         cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/acceptance.exec
@@ -212,22 +186,18 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
-                            -x classes \\
                             -PjacocoExecFile=build/jacoco/acceptance.exec \\
                             -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
                             --stacktrace \\
-                            --profile \\
                             --console plain
                     '''
                     // Collection of coverage in DSL
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
-                            -x classes \\
                             -PjacocoExecFile=build/jacoco/dsl.exec \\
                             -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
                             --stacktrace \\
-                            --profile \\
                             --console plain
                     '''
                     // Upload to Codecov
@@ -238,72 +208,68 @@ docker-compose --project-name local --file docker-compose.yml --file docker-comp
                 }
                 always {
                     sh '''
-                        #!/bin/bash
-                        set -e
-                        echo "Cleanup..."
                         rm -rf build/acceptance
                         mkdir -p build
                         cp -r ontrack-acceptance/src/main/compose/build build/acceptance
-                        cd ontrack-acceptance/src/main/compose
-                        docker-compose --project-name local --file docker-compose.yml --file docker-compose-jacoco.yml down --volumes
-                    '''
+                        '''
                     script {
                         def results = junit('build/acceptance/*.xml')
-                        if (!pr) {
+                        if (!(BRANCH_NAME ==~ /PR-.*/)) {
                             ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
                                     validationStamp: 'ACCEPTANCE',
                                     testResults: results,
                             )
                         }
                     }
                 }
+                cleanup {
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            down --volumes
+                    '''
+                }
             }
         }
 
         stage('Local extension tests') {
+            agent {
+                docker {
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
+                }
+            }
             when {
+                beforeAgent true
                 not {
                     branch "master"
                 }
-                beforeAgent true
-            }
-            agent {
-                docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                }
-            }
-            environment {
-                ONTRACK_VERSION = "${version}"
-                CODECOV_TOKEN = credentials("CODECOV_TOKEN")
             }
             steps {
                 timeout(time: 25, unit: 'MINUTES') {
                     // Cleanup
-                    sh """\
-rm -rf ontrack-acceptance/src/main/compose/build
-"""
+                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
                     // Launches the tests
-                    sh """\
-#!/bin/bash
-set -e
-
-echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-
-echo "Launching tests..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml --file docker-compose-jacoco.yml up --exit-code-from ontrack_acceptance
-"""
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name ext \\
+                            --file docker-compose-ext.yml \\
+                            --file docker-compose-jacoco.yml up \\
+                            --exit-code-from ontrack_acceptance
+                    '''
                 }
             }
             post {
                 success {
                     sh '''
-                        #!/bin/bash
-                        set -e
                         echo "Getting Jacoco coverage"
                         mkdir -p build/jacoco/
                         cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/extension.exec
@@ -312,11 +278,9 @@ docker-compose --project-name ext --file docker-compose-ext.yml --file docker-co
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
-                            -x classes \\
                             -PjacocoExecFile=build/jacoco/extension.exec \\
                             -PjacocoReportFile=build/reports/jacoco/extension.xml \\
                             --stacktrace \\
-                            --profile \\
                             --console plain
                     '''
                     // Upload to Codecov
@@ -325,99 +289,179 @@ docker-compose --project-name ext --file docker-compose-ext.yml --file docker-co
                     '''
                 }
                 always {
-                    sh """\
-echo "Cleanup..."
-mkdir -p build
-rm -rf build/extension
-cp -r ontrack-acceptance/src/main/compose/build build/extension
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name ext --file docker-compose-ext.yml --file docker-compose-jacoco.yml down --volumes
-"""
+                    sh '''
+                        mkdir -p build
+                        rm -rf build/extension
+                        cp -r ontrack-acceptance/src/main/compose/build build/extension
+                    '''
                     script {
                         def results = junit 'build/extension/*.xml'
                         ontrackValidate(
-                                project: projectName,
-                                branch: branchName,
-                                build: version,
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: ONTRACK_BRANCH_NAME,
+                                build: VERSION,
                                 validationStamp: 'EXTENSIONS',
                                 testResults: results,
                         )
                     }
                 }
+                cleanup {
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name ext \\
+                            --file docker-compose-ext.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            down --volumes
+                    '''
+                }
             }
         }
 
-
-        // We stop here for pull requests and feature branches
-
-        // OS tests + DO tests in parallel
-
-        stage('Platform tests') {
-            environment {
-                ONTRACK_VERSION = "${version}"
+        stage('Local Vault tests') {
+            agent {
+                docker {
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
+                }
             }
             when {
                 beforeAgent true
-                branch 'release/*'
+                not {
+                    branch "master"
+                }
             }
-            parallel {
-                // CentOS7
+            steps {
+                timeout(time: 25, unit: 'MINUTES') {
+                    // Cleanup
+                    sh ' rm -rf ontrack-acceptance/src/main/compose/build '
+                    // Launches the tests
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name vault \\
+                            --file docker-compose-vault.yml \\
+                            --file docker-compose-jacoco.yml up \\
+                            --exit-code-from ontrack_acceptance
+                    '''
+                }
+            }
+            post {
+                success {
+                    sh '''
+                        echo "Getting Jacoco coverage"
+                        mkdir -p build/jacoco/
+                        cp ontrack-acceptance/src/main/compose/jacoco/jacoco.exec build/jacoco/vault.exec
+                    '''
+                    // Collection of coverage in Docker
+                    sh '''
+                        ./gradlew \\
+                            codeDockerCoverageReport \\
+                            -PjacocoExecFile=build/jacoco/vault.exec \\
+                            -PjacocoReportFile=build/reports/jacoco/vault.xml \\
+                            --stacktrace \\
+                            --console plain
+                    '''
+                    // Upload to Codecov
+                    sh '''
+                        curl -s https://codecov.io/bash | bash -s -- -c -F vault -f build/reports/jacoco/vault.xml
+                    '''
+                }
+                always {
+                    sh '''
+                        mkdir -p build
+                        rm -rf build/vault
+                        cp -r ontrack-acceptance/src/main/compose/build build/vault
+                    '''
+                    script {
+                        def results = junit 'build/vault/*.xml'
+                        ontrackValidate(
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: ONTRACK_BRANCH_NAME,
+                                build: VERSION,
+                                validationStamp: 'VAULT',
+                                testResults: results,
+                        )
+                    }
+                }
+                cleanup {
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose \\
+                            --project-name vault \\
+                            --file docker-compose-vault.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            down --volumes
+                    '''
+                }
+            }
+        }
+
+        // We stop here for pull requests and feature branches
+
+        // OS tests
+
+        stage('Platform tests') {
+            when {
+                beforeAgent true
+                anyOf {
+                    branch 'release/*'
+                }
+            }
+            stages {
                 stage('CentOS7') {
                     agent {
                         docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                            image AGENT_IMAGE
+                            reuseNode true
+                            args AGENT_OPTIONS
                         }
                     }
                     steps {
-                        unstash name: "rpm"
                         timeout(time: 25, unit: 'MINUTES') {
-                            sh """\
-#!/bin/bash
-set -e
-
-echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-
-echo "Preparing environment..."
-DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
-rm -f \${DOCKER_DIR}/*.rpm
-cp build/distributions/*rpm \${DOCKER_DIR}/ontrack.rpm
-
-echo "Launching test environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
-
-echo "Launching Ontrack in CentOS environment..."
-CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
-echo "... for container \${CONTAINER}"
-docker container exec \${CONTAINER} /etc/init.d/ontrack start
-
-echo "Launching tests..."
-docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
-"""
+                            sh '''
+                                echo "Preparing environment..."
+                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/centos/7/docker
+                                rm -f ${DOCKER_DIR}/*.rpm
+                                cp build/distributions/*rpm ${DOCKER_DIR}/ontrack.rpm
+                                
+                                echo "Launching test environment..."
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --build -d ontrack
+                                
+                                echo "Launching Ontrack in CentOS environment..."
+                                CONTAINER=`docker-compose --project-name centos --file docker-compose-centos-7.yml ps -q ontrack`
+                                echo "... for container ${CONTAINER}"
+                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                
+                                echo "Launching tests..."
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml up --exit-code-from ontrack_acceptance ontrack_acceptance
+                            '''
                         }
                     }
                     post {
                         always {
-                            sh """\
-#!/bin/bash
-set -e
-echo "Cleanup..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/centos
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
-"""
+                            sh '''
+                                mkdir -p build
+                                cp -r ontrack-acceptance/src/main/compose/build build/centos
+                                '''
                             script {
                                 def results = junit 'build/centos/*.xml'
                                 ontrackValidate(
-                                        project: projectName,
-                                        branch: branchName,
-                                        build: version,
+                                        project: ONTRACK_PROJECT_NAME,
+                                        branch: ONTRACK_BRANCH_NAME,
+                                        build: VERSION,
                                         validationStamp: 'ACCEPTANCE.CENTOS.7',
                                         testResults: results,
                                 )
                             }
+                        }
+                        cleanup {
+                            sh '''
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name centos --file docker-compose-centos-7.yml down --volumes
+                                '''
                         }
                     }
                 }
@@ -425,156 +469,55 @@ docker-compose --project-name centos --file docker-compose-centos-7.yml down --v
                 stage('Debian') {
                     agent {
                         docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                            image AGENT_IMAGE
+                            reuseNode true
+                            args AGENT_OPTIONS
                         }
                     }
                     steps {
-                        unstash name: "debian"
                         timeout(time: 25, unit: 'MINUTES') {
-                            sh """\
-#!/bin/bash
-set -e
-
-echo \${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username \${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-
-echo "Preparing environment..."
-DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
-rm -f \${DOCKER_DIR}/*.deb
-cp build/distributions/*.deb \${DOCKER_DIR}/ontrack.deb
-
-echo "Launching test environment..."
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
-
-echo "Launching Ontrack in Debian environment..."
-CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
-echo "... for container \${CONTAINER}"
-docker container exec \${CONTAINER} /etc/init.d/ontrack start
-
-echo "Launching tests..."
-docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
-"""
+                            sh '''
+                                echo "Preparing environment..."
+                                DOCKER_DIR=ontrack-acceptance/src/main/compose/os/debian/docker
+                                rm -f ${DOCKER_DIR}/*.deb
+                                cp build/distributions/*.deb ${DOCKER_DIR}/ontrack.deb
+                                
+                                echo "Launching test environment..."
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name debian --file docker-compose-debian.yml up --build -d ontrack
+                                
+                                echo "Launching Ontrack in Debian environment..."
+                                CONTAINER=`docker-compose --project-name debian --file docker-compose-debian.yml ps -q ontrack`
+                                echo "... for container ${CONTAINER}"
+                                docker container exec ${CONTAINER} /etc/init.d/ontrack start
+                                
+                                echo "Launching tests..."
+                                docker-compose --project-name debian --file docker-compose-debian.yml up --build --exit-code-from ontrack_acceptance ontrack_acceptance
+                                '''
                         }
                     }
                     post {
                         always {
-                            sh """\
-#!/bin/bash
-set -e
-echo "Cleanup..."
-mkdir -p build/debian
-cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
-cd ontrack-acceptance/src/main/compose
-docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
-"""
+                            sh '''
+                                mkdir -p build/debian
+                                cp -r ontrack-acceptance/src/main/compose/build/* build/debian/
+                                '''
                             script {
                                 def results = junit 'build/debian/*.xml'
                                 ontrackValidate(
-                                        project: projectName,
-                                        branch: branchName,
-                                        build: version,
+                                        project: ONTRACK_PROJECT_NAME,
+                                        branch: ONTRACK_BRANCH_NAME,
+                                        build: VERSION,
                                         validationStamp: 'ACCEPTANCE.DEBIAN',
                                         testResults: results,
                                 )
                             }
                         }
-                    }
-                }
-                // Digital Ocean
-                stage('Digital Ocean') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
-                    when {
-                        // FIXME #683 Disabled until fixed
-                        expression { false }
-                    }
-                    environment {
-                        DROPLET_NAME = "ontrack-acceptance-${version}"
-                        DO_TOKEN = credentials("DO_NEMEROSA_JENKINS2_BUILD")
-                    }
-                    steps {
-                        timeout(time: 60, unit: 'MINUTES') {
-                            sh '''\
-#!/bin/bash
-
-echo "(*) Cleanup..."
-rm -rf ontrack-acceptance/src/main/compose/build
-
-echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-docker-machine rm --force ${DROPLET_NAME} > /dev/null
-
-# Failing on first error from now on
-set -e
-
-echo "(*) Creating ${DROPLET_NAME} droplet..."
-docker-machine create \\
-    --driver=digitalocean \\
-    --digitalocean-access-token=${DO_TOKEN} \\
-    --digitalocean-region=ams3 \\
-    --digitalocean-size=1gb \\
-    --digitalocean-backups=false \\
-    ${DROPLET_NAME}
-
-echo "(*) Gets ${DROPLET_NAME} droplet IP..."
-DROPLET_IP=`docker-machine ip ${DROPLET_NAME}`
-echo "Droplet IP = ${DROPLET_IP}"
-
-echo "(*) Target Ontrack application..."
-export ONTRACK_ACCEPTANCE_TARGET_URL="http://${DROPLET_IP}:8080"
-
-echo "(*) Launching the remote Ontrack ecosystem..."
-eval $(docker-machine env --shell bash ${DROPLET_NAME})
-echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-server.yml \\
-    --project-name ontrack \\
-    up -d
-
-echo "(*) Running the tests..."
-eval $(docker-machine env --shell bash --unset)
-echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name do \\
-    up --exit-code-from ontrack_acceptance
-
-'''
-                        }
-                    }
-                    post {
-                        always {
-                            sh '''\
-#!/bin/bash
-
-echo "(*) Copying the test results..."
-mkdir -p build
-rm -rf build/do
-cp -r ontrack-acceptance/src/main/compose/build build/do
-
-echo "(*) Removing the test environment..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-do-client.yml \\
-    --project-name do \\
-    down
-
-echo "(*) Removing any previous machine: ${DROPLET_NAME}..."
-docker-machine rm --force ${DROPLET_NAME}
-'''
-                            script {
-                                def results = junit 'build/do/*.xml'
-                                ontrackValidate(
-                                        project: projectName,
-                                        branch: branchName,
-                                        build: version,
-                                        validationStamp: 'ACCEPTANCE.DO',
-                                        testResults: results,
-                                )
-                            }
+                        cleanup {
+                            sh '''
+                                cd ontrack-acceptance/src/main/compose
+                                docker-compose --project-name debian --file docker-compose-debian.yml down --volumes
+                                '''
                         }
                     }
                 }
@@ -584,110 +527,69 @@ docker-machine rm --force ${DROPLET_NAME}
         // Publication
 
         stage('Publication') {
+            agent {
+                docker {
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
+                }
+            }
             when {
                 beforeAgent true
-                branch 'release/*'
+                anyOf {
+                    branch 'release/*'
+                    branch 'feature/*publication'
+                }
             }
-            environment {
-                ONTRACK_VERSION = "${version}"
-            }
-            parallel {
+            stages {
                 stage('Docker Hub') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
                     environment {
                         DOCKER_HUB = credentials("DOCKER_HUB")
                     }
                     steps {
                         echo "Docker push"
-                        sh '''\
-#!/bin/bash
-set -e
-
-echo "Making sure the images are available on this node..."
-
-echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
-
-echo "Publishing in Docker Hub..."
-
-echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-
-docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION}
-
-docker image push nemerosa/ontrack:${ONTRACK_VERSION}
-'''
+                        sh '''
+                            echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
+                            docker image push nemerosa/ontrack:${VERSION}
+                        '''
                     }
                     post {
                         always {
                             ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'DOCKER.HUB',
-                                    buildResult: currentBuild.result,
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
+                                    validationStamp: 'DOCKER.HUB'
                             )
                         }
                     }
                 }
-                stage('Maven publication') {
-                    agent {
-                        docker {
-                            image buildImageVersion
-                            args "--volume /var/run/docker.sock:/var/run/docker.sock"
-                        }
-                    }
+                stage('Maven Central') {
                     environment {
-                        ONTRACK_COMMIT = "${gitCommit}"
-                        ONTRACK_BRANCH = "${branchName}"
-                        GPG_KEY = credentials("GPG_KEY")
-                        GPG_KEY_RING = credentials("GPG_KEY_RING")
                         OSSRH = credentials("OSSRH")
                     }
                     steps {
-                        echo "Maven publication"
-
-                        unstash name: "delivery"
-                        sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
-
-                        sh '''\
-#!/bin/bash
-set -e
-
-./gradlew \\
-    --build-file publication.gradle \\
-    --info \\
-    --profile \\
-    --console plain \\
-    --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION} \\
-    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
-    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
-    -Psigning.keyId=${GPG_KEY_USR} \\
-    -Psigning.password=${GPG_KEY_PSW} \\
-    -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-    -PossrhUser=${OSSRH_USR} \\
-    -PossrhPassword=${OSSRH_PSW} \\
-    publicationMaven
-'''
+                        sh '''
+                            ./gradlew \\
+                                publishToMavenCentral \\
+                                -Pdocumentation \\
+                                -Psigning.keyId=${GPG_KEY_USR} \\
+                                -Psigning.password=${GPG_KEY_PSW} \\
+                                -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
+                                -PossrhUsername=${OSSRH_USR} \\
+                                -PossrhPassword=${OSSRH_PSW} \\
+                                --info \\
+                                --console plain \\
+                                --stacktrace
+                        '''
                     }
                     post {
                         always {
                             ontrackValidate(
-                                    project: projectName,
-                                    branch: branchName,
-                                    build: version,
-                                    validationStamp: 'MAVEN.CENTRAL',
-                                    buildResult: currentBuild.result,
+                                    project: ONTRACK_PROJECT_NAME,
+                                    branch: ONTRACK_BRANCH_NAME,
+                                    build: VERSION,
+                                    validationStamp: 'MAVEN.CENTRAL'
                             )
                         }
                     }
@@ -700,66 +602,47 @@ set -e
         stage('Release') {
             agent {
                 docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             environment {
-                ONTRACK_VERSION = "${version}"
-                ONTRACK_COMMIT = "${gitCommit}"
-                ONTRACK_BRANCH = "${branchName}"
-                GITHUB = credentials("GITHUB_NEMEROSA_JENKINS2")
+                GITHUB_TOKEN = credentials("JENKINS_GITHUB_TOKEN")
             }
             when {
                 beforeAgent true
-                branch 'release/*'
+                anyOf {
+                    branch 'release/*'
+                }
             }
             steps {
-                echo "Release"
-
-                unstash name: "delivery"
-                unstash name: "rpm"
-                unstash name: "debian"
-                sh '''\
-#!/bin/bash
-set -e
-unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-'''
-
-                sh '''\
-#!/bin/bash
-set -e
-
-./gradlew \\
-    --build-file publication.gradle \\
-    --info \\
-    --profile \\
-    --console plain \\
-    --stacktrace \\
-    -PontrackVersion=${ONTRACK_VERSION} \\
-    -PontrackVersionCommit=${ONTRACK_COMMIT} \\
-    -PontrackReleaseBranch=${ONTRACK_BRANCH} \\
-    -PgitHubUser=${GITHUB_USR} \\
-    -PgitHubPassword=${GITHUB_PSW} \\
-    publicationRelease
-'''
+                sh '''
+                    ./gradlew \\
+                        --info \\
+                        --console plain \\
+                        --stacktrace \\
+                        -PgitHubToken=${GITHUB_TOKEN} \\
+                        -PgitHubCommit=${GIT_COMMIT} \\
+                        -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
+                        githubRelease
+                '''
 
             }
             post {
                 always {
                     ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
                             validationStamp: 'GITHUB.RELEASE',
                     )
                 }
                 success {
                     ontrackPromote(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
                             promotionLevel: 'RELEASE',
                     )
                 }
@@ -771,36 +654,29 @@ set -e
         stage('Documentation') {
             agent {
                 docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             environment {
-                ONTRACK_VERSION = "${version}"
                 AMS3_DELIVERY = credentials("AMS3_DELIVERY")
             }
             when {
                 beforeAgent true
-                branch 'release/*'
+                anyOf {
+                    branch 'release/*'
+                    branch 'develop'
+                }
             }
             steps {
-                echo "Release"
-
-                unstash name: "delivery"
-                sh '''\
-                    unzip -n build/distributions/ontrack-${ONTRACK_VERSION}-delivery.zip -d ${WORKSPACE}
-                    unzip -n ${WORKSPACE}/ontrack-publication.zip -d publication
-                '''
-
-                sh '''\
-                    ./gradlew \\
-                        --build-file publication.gradle \\
-                        --info \\
-                        --profile \\
-                        --console plain \\
-                        --stacktrace \\
-                        releaseDocPrepare
-                '''
+                script {
+                    if (BRANCH_NAME == 'develop') {
+                        env.DOC_DIR = 'develop'
+                    } else {
+                        env.DOC_DIR = env.VERSION
+                    }
+                }
 
                 sh '''
                     s3cmd \\
@@ -810,7 +686,7 @@ set -e
                         --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
                         put \\
                         build/site/release/* \\
-                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
+                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
                         --acl-public \\
                         --add-header=Cache-Control:max-age=86400 \\
                         --recursive
@@ -820,9 +696,9 @@ set -e
             post {
                 always {
                     ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
                             validationStamp: 'DOCUMENTATION',
                     )
                 }
@@ -832,13 +708,12 @@ set -e
         // Merge to master (for latest release only)
 
         stage('Merge to master') {
-            agent any
             when {
                 beforeAgent true
                 allOf {
                     branch "release/3.*"
                     expression {
-                        ontrackGetLastBranch(project: projectName, pattern: 'release-3\\..*') == branchName
+                        ontrackGetLastBranch(project: ONTRACK_PROJECT_NAME, pattern: 'release-3\\..*') == ONTRACK_BRANCH_NAME
                     }
                 }
             }
@@ -858,9 +733,9 @@ set -e
             post {
                 always {
                     ontrackValidate(
-                            project: projectName,
-                            branch: branchName,
-                            build: version,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: ONTRACK_BRANCH_NAME,
+                            build: VERSION,
                             validationStamp: 'MERGE',
                     )
                 }
@@ -870,7 +745,6 @@ set -e
         // Master setup
 
         stage('Master setup') {
-            agent any
             when {
                 beforeAgent true
                 branch 'master'
@@ -885,8 +759,8 @@ set -e
                     // Trace
                     echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
                     // Version components
-                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)\.\d.*/)
-                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)(?:-beta)?\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+(?:-beta)?\.\d.*/)
                     echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
                     echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
                     // Gets the corresponding branch
@@ -901,13 +775,13 @@ set -e
                                 }
                             ''',
                             bindings: [
-                                    'project': projectName,
+                                    'project': ONTRACK_PROJECT_NAME,
                                     'build'  : env.ONTRACK_VERSION as String
                             ],
                     )
-                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
+                    env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
                     // Trace
-                    echo "ONTRACK_BRANCH_NAME=${env.ONTRACK_BRANCH_NAME}"
+                    echo "ONTRACK_TARGET_BRANCH_NAME=${env.ONTRACK_TARGET_BRANCH_NAME}"
                 }
             }
         }
@@ -917,7 +791,9 @@ set -e
         stage('Latest documentation') {
             agent {
                 docker {
-                    image buildImageVersion
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             when {
@@ -944,8 +820,8 @@ set -e
             post {
                 always {
                     ontrackValidate(
-                            project: projectName,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'DOCUMENTATION.LATEST',
                     )
@@ -958,11 +834,13 @@ set -e
         stage('Docker Latest') {
             agent {
                 docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             when {
+                beforeAgent true
                 branch "master"
             }
             environment {
@@ -972,13 +850,12 @@ set -e
                 sh '''\
                     echo "Making sure the images are available on this node..."
 
-                    echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-                    docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
+                    docker image pull nemerosa/ontrack:${ONTRACK_VERSION}
 
                     echo "Tagging..."
 
-                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
+                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
+                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
 
                     echo "Publishing latest versions in Docker Hub..."
 
@@ -991,8 +868,8 @@ set -e
             post {
                 always {
                     ontrackValidate(
-                            project: projectName,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'DOCKER.LATEST',
                     )
@@ -1005,7 +882,9 @@ set -e
         stage('Site generation') {
             agent {
                 docker {
-                    image buildImageVersion
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             environment {
@@ -1033,8 +912,8 @@ set -e
             post {
                 always {
                     ontrackValidate(
-                            project: projectName,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'SITE',
                     )
@@ -1047,7 +926,9 @@ set -e
         stage('Production') {
             agent {
                 docker {
-                    image buildImageVersion
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             when {
@@ -1058,24 +939,20 @@ set -e
                 ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
             }
             steps {
-                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
+                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_TARGET_BRANCH_NAME} in production"
                 // Running the deployment
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
                         sshagent(credentials: ['ONTRACK_SSH_KEY']) {
-                            sh '''\
-#!/bin/bash
-
-set -e
-
-SSH_OPTIONS=StrictHostKeyChecking=no
-
-SSH_HOST=${ONTRACK_IP}
-
-scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
-ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
-
-'''
+                            sh '''
+                                SSH_OPTIONS=StrictHostKeyChecking=no
+                                
+                                SSH_HOST=${ONTRACK_IP}
+                                
+                                scp -o ${SSH_OPTIONS} compose/docker-compose-prod.yml root@${SSH_HOST}:/root
+                                ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONTRACK_POSTGRES_USER=${ONTRACK_POSTGRES_USR}" "ONTRACK_POSTGRES_PASSWORD=${ONTRACK_POSTGRES_PSW}" docker-compose --project-name prod --file /root/docker-compose-prod.yml up -d
+                                
+                                '''
                         }
                     }
                 }
@@ -1087,8 +964,9 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
         stage('Production tests') {
             agent {
                 docker {
-                    image buildImageVersion
-                    args "--volume /var/run/docker.sock:/var/run/docker.sock"
+                    image AGENT_IMAGE
+                    reuseNode true
+                    args AGENT_OPTIONS
                 }
             }
             when {
@@ -1100,42 +978,37 @@ ssh -o ${SSH_OPTIONS} root@${SSH_HOST} "ONTRACK_VERSION=${ONTRACK_VERSION}" "ONT
             }
             steps {
                 timeout(time: 30, unit: 'MINUTES') {
-                    sh '''\
-#!/bin/bash
-set -e
-
-echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-
-echo "(*) Launching the tests..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-    --project-name production \\
-    up --exit-code-from ontrack_acceptance
-'''
+                    sh '''
+                        echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
+                        
+                        echo "(*) Launching the tests..."
+                        docker-compose \\
+                            --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+                            --project-name production \\
+                            up --exit-code-from ontrack_acceptance
+                        '''
                 }
             }
             post {
                 always {
-                    sh '''\
-#!/bin/bash
-
-echo "(*) Copying the test results..."
-mkdir -p build
-cp -r ontrack-acceptance/src/main/compose/build build/production
-
-echo "(*) Removing the test environment..."
-docker-compose \\
-    --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
-    --project-name production \\
-    down
-
-'''
+                    sh '''
+                        echo "(*) Copying the test results..."
+                        mkdir -p build
+                        cp -r ontrack-acceptance/src/main/compose/build build/production
+                        
+                        echo "(*) Removing the test environment..."
+                        docker-compose \\
+                            --file ontrack-acceptance/src/main/compose/docker-compose-prod-client.yml \\
+                            --project-name production \\
+                            down
+                        
+                        '''
                     archiveArtifacts 'build/production/**'
                     script {
                         def results = junit 'build/production/*.xml'
                         ontrackValidate(
-                                project: projectName,
-                                branch: env.ONTRACK_BRANCH_NAME as String,
+                                project: ONTRACK_PROJECT_NAME,
+                                branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                                 build: env.ONTRACK_VERSION as String,
                                 validationStamp: 'ONTRACK.SMOKE',
                                 testResults: results,
@@ -1144,8 +1017,8 @@ docker-compose \\
                 }
                 success {
                     ontrackPromote(
-                            project: projectName,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            project: ONTRACK_PROJECT_NAME,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             promotionLevel: 'ONTRACK',
                     )
@@ -1164,6 +1037,6 @@ String extractFromVersion(String version, String pattern) {
     if (matcher.matches()) {
         return matcher.group(1)
     } else {
-        throw new IllegalAccessException("Version $version does not match pattern: $pattern")
+        error("Version $version does not match pattern: $pattern")
     }
 }

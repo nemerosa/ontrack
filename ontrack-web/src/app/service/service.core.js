@@ -15,7 +15,8 @@ angular.module('ot.service.core', [
             $rootScope.view = {
                 title: '',
                 commands: [],
-                breadcrumbs: self.homeBreadcrumbs()
+                breadcrumbs: self.homeBreadcrumbs(),
+                disableSearch: false
             };
             return $rootScope.view;
         };

@@ -7,14 +7,23 @@ services:
       POSTGRES_DB      : ontrack
       POSTGRES_USER    : ontrack
       POSTGRES_PASSWORD: ontrack
+   elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+      ports:
+         - "9200:9200"
+         - "9300:9300"
+      environment:
+         - "discovery.type=single-node"
    influxdb:
     image: influxdb:1.5.2
    ontrack:
-      image: "docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
+      image: "nemerosa/ontrack:${VERSION:-latest}"
       depends_on:
          postgres:
             condition: service_started
          influxdb:
+           condition: service_started
+         elasticsearch:
            condition: service_started
       environment:
          PROFILE: acceptance
@@ -24,12 +33,16 @@ services:
          # InfluxDB being enabled
          ONTRACK_INFLUXDB_ENABLED: "true"
          ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
+         # Elastic search
+         ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
+         ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
+         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
       environment:
          JAVA_OPTS: "-Xmx3072m -Xms3072m"
    ontrack_acceptance:
-      image: "docker.nemerosa.net/nemerosa/ontrack-acceptance:${ONTRACK_VERSION:-latest}"
+      image: "nemerosa/ontrack-acceptance:${VERSION:-latest}"
       depends_on:
          ontrack:
             condition: service_healthy

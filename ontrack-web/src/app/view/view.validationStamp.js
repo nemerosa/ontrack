@@ -25,6 +25,9 @@ angular.module('ot.view.validationStamp', [
             size: pageSize
         };
 
+        // Range of validation runs
+        $scope.selectedValidationRuns = {};
+
         // Query for the validation stamp
         const query = `
             query PaginatedValidationRuns($validationStampId: Int!, $offset: Int = 0, $size: Int = 20) {
@@ -58,6 +61,12 @@ angular.module('ot.view.validationStamp', [
                       project {
                         id
                         name
+                      }
+                      buildDiffActions {
+                        id
+                        name
+                        type
+                        uri
                       }
                     }
                     links {
@@ -216,9 +225,22 @@ angular.module('ot.view.validationStamp', [
 
         // Switching the page
         $scope.switchPage = function (pageRequest) {
+            $scope.selectedValidationRuns.first = undefined;
+            $scope.selectedValidationRuns.second = undefined;
             queryVariables.offset = pageRequest.offset;
             queryVariables.size = pageSize;
             loadValidationStamp();
+        };
+
+        // Diff between two validation runs
+        $scope.validationRunDiff = function (action) {
+            if ($scope.selectedValidationRuns.first && $scope.selectedValidationRuns.second) {
+                $state.go(action.id, {
+                    branch: $scope.validationStamp.branch.id,
+                    from: $scope.selectedValidationRuns.first.build.id,
+                    to: $scope.selectedValidationRuns.second.build.id
+                });
+            }
         };
 
     })

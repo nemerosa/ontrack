@@ -105,6 +105,11 @@ interface GitRepositoryClient {
     fun <T> forEachCommitFrom(branch: String, commit: String, include: Boolean = true, code: (RevCommit) -> T?): T?
 
     /**
+     * Loops through all commmits of a repository.
+     */
+    fun forEachCommit(code: (GitCommit) -> Unit)
+
+    /**
      * Gets the earliest commit that contains the commit.
      *
      *
@@ -162,6 +167,11 @@ interface GitRepositoryClient {
     fun reset()
 
     /**
+     * Checks if the repository is ready to be used
+     */
+    val isReady: Boolean
+
+    /**
      * Checks the log history and returns `true` if the token can be found.
      *
      * @param token Expression to be searched for
@@ -183,4 +193,5 @@ interface GitRepositoryClient {
      * whose message matches the given [regex] regular expression.
      */
     fun getLastCommitForExpression(regex: String): String?
+
 }

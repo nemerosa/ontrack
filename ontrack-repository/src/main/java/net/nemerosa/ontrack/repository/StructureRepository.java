@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -19,6 +21,15 @@ public interface StructureRepository {
 
     List<Project> getProjectList();
 
+    /**
+     * Looks for a project using its ID.
+     * @param projectId ID of the project
+     * @return Project or <code>null</code> if not found
+     */
+    @Nullable
+    Project findProjectByID(ID projectId);
+
+    @NotNull
     Project getProject(ID projectId);
 
     Optional<Project> getProjectByName(String project);
@@ -29,6 +40,15 @@ public interface StructureRepository {
 
     // Branches
 
+    /**
+     * Looks for a branch using its ID.
+     * @param branchId ID of the project
+     * @return Branch or `null` if not found
+     */
+    @Nullable
+    Branch findBranchByID(ID branchId);
+
+    @NotNull
     Branch getBranch(ID branchId);
 
     Optional<Branch> getBranchByName(String project, String branch);
@@ -47,6 +67,15 @@ public interface StructureRepository {
 
     Build saveBuild(Build build);
 
+    /**
+     * Looks for a build using its ID.
+     * @param buildId ID of the build
+     * @return Build or `null` if not found
+     */
+    @Nullable
+    Build findBuildByID(ID buildId);
+
+    @NotNull
     Build getBuild(ID buildId);
 
     Optional<Build> getBuildByName(String project, String branch, String build);
@@ -121,6 +150,11 @@ public interface StructureRepository {
 
     boolean isLinkedTo(ID id, String project, String buildPattern);
 
+    /**
+     * Loops over ALL the build links. Use this method with care, mostly for external indexation.
+     */
+    void forEachBuildLink(BiConsumer<Build,Build> code);
+
     // Promotion levels
 
     List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);
@@ -128,6 +162,14 @@ public interface StructureRepository {
     PromotionLevel newPromotionLevel(PromotionLevel promotionLevel);
 
     PromotionLevel getPromotionLevel(ID promotionLevelId);
+
+    /**
+     * Looks for a promotion level using its ID.
+     * @param promotionLevelId ID of the promotion level
+     * @return Promotion level or `null` if not found
+     */
+    @Nullable
+    PromotionLevel findPromotionLevelByID(ID promotionLevelId);
 
     Optional<PromotionLevel> getPromotionLevelByName(String project, String branch, String promotionLevel);
 
@@ -148,6 +190,14 @@ public interface StructureRepository {
     PromotionRun newPromotionRun(PromotionRun promotionRun);
 
     PromotionRun getPromotionRun(ID promotionRunId);
+
+    /**
+     * Looks for a promotion run using its ID.
+     * @param promotionRunId ID of the promotion run
+     * @return Promotion run or `null` if not found
+     */
+    @Nullable
+    PromotionRun findPromotionRunByID(ID promotionRunId);
 
     Ack deletePromotionRun(ID promotionRunId);
 
@@ -181,6 +231,14 @@ public interface StructureRepository {
 
     ValidationStamp getValidationStamp(ID validationStampId);
 
+    /**
+     * Looks for a validation stamp using its ID.
+     * @param validationStampId ID of the validation stamp
+     * @return Validation stamp or `null` if not found
+     */
+    @Nullable
+    ValidationStamp findValidationStampByID(ID validationStampId);
+
     Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp);
 
     Optional<ValidationStamp> getValidationStampByName(Branch branch, String validationStamp);
@@ -199,9 +257,25 @@ public interface StructureRepository {
 
     // Validation runs
 
+    /**
+     * Looping over ALL validation runs.
+     * @param validationRunStatusService Run status mapping function (provided by caller)
+     * @param processing Processing code
+     */
+    void forEachValidationRun(Function<String, ValidationRunStatusID> validationRunStatusService, Consumer<ValidationRun> processing);
+
     ValidationRun newValidationRun(ValidationRun validationRun, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
+
+    /**
+     * Looks for a validation run using its ID.
+     *
+     * @param validationRunId ID of the validation run
+     * @return Validation run or `null` if not found
+     */
+    @Nullable
+    ValidationRun findValidationRunByID(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     /**
      * @deprecated Use {@link #getValidationRunsForBuild(Build, int, int, Function)} instead.

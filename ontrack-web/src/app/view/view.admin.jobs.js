@@ -228,5 +228,11 @@ angular.module('ot.view.admin.jobs', [
             });
         };
 
+        $scope.jobKeysVisible = false;
+
+        $scope.toggleJobKeys = () => {
+            $scope.jobKeysVisible = !$scope.jobKeysVisible;
+        };
+
     })
 ;

@@ -28,7 +28,3 @@ tasks.getByName<BootJar>("bootJar") {
     launchScript()
     archiveClassifier.set("executable")
 }
-
-rootProject.tasks.named<Zip>("publicationPackage") {
-    from(project(":ontrack-dsl-shell").tasks["bootJar"])
-}

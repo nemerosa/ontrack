@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.model.events.BuildLinkListenerService;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.repository.StatsRepository;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +42,7 @@ public class StructureServiceImplTest {
         ProjectFavouriteService projectFavouriteService = mock(ProjectFavouriteService.class);
         ValidationDataTypeService validationDataTypeService = mock(ValidationDataTypeService.class);
         PromotionRunCheckService promotionRunCheckService = mock(PromotionRunCheckService.class);
+        StatsRepository statsRepository = mock(StatsRepository.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
@@ -52,7 +55,9 @@ public class StructureServiceImplTest {
                 predefinedValidationStampService,
                 decorationService,
                 projectFavouriteService,
-                promotionRunCheckService
+                promotionRunCheckService,
+                statsRepository,
+                mock(BuildLinkListenerService.class)
         );
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));

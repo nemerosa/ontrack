@@ -207,4 +207,14 @@ interface GitService : SCMService {
      * Converts a raw [GitCommit] into an annotated [GitUICommit]
      */
     fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit
+
+    /**
+     * Loops over the commits of a configuration
+     */
+    fun forEachCommit(gitConfiguration: GitConfiguration, code: (GitCommit) -> Unit)
+
+    /**
+     * Checks if the repository is ready to be used.
+     */
+    fun isRepositorySynched(gitConfiguration: GitConfiguration): Boolean
 }

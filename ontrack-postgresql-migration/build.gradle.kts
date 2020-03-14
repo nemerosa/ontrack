@@ -1,5 +1,9 @@
 apply(plugin = "org.springframework.boot")
 
+plugins {
+    `java-library`
+}
+
 dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter")
@@ -12,4 +16,20 @@ dependencies {
     runtimeOnly(project(":ontrack-database"))
     runtimeOnly("com.h2database:h2:1.4.197")
 
+}
+
+val bootJar = tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar")
+
+tasks.named("assemble") {
+    dependsOn(bootJar)
+}
+
+publishing {
+    publications {
+        named<MavenPublication>("mavenCustom") {
+            artifact(bootJar) {
+                classifier = "app"
+            }
+        }
+    }
 }

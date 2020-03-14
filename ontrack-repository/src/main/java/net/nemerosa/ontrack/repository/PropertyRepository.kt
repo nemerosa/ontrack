@@ -28,4 +28,9 @@ interface PropertyRepository {
     fun findBuildByBranchAndSearchkey(branchId: ID, typeName: String, searchArguments: PropertySearchArguments?): ID?
 
     fun findByEntityTypeAndSearchkey(entityType: ProjectEntityType, typeName: String, searchArguments: PropertySearchArguments?): List<ID>
+
+    /**
+     * Loops over all the properties of a given type.
+     */
+    fun forEachEntityWithProperty(typeName: String, consumer: (TProperty) -> Unit)
 }

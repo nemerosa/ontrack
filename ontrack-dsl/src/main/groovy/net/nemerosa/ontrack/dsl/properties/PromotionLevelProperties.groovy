@@ -43,7 +43,7 @@ class PromotionLevelProperties extends ProjectEntityProperties {
         autoPromotion(validationStamps as List)
     }
 
-    @DSLMethod(value = "Sets the validation stamps participating into the auto promotion, and sets the include/exclude settings.", count = 3)
+    @DSLMethod(id="auto-promotion-patterns", value = "Sets the validation stamps participating into the auto promotion, and sets the include/exclude settings.", count = 3)
     def autoPromotion(Collection<String> validationStamps, String include = '', String exclude = '') {
         property(
                 'net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType',

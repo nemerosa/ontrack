@@ -13,10 +13,10 @@ open class OntrackChangeLog : AbstractOntrackTask() {
     var ontrackReleasePromotionLevel: String = "RELEASE"
 
     @Input
-    var ontrackReleaseBranch: String = project.properties["ontrackReleaseBranch"] as String
+    var ontrackReleaseBranch: String = ""
 
     @Input
-    var ontrackReleaseFilter: String = project.properties["ontrackReleaseFilter"] as String
+    var ontrackReleaseFilter: String = ""
 
     var changeLog: String = ""
 

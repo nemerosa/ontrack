@@ -1,0 +1,50 @@
+# Docker Compose file used for a quick start
+
+version: "2.1"
+
+services:
+
+  # Ontrack container
+  ontrack:
+    image: nemerosa/ontrack:${ONTRACK_VERSION:-3}
+    restart: always
+    environment:
+      PROFILE: prod
+      JAVA_OPTIONS: "-Xms1024m -Xmx1024m"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+      ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
+      SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
+    depends_on:
+      postgres:
+        condition: service_started
+      elasticsearch:
+        condition: service_started
+    volumes:
+      - "ontrack_data:/var/ontrack/data"
+    ports:
+      - "8080:8080"
+
+  # Postgresql database
+  postgres:
+    image: postgres:9.5
+    restart: always
+    environment:
+      POSTGRES_DB: ${ONTRACK_POSTGRES_DB:-ontrack}
+      POSTGRES_USER: ${ONTRACK_POSTGRES_USER:-ontrack}
+      POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD:-ontrack}
+    volumes:
+      - "ontrack_postgres:/var/lib/postgresql/data"
+
+  # ElasticSearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    restart: always
+    environment:
+      - "discovery.type=single-node"
+    volumes:
+      - "ontrack_elasticsearch:/usr/share/elasticsearch/data"
+
+volumes:
+  ontrack_postgres:
+  ontrack_elasticsearch:
+  ontrack_data:

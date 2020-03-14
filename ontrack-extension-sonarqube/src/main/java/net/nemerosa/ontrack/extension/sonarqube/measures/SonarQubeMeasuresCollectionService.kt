@@ -14,7 +14,14 @@ interface SonarQubeMeasuresCollectionService {
      */
     fun matches(build: Build, property: SonarQubeProperty): Boolean
 
-    fun collect(build: Build, property: SonarQubeProperty): Ack
+    /**
+     * Collects SonarQube metrics for an individual build
+     *
+     * @param build Build to scan
+     * @param property Project SonarQube property
+     * @return OK or error message
+     */
+    fun collect(build: Build, property: SonarQubeProperty): SonarQubeMeasuresCollectionResult
 
     /**
      * Gets the SonarQube measures for a build.

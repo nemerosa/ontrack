@@ -95,12 +95,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     }
 
     fun <T> withDisabledConfigurationTest(code: () -> T): T {
-        val configurationTest = ontrackConfigProperties.isConfigurationTest
-        ontrackConfigProperties.isConfigurationTest = false
+        val configurationTest = ontrackConfigProperties.configurationTest
+        ontrackConfigProperties.configurationTest = false
         return try {
             code()
         } finally {
-            ontrackConfigProperties.isConfigurationTest = configurationTest
+            ontrackConfigProperties.configurationTest = configurationTest
         }
     }
 
@@ -128,6 +128,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun <T> Project.branch(name: String = uid("B"), init: Branch.() -> T): T {
         val branch = doCreateBranch(this, NameDescription.nd(name, ""))
         return branch.init()
+    }
+
+    /**
+     * Deletes a branch
+     */
+    fun Branch.delete() {
+        asAdmin {
+            structureService.deleteBranch(id)
+        }
     }
 
     fun Branch.promotionLevel(name: String = uid("P"), init: PromotionLevel.() -> Unit = {}): PromotionLevel =
@@ -161,13 +170,23 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return build.init()
     }
 
-    protected fun <T, P : PropertyType<T>> Build.property(type: KClass<P>, value: T) {
-        propertyService.editProperty<T>(
-                this,
-                type.java,
-                value
-        )
+    protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>, value: T?) {
+        if (value != null) {
+            propertyService.editProperty<T>(
+                    this,
+                    type.java,
+                    value
+            )
+        } else {
+            propertyService.deleteProperty(
+                    this,
+                    type.java
+            )
+        }
     }
+
+    protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>): T? =
+            propertyService.getProperty(this, type.java).value
 
     fun Build.promote(promotionLevel: PromotionLevel) {
         doPromote(this, promotionLevel, "")
@@ -236,6 +255,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
+    /**
+     * Deletes a build
+     */
+    fun Build.delete() {
+        asAdmin {
+            structureService.deleteBuild(id)
+        }
+    }
+
     fun Build.linkTo(project: Project, buildName: String) {
         val build = structureService.buildSearch(
                 project.id,
@@ -246,6 +274,13 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     fun Build.linkTo(build: Build) {
         structureService.addBuildLink(
+                this,
+                build
+        )
+    }
+
+    fun Build.unlinkTo(build: Build) {
+        structureService.deleteBuildLink(
                 this,
                 build
         )

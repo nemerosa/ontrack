@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.events.BuildLinkListenerService
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.exceptions.*
@@ -21,6 +22,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.isEntityNew
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper
+import net.nemerosa.ontrack.repository.StatsRepository
 import net.nemerosa.ontrack.repository.StructureRepository
 import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
@@ -34,7 +36,6 @@ import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Predicate
 import java.util.function.Supplier
-import kotlin.streams.toList
 
 @Service
 @Transactional
@@ -51,7 +52,9 @@ class StructureServiceImpl(
         private val predefinedValidationStampService: PredefinedValidationStampService,
         private val decorationService: DecorationService,
         private val projectFavouriteService: ProjectFavouriteService,
-        private val promotionRunCheckService: PromotionRunCheckService
+        private val promotionRunCheckService: PromotionRunCheckService,
+        private val statsRepository: StatsRepository,
+        private val buildLinkListenerService: BuildLinkListenerService
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
@@ -105,6 +108,12 @@ class StructureServiceImpl(
         return newProject
     }
 
+    override fun findProjectByID(projectId: ID): Project? {
+        return structureRepository.findProjectByID(projectId)?.takeIf {
+            securityService.isProjectFunctionGranted(it.id(), ProjectView::class.java)
+        }
+    }
+
     override fun getProject(projectId: ID): Project {
         securityService.checkProjectFunction(projectId.value, ProjectView::class.java)
         return structureRepository.getProject(projectId)
@@ -137,6 +146,11 @@ class StructureServiceImpl(
         eventPostService.post(eventFactory.deleteProject(getProject(projectId)))
         return structureRepository.deleteProject(projectId)
     }
+
+    override fun findBranchByID(branchId: ID): Branch? =
+            structureRepository.findBranchByID(branchId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
 
     override fun getBranch(branchId: ID): Branch {
         val branch = structureRepository.getBranch(branchId)
@@ -329,6 +343,11 @@ class StructureServiceImpl(
         }
     }
 
+    override fun findBuildByID(buildId: ID): Build? =
+            structureRepository.findBuildByID(buildId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
+
     override fun getBuild(buildId: ID): Build {
         val build = structureRepository.getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
@@ -368,7 +387,7 @@ class StructureServiceImpl(
     override fun forEachBuild(branch: Branch, sortDirection: BuildSortDirection, processor: (Build) -> Boolean) {
         findBuild(branch.id, sortDirection) { build ->
             val goingOn = processor(build)
-           !goingOn // Found = Not going on
+            !goingOn // Found = Not going on
         }
     }
 
@@ -451,12 +470,14 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
         structureRepository.addBuildLink(fromBuild.id, toBuild.id)
+        buildLinkListenerService.onBuildLinkAdded(fromBuild, toBuild)
     }
 
     override fun deleteBuildLink(fromBuild: Build, toBuild: Build) {
         securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
         structureRepository.deleteBuildLink(fromBuild.id, toBuild.id)
+        buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild)
     }
 
     override fun getBuildLinksFrom(build: Build): List<Build> {
@@ -544,6 +565,11 @@ class StructureServiceImpl(
         return structureRepository.isLinkedTo(build.id, project, buildPattern)
     }
 
+    override fun forEachBuildLink(code: (from: Build, to: Build) -> Unit) {
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        structureRepository.forEachBuildLink(code)
+    }
+
     override fun getValidationStampRunViewsForBuild(build: Build): List<ValidationStampRunView> {
         // Gets all validation stamps
         val stamps = getValidationStampListForBranch(build.branch.id)
@@ -616,6 +642,11 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(promotionLevel.branch.project.id(), ProjectView::class.java)
         return promotionLevel
     }
+
+    override fun findPromotionLevelByID(promotionLevelId: ID): PromotionLevel? =
+            structureRepository.findPromotionLevelByID(promotionLevelId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
 
     override fun getPromotionLevelImage(promotionLevelId: ID): Document {
         // Checks access
@@ -791,6 +822,11 @@ class StructureServiceImpl(
         return promotionRun
     }
 
+    override fun findPromotionRunByID(promotionRunId: ID): PromotionRun? =
+            structureRepository.findPromotionRunByID(promotionRunId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
+
     override fun getPromotionRunsForBuild(buildId: ID): List<PromotionRun> {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
@@ -869,6 +905,11 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return validationStamp
     }
+
+    override fun findValidationStampByID(validationStampId: ID): ValidationStamp? =
+            structureRepository.findValidationStampByID(validationStampId)?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
 
     override fun findValidationStampByName(project: String, branch: String, validationStamp: String): Optional<ValidationStamp> {
         return structureRepository.getValidationStampByName(project, branch, validationStamp)
@@ -1193,11 +1234,36 @@ class StructureServiceImpl(
         }
     }
 
+    override fun restoreValidationRunDataMetrics(logger: (String) -> Unit) {
+        val extensions = extensionManager.getExtensions(ValidationRunMetricsExtension::class.java)
+        var count = 0
+        val total = statsRepository.validationRunCount
+        structureRepository.forEachValidationRun({ validationRunStatusService.getValidationRunStatus(it) }) { validationRun ->
+            try {
+                extensions.forEach { it.onValidationRun(validationRun) }
+                count++
+                if (count % 100 == 0) {
+                    this.logger.info("Restored $count/$total validation run data metrics...")
+                }
+            } catch (ex: Exception) {
+                this.logger.error("Cannot publish metrics for ${validationRun.entityDisplayName}", ex)
+            }
+        }
+        this.logger.info("Restored $total validation run data metrics.")
+    }
+
     override fun getValidationRun(validationRunId: ID): ValidationRun {
         val validationRun = structureRepository.getValidationRun(validationRunId) { validationRunStatusService.getValidationRunStatus(it) }
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ProjectView::class.java)
         return validationRun
     }
+
+    override fun findValidationRunByID(validationRunId: ID): ValidationRun? =
+            structureRepository.findValidationRunByID(validationRunId) {
+                validationRunStatusService.getValidationRunStatus(it)
+            }?.takeIf {
+                securityService.isProjectFunctionGranted(it, ProjectView::class.java)
+            }
 
     override fun getValidationRunsForBuild(buildId: ID): List<ValidationRun> {
         val build = getBuild(buildId)
@@ -1249,14 +1315,17 @@ class StructureServiceImpl(
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
-        val validationStamp = getValidationStamp(validationStampId)
+    override fun getValidationRunsForValidationStamp(validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun> {
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return structureRepository.getValidationRunsForValidationStamp(validationStamp, offset, count) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsForValidationStampAndStatus(validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+    override fun getValidationRunsForValidationStamp(validationStampId: ID, offset: Int, count: Int): List<ValidationRun> {
         val validationStamp = getValidationStamp(validationStampId)
+        return getValidationRunsForValidationStamp(validationStamp, offset, count)
+    }
+
+    override fun getValidationRunsForValidationStampAndStatus(validationStamp: ValidationStamp, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
         securityService.checkProjectFunction(validationStamp.branch.project.id(), ProjectView::class.java)
         return structureRepository.getValidationRunsForValidationStampAndStatus(
                 validationStamp,
@@ -1266,6 +1335,11 @@ class StructureServiceImpl(
         ) {
             validationRunStatusService.getValidationRunStatus(it)
         }
+    }
+
+    override fun getValidationRunsForValidationStampAndStatus(validationStampId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {
+        val validationStamp = getValidationStamp(validationStampId)
+        return getValidationRunsForValidationStampAndStatus(validationStamp, statuses, offset, count)
     }
 
     override fun getValidationRunsForStatus(branchId: ID, statuses: List<ValidationRunStatusID>, offset: Int, count: Int): List<ValidationRun> {

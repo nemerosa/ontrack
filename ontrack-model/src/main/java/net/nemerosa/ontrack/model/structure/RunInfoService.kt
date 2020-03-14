@@ -30,4 +30,9 @@ interface RunInfoService {
      * @return [Ack.OK] if the the [RunInfo] was existing, [Ack.NOK] otherwise.
      */
     fun deleteRunInfo(runnableEntity: RunnableEntity): Ack
+
+    /**
+     * Fetches all restore informations and re-exports them.
+     */
+    fun restore(logger: (String) -> Unit = {})
 }

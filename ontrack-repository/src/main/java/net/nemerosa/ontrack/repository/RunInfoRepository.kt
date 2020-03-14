@@ -27,4 +27,17 @@ interface RunInfoRepository {
      * @return [Ack.OK] if the the [RunInfo] was existing, [Ack.NOK] otherwise.
      */
     fun deleteRunInfo(runnableEntityType: RunnableEntityType, id: Int): Ack
+
+    /**
+     * Loops over all the run infos for the given [type][runnableEntityType] and executes some code.
+     *
+     * @param runnableEntityType The type for which to get the run info
+     * @param code Function to run against the entity ID and the associated run info.
+     */
+    fun forEachRunnableEntityType(runnableEntityType: RunnableEntityType, code: (id: Int, runInfo: RunInfo) -> Unit)
+
+    /**
+     * Gets the count of the run infos a given [type].
+     */
+    fun getCountByRunnableEntityType(type: RunnableEntityType): Int
 }

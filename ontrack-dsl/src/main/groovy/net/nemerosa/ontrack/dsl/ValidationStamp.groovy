@@ -38,7 +38,7 @@ class ValidationStamp extends AbstractProjectResource {
         image(o, 'image/png')
     }
 
-    @DSLMethod("Sets the validation stamp image (see <<dsl-usecases-images>>)")
+    @DSLMethod(id = "image-content-type", value = "Sets the validation stamp image (see <<dsl-usecases-images>>)")
     def image(Object o, String contentType) {
         ontrack.upload(link('image'), 'file', o, contentType)
     }

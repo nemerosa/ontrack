@@ -1,4 +1,0 @@
-ontrack:
-  config:
-    cache:
-      gitChangeLog: maximumSize=20,expireAfterWrite=1Om,recordStats

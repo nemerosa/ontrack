@@ -61,7 +61,7 @@ class ValidationRunStatusIssuesGraphQLFieldContributor(
             issueService
                     // Getting the issues from the description
                     ?.extractIssueKeysFromMessage(description)
-                    ?.map { key ->
+                    ?.mapNotNull { key ->
                         issueService.getIssue(key)
                     }
                     ?: emptyList()

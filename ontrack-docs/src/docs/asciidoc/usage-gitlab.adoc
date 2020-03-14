@@ -26,7 +26,7 @@ supported.s
 
 The existing configurations can be updated and deleted.
 
-[[usage-gitlab-config]]
+[[usage-gitlab-project]]
 ===== Project configuration
 
 The link between a project and a GitLab repository is defined by the _GitLab

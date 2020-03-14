@@ -47,7 +47,14 @@
                             {{configName}}
                         </td>
                         <td>
-                            <b>{{config}}</b>
+                            <b>{{config.status}}</b>
+                            <span class="fa fa-circle" ng-class="{
+                                'text-success': config.status == 'UP',
+                                'text-danger': config.status != 'UP'
+                            }"></span>
+                            <div ng-if="config.details">
+                                <pre style="white-space: pre-wrap;">{{config.details}}</pre>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
