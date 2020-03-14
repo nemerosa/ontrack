@@ -35,6 +35,7 @@ angular.module('ot.view.validationStamp', [
                     id
                     name
                     description
+                    annotatedDescription
                     image
                     _image
                     decorations {
