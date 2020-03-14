@@ -21,8 +21,7 @@
                     <tbody>
                     <tr ng-repeat="promotionRun in build.promotionRuns">
                         <td>
-                            <ot-entity-image entity="promotionRun.promotionLevel"></ot-entity-image>
-                            {{promotionRun.promotionLevel.name}}
+                            <ot-entity-image link="{{promotionRun.promotionLevel.links._page}}" entity="promotionRun.promotionLevel">{{promotionRun.promotionLevel.name}}</ot-entity-image>
                         </td>
                         <td>
                             <ot-creation creation="promotionRun.creation"></ot-creation>
