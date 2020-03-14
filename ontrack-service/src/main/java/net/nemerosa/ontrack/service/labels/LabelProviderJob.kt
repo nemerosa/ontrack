@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 import java.util.stream.Stream
 import kotlin.streams.asStream
@@ -20,7 +21,8 @@ class LabelProviderJob(
         private val securityService: SecurityService,
         private val structureService: StructureService,
         private val labelProviderService: LabelProviderService,
-        private val settingsService: CachedSettingsService
+        private val settingsService: CachedSettingsService,
+        private val ontrackConfigProperties: OntrackConfigProperties
 ) : JobOrchestratorSupplier {
 
     companion object {

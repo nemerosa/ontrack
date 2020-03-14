@@ -13,7 +13,7 @@ class LabelProviderJobSettingsProvider(
 
     override fun getSettings(): LabelProviderJobSettings =
             LabelProviderJobSettings(
-                    settingsRepository.getBoolean(LabelProviderJobSettings::class.java, LabelProviderJobSettings::enabled.name, ontrackConfigProperties.isJobLabelProviderEnabled),
+                    settingsRepository.getBoolean(LabelProviderJobSettings::class.java, LabelProviderJobSettings::enabled.name, ontrackConfigProperties.jobLabelProviderEnabled),
                     settingsRepository.getInt(LabelProviderJobSettings::class.java, LabelProviderJobSettings::interval.name, DEFAULT_LABEL_PROVIDER_JOB_INTERVAL),
                     settingsRepository.getBoolean(LabelProviderJobSettings::class.java, LabelProviderJobSettings::perProject.name, DEFAULT_LABEL_PROVIDER_JOB_PER_PROJECT)
             )

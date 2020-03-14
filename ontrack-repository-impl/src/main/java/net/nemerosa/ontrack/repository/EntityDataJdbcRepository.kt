@@ -2,14 +2,11 @@ package net.nemerosa.ontrack.repository
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
-import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityID
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
-import net.nemerosa.ontrack.repository.support.getNullableInt
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import javax.sql.DataSource
@@ -79,7 +76,7 @@ class EntityDataJdbcRepository(
                 """,
                 params("key", key).addValue("value", value.format())
         ) { rs: ResultSet, _ ->
-            val id: ID = ID.of(rs.getInt(type.name))
+            val id = rs.getInt(type.name)
             ProjectEntityID(type, id)
         }.firstOrNull()
     }

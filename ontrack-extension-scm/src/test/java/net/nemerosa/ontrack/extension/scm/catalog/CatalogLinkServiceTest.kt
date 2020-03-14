@@ -152,7 +152,7 @@ class CatalogLinkServiceTest {
                 ProjectEntityType.PROJECT,
                 CatalogLinkService::class.java.name,
                 entry.key.asJson()
-        )).thenReturn(ProjectEntityID(ProjectEntityType.PROJECT, project.id))
+        )).thenReturn(ProjectEntityID(ProjectEntityType.PROJECT, project.id()))
         whenever(structureService.getProject(project.id)).thenReturn(project)
         val loaded = catalogLinkService.getLinkedProject(entry)
         assertEquals(project, loaded)
@@ -165,7 +165,7 @@ class CatalogLinkServiceTest {
                 ProjectEntityType.PROJECT,
                 CatalogLinkService::class.java.name,
                 entry.key.asJson()
-        )).thenReturn(ProjectEntityID(ProjectEntityType.PROJECT, project.id))
+        )).thenReturn(ProjectEntityID(ProjectEntityType.PROJECT, project.id()))
         val linked = catalogLinkService.isLinked(entry)
         assertEquals(true, linked)
     }
