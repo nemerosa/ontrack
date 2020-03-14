@@ -95,7 +95,7 @@ class LabelProviderJob(
             override fun getDescription(): String =
                     "Collection of automated labels for project ${project.name}"
 
-            override fun isDisabled(): Boolean = project.isDisabled || !ontrackConfigProperties.jobLabelProviderEnabled
+            override fun isDisabled(): Boolean = project.isDisabled
 
         }
     }
