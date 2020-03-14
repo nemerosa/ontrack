@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.service.security.SecurityServiceImpl
 import org.junit.Before
 import org.junit.Test
@@ -47,8 +46,7 @@ class LabelProviderJobTest {
                 securityService,
                 structureService,
                 labelProviderService,
-                settingsService,
-                OntrackConfigProperties()
+                settingsService
         )
     }
 
