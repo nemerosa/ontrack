@@ -2,11 +2,9 @@
     <div class="row">
         <div class="col-md-12 ot-view-title">
             <span id="build-page-title">Build {{build.name}}</span>
-            <ot-entity-embedded-decorations decorations="build.decorations">
-            <div ng-show="build.description" class="ot-description">
-                {{build.description}}
-            </div>
-            <ot-creation creation="build.creation"></ot-creation>
+            <ot-entity-embedded-decorations decorations="build.decorations"></ot-entity-embedded-decorations>
+            <div ng-show="build.description" class="ot-description" ng-bind-html="build.annotatedDescription"></div>
+            <ot-creation class="ot-description" creation="build.creation"></ot-creation>
         </div>
     </div>
     <div class="row">

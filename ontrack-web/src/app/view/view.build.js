@@ -27,6 +27,7 @@ angular.module('ot.view.build', [
                     id
                     name
                     description
+                    annotatedDescription
                     creation {
                       user
                       time
