@@ -144,9 +144,6 @@ angular.module('ot.view.branch', [
                       image
                       _image
                     }
-                    links {
-                      _all
-                    }
                   }
                   validations {
                     validationStamp {
@@ -579,8 +576,7 @@ angular.module('ot.view.branch', [
                     config: function () {
                         return {
                             build: build,
-                            promotionLevel: promotionRun.promotionLevel,
-                            uri: promotionRun.links._all
+                            promotionLevel: promotionRun.promotionLevel
                         };
                     }
                 }

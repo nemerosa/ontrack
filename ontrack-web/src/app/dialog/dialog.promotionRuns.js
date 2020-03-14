@@ -1,13 +1,43 @@
 angular.module('ot.dialog.promotionRuns', [
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.graphql'
 ])
-    .controller('otDialogPromotionRuns', function ($scope, $modalInstance, $http, config, ot, otAlertService) {
+    .controller('otDialogPromotionRuns', function ($scope, $modalInstance, $http, config, ot, otAlertService, otGraphqlService) {
         // General configuration
         $scope.config = config;
+        // GraphQL query
+        const query = `query PromotionRuns($build: Int!, $promotionLevel: String!) {
+            builds(id: $build) {
+                promotionRuns(promotion: $promotionLevel) {
+                    id
+                    description
+                    annotatedDescription
+                    creation {
+                        user
+                        time
+                    }
+                    promotionLevel {
+                        id
+                        name
+                        description
+                        image
+                        _image
+                    }
+                    links {
+                        _delete
+                    }
+                }
+            }
+        }`;
+        // Variables
+        const queryParams = {
+            build: config.build.id,
+            promotionLevel: config.promotionLevel.name
+        };
         // Loading all the promotion runs
         function loadRuns() {
-            ot.call($http.get(config.uri)).then(function (promotionRuns) {
-                $scope.promotionRuns = promotionRuns.resources;
+            otGraphqlService.pageGraphQLCall(query, queryParams).then((data) => {
+                $scope.promotionRuns = data.builds[0].promotionRuns;
             });
         }
 
@@ -23,7 +53,7 @@ angular.module('ot.dialog.promotionRuns', [
                 title: "Promotion deletion",
                 message: "Do you really want to delete this promotion?"
             }).then(function () {
-                return ot.call($http.delete(promotionRun._delete));
+                return ot.call($http.delete(promotionRun.links._delete));
             }).then(loadRuns);
         };
     })
