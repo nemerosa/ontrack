@@ -23,7 +23,7 @@ public class ValidationRun implements RunnableEntity {
     private final ValidationStamp validationStamp;
 
     /**
-     * The validation run, as such, as no description, because it's mangaged at {@link #getValidationRunStatuses()} level.
+     * The validation run, as such, as no description, because it's managed at validation run status level.
      */
     @Nullable
     @Override
