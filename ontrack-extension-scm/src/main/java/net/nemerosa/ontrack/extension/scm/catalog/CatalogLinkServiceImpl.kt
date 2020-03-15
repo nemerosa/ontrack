@@ -52,6 +52,9 @@ class CatalogLinkServiceImpl(
     override fun isLinked(entry: SCMCatalogEntry): Boolean =
             entityDataService.findEntityByValue(ProjectEntityType.PROJECT, CatalogLinkService::class.java.name, entry.key.asJson()) != null
 
+    override fun isOrphan(project: Project): Boolean =
+            !entityDataService.hasEntityValue(project, CatalogLinkService::class.java.name)
+
     private fun computeCatalogLink(
             entry: SCMCatalogEntry,
             projects: List<Project>,

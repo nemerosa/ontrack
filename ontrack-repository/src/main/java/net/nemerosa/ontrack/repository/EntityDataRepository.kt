@@ -32,6 +32,11 @@ interface EntityDataRepository {
     fun retrieveJson(entity: ProjectEntity, key: String): JsonNode?
 
     /**
+     * Checks if the given [entity] has a value associated with the [key]
+     */
+    fun hasEntityValue(entity: ProjectEntity, key: String): Boolean
+
+    /**
      * Looks for a linked entry using a JSON value
      */
     fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID?

@@ -71,6 +71,9 @@ class EntityDataServiceImpl(
         return text?.let(parser)
     }
 
+    override fun hasEntityValue(entity: ProjectEntity, key: String): Boolean =
+            repository.hasEntityValue(entity, key)
+
     override fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID? {
         return repository.findEntityByValue(type, key, value)
     }

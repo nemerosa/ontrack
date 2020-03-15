@@ -7,7 +7,9 @@ import net.nemerosa.ontrack.model.structure.*
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class CatalogLinkServiceTest {
 
@@ -177,6 +179,14 @@ class CatalogLinkServiceTest {
         whenever(entityDataService.retrieve(project, CatalogLinkService::class.java.name)).thenReturn("unknown-key")
         val loaded = catalogLinkService.getLinkedProject(entry)
         assertNull(loaded)
+    }
+
+    @Test
+    fun `Orphan project`() {
+        whenever(entityDataService.hasEntityValue(project, CatalogLinkService::class.java.name)).thenReturn(false)
+        assertTrue(catalogLinkService.isOrphan(project))
+        whenever(entityDataService.hasEntityValue(project, CatalogLinkService::class.java.name)).thenReturn(true)
+        assertFalse(catalogLinkService.isOrphan(project))
     }
 
 }

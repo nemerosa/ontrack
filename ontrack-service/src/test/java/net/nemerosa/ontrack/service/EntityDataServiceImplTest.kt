@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service
 
+import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -25,6 +26,14 @@ class EntityDataServiceImplTest {
         securityService = mock(SecurityService::class.java)
         service = EntityDataServiceImpl(repository, securityService)
         project = Project.of(NameDescription.nd("P", "Project")).withId(ID.of(1))
+    }
+
+    @Test
+    fun `Testing if data is associated with a project`() {
+        whenever(repository.hasEntityValue(project, "Key")).thenReturn(false)
+        assertFalse(service.hasEntityValue(project, "Key"))
+        whenever(repository.hasEntityValue(project, "Key")).thenReturn(true)
+        assertTrue(service.hasEntityValue(project, "Key"))
     }
 
     @Test

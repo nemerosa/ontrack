@@ -63,6 +63,19 @@ class EntityDataJdbcRepository(
         ).map { this.readJson(it) }.orElse(null)
     }
 
+    override fun hasEntityValue(entity: ProjectEntity, key: String): Boolean {
+        return namedParameterJdbcTemplate!!.queryForList(
+                """
+                   SELECT ID
+                   FROM ENTITY_DATA
+                   WHERE ${entity.projectEntityType.name} = :id
+                   AND NAME = :key
+                """,
+                params("id", entity.id()).addValue("key", key),
+                Int::class.java
+        ).isNotEmpty()
+    }
+
     override fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID? {
         return namedParameterJdbcTemplate!!.query(
                 """

@@ -54,6 +54,11 @@ interface EntityDataService {
     fun <T> retrieve(entity: ProjectEntity, key: String, type: Class<T>): T?
 
     /**
+     * Checks if the given [entity] has a value associated with the [key]
+     */
+    fun hasEntityValue(entity: ProjectEntity, key: String): Boolean
+
+    /**
      * Looks for a linked entry using a text value
      */
     fun findEntityByValue(type: ProjectEntityType, key: String, value: JsonNode): ProjectEntityID?

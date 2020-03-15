@@ -24,4 +24,9 @@ interface CatalogLinkService {
      */
     fun isLinked(entry: SCMCatalogEntry): Boolean
 
+    /**
+     * Quick check for checking if a [project] is linked to a SCM catalog entry.
+     */
+    fun isOrphan(project: Project): Boolean
+
 }
