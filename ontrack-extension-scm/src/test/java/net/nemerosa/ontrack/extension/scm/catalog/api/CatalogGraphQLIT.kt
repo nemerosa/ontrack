@@ -50,7 +50,7 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
         val orphanData = withGrantViewToAll {
             asUserWith<SCMCatalogAccessFunction, JsonNode> {
                 run("""{
-                    scmCatalog(link: "ORPHAN") {
+                    scmCatalog(link: "UNLINKED") {
                         pageItems {
                             repository
                             project {

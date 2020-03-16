@@ -18,6 +18,6 @@ enum class SCMCatalogFilterLink {
     /**
      * Only entries having no corresponding project
      */
-    ORPHAN
+    UNLINKED
 
 }

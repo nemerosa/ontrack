@@ -517,7 +517,7 @@ angular.module('ontrack.extension.scm', [
         $scope.filterLinks = {
             ALL: "All entries",
             LINKED: "Linked entries",
-            ORPHAN: "Orphan entries"
+            UNLINKED: "Unlinked entries"
         };
 
         const query = `
