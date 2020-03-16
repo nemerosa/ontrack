@@ -95,6 +95,16 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Entries only`() {
+        doTest(link = SCMCatalogProjectFilterLink.ENTRY) {
+            expect(REPO_LINKED)
+            expect(REPO_LINKED_OTHER)
+            expect(REPO_UNLINKED)
+            notOrphan(projectOrphan)
+        }
+    }
+
+    @Test
     fun `Linked entries only`() {
         doTest(link = SCMCatalogProjectFilterLink.LINKED) {
             expect(REPO_LINKED)
