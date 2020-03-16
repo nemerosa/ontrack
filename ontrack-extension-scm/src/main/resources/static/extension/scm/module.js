@@ -512,10 +512,11 @@ angular.module('ontrack.extension.scm', [
             config: "",
             repository: "",
             project: "",
-            link: "ALL"
+            link: "ENTRY"
         };
 
         $scope.filterLinks = {
+            ENTRY: "Only SCM entries",
             ALL: "All entries and orphan projects",
             LINKED: "Linked entries only",
             UNLINKED: "Unlinked entries only",
@@ -588,7 +589,7 @@ angular.module('ontrack.extension.scm', [
             $scope.queryVariables.config = "";
             $scope.queryVariables.repository = "";
             $scope.queryVariables.project = "";
-            $scope.queryVariables.link = "ALL";
+            $scope.queryVariables.link = "ENTRY";
             loadCatalog();
         };
 
