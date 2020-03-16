@@ -55,6 +55,46 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Filter on SCM`() {
+        doTest(scm = "test") {
+            // expect(REPO_LINKED)
+            // expect(REPO_LINKED_OTHER)
+            // expect(REPO_UNLINKED)
+            orphan(projectOrphan)
+        }
+    }
+
+    @Test
+    fun `Filter on configuration`() {
+        doTest(config = "config-1") {
+            expect(REPO_LINKED)
+            // expect(REPO_LINKED_OTHER)
+            // expect(REPO_UNLINKED)
+            orphan(projectOrphan)
+        }
+    }
+
+    @Test
+    fun `Filter on repository`() {
+        doTest(repository = ".*repo.*") {
+            expect(REPO_LINKED)
+            expect(REPO_LINKED_OTHER)
+            expect(REPO_UNLINKED)
+            orphan(projectOrphan)
+        }
+    }
+
+    @Test
+    fun `Filter on specific repository`() {
+        doTest(repository = REPO_LINKED_OTHER) {
+            // expect(REPO_LINKED)
+            expect(REPO_LINKED_OTHER)
+            // expect(REPO_UNLINKED)
+            orphan(projectOrphan)
+        }
+    }
+
+    @Test
     fun `Linked entries only`() {
         doTest(link = SCMCatalogProjectFilterLink.LINKED) {
             expect(REPO_LINKED)
