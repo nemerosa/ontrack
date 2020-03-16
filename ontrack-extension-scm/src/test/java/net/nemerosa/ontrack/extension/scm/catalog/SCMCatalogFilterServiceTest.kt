@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures.entry
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -21,9 +22,11 @@ class SCMCatalogFilterServiceTest {
         catalog = mock()
         catalogLinkService = mock()
         securityService = mock()
+        val structureService = mock<StructureService>()
         service = SCMCatalogFilterServiceImpl(
                 catalog,
                 catalogLinkService,
+                structureService,
                 securityService
         )
     }
@@ -110,7 +113,7 @@ class SCMCatalogFilterServiceTest {
 
     @Test
     fun `Orphan entries`() {
-        doTest(link = SCMCatalogFilterLink.ORPHAN) {
+        doTest(link = SCMCatalogFilterLink.UNLINKED) {
             +"repo-1"
             +"repo-3-other-config"
             +"repo-5-other-scm"

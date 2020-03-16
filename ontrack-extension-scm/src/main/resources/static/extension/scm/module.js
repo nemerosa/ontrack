@@ -511,18 +511,20 @@ angular.module('ontrack.extension.scm', [
             scm: "",
             config: "",
             repository: "",
+            project: "",
             link: "ALL"
         };
 
         $scope.filterLinks = {
-            ALL: "All entries",
-            LINKED: "Linked entries",
-            UNLINKED: "Unlinked entries"
+            ALL: "All entries and orphan projects",
+            LINKED: "Linked entries only",
+            UNLINKED: "Unlinked entries only",
+            ORPHAN: "Orphan projects only"
         };
 
         const query = `
-            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String) {
-                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link) {
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String) {
+                scmCatalogWithOrphans(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project) {
                     pageInfo {
                       totalSize
                       currentOffset
@@ -539,11 +541,13 @@ angular.module('ontrack.extension.scm', [
                       }
                     }
                     pageItems {
-                      scm
-                      config
-                      repository
-                      repositoryPage
-                      timestamp
+                      entry {
+                        scm
+                        config
+                        repository
+                        repositoryPage
+                        timestamp
+                      }
                       project {
                         id
                         name
@@ -563,6 +567,10 @@ angular.module('ontrack.extension.scm', [
                 $scope.queryVariables.repository = `.*${$scope.queryVariables.repository}.*`;
             }
 
+            if ($scope.queryVariables.project && $scope.queryVariables.project.indexOf("*") < 0) {
+                $scope.queryVariables.project = `.*${$scope.queryVariables.project}.*`;
+            }
+
             otGraphqlService.pageGraphQLCall(query, $scope.queryVariables).then(data => {
                 $scope.data = data;
             }).finally(() => {
@@ -579,6 +587,7 @@ angular.module('ontrack.extension.scm', [
             $scope.queryVariables.scm = "";
             $scope.queryVariables.config = "";
             $scope.queryVariables.repository = "";
+            $scope.queryVariables.project = "";
             $scope.queryVariables.link = "ALL";
             loadCatalog();
         };
@@ -589,91 +598,5 @@ angular.module('ontrack.extension.scm', [
             loadCatalog();
         };
 
-    })
-    .config(function ($stateProvider) {
-        $stateProvider.state('project-catalog-info', {
-            url: '/extension/scm/project/{project}/catalog-info',
-            templateUrl: 'extension/scm/project-catalog-info.tpl.html',
-            controller: 'ProjectCatalogInfoCtrl'
-        });
-    })
-    .controller('ProjectCatalogInfoCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
-        const projectId = $stateParams.project;
-        $scope.loadingInfo = true;
-
-        const view = ot.view();
-        view.title = "";
-
-        const query = `
-            query ProjectCatalogInfo($id: Int!) {
-                projects(id: $id) {
-                    id
-                    name
-                    scmCatalogEntryLink {
-                        scmCatalogEntry {
-                            scm
-                            config
-                            repository
-                            repositoryPage
-                            timestamp
-                        }
-                        infos {
-                            id
-                            name
-                            isDynamic
-                            timestamp
-                            data
-                            error
-                            feature {
-                                id
-                            }
-                        }
-                    }
-                }
-            }
-        `;
-
-        let viewInitialized = false;
-
-        const loadCatalogInfo = () => {
-            $scope.loadingInfo = true;
-
-            const queryVariables = {
-                id: projectId
-            };
-
-            otGraphqlService.pageGraphQLCall(query, queryVariables).then(data => {
-                $scope.project = data.projects[0];
-                if (!viewInitialized) {
-                    // Title
-                    view.title = `SCM Catalog info for ${$scope.project.name}`;
-                    // View configuration
-                    view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
-                    // Commands
-                    view.commands = [
-                        ot.viewCloseCommand('/project/' + $scope.project.id)
-                    ];
-                    // OK
-                    viewInitialized = true;
-                }
-            }).finally(() => {
-                $scope.loadingInfo = false;
-            });
-        };
-
-        // Loads the issues
-        loadCatalogInfo();
-
-        // Path to the catalog info template
-        $scope.getCatalogInfoPath = (info) => `extension/${info.feature.id}/catalog-info/${info.id}.tpl.html`;
-    })
-    .directive('otScmCatalogEntry', function () {
-        return {
-            restrict: 'E',
-            templateUrl: 'extension/scm/directive.scmCatalogEntry.tpl.html',
-            scope: {
-                entry: '='
-            }
-        };
     })
 ;
