@@ -19,21 +19,21 @@ class SCMCatalogFilterServiceImpl(
 ) : SCMCatalogFilterService {
 
     override fun findCatalogEntries(filter: SCMCatalogFilter): List<SCMCatalogEntry> {
-        securityService.checkGlobalFunction(SCMCatalogAccessFunction::class.java)
-        val repositoryRegex = filter.repository?.takeIf { it.isNotBlank() }?.toRegex()
-        return scmCatalog.catalogEntries.sorted().filter { entry ->
-            filter.scm?.takeIf { it.isNotBlank() }?.let { entry.scm == it } ?: true
-        }.filter { entry ->
-            filter.config?.takeIf { it.isNotBlank() }?.let { entry.config == it } ?: true
-        }.filter { entry ->
-            repositoryRegex?.matches(entry.repository) ?: true
-        }.filter { entry ->
-            when (filter.link) {
-                SCMCatalogFilterLink.ALL -> true
-                SCMCatalogFilterLink.LINKED -> catalogLinkService.isLinked(entry)
-                SCMCatalogFilterLink.UNLINKED -> !catalogLinkService.isLinked(entry)
-            }
-        }.drop(filter.offset).take(filter.size).toList()
+        return findCatalogProjectEntries(
+                SCMCatalogProjectFilter(
+                        offset = filter.offset,
+                        size = filter.size,
+                        scm = filter.scm,
+                        config = filter.config,
+                        repository = filter.repository,
+                        project = null,
+                        link = when (filter.link) {
+                            SCMCatalogFilterLink.ALL -> SCMCatalogProjectFilterLink.ALL
+                            SCMCatalogFilterLink.LINKED -> SCMCatalogProjectFilterLink.LINKED
+                            SCMCatalogFilterLink.UNLINKED -> SCMCatalogProjectFilterLink.UNLINKED
+                        }
+                )
+        ).mapNotNull { it.entry }
     }
 
     override fun findCatalogProjectEntries(filter: SCMCatalogProjectFilter): List<SCMCatalogEntryOrProject> {

@@ -127,7 +127,8 @@ class SCMCatalogFilterServiceTest {
             config: String? = null,
             repository: String? = null,
             link: SCMCatalogFilterLink = SCMCatalogFilterLink.ALL,
-            expectations: Expectations.() -> Unit) {
+            expectations: Expectations.() -> Unit
+    ) {
         val store = listOf(
                 entry(scm = "scm-1", config = "config-1", repository = "repo-1"),
                 entry(scm = "scm-1", config = "config-1", repository = "repo-2-linked"),
