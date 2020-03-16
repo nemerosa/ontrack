@@ -54,6 +54,42 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Linked entries only`() {
+        doTest(link = SCMCatalogProjectFilterLink.LINKED) {
+            expect(REPO_LINKED)
+            expect(REPO_LINKED_OTHER)
+        }
+    }
+
+    @Test
+    fun `Unlinked entries only`() {
+        doTest(link = SCMCatalogProjectFilterLink.UNLINKED) {
+            expect(REPO_UNLINKED)
+        }
+    }
+
+    @Test
+    fun `Orphan entries only`() {
+        doTest(link = SCMCatalogProjectFilterLink.ORPHAN) {
+            orphan(projectOrphan)
+        }
+    }
+
+    @Test
+    fun `Orphan entries only with positive regex`() {
+        doTest(link = SCMCatalogProjectFilterLink.ORPHAN, project = ".*${projectOrphan.name}.*") {
+            orphan(projectOrphan)
+        }
+    }
+
+    @Test
+    fun `Orphan entries only with negative regex`() {
+        doTest(link = SCMCatalogProjectFilterLink.ORPHAN, project = ".*${projectOrphan.name}notamatch.*") {
+            notOrphan(projectOrphan)
+        }
+    }
+
     private fun doTest(
             authorizedProjects: List<Project>? = null,
             offset: Int = 0,
@@ -68,9 +104,9 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
         scmCatalogProvider.clear()
 
         // All entries
-        val entryLinked = CatalogFixtures.entry(scm = "scm-1", repository = REPO_LINKED, config = "config-1")
-        val entryLinkedOther = CatalogFixtures.entry(scm = "scm-1", repository = REPO_LINKED_OTHER, config = "config-1")
-        val entryUnlinked = CatalogFixtures.entry(scm = "scm-2", repository = REPO_UNLINKED, config = "config-2")
+        val entryLinked = CatalogFixtures.entry(scm = "mocking", repository = REPO_LINKED, config = "config-1")
+        val entryLinkedOther = CatalogFixtures.entry(scm = "mocking", repository = REPO_LINKED_OTHER, config = "config-2")
+        val entryUnlinked = CatalogFixtures.entry(scm = "mocking", repository = REPO_UNLINKED, config = "config-3")
 
         // Mock data
         scmCatalogProvider.storeEntry(entryLinked)
@@ -80,10 +116,12 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
         scmCatalogProvider.linkEntry(entryLinked, projectLinked)
         scmCatalogProvider.linkEntry(entryLinkedOther, projectLinkedOther)
 
-        // Collection of entries
-        scmCatalog.collectSCMCatalog { println(it) }
-        // Collection of catalog links
-        catalogLinkService.computeCatalogLinks()
+        asAdmin {
+            // Collection of entries
+            scmCatalog.collectSCMCatalog { println(it) }
+            // Collection of catalog links
+            catalogLinkService.computeCatalogLinks()
+        }
 
         // Testing context
         val expectationsContext = Expectations()
@@ -117,15 +155,26 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
                     expectationsContext.repos,
                     items.mapNotNull { it.entry?.repository }
             )
-            // Projects
+            // Orphan projects
+            val actualOrphanProjectNames = items.filter { it.entry == null }.mapNotNull { it.project?.name }
             assertTrue(
                     // Actual list of orphan projects contains the expected one
                     // Note that the list of orphan projects will grow
                     // much larger than the expected ones
-                    actual = items.filter { it.entry == null }.mapNotNull { it.project?.name }.containsAll(
+                    actual = actualOrphanProjectNames.containsAll(
                             expectationsContext.orphans.mapNotNull { it.project?.name }
                     ),
                     message = "Orphan projects"
+            )
+            // Not orphan projects
+            assertTrue(
+                    // Actual list of orphan projects DOES NOT contains any of the expected one
+                    // Note that the list of orphan projects will grow
+                    // much larger than the expected ones
+                    actual = actualOrphanProjectNames.intersect(
+                            expectationsContext.notOrphans.mapNotNull { it.project?.name }
+                    ).isEmpty(),
+                    message = "Not in orphan projects"
             )
         }
     }
@@ -138,6 +187,7 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
 
         val repos = mutableListOf<String>()
         val orphans = mutableListOf<Project>()
+        val notOrphans = mutableListOf<Project>()
 
         fun expect(repo: String) {
             repos += repo
@@ -145,6 +195,10 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
 
         fun orphan(project: Project) {
             orphans += project
+        }
+
+        fun notOrphan(project: Project) {
+            notOrphans += project
         }
 
     }
