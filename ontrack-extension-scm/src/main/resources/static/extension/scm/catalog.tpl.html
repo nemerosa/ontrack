@@ -14,17 +14,17 @@
         <tr>
             <td colspan="4">
                 <form class="form-inline">
-                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalogWithOrphans.pageInfo.previousPage)" ng-disabled="!data.scmCatalogWithOrphans.pageInfo.previousPage">
+                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
                         <span class="fa fa-step-backward"></span>
                         Previous
                     </button>
-                    <span ng-if="data.scmCatalogWithOrphans.pageInfo.currentSize > 0">
-                        {{data.scmCatalogWithOrphans.pageInfo.currentOffset + 1}}-{{data.scmCatalogWithOrphans.pageInfo.currentOffset + data.scmCatalogWithOrphans.pageInfo.currentSize}} / {{data.scmCatalogWithOrphans.pageInfo.totalSize}}
+                    <span ng-if="data.scmCatalog.pageInfo.currentSize > 0">
+                        {{data.scmCatalog.pageInfo.currentOffset + 1}}-{{data.scmCatalog.pageInfo.currentOffset + data.scmCatalog.pageInfo.currentSize}} / {{data.scmCatalog.pageInfo.totalSize}}
                     </span>
-                    <span ng-if="data.scmCatalogWithOrphans.pageInfo.currentSize == 0">
+                    <span ng-if="data.scmCatalog.pageInfo.currentSize == 0">
                         -
                     </span>
-                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalogWithOrphans.pageInfo.nextPage)" ng-disabled="!data.scmCatalogWithOrphans.pageInfo.nextPage">
+                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.nextPage)" ng-disabled="!data.scmCatalog.pageInfo.nextPage">
                         <span class="fa fa-step-forward"></span>
                         Next
                     </button>
@@ -81,14 +81,14 @@
             </td>
         </tr>
         </thead>
-        <tbody ng-if="data.scmCatalogWithOrphans.pageInfo.currentSize == 0">
+        <tbody ng-if="data.scmCatalog.pageInfo.currentSize == 0">
         <tr class="alert alert-warning">
             <td colspan="4">
                 No SCM catalog entry was collected or the filter is too restrictive.
             </td>
         </tr>
         </tbody>
-        <thead ng-if="data.scmCatalogWithOrphans.pageInfo.currentSize > 0">
+        <thead ng-if="data.scmCatalog.pageInfo.currentSize > 0">
         <tr>
             <th>SCM</th>
             <th>Config</th>
@@ -98,7 +98,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="item in data.scmCatalogWithOrphans.pageItems">
+        <tr ng-repeat="item in data.scmCatalog.pageItems">
             <td>{{item.entry.scm}}</td>
             <td>{{item.entry.config}}</td>
             <td><a href="{{item.entry.repositoryPage}}">{{item.entry.repository}}</a></td>

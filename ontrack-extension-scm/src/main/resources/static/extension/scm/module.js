@@ -524,7 +524,7 @@ angular.module('ontrack.extension.scm', [
 
         const query = `
             query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String) {
-                scmCatalogWithOrphans(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project) {
                     pageInfo {
                       totalSize
                       currentOffset

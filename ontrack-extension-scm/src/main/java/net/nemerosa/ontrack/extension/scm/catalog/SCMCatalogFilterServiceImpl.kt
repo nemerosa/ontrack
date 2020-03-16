@@ -18,24 +18,6 @@ class SCMCatalogFilterServiceImpl(
         private val securityService: SecurityService
 ) : SCMCatalogFilterService {
 
-    override fun findCatalogEntries(filter: SCMCatalogFilter): List<SCMCatalogEntry> {
-        return findCatalogProjectEntries(
-                SCMCatalogProjectFilter(
-                        offset = filter.offset,
-                        size = filter.size,
-                        scm = filter.scm,
-                        config = filter.config,
-                        repository = filter.repository,
-                        project = null,
-                        link = when (filter.link) {
-                            SCMCatalogFilterLink.ALL -> SCMCatalogProjectFilterLink.ALL
-                            SCMCatalogFilterLink.LINKED -> SCMCatalogProjectFilterLink.LINKED
-                            SCMCatalogFilterLink.UNLINKED -> SCMCatalogProjectFilterLink.UNLINKED
-                        }
-                )
-        ).mapNotNull { it.entry }
-    }
-
     override fun findCatalogProjectEntries(filter: SCMCatalogProjectFilter): List<SCMCatalogEntryOrProject> {
         securityService.checkGlobalFunction(SCMCatalogAccessFunction::class.java)
 
@@ -53,6 +35,7 @@ class SCMCatalogFilterServiceImpl(
         val entryLinkFilter: (SCMCatalogEntry) -> Boolean = { entry ->
             when (filter.link) {
                 SCMCatalogProjectFilterLink.ALL -> true
+                SCMCatalogProjectFilterLink.ENTRY -> true
                 SCMCatalogProjectFilterLink.LINKED -> catalogLinkService.isLinked(entry)
                 SCMCatalogProjectFilterLink.UNLINKED -> !catalogLinkService.isLinked(entry)
                 SCMCatalogProjectFilterLink.ORPHAN -> false
@@ -91,11 +74,13 @@ class SCMCatalogFilterServiceImpl(
         }
 
         // ALL --> filtered entries + orphan projects
+        // ENTRIES --> filtered entries
         // LINKED, UNLINKED --> filtered entries
         // ORPHAN --> orphan projects only
 
         val allEntries: Sequence<SCMCatalogEntryOrProject> = when (filter.link) {
             SCMCatalogProjectFilterLink.ALL -> entries() + orphanProjects()
+            SCMCatalogProjectFilterLink.ENTRY -> entries()
             SCMCatalogProjectFilterLink.LINKED -> entries()
             SCMCatalogProjectFilterLink.UNLINKED -> entries()
             SCMCatalogProjectFilterLink.ORPHAN -> orphanProjects()

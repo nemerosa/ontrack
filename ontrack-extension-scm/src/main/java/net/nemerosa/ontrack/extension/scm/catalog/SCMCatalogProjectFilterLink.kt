@@ -6,9 +6,14 @@ package net.nemerosa.ontrack.extension.scm.catalog
 enum class SCMCatalogProjectFilterLink {
 
     /**
-     * Any entry is accepted
+     * Any entry or orphan project is accepted
      */
     ALL,
+
+    /**
+     * Only entries (not orphan projects) is accepted
+     */
+    ENTRY,
 
     /**
      * Only entries being linked to a project
