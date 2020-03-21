@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.scm.catalog.api
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogAccessFunction
+import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.security.Roles
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
-import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -22,8 +22,15 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
     @Autowired
     private lateinit var catalogLinkService: CatalogLinkService
 
+    @Autowired
+    private lateinit var scmCatalogProvider: MockSCMCatalogProvider
+
     @Test
     fun `Collection of entries and linking`() {
+        scmCatalogProvider.clear()
+        // Registration of mock entry
+        val entry = CatalogFixtures.entry(scm = "mocking", repository = "project/repository", config = "my-config")
+        scmCatalogProvider.storeEntry(entry)
         // Collection of entries
         scmCatalog.collectSCMCatalog { println(it) }
         // Checks entry has been collected
@@ -32,27 +39,31 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                 run("""{
                     scmCatalog {
                         pageItems {
-                            scm
-                            config
-                            repository
-                            repositoryPage
+                            entry {
+                                scm
+                                config
+                                repository
+                                repositoryPage
+                            }
                         }
                     }
                 }""")
             }
         }
         val item = collectionData["scmCatalog"]["pageItems"][0]
-        assertEquals("mocking", item["scm"].asText())
-        assertEquals("MainConfig", item["config"].asText())
-        assertEquals("project/repository", item["repository"].asText())
-        assertEquals("uri:project/repository", item["repositoryPage"].asText())
+        assertEquals("mocking", item["entry"]["scm"].asText())
+        assertEquals("my-config", item["entry"]["config"].asText())
+        assertEquals("project/repository", item["entry"]["repository"].asText())
+        assertEquals("uri:project/repository", item["entry"]["repositoryPage"].asText())
         // Search on orphan entries
         val orphanData = withGrantViewToAll {
             asUserWith<SCMCatalogAccessFunction, JsonNode> {
                 run("""{
                     scmCatalog(link: "UNLINKED") {
                         pageItems {
-                            repository
+                            entry {
+                                repository
+                            }
                             project {
                                 name
                             }
@@ -63,19 +74,19 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
         }
         assertNotNull(orphanData) {
             val orphanItem = it["scmCatalog"]["pageItems"][0]
-            assertEquals("project/repository", orphanItem["repository"].asText())
+            assertEquals("project/repository", orphanItem["entry"]["repository"].asText())
             assertTrue(orphanItem["project"].isNull, "Entry is not linked")
         }
         // Link with one project
-        val name = uid("repository-")
-        project(nd(name, "")) {
+        val project = project {
             // Collection of catalog links
+            scmCatalogProvider.linkEntry(entry, this)
             catalogLinkService.computeCatalogLinks()
             // Checks the link has been recorded
             val linkedEntry = catalogLinkService.getSCMCatalogEntry(this)
             assertNotNull(linkedEntry, "Project is linked to a SCM catalog entry") {
                 assertEquals("mocking", it.scm)
-                assertEquals("MainConfig", it.config)
+                assertEquals("my-config", it.config)
                 assertEquals("project/repository", it.repository)
                 assertEquals("uri:project/repository", it.repositoryPage)
             }
@@ -98,11 +109,11 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
             }
             // Checking data
             assertNotNull(data) {
-                val entry = it["projects"][0]["scmCatalogEntry"]
-                assertEquals("mocking", entry["scm"].asText())
-                assertEquals("MainConfig", entry["config"].asText())
-                assertEquals("project/repository", entry["repository"].asText())
-                assertEquals("uri:project/repository", entry["repositoryPage"].asText())
+                val projectItem = it["projects"][0]["scmCatalogEntry"]
+                assertEquals("mocking", projectItem["scm"].asText())
+                assertEquals("my-config", projectItem["config"].asText())
+                assertEquals("project/repository", projectItem["repository"].asText())
+                assertEquals("uri:project/repository", projectItem["repositoryPage"].asText())
             }
             // Getting the data through GraphQL & catalog entries
             val entryCollectionData = withGrantViewToAll {
@@ -138,8 +149,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
             }
         }
         assertNotNull(data) {
-            val project = it["scmCatalog"]["pageItems"][0]["project"]
-            assertEquals(name, project["name"].asText())
+            val projectItem = it["scmCatalog"]["pageItems"][0]["project"]
+            assertEquals(project.name, projectItem["name"].asText())
         }
     }
 
@@ -172,11 +183,13 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
 
     private fun scmCatalogTest(setup: (code: () -> Unit) -> Unit) {
         // Collection of entries
+        val entry = CatalogFixtures.entry(scm = "mocking")
+        scmCatalogProvider.clear()
+        scmCatalogProvider.storeEntry(entry)
         scmCatalog.collectSCMCatalog { println(it) }
         // Link with one project
-        val name = uid("repository-")
-        project(nd(name, "")) {
-            // Collection of catalog links
+        val project = project {
+            scmCatalogProvider.linkEntry(entry, this)
             catalogLinkService.computeCatalogLinks()
         }
         // Checks rights
@@ -191,8 +204,8 @@ class CatalogGraphQLIT : AbstractQLKTITSupport() {
                     }
                 }""")
             assertNotNull(data) {
-                val entry = it["scmCatalog"]["pageItems"][0]
-                assertEquals(name, entry["project"]["name"].asText())
+                val entryItem = it["scmCatalog"]["pageItems"][0]
+                assertEquals(project.name, entryItem["project"]["name"].asText())
             }
         }
     }
