@@ -126,14 +126,32 @@ image::images/projects-labels-assign-creation-done.png[After creation,400]
 Some labels can be created and assigned automatically using
 the concept of the "label providers".
 
-As-of now, there is no label provider in the core Ontrack
-application and they must be made available through
-extensions.
-
 [NOTE]
 ====
 The main thing to remember about automatically assigned labels
 is that they cannot be edited, not deleted, not unselected.
+====
+
+By default, automated labels are NOT enabled. In order to enable
+their collection, you can:
+
+* set the `ontrack.config.job-label-provider-enabled`
+  <<configuration-properties,configuration property>> to `true`
+* _or_ go to the _Settings_ and navigate to the _Label provider job_ section:
+
+image::images/label-provider-job-settings.png[300,Label provider job settings]
+
+* _enabled_ - enable or disable the collection of automated labels. This
+  overrides the settings defined by `ontrack.config.job-label-provider-enabled`
+* _interval_ - how often the collection of labels must be performed
+* _job per project_ - by default, only one <<admin-console-jobs,job>>
+  is created for the collection of all labels. Set this option to split
+  this job per project.
+
+[NOTE]
+====
+Those options are mostly used for tuning the performances on
+really big Ontrack instances.
 ====
 
 To create a label provider, you have to create an <<extending,extension>>:

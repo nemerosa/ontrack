@@ -28,6 +28,11 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    public void delete(String store, String key) {
+        repository.delete(store, key);
+    }
+
+    @Override
     public Optional<JsonNode> retrieveJson(String store, String key) {
         return repository.retrieveJson(store, key);
     }

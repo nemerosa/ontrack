@@ -22,6 +22,16 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
     }
 
     @Override
+    public void delete(String store, String key) {
+        MapSqlParameterSource params = params("store", store).addValue("key", key);
+        // Deleting first
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM STORAGE WHERE STORE = :store AND NAME = :key",
+                params
+        );
+    }
+
+    @Override
     public void storeJson(String store, String key, JsonNode node) {
         MapSqlParameterSource params = params("store", store).addValue("key", key);
         // Deleting first

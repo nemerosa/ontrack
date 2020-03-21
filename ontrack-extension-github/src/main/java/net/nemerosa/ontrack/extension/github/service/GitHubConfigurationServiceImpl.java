@@ -33,15 +33,15 @@ public class GitHubConfigurationServiceImpl extends AbstractConfigurationService
         try {
             // Gets the client
             OntrackGitHubClient client = gitHubClientFactory.create(configuration);
-            // Gets the list of repositories
-            client.getRepositories();
+            // Gets the list of organisations
+            client.getOrganizations();
             // OK
             return ConnectionResult.ok();
         } catch (Exception ex) {
             applicationLogService.log(
                     ApplicationLogEntry.error(
                             ex,
-                            NameDescription.nd("github", "GitHub connection issue"),
+                            NameDescription.nd("github", "GitHub connection issue" ),
                             configuration.getUrl()
                     )
                             .withDetail("github-config-name", configuration.getName())

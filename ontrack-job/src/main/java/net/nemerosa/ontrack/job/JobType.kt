@@ -20,6 +20,23 @@ data class JobType(
         )
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is JobType) return false
+
+        if (category != other.category) return false
+        if (key != other.key) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = category.hashCode()
+        result = 31 * result + key.hashCode()
+        return result
+    }
+
+
     companion object {
         @JvmStatic
         fun of(category: JobCategory, key: String): JobType {

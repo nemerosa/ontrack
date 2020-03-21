@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.extension.github
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue
+import net.nemerosa.ontrack.extension.github.model.GitHubState
+import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
@@ -119,8 +122,20 @@ class GitHubIssueServiceExtensionTest {
 
     @Test
     fun `Message regular expression`() {
-        val issue = mock(GitHubIssue::class.java)
-        `when`(issue.displayKey).thenReturn("#625")
+        val issue = GitHubIssue(
+                id = 625,
+                url = "...",
+                summary = "...",
+                body = "...",
+                bodyHtml = "...",
+                assignee = GitHubUser("login", "..."),
+                labels = emptyList(),
+                state = GitHubState.open,
+                milestone = null,
+                createdAt = Time.now(),
+                updateTime = Time.now(),
+                closedAt = null
+        )
         val regex = extension.getMessageRegex(configuration, issue).toRegex()
         kotlin.test.assertTrue(regex.containsMatchIn("#625"))
         kotlin.test.assertTrue(regex.containsMatchIn("#625 at the beginning"))

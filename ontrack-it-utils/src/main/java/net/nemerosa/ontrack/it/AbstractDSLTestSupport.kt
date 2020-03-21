@@ -104,8 +104,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun project(init: Project.() -> Unit = {}): Project {
-        val project = doCreateProject()
+    fun project(name: NameDescription = AbstractITTestSupport.nameDescription(), init: Project.() -> Unit = {}): Project {
+        val project = doCreateProject(name)
         securityService.asAdmin {
             project.init()
         }
@@ -156,6 +156,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             validationDataTypeConfig: ValidationDataTypeConfig<*>? = null
     ): ValidationStamp =
             doCreateValidationStamp(this, NameDescription.nd(name, ""), validationDataTypeConfig)
+
+    /**
+     * Deletes a validation stamp
+     */
+    fun ValidationStamp.delete() {
+        asAdmin {
+            structureService.deleteValidationStamp(id)
+        }
+    }
 
     fun Branch.build(name: String = uid("B"), init: (Build.() -> Unit)? = {}): Build {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))

@@ -83,4 +83,32 @@ constructor(
             offset,
             count
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is EntityDataStoreFilter) return false
+
+        if (entity != other.entity) return false
+        if (category != other.category) return false
+        if (name != other.name) return false
+        if (group != other.group) return false
+        if (beforeTime != other.beforeTime) return false
+        if (offset != other.offset) return false
+        if (count != other.count) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = entity?.hashCode() ?: 0
+        result = 31 * result + (category?.hashCode() ?: 0)
+        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (group?.hashCode() ?: 0)
+        result = 31 * result + (beforeTime?.hashCode() ?: 0)
+        result = 31 * result + offset
+        result = 31 * result + count
+        return result
+    }
+
+
 }

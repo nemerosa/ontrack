@@ -1,0 +1,118 @@
+<ot-view>
+
+    <div class="row" ng-show="loadingCatalog">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading catalog...
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-hover table-condensed" ng-show="data">
+        <thead>
+        <tr>
+            <td colspan="4">
+                <form class="form-inline">
+                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.previousPage)" ng-disabled="!data.scmCatalog.pageInfo.previousPage">
+                        <span class="fa fa-step-backward"></span>
+                        Previous
+                    </button>
+                    <span ng-if="data.scmCatalog.pageInfo.currentSize > 0">
+                        {{data.scmCatalog.pageInfo.currentOffset + 1}}-{{data.scmCatalog.pageInfo.currentOffset + data.scmCatalog.pageInfo.currentSize}} / {{data.scmCatalog.pageInfo.totalSize}}
+                    </span>
+                    <span ng-if="data.scmCatalog.pageInfo.currentSize == 0">
+                        -
+                    </span>
+                    <button class="btn btn-default" type="button" ng-click="navigate(data.scmCatalog.pageInfo.nextPage)" ng-disabled="!data.scmCatalog.pageInfo.nextPage">
+                        <span class="fa fa-step-forward"></span>
+                        Next
+                    </button>
+                    <!-- Link filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+                            {{queryVariables.link ? filterLinks[queryVariables.link] : filterLinks["ALL"]}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="(key, name) in filterLinks">
+                                <a class="ot-action" ng-click="queryVariables.link = key;">{{name}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- SCM filter -->
+                    <div class="form-group">
+                        <label for="catalogFilterScm">SCM</label>
+                        <input type="text" class="form-control" id="catalogFilterScm" ng-model="queryVariables.scm">
+                    </div>
+                    <!-- Config filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-config">Config</label>
+                        <input id="catalog-filter-config" class="form-control" type="text" ng-model="queryVariables.config" />
+                    </div>
+                    <!-- Repository filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-repository">Repository</label>
+                        <input id="catalog-filter-repository" class="form-control" type="text" ng-model="queryVariables.repository" />
+                    </div>
+                    <!-- Project filter -->
+                    <div class="form-group">
+                        <label for="catalog-filter-project">Project</label>
+                        <input id="catalog-filter-project" class="form-control" type="text" ng-model="queryVariables.project" />
+                    </div>
+                    <!-- Search button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-click="loadCatalog()"
+                                class="btn btn-primary">
+                            <span class="fa fa-search"></span>
+                        </button>
+                    </div>
+                    <!-- Clear button -->
+                    <div class="form-group">
+                        <button type="button"
+                                ng-click="clearCatalogFilter()"
+                                title="Clears current filter and reloads the catalog"
+                                class="btn btn-default">
+                            <span class="fa fa-ban"></span>
+                        </button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </thead>
+        <tbody ng-if="data.scmCatalog.pageInfo.currentSize == 0">
+        <tr class="alert alert-warning">
+            <td colspan="4">
+                No SCM catalog entry was collected or the filter is too restrictive.
+            </td>
+        </tr>
+        </tbody>
+        <thead ng-if="data.scmCatalog.pageInfo.currentSize > 0">
+        <tr>
+            <th>SCM</th>
+            <th>Config</th>
+            <th>Repository</th>
+            <th>Project</th>
+            <th>Collection time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in data.scmCatalog.pageItems">
+            <td>{{item.entry.scm}}</td>
+            <td>{{item.entry.config}}</td>
+            <td><a href="{{item.entry.repositoryPage}}">{{item.entry.repository}}</a></td>
+            <td>
+                <span ng-if="!item.entry"><span class="fa fa-ban text-danger"></span>&nbsp;<a ng-if="item.project" href="{{item.project.links._page}}">{{item.project.name}}</a>&nbsp;<span class="ot-description">This project is not linked to any repository.</span></span>
+                <span ng-if="item.entry && !item.project"><span class="fa fa-info text-info"></span>&nbsp;<span class="ot-description">This project is not managed in Ontrack.</span></span>
+                <span ng-if="item.entry && item.project"><span class="fa fa-archive text-success"></span>&nbsp;<a ng-if="item.project" href="{{item.project.links._page}}">{{item.project.name}}</a></span>
+            </td>
+            <td title="Collection timestamp">
+                {{item.entry.timestamp | date:'mediumDate'}}
+                {{item.entry.timestamp | date:'shortTime'}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

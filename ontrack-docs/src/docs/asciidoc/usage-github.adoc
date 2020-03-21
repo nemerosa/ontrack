@@ -41,3 +41,10 @@ configuration_ property:
   the issues of the repository will be used
 
 Branches can be <<usage-git,configured for Git>> independently.
+
+[[usage-github-scm-catalog]]
+===== SCM Catalog configuration
+
+The <<scm-catalog,SCM Catalog>> feature requires some additional
+configuration for GitHub. See the specific <<scm-catalog-github,section>>
+for more information.

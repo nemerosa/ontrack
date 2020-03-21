@@ -20,6 +20,8 @@ include::usage-properties.adoc[]
 
 include::templates.adoc[]
 
+include::usage-scm.adoc[]
+
 include::usage-git.adoc[]
 
 include::usage-subversion.adoc[]

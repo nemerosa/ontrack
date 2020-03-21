@@ -65,3 +65,11 @@ To activate the label collection job, just set the
 `ontrack.config.job-label-provider-enabled`
 <<configuration-properties,configuration property>>
 to `true`.
+
+Additionally, the label collection can be configured by administrators in the _Settings_:
+
+image::images/extension-label-provider-settings.png[Label provider job settings,400]
+
+* _Enabled_ - Check to enable the automated collection of labels for all projects. This can generate a high level activity in the background.
+* _Interval_ - Interval (in minutes) between each label scan.
+* _Per project_ - Check to have one distinct label collection job per project.
