@@ -488,4 +488,116 @@ angular.module('ontrack.extension.scm', [
             $modalInstance.dismiss('cancel');
         };
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('scm-catalog', {
+            url: '/extension/scm/catalog',
+            templateUrl: 'extension/scm/catalog.tpl.html',
+            controller: 'CatalogCtrl'
+        });
+    })
+    .controller('CatalogCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+        $scope.loadingCatalog = true;
+
+        const view = ot.view();
+        view.title = "SCM Catalog";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            ot.viewCloseCommand('/home')
+        ];
+
+        $scope.queryVariables = {
+            offset: 0,
+            size: 30,
+            scm: "",
+            config: "",
+            repository: "",
+            project: "",
+            link: "ENTRY"
+        };
+
+        $scope.filterLinks = {
+            ENTRY: "Only SCM entries",
+            ALL: "All entries and orphan projects",
+            LINKED: "Linked entries only",
+            UNLINKED: "Unlinked entries only",
+            ORPHAN: "Orphan projects only"
+        };
+
+        const query = `
+            query CatalogInfo($offset: Int!, $size: Int!, $scm: String, $config: String, $repository: String, $link: String, $project: String) {
+                scmCatalog(offset: $offset, size: $size, scm: $scm, config: $config, repository: $repository, link: $link, project: $project) {
+                    pageInfo {
+                      totalSize
+                      currentOffset
+                      currentSize
+                      pageTotal
+                      pageIndex
+                      nextPage {
+                        offset
+                        size
+                      }
+                      previousPage {
+                        offset
+                        size
+                      }
+                    }
+                    pageItems {
+                      entry {
+                        scm
+                        config
+                        repository
+                        repositoryPage
+                        timestamp
+                      }
+                      project {
+                        id
+                        name
+                        links {
+                          _page
+                        }
+                      }
+                    }
+                }
+            }
+        `;
+
+        const loadCatalog = () => {
+            $scope.loadingCatalog = true;
+
+            if ($scope.queryVariables.repository && $scope.queryVariables.repository.indexOf("*") < 0) {
+                $scope.queryVariables.repository = `.*${$scope.queryVariables.repository}.*`;
+            }
+
+            if ($scope.queryVariables.project && $scope.queryVariables.project.indexOf("*") < 0) {
+                $scope.queryVariables.project = `.*${$scope.queryVariables.project}.*`;
+            }
+
+            otGraphqlService.pageGraphQLCall(query, $scope.queryVariables).then(data => {
+                $scope.data = data;
+            }).finally(() => {
+                $scope.loadingCatalog = false;
+            });
+        };
+
+        // Loads the issues
+        loadCatalog();
+        $scope.loadCatalog = loadCatalog;
+
+        // Clearing the filter
+        $scope.clearCatalogFilter = function () {
+            $scope.queryVariables.scm = "";
+            $scope.queryVariables.config = "";
+            $scope.queryVariables.repository = "";
+            $scope.queryVariables.project = "";
+            $scope.queryVariables.link = "ENTRY";
+            loadCatalog();
+        };
+
+        // Navigating
+        $scope.navigate = pageRequest => {
+            $scope.queryVariables.offset = pageRequest.offset;
+            loadCatalog();
+        };
+
+    })
 ;

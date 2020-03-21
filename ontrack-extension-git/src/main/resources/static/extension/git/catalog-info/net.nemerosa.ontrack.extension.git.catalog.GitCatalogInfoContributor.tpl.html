@@ -1,0 +1,11 @@
+Commit
+<a href="{{info.data.uiCommit.link}}" target="_blank">
+    <code>{{info.data.uiCommit.commit.id}}</code>
+</a>
+<p ng-bind-html="info.data.uiCommit.fullAnnotatedMessage"></p>
+<p class="ot-description">
+    --
+    {{info.data.uiCommit.commit.author.name}},
+    {{info.data.uiCommit.commit.commitTime | date:'mediumDate'}}
+    {{info.data.uiCommit.commit.commitTime | date:'shortTime'}}
+</p>

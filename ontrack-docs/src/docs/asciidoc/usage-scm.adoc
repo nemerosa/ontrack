@@ -1,0 +1,23 @@
+[[usage-scm]]
+=== Working with SCM
+
+Source Control Management (SCM) is at the core of Continuous
+Integration and Continuous Delivery chains. It's therefore not
+a surprise that they play a major role in Ontrack.
+
+Out of the box, several SCM are supported:
+
+* Git based systems
+** <<usage-git,Generic Git repositories>>
+** <<usage-github,GitHub Cloud & Enterprise>>
+** <<usage-gitlab,GitLab>>
+** <<usage-bitbucket,BitBucket Cloud & Server>>
+* <<usage-subversion,Subversion>>
+
+[WARNING]
+====
+As of version 3.41, Subversion is now _deprecated_ and support
+for it will be removed in version 4.x
+====
+
+include::scm-catalog.adoc[]

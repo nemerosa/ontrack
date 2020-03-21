@@ -36,6 +36,11 @@ inline fun <reified T> JsonNode.parse(): T =
         JsonUtils.parse(this, T::class.java)
 
 /**
+ * Formatting a JSON node as a string
+ */
+fun JsonNode.format() = JsonUtils.toJSONString(this)
+
+/**
  * Parses any node into an object or returns `null` if parsing fails
  */
 inline fun <reified T> JsonNode.parseOrNull(): T? =

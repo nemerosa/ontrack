@@ -589,6 +589,13 @@ class GitServiceImpl(
         }
     }
 
+    override fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit {
+        return toUICommits(
+                gitConfiguration,
+                listOf(commit)
+        ).first()
+    }
+
     private fun toUICommits(gitConfiguration: GitConfiguration, commits: List<GitCommit>): List<GitUICommit> {
         // Link?
         val commitLink = gitConfiguration.commitLink

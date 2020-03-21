@@ -759,8 +759,8 @@ pipeline {
                     // Trace
                     echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
                     // Version components
-                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)\.\d.*/)
-                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)(?:-beta)?\.\d.*/)
+                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+(?:-beta)?\.\d.*/)
                     echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
                     echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
                     // Gets the corresponding branch
@@ -779,9 +779,9 @@ pipeline {
                                     'build'  : env.ONTRACK_VERSION as String
                             ],
                     )
-                    env.ONTRACK_BRANCH_NAME = result.data.builds.first().branch.name as String
+                    env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
                     // Trace
-                    echo "ONTRACK_BRANCH_NAME=${env.ONTRACK_BRANCH_NAME}"
+                    echo "ONTRACK_TARGET_BRANCH_NAME=${env.ONTRACK_TARGET_BRANCH_NAME}"
                 }
             }
         }
@@ -821,7 +821,7 @@ pipeline {
                 always {
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'DOCUMENTATION.LATEST',
                     )
@@ -850,13 +850,12 @@ pipeline {
                 sh '''\
                     echo "Making sure the images are available on this node..."
 
-                    echo ${DOCKER_REGISTRY_CREDENTIALS_PSW} | docker login docker.nemerosa.net --username ${DOCKER_REGISTRY_CREDENTIALS_USR} --password-stdin
-                    docker image pull docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION}
+                    docker image pull nemerosa/ontrack:${ONTRACK_VERSION}
 
                     echo "Tagging..."
 
-                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-                    docker image tag docker.nemerosa.net/nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
+                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
+                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
 
                     echo "Publishing latest versions in Docker Hub..."
 
@@ -870,7 +869,7 @@ pipeline {
                 always {
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'DOCKER.LATEST',
                     )
@@ -914,7 +913,7 @@ pipeline {
                 always {
                     ontrackValidate(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             validationStamp: 'SITE',
                     )
@@ -940,7 +939,7 @@ pipeline {
                 ONTRACK_POSTGRES = credentials('ONTRACK_POSTGRES')
             }
             steps {
-                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_BRANCH_NAME} in production"
+                echo "Deploying ${ONTRACK_VERSION} from branch ${ONTRACK_TARGET_BRANCH_NAME} in production"
                 // Running the deployment
                 timeout(time: 15, unit: 'MINUTES') {
                     script {
@@ -1009,7 +1008,7 @@ pipeline {
                         def results = junit 'build/production/*.xml'
                         ontrackValidate(
                                 project: ONTRACK_PROJECT_NAME,
-                                branch: env.ONTRACK_BRANCH_NAME as String,
+                                branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                                 build: env.ONTRACK_VERSION as String,
                                 validationStamp: 'ONTRACK.SMOKE',
                                 testResults: results,
@@ -1019,7 +1018,7 @@ pipeline {
                 success {
                     ontrackPromote(
                             project: ONTRACK_PROJECT_NAME,
-                            branch: env.ONTRACK_BRANCH_NAME as String,
+                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
                             build: env.ONTRACK_VERSION as String,
                             promotionLevel: 'ONTRACK',
                     )
@@ -1038,6 +1037,6 @@ String extractFromVersion(String version, String pattern) {
     if (matcher.matches()) {
         return matcher.group(1)
     } else {
-        throw new IllegalAccessException("Version $version does not match pattern: $pattern")
+        error("Version $version does not match pattern: $pattern")
     }
 }

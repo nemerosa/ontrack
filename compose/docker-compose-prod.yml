@@ -59,6 +59,7 @@ services:
 
   # ElasticSearch
   elasticsearch:
+    restart: always
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
     ports:
       - "9200:9200"
