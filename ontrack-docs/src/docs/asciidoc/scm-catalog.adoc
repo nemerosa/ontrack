@@ -68,6 +68,17 @@ get a special decoration, so that they can easily be identified
 
 image::images/scm-catalog-orphan-decoration.png[150,Orphan project decoration]
 
+[[scm-catalog-labels]]
+===== Project labels
+
+If the <<projects-labels-auto,collection of project labels>>
+is enabled, the following labels will be set for projects:
+
+* `scm-catalog:entry` when the project is associated with a SCM Catalog entry
+* `scm-catalog:no-entry` when the project is NOT associated with a SCM Catalog entry
+
+Those labels can
+
 [[scm-catalog-graphql]]
 ===== GraphQL schema
 
