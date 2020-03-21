@@ -18,7 +18,7 @@ class CatalogLinkJobTest {
         assertEquals(1, jobs.size)
         val jobRegistration = jobs.first()
         assertEquals(jobRegistration.schedule.initialPeriod, 0)
-        assertEquals(jobRegistration.schedule.period, 7)
+        assertEquals(jobRegistration.schedule.period, 1)
         assertEquals(jobRegistration.schedule.unit, TimeUnit.DAYS)
         val job = jobRegistration.job
         assertFalse(job.isDisabled)

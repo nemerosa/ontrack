@@ -30,10 +30,8 @@ class SCMCatalogMetricsJob(
         override fun getDescription(): String = "Collection of SCM Catalog metrics"
 
         override fun getTask() = JobRun {
-            SCMCatalogProjectFilterLink.values().forEach { link ->
-                val counts = scmCatalogFilterService.indexCatalogProjectEntries()
-                scmCatalogMetricsCache.counts = counts
-            }
+            val counts = scmCatalogFilterService.indexCatalogProjectEntries()
+            scmCatalogMetricsCache.counts = counts
         }
 
     }
