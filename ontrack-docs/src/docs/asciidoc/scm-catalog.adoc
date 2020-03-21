@@ -128,6 +128,17 @@ to provide information about any associated SCM Catalog entry:
 }
 ----
 
+[[scm-catalog-metrics]]
+===== Metrics
+
+The following <<monitoring-metrics,metrics>> are available:
+
+* `ontrack_extension_scm_catalog_total` (gauge) - count of SCM catalog entries + orphan projects
+* `ontrack_extension_scm_catalog_entries` (gauge) - count of SCM catalog entries
+* `ontrack_extension_scm_catalog_linked` (gauge) - count of _linked_ SCM catalog entries
+* `ontrack_extension_scm_catalog_unlinked` (gauge) - count of _unlinked_ SCM catalog entries
+* `ontrack_extension_scm_catalog_orphan` (gauge) - count of orphan projects
+
 [[scm-catalog-jobs]]
 ===== Administration
 
