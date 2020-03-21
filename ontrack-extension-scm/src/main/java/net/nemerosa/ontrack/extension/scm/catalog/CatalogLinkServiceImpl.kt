@@ -33,7 +33,7 @@ class CatalogLinkServiceImpl(
         projects.forEach { project ->
             val value = entityDataService.retrieve(project, CatalogLinkService::class.java.name)
             if (!value.isNullOrBlank() && (value in leftOverKeys || value !in allCatalogKeys)) {
-                logger.debug("Catalog entry $value linked with ${project.name} is obsolete.")
+                logger.debug("Catalog entry $value --> ${project.name} is obsolete.")
                 entityDataService.delete(project, CatalogLinkService::class.java.name)
             }
         }
@@ -60,7 +60,7 @@ class CatalogLinkServiceImpl(
             projects: List<Project>,
             providers: Map<String, SCMCatalogProvider>
     ): Boolean {
-        logger.debug("Catalog link for ${entry.key}")
+        logger.debug("Catalog entry ${entry.key}")
         // Gets a provider for this entry
         val provider = providers[entry.scm]
         // For all projects
@@ -68,7 +68,7 @@ class CatalogLinkServiceImpl(
             projects.forEach { project ->
                 // Is that a match?
                 if (provider.matches(entry, project)) {
-                    logger.debug("Catalog entry ${entry.key} links with ${project.name}")
+                    logger.debug("Catalog entry ${entry.key} --> ${project.name}")
                     // Stores the link
                     entityDataService.store(
                             project,

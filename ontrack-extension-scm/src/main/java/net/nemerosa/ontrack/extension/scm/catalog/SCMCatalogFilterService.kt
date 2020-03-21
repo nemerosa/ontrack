@@ -7,4 +7,9 @@ interface SCMCatalogFilterService {
      */
     fun findCatalogProjectEntries(filter: SCMCatalogProjectFilter): List<SCMCatalogEntryOrProject>
 
+    /**
+     * Gets the count of entries per link.
+     */
+    fun indexCatalogProjectEntries(): Map<SCMCatalogProjectFilterLink, Int>
+
 }

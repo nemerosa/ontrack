@@ -18,6 +18,36 @@ class SCMCatalogFilterServiceImpl(
         private val securityService: SecurityService
 ) : SCMCatalogFilterService {
 
+    override fun indexCatalogProjectEntries(): Map<SCMCatalogProjectFilterLink, Int> {
+        val results = mutableMapOf<SCMCatalogProjectFilterLink, Int>()
+
+        scmCatalog.catalogEntries.forEach { entry ->
+            incr(results, SCMCatalogProjectFilterLink.ALL)
+            incr(results, SCMCatalogProjectFilterLink.ENTRY)
+            val linked = catalogLinkService.isLinked(entry)
+            if (linked) {
+                incr(results, SCMCatalogProjectFilterLink.LINKED)
+            } else {
+                incr(results, SCMCatalogProjectFilterLink.UNLINKED)
+            }
+        }
+
+        securityService.asAdmin {
+            structureService.projectList.forEach { project ->
+                if (catalogLinkService.isOrphan(project)) {
+                    incr(results, SCMCatalogProjectFilterLink.ALL)
+                    incr(results, SCMCatalogProjectFilterLink.ORPHAN)
+                }
+            }
+        }
+
+        return results.toMap()
+    }
+
+    private fun incr(results: MutableMap<SCMCatalogProjectFilterLink, Int>, link: SCMCatalogProjectFilterLink) {
+        results[link] = results[link]?.plus(1) ?: 1
+    }
+
     override fun findCatalogProjectEntries(filter: SCMCatalogProjectFilter): List<SCMCatalogEntryOrProject> {
         securityService.checkGlobalFunction(SCMCatalogAccessFunction::class.java)
 
@@ -32,15 +62,7 @@ class SCMCatalogFilterServiceImpl(
         val entryRepositoryFilter: (SCMCatalogEntry) -> Boolean = repositoryRegex?.let {
             { entry: SCMCatalogEntry -> it.matches(entry.repository) }
         } ?: { true }
-        val entryLinkFilter: (SCMCatalogEntry) -> Boolean = { entry ->
-            when (filter.link) {
-                SCMCatalogProjectFilterLink.ALL -> true
-                SCMCatalogProjectFilterLink.ENTRY -> true
-                SCMCatalogProjectFilterLink.LINKED -> catalogLinkService.isLinked(entry)
-                SCMCatalogProjectFilterLink.UNLINKED -> !catalogLinkService.isLinked(entry)
-                SCMCatalogProjectFilterLink.ORPHAN -> false
-            }
-        }
+        val entryLinkFilter: (SCMCatalogEntry) -> Boolean = getEntryLinkFilter(filter.link)
         val entryFilter: (SCMCatalogEntry) -> Boolean = entryScmFilter and
                 entryConfigFilter and
                 entryRepositoryFilter and
@@ -88,6 +110,16 @@ class SCMCatalogFilterServiceImpl(
 
         // Sorting
         return allEntries.sorted().drop(filter.offset).take(filter.size).toList()
+    }
+
+    private fun getEntryLinkFilter(link: SCMCatalogProjectFilterLink): (SCMCatalogEntry) -> Boolean = { entry ->
+        when (link) {
+            SCMCatalogProjectFilterLink.ALL -> true
+            SCMCatalogProjectFilterLink.ENTRY -> true
+            SCMCatalogProjectFilterLink.LINKED -> catalogLinkService.isLinked(entry)
+            SCMCatalogProjectFilterLink.UNLINKED -> !catalogLinkService.isLinked(entry)
+            SCMCatalogProjectFilterLink.ORPHAN -> false
+        }
     }
 
 }

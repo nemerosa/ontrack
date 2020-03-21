@@ -13,7 +13,7 @@ class CatalogLinkJob(
     override fun getStartingJobs(): Collection<JobRegistration> = listOf(
             JobRegistration(
                     createCatalogLinkJob(),
-                    Schedule.EVERY_WEEK
+                    Schedule.EVERY_DAY
             )
     )
 
