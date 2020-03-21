@@ -153,3 +153,17 @@ image::images/scm-catalog-jobs.png[SCM Catalog jobs]
   projects and associated SCM repositories. Runs once a day.
 * _Collection of SCM Catalog metrics_ - computes some metrics
   about the SCM catalog
+
+[[scm-catalog-github]]
+====== Specific configuration for GitHub
+
+The GitHub repositories are _not_ collected unless their
+organization is specifically allowed. By default, none are.
+
+In order to enable the scanning of a GitHub organization,
+log as administrator, go to the _Settings_, scroll to the
+_GitHub SCM Catalog_ section and enter the names of the
+organizations to authorise for collection. For example, below,
+only the `nemerosa` organization is allowed:
+
+image::images/scm-catalog-github.png[200,GitHub SCM Catalog]
