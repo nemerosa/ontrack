@@ -157,8 +157,8 @@ class DefaultOntrackGitHubClient(
                 )
             }
 
-    private fun toUser(user: User): GitHubUser =
-            user.run {
+    private fun toUser(user: User?): GitHubUser? =
+            user?.run {
                 GitHubUser(
                         login,
                         htmlUrl
