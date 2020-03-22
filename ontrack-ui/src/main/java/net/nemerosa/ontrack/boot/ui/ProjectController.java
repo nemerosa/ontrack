@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.annotations.API;
+import net.nemerosa.ontrack.model.annotations.APIMethod;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Replacements;
 import net.nemerosa.ontrack.model.form.Text;
@@ -11,8 +13,6 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
-import net.nemerosa.ontrack.model.annotations.API;
-import net.nemerosa.ontrack.model.annotations.APIMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -53,16 +53,6 @@ public class ProjectController extends AbstractResourceController {
         return Resources.of(
                 structureService.getProjectStatusViews(),
                 uri(on(ProjectController.class).getProjectStatusViews())
-        )
-                .forView(ProjectStatusView.class)
-                .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
-    }
-
-    @RequestMapping(value = "favourites", method = RequestMethod.GET)
-    public Resources<ProjectStatusView> getProjectStatusViewsForFavourites() {
-        return Resources.of(
-                structureService.getProjectStatusViewsForFavourites(),
-                uri(on(ProjectController.class).getProjectStatusViewsForFavourites())
         )
                 .forView(ProjectStatusView.class)
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
