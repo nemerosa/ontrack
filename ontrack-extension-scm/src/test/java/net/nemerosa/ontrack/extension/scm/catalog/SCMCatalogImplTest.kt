@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.catalog
 
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.junit.Before
 import org.junit.Test
@@ -13,15 +14,17 @@ import kotlin.test.assertNull
 class SCMCatalogImplTest {
 
     private lateinit var storageService: StorageService
+    private lateinit var applicationLogService: ApplicationLogService
 
     @Before
     fun init() {
         storageService = mock()
+        applicationLogService = mock()
     }
 
     @Test
     fun `Registering entries without any provider`() {
-        val catalog = SCMCatalogImpl(storageService, emptyList())
+        val catalog = SCMCatalogImpl(storageService, emptyList(), applicationLogService)
         whenever(storageService.getKeys("scm-catalog")).thenReturn(emptyList())
         catalog.collectSCMCatalog { println(it) }
         verify(storageService, times(0)).store(eq("scm-catalog"), any(), any())
@@ -34,7 +37,7 @@ class SCMCatalogImplTest {
         whenever(provider.id).thenReturn("scm")
         whenever(provider.entries).thenReturn(listOf(source("project/repo1")))
 
-        val catalog = SCMCatalogImpl(storageService, listOf(provider))
+        val catalog = SCMCatalogImpl(storageService, listOf(provider), applicationLogService)
         whenever(storageService.getKeys("scm-catalog")).thenReturn(emptyList())
         catalog.collectSCMCatalog { println(it) }
         verify(storageService, times(1)).store(
@@ -57,7 +60,7 @@ class SCMCatalogImplTest {
         whenever(provider2.id).thenReturn("scm2")
         whenever(provider2.entries).thenReturn(listOf(source("project/repo2")))
 
-        val catalog = SCMCatalogImpl(storageService, listOf(provider1, provider2))
+        val catalog = SCMCatalogImpl(storageService, listOf(provider1, provider2), applicationLogService)
         whenever(storageService.getKeys("scm-catalog")).thenReturn(emptyList())
         catalog.collectSCMCatalog { println(it) }
         verify(storageService, times(1)).store(
@@ -83,7 +86,7 @@ class SCMCatalogImplTest {
         whenever(provider.id).thenReturn("scm")
         whenever(provider.entries).thenReturn(listOf(source("project/repo1"), source("project/repo2")))
 
-        val catalog = SCMCatalogImpl(storageService, listOf(provider))
+        val catalog = SCMCatalogImpl(storageService, listOf(provider), applicationLogService)
         whenever(storageService.getKeys("scm-catalog")).thenReturn(listOf("scm::config::project/repo1"))
         catalog.collectSCMCatalog { println(it) }
         verify(storageService, times(1)).store(
@@ -109,7 +112,7 @@ class SCMCatalogImplTest {
         whenever(provider.id).thenReturn("scm")
         whenever(provider.entries).thenReturn(listOf(source("project/repo1")))
 
-        val catalog = SCMCatalogImpl(storageService, listOf(provider))
+        val catalog = SCMCatalogImpl(storageService, listOf(provider), applicationLogService)
         whenever(storageService.getKeys("scm-catalog")).thenReturn(listOf("scm::config::project/repo2"))
         catalog.collectSCMCatalog { println(it) }
         verify(storageService, times(1)).store(
@@ -124,7 +127,7 @@ class SCMCatalogImplTest {
 
     @Test
     fun `Getting entries`() {
-        val catalog = SCMCatalogImpl(storageService, emptyList())
+        val catalog = SCMCatalogImpl(storageService, emptyList(), applicationLogService)
         whenever(storageService.getData("scm-catalog", SCMCatalogEntry::class.java)).thenReturn(
                 mapOf(
                         "key1" to entry("project/repo1"),
@@ -140,7 +143,7 @@ class SCMCatalogImplTest {
 
     @Test
     fun `Getting an entry by key`() {
-        val catalog = SCMCatalogImpl(storageService, emptyList())
+        val catalog = SCMCatalogImpl(storageService, emptyList(), applicationLogService)
         whenever(storageService.retrieve("scm-catalog", "key1", SCMCatalogEntry::class.java)).thenReturn(
                 Optional.of(entry("project/repo"))
         )
