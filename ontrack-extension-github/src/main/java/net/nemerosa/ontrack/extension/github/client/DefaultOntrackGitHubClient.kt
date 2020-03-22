@@ -103,8 +103,8 @@ class DefaultOntrackGitHubClient(
                 toLabels(issue.labels),
                 toState(issue.state),
                 toMilestone(repository, issue.milestone),
-                toDateTime(issue.createdAt),
-                toDateTime(issue.updatedAt),
+                toDateTime(issue.createdAt)!!,
+                toDateTime(issue.updatedAt) ?: toDateTime(issue.createdAt)!!,
                 toDateTime(issue.closedAt)
         )
     }
@@ -132,7 +132,7 @@ class DefaultOntrackGitHubClient(
         return client
     }
 
-    private fun toDateTime(date: Date): LocalDateTime = Time.from(date, null)
+    private fun toDateTime(date: Date?): LocalDateTime? = Time.from(date, null)
 
     private fun toMilestone(repository: String, milestone: Milestone): GitHubMilestone =
             milestone.run {
