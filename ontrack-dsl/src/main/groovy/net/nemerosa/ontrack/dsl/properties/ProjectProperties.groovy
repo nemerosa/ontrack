@@ -80,23 +80,6 @@ class ProjectProperties extends ProjectEntityProperties {
     }
 
     /**
-     * SVN configuration
-     */
-
-    @DSLMethod("Configures the project for Subversion.")
-    def svn(String name, String projectPath) {
-        property('net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType', [
-                configuration: name,
-                projectPath  : projectPath
-        ])
-    }
-
-    @DSLMethod(see = "svn")
-    def getSvn() {
-        property('net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType')
-    }
-
-    /**
      * Git configuration
      */
 

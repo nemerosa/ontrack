@@ -1,8 +1,0 @@
-Returns any <<usage-subversion,Subversion>> revision attached to this build.
-
-[source,groovy]
-----
-def build = ontrack.build('project', 'branch', '1')
-Long revision = build.svnRevisionDecoration
-assert revision != null
-----

@@ -306,14 +306,6 @@ class Build extends AbstractProjectResource {
         }
     }
 
-    /**
-     * SVN revision decoration
-     */
-    @DSLMethod
-    Long getSvnRevisionDecoration() {
-        getDecoration('net.nemerosa.ontrack.extension.svn.SVNRevisionDecorationExtension') as Long
-    }
-
     @DSLMethod("Gets the associated run info with this build, or `null` if none")
     RunInfo getRunInfo() {
         def result = ontrack.get(link("runInfo"))
