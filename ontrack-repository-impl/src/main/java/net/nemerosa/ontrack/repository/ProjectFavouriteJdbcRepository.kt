@@ -20,11 +20,11 @@ class ProjectFavouriteJdbcRepository(dataSource: DataSource) : AbstractJdbcRepos
     }
 
     override fun isProjectFavourite(accountId: Int, projectId: Int): Boolean {
-        return getOptional(
+        return getFirstItem(
                 "SELECT ID FROM PROJECT_FAVOURITES WHERE ACCOUNTID = :account AND PROJECTID = :project",
                 params("account", accountId).addValue("project", projectId),
                 Int::class.java
-        ).isPresent
+        ) != null
     }
 
     override fun setProjectFavourite(accountId: Int, projectId: Int, favourite: Boolean) {
