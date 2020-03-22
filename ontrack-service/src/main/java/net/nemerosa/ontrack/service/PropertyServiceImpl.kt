@@ -73,6 +73,10 @@ class PropertyServiceImpl(
         return getProperty(entity, propertyTypeClass.name)
     }
 
+    override fun <T> hasProperty(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): Boolean {
+        return propertyRepository.hasProperty(propertyTypeClass.javaClass.name, entity.projectEntityType, entity.id)
+    }
+
     override fun editProperty(entity: ProjectEntity, propertyTypeName: String, data: JsonNode): Ack {
         // Gets the property using its fully qualified type name
         val propertyType: PropertyType<*> = getPropertyTypeByName<Any>(propertyTypeName)

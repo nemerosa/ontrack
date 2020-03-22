@@ -129,8 +129,7 @@ interface PropertyService {
     /**
      * Tests if a property is defined.
      */
-    fun <T> hasProperty(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): Boolean =
-            !getProperty(entity, propertyTypeClass).isEmpty
+    fun <T> hasProperty(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): Boolean
 
     /**
      * Copy/clones the `property` into the `targetEntity` after applying the replacement function.
