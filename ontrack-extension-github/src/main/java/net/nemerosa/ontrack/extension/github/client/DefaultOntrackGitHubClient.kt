@@ -134,8 +134,8 @@ class DefaultOntrackGitHubClient(
 
     private fun toDateTime(date: Date?): LocalDateTime? = Time.from(date, null)
 
-    private fun toMilestone(repository: String, milestone: Milestone): GitHubMilestone =
-            milestone.run {
+    private fun toMilestone(repository: String, milestone: Milestone?): GitHubMilestone? =
+            milestone?.run {
                 GitHubMilestone(
                         title,
                         toState(state),
