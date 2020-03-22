@@ -74,7 +74,7 @@ class PropertyServiceImpl(
     }
 
     override fun <T> hasProperty(entity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): Boolean {
-        return propertyRepository.hasProperty(propertyTypeClass.javaClass.name, entity.projectEntityType, entity.id)
+        return propertyRepository.hasProperty(propertyTypeClass.name, entity.projectEntityType, entity.id)
     }
 
     override fun editProperty(entity: ProjectEntity, propertyTypeName: String, data: JsonNode): Ack {
