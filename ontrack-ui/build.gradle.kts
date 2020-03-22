@@ -48,7 +48,6 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-general"))
     runtimeOnly(project(":ontrack-extension-jenkins"))
     runtimeOnly(project(":ontrack-extension-jira"))
-    runtimeOnly(project(":ontrack-extension-svn"))
     runtimeOnly(project(":ontrack-extension-artifactory"))
     runtimeOnly(project(":ontrack-extension-git"))
     runtimeOnly(project(":ontrack-extension-github"))
