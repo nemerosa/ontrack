@@ -103,8 +103,8 @@ class DefaultOntrackGitHubClient(
                 toLabels(issue.labels),
                 toState(issue.state),
                 toMilestone(repository, issue.milestone),
-                toDateTime(issue.createdAt),
-                toDateTime(issue.updatedAt),
+                toDateTime(issue.createdAt)!!,
+                toDateTime(issue.updatedAt) ?: toDateTime(issue.createdAt)!!,
                 toDateTime(issue.closedAt)
         )
     }
@@ -132,10 +132,10 @@ class DefaultOntrackGitHubClient(
         return client
     }
 
-    private fun toDateTime(date: Date): LocalDateTime = Time.from(date, null)
+    private fun toDateTime(date: Date?): LocalDateTime? = Time.from(date, null)
 
-    private fun toMilestone(repository: String, milestone: Milestone): GitHubMilestone =
-            milestone.run {
+    private fun toMilestone(repository: String, milestone: Milestone?): GitHubMilestone? =
+            milestone?.run {
                 GitHubMilestone(
                         title,
                         toState(state),
@@ -149,16 +149,16 @@ class DefaultOntrackGitHubClient(
 
     private fun toState(state: String): GitHubState = GitHubState.valueOf(state)
 
-    private fun toLabels(labels: List<Label>): List<GitHubLabel> = labels
-            .map { label: Label ->
+    private fun toLabels(labels: List<Label>?): List<GitHubLabel> = labels
+            ?.map { label: Label ->
                 GitHubLabel(
                         label.name,
                         label.color
                 )
-            }
+            } ?: emptyList()
 
-    private fun toUser(user: User): GitHubUser =
-            user.run {
+    private fun toUser(user: User?): GitHubUser? =
+            user?.run {
                 GitHubUser(
                         login,
                         htmlUrl
