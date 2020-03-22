@@ -296,7 +296,7 @@ file.bytes = promotionLevel.image.content
 [[dsl-usecases-changelogs]]
 ==== DSL Change logs
 
-When a branch is configured for a SCM (Git, Subversion), a
+When a branch is configured for a <<usage-scm,SCM>>, a
 <<changelogs,change log>> can be computed between two builds and following
 collections can be displayed:
 
@@ -305,8 +305,7 @@ collections can be displayed:
 * file changes
 
 TIP: Change logs can also be computed between builds which belong to different
-     branches, as long as they are in the same project. _This is only
-     supported for Git, not for Subversion._
+     branches, as long as they are in the same project.
 
 [[dsl-usecases-changelogs-get]]
 ===== Getting the change log
@@ -464,7 +463,7 @@ ontrack.branch('project', 'template').instance 'TEST', [
 [[dsl-scm]]
 ==== DSL SCM extensions
 
-If a SCM (<<usage-subversion,Subversion>> or <<usage-git,Git>>) is correctly configured on a branch, it is possible
+If a <<usage-scm,SCM>> is correctly configured on a branch, it is possible
 to download some files.
 
 IMPORTANT: This is allowed only for the project owner.

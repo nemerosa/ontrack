@@ -24,8 +24,6 @@ include::usage-scm.adoc[]
 
 include::usage-git.adoc[]
 
-include::usage-subversion.adoc[]
-
 include::changelogs.adoc[]
 
 include::searching.adoc[]

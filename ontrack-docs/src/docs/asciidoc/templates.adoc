@@ -110,15 +110,3 @@ the `branchName` variable is bound to the branch name.
 
 Note that those Groovy expression are executed in a _sand box_ that prevent malicious code execution.
 
-[[templates-expressions-examples]]
-===== Examples
-
-In a SVN context, we can bind the branch SVN configuration (branch location +
-tag pattern) this way, using simple replacements:
-
-	branchLocation: branchName -> /project/branches/${branchName}
-	tagPattern:     branchName -> /project/tags/{build:${branchName}*}
-
-In a Jenkins context, we can bind the job name for a branch:
-
-	jobName: branchName -> PROJECT_${branchName.toUpperCase()}_BUILD

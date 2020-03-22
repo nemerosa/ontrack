@@ -9,7 +9,7 @@ of the applications.
 ==== Health
 
 The `/manage/health` end point provides a JSON tree which indicates the status
-of all connected systems: JIRA, Jenkins, Subversion repositories, Git
+of all connected systems: JIRA, Jenkins, Git
 repositories, etc.
 
 Note than an administrator can have access to this information as a dashboard

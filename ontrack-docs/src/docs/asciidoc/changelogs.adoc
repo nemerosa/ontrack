@@ -1,7 +1,7 @@
 [[changelogs]]
 === Change logs
 
-When working with <<usage-git,Git>> or <<usage-subversion,Subversion>>, you
+When working with <<usage-git,Git>> or any <<usage-scm,SCM>>, you
 have the opportunity to get a change log between two <<usage-builds,builds>> of
 the same project.
 
@@ -25,7 +25,7 @@ The _Change log_ button displays the change log page, which contains four
 sections:
 
 * general information about the two build boundaries
-* the commits (for Git) or revision (for Subversion) section
+* the commits section
 * the issues section
 * the file changes selection
 
@@ -34,7 +34,7 @@ other ones are displayed only when you request them by clicking on one of the
 corresponding buttons or links.
 
 Note that the issue section is available only if the corresponding SCM
-configuration (Git or Subversion) is associated with an issue server (like
+configuration is associated with an issue server (like
 <<usage-jira,JIRA>> or <<usage-github,GitHub>>).
 
 [[changelogs-commits]]
@@ -60,8 +60,7 @@ The list of file changes between the two build boundaries is displayed here:
 
 image::images/changelog.files.png[Change log files,600]
 
-Each file change is associated with the corresponding changes. This includes
-the list of revisions for Subversion.
+Each file change is associated with the corresponding changes.
 
 Additionally, you can define filters on the file changes, in order to have
 access to a list of files impacted by the change log.

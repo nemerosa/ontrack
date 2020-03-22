@@ -4,7 +4,7 @@
 Ontrack makes a heavy use of _jobs_ in order to schedule regular activities,
 like:
 
-* SCM indexation (for SVN for example)
+* SCM indexation (for Git repositories for example)
 * SCM/build synchronisations
 * Branch templating synchronisation
 * etc.
@@ -102,7 +102,7 @@ The `Job` provides also a description, and the desired state of the job:
   the job which synchronizes a branch instance with its template will be disable
   if the branch is disabled
 * valid or not - when a job becomes invalid, it is not executed, and will be
-  unregistered automatically. For example, a Subversion indexation job might
+  unregistered automatically. For example, a Git indexation job might
   become invalid if the associated repository configuration has been deleted.
 
 Finally, of course, the job must provide the task to actually execute:

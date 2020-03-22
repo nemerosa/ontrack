@@ -147,14 +147,14 @@ ExtensionFeatureOptions.DEFAULT.withGui(true)
 ----
 
 If your extension depends on other extensions, it must declare them. For
-example, to depend on GitHub and Subversion extensions, first declare them as
+example, to depend on GitHub and SCM extensions, first declare them as
 dependencies in the `build.gradle`:
 
 [source,groovy]
 ----
 ontrack {
    uses 'github'
-   uses 'svn'
+   uses 'scm'
 }
 ----
 
@@ -167,7 +167,7 @@ public class MyExtensionFeature extends AbstractExtensionFeature {
     @Autowired
     public MyExtensionFeature(
       GitHubExtensionFeature gitHubExtensionFeature,
-      SVNExtensionFeature svnExtensionFeature
+      SCMExtensionFeature scmExtensionFeature
     ) {
         super(
             "myextension",
@@ -175,7 +175,7 @@ public class MyExtensionFeature extends AbstractExtensionFeature {
             "Sample extension for Ontrack",
             ExtensionFeatureOptions.DEFAULT
                .withDependency(gitHubExtensionFeature)
-               .withDependency(svnExtensionFeature)
+               .withDependency(scmExtensionFeature)
         );
     }
 }
