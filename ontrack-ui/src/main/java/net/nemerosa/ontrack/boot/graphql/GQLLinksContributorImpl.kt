@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.ui.resource.ResourceContext
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator
 import net.nemerosa.ontrack.ui.resource.ResourceDecoratorDelegate
 import org.springframework.stereotype.Component
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class GQLLinksContributorImpl(
@@ -22,6 +23,7 @@ class GQLLinksContributorImpl(
 ) : GQLFieldContributor {
 
     override fun getFields(type: Class<*>): List<GraphQLFieldDefinition> {
+        val resourceContext = DefaultResourceContext(uriBuilder, securityService)
         val definitions = mutableListOf<GraphQLFieldDefinition>()
         // Links
         val typeDecorators = decorators
@@ -44,12 +46,13 @@ class GQLLinksContributorImpl(
                                                                 newFieldDefinition()
                                                                         .name(linkName)
                                                                         .type(GraphQLString)
+                                                                        .dataFetcher(linkDataFetcher(linkName))
                                                                         .build()
                                                             }
                                             )
                                             .build()
                             )
-                            .dataFetcher(typeLinksFetcher(typeDecorators))
+                            .dataFetcher { env -> LinksCache(resourceContext, env.getSource(), typeDecorators) }
                             .build()
             )
         }
@@ -57,38 +60,48 @@ class GQLLinksContributorImpl(
         return definitions
     }
 
-    private fun typeLinksFetcher(typeDecorators: List<ResourceDecorator<*>>): DataFetcher<*> {
-        return DataFetcher<Any> { environment ->
-            val source = environment.getSource<Any>()
-            for (decorator in typeDecorators) {
-                return@DataFetcher getLinks<Any>(decorator, source)
+    private fun linkDataFetcher(linkName: String) =
+            DataFetcher<String> { environment ->
+                val linksCache = environment.getSource<LinksCache>()
+                linksCache.getLink(linkName)
             }
-            emptyMap<Any, Any>()
+
+    private class LinksCache(
+            private val resourceContext: ResourceContext,
+            private val source: Any,
+            private val typeDecorators: List<ResourceDecorator<*>>
+    ) {
+
+        private val cache = ConcurrentHashMap<String, CachedLink>()
+
+        fun getLink(linkName: String): String? =
+                cache.getOrPut(linkName) {
+                    computeLink(linkName)
+                }.link
+
+        private fun computeLink(linkName: String): CachedLink {
+            val link = typeDecorators.mapNotNull { decorator ->
+                computeLink(decorator, linkName)
+            }.firstOrNull()
+            return CachedLink(link)
         }
+
+        private fun <T> computeLink(decorator: ResourceDecorator<T>, linkName: String): String? =
+                if (linkName in decorator.linkNames) {
+                    @Suppress("UNCHECKED_CAST")
+                    val t: T = if (source is ResourceDecoratorDelegate) {
+                        source.getLinkDelegate()
+                    } else {
+                        source
+                    } as T
+                    val link = decorator.linkByName(t, resourceContext, linkName)
+                    link?.href?.toString()
+                } else {
+                    null
+                }
+
     }
 
-    private fun <T> getLinks(decorator: ResourceDecorator<*>, source: Any): Map<String, String> {
-        @Suppress("UNCHECKED_CAST")
-        val resourceDecorator = decorator as ResourceDecorator<T>
-        @Suppress("UNCHECKED_CAST")
-        val t: T = if (source is ResourceDecoratorDelegate) {
-            source.getLinkDelegate()
-        } else {
-            source
-        } as T
-        return resourceDecorator.links(
-                t,
-                createResourceContext()
-        ).associate { link ->
-            link.name to link.href.toString()
-        }
-    }
-
-    private fun createResourceContext(): ResourceContext {
-        return DefaultResourceContext(
-                uriBuilder,
-                securityService
-        )
-    }
+    private class CachedLink(val link: String?)
 
 }

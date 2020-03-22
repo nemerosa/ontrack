@@ -26,6 +26,16 @@ class PropertyJdbcRepository(
         dataSource: DataSource
 ) : AbstractJdbcRepository(dataSource), PropertyRepository {
 
+    override fun hasProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): Boolean {
+        return namedParameterJdbcTemplate!!.queryForList(
+                """
+                    SELECT ID FROM PROPERTIES WHERE TYPE = :type AND ${entityType.name} = :entityId
+                """,
+                params("type", typeName).addValue("entityId", entityId.value),
+                Int::class.java
+        ).isNotEmpty()
+    }
+
     @Cacheable(cacheNames = ["properties"], key = "#typeName + #entityType.name() + #entityId.value")
     override fun loadProperty(typeName: String, entityType: ProjectEntityType, entityId: ID): TProperty? {
         return getFirstItem(

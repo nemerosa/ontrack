@@ -39,6 +39,10 @@ ontrack.config.application-log-info-max = 10
 # It is usually set by the installation
 ontrack.config.application-working-dir = work/files
 
+# Maximum number of builds which can be returned by a build filter
+# Any number above is truncated down to this value
+ontrack.config.build-filter-count-max = 200
+
 # Testing the configurations of external configurations
 # Used only for internal testing, to disable the checks
 # when creating external configurations

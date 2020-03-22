@@ -39,7 +39,6 @@ public class StructureServiceImplTest {
         PredefinedPromotionLevelService predefinedPromotionLevelService = mock(PredefinedPromotionLevelService.class);
         PredefinedValidationStampService predefinedValidationStampService = mock(PredefinedValidationStampService.class);
         DecorationService decorationService = mock(DecorationService.class);
-        ProjectFavouriteService projectFavouriteService = mock(ProjectFavouriteService.class);
         ValidationDataTypeService validationDataTypeService = mock(ValidationDataTypeService.class);
         PromotionRunCheckService promotionRunCheckService = mock(PromotionRunCheckService.class);
         StatsRepository statsRepository = mock(StatsRepository.class);
@@ -54,7 +53,6 @@ public class StructureServiceImplTest {
                 predefinedPromotionLevelService,
                 predefinedValidationStampService,
                 decorationService,
-                projectFavouriteService,
                 promotionRunCheckService,
                 statsRepository,
                 mock(BuildLinkListenerService.class)

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
@@ -630,11 +631,14 @@ class GitServiceImpl(
         return SCMBuildView(getBuildView(buildId), GitBuildInfo())
     }
 
+    override fun isProjectConfiguredForGit(project: Project): Boolean =
+            gitConfigurators.any { configurator ->
+                configurator.isProjectConfigured(project)
+            }
+
     override fun getProjectConfiguration(project: Project): GitConfiguration? {
-        return gitConfigurators
-                .map { c -> c.getConfiguration(project) }
-                .filter { it.isPresent }
-                .map { it.get() }
+        return gitConfigurators.asSequence()
+                .mapNotNull { c -> c.getConfiguration(project).getOrNull() }
                 .firstOrNull()
     }
 

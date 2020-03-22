@@ -51,7 +51,6 @@ class StructureServiceImpl(
         private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
         private val predefinedValidationStampService: PredefinedValidationStampService,
         private val decorationService: DecorationService,
-        private val projectFavouriteService: ProjectFavouriteService,
         private val promotionRunCheckService: PromotionRunCheckService,
         private val statsRepository: StatsRepository,
         private val buildLinkListenerService: BuildLinkListenerService
@@ -68,24 +67,6 @@ class StructureServiceImpl(
                             getBranchStatusViews(project.id)
                     )
                 }
-
-    override val projectStatusViewsForFavourites: List<ProjectStatusView>
-        get() = projectFavourites
-                .map { project ->
-                    ProjectStatusView(
-                            project,
-                            decorationService.getDecorations(project),
-                            getBranchStatusViews(project.id)
-                    )
-                }
-
-    /**
-     * Gets the list of all authorised projects...
-     * .. filtered using the preferences
-     * .. ok
-     */
-    override val projectFavourites: List<Project>
-        get() = projectList.filter { projectFavouriteService.isProjectFavourite(it) }
 
     override val projectList: List<Project>
         get() {
