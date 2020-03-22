@@ -6,12 +6,11 @@ import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import net.nemerosa.ontrack.common.and
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.checkArgList
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.model.structure.*
-import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.springframework.stereotype.Component
-import java.util.regex.Pattern
 
 const val GRAPHQL_BRANCHES_FAVORITE_ARG = "favourite"
 
@@ -58,55 +57,73 @@ class GQLRootQueryBranches(
                 .build()
     }
 
-    private fun branchFetcher(): DataFetcher<*> {
-        return DataFetcher<List<Branch>> { environment ->
-            val id: Int? = environment.getArgument("id")
-            val projectName: String? = environment.getArgument("project")
-            val name: String? = environment.getArgument("name")
-            val favourite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
-            val propertyFilterArg: Any? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
-            // Per ID
-            if (id != null) {
-                checkArgList(environment, "id")
-                listOf(structureService.getBranch(ID.of(id)))
-            } else if ((favourite != null && favourite) || isNotBlank(projectName) || isNotBlank(name) || propertyFilterArg != null) {
+    private fun branchFetcher(): DataFetcher<List<Branch>> = DataFetcher { environment ->
+        val id: Int? = environment.getArgument("id")
+        val projectName: String? = environment.getArgument("project")
+        val name: String? = environment.getArgument("name")
+        val favourite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
+        val propertyFilterArg: Any? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
 
-                // Project filter
-                var projectFilter: (Project) -> Boolean = { true }
-                if (isNotBlank(projectName)) {
-                    projectFilter = projectFilter.and { p -> projectName == p.name }
-                }
+        // Project filter
+        val projectFilter: (Project) -> Boolean = if (projectName.isNullOrBlank()) {
+            { true }
+        } else {
+            { project -> project.name == projectName }
+        }
 
-                // Branch filter
-                var branchFilter: (Branch) -> Boolean = { true }
-                if (isNotBlank(name)) {
-                    val pattern = Pattern.compile(name)
-                    branchFilter = branchFilter.and { b -> pattern.matcher(b.name).matches() }
-                }
-                if (favourite != null && favourite) {
-                    branchFilter = branchFilter and { branchFavouriteService.isBranchFavourite(it) }
-                }
+        // Branch name filter
+        val regex = name?.toRegex()
+        val branchNameFilter: (Branch) -> Boolean = if (regex == null) {
+            { true }
+        } else {
+            { branch -> regex.matches(branch.name) }
+        }
 
-                // Property filter?
-                if (propertyFilterArg != null) {
-                    val filterObject: PropertyFilter? = propertyFilter.convert(propertyFilterArg)
-                    val type = filterObject?.type
-                    if (filterObject != null && type != null && type.isNotBlank()) {
-                        branchFilter = branchFilter.and { b -> propertyFilter.getFilter(filterObject).test(b) }
-                    }
-                }
-
-                // Gets the list of authorised projects
-                structureService.projectList
-                        // Filter on the project
-                        .filter(projectFilter)
-                        // Gets the list of branches
-                        .flatMap { project -> structureService.getBranchesForProject(project.id) }
-                        // Filter on the branch
-                        .filter(branchFilter)
+        // Property filter?
+        val branchPropertyFilter: (Branch) -> Boolean = if (propertyFilterArg != null) {
+            val filterObject: PropertyFilter? = propertyFilter.convert(propertyFilterArg)
+            val type = filterObject?.type
+            if (filterObject != null && type != null && type.isNotBlank()) {
+                { b: Branch -> propertyFilter.getFilter(filterObject).test(b) }
             } else {
-                emptyList()
+                { true }
             }
+        } else {
+            { true }
+        }
+
+        // Branch filter
+        val branchFilter = branchNameFilter and branchPropertyFilter
+
+        // Per ID
+        if (id != null) {
+            checkArgList(environment, "id")
+            listOf(structureService.getBranch(ID.of(id)))
+        } else if (favourite == true) {
+            // Gets the list of favourite branches
+            val branches = branchFavouriteService.getFavouriteBranches()
+            // Filter them with project, name & property
+            branches.filter {
+                projectFilter(it.project) && branchFilter(it)
+            }
+        } else if (!projectName.isNullOrBlank()) {
+            // Gets the project
+            val project = structureService.findProjectByName(projectName).getOrNull()
+            // Gets the branches for this project
+            val branches = project?.let { structureService.getBranchesForProject(project.id) } ?: emptyList()
+            // Filter them with name & property
+            branches.filter(branchFilter)
+        } else {
+            // Gets the projects
+            structureService.projectList.asSequence()
+                    // Filter on the project
+                    .filter(projectFilter)
+                    // Gets the list of branches
+                    .flatMap { project -> structureService.getBranchesForProject(project.id).asSequence() }
+                    // Filter on the branch
+                    .filter(branchFilter)
+                    // OK
+                    .toList()
         }
     }
 

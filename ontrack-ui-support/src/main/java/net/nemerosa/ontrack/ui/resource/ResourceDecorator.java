@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.ui.resource;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -7,6 +10,11 @@ public interface ResourceDecorator<T> {
 
     default List<Link> links(T resource, ResourceContext resourceContext) {
         return Collections.emptyList();
+    }
+
+    default @Nullable
+    Link linkByName(@NotNull T resource, @NotNull ResourceContext resourceContext, @NotNull String linkName) {
+        return null;
     }
 
     boolean appliesFor(Class<?> beanClass);

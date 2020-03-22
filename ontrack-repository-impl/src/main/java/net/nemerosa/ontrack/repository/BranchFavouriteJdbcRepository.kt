@@ -9,6 +9,18 @@ class BranchFavouriteJdbcRepository(
         dataSource: DataSource
 ) : AbstractJdbcRepository(dataSource), BranchFavouriteRepository {
 
+    override fun getFavouriteBranches(accountId: Int): List<Int> {
+        return namedParameterJdbcTemplate!!.queryForList(
+                """
+                    SELECT B.ID FROM BRANCHES B
+                    INNER JOIN BRANCH_FAVOURITES BF ON BF.BRANCHID = B.ID
+                    WHERE BF.ACCOUNTID = :accountId
+                """,
+                params("accountId", accountId),
+                Int::class.java
+        )
+    }
+
     override fun isBranchFavourite(accountId: Int, branchId: Int): Boolean {
         return getFirstItem(
                 "SELECT ID FROM BRANCH_FAVOURITES WHERE ACCOUNTID = :account AND BRANCHID = :branch",
@@ -20,13 +32,13 @@ class BranchFavouriteJdbcRepository(
     override fun setBranchFavourite(accountId: Int, branchId: Int, favourite: Boolean) {
         if (favourite) {
             if (!isBranchFavourite(accountId, branchId)) {
-                namedParameterJdbcTemplate.update(
+                namedParameterJdbcTemplate!!.update(
                         "INSERT INTO BRANCH_FAVOURITES(ACCOUNTID, BRANCHID) VALUES (:account, :branch)",
                         params("account", accountId).addValue("branch", branchId)
                 )
             }
         } else {
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     "DELETE FROM BRANCH_FAVOURITES WHERE ACCOUNTID = :account AND BRANCHID = :branch",
                     params("account", accountId).addValue("branch", branchId)
             )

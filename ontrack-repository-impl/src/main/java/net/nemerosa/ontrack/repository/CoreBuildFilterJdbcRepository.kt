@@ -2,22 +2,24 @@ package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
+import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository
-
-import javax.sql.DataSource
-import java.util.Optional
-
 import java.lang.String.format
-import org.apache.commons.lang3.StringUtils.isNotBlank
+import java.util.*
+import javax.sql.DataSource
 import kotlin.math.max
+import kotlin.math.min
 
 @Repository
-class CoreBuildFilterJdbcRepository @Autowired
-constructor(dataSource: DataSource, private val structureRepository: StructureRepository) : AbstractJdbcRepository(dataSource), CoreBuildFilterRepository {
+class CoreBuildFilterJdbcRepository(
+        dataSource: DataSource,
+        private val structureRepository: StructureRepository,
+        private val ontrackConfigProperties: OntrackConfigProperties
+) : AbstractJdbcRepository(dataSource), CoreBuildFilterRepository {
 
     /**
      * The fat join query (dreaming of Neo4J) defines the following columns:
@@ -247,14 +249,14 @@ constructor(dataSource: DataSource, private val structureRepository: StructureRe
                 "%s %s ORDER BY B.ID DESC LIMIT :count",
                 tables,
                 criteria)
-        params.addValue("count", data.count)
+        params.addValue("count", min(data.count, ontrackConfigProperties.buildFilterCountMax))
 
         // Running the query
         return loadBuilds(sql, params)
     }
 
     private fun loadBuilds(sql: String, params: MapSqlParameterSource): List<Build> {
-        return namedParameterJdbcTemplate
+        return namedParameterJdbcTemplate!!
                 .queryForList(
                         sql,
                         params,
@@ -302,7 +304,7 @@ constructor(dataSource: DataSource, private val structureRepository: StructureRe
         sql.append(" ORDER BY B.ID DESC")
         // Limit
         sql.append(" LIMIT :count")
-        params.addValue("count", count)
+        params.addValue("count", min(count, ontrackConfigProperties.buildFilterCountMax))
 
         // Running the query
         return loadBuilds(sql.toString(), params)

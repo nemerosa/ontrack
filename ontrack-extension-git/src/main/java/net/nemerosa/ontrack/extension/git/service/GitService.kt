@@ -21,6 +21,11 @@ val GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git")
 interface GitService : SCMService {
 
     /**
+     * Tests if a project is correctly configured for Git.
+     */
+    fun isProjectConfiguredForGit(project: Project): Boolean
+
+    /**
      * Tests if a branch is correctly configured for Git.
      */
     fun isBranchConfiguredForGit(branch: Branch): Boolean

@@ -12,10 +12,6 @@ interface StructureService {
 
     val projectStatusViews: List<ProjectStatusView>
 
-    val projectStatusViewsForFavourites: List<ProjectStatusView>
-
-    val projectFavourites: List<Project>
-
     val projectList: List<Project>
 
     // Projects

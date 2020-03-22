@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,11 @@ public class GitLabConfigurator implements GitConfigurator {
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.issueServiceExtension = issueServiceExtension;
+    }
+
+    @Override
+    public boolean isProjectConfigured(@NotNull Project project) {
+        return propertyService.hasProperty(project, GitLabProjectConfigurationPropertyType.class);
     }
 
     @Override

@@ -31,6 +31,11 @@ class OntrackConfigProperties {
     @Min(1)
     var applicationLogInfoMax = 10
     /**
+     * Maximum number of builds which can be returned by a build filter
+     */
+    @Min(1)
+    var buildFilterCountMax = 200
+    /**
      * Home directory
      */
     var applicationWorkingDir = "work/files"

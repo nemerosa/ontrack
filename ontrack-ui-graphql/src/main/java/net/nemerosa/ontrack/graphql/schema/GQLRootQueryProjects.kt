@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.ProjectFavouriteService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
@@ -22,7 +23,8 @@ class GQLRootQueryProjects(
         private val structureService: StructureService,
         private val project: GQLTypeProject,
         private val propertyFilter: GQLInputPropertyFilter,
-        private val projectLabelManagementService: ProjectLabelManagementService
+        private val projectLabelManagementService: ProjectLabelManagementService,
+        private val projectFavouriteService: ProjectFavouriteService
 ) : GQLRootQuery {
 
     override fun getFieldDefinition(): GraphQLFieldDefinition {
@@ -85,7 +87,7 @@ class GQLRootQueryProjects(
                 favourites -> {
                     // No other argument is expected
                     checkArgList(environment, ARG_FAVOURITES)
-                    return@DataFetcher structureService.projectFavourites
+                    return@DataFetcher projectFavouriteService.getFavouriteProjects()
                 }
                 else -> {
                     // Filter to use
