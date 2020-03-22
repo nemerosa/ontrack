@@ -149,13 +149,13 @@ class DefaultOntrackGitHubClient(
 
     private fun toState(state: String): GitHubState = GitHubState.valueOf(state)
 
-    private fun toLabels(labels: List<Label>): List<GitHubLabel> = labels
-            .map { label: Label ->
+    private fun toLabels(labels: List<Label>?): List<GitHubLabel> = labels
+            ?.map { label: Label ->
                 GitHubLabel(
                         label.name,
                         label.color
                 )
-            }
+            } ?: emptyList()
 
     private fun toUser(user: User?): GitHubUser? =
             user?.run {
