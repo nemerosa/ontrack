@@ -6,6 +6,17 @@ import org.junit.Test
 
 class MessageAnnotationUtilsTest {
 
+    private val linkFreeTextAnnotatorContributor = RegexMessageAnnotator("((https?://|ftp://|www\\.)\\S+)") { link ->
+        MessageAnnotation.of("a")
+                .attr("href", link)
+                .attr("target", "_blank")
+                .text(link)
+    }
+
+    private val jiraIssueMessageAnnotator = RegexMessageAnnotator("([A-Z]+-\\d+)") { match ->
+        MessageAnnotation.of("a").attr("href", "http://jira/browse/$match").text(match)
+    }
+
     private val issueMessageAnnotator = RegexMessageAnnotator("(#\\d+)") { match ->
         val id = match.substring(1)
         MessageAnnotation.of("link").attr("url", "http://test/id/$id").text(match)
@@ -13,6 +24,41 @@ class MessageAnnotationUtilsTest {
 
     private val numberMessageAnnotator = RegexMessageAnnotator("(\\d+)") { match ->
         MessageAnnotation.of("emphasis").text(match)
+    }
+
+    @Test
+    fun `Link with dashes`() {
+        val html = MessageAnnotationUtils.annotate(
+                "Description for https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4",
+                listOf(
+                        linkFreeTextAnnotatorContributor
+                )
+        )
+        assertEquals("""Description for <a href="https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4" target="_blank">https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4</a>""", html)
+    }
+
+    @Test
+    fun `Link with dashes and JIRA annotator second`() {
+        val html = MessageAnnotationUtils.annotate(
+                "Description for https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4",
+                listOf(
+                        linkFreeTextAnnotatorContributor,
+                        jiraIssueMessageAnnotator
+                )
+        )
+        assertEquals("""Description for <a href="https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4" target="_blank">https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4</a>""", html)
+    }
+
+    @Test
+    fun `Link with dashes and JIRA annotator first`() {
+        val html = MessageAnnotationUtils.annotate(
+                "Description for https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4",
+                listOf(
+                        linkFreeTextAnnotatorContributor,
+                        jiraIssueMessageAnnotator
+                )
+        )
+        assertEquals("""Description for <a href="https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4" target="_blank">https://www.example.com/asset/11f90cd5-d3c9-46f4-9b7c-9773284e3ad4</a>""", html)
     }
 
     @Test

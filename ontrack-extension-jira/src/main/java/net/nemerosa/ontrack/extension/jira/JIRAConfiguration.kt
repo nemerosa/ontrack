@@ -110,7 +110,7 @@ open class JIRAConfiguration(
 
     companion object {
 
-        private const val ISSUE_PATTERN_REGEX = "([A-Za-z][A-Za-z0-9]*-[0-9]+)"
+        private const val ISSUE_PATTERN_REGEX = "([A-Z]+-\\d+)"
 
         @JvmField
         val ISSUE_PATTERN: Pattern = Pattern.compile(ISSUE_PATTERN_REGEX)
