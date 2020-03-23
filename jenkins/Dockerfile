@@ -4,7 +4,6 @@ FROM openjdk:8u222-jdk
 # Makes sure all tools for the build are installed
 RUN apt-get update && apt-get install -y \
     git \
-    subversion \
     zip \
     rsync \
     graphviz \
