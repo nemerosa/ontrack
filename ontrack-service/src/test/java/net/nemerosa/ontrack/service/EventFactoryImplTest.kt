@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventCannotRenderEntityException
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.service.events.EventFactoryImpl
 import org.junit.Test

@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.TestUtils.uid

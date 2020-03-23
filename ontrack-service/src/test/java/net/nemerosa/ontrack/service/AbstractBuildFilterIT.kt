@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import java.time.LocalDateTime
