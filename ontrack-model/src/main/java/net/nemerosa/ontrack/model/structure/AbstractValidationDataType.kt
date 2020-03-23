@@ -4,10 +4,8 @@ import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 
 abstract class AbstractValidationDataType<C, T>(
-        private val extensionFeature: ExtensionFeature
+        override val feature: ExtensionFeature
 ) : ValidationDataType<C, T> {
-
-    override fun getFeature() = extensionFeature
 
     protected fun validateNotNull(data: T?): T {
         if (data == null) {
