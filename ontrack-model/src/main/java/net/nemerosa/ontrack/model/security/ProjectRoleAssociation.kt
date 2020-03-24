@@ -1,19 +1,12 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import lombok.Data;
-
-import java.io.Serializable;
+import java.io.Serializable
 
 /**
  * Association of a project role and a projet ID.
  */
-@Data
-public class ProjectRoleAssociation implements Serializable {
+class ProjectRoleAssociation(val projectId: Int, val projectRole: ProjectRole) : Serializable {
 
-    private final int projectId;
-    private final ProjectRole projectRole;
+    fun isGranted(fn: Class<out ProjectFunction>): Boolean = projectRole.isGranted(fn)
 
-    public boolean isGranted(Class<? extends ProjectFunction> fn) {
-        return projectRole.isGranted(fn);
-    }
 }

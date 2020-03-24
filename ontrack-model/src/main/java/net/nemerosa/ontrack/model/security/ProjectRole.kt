@@ -1,38 +1,30 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import lombok.Data;
-
-import java.io.Serializable;
-import java.util.Set;
+import java.io.Serializable
 
 /**
  * A project role is the association between an identifier, a name and a set of
- * {@linkplain net.nemerosa.ontrack.model.security.ProjectFunction project functions}.
+ * [project functions][net.nemerosa.ontrack.model.security.ProjectFunction].
  */
-@Data
-public class ProjectRole implements Serializable {
+class ProjectRole(
+        /**
+         * Project role's identifier
+         */
+        val id: String,
+        /**
+         * Project role's name
+         */
+        val name: String,
+        /**
+         * Description
+         */
+        val description: String,
+        /**
+         * Associated set of project functions
+         */
+        val functions: Set<Class<out ProjectFunction>>) : Serializable {
 
-    /**
-     * Project role's identifier
-     */
-    private final String id;
+    fun isGranted(functionToCheck: Class<out ProjectFunction>): Boolean =
+            functions.any { functionToCheck.isAssignableFrom(it) }
 
-    /**
-     * Project role's name
-     */
-    private final String name;
-
-    /**
-     * Description
-     */
-    private final String description;
-
-    /**
-     * Associated set of project functions
-     */
-    private final Set<Class<? extends ProjectFunction>> functions;
-
-    public boolean isGranted(Class<? extends ProjectFunction> functionToCheck) {
-        return functions.stream().anyMatch(functionToCheck::isAssignableFrom);
-    }
 }

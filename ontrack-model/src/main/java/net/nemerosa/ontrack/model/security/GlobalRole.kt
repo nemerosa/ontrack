@@ -1,50 +1,39 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import lombok.Data;
-
-import java.io.Serializable;
-import java.util.Set;
+import java.io.Serializable
 
 /**
  * A global role defines the association between a name, a set of
- * {@linkplain net.nemerosa.ontrack.model.security.GlobalFunction global functions}
- * and a set of {@linkplain net.nemerosa.ontrack.model.security.ProjectFunction project functions}
+ * [global functions][net.nemerosa.ontrack.model.security.GlobalFunction]
+ * and a set of [project functions][net.nemerosa.ontrack.model.security.ProjectFunction]
  * that are attributed for all projects.
  */
-@Data
-public class GlobalRole implements Serializable {
+class GlobalRole(
+        /**
+         * Global role's identifier
+         */
+        val id: String,
+        /**
+         * Global role's name
+         */
+        val name: String,
+        /**
+         * Description of the role
+         */
+        val description: String,
+        /**
+         * Global functions
+         */
+        val globalFunctions: Set<Class<out GlobalFunction>>,
+        /**
+         * Project functions to grant for all projects
+         */
+        val projectFunctions: Set<Class<out ProjectFunction>>
+) : Serializable {
 
-    /**
-     * Global role's identifier
-     */
-    private final String id;
+    fun isGlobalFunctionGranted(fn: Class<out GlobalFunction>): Boolean = globalFunctions.contains(fn)
 
-    /**
-     * Global role's name
-     */
-    private final String name;
+    fun isProjectFunctionGranted(fn: Class<out ProjectFunction>): Boolean =
+            projectFunctions.any { fn.isAssignableFrom(it) }
 
-    /**
-     * Description of the role
-     */
-    private final String description;
-
-    /**
-     * Global functions
-     */
-    private final Set<Class<? extends GlobalFunction>> globalFunctions;
-
-    /**
-     * Project functions to grant for all projects
-     */
-    private final Set<Class<? extends ProjectFunction>> projectFunctions;
-
-
-    public boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn) {
-        return globalFunctions.contains(fn);
-    }
-
-    public boolean isProjectFunctionGranted(Class<? extends ProjectFunction> fn) {
-        return projectFunctions.stream().anyMatch(fn::isAssignableFrom);
-    }
 }

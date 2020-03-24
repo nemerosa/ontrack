@@ -1,11 +1,3 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import lombok.Data;
-
-@Data
-public class GlobalPermission {
-
-    private final PermissionTarget target;
-    private final GlobalRole role;
-
-}
+class GlobalPermission(val target: PermissionTarget, val role: GlobalRole)

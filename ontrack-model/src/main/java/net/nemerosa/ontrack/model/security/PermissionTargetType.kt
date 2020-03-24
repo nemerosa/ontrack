@@ -1,9 +1,5 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-public enum PermissionTargetType {
-
-    ACCOUNT,
-
-    GROUP
-
+enum class PermissionTargetType {
+    ACCOUNT, GROUP
 }
