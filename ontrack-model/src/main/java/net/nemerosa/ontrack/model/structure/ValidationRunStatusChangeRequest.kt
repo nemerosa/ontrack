@@ -1,11 +1,6 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.structure
 
-import lombok.Data;
-
-@Data
-public class ValidationRunStatusChangeRequest {
-
-    private final String validationRunStatusId;
-    private final String description;
-
-}
+data class ValidationRunStatusChangeRequest(
+        val validationRunStatusId: String,
+        val description: String?
+)
