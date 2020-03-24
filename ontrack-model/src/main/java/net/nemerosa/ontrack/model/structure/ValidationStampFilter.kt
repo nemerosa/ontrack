@@ -1,14 +1,12 @@
 package net.nemerosa.ontrack.model.structure
 
 open class ValidationStampFilter(
-        private val id: ID = ID.NONE,
+        override val id: ID = ID.NONE,
         val name: String,
         val vsNames: List<String>,
         val project: Project? = null,
         val branch: Branch? = null
 ) : Entity {
-
-    override fun getId(): ID = id
 
     fun withName(name: String): ValidationStampFilter {
         return ValidationStampFilter(
