@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
 
 /**
@@ -13,6 +14,7 @@ class ValidationStamp(
         @JsonView(value = [ValidationStamp::class])
         val branch: Branch,
         val owner: User?,
+        @JsonProperty("image")
         val isImage: Boolean,
         override val signature: Signature,
         val dataType: ValidationDataTypeConfig<*>?

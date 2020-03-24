@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonView
 import net.nemerosa.ontrack.model.form.Form
@@ -11,6 +12,7 @@ class PromotionLevel(
         override val description: String?,
         @JsonView(value = [PromotionLevel::class, PromotionView::class, PromotionRunView::class])
         val branch: Branch,
+        @JsonProperty("image")
         val isImage: Boolean,
         override val signature: Signature
 ) : ProjectEntity {
