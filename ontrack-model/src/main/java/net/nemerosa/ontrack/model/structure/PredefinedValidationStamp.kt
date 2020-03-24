@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ class PredefinedValidationStamp(
         override val id: ID,
         val name: String,
         val description: String?,
+        @JsonProperty("image")
         val isImage: Boolean,
         val dataType: ValidationDataTypeConfig<*>?
 ) : Entity {
@@ -25,6 +27,15 @@ class PredefinedValidationStamp(
     fun withDataType(dataType: ValidationDataTypeConfig<*>?) = PredefinedValidationStamp(id, name, description, isImage, dataType)
 
     fun withImage(isImage: Boolean) = PredefinedValidationStamp(id, name, description, isImage, dataType)
+
+    fun update(nameDescription: NameDescription) =
+            PredefinedValidationStamp(
+                    id,
+                    nameDescription.name,
+                    nameDescription.description,
+                    isImage,
+                    dataType
+            )
 
     companion object {
         @JvmStatic
@@ -38,14 +49,4 @@ class PredefinedValidationStamp(
                 )
     }
 
-
-    public PredefinedValidationStamp update(NameDescription nameDescription) {
-        return new PredefinedValidationStamp(
-                id,
-                nameDescription.getName(),
-                nameDescription.getDescription(),
-                image,
-                dataType
-        );
-    }
 }

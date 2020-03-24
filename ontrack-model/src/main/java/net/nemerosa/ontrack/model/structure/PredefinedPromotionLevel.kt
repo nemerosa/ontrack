@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.nameAndDescription
@@ -9,6 +10,7 @@ class PredefinedPromotionLevel(
         override val id: ID,
         val name: String,
         val description: String?,
+        @JsonProperty("image")
         val isImage: Boolean
 ) : Entity {
 
