@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotDeleteException
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotUpdateNameException
@@ -28,8 +29,11 @@ class AccountServiceImpl(
         private val accountGroupRepository: AccountGroupRepository,
         private val securityService: SecurityService,
         private val authenticationSourceService: AuthenticationSourceService,
-        private val passwordEncoder: PasswordEncoder) : AccountService {
+        private val passwordEncoder: PasswordEncoder
+) : AccountService {
+
     private var accountGroupContributors: Collection<AccountGroupContributor> = emptyList()
+
     @Autowired(required = false)
     fun setAccountGroupContributors(accountGroupContributors: Collection<AccountGroupContributor>) {
         this.accountGroupContributors = accountGroupContributors
@@ -39,7 +43,7 @@ class AccountServiceImpl(
         return raw.account
                 // Global role
                 .withGlobalRole(
-                        roleRepository.findGlobalRoleByAccount(raw.account.id()).flatMap { id: String? -> rolesService.getGlobalRole(id!!) }
+                        roleRepository.findGlobalRoleByAccount(raw.account.id()).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
                 )
                 // Project roles
                 .withProjectRoles(
@@ -165,7 +169,7 @@ class AccountServiceImpl(
                 .toSet()
         // Collection of groups with the selection
         return accountGroups
-                .map { group: AccountGroup -> AccountGroupSelection.of(group, accountGroupIds.contains(group.id())) }
+                .map { group: AccountGroup -> AccountGroupSelection(group, accountGroupIds.contains(group.id())) }
     }
 
     override fun searchPermissionTargets(token: String): Collection<PermissionTarget> {
@@ -388,7 +392,7 @@ class AccountServiceImpl(
     protected fun groupWithACL(group: AccountGroup): AccountGroup {
         return group // Global role
                 .withGlobalRole(
-                        roleRepository.findGlobalRoleByGroup(group.id()).flatMap { id: String? -> rolesService.getGlobalRole(id!!) }
+                        roleRepository.findGlobalRoleByGroup(group.id()).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
                 ) // Project roles
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByGroup(group.id()) { project: Int?, roleId: String? -> rolesService.getProjectRoleAssociation(project!!, roleId!!) }
