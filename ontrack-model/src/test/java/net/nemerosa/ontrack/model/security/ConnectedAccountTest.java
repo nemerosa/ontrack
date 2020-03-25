@@ -13,12 +13,12 @@ public class ConnectedAccountTest {
         assertNull(ConnectedAccount.none(false).getAccount());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void of_null() {
         ConnectedAccount.of(false, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void of_not_defined() {
         ConnectedAccount.of(false, Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none()));
     }

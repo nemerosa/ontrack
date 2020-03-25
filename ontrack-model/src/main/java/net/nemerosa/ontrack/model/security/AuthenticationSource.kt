@@ -6,7 +6,7 @@ import java.io.Serializable
 /**
  * Authentication source for an account or group.
  */
-class AuthenticationSource(
+data class AuthenticationSource(
         val id: String,
         val name: String,
         @JsonProperty("allowingPasswordChange")

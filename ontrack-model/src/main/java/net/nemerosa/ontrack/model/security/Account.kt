@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
 import java.io.Serializable
 
-class Account private constructor(
+data class Account(
         override val id: ID,
         val name: String,
         val fullName: String,

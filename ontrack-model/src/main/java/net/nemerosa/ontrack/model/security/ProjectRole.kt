@@ -6,7 +6,7 @@ import java.io.Serializable
  * A project role is the association between an identifier, a name and a set of
  * [project functions][net.nemerosa.ontrack.model.security.ProjectFunction].
  */
-class ProjectRole(
+data class ProjectRole(
         /**
          * Project role's identifier
          */

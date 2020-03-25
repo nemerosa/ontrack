@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.model.security;
 
 import java.io.Serializable
 
-class Authorisations(
+data class Authorisations(
         private val globalRole: GlobalRole?,
         private val projectRoleAssociations: Set<ProjectRoleAssociation> = emptySet()
 ) : Serializable {

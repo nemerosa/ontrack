@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
 import net.nemerosa.ontrack.model.form.Form
@@ -16,11 +17,12 @@ class Branch(
         @JsonProperty("disabled")
         val isDisabled: Boolean,
         val type: BranchType,
-        @JsonView(value = [
+        @get:JsonProperty("project")
+        @get:JsonView(value = [
             PromotionView::class, Branch::class, Build::class, PromotionLevel::class, ValidationStamp::class,
             PromotionRun::class, ValidationRun::class, PromotionRunView::class
         ])
-        @JsonProperty("project")
+        @get:JsonIgnore(false) // Overridding default at [ProjectEntity] level
         override val project: Project,
         override val signature: Signature
 ) : ProjectEntity {

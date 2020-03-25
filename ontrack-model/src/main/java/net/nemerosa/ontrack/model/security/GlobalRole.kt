@@ -8,7 +8,7 @@ import java.io.Serializable
  * and a set of [project functions][net.nemerosa.ontrack.model.security.ProjectFunction]
  * that are attributed for all projects.
  */
-class GlobalRole(
+data class GlobalRole(
         /**
          * Global role's identifier
          */
