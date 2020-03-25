@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
 
 /**
@@ -8,10 +9,11 @@ import java.io.Serializable
 class AuthenticationSource(
         val id: String,
         val name: String,
-        val allowingPasswordChange: Boolean = false
+        @JsonProperty("allowingPasswordChange")
+        val isAllowingPasswordChange: Boolean = false
 ) : Serializable {
 
-    fun withAllowingPasswordChange(allowingPasswordChange: Boolean) = AuthenticationSource(id, name, allowingPasswordChange)
+    fun withAllowingPasswordChange(isAllowingPasswordChange: Boolean) = AuthenticationSource(id, name, isAllowingPasswordChange)
 
     companion object {
 

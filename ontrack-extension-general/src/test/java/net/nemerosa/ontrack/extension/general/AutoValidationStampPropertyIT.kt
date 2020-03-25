@@ -117,9 +117,9 @@ class AutoValidationStampPropertyIT : AbstractServiceTestSupport() {
 
         assertNotNull(vs) {
             assertEquals(pvs.name, it.name)
-            assertNotNull(it.dataType) {
-                assertEquals(pvs.dataType.descriptor.id, it.descriptor.id)
-                assertEquals(pvs.dataType.config, it.config)
+            assertNotNull(it.dataType) { cfg ->
+                assertEquals(pvs.dataType?.descriptor?.id, cfg.descriptor.id)
+                assertEquals(pvs.dataType?.config, cfg.config)
             }
         }
     }

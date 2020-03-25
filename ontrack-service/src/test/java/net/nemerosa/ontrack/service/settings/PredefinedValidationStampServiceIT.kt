@@ -129,13 +129,13 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
         // Checks the validation stamp with same name has been updated
         asAdmin().call {
             assertEquals("My new description", structureService.getValidationStamp(vs2.id).description)
-            assertTrue(structureService.getValidationStamp(vs2.id).image)
+            assertTrue(structureService.getValidationStamp(vs2.id).isImage)
         }
 
         // Checks the validation stamp with NOT same name has NOT been updated
         asAdmin().call {
             assertEquals("", structureService.getValidationStamp(vs3.id).description)
-            assertFalse(structureService.getValidationStamp(vs3.id).image)
+            assertFalse(structureService.getValidationStamp(vs3.id).isImage)
         }
 
         // Checks the predefined validation stamp has been created
@@ -143,7 +143,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
             val o = service.findPredefinedValidationStampByName(vs1.name)
             assertPresent(o) {
                 assertEquals("My new description", it.description)
-                assertTrue(it.image)
+                assertTrue(it.isImage)
             }
         }
     }
@@ -172,14 +172,14 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
 
         // Checks the validation stamp with same name has been updated with no image
         asAdmin().call {
-            assertFalse(structureService.getValidationStamp(vs2.id).image, "VS2 image is gone")
+            assertFalse(structureService.getValidationStamp(vs2.id).isImage, "VS2 image is gone")
         }
 
         // Checks the predefined validation stamp has been created, without an image
         asAdmin().call {
             val o = service.findPredefinedValidationStampByName(vs1.name)
             assertPresent(o) {
-                assertFalse(it.image, "Created predefined validation stamp has no image")
+                assertFalse(it.isImage, "Created predefined validation stamp has no image")
             }
         }
     }
@@ -267,13 +267,13 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
         // Checks the validation stamp with same name has been updated
         asAdmin().call {
             assertEquals("My new description", structureService.getValidationStamp(vs2.id).description)
-            assertTrue(structureService.getValidationStamp(vs2.id).image)
+            assertTrue(structureService.getValidationStamp(vs2.id).isImage)
         }
 
         // Checks the validation stamp with NOT same name has NOT been updated
         asAdmin().call {
             assertEquals("", structureService.getValidationStamp(vs3.id).description)
-            assertFalse(structureService.getValidationStamp(vs3.id).image)
+            assertFalse(structureService.getValidationStamp(vs3.id).isImage)
         }
 
         // Checks the predefined validation stamp has been created
@@ -282,7 +282,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
             assertPresent(o) {
                 assertEquals(pvs.id, it.id)
                 assertEquals("My new description", it.description)
-                assertTrue(it.image)
+                assertTrue(it.isImage)
             }
         }
     }

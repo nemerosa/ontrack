@@ -32,6 +32,13 @@ class Project(
         @JvmStatic
         fun of(nameDescription: NameDescription) =
                 Project(ID.NONE, nameDescription.name, nameDescription.description, false, Signature.anonymous())
+
+        @JvmStatic
+        fun form(): Form =
+                Form.nameAndDescription()
+                        .with(
+                                YesNo.of("disabled").label("Disabled").help("Check if the project must be disabled.")
+                        )
     }
 
     override val project: Project = this
@@ -40,11 +47,6 @@ class Project(
 
     override val projectEntityType: ProjectEntityType = ProjectEntityType.PROJECT
 
-    fun form(): Form =
-            Form.nameAndDescription()
-                    .with(
-                            YesNo.of("disabled").label("Disabled").help("Check if the project must be disabled.")
-                    )
 
     fun update(form: NameDescriptionState): Project =
             of(form).withId(id).withDisabled(form.isDisabled)

@@ -335,12 +335,9 @@ class GQLTypeBuild(
     }
 
     private fun buildLinkedFetcher(): DataFetcher<List<Build>> {
-        return fetcher(
-                Build::class.java
-        ) { environment, build ->
-            val direction: String = GraphqlUtils.getStringArgument(environment, ARG_DIRECTION)
-                    .orElse("TO")
-            when (direction) {
+        return DataFetcher { env ->
+            val build = env.getSource<Build>()
+            when (env.getArgument(ARG_DIRECTION) ?: "TO") {
                 "TO" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
                 "FROM" -> getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
                 "BOTH" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to") +

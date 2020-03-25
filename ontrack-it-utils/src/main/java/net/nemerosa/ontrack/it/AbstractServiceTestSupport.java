@@ -373,12 +373,10 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         @SafeVarargs
         public final T with(Class<? extends GlobalFunction>... fn) {
             account.withGlobalRole(
-                    Optional.of(
-                            new GlobalRole(
-                                    "test", "Test global role", "",
-                                    new HashSet<>(Arrays.asList(fn)),
-                                    Collections.emptySet()
-                            )
+                    new GlobalRole(
+                            "test", "Test global role", "",
+                            new HashSet<>(Arrays.asList(fn)),
+                            Collections.emptySet()
                     )
             );
             //noinspection unchecked

@@ -19,8 +19,8 @@ import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.Entity.isEntityDefined
-import net.nemerosa.ontrack.model.structure.Entity.isEntityNew
+import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
+import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityNew
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper
 import net.nemerosa.ontrack.repository.StatsRepository
 import net.nemerosa.ontrack.repository.StructureRepository
@@ -391,13 +391,13 @@ class StructureServiceImpl(
             val buildViewSupplier = CachedSupplier.of { getBuildView(build, false) }
             // Branch name
             var accept: Boolean
-            accept = !StringUtils.isNotBlank(form.branchName) || Utils.safeRegexMatch(form.branchName, build.getBranch().getName())
+            accept = !StringUtils.isNotBlank(form.branchName) || Utils.safeRegexMatch(form.branchName, build.branch.name)
             // Build name
             if (accept && StringUtils.isNotBlank(form.buildName)) {
                 if (form.isBuildExactMatch) {
-                    accept = StringUtils.equals(form.buildName, build.getName())
+                    accept = StringUtils.equals(form.buildName, build.name)
                 } else {
-                    accept = Utils.safeRegexMatch(form.buildName, build.getName())
+                    accept = Utils.safeRegexMatch(form.buildName, build.name)
                 }
             }
             // Promotion name
@@ -587,7 +587,7 @@ class StructureServiceImpl(
                     savePromotionLevel(newPromotionLevel.withDescription(predefined.description))
                 }
                 // Image
-                if (predefined.image != null && predefined.image) {
+                if (predefined.isImage) {
                     setPromotionLevelImage(
                             newPromotionLevel.id,
                             predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefined.id)
@@ -706,7 +706,7 @@ class StructureServiceImpl(
         reorderPromotionLevels(branch.id, Reordering(sortedIds))
 
         // Image?
-        if (predefinedPromotionLevel.image != null && predefinedPromotionLevel.image!!) {
+        if (predefinedPromotionLevel.isImage) {
             setPromotionLevelImage(
                     promotionLevel.id,
                     predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevel.id)
@@ -850,7 +850,7 @@ class StructureServiceImpl(
                     saveValidationStamp(newValidationStamp.withDescription(predefined.description))
                 }
                 // Image
-                if (predefined.image != null && predefined.image) {
+                if (predefined.isImage) {
                     setValidationStampImage(
                             newValidationStamp.id,
                             predefinedValidationStampService.getPredefinedValidationStampImage(predefined.id)
@@ -1133,7 +1133,7 @@ class StructureServiceImpl(
                 ).withDataType(stamp.dataType)
         )
         // Image?
-        if (stamp.image != null && stamp.image!!) {
+        if (stamp.isImage) {
             setValidationStampImage(
                     validationStamp.id,
                     predefinedValidationStampService.getPredefinedValidationStampImage(stamp.id)

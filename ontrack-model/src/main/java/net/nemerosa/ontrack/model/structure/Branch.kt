@@ -52,6 +52,16 @@ class Branch(
                         project,
                         Signature.anonymous()
                 )
+
+        @JvmStatic
+        fun form(): Form = Form.create()
+                .with(
+                        Form.defaultNameField().length(120)
+                )
+                .description()
+                .with(
+                        YesNo.of("disabled").label("Disabled").help("Check if the branch must be disabled.")
+                )
     }
 
     override val projectEntityType: ProjectEntityType = ProjectEntityType.BRANCH
@@ -59,16 +69,8 @@ class Branch(
     override val entityDisplayName: String
         get() = "Branch ${project.name}/$name"
 
-    fun asForm(): Form = Form.create()
-            .with(
-                    Form.defaultNameField().length(120)
-            )
-            .description()
-            .with(
-                    YesNo.of("disabled").label("Disabled").help("Check if the branch must be disabled.")
-            )
 
-    fun toForm(): Form = asForm()
+    fun toForm(): Form = form()
             .fill("name", name)
             .fill("description", description)
             .fill("disabled", isDisabled)
