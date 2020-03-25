@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.ID
 
 class LDAPMapping(id: ID, type: String, name: String, group: AccountGroup) : AccountGroupMapping(id, type, name, group) {
     companion object {
+        @JvmStatic
         fun of(mapping: AccountGroupMapping): LDAPMapping {
             return LDAPMapping(
                     mapping.id,
