@@ -7,7 +7,7 @@ import javax.validation.constraints.Size
 /**
  * Creation of a built-in account.
  */
-class AccountInput(
+data class AccountInput(
         @NotNull(message = "The account name is required.")
         @Pattern(regexp = "[a-zA-Z0-9_.-]+", message = "The account name must contain only letters, digits, underscores, dashes and dots.")
         val name: String,
