@@ -106,7 +106,7 @@ open class ConfigurableUserDetailsContextMapper(
     }
 
     companion object {
-        protected fun getValue(dn: LdapName, key: String): String? {
+        internal fun getValue(dn: LdapName, key: String): String? {
             return try {
                 LdapUtils.getStringValue(dn, StringUtils.upperCase(key))
             } catch (ignored: IllegalArgumentException) {

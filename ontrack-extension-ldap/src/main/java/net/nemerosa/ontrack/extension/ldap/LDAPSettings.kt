@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.ldap
 
-class LDAPSettings(
+data class LDAPSettings(
         val isEnabled: Boolean,
         val url: String,
         val searchBase: String,
