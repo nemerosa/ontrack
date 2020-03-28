@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.form.YesNo
  * Representation of a branch inside a [Project]. They are usually associated
  * to a branch of the SCM associated with the parent project.
  */
-class Branch(
+data class Branch(
         override val id: ID,
         val name: String,
         override val description: String?,
