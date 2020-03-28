@@ -29,20 +29,15 @@ class GQLTypeCreation : GQLType {
 
     companion object {
 
-        @JvmField
-        val SIGNATURE = "Signature"
+        const val SIGNATURE = "Signature"
 
         @JvmStatic
         fun getCreationFromSignature(signature: Signature?): Creation {
             var result = Creation()
             if (signature != null) {
                 val user = signature.user
-                if (user != null && user.name != null) {
-                    result = result.withUser(user.name)
-                }
-                if (signature.time != null) {
-                    result = result.withTime(Time.forStorage(signature.time))
-                }
+                result = result.withUser(user.name)
+                result = result.withTime(Time.forStorage(signature.time))
             }
             return result
         }

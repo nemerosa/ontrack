@@ -212,7 +212,7 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
                     // Note that the list of orphan projects will grow
                     // much larger than the expected ones
                     actual = actualOrphanProjectNames.containsAll(
-                            expectationsContext.orphans.mapNotNull { it.project?.name }
+                            expectationsContext.orphans.mapNotNull { it.project.name }
                     ),
                     message = "Orphan projects"
             )
@@ -222,7 +222,7 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
                     // Note that the list of orphan projects will grow
                     // much larger than the expected ones
                     actual = actualOrphanProjectNames.intersect(
-                            expectationsContext.notOrphans.mapNotNull { it.project?.name }
+                            expectationsContext.notOrphans.mapNotNull { it.project.name }
                     ).isEmpty(),
                     message = "Not in orphan projects"
             )
