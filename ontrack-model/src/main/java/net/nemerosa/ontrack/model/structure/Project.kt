@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.form.YesNo
  * A project in Ontrack. Usually associated with a SCM repository, this is the main entity in the Ontrack
  * model.
  */
-class Project(
+data class Project(
         override val id: ID,
         val name: String,
         override val description: String?,

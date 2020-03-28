@@ -34,6 +34,7 @@ class BranchControllerIT : AbstractWebTestSupport() {
                 .call {
                     controller.newBranch(project.id, nameDescription)
                 }
+                .data
         // Checks the branch
         checkBranchResource(branch, nameDescription)
     }
@@ -42,7 +43,7 @@ class BranchControllerIT : AbstractWebTestSupport() {
     fun disablingEnablingBranch() {
         val branch = doCreateBranch()
         // Disables it
-        val disabled = asUser().with(branch, ProjectEdit::class.java).call { controller.disableBranch(branch.id) }
+        val disabled = asUser().with(branch, ProjectEdit::class.java).call { controller.disableBranch(branch.id) }.data
         assertTrue(disabled.isDisabled, "Branch is disabled")
         val disabledEvent = eventQueryService.getLastEvent(branch, EventFactory.DISABLE_BRANCH)
         assertNotNull(disabledEvent, "Disabled event is there") { event ->
@@ -52,7 +53,7 @@ class BranchControllerIT : AbstractWebTestSupport() {
             }
         }
         // Enables it
-        val enabled = asUser().with(branch, ProjectEdit::class.java).call { controller.enableBranch(branch.id) }
+        val enabled = asUser().with(branch, ProjectEdit::class.java).call { controller.enableBranch(branch.id) }.data
         assertFalse(enabled.isDisabled, "Branch is enabled")
         val enabledEvent = eventQueryService.getLastEvent(branch, EventFactory.ENABLE_BRANCH)
         assertNotNull(enabledEvent, "Enabled event is there") { event ->

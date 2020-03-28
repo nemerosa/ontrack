@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -81,7 +82,7 @@ public class PromotionRunController extends AbstractResourceController {
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public PromotionRun newPromotionRun(@PathVariable ID buildId, @RequestBody @Valid PromotionRunRequest promotionRunRequest) {
+    public Resource<PromotionRun> newPromotionRun(@PathVariable ID buildId, @RequestBody @Valid PromotionRunRequest promotionRunRequest) {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the promotion level
@@ -107,12 +108,12 @@ public class PromotionRunController extends AbstractResourceController {
             );
         }
         // OK
-        return promotionRun;
+        return asResource(promotionRun);
     }
 
     @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.GET)
-    public PromotionRun getPromotionRun(@PathVariable ID promotionRunId) {
-        return structureService.getPromotionRun(promotionRunId);
+    public Resource<PromotionRun> getPromotionRun(@PathVariable ID promotionRunId) {
+        return asResource(structureService.getPromotionRun(promotionRunId));
     }
 
     @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.DELETE)
@@ -122,6 +123,10 @@ public class PromotionRunController extends AbstractResourceController {
 
     protected PromotionLevel getPromotionLevel(Branch branch, Integer promotionLevelId, String promotionLevelName) {
         return structureService.getOrCreatePromotionLevel(branch, promotionLevelId, promotionLevelName);
+    }
+
+    private Resource<PromotionRun> asResource(PromotionRun promotionRun) {
+        return Resource.of(promotionRun, uri(on(PromotionRunController.class).getPromotionRun(promotionRun.getId())));
     }
 
 }

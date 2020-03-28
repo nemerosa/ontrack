@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -65,13 +66,13 @@ public class ProjectController extends AbstractResourceController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Project newProject(@RequestBody @Valid NameDescriptionState nameDescription) {
+    public Resource<Project> newProject(@RequestBody @Valid NameDescriptionState nameDescription) {
         // Creates a new project instance
         Project project = Project.of(nameDescription);
         // Saves it into the repository
         project = structureService.newProject(project);
         // OK
-        return project;
+        return asResource(project);
     }
 
     @RequestMapping(value = "{projectId}/view", method = RequestMethod.GET)
@@ -89,8 +90,8 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-    public Project getProject(@PathVariable ID projectId) {
-        return structureService.getProject(projectId);
+    public Resource<Project> getProject(@PathVariable ID projectId) {
+        return asResource(structureService.getProject(projectId));
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.DELETE)
@@ -106,7 +107,7 @@ public class ProjectController extends AbstractResourceController {
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.PUT)
     @APIMethod(value = "Updates project")
-    public Project saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
+    public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Updates
@@ -114,23 +115,23 @@ public class ProjectController extends AbstractResourceController {
         // Saves in repository
         structureService.saveProject(project);
         // As resource
-        return project;
+        return asResource(project);
     }
 
     @RequestMapping(value = "{projectId}/enable", method = RequestMethod.PUT)
-    public Project enableProject(@PathVariable ID projectId) {
+    public Resource<Project> enableProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Saves in repository
-        return structureService.enableProject(project);
+        return asResource(structureService.enableProject(project));
     }
 
     @RequestMapping(value = "{projectId}/disable", method = RequestMethod.PUT)
-    public Project disableProject(@PathVariable ID projectId) {
+    public Resource<Project> disableProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Saves in repository
-        return structureService.disableProject(project);
+        return asResource(structureService.disableProject(project));
     }
 
     /**
@@ -155,25 +156,29 @@ public class ProjectController extends AbstractResourceController {
      * Clones this project into another one.
      */
     @RequestMapping(value = "{projectId}/clone", method = RequestMethod.POST)
-    public Project clone(@PathVariable ID projectId, @RequestBody ProjectCloneRequest request) {
+    public Resource<Project> clone(@PathVariable ID projectId, @RequestBody ProjectCloneRequest request) {
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Performs the clone
-        return copyService.cloneProject(project, request);
+        return asResource(copyService.cloneProject(project, request));
     }
 
     @RequestMapping(value = "{projectId}/favourite", method = RequestMethod.PUT)
-    public Project favouriteProject(@PathVariable ID projectId) {
+    public Resource<Project> favouriteProject(@PathVariable ID projectId) {
         Project project = structureService.getProject(projectId);
         projectFavouriteService.setProjectFavourite(project, true);
-        return project;
+        return asResource(project);
     }
 
     @RequestMapping(value = "{projectId}/unfavourite", method = RequestMethod.PUT)
-    public Project unfavouriteProject(@PathVariable ID projectId) {
+    public Resource<Project> unfavouriteProject(@PathVariable ID projectId) {
         Project project = structureService.getProject(projectId);
         projectFavouriteService.setProjectFavourite(project, false);
-        return project;
+        return asResource(project);
+    }
+
+    private Resource<Project> asResource(Project project) {
+        return Resource.of(project, uri(on(ProjectController.class).getProject(project.getId())));
     }
 
 }
