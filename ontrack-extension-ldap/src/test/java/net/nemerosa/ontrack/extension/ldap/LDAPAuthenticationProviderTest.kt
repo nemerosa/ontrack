@@ -6,15 +6,16 @@ import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.test.assertNotPresent
-import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Before
 import org.junit.Test
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider
+import org.springframework.security.ldap.userdetails.LdapUserDetails
 import java.util.*
 import java.util.function.Supplier
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class LDAPAuthenticationProviderTest {
 
@@ -51,14 +52,14 @@ class LDAPAuthenticationProviderTest {
     @Test
     fun `Cannot authenticate when LDAP is disabled`() {
         val user = provider.findUser("test", UsernamePasswordAuthenticationToken("test", "xxx"))
-        assertNotPresent(user)
+        assertNull(user)
     }
 
     @Test
     fun `LDAP authentication failure when no authentication returned`() {
         whenever(ldapProviderFactory.provider).thenReturn(ldapAuthenticationProvider)
         val user = provider.findUser("test", UsernamePasswordAuthenticationToken("test", "xxx"))
-        assertNotPresent(user)
+        assertNull(user)
     }
 
     @Test
@@ -68,7 +69,7 @@ class LDAPAuthenticationProviderTest {
         whenever(authentication.isAuthenticated).thenReturn(false)
         whenever(ldapAuthenticationProvider.authenticate(authentication)).thenReturn(authentication)
         val user = provider.findUser("test", authentication)
-        assertNotPresent(user)
+        assertNull(user)
     }
 
     @Test
@@ -94,7 +95,7 @@ class LDAPAuthenticationProviderTest {
         )
 
         val authAccount = provider.findUser("test", authentication)
-        assertPresent(authAccount) {
+        assertNotNull(authAccount) {
             assertEquals(account, it.account)
         }
     }
@@ -121,7 +122,7 @@ class LDAPAuthenticationProviderTest {
         )
 
         val authAccount = provider.findUser("test", authentication)
-        assertPresent(authAccount) {
+        assertNotNull(authAccount) {
             assertEquals(tempAccount, it.account)
         }
     }
@@ -130,9 +131,9 @@ class LDAPAuthenticationProviderTest {
     fun `LDAP authentication success, LDAP detail with no email`() {
         whenever(ldapProviderFactory.provider).thenReturn(ldapAuthenticationProvider)
 
-        val ldapUserDetails = mock<ExtendedLDAPUserDetails>()
-        whenever(ldapUserDetails.fullName).thenReturn("Test user")
-        whenever(ldapUserDetails.email).thenReturn("")
+        val ldapUserDetails = mockExtendedLDAPUserDetails(
+                email = ""
+        )
 
         val authentication = mock<UsernamePasswordAuthenticationToken>()
         whenever(authentication.name).thenReturn("test")
@@ -152,7 +153,7 @@ class LDAPAuthenticationProviderTest {
         )
 
         val authAccount = provider.findUser("test", authentication)
-        assertPresent(authAccount) {
+        assertNotNull(authAccount) {
             assertEquals(tempAccount, it.account)
         }
     }
@@ -161,9 +162,9 @@ class LDAPAuthenticationProviderTest {
     fun `LDAP authentication success, full LDAP detail`() {
         whenever(ldapProviderFactory.provider).thenReturn(ldapAuthenticationProvider)
 
-        val ldapUserDetails = mock<ExtendedLDAPUserDetails>()
-        whenever(ldapUserDetails.getFullName()).thenReturn("Test user")
-        whenever(ldapUserDetails.getEmail()).thenReturn("test@test.com")
+        val ldapUserDetails = mockExtendedLDAPUserDetails(
+                email = "test@test.com"
+        )
 
         val authentication = mock<UsernamePasswordAuthenticationToken>()
         whenever(authentication.name).thenReturn("test")
@@ -195,9 +196,19 @@ class LDAPAuthenticationProviderTest {
         )
 
         val authAccount = provider.findUser("test", authentication)
-        assertPresent(authAccount) {
+        assertNotNull(authAccount) {
             assertEquals(account, it.account)
         }
+    }
+
+    private fun mockExtendedLDAPUserDetails(email: String): ExtendedLDAPUserDetails {
+        val support = mock<LdapUserDetails>()
+        return ExtendedLDAPUserDetails(
+                support = support,
+                fullName = "Test user",
+                email = email,
+                groups = emptyList()
+        )
     }
 
 }
