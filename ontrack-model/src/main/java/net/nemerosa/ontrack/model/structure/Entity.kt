@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.ID.Companion.isDefined
  *  * *defined* - the ID is [set][ID.isSet].
  *
  */
+@OpenEntity
 interface Entity {
 
     /**

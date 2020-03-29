@@ -10,7 +10,7 @@ import java.time.LocalDateTime
  * @property validationRunStatuses Must always contain at least one validation run status at creation time.
  * @property data Data used for the link to an optional [ValidationDataType] and its data
  */
-open class ValidationRun(
+data class ValidationRun(
         override val id: ID,
         @JsonView(value = [ValidationRun::class, ValidationStampRunView::class])
         val build: Build,

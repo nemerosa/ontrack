@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff
 import net.nemerosa.ontrack.model.form.Form
 import java.time.LocalDateTime
 
-open class Build(
+data class Build(
         override val id: ID,
         val name: String,
         override val description: String?,

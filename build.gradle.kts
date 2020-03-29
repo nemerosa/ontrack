@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 import net.nemerosa.versioning.VersioningExtension
 import net.nemerosa.versioning.VersioningPlugin
 import org.ajoberstar.gradle.git.publish.GitPublishExtension
+import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.redline_rpm.header.Os
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
@@ -257,6 +258,10 @@ configure(coreProjects) p@{
     apply(plugin = "kotlin")
     apply(plugin = "kotlin-spring")
     apply(plugin = "io.spring.dependency-management")
+
+    configure<AllOpenExtension> {
+        annotation("net.nemerosa.ontrack.model.structure.OpenEntity")
+    }
 
     configure<DependencyManagementExtension> {
         imports {
