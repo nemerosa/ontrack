@@ -1,10 +1,10 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.userdetails.UserDetails
 
- class AccountUserDetails(
+class AccountUserDetails(
          private val account: Account
  ) : UserDetails, AccountHolder {
 
@@ -15,9 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
      override fun getUsername(): String = account.name
 
-     override fun isCredentialsNonExpired(): Boolean {
-         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-     }
+     override fun isCredentialsNonExpired(): Boolean = true
 
      override fun getPassword(): String? = null
 
