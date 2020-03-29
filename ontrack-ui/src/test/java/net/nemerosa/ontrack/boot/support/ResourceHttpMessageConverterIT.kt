@@ -3,11 +3,7 @@ package net.nemerosa.ontrack.boot.support
 import net.nemerosa.ontrack.boot.ui.AbstractWebTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.ObjectMapperFactory
-import net.nemerosa.ontrack.model.structure.Branch.Companion.of
-import net.nemerosa.ontrack.model.structure.ID.Companion.of
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.Project.Companion.of
-import net.nemerosa.ontrack.model.structure.TestFixtures
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
 import net.nemerosa.ontrack.ui.resource.DefaultResourceModule
@@ -20,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpOutputMessage
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.nio.charset.Charset
 
 class ResourceHttpMessageConverterIT : AbstractWebTestSupport() {
 
@@ -39,9 +34,9 @@ class ResourceHttpMessageConverterIT : AbstractWebTestSupport() {
     @Throws(IOException::class)
     fun branch() {
         // Objects
-        val p = of(NameDescription("P", "Projet créé")).withId(of(1))
+        val p = Project.of(NameDescription("P", "Projet créé")).withId(ID.of(1))
                 .withSignature(TestFixtures.SIGNATURE)
-        val b = of(p, NameDescription("B", "Branch")).withId(of(1))
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
                 .withSignature(TestFixtures.SIGNATURE)
         // Message
         val message = Mockito.mock(HttpOutputMessage::class.java)
@@ -106,9 +101,9 @@ class ResourceHttpMessageConverterIT : AbstractWebTestSupport() {
     @Test
     @Throws(Exception::class)
     fun branch_disable_granted_for_automation() { // Objects
-        val p = of(NameDescription("P", "Projet créé")).withId(of(1))
+        val p = Project.of(NameDescription("P", "Projet créé")).withId(ID.of(1))
                 .withSignature(TestFixtures.SIGNATURE)
-        val b = of(p, NameDescription("B", "Branch")).withId(of(1))
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
                 .withSignature(TestFixtures.SIGNATURE)
         // Message
         val message = Mockito.mock(HttpOutputMessage::class.java)
@@ -127,9 +122,9 @@ class ResourceHttpMessageConverterIT : AbstractWebTestSupport() {
     @Test
     @Throws(Exception::class)
     fun branch_enable_granted_for_automation() { // Objects
-        val p = of(NameDescription("P", "Projet créé")).withId(of(1))
+        val p = Project.of(NameDescription("P", "Projet créé")).withId(ID.of(1))
                 .withSignature(TestFixtures.SIGNATURE)
-        val b = of(p, NameDescription("B", "Branch")).withId(of(1))
+        val b = Branch.of(p, NameDescription("B", "Branch")).withId(ID.of(1))
                 .withDisabled(true)
                 .withSignature(TestFixtures.SIGNATURE)
         // Message
