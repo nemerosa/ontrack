@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonView
 import net.nemerosa.ontrack.model.form.Form
 
 @JsonPropertyOrder(value = ["id", "name", "description", "branch", "image"])
-class PromotionLevel(
+data class PromotionLevel(
         override val id: ID,
         val name: String,
         override val description: String?,

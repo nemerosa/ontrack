@@ -72,4 +72,28 @@ open class Build(
             signature,
             branch
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Build) return false
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (description != other.description) return false
+        if (signature != other.signature) return false
+        if (branch != other.branch) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + (description?.hashCode() ?: 0)
+        result = 31 * result + signature.hashCode()
+        result = 31 * result + branch.hashCode()
+        return result
+    }
+
+
 }

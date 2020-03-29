@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void create_branch_project_not_defined() {
         structureRepository.newBranch(Branch.of(
                 Project.of(nameDescription()),
