@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
 
-open class AccountGroupMapping(
+data class AccountGroupMapping(
         override val id: ID,
         val type: String,
         val name: String,

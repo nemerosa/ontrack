@@ -8,7 +8,7 @@ import java.io.Serializable
 /**
  * Group of accounts.
  */
-open class AccountGroup(
+data class AccountGroup(
         override val id: ID,
         val name: String,
         val description: String?,
