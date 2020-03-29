@@ -6,11 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,41 +39,10 @@ public final class TestUtils {
         return prefix + new SimpleDateFormat("mmssSSS").format(new Date()) + counter.incrementAndGet();
     }
 
-    public static String getEnvIfPresent(String systemProperty, String envProperty, String defaulValue) {
-        // Trying with the system property first
-        String value = System.getProperty(systemProperty);
-        if (StringUtils.isNotBlank(value)) {
-            return value;
-        }
-        // Trying with the environment variable
-        value = System.getenv(envProperty);
-        if (StringUtils.isNotBlank(value)) {
-            return value;
-        }
-        // Not found
-        return defaulValue;
-    }
-
-    public static String getEnv(String systemProperty, String envProperty, String name) {
-        String value = getEnvIfPresent(systemProperty, envProperty, null);
-        if (StringUtils.isBlank(value)) {
-            throw new IllegalStateException(
-                    String.format(
-                            "The %s value must be defined with the system property `%s` or the environment variable `%s`.",
-                            name,
-                            systemProperty,
-                            envProperty
-                    )
-            );
-        } else {
-            return value;
-        }
-    }
-
-    public static void assertJsonWrite(JsonNode expectedJson, Object objectToWrite) throws JsonProcessingException {
+    public static void assertJsonWrite(JsonNode expectedJson, Object objectToWrite) {
         assertEquals(
-                mapper.writeValueAsString(expectedJson),
-                mapper.writeValueAsString(objectToWrite)
+                expectedJson,
+                mapper.valueToTree(objectToWrite)
         );
     }
 
@@ -102,10 +69,10 @@ public final class TestUtils {
         );
     }
 
-    public static void assertJsonEquals(TreeNode o1, TreeNode o2) throws JsonProcessingException {
+    public static void assertJsonEquals(TreeNode o1, TreeNode o2) {
         assertEquals(
-                mapper.writeValueAsString(o1),
-                mapper.writeValueAsString(o2)
+                o1,
+                o2
         );
     }
 
@@ -125,9 +92,4 @@ public final class TestUtils {
         return mapper.readTree(resourceBytes(path));
     }
 
-    public static int getAvailablePort() throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(0)) {
-            return serverSocket.getLocalPort();
-        }
-    }
 }
