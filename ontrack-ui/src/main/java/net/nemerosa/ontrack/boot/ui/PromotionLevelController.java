@@ -68,7 +68,7 @@ public class PromotionLevelController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.POST)
-    public Resource<PromotionLevel> newPromotionLevel(@PathVariable ID branchId, @RequestBody @Valid NameDescription nameDescription) {
+    public PromotionLevel newPromotionLevel(@PathVariable ID branchId, @RequestBody @Valid NameDescription nameDescription) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Creates a new promotion level
@@ -76,12 +76,12 @@ public class PromotionLevelController extends AbstractResourceController {
         // Saves it into the repository
         promotionLevel = structureService.newPromotionLevel(promotionLevel);
         // OK
-        return asResource(promotionLevel);
+        return promotionLevel;
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
-    public Resource<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
-        return asResource(structureService.getPromotionLevel(promotionLevelId));
+    public PromotionLevel getPromotionLevel(@PathVariable ID promotionLevelId) {
+        return structureService.getPromotionLevel(promotionLevelId);
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.GET)
@@ -90,7 +90,7 @@ public class PromotionLevelController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.PUT)
-    public Resource<PromotionLevel> updatePromotionLevel(@PathVariable ID promotionLevelId, @RequestBody @Valid NameDescription nameDescription) {
+    public PromotionLevel updatePromotionLevel(@PathVariable ID promotionLevelId, @RequestBody @Valid NameDescription nameDescription) {
         // Gets from the repository
         PromotionLevel promotionLevel = structureService.getPromotionLevel(promotionLevelId);
         // Updates
@@ -98,7 +98,7 @@ public class PromotionLevelController extends AbstractResourceController {
         // Saves in repository
         structureService.savePromotionLevel(promotionLevel);
         // As resource
-        return asResource(promotionLevel);
+        return promotionLevel;
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.DELETE)
@@ -140,10 +140,6 @@ public class PromotionLevelController extends AbstractResourceController {
     @PutMapping("promotionLevels/{promotionLevelId}/bulk")
     public Ack bulkUpdate(@PathVariable ID promotionLevelId) {
         return structureService.bulkUpdatePromotionLevels(promotionLevelId);
-    }
-
-    private Resource<PromotionLevel> asResource(PromotionLevel promotionLevel) {
-        return Resource.of(promotionLevel, uri(on(PromotionLevelController.class).getPromotionLevel(promotionLevel.getId())));
     }
 
 }

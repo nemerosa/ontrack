@@ -16,12 +16,9 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.Action
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
-import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import javax.validation.Valid
 
 /**
@@ -73,16 +70,16 @@ class AccountController(
      * Creation of a built-in account
      */
     @PostMapping("create")
-    fun create(@RequestBody input: @Valid AccountInput): Resource<Account> {
-        return accountService.create(input).asResource()
+    fun create(@RequestBody input: @Valid AccountInput): Account {
+        return accountService.create(input)
     }
 
     /**
      * Gets an account by its ID
      */
     @GetMapping("{accountId}")
-    fun getAccount(@PathVariable accountId: ID): Resource<Account> {
-        return accountService.getAccount(accountId).asResource()
+    fun getAccount(@PathVariable accountId: ID): Account {
+        return accountService.getAccount(accountId)
     }
 
     /**
@@ -114,8 +111,8 @@ class AccountController(
      * Updating an account
      */
     @PutMapping("{accountId}/update")
-    fun updateAccount(@PathVariable accountId: ID, @RequestBody input: @Valid AccountInput): Resource<Account> {
-        return accountService.updateAccount(accountId, input).asResource()
+    fun updateAccount(@PathVariable accountId: ID, @RequestBody input: @Valid AccountInput): Account {
+        return accountService.updateAccount(accountId, input)
     }
 
     /**
@@ -146,16 +143,16 @@ class AccountController(
      * Creation of an account group
      */
     @PostMapping("groups/create")
-    fun create(@RequestBody nameDescription: @Valid NameDescription): Resource<AccountGroup> {
-        return accountService.createGroup(nameDescription).asResource()
+    fun create(@RequestBody nameDescription: @Valid NameDescription): AccountGroup {
+        return accountService.createGroup(nameDescription)
     }
 
     /**
      * Getting a group
      */
     @GetMapping("groups/{groupId}")
-    fun getGroup(@PathVariable groupId: ID): Resource<AccountGroup> {
-        return accountService.getAccountGroup(groupId).asResource()
+    fun getGroup(@PathVariable groupId: ID): AccountGroup {
+        return accountService.getAccountGroup(groupId)
     }
 
     /**
@@ -163,18 +160,18 @@ class AccountController(
      */
     @GetMapping("groups/{groupId}/update")
     fun getGroupUpdateForm(@PathVariable groupId: ID): Form {
-        val (_, name, description) = accountService.getAccountGroup(groupId)
+        val accountGroup = accountService.getAccountGroup(groupId)
         return getGroupCreationForm()
-                .fill("name", name)
-                .fill("description", description)
+                .fill("name", accountGroup.name)
+                .fill("description", accountGroup.description)
     }
 
     /**
      * Updating a group
      */
     @PutMapping("groups/{groupId}/update")
-    fun updateGroup(@PathVariable groupId: ID, @RequestBody input: @Valid NameDescription): Resource<AccountGroup> {
-        return accountService.updateGroup(groupId, input).asResource()
+    fun updateGroup(@PathVariable groupId: ID, @RequestBody input: @Valid NameDescription): AccountGroup {
+        return accountService.updateGroup(groupId, input)
     }
 
     /**
@@ -184,9 +181,5 @@ class AccountController(
     fun deleteGroup(@PathVariable groupId: ID): Ack {
         return accountService.deleteGroup(groupId)
     }
-
-    private fun Account.asResource() = Resource.of(this, uri(on(AccountController::class.java).getAccount(id)))
-
-    private fun AccountGroup.asResource() = Resource.of(this, uri(on(AccountController::class.java).getGroup(id)))
 
 }

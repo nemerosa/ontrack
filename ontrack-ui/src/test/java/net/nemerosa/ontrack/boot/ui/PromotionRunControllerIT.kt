@@ -28,7 +28,7 @@ class PromotionRunControllerIT : AbstractWebTestSupport() {
                     // Call
                     val run = asUser().with(pl, ProjectEdit::class.java).call {
                         controller.newPromotionRun(id, request)
-                    }.data
+                    }
                     // Checks
                     assertNotNull(run)
                 }
@@ -58,7 +58,7 @@ class PromotionRunControllerIT : AbstractWebTestSupport() {
                     // Call
                     val run = asUser().with(pl, ProjectEdit::class.java).call {
                         controller.newPromotionRun(id, request)
-                    }.data
+                    }
                     // Checks
                     assertNotNull(run) {
                         val property: TestSimpleProperty? = getProperty(run, TestSimplePropertyType::class.java)

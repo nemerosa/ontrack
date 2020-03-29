@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonView
  *
  * @property dataType Data used for the link to an optional {@link ValidationDataType} and its configuration
  */
-data class ValidationStamp(
+open class ValidationStamp(
         override val id: ID,
         val name: String,
         override val description: String?,

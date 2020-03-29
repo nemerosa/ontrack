@@ -25,7 +25,7 @@ class ProjectControllerIT : AbstractWebTestSupport() {
         asUser().with(ProjectCreation::class.java).execute {
             val nameDescription = nameDescription().asState()
             val resource = controller.newProject(nameDescription)
-            checkProject(resource.data, nameDescription)
+            checkProject(resource, nameDescription)
         }
     }
 
@@ -39,7 +39,7 @@ class ProjectControllerIT : AbstractWebTestSupport() {
         val project = doCreateProject()
         // Disables it
         val disabled = asUser().with(project, ProjectEdit::class.java).call { controller.disableProject(project.id) }
-        assertTrue(disabled.data.isDisabled, "Project is disabled")
+        assertTrue(disabled.isDisabled, "Project is disabled")
         val disabledEvent = eventQueryService.getLastEvent(project, EventFactory.DISABLE_PROJECT)
         assertNotNull(disabledEvent, "Disabled event is there") { event ->
             val eventProject: Project? = event.getEntity(ProjectEntityType.PROJECT)
@@ -49,7 +49,7 @@ class ProjectControllerIT : AbstractWebTestSupport() {
         }
         // Enables it
         val enabled = asUser().with(project, ProjectEdit::class.java).call { controller.enableProject(project.id) }
-        assertFalse(enabled.data.isDisabled, "Project is enabled")
+        assertFalse(enabled.isDisabled, "Project is enabled")
         val enabledEvent = eventQueryService.getLastEvent(project, EventFactory.ENABLE_PROJECT)
         assertNotNull(enabledEvent, "Enabled event is there") { event ->
             val eventProject: Project? = event.getEntity(ProjectEntityType.PROJECT)
@@ -63,18 +63,18 @@ class ProjectControllerIT : AbstractWebTestSupport() {
     fun updateProject() {
         // Creates the project
         val initialNames = nameDescription().asState()
-        val project = asUser().with(ProjectCreation::class.java).call { controller.newProject(initialNames) }.data
+        val project = asUser().with(ProjectCreation::class.java).call { controller.newProject(initialNames) }
         val id = project.id
         // Edition
         asUser().with(id.value, ProjectEdit::class.java).execute {
             // Updates
             val nameDescription = nameDescription().asState()
             assertNotEquals(initialNames, nameDescription)
-            var updated = controller.saveProject(id, nameDescription).data
+            var updated = controller.saveProject(id, nameDescription)
             // Checks
             checkProject(updated, nameDescription)
             // Gets the project back
-            updated = controller.getProject(id).data
+            updated = controller.getProject(id)
             checkProject(updated, nameDescription)
         }
     }

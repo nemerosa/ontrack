@@ -15,7 +15,6 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +84,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
-    public Resource<Branch> newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
+    public Branch newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Creates a new branch instance
@@ -93,12 +92,12 @@ public class BranchController extends AbstractResourceController {
         // Saves it into the repository
         branch = structureService.newBranch(branch);
         // OK
-        return asResource(branch);
+        return branch;
     }
 
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
-    public Resource<Branch> getBranch(@PathVariable ID branchId) {
-        return asResource(structureService.getBranch(branchId));
+    public Branch getBranch(@PathVariable ID branchId) {
+        return structureService.getBranch(branchId);
     }
 
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.DELETE)
@@ -113,29 +112,29 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.PUT)
-    public Resource<Branch> updateBranch(@PathVariable ID branchId, @RequestBody @Valid NameDescriptionState form) {
+    public Branch updateBranch(@PathVariable ID branchId, @RequestBody @Valid NameDescriptionState form) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId).update(form);
         // Saves the branch
         structureService.saveBranch(branch);
         // OK
-        return asResource(branch);
+        return branch;
     }
 
     @RequestMapping(value = "branches/{branchId}/enable", method = RequestMethod.PUT)
-    public Resource<Branch> enableBranch(@PathVariable ID branchId) {
+    public Branch enableBranch(@PathVariable ID branchId) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId);
         // Saves the branch
-        return asResource(structureService.enableBranch(branch));
+        return structureService.enableBranch(branch);
     }
 
     @RequestMapping(value = "branches/{branchId}/disable", method = RequestMethod.PUT)
-    public Resource<Branch> disableBranch(@PathVariable ID branchId) {
+    public Branch disableBranch(@PathVariable ID branchId) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId).withDisabled(true);
         // Disables the branch
-        return asResource(structureService.disableBranch(branch));
+        return structureService.disableBranch(branch);
     }
 
     @RequestMapping(value = "branches/{branchId}/status", method = RequestMethod.GET)
@@ -192,11 +191,11 @@ public class BranchController extends AbstractResourceController {
      * Copies the configuration from a branch into this one.
      */
     @RequestMapping(value = "branches/{branchId}/copy", method = RequestMethod.PUT)
-    public Resource<Branch> copy(@PathVariable ID branchId, @RequestBody BranchCopyRequest request) {
+    public Branch copy(@PathVariable ID branchId, @RequestBody BranchCopyRequest request) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the copy
-        return asResource(copyService.copy(branch, request));
+        return copyService.copy(branch, request);
     }
 
     /**
@@ -216,11 +215,11 @@ public class BranchController extends AbstractResourceController {
      * Bulk update for a branch.
      */
     @RequestMapping(value = "branches/{branchId}/update/bulk", method = RequestMethod.PUT)
-    public Resource<Branch> bulkUpdate(@PathVariable ID branchId, @RequestBody BranchBulkUpdateRequest request) {
+    public Branch bulkUpdate(@PathVariable ID branchId, @RequestBody BranchBulkUpdateRequest request) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the update
-        return asResource(copyService.update(branch, request));
+        return copyService.update(branch, request);
     }
 
     /**
@@ -245,11 +244,11 @@ public class BranchController extends AbstractResourceController {
      * Clones this branch into another one.
      */
     @RequestMapping(value = "branches/{branchId}/clone", method = RequestMethod.POST)
-    public Resource<Branch> clone(@PathVariable ID branchId, @RequestBody BranchCloneRequest request) {
+    public Branch clone(@PathVariable ID branchId, @RequestBody BranchCloneRequest request) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the clone
-        return asResource(copyService.cloneBranch(branch, request));
+        return copyService.cloneBranch(branch, request);
     }
 
     /**
@@ -346,8 +345,8 @@ public class BranchController extends AbstractResourceController {
      * Sets this branch as a template definition, or updates the definition.
      */
     @RequestMapping(value = "branches/{branchId}/template/definition", method = RequestMethod.PUT)
-    public Resource<Branch> setTemplateDefinition(@PathVariable ID branchId, @RequestBody @Valid TemplateDefinition templateDefinition) {
-        return asResource(branchTemplateService.setTemplateDefinition(branchId, templateDefinition));
+    public Branch setTemplateDefinition(@PathVariable ID branchId, @RequestBody @Valid TemplateDefinition templateDefinition) {
+        return branchTemplateService.setTemplateDefinition(branchId, templateDefinition);
     }
 
     /**
@@ -406,8 +405,8 @@ public class BranchController extends AbstractResourceController {
      * @return Created or updated branch
      */
     @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.PUT)
-    public Resource<Branch> createTemplateInstance(@PathVariable ID branchId, @RequestBody @Valid BranchTemplateInstanceSingleRequest request) {
-        return asResource(branchTemplateService.createTemplateInstance(branchId, request));
+    public Branch createTemplateInstance(@PathVariable ID branchId, @RequestBody @Valid BranchTemplateInstanceSingleRequest request) {
+        return branchTemplateService.createTemplateInstance(branchId, request);
     }
 
     /**
@@ -423,8 +422,8 @@ public class BranchController extends AbstractResourceController {
      * Disconnects the branch from any template definition, if any.
      */
     @RequestMapping(value = "branches/{branchId}/template/instance", method = RequestMethod.DELETE)
-    public Resource<Branch> disconnectTemplateInstance(@PathVariable ID branchId) {
-        return asResource(branchTemplateService.disconnectTemplateInstance(branchId));
+    public Branch disconnectTemplateInstance(@PathVariable ID branchId) {
+        return branchTemplateService.disconnectTemplateInstance(branchId);
     }
 
     /**
@@ -460,8 +459,8 @@ public class BranchController extends AbstractResourceController {
      * @param branchId Branch to connect
      */
     @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.POST)
-    public Resource<Branch> connectTemplateInstance(@PathVariable ID branchId, @RequestBody BranchTemplateInstanceConnectRequest request) {
-        return asResource(branchTemplateService.connectTemplateInstance(branchId, request));
+    public Branch connectTemplateInstance(@PathVariable ID branchId, @RequestBody BranchTemplateInstanceConnectRequest request) {
+        return branchTemplateService.connectTemplateInstance(branchId, request);
     }
 
     private <T> BranchBuildView buildViewWithFilter(ID branchId,
@@ -486,21 +485,17 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/favourite", method = RequestMethod.PUT)
-    public Resource<Branch> favouriteBranch(@PathVariable ID branchId) {
+    public Branch favouriteBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         branchFavouriteService.setBranchFavourite(branch, true);
-        return asResource(branch);
+        return branch;
     }
 
     @RequestMapping(value = "branches/{branchId}/unfavourite", method = RequestMethod.PUT)
-    public Resource<Branch> unfavouriteBranch(@PathVariable ID branchId) {
+    public Branch unfavouriteBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         branchFavouriteService.setBranchFavourite(branch, false);
-        return asResource(branch);
-    }
-
-    private Resource<Branch> asResource(Branch branch) {
-        return Resource.of(branch, uri(on(BranchController.class).getBranch(branch.getId())));
+        return branch;
     }
 
 }

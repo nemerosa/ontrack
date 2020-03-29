@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff
 
 @JsonPropertyOrder(alphabetic = true)
-class PromotionRun(
+open class PromotionRun(
         override val id: ID,
         @JsonView(value = [ProjectStatusView::class, BranchStatusView::class, PromotionView::class, PromotionRun::class, Build::class, PromotionRunView::class])
         val build: Build,
