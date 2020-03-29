@@ -1,86 +1,72 @@
-package net.nemerosa.ontrack.boot.support;
+package net.nemerosa.ontrack.boot.support
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.boot.ui.AbstractWebTestSupport;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.test.TestUtils;
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
-import net.nemerosa.ontrack.ui.resource.DefaultResourceModule;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpOutputMessage;
+import net.nemerosa.ontrack.boot.ui.AbstractWebTestSupport
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.ObjectMapperFactory
+import net.nemerosa.ontrack.model.structure.Branch.Companion.of
+import net.nemerosa.ontrack.model.structure.ID.Companion.of
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Project.Companion.of
+import net.nemerosa.ontrack.model.structure.TestFixtures
+import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.ui.controller.MockURIBuilder
+import net.nemerosa.ontrack.ui.resource.DefaultResourceModule
+import net.nemerosa.ontrack.ui.resource.ResourceDecorator
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
+import org.mockito.Mockito
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpOutputMessage
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.nio.charset.Charset
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
-import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
-import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-public class ResourceHttpMessageConverterIT extends AbstractWebTestSupport {
+class ResourceHttpMessageConverterIT : AbstractWebTestSupport() {
 
     @Autowired
-    private SecurityService securityService;
+    private lateinit var decorators: Collection<ResourceDecorator<*>>
 
-    @Autowired
-    private Collection<ResourceDecorator<?>> decorators;
-
-    private ResourceHttpMessageConverter converter;
+    private lateinit var converter: ResourceHttpMessageConverter
 
     @Before
-    public void before() {
-        converter = new ResourceHttpMessageConverter(
-                new MockURIBuilder(), securityService,
-                Collections.singletonList(new DefaultResourceModule(decorators))
-        );
+    fun before() {
+        converter = ResourceHttpMessageConverter(
+                MockURIBuilder(), securityService, listOf(DefaultResourceModule(decorators)))
     }
 
     @Test
-    public void branch() throws IOException {
+    @Throws(IOException::class)
+    fun branch() {
         // Objects
-        Project p = Project.of(new NameDescription("P", "Projet créé")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
+        val p = of(NameDescription("P", "Projet créé")).withId(of(1))
+                .withSignature(TestFixtures.SIGNATURE)
+        val b = of(p, NameDescription("B", "Branch")).withId(of(1))
+                .withSignature(TestFixtures.SIGNATURE)
         // Message
-        HttpOutputMessage message = mock(HttpOutputMessage.class);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        when(message.getBody()).thenReturn(output);
+        val message = Mockito.mock(HttpOutputMessage::class.java)
+        val output = ByteArrayOutputStream()
+        Mockito.`when`(message.body).thenReturn(output)
         // Serialization
-        converter.writeInternal(b, message);
-
+        converter.writeInternal(b, message)
         // Content
-        String json = new String(output.toByteArray(), "UTF-8");
-
+        val json = output.toByteArray().toString(Charsets.UTF_8)
         // Parsing
-        JsonNode node = ObjectMapperFactory.create().readTree(json);
-
+        val node = ObjectMapperFactory.create().readTree(json)
         // Check
         TestUtils.assertJsonEquals(
-                object()
+                JsonUtils.`object`()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
                         .with("type", "CLASSIC")
-                        .with("project", object()
+                        .with("project", JsonUtils.`object`()
                                 .with("id", 1)
                                 .with("name", "P")
                                 .with("description", "Projet créé")
                                 .with("disabled", false)
-                                .with("signature", SIGNATURE_OBJECT)
+                                .with("signature", TestFixtures.SIGNATURE_OBJECT)
                                 .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                 .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                                 .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
@@ -94,7 +80,7 @@ public class ResourceHttpMessageConverterIT extends AbstractWebTestSupport {
                                 .with("_page", "urn:test:#:entity:PROJECT:1")
                                 .end()
                         )
-                        .with("signature", SIGNATURE_OBJECT)
+                        .with("signature", TestFixtures.SIGNATURE_OBJECT)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
                         .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:1")
@@ -114,58 +100,49 @@ public class ResourceHttpMessageConverterIT extends AbstractWebTestSupport {
                         .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 node
-        );
+        )
     }
 
     @Test
-    public void branch_disable_granted_for_automation() throws Exception {
-        // Objects
-        Project p = Project.of(new NameDescription("P", "Projet créé")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
+    @Throws(Exception::class)
+    fun branch_disable_granted_for_automation() { // Objects
+        val p = of(NameDescription("P", "Projet créé")).withId(of(1))
+                .withSignature(TestFixtures.SIGNATURE)
+        val b = of(p, NameDescription("B", "Branch")).withId(of(1))
+                .withSignature(TestFixtures.SIGNATURE)
         // Message
-        HttpOutputMessage message = mock(HttpOutputMessage.class);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        when(message.getBody()).thenReturn(output);
+        val message = Mockito.mock(HttpOutputMessage::class.java)
+        val output = ByteArrayOutputStream()
+        Mockito.`when`(message.body).thenReturn(output)
         // Serialization
-        asGlobalRole("AUTOMATION").execute(() -> converter.writeInternal(b, message)
-        );
-
+        asGlobalRole("AUTOMATION").execute { converter.writeInternal(b, message) }
         // Content
-        String json = new String(output.toByteArray(), "UTF-8");
-
+        val json = output.toByteArray().toString(Charsets.UTF_8)
         // Parsing
-        JsonNode node = ObjectMapperFactory.create().readTree(json);
-
+        val node = ObjectMapperFactory.create().readTree(json)
         // Disable link
-        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.BranchController#disableBranch:1", node.path("_disable").asText());
+        Assert.assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.BranchController#disableBranch:1", node.path("_disable").asText())
     }
 
     @Test
-    public void branch_enable_granted_for_automation() throws Exception {
-        // Objects
-        Project p = Project.of(new NameDescription("P", "Projet créé")).withId(ID.of(1))
-                .withSignature(SIGNATURE);
-        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1))
+    @Throws(Exception::class)
+    fun branch_enable_granted_for_automation() { // Objects
+        val p = of(NameDescription("P", "Projet créé")).withId(of(1))
+                .withSignature(TestFixtures.SIGNATURE)
+        val b = of(p, NameDescription("B", "Branch")).withId(of(1))
                 .withDisabled(true)
-                .withSignature(SIGNATURE);
+                .withSignature(TestFixtures.SIGNATURE)
         // Message
-        HttpOutputMessage message = mock(HttpOutputMessage.class);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        when(message.getBody()).thenReturn(output);
+        val message = Mockito.mock(HttpOutputMessage::class.java)
+        val output = ByteArrayOutputStream()
+        Mockito.`when`(message.body).thenReturn(output)
         // Serialization
-        asGlobalRole("AUTOMATION").execute(() -> converter.writeInternal(b, message)
-        );
-
+        asGlobalRole("AUTOMATION").execute { converter.writeInternal(b, message) }
         // Content
-        String json = new String(output.toByteArray(), "UTF-8");
-
+        val json = output.toByteArray().toString(Charsets.UTF_8)
         // Parsing
-        JsonNode node = ObjectMapperFactory.create().readTree(json);
-
+        val node = ObjectMapperFactory.create().readTree(json)
         // Enable link
-        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.BranchController#enableBranch:1", node.path("_enable").asText());
+        Assert.assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.BranchController#enableBranch:1", node.path("_enable").asText())
     }
-
 }
