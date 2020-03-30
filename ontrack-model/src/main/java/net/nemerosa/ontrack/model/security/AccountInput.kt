@@ -19,7 +19,8 @@ data class AccountInput(
         val email: String,
         val password: String,
         /**
-         * List of selected groups
+         * List of selected groups. It can be `null`, meaning that the list of groups
+         * must be empty.
          */
-        val groups: Collection<Int>
+        val groups: Collection<Int>?
 )

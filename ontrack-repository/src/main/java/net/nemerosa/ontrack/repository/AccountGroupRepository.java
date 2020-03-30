@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +22,7 @@ public interface AccountGroupRepository {
 
     Ack delete(ID groupId);
 
-    void linkAccountToGroups(int accountId, Collection<Integer> groupIds);
+    void linkAccountToGroups(int accountId, @Nullable Collection<Integer> groupIds);
 
     List<AccountGroup> findByNameToken(String token);
 }
