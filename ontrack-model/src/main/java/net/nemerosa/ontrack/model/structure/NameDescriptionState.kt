@@ -8,10 +8,10 @@ import javax.validation.constraints.Pattern
 
 
 data class NameDescriptionState(
-        @NotNull(message = "The name is required.")
-        @Pattern(regexp = NAME, message = "The name $NAME_MESSAGE_SUFFIX")
+        @get:NotNull(message = "The name is required.")
+        @get:Pattern(regexp = NAME, message = "The name $NAME_MESSAGE_SUFFIX")
         val name: String,
         val description: String?,
-        @JsonProperty("disabled")
+        @get:JsonProperty("disabled")
         val isDisabled: Boolean
 )

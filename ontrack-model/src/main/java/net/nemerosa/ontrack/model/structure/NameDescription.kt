@@ -4,8 +4,8 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
 data class NameDescription(
-        @NotNull(message = "The name is required.")
-        @Pattern(regexp = NAME, message = "The name $NAME_MESSAGE_SUFFIX")
+        @get:NotNull(message = "The name is required.")
+        @get:Pattern(regexp = NAME, message = "The name $NAME_MESSAGE_SUFFIX")
         val name: String,
         val description: String?
 ) {

@@ -70,7 +70,7 @@ class AccountController(
      * Creation of a built-in account
      */
     @PostMapping("create")
-    fun create(@RequestBody input: @Valid AccountInput): Account {
+    fun create(@RequestBody @Valid input: AccountInput): Account {
         return accountService.create(input)
     }
 
@@ -111,7 +111,7 @@ class AccountController(
      * Updating an account
      */
     @PutMapping("{accountId}/update")
-    fun updateAccount(@PathVariable accountId: ID, @RequestBody input: @Valid AccountInput): Account {
+    fun updateAccount(@PathVariable accountId: ID, @RequestBody @Valid input: AccountInput): Account {
         return accountService.updateAccount(accountId, input)
     }
 
@@ -143,7 +143,7 @@ class AccountController(
      * Creation of an account group
      */
     @PostMapping("groups/create")
-    fun create(@RequestBody nameDescription: @Valid NameDescription): AccountGroup {
+    fun create(@RequestBody @Valid nameDescription: NameDescription): AccountGroup {
         return accountService.createGroup(nameDescription)
     }
 
@@ -170,7 +170,7 @@ class AccountController(
      * Updating a group
      */
     @PutMapping("groups/{groupId}/update")
-    fun updateGroup(@PathVariable groupId: ID, @RequestBody input: @Valid NameDescription): AccountGroup {
+    fun updateGroup(@PathVariable groupId: ID, @RequestBody @Valid input: NameDescription): AccountGroup {
         return accountService.updateGroup(groupId, input)
     }
 
