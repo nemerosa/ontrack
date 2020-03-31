@@ -6,12 +6,11 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.NAME_MESSA
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
-
 data class NameDescriptionState(
         @get:NotNull(message = "The name is required.")
         @get:Pattern(regexp = NAME, message = "The name $NAME_MESSAGE_SUFFIX")
         val name: String,
         val description: String?,
-        @get:JsonProperty("disabled")
+        @JsonProperty("disabled")
         val isDisabled: Boolean
 )

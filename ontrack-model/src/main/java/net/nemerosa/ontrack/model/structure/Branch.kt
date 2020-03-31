@@ -17,7 +17,7 @@ data class Branch(
         @JsonProperty("disabled")
         val isDisabled: Boolean,
         val type: BranchType,
-        @get:JsonProperty("project")
+        @JsonProperty("project")
         @get:JsonView(value = [
             PromotionView::class, Branch::class, Build::class, PromotionLevel::class, ValidationStamp::class,
             PromotionRun::class, ValidationRun::class, PromotionRunView::class
