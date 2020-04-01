@@ -32,22 +32,13 @@ data class Signature(
         /**
          * Anonymous signature
          */
+        @JvmStatic
         fun anonymous(): Signature {
             return Signature(
                     Time.now(),
                     User.anonymous()
             )
         }
-
-        /**
-         * Anonymous signature
-         */
-        @Deprecated(
-                message = "Use `anonymous` instead",
-                replaceWith = ReplaceWith("anonymous()")
-        )
-        @JvmStatic
-        fun none() = anonymous()
 
     }
 }

@@ -84,7 +84,7 @@ public class SecurityServiceImpl implements SecurityService {
         if (account != null) {
             return Signature.of(account.getName());
         } else {
-            return Signature.none();
+            return Signature.anonymous();
         }
     }
 
