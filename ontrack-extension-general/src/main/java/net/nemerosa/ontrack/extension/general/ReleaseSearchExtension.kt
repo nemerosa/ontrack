@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,7 +15,7 @@ class ReleaseSearchExtension(
         private val structureService: StructureService
 ) : AbstractExtension(
         extensionFeature
-), SearchExtension, SearchIndexer<ReleaseSearchItem> {
+), SearchIndexer<ReleaseSearchItem> {
 
     override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
@@ -25,33 +23,6 @@ class ReleaseSearchExtension(
             "Build with Release",
             "Release, label or version attached to a build"
     )
-
-    override fun getSearchProvider() = object : AbstractSearchProvider(uriBuilder) {
-
-        /**
-         * Any token is searchable
-         */
-        override fun isTokenSearchable(token: String): Boolean = true
-
-        override fun search(token: String): Collection<SearchResult> =
-                propertyService.findByEntityTypeAndSearchkey(
-                        ProjectEntityType.BUILD,
-                        ReleasePropertyType::class.java,
-                        token
-                ).map { id ->
-                    structureService.getBuild(id)
-                }.map { build ->
-                    SearchResult(
-                            build.entityDisplayName,
-                            "Build ${build.entityDisplayName} having version/label/release $token",
-                            uriBuilder.getEntityURI(build),
-                            uriBuilder.getEntityPage(build),
-                            100.0,
-                            searchResultType
-                    )
-                }
-
-    }
 
     override val indexerName: String = "Release property"
 

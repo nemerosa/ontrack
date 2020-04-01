@@ -6,9 +6,7 @@ import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.springframework.stereotype.Component
-import java.util.regex.Pattern
 
 /**
  * Minimum length of a token to compare with project names by content.
@@ -31,10 +29,10 @@ const val PROJECT_SEARCH_RESULT_TYPE = "project"
  */
 @Component
 class ProjectSearchProvider(
-        uriBuilder: URIBuilder,
+        private val uriBuilder: URIBuilder,
         private val structureService: StructureService,
         private val searchIndexService: SearchIndexService
-) : AbstractSearchProvider(uriBuilder), SearchIndexer<ProjectSearchItem>, EventListener {
+) : SearchIndexer<ProjectSearchItem>, EventListener {
 
     override val searchResultType = SearchResultType(
             feature = CoreExtensionFeature.INSTANCE.featureDescription,
@@ -42,30 +40,6 @@ class ProjectSearchProvider(
             name = "Project",
             description = "Project name in Ontrack"
     )
-
-    override fun isTokenSearchable(token: String): Boolean {
-        return Pattern.matches(NameDescription.NAME, token)
-    }
-
-    override fun search(token: String): Collection<SearchResult> {
-        return structureService.projectList
-                .filter { project ->
-                    project.name.equals(token, true) ||
-                            (token.length >= PROJECT_SEARCH_PROVIDER_TOKEN_MIN_LENGTH &&
-                                    project.name.contains(token, true)
-                                    )
-                }
-                .map { project ->
-                    SearchResult(
-                            title = project.entityDisplayName,
-                            description = "",
-                            uri = uriBuilder.getEntityURI(project),
-                            page = uriBuilder.getEntityPage(project),
-                            accuracy = 100.0,
-                            type = searchResultType
-                    )
-                }
-    }
 
     override val indexerName: String = "Projects"
 

@@ -2,14 +2,12 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
-import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.BuildLinkListener
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 
@@ -23,20 +21,7 @@ class BuildLinkSearchExtension(
         private val structureService: StructureService,
         private val buildDisplayNameService: BuildDisplayNameService,
         private val searchIndexService: SearchIndexService
-) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<BuildLinkSearchItem>, BuildLinkListener {
-
-    override fun getSearchProvider(): SearchProvider {
-        return object : AbstractSearchProvider(uriBuilder) {
-            override fun isTokenSearchable(token: String): Boolean {
-                return this@BuildLinkSearchExtension.isTokenSearchable(token)
-            }
-
-            override fun search(token: String): Collection<SearchResult> {
-                return this@BuildLinkSearchExtension.search(token)
-            }
-
-        }
-    }
+) : AbstractExtension(extensionFeature), SearchIndexer<BuildLinkSearchItem>, BuildLinkListener {
 
     fun isTokenSearchable(token: String): Boolean {
         return StringUtils.indexOf(token, ":") > 0

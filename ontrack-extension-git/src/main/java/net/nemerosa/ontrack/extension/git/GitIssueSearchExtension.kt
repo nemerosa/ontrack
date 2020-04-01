@@ -3,23 +3,18 @@ package net.nemerosa.ontrack.extension.git
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
-import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import java.util.*
-import java.util.function.BiConsumer
 
 @Component
 class GitIssueSearchExtension(
@@ -29,77 +24,10 @@ class GitIssueSearchExtension(
         private val structureService: StructureService,
         private val ontrackConfigProperties: OntrackConfigProperties,
         private val searchIndexService: SearchIndexService
-) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitIssueSearchItem> {
+) : AbstractExtension(extensionFeature), SearchIndexer<GitIssueSearchItem> {
 
     private val logger: Logger = LoggerFactory.getLogger(GitIssueSearchExtension::class.java)
 
-    override fun getSearchProvider(): SearchProvider {
-        return GitIssueSearchProvider(uriBuilder)
-    }
-
-    protected inner class GitIssueSearchProvider(uriBuilder: URIBuilder) : AbstractSearchProvider(uriBuilder) {
-
-        override fun isTokenSearchable(token: String): Boolean {
-            var match = false
-            // For all Git-configured projects
-            gitService.forEachConfiguredProject(BiConsumer { _, gitConfiguration ->
-                if (!match) {
-                    // Gets issue service
-                    if (gitConfiguration.configuredIssueService.isPresent) {
-                        match = gitConfiguration.configuredIssueService.get()
-                                .issueServiceExtension.validIssueToken(token)
-                    }
-                }
-            })
-            return match
-        }
-
-        override fun search(token: String): Collection<SearchResult> {
-            // Map of results per project, with the first result being the one for the first corresponding branch
-            val projectResults = LinkedHashMap<ID, SearchResult>()
-            // For all Git-configured projects
-            gitService.forEachConfiguredProject(BiConsumer { project, gitConfiguration ->
-                val configuredIssueService: ConfiguredIssueService? =
-                        gitConfiguration.configuredIssueService.orElse(null)
-                if (configuredIssueService != null) {
-                    val projectId: ID = project.id
-                    // Skipping if associated project is already associated with the issue
-                    if (!projectResults.containsKey(projectId)) {
-                        // ... searches for the issue token in the git repository
-                        val found = configuredIssueService.issueServiceExtension.validIssueToken(token) &&
-                                gitService.isPatternFound(gitConfiguration, token)
-                        // ... and if found
-                        if (found) {
-                            // ... loads the issue
-                            val issue: Issue? = configuredIssueService.getIssue(token)
-                            // Saves the result for the project if an issue has been found
-                            if (issue != null) {
-                                projectResults[projectId] = SearchResult(
-                                        issue.displayKey,
-                                        String.format("Issue %s found in project %s",
-                                                issue.key,
-                                                project.name
-                                        ),
-                                        uri(on(GitController::class.java).issueProjectInfo(
-                                                project.id,
-                                                issue.key
-                                        )),
-                                        uriBuilder.page("extension/git/%d/issue/%s",
-                                                project.id(),
-                                                issue.key),
-                                        100.0,
-                                        searchResultType
-                                )
-                            }
-                        }
-                    }
-                }
-            })
-            // OK
-            return projectResults.values
-        }
-
-    }
 
     override val indexerName: String = "Git Issues"
 

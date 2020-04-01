@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -10,7 +9,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.function.BiFunction
@@ -23,7 +21,7 @@ class MetaInfoSearchExtension(
         private val propertyService: PropertyService,
         private val structureService: StructureService,
         private val securityService: SecurityService
-) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<MetaInfoSearchItem> {
+) : AbstractExtension(extensionFeature), SearchIndexer<MetaInfoSearchItem> {
 
     override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
@@ -31,18 +29,6 @@ class MetaInfoSearchExtension(
             "Build with Meta Info",
             "Meta information pair using format name:[value] or value"
     )
-
-    override fun getSearchProvider(): SearchProvider {
-        return object : AbstractSearchProvider(uriBuilder) {
-            override fun isTokenSearchable(token: String): Boolean {
-                return this@MetaInfoSearchExtension.isTokenSearchable(token)
-            }
-
-            override fun search(token: String): Collection<SearchResult> {
-                return this@MetaInfoSearchExtension.search(token)
-            }
-        }
-    }
 
     fun isTokenSearchable(token: String): Boolean = StringUtils.indexOf(token, META_INFO_SEPARATOR) > 0
 

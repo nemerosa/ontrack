@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
-import net.nemerosa.ontrack.extension.api.SearchExtension
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
@@ -15,12 +14,10 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import net.nemerosa.ontrack.ui.support.AbstractSearchProvider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import java.util.*
 import java.util.function.BiConsumer
 import java.util.regex.Pattern
 
@@ -34,7 +31,7 @@ class GitCommitSearchExtension(
         gitSearchConfigProperties: GitSearchConfigProperties,
         private val ontrackConfigProperties: OntrackConfigProperties,
         private val gitIssueSearchExtension: GitIssueSearchExtension
-) : AbstractExtension(extensionFeature), SearchExtension, SearchIndexer<GitCommitSearchItem> {
+) : AbstractExtension(extensionFeature), SearchIndexer<GitCommitSearchItem> {
 
     private val logger: Logger = LoggerFactory.getLogger(GitCommitSearchExtension::class.java)
 
@@ -46,47 +43,6 @@ class GitCommitSearchExtension(
             "Git Commit",
             "Commit hash (abbreviated or not)"
     )
-
-    override fun getSearchProvider(): SearchProvider {
-        return GitCommitSearchProvider(uriBuilder)
-    }
-
-    protected inner class GitCommitSearchProvider(uriBuilder: URIBuilder?) : AbstractSearchProvider(uriBuilder) {
-        override fun isTokenSearchable(token: String): Boolean {
-            return shaPattern.matcher(token).matches()
-        }
-
-        override fun search(token: String): Collection<SearchResult> { // List of results
-            val results: MutableList<SearchResult> = ArrayList()
-            // For all Git-configured projects
-            gitService.forEachConfiguredProject(BiConsumer { project: Project, gitConfiguration: GitConfiguration? ->
-                // ... scans for the commit
-                val commit = gitService.lookupCommit(gitConfiguration!!, token)
-                // ... and if found
-                if (commit != null) { // ... creates a result entry
-                    results.add(
-                            SearchResult(String.format("[%s] %s %s",
-                                    project.name,
-                                    commit.id,
-                                    commit.shortMessage), String.format("%s - %s",
-                                    commit.author.name,
-                                    commit.fullMessage),
-                                    uri(MvcUriComponentsBuilder.on(GitController::class.java)
-                                            .commitProjectInfo(project.id, commit.id)),
-                                    uriBuilder.page("extension/git/%d/commit/%s",
-                                            project.id(),
-                                            commit.id),
-                                    100.0,
-                                    searchResultType
-                            )
-                    )
-                }
-            })
-            // OK
-            return results
-        }
-
-    }
 
     override val indexerName: String = "Git commits"
 
