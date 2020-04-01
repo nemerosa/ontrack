@@ -74,11 +74,6 @@ public class TestSimplePropertyType extends AbstractPropertyType<TestSimplePrope
     }
 
     @Override
-    public String getSearchKey(TestSimpleProperty value) {
-        return value.getValue();
-    }
-
-    @Override
     public TestSimpleProperty replaceValue(TestSimpleProperty value, Function<String, String> replacementFunction) {
         return new TestSimpleProperty(
                 replacementFunction.apply(value.getValue())

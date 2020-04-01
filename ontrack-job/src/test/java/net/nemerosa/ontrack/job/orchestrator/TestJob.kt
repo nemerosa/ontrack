@@ -20,6 +20,7 @@ class TestJob(private val name: String) : Job {
     override fun isDisabled(): Boolean = false
 
     companion object {
+        @JvmStatic
         fun getKey(name: String): JobKey = of("test").getType("orchestrator").getKey(name!!)
     }
 

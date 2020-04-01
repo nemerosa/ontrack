@@ -77,11 +77,6 @@ public class JIRAFollowLinksPropertyType extends AbstractPropertyType<JIRAFollow
     }
 
     @Override
-    public String getSearchKey(JIRAFollowLinksProperty value) {
-        return StringUtils.join(value.getLinkNames(), " ");
-    }
-
-    @Override
     public JIRAFollowLinksProperty replaceValue(JIRAFollowLinksProperty value, Function<String, String> replacementFunction) {
         return new JIRAFollowLinksProperty(
                 value.getLinkNames().stream().map(replacementFunction).collect(Collectors.toList())

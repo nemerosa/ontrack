@@ -55,7 +55,5 @@ class BranchingModelPropertyType(
         return JsonUtils.parse(node, BranchingModelProperty::class.java)
     }
 
-    override fun getSearchKey(value: BranchingModelProperty): String = ""
-
     override fun replaceValue(value: BranchingModelProperty, replacementFunction: Function<String, String>) = value
 }

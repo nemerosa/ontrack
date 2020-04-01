@@ -58,10 +58,6 @@ class BuildLinkDisplayPropertyType(
         return AbstractPropertyType.parse(node, BuildLinkDisplayProperty::class.java)
     }
 
-    override fun getSearchKey(value: BuildLinkDisplayProperty): String {
-        return ""
-    }
-
     override fun replaceValue(value: BuildLinkDisplayProperty, replacementFunction: Function<String, String>): BuildLinkDisplayProperty {
         return value
     }

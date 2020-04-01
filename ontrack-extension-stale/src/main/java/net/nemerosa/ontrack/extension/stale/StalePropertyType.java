@@ -96,11 +96,6 @@ public class StalePropertyType extends AbstractPropertyType<StaleProperty> {
     }
 
     @Override
-    public String getSearchKey(StaleProperty value) {
-        return null;
-    }
-
-    @Override
     public StaleProperty replaceValue(StaleProperty value, Function<String, String> replacementFunction) {
         return value;
     }

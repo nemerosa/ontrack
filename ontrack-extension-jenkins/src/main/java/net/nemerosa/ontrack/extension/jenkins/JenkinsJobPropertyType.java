@@ -102,11 +102,6 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public String getSearchKey(JenkinsJobProperty value) {
-        return value.getJob();
-    }
-
-    @Override
     public JenkinsJobProperty replaceValue(JenkinsJobProperty value, Function<String, String> replacementFunction) {
         return new JenkinsJobProperty(
                 replaceConfiguration(value.getConfiguration(), replacementFunction),

@@ -127,11 +127,6 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
     }
 
     @Override
-    public String getSearchKey(ArtifactoryPromotionSyncProperty value) {
-        return value.getConfiguration().getName();
-    }
-
-    @Override
     public ArtifactoryPromotionSyncProperty replaceValue(ArtifactoryPromotionSyncProperty value, Function<String, String> replacementFunction) {
         return new ArtifactoryPromotionSyncProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),

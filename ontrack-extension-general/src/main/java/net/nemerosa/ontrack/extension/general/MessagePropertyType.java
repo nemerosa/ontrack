@@ -93,11 +93,6 @@ public class MessagePropertyType extends AbstractPropertyType<MessageProperty> {
     }
 
     @Override
-    public String getSearchKey(MessageProperty value) {
-        return value.getText();
-    }
-
-    @Override
     public MessageProperty replaceValue(MessageProperty value, Function<String, String> replacementFunction) {
         return new MessageProperty(
                 value.getType(),

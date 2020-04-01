@@ -148,11 +148,6 @@ public class GitHubProjectConfigurationPropertyType
     }
 
     @Override
-    public String getSearchKey(GitHubProjectConfigurationProperty value) {
-        return value.getConfiguration().getName();
-    }
-
-    @Override
     public GitHubProjectConfigurationProperty replaceValue(GitHubProjectConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitHubProjectConfigurationProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),

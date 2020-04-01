@@ -141,11 +141,6 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
     }
 
     @Override
-    public String getSearchKey(StashProjectConfigurationProperty value) {
-        return value.getConfiguration().getName();
-    }
-
-    @Override
     public StashProjectConfigurationProperty replaceValue(StashProjectConfigurationProperty value, Function<String, String> replacementFunction) {
         return new StashProjectConfigurationProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),

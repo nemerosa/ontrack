@@ -71,11 +71,6 @@ public class TestPropertyType extends AbstractPropertyType<TestProperty> impleme
     }
 
     @Override
-    public String getSearchKey(TestProperty value) {
-        return value.getValue();
-    }
-
-    @Override
     public TestProperty replaceValue(TestProperty value, Function<String, String> replacementFunction) {
         return new TestProperty(
                 value.getConfiguration().clone(

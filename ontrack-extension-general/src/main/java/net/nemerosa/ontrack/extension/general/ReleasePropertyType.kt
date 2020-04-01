@@ -64,10 +64,6 @@ class ReleasePropertyType(
         )
     }
 
-    override fun getSearchKey(value: ReleaseProperty): String {
-        return value.name
-    }
-
     override fun replaceValue(value: ReleaseProperty, replacementFunction: Function<String, String>): ReleaseProperty {
         return value
     }

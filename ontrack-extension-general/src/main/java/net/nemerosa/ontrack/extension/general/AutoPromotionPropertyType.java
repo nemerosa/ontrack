@@ -168,11 +168,6 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
     }
 
     @Override
-    public String getSearchKey(AutoPromotionProperty value) {
-        return "";
-    }
-
-    @Override
     public AutoPromotionProperty replaceValue(AutoPromotionProperty value, Function<String, String> replacementFunction) {
         return value;
     }

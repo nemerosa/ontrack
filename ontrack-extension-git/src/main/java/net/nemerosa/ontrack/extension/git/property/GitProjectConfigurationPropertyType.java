@@ -94,11 +94,6 @@ public class GitProjectConfigurationPropertyType extends AbstractGitProjectConfi
     }
 
     @Override
-    public String getSearchKey(GitProjectConfigurationProperty value) {
-        return value.getConfiguration().getName();
-    }
-
-    @Override
     public GitProjectConfigurationProperty replaceValue(GitProjectConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitProjectConfigurationProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction)

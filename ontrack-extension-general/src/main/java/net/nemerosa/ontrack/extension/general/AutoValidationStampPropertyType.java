@@ -118,11 +118,6 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
     }
 
     @Override
-    public String getSearchKey(AutoValidationStampProperty value) {
-        return "";
-    }
-
-    @Override
     public AutoValidationStampProperty replaceValue(AutoValidationStampProperty value, Function<String, String> replacementFunction) {
         return value;
     }

@@ -76,11 +76,6 @@ public class TestDecoratorPropertyType extends AbstractPropertyType<TestDecorati
     }
 
     @Override
-    public String getSearchKey(TestDecorationData value) {
-        return value.getValue();
-    }
-
-    @Override
     public TestDecorationData replaceValue(TestDecorationData value, Function<String, String> replacementFunction) {
         return new TestDecorationData(
                 replacementFunction.apply(value.getValue()),

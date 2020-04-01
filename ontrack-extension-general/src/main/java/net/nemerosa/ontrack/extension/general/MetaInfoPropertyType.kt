@@ -71,13 +71,6 @@ class MetaInfoPropertyType(
         return parse(node, MetaInfoProperty::class.java)
     }
 
-    override fun getSearchKey(value: MetaInfoProperty): String {
-        return value.items
-                .joinToString(separator = ";") {
-                    "${it.name}:${it.value}"
-                }
-    }
-
     override fun containsValue(property: MetaInfoProperty, propertyValue: String): Boolean {
         val pos = StringUtils.indexOf(propertyValue, ":")
         return if (pos > 0) {

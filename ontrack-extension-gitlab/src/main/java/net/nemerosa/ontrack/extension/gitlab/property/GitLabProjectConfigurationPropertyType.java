@@ -151,11 +151,6 @@ public class GitLabProjectConfigurationPropertyType
     }
 
     @Override
-    public String getSearchKey(GitLabProjectConfigurationProperty value) {
-        return value.getConfiguration().getName();
-    }
-
-    @Override
     public GitLabProjectConfigurationProperty replaceValue(GitLabProjectConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitLabProjectConfigurationProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),

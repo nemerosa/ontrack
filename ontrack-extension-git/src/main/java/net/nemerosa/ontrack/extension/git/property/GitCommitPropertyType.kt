@@ -63,10 +63,6 @@ class GitCommitPropertyType(
         )
     }
 
-    override fun getSearchKey(value: GitCommitProperty): String {
-        return value.commit
-    }
-
     override fun replaceValue(value: GitCommitProperty, replacementFunction: Function<String, String>): GitCommitProperty {
         // A commit is immutable...
         return value

@@ -133,10 +133,6 @@ class GitBranchConfigurationPropertyType(
         )
     }
 
-    override fun getSearchKey(value: GitBranchConfigurationProperty): String {
-        return value.branch
-    }
-
     override fun replaceValue(value: GitBranchConfigurationProperty, replacementFunction: Function<String, String>): GitBranchConfigurationProperty {
         return GitBranchConfigurationProperty(
                 replacementFunction.apply(value.branch),

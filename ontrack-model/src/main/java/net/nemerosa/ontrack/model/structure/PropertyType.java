@@ -95,21 +95,6 @@ public interface PropertyType<T> extends Extension {
     }
 
     /**
-     * Given the value of a property, computes some text that can be used as a hint to search among all
-     * the properties when looking for a key word. Typically, in a database store, the resulting value
-     * will be stored in an indexed column.
-     *
-     * @param value Value to index
-     * @return Index value
-     *
-     * @deprecated The search key is no longer used and will be deleted in next release
-     */
-    @Deprecated
-    default String getSearchKey(T value) {
-        return "";
-    }
-
-    /**
      * Replaces a value by another one by transforming each string of the value into another one.
      *
      * @param value               Value to replace
@@ -120,8 +105,6 @@ public interface PropertyType<T> extends Extension {
 
     /**
      * Checks if the property <code>value</code> contains the given search token.
-     * <p>
-     * By default, this method uses the {@link #getSearchKey(Object) search key}.
      *
      * @param value         Value to search into
      * @param propertyValue Search token

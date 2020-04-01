@@ -49,11 +49,7 @@ class LinkPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): LinkProperty {
-        return AbstractPropertyType.parse(node, LinkProperty::class.java)
-    }
-
-    override fun getSearchKey(value: LinkProperty): String {
-        return ""
+        return parse(node, LinkProperty::class.java)
     }
 
     override fun replaceValue(value: LinkProperty, replacementFunction: Function<String, String>): LinkProperty {
