@@ -1,28 +1,31 @@
 package net.nemerosa.ontrack.extension.ldap
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 data class LDAPSettings(
+        @JsonProperty("enabled")
         val isEnabled: Boolean,
-        val url: String,
-        val searchBase: String,
-        val searchFilter: String,
-        val user: String,
-        val password: String,
-        val fullNameAttribute: String,
-        val emailAttribute: String,
-        val groupAttribute: String,
-        val groupFilter: String,
+        val url: String?,
+        val searchBase: String?,
+        val searchFilter: String?,
+        val user: String?,
+        val password: String?,
+        val fullNameAttribute: String?,
+        val emailAttribute: String?,
+        val groupAttribute: String?,
+        val groupFilter: String?,
         /**
          * The ID of the attribute which contains the name for a group
          */
-        val groupNameAttribute: String = "cn",
+        val groupNameAttribute: String? = "cn",
         /**
          * The base DN from which the search for group membership should be performed
          */
-        val groupSearchBase: String = "",
+        val groupSearchBase: String? = "",
         /**
          * The pattern to be used for the user search. {0} is the user's DN
          */
-        val groupSearchFilter: String = "(member={0})"
+        val groupSearchFilter: String? = "(member={0})"
 ) {
 
     fun withPassword(password: String): LDAPSettings {

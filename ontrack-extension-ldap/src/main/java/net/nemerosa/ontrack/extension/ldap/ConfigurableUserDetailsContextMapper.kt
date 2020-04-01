@@ -72,12 +72,10 @@ open class ConfigurableUserDetailsContextMapper(
     }
 
     private fun getGroupsFromUser(ctx: DirContextOperations): Collection<String> {
-        val groupNameAttribute: String
-        val groupNameAttributeValue = settings.groupNameAttribute
-        groupNameAttribute = if (StringUtils.isBlank(groupNameAttributeValue)) {
+        val groupNameAttribute: String = if (settings.groupNameAttribute.isNullOrBlank()) {
             "cn"
         } else {
-            groupNameAttributeValue
+            settings.groupNameAttribute
         }
         var groupAttribute = settings.groupAttribute
         if (StringUtils.isBlank(groupAttribute)) {
@@ -92,7 +90,7 @@ open class ConfigurableUserDetailsContextMapper(
                     // Filter on OU
                     .filter { dn: LdapName ->
                         val ou = getValue(dn, "OU")
-                        groupFilter.isBlank() || StringUtils.equalsIgnoreCase(ou, groupFilter)
+                        groupFilter.isNullOrBlank() || StringUtils.equalsIgnoreCase(ou, groupFilter)
                     }
                     // Getting the common name
                     .mapNotNull { dn: LdapName -> getValue(dn, groupNameAttribute) }
