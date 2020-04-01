@@ -25,7 +25,7 @@ constructor(
 
     override fun getEvents(offset: Int, count: Int): List<Event> {
         // Gets the list of projects the current user is allowed to view
-        val projectIds = structureService.projectList.map(Project::id)
+        val projectIds = structureService.projectList.map { it.id() }
         // Performs the query
         return eventRepository.query(
                 projectIds,

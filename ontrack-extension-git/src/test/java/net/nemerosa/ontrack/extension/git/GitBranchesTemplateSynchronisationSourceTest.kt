@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.Before
 import org.junit.Test

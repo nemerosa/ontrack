@@ -125,7 +125,7 @@ public class PromotionLevelController extends AbstractResourceController {
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/runs", method = RequestMethod.GET)
     public Resource<PromotionRunView> getPromotionRunView(@PathVariable ID promotionLevelId) {
         return Resource.of(
-                structureService.getPromotionRunView(getPromotionLevel(promotionLevelId)),
+                structureService.getPromotionRunView(structureService.getPromotionLevel(promotionLevelId)),
                 uri(on(PromotionLevelController.class).getPromotionRunView(promotionLevelId))
         );
     }

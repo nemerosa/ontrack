@@ -25,7 +25,7 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         structureService.newProject(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void newProject_existing() {
         structureService.newProject(Project.of(nameDescription()).withId(ID.of(1)));
     }

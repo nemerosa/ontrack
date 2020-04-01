@@ -72,12 +72,10 @@ public class AccountTest {
     @Test
     public void global_function_granted() {
         Account account = baseAccount().withGlobalRole(
-                Optional.of(
-                        new GlobalRole(
-                                "test", "Test", "",
-                                Collections.singleton(GlobalSettings.class),
-                                Collections.emptySet()
-                        )
+                new GlobalRole(
+                        "test", "Test", "",
+                        Collections.singleton(GlobalSettings.class),
+                        Collections.emptySet()
                 )
         );
         assertTrue(account.isGranted(GlobalSettings.class));

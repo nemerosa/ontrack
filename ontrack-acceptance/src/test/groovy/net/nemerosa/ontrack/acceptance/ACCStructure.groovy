@@ -10,11 +10,6 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCStructure extends AcceptanceTestClient {
 
     @Test
-    void 'No name for a project is invalid'() {
-        validationMessage({ doCreateProject(object().end()) }, "The name is required.")
-    }
-
-    @Test
     void 'Empty name for a project is invalid'() {
         validationMessage({
             doCreateProject(object().with('name', '').end())

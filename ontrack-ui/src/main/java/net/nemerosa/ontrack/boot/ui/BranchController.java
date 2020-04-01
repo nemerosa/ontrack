@@ -256,7 +256,7 @@ public class BranchController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/template/definition", method = RequestMethod.GET)
     public Form getTemplateDefinition(@PathVariable ID branchId) {
-        Branch branch = getBranch(branchId);
+        Branch branch = structureService.getBranch(branchId);
         Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
         return Form.create()
                 .with(
@@ -466,7 +466,7 @@ public class BranchController extends AbstractResourceController {
     private <T> BranchBuildView buildViewWithFilter(ID branchId,
                                                     BuildFilterProviderData<T> buildFilterProviderData) {
         // Gets the branch
-        Branch branch = getBranch(branchId);
+        Branch branch = structureService.getBranch(branchId);
         // Gets the list of builds
         List<Build> builds = buildFilterProviderData.filterBranchBuilds(branch);
         // Gets the list of build diff actions

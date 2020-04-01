@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
-import graphql.schema.*
+import graphql.schema.DataFetcher
+import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
+import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -126,46 +129,6 @@ class GQLTypeBuild(
                             .type(stdList(validation.typeRef))
                             .dataFetcher(buildValidationsFetcher())
                 }
-                // Build links
-                .field { f ->
-                    f.name("linkedBuilds")
-                            .deprecate("Use `using` and `usedBy` fields instead.")
-                            .description("Builds this build is linked to")
-                            .argument { a ->
-                                a.name(ARG_DIRECTION)
-                                        .description("Direction of the link to follow.")
-                                        .type(
-                                                GraphQLEnumType.newEnum()
-                                                        .name("BuildLinkDirection")
-                                                        .description("Direction for build links.")
-                                                        .value("TO")
-                                                        .value("FROM")
-                                                        .value("BOTH")
-                                                        .build()
-                                        )
-                                        .defaultValue("TO")
-                            }
-                            .type(stdList(GraphQLTypeReference(BUILD)))
-                            .dataFetcher(buildLinkedFetcher())
-                }
-                // Build links - "uses" direction, no pagination needed
-                .field { f ->
-                    f.name("uses")
-                            .deprecate("Use `using` field instead.")
-                            .description("List of builds being used by this one.")
-                            .type(stdList(GraphQLTypeReference(BUILD)))
-                            .argument {
-                                it.name("project")
-                                        .description("Keeps only links targeted to this project")
-                                        .type(GraphQLString)
-                            }
-                            .argument {
-                                it.name("branch")
-                                        .description("Keeps only links targeted to this branch. `project` argument is also required.")
-                                        .type(GraphQLString)
-                            }
-                            .dataFetcher(buildBeingUsedFetcher())
-                }
                 // Build links - "using" direction, with pagination
                 .field(
                         paginatedListFactory.createPaginatedField<Build, Build>(
@@ -226,14 +189,6 @@ class GQLTypeBuild(
                                 }
                         )
                 )
-                // Link direction (only used for linked builds)
-                .field { f ->
-                    f.name(ARG_DIRECTION)
-                            .description("Link direction")
-                            .deprecate("Use `uses` and `usedBy` fields on the `Build` type instead.")
-                            .type(GraphQLString)
-                            .dataFetcher(fetcher(LinkedBuild::class.java, LinkedBuild::direction))
-                }
                 // Run info
                 .field {
                     it.name("runInfo")
@@ -309,49 +264,6 @@ class GQLTypeBuild(
                 )
         )
     }
-
-    private fun buildBeingUsedFetcher(): DataFetcher<List<Build>> {
-        return DataFetcher { environment ->
-            val build: Build = environment.getSource()
-            val links = structureService.getBuildLinksFrom(build)
-            val projectName: String? = environment.getArgument("project")
-            val branchName: String? = environment.getArgument("branch")
-            if (branchName != null) {
-                if (projectName == null) {
-                    throw IllegalArgumentException("`project` is required")
-                } else {
-                    links.filter { link ->
-                        link.branch.project.name == projectName && link.branch.name == branchName
-                    }
-                }
-            } else if (projectName != null) {
-                links.filter { link ->
-                    link.branch.project.name == projectName
-                }
-            } else {
-                links
-            }
-        }
-    }
-
-    private fun buildLinkedFetcher(): DataFetcher<List<Build>> {
-        return fetcher(
-                Build::class.java
-        ) { environment, build ->
-            val direction: String = GraphqlUtils.getStringArgument(environment, ARG_DIRECTION)
-                    .orElse("TO")
-            when (direction) {
-                "TO" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
-                "FROM" -> getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
-                "BOTH" -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to") +
-                        getLinkedBuilds(structureService.getBuildLinksTo(build), "from")
-                else -> getLinkedBuilds(structureService.getBuildLinksFrom(build), "to")
-            }
-        }
-    }
-
-    private fun getLinkedBuilds(builds: List<Build>, direction: String) =
-            builds.map { LinkedBuild(it, direction) }
 
     private fun buildValidationRunsFetcher() =
             DataFetcher<List<ValidationRun>> { environment ->
@@ -445,20 +357,5 @@ class GQLTypeBuild(
          * Last per level argument
          */
         const val ARG_LAST_PER_LEVEL = "lastPerLevel"
-        /**
-         * Direction argument
-         */
-        const val ARG_DIRECTION = "direction"
     }
 }
-
-class LinkedBuild(
-        build: Build,
-        val direction: String
-) : Build(
-        build.id,
-        build.name,
-        build.description,
-        build.signature,
-        build.branch
-)

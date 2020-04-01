@@ -40,13 +40,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // No filter
                     run("""{
                         builds(id: $id) {
-                            uses {
-                                name
+                            using {
+                                pageItems {
+                                    name
+                                }
                             }
                         }
                     }"""
                     ).run {
-                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                        this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
                                 setOf("1.0", "2.0", "3.0"),
@@ -57,13 +59,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // Filter by project
                     run("""{
                         builds(id: $id) {
-                            uses(project: "${ref1.name}") {
-                                name
+                            using(project: "${ref1.name}") {
+                                pageItems {
+                                    name
+                                }
                             }
                         }
                     }"""
                     ).run {
-                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                        this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
                                 setOf("1.0", "2.0"),
@@ -74,13 +78,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // Filter by branch
                     run("""{
                         builds(id: $id) {
-                            uses(project: "${ref1.name}", branch: "master") {
-                                name
+                            using(project: "${ref1.name}", branch: "master") {
+                                pageItems {
+                                    name
+                                }
                             }
                         }
                     }"""
                     ).run {
-                        this["builds"][0]["uses"].map { it["name"].asText() }.toSet()
+                        this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
                                 setOf("2.0"),
@@ -222,8 +228,10 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
 
         val data = run("""{
             builds(id: ${build.id}) {
-                uses {
-                    name
+                using {
+                    pageItems {
+                        name
+                    }
                 }
                 usedBy {
                     pageItems {
@@ -234,7 +242,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         }""")
 
         val b = data["builds"].first()
-        assertNotNull(b["uses"]) {
+        assertNotNull(b["using"]["pageItems"]) {
             assertTrue(it.size() == 0)
         }
         assertNotNull(b["usedBy"]["pageItems"]) {
@@ -253,19 +261,21 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
 
         val data = run("""{
             builds(id: ${build.id}) {
-                uses {
-                    name
-                    branch {
+                using {
+                    pageItems {
                         name
-                        project {
+                        branch {
                             name
+                            project {
+                                name
+                            }
                         }
                     }
                 }
             }
         }""")
 
-        val links = data["builds"].first()["uses"]
+        val links = data["builds"].first()["using"]["pageItems"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
@@ -290,15 +300,16 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         // Query build links of "b" TO
         val data = run("""{
             builds(id: ${b.id}) {
-                uses {
-                    id
-                    name
-                    direction
+                using {
+                    pageItems {
+                        id
+                        name
+                    }
                 }
             }
         }""")
         // Checks the result
-        val links = data["builds"].first()["uses"]
+        val links = data["builds"].first()["using"]["pageItems"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
@@ -339,55 +350,6 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             assertEquals(a.name, link["name"].asText())
             assertEquals(a.id(), link["id"].asInt())
         }
-    }
-
-    @Test
-    fun `Following build links BOTH`() {
-        // Three builds
-        val a = doCreateBuild()
-        val b = doCreateBuild()
-        val c = doCreateBuild()
-        // Links: a -> b -> c
-        asAdmin().execute {
-            structureService.addBuildLink(a, b)
-            structureService.addBuildLink(b, c)
-        }
-        // Query build links of "b" BOTH
-        val data = run("""{
-            builds(id: ${b.id}) {
-                linkedBuilds(direction: BOTH) {
-                    id
-                    name
-                    direction
-                }
-            }
-        }""")
-        // Checks the result
-        val links = data["builds"].first()["linkedBuilds"]
-        assertNotNull(links) {
-            assertEquals(2, it.size())
-            val cLink = it[0]
-            assertEquals(c.name, cLink["name"].asText())
-            assertEquals(c.id(), cLink["id"].asInt())
-            assertEquals("to", cLink.path("direction").asText())
-            val aLink = it[1]
-            assertEquals(a.name, aLink["name"].asText())
-            assertEquals(a.id(), aLink["id"].asInt())
-            assertEquals("from", aLink.path("direction").asText())
-        }
-    }
-
-    @Test(expected = AssertionError::class)
-    fun `Following build links with unknown direction`() {
-        val b = doCreateBuild()
-        run("""{
-            builds(id: ${b.id}) {
-                linkedBuilds(direction: TBD) {
-                    id
-                    name
-                }
-            }
-        }""")
     }
 
     @Test

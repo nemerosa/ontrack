@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.net.URI

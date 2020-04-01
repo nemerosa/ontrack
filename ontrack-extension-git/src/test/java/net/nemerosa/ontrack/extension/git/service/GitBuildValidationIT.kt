@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.api.model.BuildValidationException
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.Test
 import org.springframework.test.context.ActiveProfiles
 

@@ -60,7 +60,7 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
                     // Description must be aligned
                     assertEquals("My predefined description", pl.description)
                     // An image must have been set
-                    assertTrue(pl.image, "An image must have been set")
+                    assertTrue(pl.isImage, "An image must have been set")
                 }
             }
         }
@@ -85,7 +85,7 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
                     // Description must be aligned
                     assertEquals("My predefined description", vs.description)
                     // An image must have been set
-                    assertTrue(vs.image, "An image must have been set")
+                    assertTrue(vs.isImage, "An image must have been set")
                 }
             }
         }
