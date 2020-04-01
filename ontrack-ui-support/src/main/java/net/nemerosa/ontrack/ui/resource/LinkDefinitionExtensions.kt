@@ -10,17 +10,17 @@ infix fun <T> String.linkTo(linkFn: (T) -> Any): LinkDefinition<T> = linkTo { t,
 infix fun <T> String.linkTo(linkFn: (T, ResourceContext) -> Any): LinkDefinition<T> =
         SimpleLinkDefinition(this, linkFn) { _, _ -> true }
 
-infix fun <T : ProjectEntity, P : ProjectFunction> LinkDefinition<T>.linkIf(fn: KClass<P>): LinkDefinition<T> = addCheckFn { t, rc ->
+infix fun <T : ProjectEntity, P : ProjectFunction> LinkDefinition<T>.linkIf(fn: KClass<P>): LinkDefinition<T> = linkIf { t, rc ->
     rc.isProjectFunctionGranted(t, fn.java)
 }
 
-infix fun <T : ProjectEntity, G : GlobalFunction> LinkDefinition<T>.linkIfGlobal(fn: KClass<G>): LinkDefinition<T> = addCheckFn { _, rc ->
+infix fun <T : ProjectEntity, G : GlobalFunction> LinkDefinition<T>.linkIfGlobal(fn: KClass<G>): LinkDefinition<T> = linkIf { _, rc ->
     rc.isGlobalFunctionGranted(fn.java)
 }
 
-private fun <T : ProjectEntity> LinkDefinition<T>.addCheckFn(fn: (T, ResourceContext) -> Boolean) = object : LinkDefinition<T> {
-    override val name: String = this@addCheckFn.name
+infix fun <T : ProjectEntity> LinkDefinition<T>.linkIf(fn: (T, ResourceContext) -> Boolean) = object : LinkDefinition<T> {
+    override val name: String = this@linkIf.name
     override val checkFn: (T, ResourceContext) -> Boolean = fn
     override fun addLink(linksBuilder: LinksBuilder, resource: T, resourceContext: ResourceContext): LinksBuilder =
-            this@addCheckFn.addLink(linksBuilder, resource, resourceContext)
+            this@linkIf.addLink(linksBuilder, resource, resourceContext)
 }

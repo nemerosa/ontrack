@@ -5,8 +5,9 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.ui.resource.LinkDefinition
-import net.nemerosa.ontrack.ui.resource.LinkDefinitions
 import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributor
+import net.nemerosa.ontrack.ui.resource.linkIf
+import net.nemerosa.ontrack.ui.resource.linkTo
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
@@ -17,11 +18,9 @@ class SonarQubeBuildResourceDecorationContributor(
 
     override fun getLinkDefinitions(): List<LinkDefinition<Build>> {
         return listOf(
-                LinkDefinitions.link(
-                        "_collectSonarQube",
-                        { build, _ -> on(SonarQubeController::class.java).collectBuildMeasures(build.id) },
-                        { build, _ -> propertyService.hasProperty(build.project, SonarQubePropertyType::class.java) }
-                )
+                "_collectSonarQube"
+                        .linkTo { build: Build, _ -> on(SonarQubeController::class.java).collectBuildMeasures(build.id) }
+                        .linkIf { build, _ -> propertyService.hasProperty(build.project, SonarQubePropertyType::class.java) }
         )
     }
 
