@@ -13,12 +13,6 @@ interface SearchService {
     val searchResultTypes: List<SearchResultType>
 
     /**
-     * Search entry point
-     */
-    @Deprecated("Use the paginated search", replaceWith = ReplaceWith("paginatedSearch"))
-    fun search(request: SearchRequest): Collection<SearchResult> = paginatedSearch(request).items
-
-    /**
      * Paginated search entry point
      */
     fun paginatedSearch(request: SearchRequest): SearchResults

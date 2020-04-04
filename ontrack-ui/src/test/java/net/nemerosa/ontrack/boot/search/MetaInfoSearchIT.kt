@@ -26,14 +26,14 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                     metaInfo(name to "${value}2")
                 }
                 // Looks for exact match
-                val exactMatches = searchService.search(SearchRequest("$name:${value}1")).toList()
+                val exactMatches = searchService.paginatedSearch(SearchRequest("$name:${value}1")).items
                 val exactMatch = exactMatches.find { it.title == build1.entityDisplayName }
                         ?: error("Exact match not found")
                 val variantMatch = exactMatches.find { it.title == build2.entityDisplayName }
                         ?: error("Variant not found")
                 assertTrue(exactMatch.accuracy > variantMatch.accuracy, "Exact match scope is higher than non exact match")
                 // Looks for prefix
-                val prefixMatches = searchService.search(SearchRequest("$name:$value")).toList()
+                val prefixMatches = searchService.paginatedSearch(SearchRequest("$name:$value")).items
                 assertTrue(prefixMatches.any { it.title == build1.entityDisplayName }, "Build 1 found")
                 assertTrue(prefixMatches.any { it.title == build2.entityDisplayName }, "Build 2 found")
             }
@@ -52,13 +52,13 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                     metaInfo(name1 to value1)
                 }
                 // Looks for exact match now
-                searchService.search(SearchRequest("$name1:$value1")).toList().apply {
+                searchService.paginatedSearch(SearchRequest("$name1:$value1")).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with current meta information")
                 }
                 // Changing the meta info
                 build.metaInfo(name2 to value2)
                 // Looks for exact match now
-                searchService.search(SearchRequest("$name2:$value2")).toList().apply {
+                searchService.paginatedSearch(SearchRequest("$name2:$value2")).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with new meta information")
                 }
             }
@@ -75,13 +75,13 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                     metaInfo(name to value)
                 }
                 // Looks for exact match now
-                searchService.search(SearchRequest("$name:$value")).toList().apply {
+                searchService.paginatedSearch(SearchRequest("$name:$value")).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with meta information")
                 }
                 // Deleting the meta info
                 deleteProperty(build, MetaInfoPropertyType::class.java)
                 // Looks for exact match now should not return this build
-                searchService.search(SearchRequest("$name:$value")).toList().apply {
+                searchService.paginatedSearch(SearchRequest("$name:$value")).items.apply {
                     assertTrue(none { it.title == build.entityDisplayName }, "Build not found with meta information")
                 }
             }
@@ -98,7 +98,7 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                     metaInfo(name to value)
                 }
                 // Looks for exact match now
-                searchService.search(SearchRequest("$name:$value")).toList().apply {
+                searchService.paginatedSearch(SearchRequest("$name:$value")).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with meta information")
                 }
                 // Deleting the build
@@ -106,7 +106,7 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                     structureService.deleteBuild(build.id)
                 }
                 // Looks for exact match now should not return this build (and not fail horribly)
-                searchService.search(SearchRequest("$name:$value")).toList().apply {
+                searchService.paginatedSearch(SearchRequest("$name:$value")).items.apply {
                     assertTrue(none { it.title == build.entityDisplayName }, "Build not found with meta information")
                 }
             }
@@ -130,7 +130,7 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                 // Indexation of meta information
                 index(META_INFO_SEARCH_INDEX)
                 // Search should return those two builds
-                val results = searchService.search(SearchRequest("$name1:value1")).toList()
+                val results = searchService.paginatedSearch(SearchRequest("$name1:value1")).items
                 assertTrue(results.any { it.title == build1.entityDisplayName }, "Build 1 found")
                 assertTrue(results.any { it.title == build2.entityDisplayName }, "Build 2 found")
             }
@@ -165,7 +165,7 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                 index(META_INFO_SEARCH_INDEX)
 
                 // Looks for the exact match
-                val results = searchService.search(SearchRequest("$name:$value")).toList()
+                val results = searchService.paginatedSearch(SearchRequest("$name:$value")).items
                 assertTrue(results.size > 1)
                 // First build is the original one
                 results[0].apply {

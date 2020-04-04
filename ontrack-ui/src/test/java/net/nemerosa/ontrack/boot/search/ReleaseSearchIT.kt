@@ -22,14 +22,14 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                     release("${value}-2")
                 }
                 // Looks for exact match
-                val exactMatches = searchService.search(SearchRequest("${value}-1")).toList()
+                val exactMatches = searchService.paginatedSearch(SearchRequest("${value}-1")).items
                 val exactMatch = exactMatches.find { it.title == build1.entityDisplayName }
                         ?: error("Exact match not found")
                 val variantMatch = exactMatches.find { it.title == build2.entityDisplayName }
                         ?: error("Variant not found")
                 assertTrue(exactMatch.accuracy > variantMatch.accuracy, "Exact match scope is higher than non exact match")
                 // Looks for prefix
-                val prefixMatches = searchService.search(SearchRequest(value)).toList()
+                val prefixMatches = searchService.paginatedSearch(SearchRequest(value)).items
                 assertTrue(prefixMatches.any { it.title == build1.entityDisplayName }, "Build 1 found")
                 assertTrue(prefixMatches.any { it.title == build2.entityDisplayName }, "Build 2 found")
             }
@@ -46,13 +46,13 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                     release(value1)
                 }
                 // Looks for exact match now
-                searchService.search(SearchRequest(value1)).toList().apply {
+                searchService.paginatedSearch(SearchRequest(value1)).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with current release information")
                 }
                 // Changing the release info
                 build.release(value2)
                 // Looks for exact match now
-                searchService.search(SearchRequest(value2)).toList().apply {
+                searchService.paginatedSearch(SearchRequest(value2)).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with new release information")
                 }
             }
@@ -68,13 +68,13 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                     release(value)
                 }
                 // Looks for exact match now
-                searchService.search(SearchRequest(value)).toList().apply {
+                searchService.paginatedSearch(SearchRequest(value)).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with current release information")
                 }
                 // Deleting the release info
                 deleteProperty(build, ReleasePropertyType::class.java)
                 // Looks for exact match now
-                searchService.search(SearchRequest(value)).toList().apply {
+                searchService.paginatedSearch(SearchRequest(value)).items.apply {
                     assertTrue(none { it.title == build.entityDisplayName }, "Build not found with removed release information")
                 }
             }
@@ -90,7 +90,7 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                     release(value)
                 }
                 // Looks for exact match now
-                searchService.search(SearchRequest(value)).toList().apply {
+                searchService.paginatedSearch(SearchRequest(value)).items.apply {
                     assertTrue(any { it.title == build.entityDisplayName }, "Build found with release information")
                 }
                 // Deleting the build
@@ -98,7 +98,7 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                     structureService.deleteBuild(build.id)
                 }
                 // Looks for exact match now should not return this build (and not fail horribly)
-                searchService.search(SearchRequest(value)).toList().apply {
+                searchService.paginatedSearch(SearchRequest(value)).items.apply {
                     assertTrue(none { it.title == build.entityDisplayName }, "Build not found with release information")
                 }
             }
@@ -115,7 +115,7 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                     // Indexation
                     index(RELEASE_SEARCH_INDEX)
                     // Search
-                    val results = searchService.search(SearchRequest(version)).toList()
+                    val results = searchService.paginatedSearch(SearchRequest(version)).items
                     assertTrue(results.isNotEmpty())
                     results[0].apply {
                         assertEquals(entityDisplayName, title)

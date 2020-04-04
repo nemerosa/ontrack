@@ -25,7 +25,7 @@ class BranchSearchIT : AbstractSearchTestSupport() {
         index("projects")
         index("branches")
         // Searches for the candidate project
-        val results = searchService.search(SearchRequest(candidate.name))
+        val results = searchService.paginatedSearch(SearchRequest(candidate.name)).items
         assertEquals(1, results.size)
         val result = results.first()
         result.apply {
@@ -48,7 +48,7 @@ class BranchSearchIT : AbstractSearchTestSupport() {
         index(PROJECT_SEARCH_INDEX)
         index("branches")
         // Searches for the name
-        val results = searchService.search(SearchRequest(branch.name)).toList()
+        val results = searchService.paginatedSearch(SearchRequest(branch.name)).items
         assertEquals(2, results.size)
         assertTrue(results[0].accuracy > results[1].accuracy, "Project is returned first")
         results[0].apply {
@@ -70,7 +70,7 @@ class BranchSearchIT : AbstractSearchTestSupport() {
         index(PROJECT_SEARCH_INDEX)
         index(BRANCH_SEARCH_INDEX)
         // Search on project name
-        val results = searchService.search(SearchRequest(branch.project.name))
+        val results = searchService.paginatedSearch(SearchRequest(branch.project.name)).items
         // Project is found
         val projectResult = results.find { it.title == branch.project.entityDisplayName }
                 ?: error("Cannot find project")
@@ -97,7 +97,7 @@ class BranchSearchIT : AbstractSearchTestSupport() {
             // Performing a search using the prefix and being authorised only for the first branch
             branches[0].asUserWithView {
                 // Launching the search
-                val results = searchService.search(SearchRequest(prefix))
+                val results = searchService.paginatedSearch(SearchRequest(prefix)).items
                 // Names of branches
                 val foundNames = results.map { it.title }
                 // Checks that authorized branch is found

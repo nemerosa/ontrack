@@ -17,7 +17,7 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
     fun `Searching for a project after its creation`() {
         val candidate = project {}
         // Searches for the candidate project
-        val results = searchService.search(SearchRequest(candidate.name)).toList()
+        val results = searchService.paginatedSearch(SearchRequest(candidate.name)).items
         assertTrue(results.isNotEmpty(), "At least one result")
         results[0].apply {
             assertEquals(candidate.entityDisplayName, title)
@@ -33,7 +33,7 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
         // Launching indexation for the projects
         index(PROJECT_SEARCH_INDEX)
         // Searches for the candidate project
-        val results = searchService.search(SearchRequest(candidate.name))
+        val results = searchService.paginatedSearch(SearchRequest(candidate.name)).items
         assertEquals(1, results.size)
         val result = results.first()
         result.apply {
@@ -56,7 +56,7 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
             // Performing a search using the prefix and being authorised only for the first project
             projects[0].asUserWithView {
                 // Launching the search
-                val results = searchService.search(SearchRequest(prefix))
+                val results = searchService.paginatedSearch(SearchRequest(prefix)).items
                 // Names of projects
                 val foundNames = results.map { it.title }
                 // Checks that authorized project is found

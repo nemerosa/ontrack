@@ -70,7 +70,7 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
                 searchIndexService.index(gitCommitSearchExtension)
                 // Looks for every commit
                 commits.forEach { (_, commit) ->
-                    val results = searchService.search(SearchRequest(commit))
+                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
                     val title = "$name $commit"
                     val result = results.find { it.title == title }
                     assertNotNull(result)
@@ -95,7 +95,7 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
             }
             // Looks for every commit
             commits.forEach { (_, commit) ->
-                val results = searchService.search(SearchRequest(commit))
+                val results = searchService.paginatedSearch(SearchRequest(commit)).items
                 val title = "${project.name} $commit"
                 val result = results.find { it.title == title }
                 assertNull(result, "Cannot find commit after project is deleted")

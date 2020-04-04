@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.model.structure.SearchRequest
-import net.nemerosa.ontrack.model.structure.SearchResult
 import net.nemerosa.ontrack.model.structure.SearchResultType
+import net.nemerosa.ontrack.model.structure.SearchResults
 import net.nemerosa.ontrack.model.structure.SearchService
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -18,7 +19,8 @@ class SearchController(
 ) {
 
     @PostMapping("/search")
-    fun search(@RequestBody request: SearchRequest): Collection<SearchResult> = searchService.search(request)
+    fun search(@RequestBody request: SearchRequest): ResponseEntity<SearchResults> =
+            ResponseEntity.ok(searchService.paginatedSearch(request))
 
     /**
      * Gets the list of search types

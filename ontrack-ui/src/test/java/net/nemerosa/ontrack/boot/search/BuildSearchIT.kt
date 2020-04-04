@@ -25,7 +25,7 @@ class BuildSearchIT : AbstractSearchTestSupport() {
         // Indexes the builds
         index(BUILD_SEARCH_INDEX)
         // Searches for the builds using the name
-        val results = searchService.search(SearchRequest(name))
+        val results = searchService.paginatedSearch(SearchRequest(name)).items
         // Checks the builds have been found
         builds.forEach { build ->
             assertTrue(build.entityDisplayName in results.map { it.title })

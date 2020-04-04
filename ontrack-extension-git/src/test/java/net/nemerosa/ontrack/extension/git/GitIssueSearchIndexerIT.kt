@@ -39,7 +39,7 @@ class GitIssueSearchIndexerIT : AbstractGitSearchTestSupport() {
                 }
             }
             // Issue 4 not found
-            val results = searchService.search(SearchRequest("#4", gitIssueSearchExtension.searchResultType.id))
+            val results = searchService.paginatedSearch(SearchRequest("#4", gitIssueSearchExtension.searchResultType.id)).items
             assertTrue(results.none { "#4" in it.title })
         }
     }
