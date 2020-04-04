@@ -69,7 +69,6 @@ angular.module('ot.view.build', [
                     }
                     links {
                       _self
-                      _buildLinks
                       _promote
                       _validate
                       _update
@@ -240,15 +239,6 @@ angular.module('ot.view.build', [
                     view.commands = [
                         {
                             condition: function () {
-                                return build.links._buildLinks;
-                            },
-                            id: 'buildLinks',
-                            name: "Build links",
-                            cls: 'ot-command-link',
-                            action: manageBuildLinks
-                        },
-                        {
-                            condition: function () {
                                 return build.links._promote;
                             },
                             id: 'promote',
@@ -340,11 +330,6 @@ angular.module('ot.view.build', [
 
             // Page initialisation
             loadBuild();
-
-            // Management of build links
-            function manageBuildLinks() {
-                otStructureService.update($scope.build.links._buildLinks, 'Build links').then(loadBuild);
-            }
 
             // Promotion
             function promote() {

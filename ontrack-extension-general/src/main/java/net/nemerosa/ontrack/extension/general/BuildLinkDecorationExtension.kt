@@ -24,14 +24,17 @@ class BuildLinkDecorationExtension(
     override fun getDecorations(entity: ProjectEntity): List<Decoration<BuildLinkDecorationList>> {
         // Gets the main build links of the source project
         val labels = mainBuildLinksService.getMainBuildLinksConfig(entity.project).labels
-        // Gets the links from
-        val links = structureService.getBuildLinksFrom(entity as Build)
-        // Main links
-        val mainLinks = links.filter { target ->
-            labels.isEmpty() || mainBuildLinksFilterService.isMainBuidLink(target, labels)
-        }
+        // Gets the main links from this build
+        var extraLinks = false
+        val mainLinks = structureService.getBuildsUsedBy(entity as Build, 0, Int.MAX_VALUE) { target ->
+            val mainLink = labels.isEmpty() || mainBuildLinksFilterService.isMainBuidLink(target, labels)
+            // There are extra links if a target build is NOT a main link
+            extraLinks = extraLinks || !mainLink
+            // OK
+            mainLink
+        }.pageItems
+
         // Checks if there are extra links (besides the main ones)
-        val extraLinks = links.isNotEmpty() && (links.size > mainLinks.size)
         val extraLink = if (extraLinks) {
             uriBuilder.getEntityPage(entity)
         } else {

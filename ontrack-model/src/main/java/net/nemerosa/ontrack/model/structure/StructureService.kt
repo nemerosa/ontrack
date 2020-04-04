@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.pagination.PaginatedList
 import org.springframework.security.access.AccessDeniedException
 import java.util.*
 import java.util.function.BiFunction
-import java.util.function.Predicate
 
 interface StructureService {
 
@@ -116,9 +115,6 @@ interface StructureService {
     fun addBuildLink(fromBuild: Build, toBuild: Build)
 
     fun deleteBuildLink(fromBuild: Build, toBuild: Build)
-
-    @Deprecated("Use getBuildsUsedBy instead")
-    fun getBuildLinksFrom(build: Build): List<Build>
 
     /**
      * Gets the builds used by the given one.

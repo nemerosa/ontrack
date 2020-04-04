@@ -452,12 +452,6 @@ class StructureServiceImpl(
         buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild)
     }
 
-    override fun getBuildLinksFrom(build: Build): List<Build> {
-        securityService.checkProjectFunction(build, ProjectView::class.java)
-        return structureRepository.getBuildLinksFrom(build.id)
-                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
-    }
-
     override fun getBuildsUsedBy(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean): PaginatedList<Build> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         // Gets the complete list, filtered by ACL
@@ -490,7 +484,7 @@ class StructureServiceImpl(
     override fun editBuildLinks(build: Build, form: BuildLinkForm) {
         securityService.checkProjectFunction(build, BuildConfig::class.java)
         // Gets the existing links, with authorisations
-        val authorisedExistingLinks = getBuildLinksFrom(build).map { it.id }
+        val authorisedExistingLinks = structureRepository.getBuildsUsedBy(build).map { it.id }
         // Added links
         val addedLinks = HashSet<ID>()
         // Loops through the new links

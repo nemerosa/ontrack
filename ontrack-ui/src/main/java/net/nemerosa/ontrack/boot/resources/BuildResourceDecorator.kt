@@ -80,16 +80,6 @@ class BuildResourceDecorator(
                 link(
                         "_next"
                 ) { build -> on(BuildController::class.java).getNextBuild(build.id) },
-                // Build links
-                link(
-                        "_buildLinksFrom"
-                ) { build -> on(BuildController::class.java).getBuildLinksFrom(build.id) },
-                link(
-                        "_buildLinksTo"
-                ) { build -> on(BuildController::class.java).getBuildLinksTo(build.id) },
-                "_buildLinks" linkTo { build: Build ->
-                    on(BuildController::class.java).getBuildLinkForm(build.id)
-                } linkIf BuildConfig::class,
                 // Run info
                 link(
                         "_runInfo"

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -244,10 +245,10 @@ public class BuildController extends AbstractResourceController {
      * @return List of builds
      */
     @RequestMapping(value = "builds/{buildId}/links/from", method = RequestMethod.GET)
-    public Resources<Build> getBuildLinksFrom(@PathVariable ID buildId) {
+    public Resources<Build> getBuildLinksFrom(@PathVariable ID buildId, @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int size) {
         return Resources.of(
-                structureService.getBuildLinksFrom(structureService.getBuild(buildId)),
-                uri(on(getClass()).getBuildLinksFrom(buildId))
+                structureService.getBuildsUsedBy(structureService.getBuild(buildId), offset, size, (build) -> true).getPageItems(),
+                uri(on(getClass()).getBuildLinksFrom(buildId, offset, size))
         ).forView(Build.class);
     }
 
@@ -258,38 +259,11 @@ public class BuildController extends AbstractResourceController {
      * @return List of builds
      */
     @RequestMapping(value = "builds/{buildId}/links/to", method = RequestMethod.GET)
-    public Resources<Build> getBuildLinksTo(@PathVariable ID buildId) {
+    public Resources<Build> getBuildLinksTo(@PathVariable ID buildId, @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int size) {
         return Resources.of(
-                structureService.getBuildLinksTo(structureService.getBuild(buildId)),
-                uri(on(getClass()).getBuildLinksFrom(buildId))
+                structureService.getBuildsUsing(structureService.getBuild(buildId), offset, size, (build) -> true).getPageItems(),
+                uri(on(getClass()).getBuildLinksTo(buildId, offset, size))
         ).forView(Build.class);
-    }
-
-    /**
-     * Form to create a link between a build and another
-     *
-     * @param buildId From this build...
-     * @return List of builds
-     */
-    @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.GET)
-    public Form getBuildLinkForm(@PathVariable ID buildId) {
-        // Gets the form values
-        List<BuildLinkFormItem> items = structureService.getBuildLinksFrom(structureService.getBuild(buildId))
-                .stream()
-                .map(build -> new BuildLinkFormItem(build.getProject().getName(), build.getName()))
-                .collect(Collectors.toList());
-        // Creates the form
-        return Form.create()
-                .with(
-                        MultiForm.of(
-                                "links",
-                                Form.create()
-                                        .with(Text.of("project").label("Project name"))
-                                        .with(Text.of("build").label("Build name"))
-                        )
-                                .label("Links")
-                                .value(items)
-                );
     }
 
     /**
