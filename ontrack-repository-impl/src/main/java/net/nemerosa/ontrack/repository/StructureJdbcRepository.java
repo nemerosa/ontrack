@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -295,17 +294,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<Build> getBuildLinksFrom(ID buildId) {
-        return getNamedParameterJdbcTemplate().query(
-                "SELECT T.* FROM BUILDS T " +
-                        "INNER JOIN BUILD_LINKS BL ON BL.TARGETBUILDID = T.ID " +
-                        "WHERE BL.BUILDID = :buildId",
-                params("buildId", buildId.get()),
-                (rs, num) -> toBuild(rs, this::getBranch)
-        );
-    }
-
-    @Override
     public List<Build> getBuildsUsedBy(Build build) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT F.* FROM BUILDS F " +
@@ -325,19 +313,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "WHERE BL.TARGETBUILDID = :buildId " +
                         "ORDER BY F.ID DESC ",
                 params("buildId", build.id()),
-                (rs, num) -> toBuild(rs, this::getBranch)
-        );
-    }
-
-    @Override
-    public List<Build> getBuildLinksTo(ID buildId) {
-        return getNamedParameterJdbcTemplate().query(
-                "SELECT F.* FROM BUILDS F " +
-                        "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
-                        "WHERE BL.TARGETBUILDID = :buildId " +
-                        "ORDER BY F.ID DESC " +
-                        "LIMIT 20",
-                params("buildId", buildId.get()),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );
     }

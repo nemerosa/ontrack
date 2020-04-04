@@ -119,9 +119,6 @@ public interface StructureRepository {
 
     void deleteBuildLink(ID fromBuildId, ID toBuildId);
 
-    @Deprecated
-    List<Build> getBuildLinksFrom(ID buildId);
-
     /**
      * Gets the builds used by the given one.
      *
@@ -137,12 +134,6 @@ public interface StructureRepository {
      * @return List of builds which use the given one
      */
     List<Build> getBuildsUsing(Build build);
-
-    /**
-     * @deprecated Use {@link #getBuildsUsing(Build)} instead.
-     */
-    @Deprecated
-    List<Build> getBuildLinksTo(ID buildId);
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
 
