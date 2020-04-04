@@ -335,15 +335,6 @@ class StructureServiceImpl(
         return build
     }
 
-    override fun findBuild(branchId: ID, buildPredicate: Predicate<Build>, sortDirection: BuildSortDirection): Optional<Build> {
-        return Optional.ofNullable(
-                findBuild(
-                        branchId,
-                        sortDirection
-                ) { build -> buildPredicate.test(build) }
-        )
-    }
-
     override fun findBuild(branchId: ID, sortDirection: BuildSortDirection, buildPredicate: (Build) -> Boolean): Build? {
         // Gets the branch
         val branch = getBranch(branchId)

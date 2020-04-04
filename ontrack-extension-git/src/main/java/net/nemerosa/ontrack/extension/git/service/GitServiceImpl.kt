@@ -906,11 +906,9 @@ class GitServiceImpl(
     ) {
         val buildCommitLink = config.buildCommitLink
         if (buildCommitLink != null) {
-            structureService.findBuild(
-                    branch.id,
-                    Predicate { build -> collectIndexableGitCommitForBuild(build, client, buildCommitLink, overrides, listener) },
-                    BuildSortDirection.FROM_NEWEST
-            )
+            structureService.findBuild(branch.id, BuildSortDirection.FROM_NEWEST) { build ->
+                collectIndexableGitCommitForBuild(build, client, buildCommitLink, overrides, listener) ?: false
+            }
         }
     }
 
@@ -939,7 +937,7 @@ class GitServiceImpl(
             buildCommitLink: ConfiguredBuildGitCommitLink<*>,
             overrides: Boolean,
             listener: JobRunListener
-    ): Boolean = transactionTemplate.execute {
+    ): Boolean? = transactionTemplate.execute {
         val commit =
                 try {
                     buildCommitLink.getCommitFromBuild(build)

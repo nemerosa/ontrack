@@ -163,17 +163,6 @@ interface StructureService {
      * Looks for the first build which matches a given predicate.
      *
      * @param branchId       Branch to look builds into
-     * @param buildPredicate Predicate for a match
-     * @param sortDirection  Build search direction
-     * @return Build if found, empty otherwise
-     */
-    @Deprecated("Must be replaced with the other `findBuild` method.")
-    fun findBuild(branchId: ID, buildPredicate: Predicate<Build>, sortDirection: BuildSortDirection): Optional<Build>
-
-    /**
-     * Looks for the first build which matches a given predicate.
-     *
-     * @param branchId       Branch to look builds into
      * @param sortDirection  Build search direction
      * @param buildPredicate Predicate for a match
      * @return Build if found, `null` otherwise
