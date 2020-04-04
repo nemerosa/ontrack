@@ -138,10 +138,6 @@ interface StructureService {
      */
     fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
-
-    @Deprecated("Use getBuildsUsing instead")
-    fun getBuildLinksTo(build: Build): List<Build>
-
     fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build>
 
     fun editBuildLinks(build: Build, form: BuildLinkForm)

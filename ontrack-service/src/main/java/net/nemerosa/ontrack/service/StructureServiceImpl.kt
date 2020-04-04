@@ -470,12 +470,6 @@ class StructureServiceImpl(
         return PaginatedList.create(list.filter(filter), offset, size)
     }
 
-    override fun getBuildLinksTo(build: Build): List<Build> {
-        securityService.checkProjectFunction(build, ProjectView::class.java)
-        return structureRepository.getBuildLinksTo(build.id)
-                .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
-    }
-
     override fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build> {
         return structureRepository.searchBuildsLinkedTo(projectName, buildPattern)
                 .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
