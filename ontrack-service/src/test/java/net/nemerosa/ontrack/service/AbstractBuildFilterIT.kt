@@ -6,12 +6,10 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import java.time.LocalDateTime
 
-@Deprecated("Use directly AbstractDSLTestSupport instead")
 abstract class AbstractBuildFilterIT : AbstractDSLTestSupport() {
 
     protected lateinit var branch: Branch
@@ -23,12 +21,16 @@ abstract class AbstractBuildFilterIT : AbstractDSLTestSupport() {
 
     @Before
     fun prepare() {
-        branch = doCreateBranch()
-        copper = doCreatePromotionLevel(branch, nd("COPPER", ""))
-        bronze = doCreatePromotionLevel(branch, nd("BRONZE", ""))
-        gold = doCreatePromotionLevel(branch, nd("GOLD", ""))
-        publication = doCreateValidationStamp(branch, nd("PUBLICATION", ""))
-        production = doCreateValidationStamp(branch, nd("PRODUCTION", ""))
+        project {
+            branch {
+                this@AbstractBuildFilterIT.branch = this
+                copper = promotionLevel("COPPER")
+                bronze = promotionLevel("BRONZE")
+                gold = promotionLevel("GOLD")
+                publication = validationStamp("PUBLICATION")
+                production = validationStamp("PRODUCTION")
+            }
+        }
     }
 
     protected fun build(name: Int): BuildCreator {
