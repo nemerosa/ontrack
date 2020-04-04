@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.BuildLinkListener
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 
 /**
@@ -22,33 +21,6 @@ class BuildLinkSearchExtension(
         private val buildDisplayNameService: BuildDisplayNameService,
         private val searchIndexService: SearchIndexService
 ) : AbstractExtension(extensionFeature), SearchIndexer<BuildLinkSearchItem>, BuildLinkListener {
-
-    fun isTokenSearchable(token: String): Boolean {
-        return StringUtils.indexOf(token, ":") > 0
-    }
-
-    protected fun search(token: String): Collection<SearchResult> {
-        return if (isTokenSearchable(token)) {
-            val project = StringUtils.substringBefore(token, ":")
-            val buildName = StringUtils.substringAfter(token, ":")
-            // Searches for all builds which are linked to project:build*
-            val builds = structureService.searchBuildsLinkedTo(project, buildName)
-            // Returns search results
-            builds.map { build: Build -> toSearchResult(build) }
-        } else {
-            emptyList()
-        }
-    }
-
-    protected fun toSearchResult(build: Build): SearchResult {
-        return SearchResult(
-                build.entityDisplayName, "${build.project.name} -> ${build.name}",
-                uriBuilder.getEntityURI(build),
-                uriBuilder.getEntityPage(build),
-                100.0,
-                searchResultType
-        )
-    }
 
     override val indexerName: String = "Build links"
 

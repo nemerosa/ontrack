@@ -17,8 +17,7 @@ class MetaInfoPropertyTypeTest {
                     extensionFeature = GeneralExtensionFeature(),
                     uriBuilder = MockURIBuilder(),
                     propertyService = mock(),
-                    structureService = mock(),
-                    securityService = mock()
+                    structureService = mock()
             )
     )
 

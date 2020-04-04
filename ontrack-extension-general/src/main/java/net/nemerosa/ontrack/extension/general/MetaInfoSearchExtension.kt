@@ -4,23 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
-import net.nemerosa.ontrack.model.security.ProjectView
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.URIBuilder
-import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
-import java.util.function.BiFunction
-import java.util.function.Predicate
 
 @Component
 class MetaInfoSearchExtension(
         extensionFeature: GeneralExtensionFeature,
         private val uriBuilder: URIBuilder,
         private val propertyService: PropertyService,
-        private val structureService: StructureService,
-        private val securityService: SecurityService
+        private val structureService: StructureService
 ) : AbstractExtension(extensionFeature), SearchIndexer<MetaInfoSearchItem> {
 
     override val searchResultType = SearchResultType(
@@ -29,45 +22,6 @@ class MetaInfoSearchExtension(
             "Build with Meta Info",
             "Meta information pair using format name:[value] or value"
     )
-
-    fun isTokenSearchable(token: String): Boolean = StringUtils.indexOf(token, META_INFO_SEPARATOR) > 0
-
-    protected fun search(token: String): Collection<SearchResult> {
-        return if (isTokenSearchable(token)) {
-            val name = StringUtils.substringBefore(token, META_INFO_SEPARATOR)
-            val value = StringUtils.substringAfter(token, META_INFO_SEPARATOR)
-            // Searchs for all entities with the value
-            val entities = securityService.callAsAdmin {
-                propertyService.searchWithPropertyValue(
-                        MetaInfoPropertyType::class.java,
-                        BiFunction { entityType, id -> entityType.getEntityFn(structureService).apply(id) },
-                        Predicate { metaInfoProperty -> metaInfoProperty.matchNameValue(name, value) }
-                )
-            }.filter { entity ->
-                securityService.isProjectFunctionGranted(entity, ProjectView::class.java)
-            }
-            // Returns search results
-            entities.mapNotNull { entity -> toSearchResult(entity, name) }
-        } else {
-            emptyList()
-        }
-    }
-
-    protected fun toSearchResult(entity: ProjectEntity, name: String): SearchResult? {
-        // Gets the property value for the meta info name (required)
-        val value = propertyService.getProperty(entity, MetaInfoPropertyType::class.java).value?.getValue(name)
-        // OK
-        return value?.run {
-            SearchResult(
-                    entity.entityDisplayName,
-                    String.format("%s -> %s", name, this),
-                    uriBuilder.getEntityURI(entity),
-                    uriBuilder.getEntityPage(entity),
-                    100.0,
-                    searchResultType
-            )
-        }
-    }
 
     override val indexerName: String = "Meta info properties"
 
