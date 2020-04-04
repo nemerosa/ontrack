@@ -11,7 +11,7 @@ inline fun <reified T> assertIs(value: Any?, code: (T) -> Unit) {
     }
 }
 
-fun <T> assertPresent(o: Optional<T>, message: String = "Optional must be present", code: (T) -> Unit) {
+fun <T> assertPresent(o: Optional<T>, message: String = "Optional must be present", code: (T) -> Unit = {}) {
     if (o.isPresent) {
         code(o.get())
     } else {
