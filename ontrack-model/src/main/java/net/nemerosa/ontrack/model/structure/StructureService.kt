@@ -323,10 +323,6 @@ interface StructureService {
      */
     fun getValidationRunsCountForBuild(buildId: ID): Int
 
-
-    @Deprecated("Use {@link #getValidationRunsForBuildAndValidationStamp(ID, ID, int, int)} instead.")
-    fun getValidationRunsForBuildAndValidationStamp(buildId: ID, validationStampId: ID): List<ValidationRun>
-
     /**
      * Gets the list of validation runs for a build and a validation stamp.
      *
