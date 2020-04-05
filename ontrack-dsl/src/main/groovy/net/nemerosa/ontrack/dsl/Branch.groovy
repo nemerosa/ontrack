@@ -170,11 +170,6 @@ class Branch extends AbstractProjectResource {
         new BranchProperties(ontrack, this)
     }
 
-    @DSLMethod
-    String getType() {
-        node.type
-    }
-
     @DSLMethod("Gets the disabled state of the branch")
     boolean isDisabled() {
         return node.disabled as boolean
