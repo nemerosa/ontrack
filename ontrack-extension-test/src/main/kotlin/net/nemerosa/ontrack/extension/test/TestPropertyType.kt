@@ -42,8 +42,6 @@ constructor(extensionFeature: TestFeature) : AbstractPropertyType<TestProperty>(
     override fun fromStorage(node: JsonNode): TestProperty =
             AbstractPropertyType.parse(node, TestProperty::class.java)
 
-    override fun getSearchKey(value: TestProperty): String = value.value
-
     override fun replaceValue(value: TestProperty, replacementFunction: Function<String, String>): TestProperty =
             TestProperty(
                     replacementFunction.apply(value.value)
