@@ -32,7 +32,7 @@
             <table class="ot-project-branches">
                 <tbody>
                 <tr ng-repeat="branch in project.favouriteBranches | orderBy:getBranchTime:true"
-                    ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
+                    ng-show="showDisabled || !branch.disabled">
                     <td class="ot-project-branch-name ot-decoration-list"
                         ng-class="{'ot-entity-disabled': branch.disabled}">
                         <span
@@ -129,7 +129,7 @@
             <div class="row">
                 <div class="col-md-3"
                      ng-repeat="branch in project.branches | filter:{name: branchFilter.name} | orderBy:getBranchTime:true"
-                     ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
+                     ng-show="showDisabled || !branch.disabled">
                     <div class="ot-project-branch" ng-class="{'ot-entity-disabled': branch.disabled}">
                         <span
                                 class="fa fa-star-o ot-command"

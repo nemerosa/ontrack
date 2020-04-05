@@ -4,13 +4,6 @@
         <div class="col-md-12 ot-view-title">
             <span id="ot-view-title">{{branch.name}}</span>
             <ot-entity-decorations entity="branch"></ot-entity-decorations>
-            <div ng-if="templateDefinition" class="ot-branch-template">
-                <span class="fa fa-share fa-flip-vertical">
-                </span>
-                <a href="#/branch/{{templateDefinition.id}}">
-                    {{templateDefinition.name}}
-                </a>
-            </div>
             <div ng-if="branch.description" class="ot-description" ng-bind-html="branchView.annotatedDescription"></div>
         </div>
     </div>
@@ -19,13 +12,13 @@
         The branch is disabled.
     </ot-entity-disabled>
 
-    <div class="row" ng-if="branch.type != 'TEMPLATE_DEFINITION'" ng-show="builds.length > 0">
+    <div class="row" ng-show="builds.length > 0">
         <div class="col-md-12">
             <ng-include src="'app/view/fragment.branchBuildView.tpl.html'"></ng-include>
         </div>
     </div>
 
-    <div class="row" ng-show="branch.type != 'TEMPLATE_DEFINITION' && builds && builds.length == 0">
+    <div class="row" ng-show="builds && builds.length == 0">
         <div class="col-md-12">
             <div class="alert alert-warning">
                 No build has been created for this branch or the filter is too restrictive.
@@ -36,18 +29,12 @@
         </div>
     </div>
 
-    <div class="row" ng-show="(!branch || branch.type != 'TEMPLATE_DEFINITION') && loadingBuildView">
+    <div class="row" ng-show="(!branch) && loadingBuildView">
         <div class="col-md-12">
             <div class="alert alert-warning">
                 <span class="fa fa-spinner fa-spin"></span>
                 Loading the builds...
             </div>
-        </div>
-    </div>
-
-    <div class="row" ng-if="branch.type == 'TEMPLATE_DEFINITION'">
-        <div class="col-md-12 alert alert-info">
-            This branch is a template and no build can be associated to it.
         </div>
     </div>
 

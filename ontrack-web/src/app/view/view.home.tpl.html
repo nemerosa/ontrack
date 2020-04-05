@@ -40,7 +40,7 @@
             <table class="ot-project-branches" ng-if="favouriteBranches.length > 0">
                 <tbody>
                 <tr ng-repeat="branch in favouriteBranches | orderBy:getBranchTime:true"
-                    ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
+                    ng-show="showDisabled || !(branch.disabled)">
                     <td class="ot-project-branch-name ot-decoration-list"
                         ng-class="{'ot-entity-disabled': branch.disabled}">
                         <span
@@ -143,7 +143,7 @@
                         </div>
                         <div class="ot-home-branch"
                              ng-repeat="branch in projectFavourite.branches"
-                             ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
+                             ng-show="showDisabled || !branch.disabled">
                             <span class="ot-home-branch-name ot-decoration-list"
                                   ng-class="{'ot-entity-disabled': branch.disabled}">
                                 <a href="#/branch/{{branch.id}}">{{branch.name}}</a>

@@ -183,7 +183,7 @@ angular.module('ot.view.home', [
                 $scope.projectFavourites.forEach(function (projectFavourite) {
                     projectFavourite.allBranchesDisabled = projectFavourite.branches.length > 0 &&
                         projectFavourite.branches.every(function (branch) {
-                            return branch.disabled || branch.type === 'TEMPLATE_DEFINITION';
+                            return branch.disabled;
                         });
                 });
 
