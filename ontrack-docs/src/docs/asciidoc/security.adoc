@@ -37,18 +37,18 @@ created with the `ADMINISTRATOR` role, having _admin_ as password. This
 password should be changed as soon as possible.
 
 A **CREATOR** can create any project and can, on all projects, configure them,
-create branches, manage branch templates, create promotion levels and
+create branches, create promotion levels and
 validation stamps. This role should be attributed to service users in charge
 of automating the definition of projects and branches.
 
 An **AUTOMATION** user can do the same things than a _CREATOR_ but can, on all
 projects, additionally edit promotion levels and validation stamps, create
-builds, promote and validate them, synchronize branches with their template,
+builds, promote and validate them,
 manage account groups and project permissions.
 This role is suited for build and integration automation (CI).
 
 A **CONTROLLER** can, on all projects, create builds, promote and validate
-them, synchronize branches with their template. It is suited for a basic CI
+them. It is suited for a basic CI
 need when the Ontrack structure already exists and does not need to be created.
 
 A **GLOBAL VALIDATION MANAGER** can manage validation stamps across all projects.

@@ -98,9 +98,7 @@ public JobKey getKey() {
 
 The `Job` provides also a description, and the desired state of the job:
 
-* disabled or not - might depend on the job parameters and context. For example,
-  the job which synchronizes a branch instance with its template will be disable
-  if the branch is disabled
+* disabled or not - might depend on the job parameters and context
 * valid or not - when a job becomes invalid, it is not executed, and will be
   unregistered automatically. For example, a Git indexation job might
   become invalid if the associated repository configuration has been deleted.

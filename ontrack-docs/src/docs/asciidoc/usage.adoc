@@ -18,8 +18,6 @@ include::usage-properties.adoc[]
 [[topics]]
 == Topics
 
-include::templates.adoc[]
-
 include::usage-scm.adoc[]
 
 include::usage-git.adoc[]

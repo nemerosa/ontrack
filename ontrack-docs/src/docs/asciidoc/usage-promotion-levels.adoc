@@ -85,10 +85,10 @@ property on a promotion level, and selecting the dependencies it depends on.
 ==== Auto creation
 
 Creating the promotion levels for each branch, or making sure they are always
-up to date, can be a non trivial task. Having mechanisms like cloning or
-<<templates,templating>> can help, but then one must still make sure the list
-of promotion levels in the template is up to date and than the template is
-regularly synchronized.
+up to date, can be a non trivial task. Having mechanisms like cloning
+can help, but then one must still make sure the list
+of promotion levels in the cloned branches is
+regularly synchronized to the list of targets.
 
 Another approach is to allow projects to create automatically the promotion
 levels on demand, whenever a build is promoted. This must of course be

@@ -84,9 +84,9 @@ branch.validationStamp("Metrics data") {
 
 Creating the validation stamps for each branch, or making sure they are
 always up to date, can be a non trivial task. Having mechanisms like cloning
-or <<templates,templates>> can help, but then one must still make sure
-the list of validation stamps in the template is up to date and than the
-template is regularly synchronized.
+can help, but then one must still make sure
+the list of validation stamps in the cloned branch
+is regularly synchronized with the target branches.
 
 Another approach is to allow projects to create automatically the validation
 stamps on demand, whenever a build is validated. This must of course be
