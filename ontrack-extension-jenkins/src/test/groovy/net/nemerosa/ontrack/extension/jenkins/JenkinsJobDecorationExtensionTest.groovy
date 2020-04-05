@@ -72,14 +72,4 @@ class JenkinsJobDecorationExtensionTest {
         )
     }
 
-    @Test
-    void 'No decoration for a branch template'() {
-        branch = branch.withType(BranchType.TEMPLATE_DEFINITION)
-        when(propertyService.getProperty(branch, JenkinsJobPropertyType.class.getName())).thenReturn(
-                jenkinsJobProperty
-        )
-        def decorations = extension.getDecorations(branch)
-        assert decorations == []
-    }
-
 }
