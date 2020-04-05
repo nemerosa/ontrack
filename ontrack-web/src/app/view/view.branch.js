@@ -79,7 +79,6 @@ angular.module('ot.view.branch', [
                   id
                   name
                   disabled
-                  type
                 }
                 buildDiffActions {
                   id

@@ -67,7 +67,6 @@ angular.module('ot.view.home', [
                 id
                 name
                 disabled
-                type
                 decorations {
                   ...decorationContent
                 }
@@ -138,7 +137,6 @@ angular.module('ot.view.home', [
                 branches(useModel: true) {
                   id
                   name
-                  type
                   disabled
                   decorations {
                     ...decorationContent

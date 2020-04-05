@@ -69,7 +69,6 @@ angular.module('ot.view.project', [
                   id
                   name
                   disabled
-                  type
                   decorations {
                     ...decorationContent
                   }
@@ -108,7 +107,6 @@ angular.module('ot.view.project', [
                   id
                   name
                   disabled
-                  type
                   decorations {
                     ...decorationContent
                   }
