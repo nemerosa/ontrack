@@ -125,7 +125,7 @@ interface StructureService {
      * @param filter Optional filter on the builds
      * @return List of builds which are used by the given one
      */
-    fun getBuildsUsedBy(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
+    fun getBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
      * Gets the builds which use the given one.
@@ -136,7 +136,7 @@ interface StructureService {
      * @param filter Optional filter on the builds
      * @return List of builds which use the given one
      */
-    fun getBuildsUsing(build: Build, offset: Int, size: Int, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
+    fun getBuildsUsing(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     fun searchBuildsLinkedTo(projectName: String, buildPattern: String): List<Build>
 
