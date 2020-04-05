@@ -477,8 +477,10 @@ class StructureServiceImpl(
 
     override fun editBuildLinks(build: Build, form: BuildLinkForm) {
         securityService.checkProjectFunction(build, BuildConfig::class.java)
-        // Gets the existing links, with authorisations
-        val authorisedExistingLinks = structureRepository.getBuildsUsedBy(build).map { it.id }
+        // Gets the existing links, filtered by authorisations
+        val authorisedExistingLinks = structureRepository.getBuildsUsedBy(build)
+                .filter { securityService.isProjectFunctionGranted(it, ProjectView::class.java) }
+                .map { it.id }
         // Added links
         val addedLinks = HashSet<ID>()
         // Loops through the new links
@@ -492,7 +494,7 @@ class StructureServiceImpl(
                     .withBuildName(item.build)
                     .withBuildExactMatch(true)
             )
-            if (!builds.isEmpty()) {
+            if (builds.isNotEmpty()) {
                 val target = builds[0]
                 // Adds the link
                 addBuildLink(build, target)
@@ -502,7 +504,7 @@ class StructureServiceImpl(
             }
         }
         // Deletes all authorised links which were not added again
-        if (!form.isAddOnly) {
+        if (!form.addOnly) {
             // Other links, not authorised to view, were not subject to edition and are not visible
             val linksToDelete = HashSet(authorisedExistingLinks)
             linksToDelete.removeAll(addedLinks)
