@@ -1047,24 +1047,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService) {
-        return getNamedParameterJdbcTemplate().query(
-                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
-                        "FROM VALIDATION_RUNS VR " +
-                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
-                        "WHERE VR.BUILDID = :buildId " +
-                        "ORDER BY VR.ID",
-                params("buildId", build.id()),
-                (rs, rowNum) -> toValidationRun(
-                        rs,
-                        id -> build,
-                        this::getValidationStamp,
-                        validationRunStatusService
-                )
-        );
-    }
-
-    @Override
     public List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
@@ -1091,25 +1073,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
                 params("buildId", build.id()),
                 Integer.class
-        );
-    }
-
-    @Override
-    public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String, ValidationRunStatusID> validationRunStatusService) {
-        return getNamedParameterJdbcTemplate().query(
-                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
-                        "FROM VALIDATION_RUNS VR " +
-                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
-                        "WHERE VR.BUILDID = :buildId " +
-                        "AND VR.VALIDATIONSTAMPID = :validationStampId " +
-                        "ORDER BY VR.ID DESC ",
-                params("buildId", build.id()).addValue("validationStampId", validationStamp.id()),
-                (rs, rowNum) -> toValidationRun(
-                        rs,
-                        id -> build,
-                        id -> validationStamp,
-                        validationRunStatusService
-                )
         );
     }
 
