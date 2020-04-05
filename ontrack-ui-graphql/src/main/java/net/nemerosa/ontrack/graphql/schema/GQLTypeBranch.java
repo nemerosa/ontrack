@@ -76,6 +76,7 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .field(
                         newFieldDefinition()
                                 .name("type")
+                                .deprecate("The branch type is deprecated and will be removed in version 4.")
                                 .type(GraphqlUtils.newEnumType(BranchType.class))
                                 .build()
                 )
