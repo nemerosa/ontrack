@@ -155,7 +155,7 @@ class Ontrack {
 
     @DSLMethod(value = "Launches a global search based on a token.", count = 4)
     List<SearchResult> search(String token, String type = null, int offset = 0, int size = 20) {
-        post('search', [token: token, type: type, offset: offset, size: size]).collect {
+        post('search', [token: token, type: type, offset: offset, size: size]).items.collect {
             new SearchResult(this, it)
         }
     }
