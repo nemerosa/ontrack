@@ -532,11 +532,11 @@ class StructureServiceImpl(
         structureRepository.forEachBuildLink(code)
     }
 
-    override fun getValidationStampRunViewsForBuild(build: Build): List<ValidationStampRunView> {
+    override fun getValidationStampRunViewsForBuild(build: Build, offset: Int, size: Int): List<ValidationStampRunView> {
         // Gets all validation stamps
         val stamps = getValidationStampListForBranch(build.branch.id)
         // Gets all runs for this build
-        val runs = getValidationRunsForBuild(build.id)
+        val runs = getValidationRunsForBuild(build.id, offset, size)
         // Gets the validation stamp run views
         return stamps.map { stamp -> getValidationStampRunView(runs, stamp) }
     }
@@ -1226,12 +1226,6 @@ class StructureServiceImpl(
             }?.takeIf {
                 securityService.isProjectFunctionGranted(it, ProjectView::class.java)
             }
-
-    override fun getValidationRunsForBuild(buildId: ID): List<ValidationRun> {
-        val build = getBuild(buildId)
-        securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
-        return structureRepository.getValidationRunsForBuild(build) { validationRunStatusService.getValidationRunStatus(it) }
-    }
 
     override fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int): List<ValidationRun> {
         val build = getBuild(buildId)

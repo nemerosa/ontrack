@@ -175,7 +175,7 @@ interface StructureService {
 
     fun buildSearch(projectId: ID, form: BuildSearchForm): List<Build>
 
-    fun getValidationStampRunViewsForBuild(build: Build): List<ValidationStampRunView>
+    fun getValidationStampRunViewsForBuild(build: Build, offset: Int = 0, size: Int = 10): List<ValidationStampRunView>
 
     // Promotion levels
 
@@ -304,10 +304,6 @@ interface StructureService {
      * @return Validation run or `null` if not found
      */
     fun findValidationRunByID(validationRunId: ID): ValidationRun?
-
-
-    @Deprecated("Use {@link #getValidationRunsForBuild(ID, int, int)} instead.")
-    fun getValidationRunsForBuild(buildId: ID): List<ValidationRun>
 
     /**
      * Gets the list of validation runs for a build.

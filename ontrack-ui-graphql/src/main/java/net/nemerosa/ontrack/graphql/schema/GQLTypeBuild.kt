@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
+import net.nemerosa.ontrack.model.pagination.PageRequest
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
@@ -126,6 +127,18 @@ class GQLTypeBuild(
                                             .type(GraphQLString)
                                             .build()
                             )
+                            .argument {
+                                it.name(GQLPaginatedListFactory.ARG_OFFSET)
+                                        .description("Offset for the page")
+                                        .type(GraphQLInt)
+                                        .defaultValue(0)
+                            }
+                            .argument {
+                                it.name(GQLPaginatedListFactory.ARG_SIZE)
+                                        .description("Size of the page")
+                                        .type(GraphQLInt)
+                                        .defaultValue(PageRequest.DEFAULT_PAGE_SIZE)
+                            }
                             .type(stdList(validation.typeRef))
                             .dataFetcher(buildValidationsFetcher())
                 }
@@ -228,6 +241,8 @@ class GQLTypeBuild(
         ) { environment: DataFetchingEnvironment, build: Build ->
             // Filter on validation stamp
             val validationStampName = GraphqlUtils.getStringArgument(environment, ARG_VALIDATION_STAMP)
+            val offset = environment.getArgument<Int>(GQLPaginatedListFactory.ARG_OFFSET) ?: 0
+            val size = environment.getArgument<Int>(GQLPaginatedListFactory.ARG_SIZE) ?: 10
             if (validationStampName.isPresent) {
                 val validationStamp: ValidationStamp? =
                         structureService.findValidationStampByName(
@@ -238,7 +253,7 @@ class GQLTypeBuild(
                 if (validationStamp != null) {
                     return@fetcher listOf(
                             buildValidation(
-                                    validationStamp, build
+                                    validationStamp, build, offset, size
                             )
                     )
                 } else {
@@ -247,20 +262,24 @@ class GQLTypeBuild(
             } else {
                 // Gets the validation runs for the build
                 return@fetcher structureService.getValidationStampListForBranch(build.branch.id)
-                        .map { validationStamp -> buildValidation(validationStamp, build) }
+                        .map { validationStamp -> buildValidation(validationStamp, build, offset, size) }
             }
         }
     }
 
     private fun buildValidation(
             validationStamp: ValidationStamp,
-            build: Build
+            build: Build,
+            offset: Int,
+            size: Int
     ): GQLTypeValidation.GQLTypeValidationData {
         return GQLTypeValidation.GQLTypeValidationData(
                 validationStamp,
                 structureService.getValidationRunsForBuildAndValidationStamp(
                         build.id,
-                        validationStamp.id
+                        validationStamp.id,
+                        offset,
+                        size
                 )
         )
     }
@@ -291,7 +310,7 @@ class GQLTypeBuild(
                     ).take(count)
                 } else {
                     // Gets all the validation runs (limited by count)
-                    return@DataFetcher structureService.getValidationRunsForBuild(build.id)
+                    return@DataFetcher structureService.getValidationRunsForBuild(build.id, 0, count)
                             .take(count)
                 }
             }
