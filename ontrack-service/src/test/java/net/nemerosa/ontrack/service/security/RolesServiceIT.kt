@@ -252,7 +252,6 @@ class RolesServiceIT : AbstractServiceTestSupport() {
                     ProjectConfig::class.java,
                     ProjectAuthorisationMgt::class.java,
                     BranchCreate::class.java,
-                    BranchTemplateMgt::class.java,
                     PromotionLevelCreate::class.java,
                     PromotionLevelEdit::class.java,
                     ValidationStampCreate::class.java,
@@ -261,8 +260,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
                     BuildCreate::class.java,
                     BuildConfig::class.java,
                     PromotionRunCreate::class.java,
-                    ValidationRunCreate::class.java,
-                    BranchTemplateSync::class.java
+                    ValidationRunCreate::class.java
             ).forEach { fn ->
                 assertTrue(securityService.isProjectFunctionGranted(project, fn))
             }

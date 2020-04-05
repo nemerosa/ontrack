@@ -157,15 +157,4 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         assertEquals(1, service.collectJobRegistrations().count());
     }
 
-    @Test
-    public void syncBuildJobs_ignoring_templates() {
-        // Branch as template
-        branch = branch.withType(BranchType.TEMPLATE_DEFINITION);
-        when(propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class)).thenReturn(true);
-        when(structureService.getProjectList()).thenReturn(Collections.singletonList(project));
-        when(structureService.getBranchesForProject(project.getId())).thenReturn(Collections.singletonList(branch));
-        // Gets the list of jobs
-        assertEquals(0, service.collectJobRegistrations().count());
-    }
-
 }

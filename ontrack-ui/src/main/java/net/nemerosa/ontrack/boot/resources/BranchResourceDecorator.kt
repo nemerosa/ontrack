@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
-class BranchResourceDecorator @Autowired
-constructor(private val resourceDecorationContributorService: ResourceDecorationContributorService, private val structureService: StructureService, private val branchFavouriteService: BranchFavouriteService) : AbstractLinkResourceDecorator<Branch>(Branch::class.java) {
+class BranchResourceDecorator(
+        private val resourceDecorationContributorService: ResourceDecorationContributorService,
+        private val branchFavouriteService: BranchFavouriteService
+) : AbstractLinkResourceDecorator<Branch>(Branch::class.java) {
 
     override fun getLinkDefinitions(): Iterable<LinkDefinition<Branch>> {
         return listOf(
@@ -20,7 +22,7 @@ constructor(private val resourceDecorationContributorService: ResourceDecoration
                 // Build creation
                 "_createBuild"
                         linkTo { branch: Branch -> on(BuildController::class.java).newBuild(branch.id, null) }
-                        linkIf { branch, resourceContext -> branch.type != BranchType.TEMPLATE_DEFINITION && resourceContext.isProjectFunctionGranted(branch, BuildCreate::class.java) }
+                        linkIf { branch, resourceContext -> resourceContext.isProjectFunctionGranted(branch, BuildCreate::class.java) }
                 ,
                 // Promotion level creation
                 "_createPromotionLevel" linkTo { branch: Branch ->
@@ -98,47 +100,14 @@ constructor(private val resourceDecorationContributorService: ResourceDecoration
                 "_enable" linkTo { branch: Branch -> on(BranchController::class.java).enableBranch(branch.id) }
                         linkIf { branch, resourceContext ->
                     (resourceContext.isProjectFunctionGranted(branch.projectId(), BranchEdit::class.java)
-                            && branch.isDisabled
-                            && branch.type != BranchType.TEMPLATE_DEFINITION)
+                            && branch.isDisabled)
                 },
                 // Disable
                 "_disable" linkTo { branch: Branch -> on(BranchController::class.java).disableBranch(branch.id) }
                         linkIf { branch, resourceContext ->
                     (resourceContext.isProjectFunctionGranted(branch.projectId(), BranchEdit::class.java)
-                            && !branch.isDisabled
-                            && branch.type != BranchType.TEMPLATE_DEFINITION)
+                            && !branch.isDisabled)
                 },
-                // Template definition creation
-                "_templateDefinition" linkTo { branch: Branch -> on(BranchController::class.java).getTemplateDefinition(branch.id) }
-                        linkIf { branch, resourceContext ->
-                    (branch.type != BranchType.TEMPLATE_INSTANCE
-                            && structureService.getBuildCount(branch) == 0
-                            && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt::class.java))
-                },
-                // Template synchronisation
-                "_templateSync" linkTo { branch: Branch -> on(BranchController::class.java).syncTemplateDefinition(branch.id) }
-                        linkIf { branch, resourceContext -> branch.type == BranchType.TEMPLATE_DEFINITION && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt::class.java) || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync::class.java)) }
-                ,
-                // Template instance creation
-                "_templateInstanceCreate" linkTo { branch: Branch -> on(BranchController::class.java).singleTemplateInstanceForm(branch.id) }
-                        linkIf { branch, resourceContext -> branch.type == BranchType.TEMPLATE_DEFINITION && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt::class.java) || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync::class.java)) }
-                ,
-                // Template instance
-                "_templateInstance" linkTo { branch: Branch -> on(BranchController::class.java).getTemplateInstance(branch.id) }
-                        linkIf { branch, resourceContext -> branch.type == BranchType.TEMPLATE_INSTANCE && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt::class.java) }
-                ,
-                // Template instance disconnection
-                "_templateInstanceDisconnect" linkTo { branch: Branch -> on(BranchController::class.java).disconnectTemplateInstance(branch.id) }
-                        linkIf { branch, resourceContext -> branch.type == BranchType.TEMPLATE_INSTANCE && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt::class.java) }
-                ,
-                // Template instance connection
-                "_templateInstanceConnect" linkTo { branch: Branch -> on(BranchController::class.java).connectTemplateInstance(branch.id) }
-                        linkIf { branch, resourceContext -> branch.type == BranchType.CLASSIC && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt::class.java) }
-                ,
-                // Template instance synchronisation
-                "_templateInstanceSync" linkTo { branch: Branch -> on(BranchController::class.java).syncTemplateInstance(branch.id) }
-                        linkIf { branch, resourceContext -> branch.type == BranchType.TEMPLATE_INSTANCE && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt::class.java) || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync::class.java)) }
-                ,
                 // Favourite --> 'unfavourite'
                 "_unfavourite" linkTo { branch: Branch -> on(BranchController::class.java).unfavouriteBranch(branch.id) }
                         linkIf { branch, resourceContext -> resourceContext.isLogged && branchFavouriteService.isBranchFavourite(branch) }

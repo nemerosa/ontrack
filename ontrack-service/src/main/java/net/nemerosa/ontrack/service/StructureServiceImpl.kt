@@ -279,10 +279,6 @@ class StructureServiceImpl(
         isEntityNew(build, "Build must be new")
         isEntityDefined(build.branch, "Branch must be defined")
         isEntityDefined(build.branch.project, "Project must be defined")
-        // Branch must not be a template definition
-        if (getBranch(build.branch.id).type == BranchType.TEMPLATE_DEFINITION) {
-            throw BranchTemplateCannotHaveBuildException(build.branch.name)
-        }
         // Security
         securityService.checkProjectFunction(build.branch.project.id(), BuildCreate::class.java)
         // Build validation

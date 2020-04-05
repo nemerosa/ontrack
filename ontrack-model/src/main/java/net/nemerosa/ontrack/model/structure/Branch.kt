@@ -16,7 +16,6 @@ data class Branch(
         override val description: String?,
         @JsonProperty("disabled")
         val isDisabled: Boolean,
-        val type: BranchType,
         @JsonProperty("project")
         @get:JsonView(value = [
             PromotionView::class, Branch::class, Build::class, PromotionLevel::class, ValidationStamp::class,
@@ -27,15 +26,13 @@ data class Branch(
         override val signature: Signature
 ) : ProjectEntity {
 
-    fun withId(id: ID) = Branch(id, name, description, isDisabled, type, project, signature)
+    fun withId(id: ID) = Branch(id, name, description, isDisabled, project, signature)
 
-    fun withDescription(description: String?) = Branch(id, name, description, isDisabled, type, project, signature)
+    fun withDescription(description: String?) = Branch(id, name, description, isDisabled, project, signature)
 
-    fun withDisabled(isDisabled: Boolean) = Branch(id, name, description, isDisabled, type, project, signature)
+    fun withDisabled(isDisabled: Boolean) = Branch(id, name, description, isDisabled, project, signature)
 
-    fun withType(type: BranchType) = Branch(id, name, description, isDisabled, type, project, signature)
-
-    fun withSignature(signature: Signature) = Branch(id, name, description, isDisabled, type, project, signature)
+    fun withSignature(signature: Signature) = Branch(id, name, description, isDisabled, project, signature)
 
     companion object {
 
@@ -50,7 +47,6 @@ data class Branch(
                         nameDescription.name,
                         nameDescription.description,
                         nameDescription.isDisabled,
-                        BranchType.CLASSIC,
                         project,
                         Signature.anonymous()
                 )

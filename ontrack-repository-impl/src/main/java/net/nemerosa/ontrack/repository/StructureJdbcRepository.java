@@ -27,19 +27,16 @@ import java.util.stream.Collectors;
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
-    private final BranchTemplateRepository branchTemplateRepository;
     private final ValidationDataTypeService validationDataTypeService;
     private final ValidationDataTypeConfigRepository validationDataTypeConfigRepository;
 
     @Autowired
     public StructureJdbcRepository(
             DataSource dataSource,
-            BranchTemplateRepository branchTemplateRepository,
             ValidationDataTypeService validationDataTypeService,
             ValidationDataTypeConfigRepository validationDataTypeConfigRepository
     ) {
         super(dataSource);
-        this.branchTemplateRepository = branchTemplateRepository;
         this.validationDataTypeService = validationDataTypeService;
         this.validationDataTypeConfigRepository = validationDataTypeConfigRepository;
     }
@@ -1364,18 +1361,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         )
                 .withId(branchId)
                 .withSignature(readSignature(rs))
-                .withType(getBranchType(branchId))
                 .withDisabled(rs.getBoolean("disabled"));
-    }
-
-    private BranchType getBranchType(ID branchId) {
-        if (branchTemplateRepository.isTemplateDefinition(branchId)) {
-            return BranchType.TEMPLATE_DEFINITION;
-        } else if (branchTemplateRepository.isTemplateInstance(branchId)) {
-            return BranchType.TEMPLATE_INSTANCE;
-        } else {
-            return BranchType.CLASSIC;
-        }
     }
 
     protected Project toProject(ResultSet rs) throws SQLException {

@@ -221,7 +221,6 @@ class RolesServiceImpl(
                         // Structure creation functions only
                         ProjectConfig::class.java,
                         BranchCreate::class.java,
-                        BranchTemplateMgt::class.java,
                         PromotionLevelCreate::class.java,
                         ValidationStampCreate::class.java
                 )
@@ -239,7 +238,7 @@ class RolesServiceImpl(
                         ProjectConfig::class.java,
                         ProjectAuthorisationMgt::class.java,
                         BranchCreate::class.java,
-                        BranchTemplateMgt::class.java,
+                        BranchEdit::class.java,
                         PromotionLevelCreate::class.java,
                         PromotionLevelEdit::class.java,
                         ValidationStampCreate::class.java,
@@ -248,8 +247,7 @@ class RolesServiceImpl(
                         BuildCreate::class.java,
                         BuildConfig::class.java,
                         PromotionRunCreate::class.java,
-                        ValidationRunCreate::class.java,
-                        BranchTemplateSync::class.java
+                        ValidationRunCreate::class.java
                 )
         )
 
@@ -262,8 +260,7 @@ class RolesServiceImpl(
                         BuildCreate::class.java,
                         BuildConfig::class.java,
                         PromotionRunCreate::class.java,
-                        ValidationRunCreate::class.java,
-                        BranchTemplateSync::class.java
+                        ValidationRunCreate::class.java
                 )
         )
 

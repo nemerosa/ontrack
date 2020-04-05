@@ -124,11 +124,6 @@ public class StaleJobServiceImpl implements StaleJobService {
     @Override
     public void detectAndManageStaleBranch(Branch branch, LocalDateTime disablingTime, LocalDateTime deletionTime, List<String> promotionsToKeep) {
         trace(branch.getProject(), "[%s] Scanning branch for staleness", branch.getName());
-        // Templates are excluded
-        if (branch.getType() == BranchType.TEMPLATE_DEFINITION) {
-            trace(branch.getProject(), "[%s] Branch templates are not eligible for staleness", branch.getName());
-            return;
-        }
         // Indexation of promotion levels to protect
         Set<String> promotionsToProtect;
         if (promotionsToKeep != null) {

@@ -67,19 +67,6 @@ class StaleBranchesJobTest {
     }
 
     @Test
-    fun `Template branches are not managed`() {
-        // Branch template
-        branch = branch.withType(BranchType.TEMPLATE_DEFINITION)
-        // Branch creation for deletion (normally)
-        configureBranchCreationEvent(11)
-
-        staleJobService.detectAndManageStaleBranch(branch, disablingTime, deletingTime, emptyList())
-
-        verify(structureService, never()).deleteBranch(any())
-        verify(structureService, never()).saveBranch(any())
-    }
-
-    @Test
     fun `Deleting a branch using last build time`() {
         // Last build for deletion
         configureBuild(11)

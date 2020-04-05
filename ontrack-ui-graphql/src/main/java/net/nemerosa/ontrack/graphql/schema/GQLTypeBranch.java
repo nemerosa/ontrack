@@ -73,12 +73,6 @@ public class GQLTypeBranch extends AbstractGQLProjectEntity<Branch> {
                 .withInterface(projectEntityInterface.getTypeRef())
                 .fields(projectEntityInterfaceFields())
                 .field(GraphqlUtils.disabledField())
-                .field(
-                        newFieldDefinition()
-                                .name("type")
-                                .type(GraphqlUtils.newEnumType(BranchType.class))
-                                .build()
-                )
                 // Ref to project
                 .field(
                         newFieldDefinition()

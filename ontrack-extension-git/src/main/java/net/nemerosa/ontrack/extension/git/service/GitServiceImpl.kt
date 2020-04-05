@@ -85,7 +85,6 @@ class GitServiceImpl(
 
     override fun forEachConfiguredBranchInProject(project: Project, consumer: (Branch, GitBranchConfiguration) -> Unit) {
         structureService.getBranchesForProject(project.id)
-                .filter { branch -> branch.type != BranchType.TEMPLATE_DEFINITION }
                 .forEach { branch ->
                     val configuration = getBranchConfiguration(branch)
                     if (configuration != null) {
@@ -683,7 +682,6 @@ class GitServiceImpl(
     override fun findBranchWithGitBranch(project: Project, branchName: String): Branch? {
         return gitRepositoryHelper.findBranchWithProjectAndGitBranch(project, branchName)
                 ?.let { structureService.getBranch(ID.of(it)) }
-                ?.takeIf { it.type != BranchType.TEMPLATE_DEFINITION }
     }
 
     private fun <T> toConfiguredBuildGitCommitLink(serviceConfiguration: ServiceConfiguration): ConfiguredBuildGitCommitLink<T> {

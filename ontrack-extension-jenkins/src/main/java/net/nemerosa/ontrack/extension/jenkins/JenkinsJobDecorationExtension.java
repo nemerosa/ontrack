@@ -46,10 +46,6 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
         if (property.isEmpty()) {
             return Collections.emptyList();
         } else {
-            // Template branch? Decoration cannot be computed
-            if (entity instanceof Branch && ((Branch) entity).getType() == BranchType.TEMPLATE_DEFINITION) {
-                return Collections.emptyList();
-            }
             // Gets a client
             // FIXME getJob does not need a full HTTP client
             JenkinsClient jenkinsClient = jenkinsClientFactory.getClient(property.getValue().getConfiguration());

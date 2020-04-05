@@ -13,7 +13,6 @@ fun createBranch() = Branch(
         "release-1.0",
         "Branch 1.0",
         false,
-        BranchType.CLASSIC,
         createProject(),
         Signature.of("test")
 )

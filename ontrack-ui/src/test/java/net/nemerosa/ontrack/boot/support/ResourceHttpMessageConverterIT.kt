@@ -55,7 +55,6 @@ class ResourceHttpMessageConverterIT : AbstractWebTestSupport() {
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
-                        .with("type", "CLASSIC")
                         .with("project", JsonUtils.`object`()
                                 .with("id", 1)
                                 .with("name", "P")

@@ -51,7 +51,6 @@ public class BranchStatusViewTest {
                         .with("name", "master")
                         .with("description", "")
                         .with("disabled", false)
-                        .with("type", "CLASSIC")
                         .with("signature", SIGNATURE_OBJECT)
                         .end()
                 )

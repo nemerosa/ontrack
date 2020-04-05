@@ -89,7 +89,6 @@ interface RolesService {
                 BranchCreate::class.java,
                 BranchEdit::class.java,
                 BranchFilterMgt::class.java,
-                BranchTemplateMgt::class.java,
                 BranchDelete::class.java,
                 PromotionLevelCreate::class.java,
                 PromotionLevelEdit::class.java,
