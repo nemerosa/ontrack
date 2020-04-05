@@ -41,7 +41,7 @@ class Build extends AbstractProjectResource {
         )
     }
 
-    @DSLMethod(id="promote-closure", value = "Promotes this build to the given promotion level and configures the created <<dsl-promotionrun,promotion run>>.")
+    @DSLMethod(id = "promote-closure", value = "Promotes this build to the given promotion level and configures the created <<dsl-promotionrun,promotion run>>.")
     PromotionRun promote(String promotion, Closure closure) {
         def run = promote(promotion)
         run(closure)
@@ -288,7 +288,7 @@ class Build extends AbstractProjectResource {
     @DSLMethod
     def buildLink(String project, String build) {
         ontrack.put(
-                link('buildLinks'),
+                link('buildLinksFrom'),
                 [
                         addOnly: true,
                         links  : [[

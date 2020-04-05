@@ -272,7 +272,7 @@ public class BuildController extends AbstractResourceController {
      * @param buildId From this build...
      * @return List of builds
      */
-    @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.PUT)
+    @RequestMapping(value = "builds/{buildId}/links/from", method = RequestMethod.PUT)
     public Build createBuildLinkFromForm(@PathVariable ID buildId, @RequestBody BuildLinkForm form) {
         Build build = structureService.getBuild(buildId);
         structureService.editBuildLinks(build, form);
