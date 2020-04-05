@@ -22,11 +22,18 @@ public class Signature {
         );
     }
 
-    public static Signature none() {
+    public static Signature anonymous() {
         return new Signature(
                 Time.now(),
                 User.anonymous()
         );
+    }
+
+    /**
+     * @deprecated Use {@link #anonymous()} method instead. This method will be deleted in version 4.
+     */
+    public static Signature none() {
+        return anonymous();
     }
 
     public Signature withTime(LocalDateTime dateTime) {
