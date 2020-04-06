@@ -4,7 +4,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
-    groovy
     `java-library`
 }
 
@@ -41,7 +40,6 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation("org.codehaus.groovy:groovy")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // List of extensions to include in core
