@@ -1,5 +1,4 @@
 plugins {
-    groovy
     `java-library`
 }
 
@@ -15,7 +14,6 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    testImplementation("org.codehaus.groovy:groovy")
     testImplementation(project(":ontrack-test-utils"))
 }
 
