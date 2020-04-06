@@ -1,5 +1,4 @@
 plugins {
-    groovy
     `java-library`
 }
 
@@ -14,6 +13,5 @@ dependencies {
     implementation("commons-io:commons-io")
     implementation(project(":ontrack-common"))
     implementation(project(":ontrack-extension-api"))
-    implementation("org.codehaus.groovy:groovy")
     implementation("org.slf4j:slf4j-api")
 }
