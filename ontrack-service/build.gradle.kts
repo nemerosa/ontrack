@@ -16,14 +16,14 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")
-    implementation("org.codehaus.groovy:groovy")
-    implementation("org.kohsuke:groovy-sandbox")
     implementation("org.jgrapht:jgrapht-core")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.flywaydb:flyway-core")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation("org.codehaus.groovy:groovy")
+
     testRuntimeOnly(project(":ontrack-repository-impl"))
     testRuntimeOnly("io.micrometer:micrometer-registry-prometheus")
 

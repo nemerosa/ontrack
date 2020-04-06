@@ -278,7 +278,6 @@ configure(coreProjects) p@{
             dependency("org.apache.commons:commons-math3:3.6.1")
             dependency("args4j:args4j:2.33")
             dependency("org.jgrapht:jgrapht-core:1.3.0")
-            dependency("org.kohsuke:groovy-sandbox:1.19")
             dependency("com.graphql-java:graphql-java:11.0")
             dependency("org.jetbrains.kotlin:kotlin-test:${kotlinVersion}")
             // Overrides from Spring Boot
