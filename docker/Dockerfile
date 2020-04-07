@@ -22,7 +22,7 @@ MAINTAINER Damien Coraboeuf <damien.coraboeuf@nemerosa.com>
 
 # Git installation
 RUN apt-get update && \
-    apt-get install -y git && \
+    apt-get install -y git curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Directory set-up
@@ -61,9 +61,9 @@ ADD start.sh /opt/ontrack/start.sh
 WORKDIR /opt/ontrack
 ENTRYPOINT ["/opt/ontrack/start.sh"]
 
+# Copies the Ontrack JAR
+COPY ontrack.jar /opt/ontrack/
+
 # Healthcheck
 HEALTHCHECK --interval=1m --timeout=10s \
   CMD curl -f http://localhost:8080/info || exit 1
-
-# Copies the Ontrack JAR
-COPY ontrack.jar /opt/ontrack/
