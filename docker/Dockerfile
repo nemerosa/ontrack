@@ -18,10 +18,12 @@
 FROM azul/zulu-openjdk:11.0.6
 
 # Meta-information
-MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
+MAINTAINER Damien Coraboeuf <damien.coraboeuf@nemerosa.com>
 
 # Git installation
-RUN apt-get install -y git
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
 
 # Directory set-up
 RUN mkdir -p /opt/ontrack
@@ -41,7 +43,6 @@ VOLUME /var/ontrack/extensions
 ENV EXTENSIONS_DIR /var/ontrack/extensions
 
 # Exposing the ports
-EXPOSE 443
 EXPOSE 8080
 
 # Profile
@@ -53,9 +54,6 @@ ENV JAVA_OPTIONS ''
 # Additional arguments to pass on the command lines
 ENV ONTRACK_ARGS ''
 
-# Copies the Ontrack JAR
-COPY ontrack.jar /opt/ontrack/
-
 # Starting script
 ADD start.sh /opt/ontrack/start.sh
 
@@ -66,3 +64,6 @@ ENTRYPOINT ["/opt/ontrack/start.sh"]
 # Healthcheck
 HEALTHCHECK --interval=1m --timeout=10s \
   CMD curl -f http://localhost:8080/info || exit 1
+
+# Copies the Ontrack JAR
+COPY ontrack.jar /opt/ontrack/
