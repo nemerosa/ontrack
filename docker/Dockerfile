@@ -15,7 +15,7 @@
 #        password: ontrack
 
 # Base
-FROM openjdk:11.0.6-jdk
+FROM azul/zulu-openjdk:11.0.6
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
