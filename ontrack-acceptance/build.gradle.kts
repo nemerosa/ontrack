@@ -102,32 +102,10 @@ tasks.named<Test>("test") {
     enabled = false
 }
 
-// Javadoc and sources for the tests
+// No Javadoc for this module
 
-val publishedTasks = mutableListOf<Jar>(bootJar)
-
-if (hasProperty("documentation")) {
-
-    val groovydoc = tasks.named<Groovydoc>("groovydoc") {
-        source = project.the<SourceSetContainer>()["test"].allSource
-    }
-
-    val javadoc = tasks.named<Javadoc>("javadoc") {
-        source = project.the<SourceSetContainer>()["test"].allJava
-    }
-
-    val javadocJar = tasks.getByName<Jar>("javadocJar") {
-        from(javadoc)
-        from(groovydoc)
-    }
-
-    val sourcesJar = tasks.getByName<Jar>("sourcesJar") {
-        from(project.the<SourceSetContainer>()["test"].allSource)
-    }
-
-    publishedTasks.add(javadocJar)
-    publishedTasks.add(sourcesJar)
-
+tasks.named<Javadoc>("javadoc") {
+    enabled = false
 }
 
 // Publications
@@ -135,7 +113,7 @@ if (hasProperty("documentation")) {
 configure<PublishingExtension> {
     publications {
         named<MavenPublication>("mavenCustom") {
-            setArtifacts(publishedTasks)
+            setArtifacts(listOf(bootJar))
         }
     }
 }
