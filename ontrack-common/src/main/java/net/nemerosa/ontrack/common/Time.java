@@ -1,21 +1,20 @@
 package net.nemerosa.ontrack.common;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.temporal.ChronoField.*;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
 
 public final class Time {
 
@@ -29,6 +28,9 @@ public final class Time {
             .appendFraction(NANO_OF_SECOND, 0, 4, true)
             .toFormatter(Locale.ENGLISH);
 
+    /**
+     * Keeps only the 4 first digits of the nano seconds field.
+     */
     public static final DateTimeFormatter DATE_TIME_STORAGE_FORMAT = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
             .append(ISO_LOCAL_DATE)
@@ -39,6 +41,17 @@ public final class Time {
     private Time() {
     }
 
+    /**
+     * Keeps only the first 4 digits of the nanoseconds field.
+     */
+    public static @NotNull
+    LocalDateTime truncate(@NotNull LocalDateTime time) {
+        int nano = time.getNano();
+        LocalDateTime base = time.truncatedTo(ChronoUnit.SECONDS);
+        int truncatedNano = (nano / 100_000) * 100_000;
+        return base.with(NANO_OF_SECOND, truncatedNano);
+    }
+
     public static LocalDateTime now() {
         return LocalDateTime.now(ZoneOffset.UTC);
     }
@@ -47,6 +60,9 @@ public final class Time {
         return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }
 
+    /**
+     * Keeps only the 4 first digits of the nano seconds field.
+     */
     public static String forStorage(LocalDateTime time) {
         if (time == null) {
             return null;
@@ -55,6 +71,9 @@ public final class Time {
         }
     }
 
+    /**
+     * Keeps only the 4 first digits of the nano seconds field.
+     */
     public static LocalDateTime fromStorage(String value) {
         if (StringUtils.isBlank(value)) {
             return null;

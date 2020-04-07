@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.support
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.common.truncate
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
 import org.junit.Test
@@ -11,6 +12,26 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class TimeTest {
+
+    @Test
+    fun truncate() {
+        assertEquals(
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57, 123400000),
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57, 123456789).truncate()
+        )
+        assertEquals(
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57, 123400000),
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57, 123400000).truncate()
+        )
+        assertEquals(
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57, 120000000),
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57, 120000000).truncate()
+        )
+        assertEquals(
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57),
+                LocalDateTime.of(2020, 4, 7, 12, 36, 57).truncate()
+        )
+    }
 
     @Test
     fun `Stored format length check`() {

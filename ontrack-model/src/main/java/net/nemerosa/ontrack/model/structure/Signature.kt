@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.common.truncate
 import java.time.LocalDateTime
 
 /**
@@ -11,6 +12,32 @@ data class Signature(
         val user: User
 ) {
     fun withTime(dateTime: LocalDateTime?): Signature = Signature(dateTime ?: Time.now(), user)
+
+    /**
+     * Keeps at most 4 first digits for the nano seconds.
+     *
+     * @see [Time.forStorage]
+     * @see [Time.fromStorage]
+     */
+    fun truncate() = Signature(
+            time.truncate(),
+            user
+    )
+
+    /**
+     * Equality is based on the first 4 digits of the nano seconds
+     */
+    override fun equals(other: Any?): Boolean = if (other is Signature) {
+        this.user == other.user && this.time.truncate() == other.time.truncate()
+    } else {
+        false
+    }
+
+    override fun hashCode(): Int {
+        var result = time.truncate().hashCode()
+        result = 31 * result + user.hashCode()
+        return result
+    }
 
     companion object {
 
