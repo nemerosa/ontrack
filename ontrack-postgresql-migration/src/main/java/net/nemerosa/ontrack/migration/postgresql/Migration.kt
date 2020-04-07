@@ -408,7 +408,7 @@ class Migration(
     }
 
     private fun <T> intx(supplier: () -> T): T {
-        return txTemplate.execute { _ -> supplier() }
+        return txTemplate.execute { _ -> supplier() } ?: error("The code in transaction did not return any result.")
     }
 
     private fun copy(table: String, vararg columns: String) {

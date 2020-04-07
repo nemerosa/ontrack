@@ -18,7 +18,7 @@ class LabelJdbcRepository(
 ) : AbstractJdbcRepository(dataSource), LabelRepository {
 
     override fun findLabelsByProvider(providerId: String): List<LabelRecord> {
-        return namedParameterJdbcTemplate.query(
+        return namedParameterJdbcTemplate!!.query(
                 "SELECT * FROM LABEL WHERE COMPUTED_BY = :computedBy",
                 params("computedBy", providerId)
         ) { rs, _ -> rsConversion(rs) }
@@ -42,7 +42,7 @@ class LabelJdbcRepository(
             sql = "SELECT * FROM LABEL WHERE CATEGORY = :category AND NAME = :name ORDER BY CATEGORY, NAME"
             params = params("category", category).addValue("name", name)
         }
-        return namedParameterJdbcTemplate.query(
+        return namedParameterJdbcTemplate!!.query(
                 sql,
                 params
         ) { rs, _ -> rsConversion(rs) }
@@ -122,7 +122,7 @@ class LabelJdbcRepository(
 
     private fun updateLabel(labelId: Int, form: LabelForm, providerId: String?): LabelRecord {
         try {
-            namedParameterJdbcTemplate.update("""
+            namedParameterJdbcTemplate!!.update("""
                         UPDATE LABEL
                         SET category = :category,
                             name = :name,
@@ -146,7 +146,7 @@ class LabelJdbcRepository(
 
     override fun deleteLabel(labelId: Int): Ack {
         return Ack.one(
-                namedParameterJdbcTemplate.update(
+                namedParameterJdbcTemplate!!.update(
                         "DELETE FROM LABEL WHERE ID = :id",
                         params("id", labelId)
                 )
@@ -155,17 +155,17 @@ class LabelJdbcRepository(
 
     override fun getLabel(labelId: Int): LabelRecord {
         try {
-            return namedParameterJdbcTemplate.queryForObject(
+            return namedParameterJdbcTemplate!!.queryForObject(
                     "SELECT * FROM LABEL WHERE ID = :id",
                     params("id", labelId)
-            ) { rs, _ -> rsConversion(rs) }
+            ) { rs, _ -> rsConversion(rs) } ?: throw LabelIdNotFoundException(labelId)
         } catch (_: EmptyResultDataAccessException) {
             throw LabelIdNotFoundException(labelId)
         }
     }
 
     override val labels: List<LabelRecord>
-        get() = jdbcTemplate.query(
+        get() = jdbcTemplate!!.query(
                 "SELECT * FROM LABEL ORDER BY CATEGORY, NAME"
         ) { rs, _ -> rsConversion(rs) }
 

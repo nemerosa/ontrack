@@ -145,6 +145,9 @@ configure(javaProjects) p@{
     apply(plugin = "signing")
     apply(plugin = "de.marcphilipp.nexus-publish")
 
+    // Java level
+    java.sourceCompatibility = JavaVersion.VERSION_11
+
     // Documentation
 
     if (hasProperty("documentation")) {
@@ -303,7 +306,10 @@ configure(coreProjects) p@{
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions {
+            jvmTarget = "11"
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+        }
     }
 
     // Unit tests run with the `test` task

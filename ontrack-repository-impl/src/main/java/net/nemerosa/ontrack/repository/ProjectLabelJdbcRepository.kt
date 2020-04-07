@@ -12,7 +12,7 @@ class ProjectLabelJdbcRepository(
 ) : AbstractJdbcRepository(dataSource), ProjectLabelRepository {
 
     override fun getLabelsForProject(project: Int): List<LabelRecord> =
-            namedParameterJdbcTemplate.queryForList(
+            namedParameterJdbcTemplate!!.queryForList(
                     """
                         SELECT PL.LABEL_ID
                         FROM PROJECT_LABEL PL
@@ -25,7 +25,7 @@ class ProjectLabelJdbcRepository(
             ).map { labelRepository.getLabel(it) }
 
     override fun getProjectsForLabel(label: Int): List<Int> =
-            namedParameterJdbcTemplate.queryForList(
+            namedParameterJdbcTemplate!!.queryForList(
                     """
                         SELECT PL.project_id
                         FROM PROJECT_LABEL PL
@@ -39,7 +39,7 @@ class ProjectLabelJdbcRepository(
 
     override fun associateProjectToLabel(project: Int, label: Int) {
         val params = params("project", project).addValue("label", label)
-        val existing = namedParameterJdbcTemplate.queryForList(
+        val existing = namedParameterJdbcTemplate!!.queryForList(
                 """
                     SELECT *
                     FROM PROJECT_LABEL
@@ -49,7 +49,7 @@ class ProjectLabelJdbcRepository(
                 params
         )
         if (existing.isEmpty()) {
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     """
                         INSERT INTO project_label(PROJECT_ID, LABEL_ID)
                         VALUES (:project, :label)
@@ -60,7 +60,7 @@ class ProjectLabelJdbcRepository(
     }
 
     override fun unassociateProjectToLabel(project: Int, label: Int) {
-        namedParameterJdbcTemplate.update(
+        namedParameterJdbcTemplate!!.update(
                 """
                     DELETE FROM PROJECT_LABEL
                     WHERE PROJECT_ID = :project
@@ -75,7 +75,7 @@ class ProjectLabelJdbcRepository(
         val existingLabels = getLabelsForProject(project).map { it.id }
         // For any new label, saves it
         form.labels.minus(existingLabels).forEach { label ->
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     """
                         INSERT INTO project_label(PROJECT_ID, LABEL_ID)
                         VALUES (:project, :label)

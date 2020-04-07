@@ -30,7 +30,7 @@ class ValidationRunSearchJdbcRepository(
         """
         params.addValue("size", request.size).addValue("offset", request.offset)
 
-        return namedParameterJdbcTemplate.queryForList(
+        return namedParameterJdbcTemplate!!.queryForList(
                 sql,
                 params,
                 Int::class.java
@@ -51,11 +51,11 @@ class ValidationRunSearchJdbcRepository(
             $query
         """
 
-        return namedParameterJdbcTemplate.queryForObject(
+        return namedParameterJdbcTemplate!!.queryForObject(
                 sql,
                 params,
                 Int::class.java
-        )
+        ) ?: 0
     }
 
     private fun prepareProjectValidationRuns(

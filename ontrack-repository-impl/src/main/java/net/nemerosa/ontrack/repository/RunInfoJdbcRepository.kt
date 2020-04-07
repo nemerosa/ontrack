@@ -88,14 +88,14 @@ class RunInfoJdbcRepository(
     }
 
     override fun getCountByRunnableEntityType(type: RunnableEntityType): Int =
-            jdbcTemplate.queryForObject(
+            jdbcTemplate!!.queryForObject(
                     """
                 SELECT COUNT(ID)
                 FROM RUN_INFO
                 WHERE ${type.name.toUpperCase()} IS NOT NULL
             """,
                     Int::class.java
-            )
+            ) ?: 0
 
     override fun forEachRunnableEntityType(runnableEntityType: RunnableEntityType, code: (id: Int, runInfo: RunInfo) -> Unit) {
         val entityColumn = runnableEntityType.name.toUpperCase()
