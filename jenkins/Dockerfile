@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     git \
     zip \
     rsync \
+    curl \
     graphviz \
     python-setuptools \
     && rm -rf /var/lib/apt/lists/*
@@ -17,7 +18,7 @@ RUN curl --fail --silent -L https://github.com/s3tools/s3cmd/releases/download/v
     && python setup.py install
 
 # Installing Docker
-RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-18.09.3.tgz -O docker.tgz
+RUN curl --fail --silent -L https://download.docker.com/linux/static/stable/x86_64/docker-18.09.3.tgz --output docker.tgz
 RUN tar -xvzf docker.tgz
 RUN mv docker/* /usr/bin/
 RUN chmod +x /usr/bin/docker

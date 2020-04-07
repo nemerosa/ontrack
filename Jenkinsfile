@@ -9,7 +9,7 @@ pipeline {
         CODECOV_TOKEN = credentials("CODECOV_TOKEN")
         GPG_KEY = credentials("GPG_KEY")
         GPG_KEY_RING = credentials("GPG_KEY_RING")
-        AGENT_IMAGE = "nemerosa/ontrack-build:2.0.0"
+        AGENT_IMAGE = "nemerosa/ontrack-build:3.0.0"
         AGENT_OPTIONS = "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
     }
 
