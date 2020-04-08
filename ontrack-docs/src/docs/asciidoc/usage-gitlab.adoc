@@ -18,7 +18,7 @@ The access to a GitLab instance must be configured.
 ** **Name**  - unique name for the configuration
 ** **URL** - URL to the GitLab instance (not the repository, the GitLab server)
 ** **User** & **Personal Access Token** - credentials used to access GitLab
-** Ignore SSL Certificate - select _Yes_ if the <<appendix-certificates,SSL certificate>> for your GitLab
+** Ignore SSL Certificate - select _Yes_ if the SSL certificate for your GitLab
    instance cannot be trusted by default.
 
 TIP: You cannot use the account's password - only Personal Access Tokens are

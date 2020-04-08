@@ -7,8 +7,6 @@ include::appendix-deprecations.adoc[]
 
 include::appendix-roadmap.adoc[]
 
-include::appendix-certificates.adoc[]
-
 include::appendix-metrics-migration.adoc[]
 
 include::appendix-migration-postgres.adoc[]

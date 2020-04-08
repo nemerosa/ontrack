@@ -21,7 +21,7 @@ In order to create an extension, you have to create a Java project.
 
 TIP: The use of <<extending-kotlin,Kotlin>> is also possible.
 
-Note that Ontrack needs at least a JDK8u65 to run.
+Note that Ontrack needs at least a JDK 11.0.6 to run.
 
 Your extension needs to a Gradle project and have at least this minimal
 `build.gradle` file:

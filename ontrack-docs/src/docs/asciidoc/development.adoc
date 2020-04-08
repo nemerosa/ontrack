@@ -6,7 +6,7 @@
 
 Following tools must be installed before you can start coding with Ontrack:
 
-* https://www.oracle.com[JDK8u181] or better
+* a JDK 11.0.6 or better - https://www.azul.com/downloads/zulu-community/[Azul] is recommended
 * https://www.docker.com/[Docker 17.12.0] or more recent
 * https://docs.docker.com/compose/[Docker Compose 1.18.0] or more recent
 

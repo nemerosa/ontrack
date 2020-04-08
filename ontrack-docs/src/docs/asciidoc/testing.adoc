@@ -80,7 +80,7 @@ remains the easiest way.
 The acceptance tests are packaged as a standalone JAR, that contains all
 the dependencies.
 
-To run the acceptance tests, you need a JDK8 and you have to run the JAR using:
+To run the acceptance tests, you need a JDK 11 and you have to run the JAR using:
 
 
 [source,bash]
