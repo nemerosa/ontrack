@@ -63,7 +63,6 @@ class OntrackConfigProperties {
         if (!configurationTest) {
             logger.warn("[config] Tests of external configurations are disabled")
         }
-        logger.info("[search] Engine = ${search.engine}")
         logger.info("[search] Index immediate refresh = ${search.index.immediate}")
         logger.info("[search] Index batch size = ${search.index.batch}")
         logger.info("[search] Index batch logging = ${search.index.logging}")
@@ -83,10 +82,6 @@ class OntrackConfigProperties {
          * Search complete key
          */
         const val SEARCH_PROPERTY = "$PREFIX.$SEARCH"
-        /**
-         * Search engine property
-         */
-        const val SEARCH_ENGINE_PROPERTY = "$SEARCH_PROPERTY.${SearchConfigProperties.ENGINE_PROPERTY}"
         /**
          * Key store type
          */

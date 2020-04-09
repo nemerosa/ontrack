@@ -1,18 +1,12 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.service.elasticsearch
 
 import net.nemerosa.ontrack.model.structure.SearchService
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.StartupService
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-@ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
-        havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
-)
 class ElasticSearchStartupService(
         private val searchService: SearchService
 ) : StartupService {

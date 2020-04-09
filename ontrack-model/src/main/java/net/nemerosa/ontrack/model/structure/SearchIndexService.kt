@@ -2,9 +2,6 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.search.SearchQuery
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Service
 
 /**
  * This service is used to manage the search indexes when they are available.
@@ -78,34 +75,3 @@ data class BatchIndexResults(
  */
 fun <T : SearchItem> SearchIndexService.deleteSearchIndex(indexer: SearchIndexer<T>, id: Any) =
         deleteSearchIndex(indexer, id.toString())
-
-/**
- * Default implementation does not manage search indexes at all
- */
-@Service
-@ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
-        havingValue = "default",
-        matchIfMissing = true
-)
-class NOPSearchIndexService : SearchIndexService {
-
-    override val searchIndexesAvailable: Boolean = false
-
-    override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {}
-
-    override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {}
-
-    override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean) = false
-
-    override fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T) {}
-
-    override fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T) {}
-
-    override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {}
-
-    override fun <T : SearchItem> batchSearchIndex(indexer: SearchIndexer<T>, items: Collection<T>, mode: BatchIndexMode): BatchIndexResults =
-            BatchIndexResults.NONE
-
-    override fun <T : SearchItem> query(indexer: SearchIndexer<T>, size: Int, query: SearchQuery, handler: (source: JsonNode) -> Unit) {}
-}

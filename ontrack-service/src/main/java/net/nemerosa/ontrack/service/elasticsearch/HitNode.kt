@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.service.elasticsearch
 
 internal class HitNode(
         val index: String,

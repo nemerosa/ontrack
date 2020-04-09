@@ -5,18 +5,6 @@ package net.nemerosa.ontrack.model.support
  */
 class SearchConfigProperties {
 
-    companion object {
-        /**
-         * Engine property
-         */
-        const val ENGINE_PROPERTY = "engine"
-    }
-
-    /**
-     * Search engine to be used.
-     */
-    var engine = OntrackConfigProperties.SEARCH
-
     /**
      * Index configuration
      */

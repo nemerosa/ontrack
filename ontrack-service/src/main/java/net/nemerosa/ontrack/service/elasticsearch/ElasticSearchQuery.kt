@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.service.elasticsearch
 
 import net.nemerosa.ontrack.model.search.*
 import org.elasticsearch.index.query.DisMaxQueryBuilder

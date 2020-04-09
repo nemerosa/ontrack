@@ -1,19 +1,17 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.service.elasticsearch
 
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import net.nemerosa.ontrack.extension.elastic.ElasticSearchJobs.indexationAllJobKey
-import net.nemerosa.ontrack.extension.elastic.ElasticSearchJobs.indexationJobType
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchItem
 import net.nemerosa.ontrack.model.support.JobProvider
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import net.nemerosa.ontrack.service.elasticsearch.ElasticSearchJobs.indexationAllJobKey
+import net.nemerosa.ontrack.service.elasticsearch.ElasticSearchJobs.indexationJobType
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
@@ -21,10 +19,6 @@ import java.util.concurrent.TimeUnit
  * One job per type of search.
  */
 @Component
-@ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
-        havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
-)
 class ElasticSearchIndexationJobs(
         private val searchIndexers: List<SearchIndexer<*>>,
         private val elasticSearchService: SearchIndexService,

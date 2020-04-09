@@ -1,14 +1,12 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.service.elasticsearch
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.index.query.MultiMatchQueryBuilder
 import org.elasticsearch.search.builder.SearchSourceBuilder
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,10 +14,6 @@ typealias ESSearchRequest = org.elasticsearch.action.search.SearchRequest
 
 @Service
 @Transactional
-@ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
-        havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
-)
 class ElasticSearchServiceImpl(
         private val client: RestHighLevelClient,
         private val searchIndexers: List<SearchIndexer<*>>,

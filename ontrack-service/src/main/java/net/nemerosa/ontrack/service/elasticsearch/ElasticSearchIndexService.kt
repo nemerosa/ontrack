@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.elastic
+package net.nemerosa.ontrack.service.elasticsearch
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.asJson
@@ -21,16 +21,11 @@ import org.elasticsearch.client.indices.PutMappingRequest
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-@ConditionalOnProperty(
-        name = [OntrackConfigProperties.SEARCH_ENGINE_PROPERTY],
-        havingValue = ElasticSearchConfigProperties.SEARCH_ENGINE_ELASTICSEARCH
-)
 class ElasticSearchIndexService(
         private val client: RestHighLevelClient,
         private val ontrackConfigProperties: OntrackConfigProperties

@@ -18,6 +18,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.jgrapht:jgrapht-core")
     implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("org.elasticsearch.client:elasticsearch-rest-high-level-client")
     implementation("org.flywaydb:flyway-core")
 
     testImplementation(project(":ontrack-it-utils"))
