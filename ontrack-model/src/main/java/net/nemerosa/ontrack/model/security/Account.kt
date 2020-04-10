@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
 import java.io.Serializable
@@ -125,7 +126,9 @@ data class Account(
     /**
      * Default built-in admin?
      */
-    val isDefaultAdmin = "admin" == name
+    @get:JsonProperty("defaultAdmin")
+    val isDefaultAdmin
+        get() = "admin" == name
 
     fun asPermissionTarget() =
             PermissionTarget(
