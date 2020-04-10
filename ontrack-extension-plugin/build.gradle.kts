@@ -12,15 +12,12 @@ repositories {
     }
 }
 
-val springBootVersion: String by project
-val kotlinVersion: String by project
-
 dependencies {
     implementation(gradleApi())
     implementation("gradle.plugin.com.liferay:gradle-plugins-node:4.3.3")
-    implementation("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+    implementation("org.springframework.boot:spring-boot-gradle-plugin:${Versions.springBootVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-allopen:${Versions.kotlinVersion}")
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -28,7 +25,7 @@ tasks.named<ProcessResources>("processResources") {
             ReplaceTokens::class,
             "tokens" to mapOf(
                     "version" to version as String,
-                    "kotlinVersion" to kotlinVersion
+                    "kotlinVersion" to Versions.kotlinVersion
             )
     )
 }

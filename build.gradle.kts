@@ -22,17 +22,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        val kotlinVersion: String by project
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${Versions.kotlinVersion}")
     }
 }
-
-// FIXME Try to use version in gradle.properties
-// TODO See https://github.com/gradle/gradle/issues/9830 for a very clean workaround
-// val springBootVersion: String by project
-val kotlinVersion: String by project
-val elasticSearchVersion: String by project
 
 // GitHub
 val gitHubToken: String by project
@@ -43,7 +36,7 @@ val gitHubRepo: String by project
 val ossrhUsername: String by project
 val ossrhPassword: String by project
 
-extra["elasticsearch.version"] = elasticSearchVersion
+extra["elasticsearch.version"] = Versions.elasticSearchVersion
 
 plugins {
     java
@@ -54,7 +47,7 @@ plugins {
     id("org.sonarqube") version "2.5"
     id("com.avast.gradle.docker-compose") version "0.9.5"
     id("com.bmuschko.docker-remote-api") version "4.1.0"
-    id("org.springframework.boot") version "2.2.6.RELEASE" apply false
+    id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.11"
     id("io.codearte.nexus-staging") version "0.21.2"
@@ -270,8 +263,8 @@ configure(coreProjects) p@{
     configure<DependencyManagementExtension> {
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
-                bomProperty("kotlin.version", kotlinVersion)
-                bomProperty("elasticsearch.version", elasticSearchVersion)
+                bomProperty("kotlin.version", Versions.kotlinVersion)
+                bomProperty("elasticsearch.version", Versions.elasticSearchVersion)
             }
         }
         dependencies {
@@ -283,15 +276,15 @@ configure(coreProjects) p@{
             dependency("args4j:args4j:2.33")
             dependency("org.jgrapht:jgrapht-core:1.3.0")
             dependency("com.graphql-java:graphql-java:11.0")
-            dependency("org.jetbrains.kotlin:kotlin-test:${kotlinVersion}")
+            dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
             // Overrides from Spring Boot
             dependency("org.postgresql:postgresql:9.4.1208")
         }
     }
 
     dependencies {
-        "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-        "implementation"("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+        "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
+        "implementation"("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.3")
         // Lombok
