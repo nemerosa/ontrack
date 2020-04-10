@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.gradle.extension
 
-import com.liferay.gradle.plugins.node.NodeExtension
-import com.liferay.gradle.plugins.node.NodePlugin
-import com.liferay.gradle.plugins.node.tasks.ExecuteNodeScriptTask
-import com.liferay.gradle.plugins.node.tasks.NpmInstallTask
+import com.moowork.gradle.node.NodeExtension
+import com.moowork.gradle.node.NodePlugin
+import com.moowork.gradle.node.npm.NpmInstallTask
+import com.moowork.gradle.node.task.NodeTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
@@ -26,9 +26,8 @@ class OntrackExtensionPlugin : Plugin<Project> {
 
         target.apply<NodePlugin>()
         target.configure<NodeExtension> {
-            isGlobal = true
-            setNodeVersion("8.10.0")
-            setNpmVersion("5.7.1")
+            version = "8.10.0"
+            npmVersion = "5.7.1"
             isDownload = true
         }
 
@@ -63,7 +62,6 @@ class OntrackExtensionPlugin : Plugin<Project> {
 
         target.tasks.named<NpmInstallTask>("npmInstall") {
             dependsOn(copyPackageJson)
-            setNodeModulesCacheDir("${target.rootDir}/.gradle/node_modules_cache")
             setWorkingDir(target.projectDir)
             inputs.file(target.file("package.json"))
             outputs.dir(target.file("node_modules"))
@@ -73,7 +71,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
          * Gulp call
          */
 
-        val web by target.tasks.registering(ExecuteNodeScriptTask::class) {
+        val web by target.tasks.registering(NodeTask::class) {
             dependsOn(target.tasks.named("npmInstall"))
             dependsOn(copyGulpFile)
 
@@ -88,8 +86,8 @@ class OntrackExtensionPlugin : Plugin<Project> {
             }
 
             setWorkingDir(target.projectDir)
-            setScriptFile(target.file("node_modules/gulp/bin/gulp"))
-            args(
+            script = target.file("node_modules/gulp/bin/gulp")
+            addArgs(
                     "default",
                     "--extension", ontrack.id(project),
                     "--version", target.version,

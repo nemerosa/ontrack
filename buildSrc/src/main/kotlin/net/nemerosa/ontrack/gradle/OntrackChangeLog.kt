@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.gradle
 
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 open class OntrackChangeLog : AbstractOntrackTask() {
@@ -18,6 +19,7 @@ open class OntrackChangeLog : AbstractOntrackTask() {
     @Input
     var ontrackReleaseFilter: String = ""
 
+    @Internal
     var changeLog: String = ""
 
     @TaskAction

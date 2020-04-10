@@ -46,7 +46,7 @@ plugins {
     id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
     id("com.avast.gradle.docker-compose") version "0.9.5"
-    id("com.bmuschko.docker-remote-api") version "4.1.0"
+    id("com.bmuschko.docker-remote-api") version "6.4.0"
     id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.11"
@@ -482,8 +482,8 @@ val dockerPrepareEnv by tasks.registering(Copy::class) {
 val dockerBuild by tasks.registering(DockerBuildImage::class) {
     dependsOn(dockerPrepareEnv)
     inputDir.set(file("docker"))
-    tags.add("nemerosa/ontrack:$version")
-    tags.add("nemerosa/ontrack:latest")
+    images.add("nemerosa/ontrack:$version")
+    images.add("nemerosa/ontrack:latest")
 }
 
 /**

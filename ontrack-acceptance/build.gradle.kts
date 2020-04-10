@@ -72,8 +72,8 @@ tasks.named("assemble") {
 val dockerBuild by tasks.registering(DockerBuildImage::class) {
     dependsOn(acceptanceDockerPrepareEnv)
     inputDir.set(file("src/main/docker"))
-    tags.add("nemerosa/ontrack-acceptance:$version")
-    tags.add("nemerosa/ontrack-acceptance:latest")
+    images.add("nemerosa/ontrack-acceptance:$version")
+    images.add("nemerosa/ontrack-acceptance:latest")
 }
 
 /**

@@ -9,10 +9,10 @@ repositories {
 }
 
 dependencies {
-    compile(gradleApi())
-    compile(gradleKotlinDsl())
-    compile("gradle.plugin.com.liferay:gradle-plugins-node:5.1.1")
-    compile("net.nemerosa.ontrack:ontrack-dsl:3.40.0") {
+    implementation(gradleApi())
+    implementation(gradleKotlinDsl())
+    implementation("com.github.node-gradle:gradle-node-plugin:2.2.3")
+    implementation("net.nemerosa.ontrack:ontrack-dsl:3.40.0") {
         exclude(module = "groovy-all")
     }
 }

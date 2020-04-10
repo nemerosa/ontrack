@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.gradle
 
 import net.nemerosa.ontrack.dsl.Build
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 open class OntrackLastReleases : AbstractOntrackTask() {
@@ -18,6 +19,7 @@ open class OntrackLastReleases : AbstractOntrackTask() {
     @Input
     var releasePattern: String = ".*"
 
+    @Internal
     var releases: List<Build> = emptyList()
 
     companion object {
