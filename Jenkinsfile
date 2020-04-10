@@ -187,6 +187,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
+                            -x processResources \\
                             -PjacocoExecFile=build/jacoco/acceptance.exec \\
                             -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
                             --stacktrace \\
@@ -196,6 +197,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
+                            -x processResources \\
                             -PjacocoExecFile=build/jacoco/dsl.exec \\
                             -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
                             --stacktrace \\
@@ -279,6 +281,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
+                            -x processResources \\
                             -PjacocoExecFile=build/jacoco/extension.exec \\
                             -PjacocoReportFile=build/reports/jacoco/extension.xml \\
                             --stacktrace \\
@@ -359,6 +362,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             codeDockerCoverageReport \\
+                            -x processResources \\
                             -PjacocoExecFile=build/jacoco/vault.exec \\
                             -PjacocoReportFile=build/reports/jacoco/vault.xml \\
                             --stacktrace \\
