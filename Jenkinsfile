@@ -130,6 +130,7 @@ pipeline {
             }
             post {
                 always {
+                    recordIssues(tools: [kotlin(), javaDoc(), java()])
                     script {
                         def results = junit '**/build/test-results/**/*.xml'
                         // If not a PR, create a build validation stamp
