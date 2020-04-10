@@ -86,10 +86,6 @@ ontrack.config.cache.specs.properties = maximumSize=1000,expireAfterWrite=1d,rec
 # Search configuration properties
 #################################
 
-# Search engine to use
-# Use `elasticsearch` to switch to ElasticSearch based search
-ontrack.config.search.engine = default
-
 # By default, indexation is ElasticSearch is done after some
 # time after the index has been requested. The flag below
 # forces the index to be refreshed immediately.

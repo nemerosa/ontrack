@@ -1,11 +1,7 @@
 [[integration-elasticsearch]]
 === ElasticSearch search engine
 
-Enable the ElasticSearch engine by setting
-the `ontrack.config.search.engine` <<configuration-properties,configuration property>>
-to `elasticsearch`.
-
-Additionally, the `spring.elasticsearch.rest.uris` property must be set
+The `spring.elasticsearch.rest.uris` property must be set
 to specify where ElasticSearch is deployed, additionally to any credentials
 being needed (see the
 https://docs.spring.io/spring-boot/docs/{spring-boot-version}/reference/htmlsingle/#boot-features-connecting-to-elasticsearch-rest[Spring Boot documentation]).

@@ -10,7 +10,6 @@ import org.springframework.test.context.TestPropertySource
  */
 @TestPropertySource(
         properties = [
-            "ontrack.config.search.engine=elasticsearch",
             "ontrack.config.search.index.immediate=true"
         ]
 )
