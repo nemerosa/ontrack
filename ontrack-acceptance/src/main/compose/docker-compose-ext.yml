@@ -7,16 +7,26 @@ services:
       POSTGRES_DB      : ontrack
       POSTGRES_USER    : ontrack
       POSTGRES_PASSWORD: ontrack
+   elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+      ports:
+         - "9200:9200"
+         - "9300:9300"
+      environment:
+         - "discovery.type=single-node"
    ontrack:
       image: "nemerosa/ontrack-extension-test:${VERSION}"
       depends_on:
          postgres:
+            condition: service_started
+         elasticsearch:
             condition: service_started
       environment:
          PROFILE: acceptance
          SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
          ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
          JAVA_OPTIONS: "-Xmx2048m"
+         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
       environment:

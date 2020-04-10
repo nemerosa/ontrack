@@ -34,7 +34,6 @@ services:
          ONTRACK_INFLUXDB_ENABLED: "true"
          ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
          # Elastic search
-         ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
          SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
    selenium:

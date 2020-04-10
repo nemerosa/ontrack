@@ -44,7 +44,6 @@ services:
          JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
          SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
          # Elastic search
-         ONTRACK_CONFIG_SEARCH_ENGINE: "elasticsearch"
          ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
          SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
          # Using Vault for storing the encryption keys
