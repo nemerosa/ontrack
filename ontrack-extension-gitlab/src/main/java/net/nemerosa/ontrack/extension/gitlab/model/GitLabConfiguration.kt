@@ -25,7 +25,7 @@ constructor(
         val url: String,
         private val user: String?,
         private val password: String?,
-        @JsonProperty("ignoreSslCertificate")
+        @get:JsonProperty("ignoreSslCertificate")
         val isIgnoreSslCertificate: Boolean
 ) : UserPasswordConfiguration<GitLabConfiguration> {
 
