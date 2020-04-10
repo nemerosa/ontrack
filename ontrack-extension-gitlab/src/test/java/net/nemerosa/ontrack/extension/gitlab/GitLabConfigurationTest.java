@@ -85,10 +85,8 @@ public class GitLabConfigurationTest {
     public void credentials() {
         Optional<UserPassword> o = configurationFixture().getCredentials();
         assertTrue(o.isPresent());
-        if (o.isPresent()) {
-            assertEquals("test", o.get().getUser());
-            assertEquals("1234567890abcdef", o.get().getPassword());
-        }
+        assertEquals("test", o.get().getUser());
+        assertEquals("1234567890abcdef", o.get().getPassword());
     }
 
     @Test

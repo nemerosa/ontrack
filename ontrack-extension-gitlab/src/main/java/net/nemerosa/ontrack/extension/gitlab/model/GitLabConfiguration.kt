@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.gitlab.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 import net.nemerosa.ontrack.model.form.Password
@@ -24,6 +25,7 @@ constructor(
         val url: String,
         private val user: String?,
         private val password: String?,
+        @JsonProperty("ignoreSslCertificate")
         val isIgnoreSslCertificate: Boolean
 ) : UserPasswordConfiguration<GitLabConfiguration> {
 
