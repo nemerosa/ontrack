@@ -3,7 +3,8 @@ package db.migration;
 
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventType;
-import org.flywaydb.core.api.migration.spring.BaseSpringJdbcMigration;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,15 +12,15 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 @Component
-public class V11__476_ProjectEntityCreationMigration extends BaseSpringJdbcMigration {
+public class V11__476_ProjectEntityCreationMigration extends BaseJavaMigration {
 
     private final Logger logger = LoggerFactory.getLogger(V11__476_ProjectEntityCreationMigration.class);
 
     @Override
-    public void migrate(JdbcTemplate jdbcTemplate) throws Exception {
+    public void migrate(Context context) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getConfiguration().getDataSource());
         logger.info("Migrating the project entity creation events...");
         migrateCreation(jdbcTemplate, EventFactory.NEW_PROJECT, "PROJECT", "PROJECTS");
         migrateCreation(jdbcTemplate, EventFactory.NEW_BRANCH, "BRANCH", "BRANCHES");
@@ -31,7 +32,7 @@ public class V11__476_ProjectEntityCreationMigration extends BaseSpringJdbcMigra
             JdbcTemplate jdbcTemplate,
             EventType eventType,
             String eventLinkColumn,
-            String entityTable) throws SQLException {
+            String entityTable) {
         jdbcTemplate.execute(
                 connection -> connection.prepareStatement(
                         String.format("SELECT * FROM %s", entityTable),

@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.model.support.ConnectorGlobalStatus
-import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.actuate.health.HealthComponent
 
 class AdminStatus(
-        val health: Health,
+        val health: HealthComponent,
         val connectors: ConnectorGlobalStatus
 )

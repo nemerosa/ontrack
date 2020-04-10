@@ -29,6 +29,7 @@ buildscript {
 }
 
 // FIXME Try to use version in gradle.properties
+// TODO See https://github.com/gradle/gradle/issues/9830 for a very clean workaround
 // val springBootVersion: String by project
 val kotlinVersion: String by project
 val elasticSearchVersion: String by project
@@ -53,7 +54,7 @@ plugins {
     id("org.sonarqube") version "2.5"
     id("com.avast.gradle.docker-compose") version "0.9.5"
     id("com.bmuschko.docker-remote-api") version "4.1.0"
-    id("org.springframework.boot") version "2.1.9.RELEASE" apply false
+    id("org.springframework.boot") version "2.2.6.RELEASE" apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
     id("com.github.breadmoirai.github-release") version "2.2.11"
     id("io.codearte.nexus-staging") version "0.21.2"
