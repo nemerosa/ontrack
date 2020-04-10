@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 apply(plugin = "org.springframework.boot")
 
 plugins {
@@ -18,7 +20,9 @@ dependencies {
 
 }
 
-val bootJar = tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar")
+val bootJar by tasks.named<BootJar>("bootJar") {
+    archiveClassifier.set("app")
+}
 
 tasks.named("assemble") {
     dependsOn(bootJar)
@@ -27,9 +31,7 @@ tasks.named("assemble") {
 publishing {
     publications {
         named<MavenPublication>("mavenCustom") {
-            artifact(bootJar) {
-                classifier = "app"
-            }
+            setArtifacts(listOf(bootJar))
         }
     }
 }
