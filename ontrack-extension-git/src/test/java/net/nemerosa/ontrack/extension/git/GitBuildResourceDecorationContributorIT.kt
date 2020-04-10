@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.it.ResourceDecorationContributorTestSupport
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.ui.resource.ResourceModule
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
 import org.junit.Before
 import org.junit.Test
@@ -12,9 +11,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class GitBuildResourceDecorationContributorIT : AbstractGitTestSupport() {
-
-    @Autowired
-    private lateinit var resourceModule: ResourceModule
 
     @Autowired
     private lateinit var contributor: GitBuildResourceDecorationContributor
