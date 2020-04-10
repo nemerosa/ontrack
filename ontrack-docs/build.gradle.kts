@@ -21,8 +21,6 @@ dependencies {
 
 if (project.hasProperty("documentation")) {
 
-    val springBootVersion: String by project
-
     asciidoctorj {
         modules {
             diagram.setVersion("1.5.4.1")
@@ -56,7 +54,7 @@ if (project.hasProperty("documentation")) {
         description = "Generates HTML documentation."
         attributes = mapOf(
                 "ontrack-version" to version,
-                "spring-boot-version" to springBootVersion,
+                "spring-boot-version" to Versions.springBootVersion,
                 "icons" to "font"
         )
         logDocuments = true
@@ -73,7 +71,7 @@ if (project.hasProperty("documentation")) {
         description = "Generates PDF documentation."
         attributes = mapOf(
                 "ontrack-version" to version,
-                "spring-boot-version" to springBootVersion,
+                "spring-boot-version" to Versions.springBootVersion,
                 "icons" to "font",
                 "imagesdir" to file("build/docs/asciidoc")
         )
