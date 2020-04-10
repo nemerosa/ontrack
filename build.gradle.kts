@@ -327,6 +327,8 @@ configure(coreProjects) p@{
             systemProperty("spring.datasource.url", rootProject.ext["jdbcUrl"]!!)
             systemProperty("spring.datasource.username", "ontrack")
             systemProperty("spring.datasource.password", "ontrack")
+            // Ignoring ES index creation issues at test time (concurrency)
+            systemProperty("ontrack.config.search.index.ignore-existing", "true")
         }
     }
 
