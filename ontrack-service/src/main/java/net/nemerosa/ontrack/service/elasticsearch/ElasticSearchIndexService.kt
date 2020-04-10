@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.search.SearchQuery
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.action.DocWriteRequest
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
@@ -76,7 +77,15 @@ class ElasticSearchIndexService(
                     mapping(mappingSource)
                 } ?: this
             }
-            client.indices().create(request, RequestOptions.DEFAULT)
+            try {
+                client.indices().create(request, RequestOptions.DEFAULT)
+            } catch (ex: ElasticsearchStatusException) {
+                if (ontrackConfigProperties.search.index.ignoreExisting) {
+                    logger.info("[elasticsearch][index][${indexer.indexName}] Cannot create index because already existing. Ignoring issue (likely happens during test).")
+                } else {
+                    throw ex
+                }
+            }
         }
     }
 
