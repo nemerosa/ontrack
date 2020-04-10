@@ -86,7 +86,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
             }
 
             setWorkingDir(target.projectDir)
-            script = target.file("node_modules/gulp/bin/gulp")
+            script = target.file("node_modules/gulp/bin/gulp.js")
             addArgs(
                     "default",
                     "--extension", ontrack.id(project),
