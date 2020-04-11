@@ -155,7 +155,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
             dependsOn(web)
             dependsOn(ontrackProperties)
             from("build/web/dist") {
-                into { "static/extension/${ontrackExtension.id()}/${project.version}/" }
+                into("static/extension/${ontrackExtension.id()}/${project.version}/")
             }
             from("build") {
                 include("ontrack.properties")
