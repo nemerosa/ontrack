@@ -18,7 +18,7 @@ buildscript {
 }
 
 plugins {
-    id("com.bmuschko.docker-remote-api") version "5.2.0"
+    id("com.bmuschko.docker-remote-api") version "6.4.0"
 }
 
 val ontrackVersion: String by project
@@ -30,6 +30,8 @@ repositories {
     mavenLocal() // Important: used for testing
     mavenCentral()
     jcenter()
+    // FIXME #762 Remove when using final version of Spring Boot
+    maven { url = uri("https://repo.spring.io/milestone") }
 }
 
 apply(plugin = "ontrack")
@@ -64,7 +66,7 @@ val prepareDockerImage by tasks.registering(Copy::class) {
 val buildDockerImage by tasks.registering(DockerBuildImage::class) {
     dependsOn(prepareDockerImage)
     inputDir.set(project.file("build/docker"))
-    tags.add("nemerosa/ontrack-extension-test:$version")
+    images.add("nemerosa/ontrack-extension-test:$version")
 }
 
 tasks.named("assemble") {

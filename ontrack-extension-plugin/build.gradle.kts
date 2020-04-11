@@ -1,7 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    groovy
+    `kotlin-dsl`
 }
 
 description = "Gradle plugin to create an Ontrack extension."
@@ -14,7 +14,8 @@ repositories {
 
 dependencies {
     implementation(gradleApi())
-    implementation("gradle.plugin.com.liferay:gradle-plugins-node:4.3.3")
+    implementation(gradleKotlinDsl())
+    implementation("com.github.node-gradle:gradle-node-plugin:2.2.3")
     implementation("org.springframework.boot:spring-boot-gradle-plugin:${Versions.springBootVersion}")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-allopen:${Versions.kotlinVersion}")
