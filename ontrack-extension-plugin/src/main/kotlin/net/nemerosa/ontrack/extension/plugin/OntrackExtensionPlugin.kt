@@ -24,7 +24,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
          */
 
         val properties = Properties()
-        this::class.java.getResourceAsStream("/META-INF/gradle-plugins/ontrack.properties").use { properties.load(it) }
+        OntrackExtensionPlugin::class.java.getResourceAsStream("/META-INF/gradle-plugins/ontrack.properties").use { properties.load(it) }
         val ontrackVersion = properties.getProperty("implementation-version")
         val theKotlinVersion = properties.getProperty("kotlin-version")
         project.extra["ontrackVersion"] = ontrackVersion
@@ -89,7 +89,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
             doLast {
                 println("[ontrack] Copies the package.json file to ${project.projectDir}")
                 project.file("package.json").outputStream().use {
-                    this::class.java.getResourceAsStream("/extension/package.json").copyTo(it)
+                    OntrackExtensionPlugin::class.java.getResourceAsStream("/extension/package.json").copyTo(it)
                 }
             }
         }
@@ -98,7 +98,7 @@ class OntrackExtensionPlugin : Plugin<Project> {
             doLast {
                 println("[ontrack] Copies the gulpfile.js file to ${project.projectDir}")
                 project.file("gulpfile.js").outputStream().use {
-                    this::class.java.getResourceAsStream("/extension/gulpfile.js").copyTo(it)
+                    OntrackExtensionPlugin::class.java.getResourceAsStream("/extension/gulpfile.js").copyTo(it)
                 }
             }
         }
