@@ -21,6 +21,8 @@ dependencies {
     implementation("org.elasticsearch.client:elasticsearch-rest-high-level-client")
     implementation("org.flywaydb:flyway-core")
 
+    runtimeOnly("org.hibernate.validator:hibernate-validator")
+
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation("org.codehaus.groovy:groovy")
