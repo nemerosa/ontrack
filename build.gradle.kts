@@ -186,6 +186,14 @@ configure(javaProjects) p@{
                     artifact(tasks["sourcesJar"])
                     artifact(tasks["javadocJar"])
                 }
+                versionMapping {
+                    usage("java-api") {
+                        fromResolutionOf("runtimeClasspath")
+                    }
+                    usage("java-runtime") {
+                        fromResolutionResult()
+                    }
+                }
                 pom pom@{
                     name.set(this@p.name)
                     this@p.afterEvaluate {
