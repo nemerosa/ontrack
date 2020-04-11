@@ -48,7 +48,6 @@ class WebConfig(
      */
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {
         configurer.favorParameter(false)
-        configurer.favorPathExtension(false)
     }
 
     /**

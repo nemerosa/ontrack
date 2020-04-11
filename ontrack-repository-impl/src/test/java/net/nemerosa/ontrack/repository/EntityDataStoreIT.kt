@@ -171,7 +171,7 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val branch = do_create_branch()
         // Adds some data, twice, for the same name
         val name = TestUtils.uid("T")
-        val id1 = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15)).id
+        store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15)).id
         val id2 = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(16)).id
         // Gets last by category / name
         val record = store.findLastByCategoryAndName(branch, CATEGORY, name, Time.now()).orElse(null)
@@ -192,10 +192,10 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val group = TestUtils.uid("G")
         val name1 = TestUtils.uid("T")
         val name2 = TestUtils.uid("T")
-        val id11 = store.add(branch, CATEGORY, name1, Signature.of(TEST_USER), group, IntNode(11)).id
+        store.add(branch, CATEGORY, name1, Signature.of(TEST_USER), group, IntNode(11)).id
         val id12 = store.add(branch, CATEGORY, name1, Signature.of(TEST_USER), group, IntNode(12)).id
-        val id21 = store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), group, IntNode(21)).id
-        val id22 = store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), group, IntNode(22)).id
+        store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), group, IntNode(21)).id
+        store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), group, IntNode(22)).id
         // Gets last by category / name / group
         val record = store.findLastByCategoryAndGroupAndName(branch, CATEGORY, group, name1).orElse(null)
         // Checks
@@ -215,12 +215,12 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val name1 = TestUtils.uid("T")
         val name2 = TestUtils.uid("T")
         val name3 = TestUtils.uid("T")
-        val id11 = store.add(branch, CATEGORY, name1, Signature.of(TEST_USER), null, IntNode(11)).id
+        store.add(branch, CATEGORY, name1, Signature.of(TEST_USER), null, IntNode(11)).id
         val id12 = store.add(branch, CATEGORY, name1, Signature.of(TEST_USER), null, IntNode(12)).id
-        val id21 = store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), null, IntNode(21)).id
+        store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), null, IntNode(21)).id
         val id22 = store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), null, IntNode(22)).id
-        val id31 = store.add(branch, CATEGORY, name3, Signature.of(TEST_USER), null, IntNode(31)).id
-        val id32 = store.add(branch, CATEGORY, name3, Signature.of(TEST_USER), null, IntNode(32)).id
+        store.add(branch, CATEGORY, name3, Signature.of(TEST_USER), null, IntNode(31)).id
+        store.add(branch, CATEGORY, name3, Signature.of(TEST_USER), null, IntNode(32)).id
         val id33 = store.add(branch, CATEGORY, name3, Signature.of(TEST_USER), null, IntNode(33)).id
         // Gets last by name in category
         val records = store.findLastRecordsByNameInCategory(branch, CATEGORY)

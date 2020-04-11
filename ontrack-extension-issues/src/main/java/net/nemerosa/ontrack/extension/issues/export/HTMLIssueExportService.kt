@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.issues.export
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
-import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
+import org.apache.commons.text.StringEscapeUtils.escapeHtml4
 import org.springframework.stereotype.Component
 
 @Component

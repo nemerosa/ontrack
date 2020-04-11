@@ -15,7 +15,7 @@ object UIUtils {
         // Gets the parameters
         val requestParameters = request.parameterMap
         // Converts the request parameters to single values
-        val parameters = requestParameters.mapValues { (key, array) ->
+        val parameters = requestParameters.mapValues { (_, array) ->
             when {
                 array == null || array.isEmpty() -> null
                 array.size == 1 -> array[0]

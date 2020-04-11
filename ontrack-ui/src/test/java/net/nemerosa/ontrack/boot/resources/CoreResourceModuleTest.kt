@@ -157,10 +157,10 @@ class CoreResourceModuleTest {
     fun project_favourite() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
                 .withSignature(SIGNATURE)
-        `when`(securityService!!.isLogged).thenReturn(true)
-        `when`(projectFavouriteService!!.isProjectFavourite(p)).thenReturn(true)
+        `when`(securityService.isLogged).thenReturn(true)
+        `when`(projectFavouriteService.isProjectFavourite(p)).thenReturn(true)
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "P")
@@ -189,9 +189,9 @@ class CoreResourceModuleTest {
     fun project_granted_for_update_and_disabled() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withDisabled(true)
                 .withSignature(SIGNATURE)
-        `when`(securityService!!.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
+        `when`(securityService.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "P")
@@ -282,7 +282,7 @@ class CoreResourceModuleTest {
         val build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of(signatureTime, "test")).withId(ID.of(1))
         // Serialization
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "1")
@@ -362,7 +362,7 @@ class CoreResourceModuleTest {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
                 .withSignature(SIGNATURE)
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "P")
@@ -394,7 +394,7 @@ class CoreResourceModuleTest {
         val pl = PromotionLevel.of(b, NameDescription("PL", "Promotion level")).withId(ID.of(1)).withSignature(SIGNATURE)
         // Serialization
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "PL")
@@ -427,7 +427,7 @@ class CoreResourceModuleTest {
                 .withSignature(SIGNATURE)
         // Serialization
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 1)
                         .with("name", "PL")
@@ -566,7 +566,7 @@ class CoreResourceModuleTest {
     @Throws(JsonProcessingException::class)
     fun account_group_links() {
         assertResourceJson(
-                mapper!!,
+                mapper,
                 `object`()
                         .with("id", 0)
                         .with("name", "Admins")

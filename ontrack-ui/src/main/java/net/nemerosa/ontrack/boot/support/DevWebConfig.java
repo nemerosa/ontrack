@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 
 @Configuration
 @Profile(RunProfile.DEV)
-public class DevWebConfig extends WebMvcConfigurerAdapter {
+public class DevWebConfig implements WebMvcConfigurer {
 
     private final Log log = LogFactory.getLog(DevWebConfig.class);
 

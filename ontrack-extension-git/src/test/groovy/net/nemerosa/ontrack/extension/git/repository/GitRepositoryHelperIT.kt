@@ -23,7 +23,7 @@ class GitRepositoryHelperIT : AbstractGitTestSupport() {
                 gitBranch("master")
             }
             // Branch not configured for Git
-            val unconfiguredBranch = branch {}
+            branch {}
             // Looking for the "master" branch should return the configured branch
             assertNotNull(gitRepositoryHelper.findBranchWithProjectAndGitBranch(this, "master")) {
                 assertEquals(configuredBranch.id(), it)

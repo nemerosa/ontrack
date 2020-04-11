@@ -8,6 +8,7 @@ dependencies {
     api(project(":ontrack-ui-graphql"))
     
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.apache.commons:commons-text")
     implementation("org.slf4j:slf4j-api")
 
     testImplementation("org.codehaus.groovy:groovy")
