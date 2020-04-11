@@ -22,6 +22,8 @@ dependencies {
 }
 
 tasks.named<ProcessResources>("processResources") {
+    inputs.properties["version"] = version
+    inputs.properties["kotlinVersion"] = Versions.kotlinVersion
     filter(
             ReplaceTokens::class,
             "tokens" to mapOf(

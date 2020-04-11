@@ -21,7 +21,7 @@ plugins {
     id("com.bmuschko.docker-remote-api") version "6.4.0"
 }
 
-val ontrackVersion: String by project
+val ontrackVersion = project.extra["ontrackVersion"] as String
 
 group = "net.nemerosa.ontrack"
 version = ontrackVersion
