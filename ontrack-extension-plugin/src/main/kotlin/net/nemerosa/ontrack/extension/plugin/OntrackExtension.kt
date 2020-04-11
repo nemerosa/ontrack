@@ -18,7 +18,7 @@ const val PREFIX = "ontrack-extension-"
  *
  * @property project Linked project
  */
-class OntrackExtension(
+open class OntrackExtension(
         private val project: Project
 ) {
 
