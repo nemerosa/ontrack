@@ -36,8 +36,6 @@ val gitHubRepo: String by project
 val ossrhUsername: String by project
 val ossrhPassword: String by project
 
-extra["elasticsearch.version"] = Versions.elasticSearchVersion
-
 plugins {
     java
     jacoco
@@ -274,7 +272,6 @@ configure(coreProjects) p@{
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
                 bomProperty("kotlin.version", Versions.kotlinVersion)
-                bomProperty("elasticsearch.version", Versions.elasticSearchVersion)
             }
         }
         dependencies {
