@@ -79,6 +79,8 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
+        // FIXME #762 Remove when using final version of Spring Boot
+        maven { url = uri("https://repo.spring.io/milestone") }
     }
 }
 
