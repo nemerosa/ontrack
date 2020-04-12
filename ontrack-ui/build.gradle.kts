@@ -53,7 +53,6 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-gitlab"))
     runtimeOnly(project(":ontrack-extension-stash"))
     runtimeOnly(project(":ontrack-extension-combined"))
-    runtimeOnly(project(":ontrack-extension-ldap"))
     runtimeOnly(project(":ontrack-extension-stale"))
     runtimeOnly(project(":ontrack-extension-vault"))
     runtimeOnly(project(":ontrack-extension-influxdb"))
