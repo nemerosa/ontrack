@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
 @Configuration
@@ -11,10 +12,11 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
-        http.csrf {
-            it.csrfTokenRepository(
-                    CookieCsrfTokenRepository.withHttpOnlyFalse()
-            )
+        http {
+            // Enabling JS Cookies for CSRF protection (for AngularJS)
+            csrf {
+                csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+            }
         }
     }
 
