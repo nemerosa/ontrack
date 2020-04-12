@@ -68,6 +68,17 @@ class AccountServiceImpl(
                 .lock()
     }
 
+    override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
+        // Direct account authorisations
+        val authorisations = Authorisations()
+                .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
+                .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) })
+        // TODO Authorisations from groups
+        // TODO Authorisations from groups contributors
+        // OK
+        return DefaultOntrackAuthenticatedUser(raw, authorisations)
+    }
+
     override fun getAccounts(): List<Account> {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         return accountRepository

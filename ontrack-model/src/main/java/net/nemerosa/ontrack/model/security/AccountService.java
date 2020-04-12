@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,15 @@ public interface AccountService {
      * @param raw Account without authorisations
      * @return Account with authorisations
      */
+    @NotNull OntrackAuthenticatedUser withACL(@NotNull OntrackUser raw);
+
+    /**
+     * Completes an account with the list of its authorisations.
+     *
+     * @param raw Account without authorisations
+     * @return Account with authorisations
+     */
+    @Deprecated
     Account withACL(AuthenticatedAccount raw);
 
     /**
