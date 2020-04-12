@@ -71,12 +71,10 @@ class StructureServiceImpl(
     override val projectList: List<Project>
         get() {
             val list = structureRepository.projectList
-            return if (securityService.isGlobalFunctionGranted(ProjectList::class.java)) {
-                list
-            } else if (securityService.isLogged) {
-                list.filter { p -> securityService.isProjectFunctionGranted(p.id(), ProjectView::class.java) }
-            } else {
-                throw AccessDeniedException("Authentication is required.")
+            return when {
+                securityService.isGlobalFunctionGranted(ProjectList::class.java) -> list
+                securityService.isLogged -> list.filter { p -> securityService.isProjectFunctionGranted(p.id(), ProjectView::class.java) }
+                else -> throw AccessDeniedException("Authentication is required.")
             }
         }
 
