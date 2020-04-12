@@ -11,9 +11,9 @@ angular.module('ot.service.user', [
          * Initialization of the service
          */
         self.init = function () {
-            $log.debug('[user] init');
-            $interval(self.loadUser, HEART_BEAT, 0);
-            self.loadUser();
+            // $log.debug('[user] init');
+            // TODO #756 $interval(self.loadUser, HEART_BEAT, 0);
+            // self.loadUser();
         };
 
         /**
@@ -43,7 +43,8 @@ angular.module('ot.service.user', [
          * User logged?
          */
         self.logged = function () {
-            return $rootScope.user && $rootScope.user.account;
+            // TODO #756 return $rootScope.user && $rootScope.user.account;
+            return true;
         };
 
         /**
