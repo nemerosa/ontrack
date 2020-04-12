@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.security.AuthenticatedAccount;
 import net.nemerosa.ontrack.model.security.UserSource;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -14,26 +13,26 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 // TODO #756 Disable custom security
 //@Component
 //@Qualifier("password")
+@Deprecated
 public class PasswordAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements UserSource {
 
     private final AccountService accountService;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider;
+    private final BuiltinAuthenticationSourceProvider builtinAuthenticationSourceProvider;
 
     @Autowired
-    public PasswordAuthenticationProvider(AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder, PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider) {
+    public PasswordAuthenticationProvider(AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder, BuiltinAuthenticationSourceProvider builtinAuthenticationSourceProvider) {
         this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
-        this.passwordAuthenticationSourceProvider = passwordAuthenticationSourceProvider;
+        this.builtinAuthenticationSourceProvider = builtinAuthenticationSourceProvider;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class PasswordAuthenticationProvider extends AbstractUserDetailsAuthentic
 
     @Override
     public Optional<AccountUserDetails> loadUser(String username) {
-        return accountRepository.findUserByNameAndSource(username, passwordAuthenticationSourceProvider)
+        return accountRepository.findUserByNameAndSource(username, builtinAuthenticationSourceProvider)
                 .map(AuthenticatedAccount::of)
                 .map(accountService::withACL)
                 .map(AccountUserDetails::new);

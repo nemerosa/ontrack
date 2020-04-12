@@ -6,7 +6,7 @@ class PasswordAuthenticationSourceProviderTest {
 
     @Test
     void 'Password change is allowed'() {
-        assert new PasswordAuthenticationSourceProvider().source.allowingPasswordChange
+        assert new BuiltinAuthenticationSourceProvider().source.allowingPasswordChange
     }
 
 }

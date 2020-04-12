@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -35,6 +37,23 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
                 String.class
         );
         return encodedPassword != null && check.test(encodedPassword);
+    }
+
+    @Nullable
+    @Override
+    public BuiltinAccount findBuiltinAccount(@NotNull String username) {
+        return getFirstItem(
+                "SELECT * FROM ACCOUNTS WHERE MODE = 'password' AND NAME = :name",
+                params("name", username),
+                (rs, rowNum) -> new BuiltinAccount(
+                        rs.getInt("ID"),
+                        rs.getString("name"),
+                        rs.getString("fullName"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        getEnum(SecurityRole.class, rs, "role")
+                )
+        );
     }
 
     @Override

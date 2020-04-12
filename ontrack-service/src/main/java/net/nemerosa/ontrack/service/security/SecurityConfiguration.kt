@@ -1,23 +1,18 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
+import net.nemerosa.ontrack.repository.AccountRepository
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 
-import java.util.List;
-
-// TODO #756 Disable custom security
-// @Configuration
-public class SecurityConfiguration {
-
-    @Autowired
-    private List<AuthenticationProvider> authenticationProviders;
+@Configuration
+class SecurityConfiguration(
+        private val accountRepository: AccountRepository
+) {
 
     @Bean
-    public AuthenticationManager authenticationManager() {
-        return new ProviderManager(authenticationProviders);
+    fun builtinAuthenticationProvider() = DaoAuthenticationProvider().apply {
+        setUserDetailsService(BuiltinUserDetailsService(accountRepository))
     }
 
 }

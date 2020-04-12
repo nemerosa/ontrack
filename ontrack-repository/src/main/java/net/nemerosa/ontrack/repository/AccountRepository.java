@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,9 +17,14 @@ import java.util.function.Predicate;
 
 public interface AccountRepository {
 
+    @Deprecated
     boolean checkPassword(int accountId, Predicate<String> check);
 
+    @Deprecated
     Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider);
+
+    @Nullable
+    BuiltinAccount findBuiltinAccount(@NotNull String username);
 
     Collection<Account> findAll(Function<String, AuthenticationSource> authenticationSourceFunction);
 
