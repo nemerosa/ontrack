@@ -40,7 +40,7 @@ class LabelProviderJobTest {
         labelProviderService = mock()
         settingsService = mock()
 
-        securityService = SecurityServiceImpl(settingsService)
+        securityService = SecurityServiceImpl()
 
         provider = LabelProviderJob(
                 securityService,

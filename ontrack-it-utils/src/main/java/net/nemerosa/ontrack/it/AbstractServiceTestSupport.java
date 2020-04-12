@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.it;
 
 import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.settings.SecuritySettings;
-import net.nemerosa.ontrack.model.settings.SettingsManagerService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -10,7 +8,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -26,9 +27,6 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
 
     @Autowired
     protected PropertyService propertyService;
-
-    @Autowired
-    private SettingsManagerService settingsManagerService;
 
     protected AccountGroup doCreateAccountGroup() throws Exception {
         return asUser().with(AccountGroupManagement.class).call(() -> {
@@ -291,23 +289,17 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return asUser().with(projectEntity.projectId(), ProjectView.class).call(callable);
     }
 
+    @Deprecated
     public void grantViewToAll(boolean grantViewToAll) {
-        try {
-            asUser().with(GlobalSettings.class).execute(() ->
-                    settingsManagerService.saveSettings(
-                            SecuritySettings.of().withGrantProjectViewToAll(grantViewToAll)
-                    )
-            );
-        } catch (Exception ex) {
-            throw new IllegalStateException("Cannot set GrantViewToAll settings", ex);
-        }
     }
 
+    @Deprecated
     protected <T> T withGrantViewToAll(Callable<T> task) throws Exception {
         grantViewToAll(true);
         return task.call();
     }
 
+    @Deprecated
     protected <T> T withNoGrantViewToAll(Callable<T> task) throws Exception {
         grantViewToAll(false);
         try {

@@ -70,9 +70,8 @@ class StructureServiceImpl(
 
     override val projectList: List<Project>
         get() {
-            val securitySettings = securityService.securitySettings
             val list = structureRepository.projectList
-            return if (securitySettings.isGrantProjectViewToAll || securityService.isGlobalFunctionGranted(ProjectList::class.java)) {
+            return if (securityService.isGlobalFunctionGranted(ProjectList::class.java)) {
                 list
             } else if (securityService.isLogged) {
                 list.filter { p -> securityService.isProjectFunctionGranted(p.id(), ProjectView::class.java) }

@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.settings.CachedSettingsService;
-import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.structure.Signature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,18 +16,6 @@ import static java.lang.String.format;
 
 @Component
 public class SecurityServiceImpl implements SecurityService {
-
-    private final CachedSettingsService cachedSettingsService;
-
-    @Autowired
-    public SecurityServiceImpl(CachedSettingsService cachedSettingsService) {
-        this.cachedSettingsService = cachedSettingsService;
-    }
-
-    @Override
-    public SecuritySettings getSecuritySettings() {
-        return cachedSettingsService.getCachedSettings(SecuritySettings.class);
-    }
 
     @Override
     public void checkGlobalFunction(Class<? extends GlobalFunction> fn) {
@@ -59,12 +44,7 @@ public class SecurityServiceImpl implements SecurityService {
         // Gets the user
         Account user = getCurrentAccount();
         // Checks
-        return (user != null && user.isGranted(projectId, fn)) || isGlobalGrant(fn);
-    }
-
-    protected boolean isGlobalGrant(Class<? extends ProjectFunction> fn) {
-        SecuritySettings settings = cachedSettingsService.getCachedSettings(SecuritySettings.class);
-        return settings.isGrantProjectViewToAll() && fn.isAssignableFrom(ProjectView.class);
+        return (user != null && user.isGranted(projectId, fn));
     }
 
     @Override
