@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.web.filter.ShallowEtagHeaderFilter
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
@@ -20,7 +19,6 @@ import javax.annotation.PostConstruct
 import javax.servlet.DispatcherType
 
 @Configuration
-@EnableWebSecurity
 class WebConfig(
         private val uriBuilder: URIBuilder,
         private val securityService: SecurityService,
