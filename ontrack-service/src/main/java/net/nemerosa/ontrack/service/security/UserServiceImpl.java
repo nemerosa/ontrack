@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.support.PasswordChange;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +18,14 @@ public class UserServiceImpl implements UserService {
 
     private final SecurityService securityService;
     private final AccountRepository accountRepository;
-    private final PasswordEncoder passwordEncoder;
+
+    // TODO #756 Cleanup
+    private final PasswordEncoder passwordEncoder = NoOpPasswordEncoder.getInstance();
 
     @Autowired
-    public UserServiceImpl(SecurityService securityService, AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(SecurityService securityService, AccountRepository accountRepository) {
         this.securityService = securityService;
         this.accountRepository = accountRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override

@@ -18,8 +18,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Component
-@Qualifier("password")
+// TODO #756 Disable custom security
+//@Component
+//@Qualifier("password")
 public class PasswordAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements UserSource {
 
     private final AccountService accountService;

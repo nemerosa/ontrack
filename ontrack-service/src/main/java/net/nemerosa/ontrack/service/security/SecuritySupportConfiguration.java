@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Configuration
+// TODO #756 Disable custom security
+//@Configuration
 public class SecuritySupportConfiguration {
 
     @Bean

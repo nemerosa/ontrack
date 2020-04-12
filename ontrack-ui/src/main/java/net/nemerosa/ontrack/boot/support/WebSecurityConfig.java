@@ -5,11 +5,9 @@ import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointR
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -19,8 +17,9 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import java.security.SecureRandom;
 import java.util.List;
 
-@Configuration
-@EnableWebSecurity
+// TODO #756 Disable all security
+//@Configuration
+//@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final APIBasicAuthenticationEntryPoint apiBasicAuthenticationEntryPoint;

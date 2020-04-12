@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.repository.RoleRepository
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.password.NoOpPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,9 +29,11 @@ class AccountServiceImpl(
         private val accountRepository: AccountRepository,
         private val accountGroupRepository: AccountGroupRepository,
         private val securityService: SecurityService,
-        private val authenticationSourceService: AuthenticationSourceService,
-        private val passwordEncoder: PasswordEncoder
+        private val authenticationSourceService: AuthenticationSourceService
 ) : AccountService {
+
+    // TODO #756 Cleanup
+    private val passwordEncoder: PasswordEncoder = NoOpPasswordEncoder.getInstance()
 
     private var accountGroupContributors: Collection<AccountGroupContributor> = emptyList()
 
