@@ -53,18 +53,6 @@ class AccountServiceImpl(
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByAccount(raw.account.id()) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) }
                 )
-                // Groups from the repository
-                .withGroups(
-                        accountGroupRepository
-                                .findByAccount(raw.account.id())
-                                .map { group: AccountGroup -> groupWithACL(group) }
-                )
-                // Group contributions
-                .withGroups(
-                        accountGroupContributors
-                                .flatMap { accountGroupContributor: AccountGroupContributor -> accountGroupContributor.collectGroups(raw) }
-                                .map { group: AccountGroup -> groupWithACL(group) }
-                )
                 // OK
                 .lock()
     }
@@ -425,18 +413,5 @@ class AccountServiceImpl(
                     .withProjectRoles(
                             roleRepository.findProjectRoleAssociationsByGroup(group.id()) { project: Int?, roleId: String? -> rolesService.getProjectRoleAssociation(project!!, roleId!!) }
                     )
-
-    @Deprecated("V4 / Remove")
-    protected fun groupWithACL(group: AccountGroup): AccountGroup {
-        return group
-                // Global role
-                .withGlobalRole(
-                        roleRepository.findGlobalRoleByGroup(group.id()).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
-                ) // Project roles
-                .withProjectRoles(
-                        roleRepository.findProjectRoleAssociationsByGroup(group.id()) { project: Int?, roleId: String? -> rolesService.getProjectRoleAssociation(project!!, roleId!!) }
-                ) // OK
-                .lock()
-    }
 
 }

@@ -39,12 +39,10 @@ data class Account(
 
     fun isGranted(fn: Class<out GlobalFunction>) =
             (SecurityRole.ADMINISTRATOR == role)
-                    || groups.any { it.isGranted(fn) }
                     || authorisations.isGranted(fn)
 
     fun isGranted(projectId: Int, fn: Class<out ProjectFunction>) =
             SecurityRole.ADMINISTRATOR == role
-                    || groups.any { it.isGranted(projectId, fn) }
                     || authorisations.isGranted(projectId, fn)
 
     fun withId(id: ID): Account {
