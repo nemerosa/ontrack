@@ -42,6 +42,7 @@ class AccountServiceImpl(
         this.accountGroupContributors = accountGroupContributors
     }
 
+    @Deprecated("V4 / Remove")
     override fun withACL(raw: AuthenticatedAccount): Account {
         return raw.account
                 // Global role
@@ -69,14 +70,26 @@ class AccountServiceImpl(
     }
 
     override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
+        // Loads the account
+        val account = getAccount(ID.of(raw.accountId))
         // Direct account authorisations
         val authorisations = Authorisations()
                 .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
                 .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) })
-        // TODO Authorisations from groups
-        // TODO Authorisations from groups contributors
+        // List of authenticated groups
+        val groups = mutableListOf<AuthenticatedGroup>()
+        // Authorisations from groups
+        groups.addAll(
+                accountGroupRepository.findByAccount(raw.accountId).map {
+                    AuthenticatedGroup(
+                            group = it,
+                            authorisations = getGroupACL(it)
+                    )
+                }
+        )
+        // FIXME Authorisations from groups contributors
         // OK
-        return DefaultOntrackAuthenticatedUser(raw, authorisations)
+        return DefaultOntrackAuthenticatedUser(raw, account, authorisations, groups.toList())
     }
 
     override fun getAccounts(): List<Account> {
@@ -403,8 +416,20 @@ class AccountServiceImpl(
                 .withGroups(accountGroupRepository.findByAccount(accountId.value))
     }
 
+    private fun getGroupACL(group: AccountGroup): Authorisations =
+            Authorisations()
+                    // Global role
+                    .withGlobalRole(
+                            roleRepository.findGlobalRoleByGroup(group.id()).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
+                    ) // Project roles
+                    .withProjectRoles(
+                            roleRepository.findProjectRoleAssociationsByGroup(group.id()) { project: Int?, roleId: String? -> rolesService.getProjectRoleAssociation(project!!, roleId!!) }
+                    )
+
+    @Deprecated("V4 / Remove")
     protected fun groupWithACL(group: AccountGroup): AccountGroup {
-        return group // Global role
+        return group
+                // Global role
                 .withGlobalRole(
                         roleRepository.findGlobalRoleByGroup(group.id()).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
                 ) // Project roles

@@ -10,5 +10,4 @@ interface OntrackUser : UserDetails {
      * Associated account ID
      */
     val accountId: Int
-
 }

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.OntrackUser
 import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.repository.BuiltinAccount
+import org.springframework.security.core.CredentialsContainer
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.userdetails.UserDetails
@@ -27,25 +28,36 @@ class BuiltinUserDetailsService(
     }
 
     class BuiltinOntrackUser(
-            private val account: BuiltinAccount
-    ) : OntrackUser {
+            override val accountId: Int,
+            private val username: String,
+            private var password: String,
+            private val role: String
+    ) : OntrackUser, CredentialsContainer {
 
-        override val accountId: Int = account.id
+        constructor(account: BuiltinAccount) : this(
+                accountId = account.id,
+                username = account.name,
+                password = account.password,
+                role = account.role.roleName
+        )
 
-        override fun getUsername(): String = account.name
+        override fun getUsername(): String = username
 
-        override fun getPassword(): String = account.password
+        override fun getPassword(): String = password
 
-        override fun getAuthorities(): List<GrantedAuthority> = AuthorityUtils.createAuthorityList(account.role.roleName)
+        override fun getAuthorities(): List<GrantedAuthority> = AuthorityUtils.createAuthorityList(role)
 
         override fun isEnabled(): Boolean = true
 
-        override fun isCredentialsNonExpired(): Boolean = false
+        override fun isCredentialsNonExpired(): Boolean = true
 
-        override fun isAccountNonExpired(): Boolean = false
+        override fun isAccountNonExpired(): Boolean = true
 
-        override fun isAccountNonLocked(): Boolean = false
+        override fun isAccountNonLocked(): Boolean = true
 
+        override fun eraseCredentials() {
+            password = ""
+        }
     }
 
 }

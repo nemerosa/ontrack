@@ -12,4 +12,9 @@ interface OntrackAuthenticatedUser : UserDetails {
      */
     val user: OntrackUser
 
+    /**
+     * Associated account
+     */
+    val account: Account
+
 }

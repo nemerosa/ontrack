@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.repository.AccountRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,12 +12,13 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder
 
 @Configuration
 class SecurityConfiguration(
+        private val accountService: AccountService,
         private val accountRepository: AccountRepository
 ) {
 
     @Bean
     fun builtinAuthenticationProvider() = DaoAuthenticationProvider().apply {
-        setUserDetailsService(BuiltinUserDetailsService(accountRepository))
+        setUserDetailsService(BuiltinUserDetailsService(accountService, accountRepository))
         setPasswordEncoder(passwordEncoder())
     }
 
