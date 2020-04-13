@@ -27,7 +27,7 @@ class ApplicationLogServiceImpl(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun log(entry: ApplicationLogEntry) {
         val signedEntry = entry.withAuthentication(
-                securityService.account.map { it.name }.orElse("anonymous")
+                securityService.currentAccount?.account?.name ?: "anonymous"
         )
         doLog(signedEntry)
     }

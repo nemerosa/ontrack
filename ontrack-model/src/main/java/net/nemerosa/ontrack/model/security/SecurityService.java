@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.security;
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -28,7 +29,7 @@ public interface SecurityService {
     /**
      * Returns the current logged account or <code>null</code> if none is logged.
      */
-    Account getCurrentAccount();
+    @Nullable OntrackAuthenticatedUser getCurrentAccount();
 
     /**
      * Is the current user logged?
@@ -39,8 +40,11 @@ public interface SecurityService {
 
     /**
      * Returns the current logged account as an option
+     *
+     * @deprecated Use getCurrentAccount directly and check for null
      */
-    default Optional<Account> getAccount() {
+    @Deprecated
+    default Optional<OntrackAuthenticatedUser> getAccount() {
         return Optional.ofNullable(getCurrentAccount());
     }
 

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -24,13 +25,13 @@ public class SecurityServiceIT extends AbstractServiceTestSupport {
 
     @Test
     public void getCurrentAccount() throws Exception {
-        Account account = asUser().call(securityService::getCurrentAccount);
+        OntrackAuthenticatedUser account = asUser().call(securityService::getCurrentAccount);
         assertNotNull(account);
     }
 
     @Test
     public void getCurrentAccount_none() throws Exception {
-        Account account = securityService.getCurrentAccount();
+        OntrackAuthenticatedUser account = securityService.getCurrentAccount();
         assertNull(account);
     }
 

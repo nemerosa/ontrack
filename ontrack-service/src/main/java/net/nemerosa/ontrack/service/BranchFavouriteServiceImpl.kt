@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
@@ -21,7 +20,7 @@ class BranchFavouriteServiceImpl(
 ) : BranchFavouriteService {
 
     override fun getFavouriteBranches(): List<Branch> {
-        val accountId = securityService.account.getOrNull()?.id()
+        val accountId = securityService.currentAccount?.account?.id()
         return if (accountId != null) {
             val branches = securityService.callAsAdmin {
                 repository.getFavouriteBranches(accountId)
@@ -34,18 +33,16 @@ class BranchFavouriteServiceImpl(
     }
 
     override fun isBranchFavourite(branch: Branch): Boolean {
-        return securityService.isProjectFunctionGranted(branch, ProjectView::class.java) && securityService.account.filter { account -> account.id.isSet }
-                .map { account ->
-                    repository.isBranchFavourite(
-                            account.id(),
-                            branch.id()
-                    )
-                }.orElse(false)
+        val user = securityService.currentAccount
+        return user != null &&
+                user.isGranted(branch.projectId(), ProjectView::class.java) &&
+                repository.isBranchFavourite(user.account.id(), branch.id())
     }
 
     override fun setBranchFavourite(branch: Branch, favourite: Boolean) {
-        if (securityService.isProjectFunctionGranted(branch, ProjectView::class.java)) {
-            securityService.account.ifPresent { account -> repository.setBranchFavourite(account.id(), branch.id(), favourite) }
+        val user = securityService.currentAccount
+        if (user != null && user.isGranted(branch.projectId(), ProjectView::class.java)) {
+            repository.setBranchFavourite(user.account.id(), branch.id(), favourite)
         }
     }
 }

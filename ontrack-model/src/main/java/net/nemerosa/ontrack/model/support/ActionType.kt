@@ -1,9 +1,5 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.model.support
 
-public enum ActionType {
-
-    LINK,
-
-    FORM
-
+enum class ActionType {
+    LINK, FORM
 }

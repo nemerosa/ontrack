@@ -1,146 +1,131 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.structure.Signature;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.stereotype.Component;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import static java.lang.String.format;
+import net.nemerosa.ontrack.model.security.GlobalFunction
+import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
+import net.nemerosa.ontrack.model.security.ProjectFunction
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.Signature
+import net.nemerosa.ontrack.model.structure.Signature.Companion.anonymous
+import net.nemerosa.ontrack.model.structure.Signature.Companion.of
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.context.SecurityContextImpl
+import org.springframework.stereotype.Component
+import java.util.function.Function
+import java.util.function.Supplier
 
 @Component
-public class SecurityServiceImpl implements SecurityService {
+class SecurityServiceImpl : SecurityService {
 
-    @Override
-    public void checkGlobalFunction(Class<? extends GlobalFunction> fn) {
+    override fun checkGlobalFunction(fn: Class<out GlobalFunction>) {
         if (!isGlobalFunctionGranted(fn)) {
-            throw new AccessDeniedException(format("Global function '%s' is not granted.", fn.getSimpleName()));
+            throw AccessDeniedException("Global function '${fn.simpleName}' is not granted.")
         }
     }
 
-    @Override
-    public boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn) {
+    override fun isGlobalFunctionGranted(fn: Class<out GlobalFunction>): Boolean {
         // Gets the user
-        Account user = getCurrentAccount();
+        val user = currentAccount
         // Checks
-        return user != null && user.isGranted(fn);
+        return user != null && user.isGranted(fn)
     }
 
-    @Override
-    public void checkProjectFunction(int projectId, Class<? extends ProjectFunction> fn) {
+    override fun checkProjectFunction(projectId: Int, fn: Class<out ProjectFunction>) {
         if (!isProjectFunctionGranted(projectId, fn)) {
-            throw new AccessDeniedException(format("Project function '%s' is not granted", fn.getSimpleName()));
+            throw AccessDeniedException(String.format("Project function '%s' is not granted", fn.simpleName))
         }
     }
 
-    @Override
-    public boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn) {
+    override fun isProjectFunctionGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean {
         // Gets the user
-        Account user = getCurrentAccount();
+        val user = currentAccount
         // Checks
-        return (user != null && user.isGranted(projectId, fn));
+        return user != null && user.isGranted(projectId, fn)
     }
 
-    @Override
-    public Account getCurrentAccount() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof AccountHolder)) {
-            return ((AccountHolder) authentication.getPrincipal()).getAccount();
+    override fun getCurrentAccount(): OntrackAuthenticatedUser? {
+        val context = SecurityContextHolder.getContext()
+        val authentication = context.authentication
+        return if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
+            authentication.principal as OntrackAuthenticatedUser
         } else {
-            return null;
+            null
         }
     }
 
-    @Override
-    public Signature getCurrentSignature() {
-        Account account = getCurrentAccount();
-        if (account != null) {
-            return Signature.of(account.getName());
+    override fun getCurrentSignature(): Signature {
+        val authenticatedUser = currentAccount
+        return if (authenticatedUser != null) {
+            of(authenticatedUser.account.name)
         } else {
-            return Signature.anonymous();
+            anonymous()
         }
     }
 
-    @Override
-    public <T> Supplier<T> runAsAdmin(Supplier<T> supplier) {
+    override fun <T> runAsAdmin(supplier: Supplier<T>): Supplier<T> {
         // Gets the current account (if any)
-        Account account = getCurrentAccount();
+        val account = currentAccount
         // Creates a temporary admin context
-        SecurityContextImpl adminContext = new SecurityContextImpl();
-        adminContext.setAuthentication(new RunAsAdminAuthentication(account));
+        val adminContext = SecurityContextImpl()
+        adminContext.authentication = RunAsAdminAuthentication(account)
         // Returns a callable that sets the context before running the target callable
-        return withSecurityContext(supplier, adminContext);
+        return withSecurityContext(supplier, adminContext)
     }
 
-    @Override
-    public <T> T asAdmin(Supplier<T> supplier) {
-        return runAsAdmin(supplier).get();
+    override fun <T> asAdmin(supplier: Supplier<T>): T {
+        return runAsAdmin(supplier).get()
     }
 
-    @Override
-    public void asAdmin(Runnable task) {
-        asAdmin(() -> {
-            task.run();
-            return null;
-        });
+    override fun asAdmin(task: Runnable) {
+        asAdmin<Unit> {
+            task.run()
+        }
     }
 
-    @Override
-    public Runnable runAsAdmin(Runnable task) {
-        Supplier<Void> supplier = runAsAdmin(() -> {
-            task.run();
-            return null;
-        });
-        return supplier::get;
+    override fun runAsAdmin(task: Runnable): Runnable {
+        val supplier: Supplier<Unit> = runAsAdmin(Supplier { task.run() })
+        return Runnable { supplier.get() }
     }
 
-    @Override
-    public <T> Supplier<T> runner(Supplier<T> supplier) {
+    override fun <T> runner(supplier: Supplier<T>): Supplier<T> {
         // Current context
-        SecurityContext context = SecurityContextHolder.getContext();
+        val context = SecurityContextHolder.getContext()
         // Uses it
-        return withSecurityContext(supplier, context);
+        return withSecurityContext(supplier, context)
     }
 
-    @Override
-    public <T, R> Function<T, R> runner(Function<T, R> fn) {
+    override fun <T, R> runner(fn: Function<T, R>): Function<T, R> {
         // Current context
-        SecurityContext context = SecurityContextHolder.getContext();
+        val context = SecurityContextHolder.getContext()
         // Uses it
-        return withSecurityContext(fn, context);
+        return withSecurityContext(fn, context)
     }
 
-    private <T, R> Function<T, R> withSecurityContext(Function<T, R> fn, SecurityContext context) {
-        return input -> {
-            SecurityContext oldContext = SecurityContextHolder.getContext();
+    private fun <T, R> withSecurityContext(fn: Function<T, R>, context: SecurityContext): Function<T, R> {
+        return Function { input: T ->
+            val oldContext = SecurityContextHolder.getContext()
             try {
-                SecurityContextHolder.setContext(context);
+                SecurityContextHolder.setContext(context)
                 // Result
-                return fn.apply(input);
+                fn.apply(input)
             } finally {
-                SecurityContextHolder.setContext(oldContext);
+                SecurityContextHolder.setContext(oldContext)
             }
-        };
+        }
     }
 
-    protected <T> Supplier<T> withSecurityContext(final Supplier<T> supplier, final SecurityContext context) {
+    protected fun <T> withSecurityContext(supplier: Supplier<T>, context: SecurityContext?): Supplier<T> {
         // Returns a callable that sets the context before running the target callable
-        return () -> {
-            SecurityContext oldContext = SecurityContextHolder.getContext();
+        return Supplier {
+            val oldContext = SecurityContextHolder.getContext()
             try {
-                SecurityContextHolder.setContext(context);
+                SecurityContextHolder.setContext(context)
                 // Result
-                return supplier.get();
+                supplier.get()
             } finally {
-                SecurityContextHolder.setContext(oldContext);
+                SecurityContextHolder.setContext(oldContext)
             }
-        };
+        }
     }
 }

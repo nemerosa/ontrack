@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -33,19 +32,16 @@ class ProjectFavouriteServiceImpl(
     }
 
     override fun isProjectFavourite(project: Project): Boolean {
-        return securityService.isProjectFunctionGranted(project, ProjectView::class.java) &&
-                securityService.account.filter { account: Account -> account.id.isSet }
-                        .map { account: Account ->
-                            repository.isProjectFavourite(
-                                    account.id(),
-                                    project.id()
-                            )
-                        }.orElse(false)
+        val user = securityService.currentAccount
+        return user?.let {
+            it.isGranted(project.id(), ProjectView::class.java) && repository.isProjectFavourite(it.id(), project.id())
+        } ?: false
     }
 
     override fun setProjectFavourite(project: Project, favourite: Boolean) {
-        if (securityService.isProjectFunctionGranted(project, ProjectView::class.java)) {
-            securityService.account.ifPresent { account: Account -> repository.setProjectFavourite(account.id(), project.id(), favourite) }
+        val user = securityService.currentAccount
+        if (user != null) {
+            repository.setProjectFavourite(user.id(), project.id(), favourite)
         }
     }
 

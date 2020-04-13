@@ -237,17 +237,21 @@ class BuildFilterServiceImpl(
         // Checks the account
         if (shared) {
             val account = securityService.currentAccount
-            // Gets the branch
-            val branch = structureService.getBranch(branchId)
-            // Checks access rights
-            securityService.checkProjectFunction(branch, BranchFilterMgt::class.java)
-            // Deletes any previous filter
-            val currentAccountId = account.id()
-            buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name).ifPresent {
-                buildFilterRepository.delete(currentAccountId, branchId.get(), name, true)
+            return if (account != null) {
+                // Gets the branch
+                val branch = structureService.getBranch(branchId)
+                // Checks access rights
+                securityService.checkProjectFunction(branch, BranchFilterMgt::class.java)
+                // Deletes any previous filter
+                val currentAccountId = account.id()
+                buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name).ifPresent {
+                    buildFilterRepository.delete(currentAccountId, branchId.get(), name, true)
+                }
+                // No account to be used
+                doSaveFilter(OptionalInt.empty(), branchId, name, type, parameters)
+            } else {
+                Ack.NOK
             }
-            // No account to be used
-            return doSaveFilter(OptionalInt.empty(), branchId, name, type, parameters)
         } else {
             val account = securityService.currentAccount
             return if (account == null) {
@@ -280,13 +284,18 @@ class BuildFilterServiceImpl(
     }
 
     override fun deleteFilter(branchId: ID, name: String): Ack {
-        // Gets the branch
-        val branch = structureService.getBranch(branchId)
-        // If user is allowed to manage shared filters, this filter might have to be deleted from the shared filters
-        // as well
-        val sharedFilter = securityService.isProjectFunctionGranted(branch, BranchFilterMgt::class.java)
-        // Deleting the filter
-        return buildFilterRepository.delete(securityService.currentAccount.id(), branchId.get(), name, sharedFilter)
+        val user = securityService.currentAccount
+        return if (user != null) {
+            // Gets the branch
+            val branch = structureService.getBranch(branchId)
+            // If user is allowed to manage shared filters, this filter might have to be deleted from the shared filters
+            // as well
+            val sharedFilter = securityService.isProjectFunctionGranted(branch, BranchFilterMgt::class.java)
+            // Deleting the filter
+            buildFilterRepository.delete(user.id(), branchId.get(), name, sharedFilter)
+        } else {
+            Ack.NOK
+        }
     }
 
     override fun copyToBranch(sourceBranchId: ID, targetBranchId: ID) {

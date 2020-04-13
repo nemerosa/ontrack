@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PreferencesService;
 import net.nemerosa.ontrack.model.structure.PreferencesType;
@@ -25,7 +25,7 @@ public class PreferencesServiceImpl implements PreferencesService {
     @Override
     public <T> T load(PreferencesType<T> preferencesType, T defaultValue) {
         // Gets the current account
-        Account account = securityService.getCurrentAccount();
+        OntrackAuthenticatedUser account = securityService.getCurrentAccount();
         if (account != null) {
             return repository.find(account.id(), preferencesType.getClass().getName())
                     .map(preferencesType::fromStorage)
@@ -39,7 +39,7 @@ public class PreferencesServiceImpl implements PreferencesService {
     @Override
     public <T> void store(PreferencesType<T> preferencesType, T value) {
         // Gets the current account
-        Account account = securityService.getCurrentAccount();
+        OntrackAuthenticatedUser account = securityService.getCurrentAccount();
         if (account != null) {
             repository.store(
                     account.id(),

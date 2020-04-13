@@ -1,30 +1,29 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.model.support
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.net.URI
 
-import java.net.URI;
+class Action(
+        val id: String,
+        val name: String,
+        val type: ActionType,
+        val uri: String
+) {
 
-@Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Action {
-
-    private final String id;
-    private final String name;
-    private final ActionType type;
-    private final String uri;
-
-    public static Action of(String id, String name, String uri, Object... parameters) {
-        return new Action(id, name, ActionType.LINK, String.format(uri, parameters));
+    fun withUri(uri: String): Action {
+        return of(id, name, uri)
     }
 
-    public static Action form(String id, String name, URI formUri) {
-        return new Action(id, name, ActionType.FORM, formUri.toString());
-    }
+    companion object {
 
-    public Action withUri(String uri) {
-        return Action.of(id, name, uri);
+        @JvmStatic
+        fun of(id: String, name: String, uri: String, vararg parameters: Any): Action {
+            return Action(id, name, ActionType.LINK, String.format(uri, *parameters))
+        }
+
+        @JvmStatic
+        fun form(id: String, name: String, formUri: URI): Action {
+            return Action(id, name, ActionType.FORM, formUri.toString())
+        }
     }
 
 }

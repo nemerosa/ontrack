@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.security;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.UserOldPasswordException;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.security.UserService;
 import net.nemerosa.ontrack.model.support.PasswordChange;
@@ -31,19 +32,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public Ack changePassword(PasswordChange input) {
         // Checks the account
-        Account account = securityService.getCurrentAccount();
-        if (account == null) {
+        OntrackAuthenticatedUser user = securityService.getCurrentAccount();
+        if (user == null) {
             throw new AccessDeniedException("Must be logged to change password.");
-        } else if (!account.getAuthenticationSource().isAllowingPasswordChange()) {
+        } else if (!user.getAccount().getAuthenticationSource().isAllowingPasswordChange()) {
             throw new AccessDeniedException("Password change is not allowed from ontrack.");
         } else if (!accountRepository.checkPassword(
-                account.id(),
+                user.id(),
                 encodedPassword -> passwordEncoder.matches(input.getOldPassword(), encodedPassword)
         )) {
             throw new UserOldPasswordException();
         } else {
             accountRepository.setPassword(
-                    account.id(),
+                    user.id(),
                     passwordEncoder.encode(input.getNewPassword())
             );
             return Ack.OK;

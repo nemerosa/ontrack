@@ -39,10 +39,10 @@ public class UserController extends AbstractResourceController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ConnectedAccount getCurrentUser() {
         // Gets the current account
-        Account account = securityService.getCurrentAccount();
+        OntrackAuthenticatedUser user = securityService.getCurrentAccount();
         // Account present
-        if (account != null) {
-            return toLoggedAccount(account);
+        if (user != null) {
+            return toLoggedAccount(user.getAccount());
         }
         // Not logged
         else {
@@ -62,14 +62,14 @@ public class UserController extends AbstractResourceController {
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ConnectedAccount login() {
         // Gets the current account
-        Account account = securityService.getCurrentAccount();
+        OntrackAuthenticatedUser user = securityService.getCurrentAccount();
         // If not logged, rejects
-        if (account == null) {
+        if (user == null) {
             throw new AccessDeniedException("Login required.");
         }
         // Already logged
         else {
-            return toLoggedAccount(account);
+            return toLoggedAccount(user.getAccount());
         }
     }
 
