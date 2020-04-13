@@ -1,45 +1,72 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountHolder;
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser;
-import net.nemerosa.ontrack.model.security.SecurityRole;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.authority.AuthorityUtils;
+import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.security.Account.Companion.of
+import net.nemerosa.ontrack.model.structure.ID
+import org.springframework.security.authentication.AbstractAuthenticationToken
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
 
-public class RunAsAdminAuthentication extends AbstractAuthenticationToken {
+class RunAsAdminAuthentication(
+        authenticatedUser: OntrackAuthenticatedUser?
+) : AbstractAuthenticationToken(AuthorityUtils.createAuthorityList(SecurityRole.ADMINISTRATOR.name)) {
 
-    private final Account account;
+    private val account: Account
 
-    public RunAsAdminAuthentication(OntrackAuthenticatedUser authenticatedUser) {
-        super(AuthorityUtils.createAuthorityList(SecurityRole.ADMINISTRATOR.name()));
-        Account account = authenticatedUser.getAccount();
-        this.account = Account.of(
-                account.getName(),
-                account.getFullName(),
-                account.getEmail(),
-                SecurityRole.ADMINISTRATOR,
-                account.getAuthenticationSource()
-        ).withId(account.getId());
+    override fun getDetails(): Account = account
+
+    override fun isAuthenticated(): Boolean {
+        return true
     }
 
-    @Override
-    public Account getDetails() {
-        return account;
+    override fun getCredentials(): Any = ""
+
+    override fun getPrincipal(): Any = DefaultOntrackAuthenticatedUser(
+            user = RunAsAdminUser(account),
+            account = account,
+            authorisations = Authorisations(),
+            groups = emptyList()
+    )
+
+    init {
+        val account = authenticatedUser?.account
+        if (account != null) {
+            this.account = of(
+                    account.name,
+                    account.fullName,
+                    account.email,
+                    SecurityRole.ADMINISTRATOR,
+                    account.authenticationSource
+            ).withId(account.id)
+        } else {
+            this.account = of(
+                    "admin",
+                    "Run-as Admin",
+                    "",
+                    SecurityRole.ADMINISTRATOR,
+                    BuiltinAuthenticationSourceProvider.SOURCE
+            ).withId(ID.of(1))
+        }
     }
 
-    @Override
-    public boolean isAuthenticated() {
-        return true;
-    }
+    class RunAsAdminUser(account: Account) : OntrackUser {
 
-    @Override
-    public Object getCredentials() {
-        return null;
-    }
+        override val accountId: Int = account.id()
 
-    @Override
-    public Object getPrincipal() {
-        return (AccountHolder) () -> account;
+        override fun getAuthorities(): Collection<GrantedAuthority> =
+                AuthorityUtils.createAuthorityList(SecurityRole.ADMINISTRATOR.roleName)
+
+        override fun isEnabled(): Boolean = true
+
+        override fun getUsername(): String = "admin"
+
+        override fun isCredentialsNonExpired(): Boolean = true
+
+        override fun getPassword(): String = ""
+
+        override fun isAccountNonExpired(): Boolean = true
+
+        override fun isAccountNonLocked(): Boolean = true
+
     }
 }

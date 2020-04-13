@@ -9,11 +9,13 @@ class BuiltinAuthenticationSourceProvider : AuthenticationSourceProvider {
 
     companion object {
         const val ID = "password"
+
+        val SOURCE = of(
+                ID,
+                "Built-in"
+        ).withAllowingPasswordChange(true)
     }
 
-    override val source = of(
-            ID,
-            "Built-in"
-    ).withAllowingPasswordChange(true)
+    override val source = SOURCE
 
 }
