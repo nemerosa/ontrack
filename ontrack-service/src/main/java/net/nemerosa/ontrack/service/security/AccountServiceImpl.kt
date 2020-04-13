@@ -71,7 +71,7 @@ class AccountServiceImpl(
 
     override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
         // Loads the account
-        val account = getAccount(ID.of(raw.accountId))
+        val account = accountRepository.getAccount(ID.of(raw.accountId)) { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
         // Direct account authorisations
         val authorisations = Authorisations()
                 .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })

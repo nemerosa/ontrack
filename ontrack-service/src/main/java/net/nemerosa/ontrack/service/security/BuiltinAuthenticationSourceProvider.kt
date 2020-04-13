@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 class BuiltinAuthenticationSourceProvider : AuthenticationSourceProvider {
 
     companion object {
-        const val ID = "builtin"
+        const val ID = "password"
     }
 
     override val source = of(
