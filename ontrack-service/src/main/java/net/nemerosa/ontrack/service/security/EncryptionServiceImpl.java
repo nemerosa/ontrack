@@ -64,10 +64,10 @@ public class EncryptionServiceImpl implements EncryptionService {
         boolean authorised;
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof AccountHolder)) {
-            Account account = ((AccountHolder) authentication.getPrincipal()).getAccount();
-            authorised = account.isGranted(ApplicationManagement.class) &&
-                    account.isGranted(GlobalSettings.class);
+        if (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof OntrackAuthenticatedUser)) {
+            OntrackAuthenticatedUser user = (OntrackAuthenticatedUser) authentication.getPrincipal();
+            authorised = user.isGranted(ApplicationManagement.class) &&
+                    user.isGranted(GlobalSettings.class);
         } else {
             authorised = false;
         }

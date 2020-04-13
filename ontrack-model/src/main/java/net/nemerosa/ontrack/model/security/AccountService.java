@@ -24,15 +24,6 @@ public interface AccountService {
     @NotNull OntrackAuthenticatedUser withACL(@NotNull OntrackUser raw);
 
     /**
-     * Completes an account with the list of its authorisations.
-     *
-     * @param raw Account without authorisations
-     * @return Account with authorisations
-     */
-    @Deprecated
-    Account withACL(AuthenticatedAccount raw);
-
-    /**
      * List of accounts
      */
     List<Account> getAccounts();
@@ -52,18 +43,14 @@ public interface AccountService {
     Account create(AccountInput input, String authenticationSourceMode);
 
     /**
-     * Looks for an account using its user name and his authentication source.
-     *
-     * @param username       User name
-     * @param sourceProvider Provider of the source
-     * @return Account
-     */
-    Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider);
-
-    /**
      * Gets an account using its ID
      */
     Account getAccount(ID accountId);
+
+    /**
+     * Gets the groups for an account
+     */
+    List<AccountGroup> getGroupsForAccount(ID accountId);
 
     /**
      * Updating an existing account

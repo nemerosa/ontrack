@@ -45,7 +45,6 @@ public class ResourceAccountTest {
                                 false,
                                 Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none())
                                         .withId(ID.of(1))
-                                        .lock()
                         ),
                         URI.create("urn:user")
                 )

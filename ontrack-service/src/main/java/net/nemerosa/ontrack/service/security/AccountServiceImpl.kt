@@ -14,7 +14,7 @@ import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.repository.RoleRepository
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.crypto.password.NoOpPasswordEncoder
+import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,29 +32,13 @@ class AccountServiceImpl(
         private val authenticationSourceService: AuthenticationSourceService
 ) : AccountService {
 
-    // TODO #756 Cleanup
-    private val passwordEncoder: PasswordEncoder = NoOpPasswordEncoder.getInstance()
+    private val passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 
     private var accountGroupContributors: Collection<AccountGroupContributor> = emptyList()
 
     @Autowired(required = false)
     fun setAccountGroupContributors(accountGroupContributors: Collection<AccountGroupContributor>) {
         this.accountGroupContributors = accountGroupContributors
-    }
-
-    @Deprecated("V4 / Remove")
-    override fun withACL(raw: AuthenticatedAccount): Account {
-        return raw.account
-                // Global role
-                .withGlobalRole(
-                        roleRepository.findGlobalRoleByAccount(raw.account.id()).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
-                )
-                // Project roles
-                .withProjectRoles(
-                        roleRepository.findProjectRoleAssociationsByAccount(raw.account.id()) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) }
-                )
-                // OK
-                .lock()
     }
 
     override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
@@ -82,9 +66,7 @@ class AccountServiceImpl(
 
     override fun getAccounts(): List<Account> {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        return accountRepository
-                .findAll { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
-                .map { account: Account -> account.withGroups(accountGroupRepository.findByAccount(account.id())) }
+        return accountRepository.findAll { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }.toList()
     }
 
     override fun create(input: AccountInput): Account {
@@ -109,11 +91,6 @@ class AccountServiceImpl(
         accountGroupRepository.linkAccountToGroups(account.id(), input.groups)
         // OK
         return account
-    }
-
-    override fun findUserByNameAndSource(username: String, sourceProvider: AuthenticationSourceProvider): Optional<Account> {
-        securityService.checkGlobalFunction(AccountManagement::class.java)
-        return accountRepository.findUserByNameAndSource(username, sourceProvider)
     }
 
     override fun updateAccount(accountId: ID, input: AccountInput): Account {
@@ -401,7 +378,11 @@ class AccountServiceImpl(
     override fun getAccount(accountId: ID): Account {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         return accountRepository.getAccount(accountId) { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
-                .withGroups(accountGroupRepository.findByAccount(accountId.value))
+    }
+
+    override fun getGroupsForAccount(accountId: ID): List<AccountGroup> {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        return accountGroupRepository.findByAccount(accountId.value).toList()
     }
 
     private fun getGroupACL(group: AccountGroup): Authorisations =

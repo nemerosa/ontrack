@@ -68,9 +68,11 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                     account.id(),
                     new PermissionInput(role)
             );
-            return accountService.withACL(
-                    AuthenticatedAccount.of(account)
-            );
+            return account;
+            // FIXME #756 Testing
+//            return accountService.withACL(
+//                    AuthenticatedAccount.of(account)
+//            );
         });
     }
 
@@ -83,9 +85,11 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
                     account.id(),
                     new PermissionInput(role)
             );
-            return accountService.withACL(
-                    AuthenticatedAccount.of(account)
-            );
+            return account;
+            // FIXME #756 Testing
+//            return accountService.withACL(
+//                    AuthenticatedAccount.of(account)
+//            );
         });
     }
 
@@ -364,27 +368,29 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
 
         @SafeVarargs
         public final T with(Class<? extends GlobalFunction>... fn) {
-            account.withGlobalRole(
-                    new GlobalRole(
-                            "test", "Test global role", "",
-                            new HashSet<>(Arrays.asList(fn)),
-                            Collections.emptySet()
-                    )
-            );
+            // FIXME #756 Testing
+//            account.withGlobalRole(
+//                    new GlobalRole(
+//                            "test", "Test global role", "",
+//                            new HashSet<>(Arrays.asList(fn)),
+//                            Collections.emptySet()
+//                    )
+//            );
             //noinspection unchecked
             return (T) this;
         }
 
         public T with(int projectId, Class<? extends ProjectFunction> fn) {
-            account.withProjectRole(
-                    new ProjectRoleAssociation(
-                            projectId,
-                            new ProjectRole(
-                                    "test", "Test", "",
-                                    Collections.singleton(fn)
-                            )
-                    )
-            );
+            // FIXME #756 Testing
+//            account.withProjectRole(
+//                    new ProjectRoleAssociation(
+//                            projectId,
+//                            new ProjectRole(
+//                                    "test", "Test", "",
+//                                    Collections.singleton(fn)
+//                            )
+//                    )
+//            );
             //noinspection unchecked
             return (T) this;
         }

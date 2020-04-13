@@ -5,9 +5,12 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
@@ -90,8 +93,11 @@ public class GQLTypeAccount implements GQLType {
         );
     }
 
-    private DataFetcher accountAccountGroupsFetcher() {
-        return fetcher(Account.class, Account::getAccountGroups);
+    private DataFetcher<List<AccountGroup>> accountAccountGroupsFetcher() {
+        return environment -> {
+            Account account = environment.getSource();
+            return accountService.getGroupsForAccount(account.getId());
+        };
     }
 
 }

@@ -87,7 +87,7 @@ public class GQLRootQueryAdminAccounts implements GQLRootQuery {
                 // Filter by group
                 if (StringUtils.isNotBlank(group)) {
                     filter = filter.and(
-                            account -> account.getAccountGroups().stream().anyMatch(
+                            account -> accountService.getGroupsForAccount(account.getId()).stream().anyMatch(
                                     grp -> contains(grp.getName(), group)
                             )
                     );
