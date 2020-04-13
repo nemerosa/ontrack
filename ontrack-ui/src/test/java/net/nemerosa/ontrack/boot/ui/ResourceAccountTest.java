@@ -34,7 +34,6 @@ public class ResourceAccountTest {
                                         .with("allowingPasswordChange", false)
                                         .end())
                                 .with("role", "ADMINISTRATOR")
-                                .with("accountGroups", array().end())
                                 .with("defaultAdmin", true)
                                 .end())
                         .with("actions", array().end())

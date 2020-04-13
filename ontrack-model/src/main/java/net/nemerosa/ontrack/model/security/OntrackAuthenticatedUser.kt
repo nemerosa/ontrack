@@ -8,12 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails
 interface OntrackAuthenticatedUser : UserDetails {
 
     /**
-     * Associated user
+     * Associated authenticated user, which is associated to the [account].
      */
     val user: OntrackUser
 
     /**
-     * Associated account
+     * Associated Ontrack account
      */
     val account: Account
 
