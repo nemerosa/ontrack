@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails
 class DefaultOntrackAuthenticatedUser(
         override val user: OntrackUser,
         override val account: Account,
-        val authorisations: Authorisations,
+        val authorisations: AuthorisationsCheck,
         val groups: List<AuthenticatedGroup>
 ) : OntrackAuthenticatedUser, UserDetails by user, CredentialsContainer {
 

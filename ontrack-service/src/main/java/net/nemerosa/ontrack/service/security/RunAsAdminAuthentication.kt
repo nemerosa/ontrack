@@ -21,12 +21,17 @@ class RunAsAdminAuthentication(
 
     override fun getCredentials(): Any = ""
 
-    override fun getPrincipal(): Any = DefaultOntrackAuthenticatedUser(
-            user = RunAsAdminUser(account),
-            account = account,
-            authorisations = Authorisations(),
-            groups = emptyList()
-    )
+    override fun getPrincipal(): Any {
+        return DefaultOntrackAuthenticatedUser(
+                user = RunAsAdminUser(account),
+                account = account,
+                authorisations = object : AuthorisationsCheck {
+                    override fun isGranted(fn: Class<out GlobalFunction>): Boolean = true
+                    override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean = true
+                },
+                groups = emptyList()
+        )
+    }
 
     init {
         val account = authenticatedUser?.account
