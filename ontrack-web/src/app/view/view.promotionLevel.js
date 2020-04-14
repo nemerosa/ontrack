@@ -32,6 +32,14 @@ angular.module('ot.view.promotionLevel', [
                         links {
                             _page
                         }
+                        decorations {
+                          decorationType
+                          error
+                          data
+                          feature {
+                            id
+                          }
+                        }
                     }
                     creation {
                         user
