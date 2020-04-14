@@ -69,9 +69,11 @@
                                 <a ng-if="action.type == 'LINK'" id="{{action.id}}-link" href="#{{action.uri}}">{{action.name}}</a>
                                 <a ng-if="action.type == 'FORM'" id="{{action.id}}-form" ng-click="showActionForm(action)">{{action.name}}</a>
                             </li>
+                            <!-- Separator -->
+                            <li role="separator" class="divider"></li>
                             <!-- Logout -->
                             <li>
-                                <a id="user-logout" ng-click="logout()">Sign out</a>
+                                <a id="user-logout" ng-click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Sign out</a>
                             </li>
                         </ul>
                     </li>
@@ -159,6 +161,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Logout form -->
+    <form id="logout-form" name="logout" action="/logout" method="post"></form>
 
 </div>
 

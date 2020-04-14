@@ -36,19 +36,6 @@ angular.module('ot.service.user', [
             );
         };
 
-        /**
-         * Logout
-         */
-        self.logout = function () {
-            return ot.call($http.post('user/logout', {})).then(function () {
-                // Reloads the user information
-                self.loadUser();
-                // Goes back to the home page
-                location.href = '/#home';
-                location.reload();
-            });
-        };
-
         return self;
     })
 ;
