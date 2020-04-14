@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Assert.assertEquals
@@ -45,7 +44,7 @@ abstract class AbstractBuildFilterIT : AbstractDSLTestSupport() {
     protected fun build(name: String, dateTime: LocalDateTime = LocalDateTime.of(2014, 7, 14, 13, 25, 0)): BuildCreator {
         try {
             val build = asUser().with(branch, BuildCreate::class.java).call {
-                structureService!!.newBuild(
+                structureService.newBuild(
                         Build.of(
                                 branch,
                                 NameDescription(name, "Build $name"),
@@ -97,12 +96,11 @@ abstract class AbstractBuildFilterIT : AbstractDSLTestSupport() {
             asUser()
                     .with(branch, ProjectView::class.java)
                     .with(otherBuild, BuildEdit::class.java)
-                    .call<Any> {
-                        structureService!!.addBuildLink(
+                    .execute {
+                        structureService.addBuildLink(
                                 otherBuild,
                                 build
                         )
-                        null
                     }
             return this
         }
@@ -112,19 +110,18 @@ abstract class AbstractBuildFilterIT : AbstractDSLTestSupport() {
             asUser()
                     .with(branch, BuildEdit::class.java)
                     .with(otherBuild, ProjectView::class.java)
-                    .call<Any> {
-                        structureService!!.addBuildLink(
+                    .execute {
+                        structureService.addBuildLink(
                                 build,
                                 otherBuild
                         )
-                        null
                     }
             return this
         }
 
         @Throws(Exception::class)
         fun withProperty(value: String): BuildCreator {
-            asUser().with(build, ProjectEdit::class.java).call<Ack> {
+            asUser().with(build, ProjectEdit::class.java).call {
                 propertyService.editProperty(
                         build,
                         TestSimplePropertyType::class.java,
