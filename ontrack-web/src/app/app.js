@@ -176,7 +176,9 @@ const ontrack = angular.module('ontrack', [
 
             // Logout
             $scope.logout = function () {
-                document.getElementById("logout-form").submit();
+                ot.call($http.post("logout", {})).then(function () {
+                    location.href = '/login?logout';
+                });
             };
 
             // User menu filter

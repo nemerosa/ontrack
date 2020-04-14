@@ -43,6 +43,10 @@ class WebSecurityConfig {
                 }
                 // Using a form login
                 formLogin { }
+                // Logout setup
+                logout {
+                    logoutUrl = "/logout"
+                }
             }
         }
     }
