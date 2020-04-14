@@ -70,11 +70,11 @@ class ValidationStampFilterServiceImpl(
     }
 
     private fun checkUpdateAuthorisations(filter: ValidationStampFilter) {
-        when {
-            filter.project != null -> securityService.checkProjectFunction(filter.project, ValidationStampFilterMgt::class.java)
-            filter.branch != null -> securityService.checkProjectFunction(filter.branch, ValidationStampFilterCreate::class.java)
-            else -> securityService.checkGlobalFunction(GlobalSettings::class.java)
-        }
+        filter.project?.let {
+            securityService.checkProjectFunction(it, ValidationStampFilterMgt::class.java)
+        } ?: filter.branch?.let {
+            securityService.checkProjectFunction(it, ValidationStampFilterCreate::class.java)
+        } ?: securityService.checkGlobalFunction(GlobalSettings::class.java)
     }
 
     override fun shareValidationStampFilter(filter: ValidationStampFilter, project: Project): ValidationStampFilter {

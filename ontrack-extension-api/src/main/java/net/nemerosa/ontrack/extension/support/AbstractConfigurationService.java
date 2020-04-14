@@ -53,11 +53,11 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
 
     @Override
     public List<ConfigurationDescriptor> getConfigurationDescriptors() {
-        return securityService.runAsAdmin(
+        return securityService.asAdmin(
                 () -> getConfigurations().stream()
                         .map(Configuration::getDescriptor)
                         .collect(Collectors.toList())
-        ).get();
+        );
     }
 
     @Override

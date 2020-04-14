@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
-open class ValidationStampFilter(
+class ValidationStampFilter(
         override val id: ID = ID.NONE,
         val name: String,
         val vsNames: List<String>,

@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.model.security
 
-import java.util.function.Supplier
-
 /**
  * More Kotlin-friendly call to [SecurityService]
  */
-fun <T> SecurityService.callAsAdmin(call: () -> T): T = asAdmin(Supplier { call() })
+@Deprecated("Native methods can be used instead.", replaceWith = ReplaceWith("asAdmin"))
+fun <T> SecurityService.callAsAdmin(call: () -> T): T = asAdmin(call)

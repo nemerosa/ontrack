@@ -18,6 +18,6 @@ public class DefaultJobDecorator implements JobDecorator {
 
     @Override
     public Runnable decorate(Job job, Runnable task) {
-        return securityService.runAsAdmin(task);
+        return () -> securityService.asAdmin(task);
     }
 }

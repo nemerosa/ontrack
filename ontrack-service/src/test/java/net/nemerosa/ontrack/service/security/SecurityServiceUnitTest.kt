@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.security.ProjectCreation
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
+import kotlin.test.assertTrue
 
 class SecurityServiceUnitTest {
 
@@ -27,6 +27,6 @@ class SecurityServiceUnitTest {
 
     @Test
     fun run_as_admin() {
-        Assert.assertTrue(securityService.runAsAdmin<Boolean> { protectedCall() }.get())
+        assertTrue(securityService.runAsAdmin<Boolean> { protectedCall() }())
     }
 }

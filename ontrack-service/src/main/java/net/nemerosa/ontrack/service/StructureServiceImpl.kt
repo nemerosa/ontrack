@@ -668,9 +668,7 @@ class StructureServiceImpl(
         )
 
         // Makes sure the order is the same than for the predefined promotion levels
-        val predefinedPromotionLevels = securityService.asAdmin(
-                Supplier { predefinedPromotionLevelService.predefinedPromotionLevels }
-        )
+        val predefinedPromotionLevels = securityService.asAdmin { predefinedPromotionLevelService.predefinedPromotionLevels }
         val sortedIds = getPromotionLevelListForBranch(branch.id)
                 .sortedBy { pl ->
                     val name: String = pl.name

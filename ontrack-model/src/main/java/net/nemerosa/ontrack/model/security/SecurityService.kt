@@ -1,54 +1,44 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.Signature;
-import org.jetbrains.annotations.Nullable;
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.Signature
+import java.util.*
 
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
+interface SecurityService {
 
-public interface SecurityService {
+    fun checkGlobalFunction(fn: Class<out GlobalFunction>)
+    fun isGlobalFunctionGranted(fn: Class<out GlobalFunction>): Boolean
 
-    void checkGlobalFunction(Class<? extends GlobalFunction> fn);
-
-    boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn);
-
-    void checkProjectFunction(int projectId, Class<? extends ProjectFunction> fn);
-
-    default void checkProjectFunction(ProjectEntity entity, Class<? extends ProjectFunction> fn) {
-        checkProjectFunction(entity.projectId(), fn);
+    fun checkProjectFunction(projectId: Int, fn: Class<out ProjectFunction>)
+    fun checkProjectFunction(entity: ProjectEntity, fn: Class<out ProjectFunction>) {
+        checkProjectFunction(entity.projectId(), fn)
     }
 
-    boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn);
-
-    default boolean isProjectFunctionGranted(ProjectEntity entity, Class<? extends ProjectFunction> fn) {
-        return isProjectFunctionGranted(entity.projectId(), fn);
+    fun isProjectFunctionGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean
+    fun isProjectFunctionGranted(entity: ProjectEntity, fn: Class<out ProjectFunction>): Boolean {
+        return isProjectFunctionGranted(entity.projectId(), fn)
     }
 
     /**
-     * Returns the current logged account or <code>null</code> if none is logged.
+     * Returns the current logged account or `null` if none is logged.
      */
-    @Nullable OntrackAuthenticatedUser getCurrentAccount();
+    val currentAccount: OntrackAuthenticatedUser?
 
     /**
      * Is the current user logged?
      */
-    default boolean isLogged() {
-        return getCurrentAccount() != null;
-    }
+    val isLogged: Boolean
+        get() = currentAccount != null
 
     /**
      * Returns the current logged account as an option
      *
-     * @deprecated Use getCurrentAccount directly and check for null
      */
-    @Deprecated
-    default Optional<OntrackAuthenticatedUser> getAccount() {
-        return Optional.ofNullable(getCurrentAccount());
-    }
+    @get:Deprecated("Use getCurrentAccount directly and check for null")
+    val account: Optional<OntrackAuthenticatedUser>
+        get() = Optional.ofNullable(currentAccount)
 
-    Signature getCurrentSignature();
+    val currentSignature: Signature
 
     /**
      * Performs a call as admin. This is mainly by internal code to access parts of the application
@@ -57,24 +47,16 @@ public interface SecurityService {
      * @param supplier Call to perform in a protected context
      * @param <T>      Type of data to get back
      * @return A new supplier running in a new security context
-     */
-    <T> Supplier<T> runAsAdmin(Supplier<T> supplier);
+    </T> */
+    fun <T> runAsAdmin(supplier: () -> T): () -> T
 
-    <T> T asAdmin(Supplier<T> supplier);
+    fun <T> asAdmin(supplier: () -> T): T
 
-    void asAdmin(Runnable task);
+    // For Java compatibility
+    fun asAdmin(code: Runnable): Unit = asAdmin {
+        code.run()
+    }
 
-    Runnable runAsAdmin(Runnable task);
-
-    /**
-     * In some asynchronous operations, we need to run a task with the same credentials that initiated the operation.
-     * This method creates a wrapping supplier that holds the initial security context.
-     *
-     * @param supplier Call to perform in a protected context
-     * @param <T>      Type of data to get back
-     * @return A new supplier running in a new security context
-     */
-    <T> Supplier<T> runner(Supplier<T> supplier);
 
     /**
      * In some asynchronous operations, we need to run a task with the same credentials that initiated the operation.
@@ -84,5 +66,5 @@ public interface SecurityService {
      * @param <T> Type of data to get back
      * @return A new function running in a new security context
      */
-    <T, R> Function<T, R> runner(Function<T, R> fn);
+    fun <T, R> runner(fn: (T) -> R): (T) -> R
 }

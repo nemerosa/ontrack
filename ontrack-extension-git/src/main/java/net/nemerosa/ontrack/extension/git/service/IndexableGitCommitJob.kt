@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
-import java.util.function.Supplier
 import java.util.stream.Stream
 import kotlin.streams.asStream
 
@@ -24,7 +23,7 @@ class IndexableGitCommitJob(
 ) : JobOrchestratorSupplier {
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
-        return securityService.asAdmin(Supplier {
+        return securityService.asAdmin {
             structureService
                     .projectList
                     .asSequence()
@@ -38,7 +37,7 @@ class IndexableGitCommitJob(
                         )
                     }
                     .asStream()
-        })
+        }
     }
 
     private fun createIndexableGitCommitJobRegistration(project: Project, overrides: Boolean, schedule: Schedule): JobRegistration =

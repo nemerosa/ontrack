@@ -1,112 +1,108 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser;
-import net.nemerosa.ontrack.model.security.ProjectCreation;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Project;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.security.ProjectCreation
+import net.nemerosa.ontrack.model.security.SecurityService
+import org.apache.commons.lang3.StringUtils
+import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.context.SecurityContextHolder
+import kotlin.test.*
 
-import java.util.List;
-import java.util.function.Function;
-
-import static org.junit.Assert.*;
-
-public class SecurityServiceIT extends AbstractServiceTestSupport {
+class SecurityServiceIT : AbstractServiceTestSupport() {
 
     @Autowired
-    private SecurityService securityService;
+    private lateinit var securityService: SecurityService
 
     @Test
-    public void getCurrentAccount() throws Exception {
-        OntrackAuthenticatedUser account = asUser().call(securityService::getCurrentAccount);
-        assertNotNull(account);
+    fun currentAccount() {
+        val account = asUser().call { securityService.currentAccount }
+        assertNotNull(account)
     }
 
     @Test
-    public void getCurrentAccount_none() throws Exception {
-        OntrackAuthenticatedUser account = securityService.getCurrentAccount();
-        assertNull(account);
+    fun currentAccount_none() {
+        val account = asAnonymous().call { securityService.currentAccount }
+        assertNull(account)
     }
 
     @Test
-    public void runner_function() throws Exception {
+    fun runner_function() {
         // Function that needs an authentication context
-        Function<String, String> fn = (s) -> s + " -> " + getContextName();
+        val fn = { s: String -> "$s -> $contextName" }
         // Testing outside a context
-        assertEquals("test -> none", fn.apply("test"));
+        assertEquals("test -> none", fn("test"))
         // With a context
-        Function<String, String> securedFn = asUser().with(ProjectCreation.class).call(() -> securityService.runner(fn));
+        val securedFn = asUser().with(ProjectCreation::class.java).call { securityService.runner(fn) }
         // Calls the secured function
-        assertEquals("test -> TestingAuthenticationToken", securedFn.apply("test"));
-    }
-
-    private static String getContextName() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null ? authentication.getClass().getSimpleName() : "none";
+        assertEquals("test -> TestingAuthenticationToken", securedFn("test"))
     }
 
     @Test
-    public void read_only_on_one_project() throws Exception {
-        withNoGrantViewToAll(() -> {
+    fun read_only_on_one_project() {
+        withNoGrantViewToAll {
+
             // Creates two projects
-            Project p1 = doCreateProject();
-            Project p2 = doCreateProject();
+            val (id, name) = doCreateProject()
+            val p2 = doCreateProject()
             // Creates an account authorised to access only one project
-            Account account = doCreateAccountWithProjectRole(p2, "READ_ONLY");
-            return asAccount(account).call(() -> {
+            val account = doCreateAccountWithProjectRole(p2, "READ_ONLY")
+            asAccount(account).call {
+
                 // With this account, gets the list of projects
-                List<Project> list = structureService.getProjectList();
+                val list = structureService.projectList
                 // Checks we only have one project
-                assertEquals(1, list.size());
-                assertEquals(p2.getName(), list.get(0).getName());
+                assertEquals(1, list.size.toLong())
+                assertEquals(p2.name, list[0].name)
                 // Access to the authorised project
-                assertTrue(structureService.findProjectByName(p2.getName()).isPresent());
-                assertNotNull(structureService.getProject(p2.getId()));
+                assertTrue(structureService.findProjectByName(p2.name).isPresent)
+                assertNotNull(structureService.getProject(p2.id))
                 // No access to the other project
-                assertFalse(structureService.findProjectByName(p1.getName()).isPresent());
+                assertFalse(structureService.findProjectByName(name).isPresent)
                 try {
-                    structureService.getProject(p1.getId());
-                    fail("Project is not authorised");
-                } catch (AccessDeniedException ignored) {
-                    assertTrue("Project cannot be found", true);
+                    structureService.getProject(id)
+                    fail("Project is not authorised")
+                } catch (ignored: AccessDeniedException) {
+                    assertTrue(true, "Project cannot be found")
                 }
-                // OK
-                return true;
-            });
-        });
+                true
+            }
+        }
     }
 
     @Test
-    public void read_only_on_all_projects() throws Exception {
-        withNoGrantViewToAll(() -> {
+    fun read_only_on_all_projects() {
+        withNoGrantViewToAll {
+
             // Creates two projects
-            Project p1 = doCreateProject();
-            Project p2 = doCreateProject();
+            val (id, name) = doCreateProject()
+            val (id1, name1) = doCreateProject()
             // Creates an account authorised to access all projects
-            Account account = doCreateAccountWithGlobalRole("READ_ONLY");
-            return asAccount(account).call(() -> {
+            val account = doCreateAccountWithGlobalRole("READ_ONLY")
+            asAccount(account).call {
+
                 // With this account, gets the list of projects
-                List<Project> list = structureService.getProjectList();
+                val list = structureService.projectList
                 // Checks we only have the two projects (among all others)
-                assertTrue(list.size() >= 2);
-                assertTrue(list.stream().anyMatch(project -> StringUtils.equals(p1.getName(), project.getName())));
-                assertTrue(list.stream().anyMatch(project -> StringUtils.equals(p2.getName(), project.getName())));
+                assertTrue(list.size >= 2)
+                assertTrue(list.stream().anyMatch { (_, name2) -> StringUtils.equals(name, name2) })
+                assertTrue(list.stream().anyMatch { (_, name2) -> StringUtils.equals(name1, name2) })
                 // Access to the projects
-                assertTrue(structureService.findProjectByName(p1.getName()).isPresent());
-                assertNotNull(structureService.getProject(p1.getId()));
-                assertTrue(structureService.findProjectByName(p2.getName()).isPresent());
-                assertNotNull(structureService.getProject(p2.getId()));
-                // OK
-                return true;
-            });
-        });
+                assertTrue(structureService.findProjectByName(name).isPresent)
+                assertNotNull(structureService.getProject(id))
+                assertTrue(structureService.findProjectByName(name1).isPresent)
+                assertNotNull(structureService.getProject(id1))
+                true
+            }
+        }
     }
 
+    companion object {
+        private val contextName: String
+            get() {
+                val authentication = SecurityContextHolder.getContext().authentication
+                return if (authentication != null) authentication.javaClass.simpleName else "none"
+            }
+    }
 }

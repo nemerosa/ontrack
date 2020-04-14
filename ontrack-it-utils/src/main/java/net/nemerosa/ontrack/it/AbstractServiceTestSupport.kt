@@ -335,8 +335,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
             private var authorisations: Authorisations = Authorisations()
     ) : AbstractContextCall() {
 
-        constructor(name: String, role: SecurityRole) : this(of(name, name, "$name@test.com", role, none())) {}
+        constructor(name: String, role: SecurityRole) : this(of(name, name, "$name@test.com", role, none()).withId(of(1)))
 
+        @SafeVarargs
         fun with(vararg fn: Class<out GlobalFunction>): T {
             authorisations = authorisations.withGlobalRole(
                     GlobalRole(

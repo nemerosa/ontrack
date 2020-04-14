@@ -12,8 +12,6 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.stereotype.Component
-import java.util.function.Function
-import java.util.function.Supplier
 
 @Component
 class SecurityServiceImpl : SecurityService {
@@ -44,26 +42,28 @@ class SecurityServiceImpl : SecurityService {
         return user != null && user.isGranted(projectId, fn)
     }
 
-    override fun getCurrentAccount(): OntrackAuthenticatedUser? {
-        val context = SecurityContextHolder.getContext()
-        val authentication = context.authentication
-        return if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
-            authentication.principal as OntrackAuthenticatedUser
-        } else {
-            null
+    override val currentAccount: OntrackAuthenticatedUser?
+        get() {
+            val context = SecurityContextHolder.getContext()
+            val authentication = context.authentication
+            return if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
+                authentication.principal as OntrackAuthenticatedUser
+            } else {
+                null
+            }
         }
-    }
 
-    override fun getCurrentSignature(): Signature {
-        val authenticatedUser = currentAccount
-        return if (authenticatedUser != null) {
-            of(authenticatedUser.account.name)
-        } else {
-            anonymous()
+    override val currentSignature: Signature
+        get() {
+            val authenticatedUser = currentAccount
+            return if (authenticatedUser != null) {
+                of(authenticatedUser.account.name)
+            } else {
+                anonymous()
+            }
         }
-    }
 
-    override fun <T> runAsAdmin(supplier: Supplier<T>): Supplier<T> {
+    override fun <T> runAsAdmin(supplier: () -> T): () -> T {
         // Gets the current account (if any)
         val account = currentAccount
         // Creates a temporary admin context
@@ -73,56 +73,36 @@ class SecurityServiceImpl : SecurityService {
         return withSecurityContext(supplier, adminContext)
     }
 
-    override fun <T> asAdmin(supplier: Supplier<T>): T {
-        return runAsAdmin(supplier).get()
-    }
+    override fun <T> asAdmin(supplier: () -> T): T = runAsAdmin(supplier)()
 
-    override fun asAdmin(task: Runnable) {
-        asAdmin<Unit> {
-            task.run()
-        }
-    }
-
-    override fun runAsAdmin(task: Runnable): Runnable {
-        val supplier: Supplier<Unit> = runAsAdmin(Supplier { task.run() })
-        return Runnable { supplier.get() }
-    }
-
-    override fun <T> runner(supplier: Supplier<T>): Supplier<T> {
-        // Current context
-        val context = SecurityContextHolder.getContext()
-        // Uses it
-        return withSecurityContext(supplier, context)
-    }
-
-    override fun <T, R> runner(fn: Function<T, R>): Function<T, R> {
+    override fun <T, R> runner(fn: (T) -> R): (T) -> R {
         // Current context
         val context = SecurityContextHolder.getContext()
         // Uses it
         return withSecurityContext(fn, context)
     }
 
-    private fun <T, R> withSecurityContext(fn: Function<T, R>, context: SecurityContext): Function<T, R> {
-        return Function { input: T ->
+    private fun <T, R> withSecurityContext(fn: (T) -> R, context: SecurityContext): (T) -> R {
+        return { input: T ->
             val oldContext = SecurityContextHolder.getContext()
             try {
                 SecurityContextHolder.setContext(context)
                 // Result
-                fn.apply(input)
+                fn(input)
             } finally {
                 SecurityContextHolder.setContext(oldContext)
             }
         }
     }
 
-    protected fun <T> withSecurityContext(supplier: Supplier<T>, context: SecurityContext?): Supplier<T> {
+    protected fun <T> withSecurityContext(supplier: () -> T, context: SecurityContext?): () -> T {
         // Returns a callable that sets the context before running the target callable
-        return Supplier {
+        return {
             val oldContext = SecurityContextHolder.getContext()
             try {
                 SecurityContextHolder.setContext(context)
                 // Result
-                supplier.get()
+                supplier()
             } finally {
                 SecurityContextHolder.setContext(oldContext)
             }
