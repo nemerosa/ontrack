@@ -94,6 +94,7 @@
             <tr>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Auto join</th>
                 <th>&nbsp;</th>
             </tr>
             </thead>
@@ -104,6 +105,9 @@
                 </td>
                 <td class="ot-description">
                     {{group.description}}
+                </td>
+                <td>
+                    {{group.autoJoin ? "Yes" : "No"}}
                 </td>
                 <td>
                 <span class="ot-command ot-command-update" title="Update group {{group.name}}"

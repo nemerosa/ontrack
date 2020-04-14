@@ -575,7 +575,7 @@ class CoreResourceModuleTest {
                         .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroupUpdateForm:0")
                         .with("_delete", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#deleteGroup:0")
                         .end(),
-                AccountGroup.of("Admins", "Administrators")
+                AccountGroup(ID.of(1), "Admins", "Administrators", false)
         )
     }
 

@@ -11,35 +11,25 @@ import java.io.Serializable
 data class AccountGroup(
         override val id: ID,
         val name: String,
-        val description: String?
+        val description: String?,
+        val autoJoin: Boolean
 ) : Entity, Serializable {
-
-    companion object {
-        @JvmStatic
-        fun of(name: String, description: String?) =
-                AccountGroup(
-                        ID.NONE,
-                        name,
-                        description
-                )
-    }
-
 
     fun withId(id: ID): AccountGroup {
         return AccountGroup(
                 id,
                 name,
-                description
+                description,
+                autoJoin
         )
     }
 
-    fun update(input: NameDescription): AccountGroup {
-        return AccountGroup(
-                id,
-                input.name,
-                input.description
-        )
-    }
+    fun update(input: AccountGroupInput) = AccountGroup(
+            id = id,
+            name = input.name,
+            description = input.description,
+            autoJoin = input.autoJoin
+    )
 
     fun asPermissionTarget() =
             PermissionTarget(

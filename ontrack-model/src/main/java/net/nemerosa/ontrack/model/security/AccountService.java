@@ -74,7 +74,7 @@ public interface AccountService {
     /**
      * Creation of an account group
      */
-    AccountGroup createGroup(NameDescription nameDescription);
+    AccountGroup createGroup(AccountGroupInput input);
 
     /**
      * Getting a group
@@ -84,7 +84,7 @@ public interface AccountService {
     /**
      * Updating a group
      */
-    AccountGroup updateGroup(ID groupId, NameDescription input);
+    AccountGroup updateGroup(ID groupId, AccountGroupInput input);
 
     /**
      * Deleting a group.

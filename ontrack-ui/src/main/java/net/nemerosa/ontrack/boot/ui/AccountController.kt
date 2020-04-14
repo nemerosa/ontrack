@@ -6,11 +6,7 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.form.Form.Companion.create
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
-import net.nemerosa.ontrack.model.form.Form.Companion.nameAndDescription
-import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.AccountGroup
-import net.nemerosa.ontrack.model.security.AccountInput
-import net.nemerosa.ontrack.model.security.AccountService
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.Action
@@ -137,14 +133,22 @@ class AccountController(
      * Form to create an account group
      */
     @GetMapping("groups/create")
-    fun getGroupCreationForm(): Form = nameAndDescription()
+    fun getGroupCreationForm(): Form = create()
+            .name()
+            .description()
+            .with(
+                    YesNo.of("autoJoin")
+                            .label("Auto join")
+                            .help("If checked, any new account is automatically added to this group.")
+                            .value(true)
+            )
 
     /**
      * Creation of an account group
      */
     @PostMapping("groups/create")
-    fun create(@RequestBody @Valid nameDescription: NameDescription): AccountGroup {
-        return accountService.createGroup(nameDescription)
+    fun create(@RequestBody @Valid input: AccountGroupInput): AccountGroup {
+        return accountService.createGroup(input)
     }
 
     /**
@@ -164,13 +168,14 @@ class AccountController(
         return getGroupCreationForm()
                 .fill("name", accountGroup.name)
                 .fill("description", accountGroup.description)
+                .fill("autoJoin", accountGroup.autoJoin)
     }
 
     /**
      * Updating a group
      */
     @PutMapping("groups/{groupId}/update")
-    fun updateGroup(@PathVariable groupId: ID, @RequestBody @Valid input: NameDescription): AccountGroup {
+    fun updateGroup(@PathVariable groupId: ID, @RequestBody @Valid input: AccountGroupInput): AccountGroup {
         return accountService.updateGroup(groupId, input)
     }
 

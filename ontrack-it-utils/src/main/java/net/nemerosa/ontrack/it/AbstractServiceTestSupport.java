@@ -8,9 +8,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -32,7 +30,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return asUser().with(AccountGroupManagement.class).call(() -> {
             String name = uid("G");
             return accountService.createGroup(
-                    NameDescription.nd(name, "")
+                    new AccountGroupInput(name, "", false)
             );
         });
     }

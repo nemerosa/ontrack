@@ -73,10 +73,12 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
     }
 
     private AccountGroup toAccountGroup(ResultSet rs) throws SQLException {
-        return AccountGroup.of(
+        return new AccountGroup(
+                id(rs),
                 rs.getString("name"),
-                rs.getString("description")
-        ).withId(id(rs));
+                rs.getString("description"),
+                rs.getBoolean("autojoin")
+        );
     }
 
     @Override
@@ -93,10 +95,11 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
             return group.withId(
                     ID.of(
                             dbCreate(
-                                    "INSERT INTO ACCOUNT_GROUPS (NAME, DESCRIPTION) " +
-                                            "VALUES (:name, :description)",
+                                    "INSERT INTO ACCOUNT_GROUPS (NAME, DESCRIPTION, AUTOJOIN) " +
+                                            "VALUES (:name, :description, :autoJoin)",
                                     params("name", group.getName())
                                             .addValue("description", group.getDescription())
+                                            .addValue("autoJoin", group.getAutoJoin())
                             )
                     )
             );
@@ -122,10 +125,11 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
     public void update(AccountGroup group) {
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE ACCOUNT_GROUPS SET NAME = :name, DESCRIPTION = :description " +
+                    "UPDATE ACCOUNT_GROUPS SET NAME = :name, DESCRIPTION = :description, AUTOJOIN = :autoJoin " +
                             "WHERE ID = :id",
                     params("name", group.getName())
                             .addValue("description", group.getDescription())
+                            .addValue("autoJoin", group.getAutoJoin())
                             .addValue("id", group.id())
             );
         } catch (DuplicateKeyException ex) {

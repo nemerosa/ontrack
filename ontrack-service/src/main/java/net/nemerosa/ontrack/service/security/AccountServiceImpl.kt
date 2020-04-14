@@ -130,10 +130,10 @@ class AccountServiceImpl(
         return accountGroupRepository.findAll()
     }
 
-    override fun createGroup(nameDescription: NameDescription): AccountGroup {
+    override fun createGroup(input: AccountGroupInput): AccountGroup {
         securityService.checkGlobalFunction(AccountGroupManagement::class.java)
         // Creates the account group
-        val group = AccountGroup.of(nameDescription.name, nameDescription.description)
+        val group = AccountGroup(ID.NONE, input.name, input.description, input.autoJoin)
         // Saves it
         return accountGroupRepository.newAccountGroup(group)
     }
@@ -143,7 +143,7 @@ class AccountServiceImpl(
         return accountGroupRepository.getById(groupId)
     }
 
-    override fun updateGroup(groupId: ID, input: NameDescription): AccountGroup {
+    override fun updateGroup(groupId: ID, input: AccountGroupInput): AccountGroup {
         securityService.checkGlobalFunction(AccountGroupManagement::class.java)
         val group = getAccountGroup(groupId).update(input)
         accountGroupRepository.update(group)

@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.userdetails.UserDetails
 
+@Deprecated("Obsolete")
 class AccountUserDetails(
          private val account: Account
  ) : UserDetails, AccountHolder {
