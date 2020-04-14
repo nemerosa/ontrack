@@ -1,41 +1,27 @@
-package net.nemerosa.ontrack.boot.resources;
+package net.nemerosa.ontrack.boot.resources
 
-import net.nemerosa.ontrack.boot.ui.UserController;
-import net.nemerosa.ontrack.model.security.ConnectedAccount;
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import net.nemerosa.ontrack.boot.ui.UserController
+import net.nemerosa.ontrack.model.security.ConnectedAccount
+import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator
+import net.nemerosa.ontrack.ui.resource.Link
+import net.nemerosa.ontrack.ui.resource.ResourceContext
+import org.springframework.stereotype.Component
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 
 @Component
-public class ConnectedAccountResourceDecorator extends AbstractResourceDecorator<ConnectedAccount> {
+class ConnectedAccountResourceDecorator : AbstractResourceDecorator<ConnectedAccount>(ConnectedAccount::class.java) {
 
-    public ConnectedAccountResourceDecorator() {
-        super(ConnectedAccount.class);
-    }
-
-    @Override
-    public List<Link> links(ConnectedAccount account, ResourceContext resourceContext) {
+    override fun links(account: ConnectedAccount, resourceContext: ResourceContext): List<Link> {
         return resourceContext.links()
-                .self(on(UserController.class).getCurrentUser())
-                        // Login if not logged
-                .link(
-                        "login",
-                        on(UserController.class).loginForm(),
-                        !account.isLogged()
-                )
-                        // Changing his password allowed for connected users which are built-in
+                .self(MvcUriComponentsBuilder.on(UserController::class.java).currentUser)
+                // Changing his password allowed for connected users which are built-in
                 .link(
                         "_changePassword",
-                        on(UserController.class).getChangePasswordForm(),
-                        account.isLogged() && account.getAccount().getAuthenticationSource().isAllowingPasswordChange()
+                        MvcUriComponentsBuilder.on(UserController::class.java).changePasswordForm,
+                        account.isLogged && account.account.authenticationSource.isAllowingPasswordChange
                 )
-                        // OK
-                .build();
+                // OK
+                .build()
     }
 
 }

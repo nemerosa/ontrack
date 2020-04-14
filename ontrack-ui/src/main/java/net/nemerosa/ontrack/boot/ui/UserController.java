@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
-import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.labels.LabelManagement;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.Action;
@@ -13,7 +12,6 @@ import net.nemerosa.ontrack.model.support.PasswordChange;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,29 +45,6 @@ public class UserController extends AbstractResourceController {
         // Not logged
         else {
             return toAnonymousAccount();
-        }
-    }
-
-    @RequestMapping(value = "login", method = RequestMethod.GET)
-    public Form loginForm() {
-        return Form.create()
-                .name()
-                .password()
-                .with(YesNo.of("rememberMe").label("Remember me").value(false))
-                ;
-    }
-
-    @RequestMapping(value = "login", method = RequestMethod.POST)
-    public ConnectedAccount login() {
-        // Gets the current account
-        OntrackAuthenticatedUser user = securityService.getCurrentAccount();
-        // If not logged, rejects
-        if (user == null) {
-            throw new AccessDeniedException("Login required.");
-        }
-        // Already logged
-        else {
-            return toLoggedAccount(user.getAccount());
         }
     }
 

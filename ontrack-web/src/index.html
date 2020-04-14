@@ -43,13 +43,8 @@
                         </a>
                     </li>
 
-                    <!-- User menu: not logged -->
-                    <li class="dropdown" ng-show="!logged()">
-                        <!-- Login link -->
-                        <a ng-click="login()">Sign in</a>
-                    </li>
-                    <!-- User menu: logged -->
-                    <li class="dropdown" ng-show="logged()">
+                    <!-- User menu -->
+                    <li class="dropdown">
                         <a id="header-user-menu" href="#" class="dropdown-toggle" data-toggle="dropdown">
                             {{user.account.fullName}}
                             <b class="caret"></b>

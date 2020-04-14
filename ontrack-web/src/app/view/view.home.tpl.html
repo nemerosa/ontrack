@@ -7,28 +7,6 @@
             </div>
         </div>
     </div>
-    <div class="row" ng-show="accessStatus == 'login-failed'">
-        <div class="col-md-12">
-            <div class="alert alert-danger">
-                The login has failed. You can <a href ng-click="login()">try again</a>.
-            </div>
-        </div>
-    </div>
-    <div class="row" ng-show="accessStatus == 'unauthorised'">
-        <div class="col-md-12">
-            <div class="alert alert-danger">
-                The resource you tried to access has not been granted. You can <a href ng-click="logout()">logout</a>
-                and contact the administrator.
-            </div>
-        </div>
-    </div>
-    <div class="row" ng-show="accessStatus == 'login-requested'">
-        <div class="col-md-12">
-            <div class="alert alert-warning">
-                Login is required.
-            </div>
-        </div>
-    </div>
     <!-- Favourite branches and projects -->
     <div class="row" ng-if="projectFavourites.length > 0 || favouriteBranches.length > 0">
         <div class="col-md-12">

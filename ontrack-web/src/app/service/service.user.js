@@ -1,5 +1,3 @@
-var HEART_BEAT = 30000; // 30 seconds
-
 angular.module('ot.service.user', [
     'ot.service.core',
     'ot.service.form'
@@ -11,9 +9,8 @@ angular.module('ot.service.user', [
          * Initialization of the service
          */
         self.init = function () {
-            // $log.debug('[user] init');
-            // TODO #756 $interval(self.loadUser, HEART_BEAT, 0);
-            // self.loadUser();
+            $log.debug('[user] init');
+            self.loadUser();
         };
 
         /**
@@ -37,49 +34,6 @@ angular.module('ot.service.user', [
                     otNotificationService.error('Cannot connect. Please try later');
                 }
             );
-        };
-
-        /**
-         * User logged?
-         */
-        self.logged = function () {
-            // TODO #756 return $rootScope.user && $rootScope.user.account;
-            return true;
-        };
-
-        /**
-         * Login
-         */
-        self.login = function () {
-            return otFormService.display({
-                uri: $rootScope.user.login,
-                title: "Sign in",
-                submit: function (data) {
-                    var credentials = data.name + ':' + data.password;
-                    var encodedCredentials = Unibabel.arrToBase64(Unibabel.strToUtf8Arr(credentials));
-                    var d = $q.defer();
-                    $http.post(
-                        $rootScope.user.login + "?remember-me=" + (data.rememberMe === true),
-                        {},
-                        {
-                            headers: {
-                                'Authorization': 'Basic ' + encodedCredentials
-                            }
-                        }
-                    )
-                        .success(function (result) {
-                            d.resolve(result);
-                        })
-                        .error(function (response) {
-                            d.reject({
-                                status: response.status,
-                                type: 'error',
-                                content: response.message
-                            });
-                        });
-                    return d.promise;
-                }
-            });
         };
 
         /**

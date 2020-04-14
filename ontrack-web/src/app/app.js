@@ -174,22 +174,6 @@ const ontrack = angular.module('ontrack', [
 
             $log.debug('[app] Initialising the app controller...');
 
-
-            // User status
-            $scope.logged = function () {
-                return otUserService.logged();
-            };
-
-            // Login
-            $scope.login = function () {
-                otUserService.login().then(
-                    function success() {
-                        $log.debug('[app] Reloading after signing in.');
-                        location.reload();
-                    }
-                );
-            };
-
             // Logout
             $scope.logout = function () {
                 otUserService.logout();

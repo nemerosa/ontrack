@@ -338,49 +338,8 @@ angular.module('ot.view.home', [
             return !$scope.projectFilter.label || project.labels.some(it => it.id === $scope.projectFilter.label.id);
         };
 
-        // Login procedure
-        $scope.accessStatus = 'undefined';
-        if (code && Number(code) === 403) {
-            $log.debug('[403] received');
-            if (otUserService.logged()) {
-                $scope.accessStatus = 'unauthorised';
-                $log.debug('[403] user already logged - error notification');
-            } else {
-                $scope.accessStatus = 'login-requested';
-                $log.debug('[403] user not logged - login redirection - callback URL = ' + url);
-                otUserService.login().then(function () {
-                    $scope.accessStatus = 'ok';
-                    if (url) {
-                        // Callback URL
-                        $log.debug('[403] reloading ' + url + 'after signing in.');
-                        location.href = url;
-                        location.reload();
-                    } else {
-                        // Reloads current page
-                        $log.debug('[403] reloading after signing in.');
-                        location.reload();
-                    }
-                }, function () {
-                    $scope.accessStatus = 'login-failed';
-                    $log.debug('[403] user cannot be logged - error notification');
-                });
-            }
-        } else if ($rootScope.user && $rootScope.user.authenticationRequired && !$rootScope.user.logged) {
-            $scope.accessStatus = 'login-requested';
-            $log.debug('user not logged and authentication is required');
-            otUserService.login().then(function () {
-                $scope.accessStatus = 'ok';
-                $log.debug('[403] reloading after signing in.');
-                location.reload();
-            }, function () {
-                $scope.accessStatus = 'login-failed';
-                $log.debug('[403] user cannot be logged - error notification');
-            });
-        } else {
-            $scope.accessStatus = 'ok';
-            // Loading the list of projects
-            loadProjects();
-        }
+        // Loading the list of projects
+        loadProjects();
 
     })
 ;
