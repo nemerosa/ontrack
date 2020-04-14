@@ -18,7 +18,7 @@
         <tbody>
         <tr ng-repeat="promotionRun in promotionLevel.promotionRuns">
             <td>
-                <a href="#/build/{{promotionRun.build.links._page}}">{{promotionRun.build.name}}</a>
+                <a href="{{promotionRun.build.links._page}}">{{promotionRun.build.name}}</a>
             </td>
             <td>
                 <ot-signature value="{time: promotionRun.creation.time, user: {name: promotionRun.creation.user}}" user="true" time="true"></ot-signature>
