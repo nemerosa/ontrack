@@ -19,9 +19,6 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Autowired
     private lateinit var rolesService: RolesService
 
-    @Autowired
-    private lateinit var securityService: SecurityService
-
     interface TestGlobalFunction : GlobalFunction
     interface TestProject1Function : ProjectFunction
     interface TestProject2Function : ProjectFunction

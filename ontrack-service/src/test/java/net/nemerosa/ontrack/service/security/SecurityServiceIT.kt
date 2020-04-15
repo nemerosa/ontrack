@@ -2,18 +2,13 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.ProjectCreation
-import net.nemerosa.ontrack.model.security.SecurityService
 import org.apache.commons.lang3.StringUtils
 import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import kotlin.test.*
 
 class SecurityServiceIT : AbstractServiceTestSupport() {
-
-    @Autowired
-    private lateinit var securityService: SecurityService
 
     @Test
     fun currentAccount() {

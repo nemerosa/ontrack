@@ -45,6 +45,7 @@ class AccountServiceImpl(
         val account = accountRepository.getAccount(ID.of(raw.accountId)) { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
         // Direct account authorisations
         val authorisations = Authorisations()
+                .withProjectFunctions(securityService.autoProjectFunctions)
                 .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
                 .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) })
         // List of authenticated groups

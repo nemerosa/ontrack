@@ -1,20 +1,24 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.security.GlobalFunction
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
-import net.nemerosa.ontrack.model.security.ProjectFunction
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.SecuritySettings
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.Signature.Companion.anonymous
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class SecurityServiceImpl : SecurityService {
+
+    @Autowired
+    private lateinit var cachedSettingsService: CachedSettingsService
 
     override fun checkGlobalFunction(fn: Class<out GlobalFunction>) {
         if (!isGlobalFunctionGranted(fn)) {
@@ -41,6 +45,16 @@ class SecurityServiceImpl : SecurityService {
         // Checks
         return user != null && user.isGranted(projectId, fn)
     }
+
+    override val autoProjectFunctions: Set<KClass<out ProjectFunction>>
+        get() {
+            val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
+            return if (settings.isGrantProjectViewToAll) {
+                setOf(ProjectView::class)
+            } else {
+                emptySet()
+            }
+        }
 
     override val currentAccount: OntrackAuthenticatedUser?
         get() {

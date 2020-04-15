@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.Signature
 import java.util.*
+import kotlin.reflect.KClass
 
 interface SecurityService {
 
@@ -18,6 +19,11 @@ interface SecurityService {
     fun isProjectFunctionGranted(entity: ProjectEntity, fn: Class<out ProjectFunction>): Boolean {
         return isProjectFunctionGranted(entity.projectId(), fn)
     }
+
+    /**
+     * List of [project functions][ProjectFunction] which are automatically assigned to authenticated users.
+     */
+    val autoProjectFunctions: Set<KClass<out ProjectFunction>>
 
     /**
      * Returns the current logged account or `null` if none is logged.

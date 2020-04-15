@@ -7,13 +7,11 @@ import net.nemerosa.ontrack.model.buildfilter.StandardFilterProviderDataBuilder
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.security.GlobalFunction
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
-import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils
@@ -23,9 +21,6 @@ import kotlin.reflect.KClass
 import kotlin.test.assertEquals
 
 abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
-
-    @Autowired
-    protected lateinit var securityService: SecurityService
 
     @Autowired
     protected lateinit var ontrackConfigProperties: OntrackConfigProperties
@@ -38,9 +33,6 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var buildFilterService: BuildFilterService
-
-    @Autowired
-    protected lateinit var settingsManagerService: SettingsManagerService
 
     @Autowired
     protected lateinit var settingsService: CachedSettingsService
@@ -104,7 +96,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun project(name: NameDescription = AbstractITTestSupport.nameDescription(), init: Project.() -> Unit = {}): Project {
+    fun project(name: NameDescription = nameDescription(), init: Project.() -> Unit = {}): Project {
         val project = doCreateProject(name)
         securityService.asAdmin {
             project.init()
@@ -181,7 +173,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>, value: T?) {
         if (value != null) {
-            propertyService.editProperty<T>(
+            propertyService.editProperty(
                     this,
                     type.java,
                     value

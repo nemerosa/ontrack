@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.it
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.security.Account.Companion.of
 import net.nemerosa.ontrack.model.security.AuthenticationSource.Companion.none
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.SecuritySettings
+import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch.Companion.of
 import net.nemerosa.ontrack.model.structure.Build.Companion.of
@@ -21,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import java.util.concurrent.Callable
 
+
 abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     @Autowired
@@ -31,6 +35,15 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     @Autowired
     protected lateinit var propertyService: PropertyService
+
+    @Autowired
+    protected lateinit var settingsManagerService: SettingsManagerService
+
+    @Autowired
+    protected lateinit var cachedSettingsService: CachedSettingsService
+
+    @Autowired
+    protected lateinit var securityService: SecurityService
 
     protected fun doCreateAccountGroup(): AccountGroup {
         return asUser().with(AccountGroupManagement::class.java).call {
@@ -268,27 +281,26 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         return asUser().with(projectEntity.projectId(), ProjectView::class.java).call { callable.call() }
     }
 
-    fun grantViewToAll(grantViewToAll: Boolean): Boolean {
-        TODO("Restore the global settings")
+    fun grantViewToAll(grantViewToAll: Boolean): Boolean = asUser().with(GlobalSettings::class.java).call {
+        val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java).isGrantProjectViewToAll
+        settingsManagerService.saveSettings(
+                SecuritySettings(isGrantProjectViewToAll = grantViewToAll)
+        )
+        old
     }
 
-    protected fun <T> withGrantViewToAll(task: () -> T): T {
-        val old = grantViewToAll(true)
-        try {
-            return task()
-        } finally {
-            grantViewToAll(old)
-        }
-    }
-
-    protected fun <T> withNoGrantViewToAll(task: () -> T): T {
-        val old = grantViewToAll(false)
+    private fun <T> withGrantViewToAll(grantViewToAll: Boolean, task: () -> T): T {
+        val old = grantViewToAll(grantViewToAll)
         return try {
             task()
         } finally {
             grantViewToAll(old)
         }
     }
+
+    protected fun <T> withGrantViewToAll(task: () -> T): T = withGrantViewToAll(true, task)
+
+    protected fun <T> withNoGrantViewToAll(task: () -> T): T = withGrantViewToAll(false, task)
 
     protected interface ContextCall {
         fun <T> call(call: () -> T): T
@@ -329,19 +341,18 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     }
 
-    protected open class AccountCall<T : AccountCall<T>>(
+    protected open inner class AccountCall<T : AccountCall<T>>(
             protected val account: Account,
             private var authorisations: Authorisations = Authorisations()
     ) : AbstractContextCall() {
 
         constructor(name: String, role: SecurityRole) : this(of(name, name, "$name@test.com", role, none()).withId(of(1)))
 
-        @SafeVarargs
-        fun with(vararg fn: Class<out GlobalFunction>): T {
+        fun with(fn: Class<out GlobalFunction>): T {
             authorisations = authorisations.withGlobalRole(
                     GlobalRole(
                             "test", "Test global role", "",
-                            fn.toSet(),
+                            setOf(fn),
                             emptySet()
                     )
             )
@@ -373,7 +384,8 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
         override fun contextSetup() {
             val context: SecurityContext = SecurityContextImpl()
-            val authorizedAccount = AuthorizedAccount(account, authorisations)
+            val finalAuthorisations = authorisations.withProjectFunctions(securityService.autoProjectFunctions)
+            val authorizedAccount = AuthorizedAccount(account, finalAuthorisations)
             val authentication = TestingAuthenticationToken(
                     DefaultOntrackAuthenticatedUser(
                             user = TestOntrackUser(account),
@@ -389,15 +401,15 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     }
 
-    protected class ProvidedAccountCall(account: Account) : AccountCall<ProvidedAccountCall>(account)
+    protected inner class ProvidedAccountCall(account: Account) : AccountCall<ProvidedAccountCall>(account)
 
-    protected class UserCall : AccountCall<UserCall>("user", SecurityRole.USER) {
+    protected inner class UserCall : AccountCall<UserCall>("user", SecurityRole.USER) {
         fun withId(id: Int): AccountCall<UserCall> {
             return AccountCall(account.withId(of(id)))
         }
     }
 
-    protected class AdminCall : AccountCall<AdminCall>("admin", SecurityRole.ADMINISTRATOR)
+    protected inner class AdminCall : AccountCall<AdminCall>("admin", SecurityRole.ADMINISTRATOR)
 }
 
 private class TestOntrackUser(
