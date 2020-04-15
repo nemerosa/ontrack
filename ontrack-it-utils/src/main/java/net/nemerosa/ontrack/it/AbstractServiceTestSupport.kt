@@ -343,7 +343,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected open inner class AccountCall<T : AccountCall<T>>(
             protected val account: Account,
-            private var authorisations: Authorisations = Authorisations()
+            protected var authorisations: Authorisations = Authorisations()
     ) : AbstractContextCall() {
 
         constructor(name: String, role: SecurityRole) : this(of(name, name, "$name@test.com", role, none()).withId(of(1)))
@@ -384,14 +384,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
         override fun contextSetup() {
             val context: SecurityContext = SecurityContextImpl()
-            val finalAuthorisations = authorisations.withProjectFunctions(securityService.autoProjectFunctions)
-            val authorizedAccount = AuthorizedAccount(account, finalAuthorisations)
+            val ontrackAuthenticatedUser = createOntrackAuthenticatedUser()
             val authentication = TestingAuthenticationToken(
-                    DefaultOntrackAuthenticatedUser(
-                            user = TestOntrackUser(account),
-                            authorizedAccount = authorizedAccount,
-                            groups = emptyList()
-                    ),
+                    ontrackAuthenticatedUser,
                     "",
                     account.role.name
             )
@@ -399,9 +394,22 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
             SecurityContextHolder.setContext(context)
         }
 
+        protected open fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser {
+            val finalAuthorisations = authorisations.withProjectFunctions(securityService.autoProjectFunctions)
+            val authorizedAccount = AuthorizedAccount(account, finalAuthorisations)
+            return DefaultOntrackAuthenticatedUser(
+                    user = TestOntrackUser(account),
+                    authorizedAccount = authorizedAccount,
+                    groups = emptyList()
+            )
+        }
+
     }
 
-    protected inner class ProvidedAccountCall(account: Account) : AccountCall<ProvidedAccountCall>(account)
+    protected inner class ProvidedAccountCall(account: Account) : AccountCall<ProvidedAccountCall>(account) {
+        override fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser =
+                accountService.withACL(TestOntrackUser(account))
+    }
 
     protected inner class UserCall : AccountCall<UserCall>("user", SecurityRole.USER) {
         fun withId(id: Int): AccountCall<UserCall> {

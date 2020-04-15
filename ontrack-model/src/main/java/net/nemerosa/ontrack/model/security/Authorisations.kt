@@ -14,12 +14,11 @@ data class Authorisations(
         fun none() = Authorisations(emptySet(), null, emptySet())
     }
 
-
     override fun isGranted(fn: Class<out GlobalFunction>) = globalRole != null && globalRole.isGlobalFunctionGranted(fn)
 
     override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>) =
             (globalRole != null && globalRole.isProjectFunctionGranted(fn))
-                    || fn in projectFunctions.map { it.java }
+                    || projectFunctions.map { it.java }.any { fn.isAssignableFrom(it) }
                     || projectRoleAssociations.any { pa -> pa.projectId == projectId && pa.isGranted(fn) }
 
     fun withProjectFunctions(projectFunctions: Set<KClass<out ProjectFunction>>) =
