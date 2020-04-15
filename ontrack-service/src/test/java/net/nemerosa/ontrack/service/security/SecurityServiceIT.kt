@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.ProjectCreation
+import net.nemerosa.ontrack.model.security.Roles
 import org.apache.commons.lang3.StringUtils
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
@@ -42,13 +43,13 @@ class SecurityServiceIT : AbstractServiceTestSupport() {
             val (id, name) = doCreateProject()
             val p2 = doCreateProject()
             // Creates an account authorised to access only one project
-            val account = doCreateAccountWithProjectRole(p2, "READ_ONLY")
+            val account = doCreateAccountWithProjectRole(p2, Roles.PROJECT_READ_ONLY)
             asAccount(account).call {
 
                 // With this account, gets the list of projects
                 val list = structureService.projectList
                 // Checks we only have one project
-                assertEquals(1, list.size.toLong())
+                assertEquals(1, list.size)
                 assertEquals(p2.name, list[0].name)
                 // Access to the authorised project
                 assertTrue(structureService.findProjectByName(p2.name).isPresent)
@@ -74,7 +75,7 @@ class SecurityServiceIT : AbstractServiceTestSupport() {
             val (id, name) = doCreateProject()
             val (id1, name1) = doCreateProject()
             // Creates an account authorised to access all projects
-            val account = doCreateAccountWithGlobalRole("READ_ONLY")
+            val account = doCreateAccountWithGlobalRole(Roles.GLOBAL_READ_ONLY)
             asAccount(account).call {
 
                 // With this account, gets the list of projects
