@@ -17,7 +17,13 @@ import java.util.function.Predicate;
 
 public interface AccountRepository {
 
-    @Deprecated
+    /**
+     * Checks if the stored password complies with the given check.
+     *
+     * @param accountId ID of the account to check
+     * @param check     Check again the stored password (might be encoded)
+     * @return Result of the check
+     */
     boolean checkPassword(int accountId, Predicate<String> check);
 
     @Deprecated
