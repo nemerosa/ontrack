@@ -19,7 +19,6 @@ import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
-import org.springframework.security.core.userdetails.UserDetails
 import java.util.concurrent.Callable
 
 abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
@@ -374,8 +373,13 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
         override fun contextSetup() {
             val context: SecurityContext = SecurityContextImpl()
+            val authorizedAccount = AuthorizedAccount(account, authorisations)
             val authentication = TestingAuthenticationToken(
-                    TestOntrackAuthenticatedUser(account, authorisations),
+                    DefaultOntrackAuthenticatedUser(
+                            user = TestOntrackUser(account),
+                            authorizedAccount = authorizedAccount,
+                            groups = emptyList()
+                    ),
                     "",
                     account.role.name
             )
@@ -394,17 +398,6 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected class AdminCall : AccountCall<AdminCall>("admin", SecurityRole.ADMINISTRATOR)
-}
-
-private class TestOntrackAuthenticatedUser(
-        override val account: Account,
-        private val authorisations: Authorisations,
-        override val user: OntrackUser = TestOntrackUser(account)
-) : OntrackAuthenticatedUser, UserDetails by user {
-
-    override fun isGranted(fn: Class<out GlobalFunction>): Boolean = authorisations.isGranted(fn)
-
-    override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean = authorisations.isGranted(projectId, fn)
 }
 
 private class TestOntrackUser(

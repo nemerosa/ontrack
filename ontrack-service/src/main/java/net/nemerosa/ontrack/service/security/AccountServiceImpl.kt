@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotUpdateName
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.AccountGroupRepository
 import net.nemerosa.ontrack.repository.AccountRepository
@@ -49,11 +48,11 @@ class AccountServiceImpl(
                 .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
                 .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String -> rolesService.getProjectRoleAssociation(project, roleId) })
         // List of authenticated groups
-        val groups = mutableListOf<AuthenticatedGroup>()
+        val groups = mutableListOf<AuthorizedGroup>()
         // Authorisations from groups
         groups.addAll(
                 accountGroupRepository.findByAccount(raw.accountId).map {
-                    AuthenticatedGroup(
+                    AuthorizedGroup(
                             group = it,
                             authorisations = getGroupACL(it)
                     )
@@ -61,7 +60,7 @@ class AccountServiceImpl(
         )
         // FIXME Authorisations from groups contributors
         // OK
-        return DefaultOntrackAuthenticatedUser(raw, account, authorisations, groups.toList())
+        return DefaultOntrackAuthenticatedUser(raw, AuthorizedAccount(account, authorisations), groups.toList())
     }
 
     override fun getAccounts(): List<Account> {

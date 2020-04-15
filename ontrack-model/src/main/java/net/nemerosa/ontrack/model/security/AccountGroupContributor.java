@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 /**
- * Contributes a list of groups to an account.
+ * FIXME Contributes a list of groups to an account.
  */
 public interface AccountGroupContributor {
 
@@ -14,6 +14,6 @@ public interface AccountGroupContributor {
      * @param authenticatedAccount Account with authentication information to collect groups for
      * @return List of groups (can be empty but not null)
      */
-    Collection<AccountGroup> collectGroups(@NotNull AuthenticatedAccount authenticatedAccount);
+    // Collection<AccountGroup> collectGroups(@NotNull AuthenticatedAccount authenticatedAccount);
 
 }

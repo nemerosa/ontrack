@@ -15,20 +15,20 @@ class RunAsAdminAuthentication(
 
     override fun getDetails(): Account = account
 
-    override fun isAuthenticated(): Boolean {
-        return true
-    }
+    override fun isAuthenticated(): Boolean = true
 
     override fun getCredentials(): Any = ""
 
     override fun getPrincipal(): Any {
         return DefaultOntrackAuthenticatedUser(
                 user = RunAsAdminUser(account),
-                account = account,
-                authorisations = object : AuthorisationsCheck {
-                    override fun isGranted(fn: Class<out GlobalFunction>): Boolean = true
-                    override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean = true
-                },
+                authorizedAccount = AuthorizedAccount(
+                        account = account,
+                        authorisations = object : AuthorisationsCheck {
+                            override fun isGranted(fn: Class<out GlobalFunction>): Boolean = true
+                            override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean = true
+                        }
+                ),
                 groups = emptyList()
         )
     }
