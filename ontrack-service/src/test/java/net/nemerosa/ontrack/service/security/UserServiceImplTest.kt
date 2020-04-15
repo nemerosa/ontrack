@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.repository.AccountRepository
 import org.junit.Before
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.crypto.password.PasswordEncoder
 import kotlin.test.assertTrue
 
 class UserServiceImplTest {
@@ -16,14 +17,19 @@ class UserServiceImplTest {
     private lateinit var service: UserService
     private lateinit var securityService: SecurityService
     private lateinit var accountRepository: AccountRepository
+    private lateinit var passwordEncoder: PasswordEncoder
+    private lateinit var user : OntrackAuthenticatedUser
 
     @Before
     fun before() {
         securityService = mock()
         accountRepository = mock()
+        passwordEncoder = mock()
+        user = mock()
         service = UserServiceImpl(
                 securityService,
-                accountRepository
+                accountRepository,
+                passwordEncoder
         )
     }
 
@@ -42,7 +48,8 @@ class UserServiceImplTest {
                 SecurityRole.USER,
                 AuthenticationSource.none().withAllowingPasswordChange(false)
         )
-        whenever(securityService.currentAccount).thenReturn(mockOntrackAuthenticatedUser(account))
+        whenever(user.account).thenReturn(account)
+        whenever(securityService.currentAccount).thenReturn(user)
         service.changePassword(PasswordChange("old", "new"))
     }
 
@@ -55,7 +62,8 @@ class UserServiceImplTest {
                 SecurityRole.USER,
                 AuthenticationSource.none().withAllowingPasswordChange(true)
         ).withId(ID.of(1))
-        whenever(securityService.currentAccount).thenReturn(mockOntrackAuthenticatedUser(account))
+        whenever(user.account).thenReturn(account)
+        whenever(securityService.currentAccount).thenReturn(user)
         whenever(accountRepository.checkPassword(eq(1), any())).thenReturn(false)
         service.changePassword(PasswordChange("old", "new"))
     }
@@ -69,16 +77,13 @@ class UserServiceImplTest {
                 SecurityRole.USER,
                 AuthenticationSource.none().withAllowingPasswordChange(true)
         ).withId(ID.of(1))
-        whenever(securityService.currentAccount).thenReturn(mockOntrackAuthenticatedUser(account))
+        whenever(user.account).thenReturn(account)
+        whenever(securityService.currentAccount).thenReturn(user)
         whenever(accountRepository.checkPassword(eq(1), any())).thenReturn(true)
+        whenever(passwordEncoder.encode("new")).thenReturn("xxx")
         val ack = service.changePassword(PasswordChange("old", "new"))
         assertTrue(ack.isSuccess)
         verify(accountRepository, times(1)).setPassword(1, "xxx")
     }
 
-    private fun mockOntrackAuthenticatedUser(account: Account): OntrackAuthenticatedUser {
-        val user = mock<OntrackAuthenticatedUser>()
-        whenever(user.account).thenReturn(account)
-        return user
-    }
 }

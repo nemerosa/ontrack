@@ -1,183 +1,164 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException;
-import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Repository;
-
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException
+import net.nemerosa.ontrack.model.exceptions.AccountNotFoundException
+import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.security.Account.Companion.of
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.ID.Companion.of
+import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import org.apache.commons.lang3.StringUtils
+import org.springframework.dao.DuplicateKeyException
+import org.springframework.stereotype.Repository
+import java.sql.ResultSet
+import java.util.*
+import javax.sql.DataSource
 
 @Repository
-public class AccountJdbcRepository extends AbstractJdbcRepository implements AccountRepository {
+class AccountJdbcRepository(dataSource: DataSource?) : AbstractJdbcRepository(dataSource), AccountRepository {
 
-    @Autowired
-    public AccountJdbcRepository(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Override
-    public boolean checkPassword(int accountId, Predicate<String> check) {
-        String encodedPassword = getFirstItem(
+    override fun checkPassword(accountId: Int, check: (String?) -> Boolean): Boolean {
+        val encodedPassword = getFirstItem(
                 "SELECT PASSWORD FROM ACCOUNTS WHERE MODE = 'password' AND ID = :id",
                 params("id", accountId),
-                String.class
-        );
-        return encodedPassword != null && check.test(encodedPassword);
+                String::class.java
+        )
+        return encodedPassword != null && check(encodedPassword)
     }
 
-    @Nullable
-    @Override
-    public BuiltinAccount findBuiltinAccount(@NotNull String username) {
+    override fun findBuiltinAccount(username: String): BuiltinAccount? {
         return getFirstItem(
                 "SELECT * FROM ACCOUNTS WHERE MODE = 'password' AND NAME = :name",
-                params("name", username),
-                (rs, rowNum) -> new BuiltinAccount(
-                        rs.getInt("ID"),
-                        rs.getString("name"),
-                        rs.getString("fullName"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        getEnum(SecurityRole.class, rs, "role")
-                )
-        );
+                params("name", username)
+        ) { rs: ResultSet, _: Int ->
+            BuiltinAccount(
+                    rs.getInt("ID"),
+                    rs.getString("name"),
+                    rs.getString("fullName"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    getEnum(SecurityRole::class.java, rs, "role")
+            )
+        }
     }
 
-    @Override
-    public Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider) {
+    override fun findUserByNameAndSource(username: String, sourceProvider: AuthenticationSourceProvider): Optional<Account> {
         return Optional.ofNullable(
                 getFirstItem(
                         "SELECT * FROM ACCOUNTS WHERE MODE = :mode AND NAME = :name",
-                        params("name", username).addValue("mode", sourceProvider.getSource().getId()),
-                        (rs, rowNum) -> toAccount(rs, mode -> sourceProvider.getSource())
-                )
-        );
+                        params("name", username).addValue("mode", sourceProvider.source.id)
+                ) { rs: ResultSet, _ -> toAccount(rs) { sourceProvider.source } }
+        )
     }
 
-    private Account toAccount(ResultSet rs, Function<String, AuthenticationSource> authenticationSourceFunction) throws SQLException {
-        return Account.of(
+    private fun toAccount(rs: ResultSet, authenticationSourceFunction: (String) -> AuthenticationSource): Account {
+        return of(
                 rs.getString("name"),
                 rs.getString("fullName"),
                 rs.getString("email"),
-                getEnum(SecurityRole.class, rs, "role"),
-                authenticationSourceFunction.apply(rs.getString("mode"))
-        ).withId(id(rs));
+                getEnum(SecurityRole::class.java, rs, "role"),
+                authenticationSourceFunction(rs.getString("mode"))
+        ).withId(id(rs))
     }
 
-    @Override
-    public Collection<Account> findAll(Function<String, AuthenticationSource> authenticationSourceFunction) {
-        return getJdbcTemplate().query(
-                "SELECT * FROM ACCOUNTS ORDER BY NAME",
-                (rs, num) -> toAccount(
-                        rs,
-                        authenticationSourceFunction
-                )
-        );
-    }
-
-    @Override
-    public Account newAccount(Account account) {
-        try {
-            int id = dbCreate(
-                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, MODE, PASSWORD, ROLE) " +
-                            "VALUES (:name, :fullName, :email, :mode, :password, :role)",
-                    params("name", account.getName())
-                            .addValue("fullName", account.getFullName())
-                            .addValue("email", account.getEmail())
-                            .addValue("mode", account.getAuthenticationSource().getId())
-                            .addValue("password", "")
-                            .addValue("role", account.getRole().name())
-            );
-            return account.withId(ID.of(id));
-        } catch (DuplicateKeyException ex) {
-            throw new AccountNameAlreadyDefinedException(account.getName());
+    override fun findAll(authenticationSourceFunction: (String) -> AuthenticationSource): Collection<Account> {
+        return jdbcTemplate!!.query(
+                "SELECT * FROM ACCOUNTS ORDER BY NAME"
+        ) { rs: ResultSet, _ ->
+            toAccount(
+                    rs,
+                    authenticationSourceFunction
+            )
         }
     }
 
-    @Override
-    public void saveAccount(Account account) {
+    override fun newAccount(account: Account): Account {
+        return try {
+            val id = dbCreate(
+                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, MODE, PASSWORD, ROLE) " +
+                            "VALUES (:name, :fullName, :email, :mode, :password, :role)",
+                    params("name", account.name)
+                            .addValue("fullName", account.fullName)
+                            .addValue("email", account.email)
+                            .addValue("mode", account.authenticationSource.id)
+                            .addValue("password", "")
+                            .addValue("role", account.role.name)
+            )
+            account.withId(of(id))
+        } catch (ex: DuplicateKeyException) {
+            throw AccountNameAlreadyDefinedException(account.name)
+        }
+    }
+
+    override fun saveAccount(account: Account) {
         try {
-            getNamedParameterJdbcTemplate().update(
+            namedParameterJdbcTemplate!!.update(
                     "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email " +
                             "WHERE ID = :id",
                     params("id", account.id())
-                            .addValue("name", account.getName())
-                            .addValue("fullName", account.getFullName())
-                            .addValue("email", account.getEmail())
-            );
-        } catch (DuplicateKeyException ex) {
-            throw new AccountNameAlreadyDefinedException(account.getName());
+                            .addValue("name", account.name)
+                            .addValue("fullName", account.fullName)
+                            .addValue("email", account.email)
+            )
+        } catch (ex: DuplicateKeyException) {
+            throw AccountNameAlreadyDefinedException(account.name)
         }
     }
 
-    @Override
-    public Ack deleteAccount(ID accountId) {
+    override fun deleteAccount(accountId: ID): Ack {
         return Ack.one(
-                getNamedParameterJdbcTemplate().update(
+                namedParameterJdbcTemplate!!.update(
                         "DELETE FROM ACCOUNTS WHERE ID = :id",
-                        params("id", accountId.getValue())
+                        params("id", accountId.value)
                 )
-        );
+        )
     }
 
-    @Override
-    public void setPassword(int accountId, String encodedPassword) {
-        getNamedParameterJdbcTemplate().update(
+    override fun setPassword(accountId: Int, encodedPassword: String) {
+        namedParameterJdbcTemplate!!.update(
                 "UPDATE ACCOUNTS SET PASSWORD = :password WHERE ID = :id",
                 params("id", accountId)
                         .addValue("password", encodedPassword)
-        );
+        )
     }
 
-    @Override
-    public Account getAccount(ID accountId, Function<String, AuthenticationSource> authenticationSourceFunction) {
-        return getNamedParameterJdbcTemplate().queryForObject(
+    override fun getAccount(accountId: ID, authenticationSourceFunction: (String) -> AuthenticationSource): Account {
+        return namedParameterJdbcTemplate!!.queryForObject(
                 "SELECT * FROM ACCOUNTS WHERE ID = :id",
-                params("id", accountId.getValue()),
-                (rs, num) -> toAccount(
-                        rs,
-                        authenticationSourceFunction
-                )
-        );
+                params("id", accountId.value)
+        ) { rs: ResultSet, _ ->
+            toAccount(
+                    rs,
+                    authenticationSourceFunction
+            )
+        } ?: throw AccountNotFoundException(accountId.value)
     }
 
-    @Override
-    public List<Account> findByNameToken(String token, Function<String, AuthenticationSource> authenticationSourceFunction) {
-        return getNamedParameterJdbcTemplate().query(
+    override fun findByNameToken(token: String, authenticationSourceFunction: (String) -> AuthenticationSource): List<Account> {
+        return namedParameterJdbcTemplate!!.query(
                 "SELECT * FROM ACCOUNTS WHERE LOWER(NAME) LIKE :filter ORDER BY NAME",
-                params("filter", String.format("%%%s%%", StringUtils.lowerCase(token))),
-                (rs, num) -> toAccount(
-                        rs,
-                        authenticationSourceFunction
-                )
-        );
+                params("filter", String.format("%%%s%%", StringUtils.lowerCase(token)))
+        ) { rs: ResultSet, _ ->
+            toAccount(
+                    rs,
+                    authenticationSourceFunction
+            )
+        }
     }
 
-    @Override
-    public List<Account> getAccountsForGroup(AccountGroup accountGroup, Function<String, AuthenticationSource> authenticationSourceFunction) {
-        return getNamedParameterJdbcTemplate().query(
+    override fun getAccountsForGroup(accountGroup: AccountGroup, authenticationSourceFunction: (String) -> AuthenticationSource): List<Account> {
+        return namedParameterJdbcTemplate!!.query(
                 "SELECT A.* FROM ACCOUNTS A " +
                         "INNER JOIN ACCOUNT_GROUP_LINK L ON L.ACCOUNT = A.ID " +
                         "WHERE L.ACCOUNTGROUP = :accountGroupId " +
                         "ORDER BY A.NAME ASC",
-                params("accountGroupId", accountGroup.id()),
-                (rs, num) -> toAccount(
-                        rs,
-                        authenticationSourceFunction
-                )
-        );
+                params("accountGroupId", accountGroup.id())
+        ) { rs: ResultSet, _ ->
+            toAccount(
+                    rs,
+                    authenticationSourceFunction
+            )
+        }
     }
 }

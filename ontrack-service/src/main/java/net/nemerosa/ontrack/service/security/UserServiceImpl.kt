@@ -1,53 +1,47 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.exceptions.UserOldPasswordException;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.security.UserService;
-import net.nemerosa.ontrack.model.support.PasswordChange;
-import net.nemerosa.ontrack.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.exceptions.UserOldPasswordException
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.UserService
+import net.nemerosa.ontrack.model.support.PasswordChange
+import net.nemerosa.ontrack.repository.AccountRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.crypto.factory.PasswordEncoderFactories
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
 
 @Service
-public class UserServiceImpl implements UserService {
-
-    private final SecurityService securityService;
-    private final AccountRepository accountRepository;
-
-    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+class UserServiceImpl internal constructor(
+        private val securityService: SecurityService,
+        private val accountRepository: AccountRepository,
+        private val passwordEncoder: PasswordEncoder
+) : UserService {
 
     @Autowired
-    public UserServiceImpl(SecurityService securityService, AccountRepository accountRepository) {
-        this.securityService = securityService;
-        this.accountRepository = accountRepository;
-    }
+    constructor(securityService: SecurityService, accountRepository: AccountRepository) : this(
+            securityService,
+            accountRepository,
+            PasswordEncoderFactories.createDelegatingPasswordEncoder()
+    )
 
-    @Override
-    public Ack changePassword(PasswordChange input) {
+    override fun changePassword(input: PasswordChange): Ack {
         // Checks the account
-        OntrackAuthenticatedUser user = securityService.getCurrentAccount();
-        if (user == null) {
-            throw new AccessDeniedException("Must be logged to change password.");
-        } else if (!user.getAccount().getAuthenticationSource().isAllowingPasswordChange()) {
-            throw new AccessDeniedException("Password change is not allowed from ontrack.");
-        } else if (!accountRepository.checkPassword(
-                user.id(),
-                encodedPassword -> passwordEncoder.matches(input.getOldPassword(), encodedPassword)
-        )) {
-            throw new UserOldPasswordException();
+        val user = securityService.currentAccount
+        return if (user == null) {
+            throw AccessDeniedException("Must be logged to change password.")
+        } else if (!user.account.authenticationSource.isAllowingPasswordChange) {
+            throw AccessDeniedException("Password change is not allowed from ontrack.")
+        } else if (!accountRepository.checkPassword(user.id()) { encodedPassword: String? -> passwordEncoder.matches(input.oldPassword, encodedPassword) }) {
+            throw UserOldPasswordException()
         } else {
             accountRepository.setPassword(
                     user.id(),
-                    passwordEncoder.encode(input.getNewPassword())
-            );
-            return Ack.OK;
+                    passwordEncoder.encode(input.newPassword)
+            )
+            Ack.OK
         }
     }
+
 }

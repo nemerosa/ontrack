@@ -1,21 +1,14 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountGroup;
-import net.nemerosa.ontrack.model.security.AuthenticationSource;
-import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
-import net.nemerosa.ontrack.model.structure.ID;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AuthenticationSource
+import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider
+import net.nemerosa.ontrack.model.structure.ID
+import java.util.*
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-public interface AccountRepository {
+interface AccountRepository {
 
     /**
      * Checks if the stored password complies with the given check.
@@ -24,27 +17,51 @@ public interface AccountRepository {
      * @param check     Check again the stored password (might be encoded)
      * @return Result of the check
      */
-    boolean checkPassword(int accountId, Predicate<String> check);
+    fun checkPassword(accountId: Int, check: (String?) -> Boolean): Boolean
 
-    @Deprecated
-    Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider);
+    @Deprecated("")
+    fun findUserByNameAndSource(username: String, sourceProvider: AuthenticationSourceProvider): Optional<Account>
 
-    @Nullable
-    BuiltinAccount findBuiltinAccount(@NotNull String username);
+    /**
+     * Gets a built-in if it exists. The criteria is based on the [username] and on the [mode][Account.authenticationSource]
+     * being stored.
+     */
+    fun findBuiltinAccount(username: String): BuiltinAccount?
 
-    Collection<Account> findAll(Function<String, AuthenticationSource> authenticationSourceFunction);
+    /**
+     * Gets the list of all accounts
+     */
+    fun findAll(authenticationSourceFunction: (String) -> AuthenticationSource): Collection<Account>
 
-    Account newAccount(Account account);
+    /**
+     * Creates a new account
+     */
+    fun newAccount(account: Account): Account
 
-    void saveAccount(Account account);
+    /**
+     * Edits an existing account
+     */
+    fun saveAccount(account: Account)
 
-    Ack deleteAccount(ID accountId);
+    /**
+     * Deletes an account
+     */
+    fun deleteAccount(accountId: ID): Ack
 
-    void setPassword(int accountId, String encodedPassword);
+    /**
+     * Changes the password of an account
+     */
+    fun setPassword(accountId: Int, encodedPassword: String)
 
-    Account getAccount(ID accountId, Function<String, AuthenticationSource> authenticationSourceFunction);
+    /**
+     * Loads an account by ID
+     */
+    fun getAccount(accountId: ID, authenticationSourceFunction: (String) -> AuthenticationSource): Account
 
-    List<Account> findByNameToken(String token, Function<String, AuthenticationSource> authenticationSourceFunction);
+    /**
+     * Looks for accounts based on some text.
+     */
+    fun findByNameToken(token: String, authenticationSourceFunction: (String) -> AuthenticationSource): List<Account>
 
     /**
      * Gets the list of accounts associated with this account group.
@@ -53,5 +70,5 @@ public interface AccountRepository {
      * @param authenticationSourceFunction Access to the authentication sources
      * @return List of accounts
      */
-    List<Account> getAccountsForGroup(AccountGroup accountGroup, Function<String, AuthenticationSource> authenticationSourceFunction);
+    fun getAccountsForGroup(accountGroup: AccountGroup, authenticationSourceFunction: (String) -> AuthenticationSource): List<Account>
 }
