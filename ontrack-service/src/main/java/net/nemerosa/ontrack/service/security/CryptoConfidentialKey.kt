@@ -1,139 +1,122 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.security.ConfidentialStore;
-import net.nemerosa.ontrack.model.security.EncryptionException;
-import org.apache.commons.lang3.Validate;
+import net.nemerosa.ontrack.model.security.ConfidentialStore
+import net.nemerosa.ontrack.model.security.EncryptionException
+import java.io.IOException
+import java.security.GeneralSecurityException
+import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Base64;
+class CryptoConfidentialKey(private val confidentialStore: ConfidentialStore, override val id: String) : ConfidentialKey {
 
-public class CryptoConfidentialKey implements ConfidentialKey {
+    @Volatile
+    private var secret: SecretKey? = null
 
-    private final ConfidentialStore confidentialStore;
-    private final String id;
-    private volatile SecretKey secret;
-
-    public CryptoConfidentialKey(ConfidentialStore confidentialStore, String id) {
-        this.confidentialStore = confidentialStore;
-        this.id = id;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String exportKey() throws IOException {
-        byte[] payload = confidentialStore.load(id);
-        if (payload != null) {
-            return Base64.getEncoder().encodeToString(
-                    payload
-            );
+    override fun exportKey(): String? {
+        val payload = confidentialStore.load(id)
+        return if (payload != null) {
+            Base64.getEncoder().encodeToString(payload)
         } else {
-            return null;
+            null
         }
     }
 
-    @Override
-    public void importKey(String key) throws IOException {
-        Validate.notNull(key, "Key to import must not be null");
+    override fun importKey(key: String) {
         confidentialStore.store(
                 id,
                 Base64.getDecoder().decode(key)
-        );
+        )
         // Reimporting the secret key
-        this.secret = null;
-        getKey();
+        secret = null
     }
 
-    private SecretKey getKey() {
-        try {
+    // Due to the stupid US export restriction JDK only ships 128bit version.
+    private val key: SecretKey?
+        get() = try {
             if (secret == null) {
-                synchronized (this) {
+                synchronized(this) {
                     if (secret == null) {
-                        byte[] payload = confidentialStore.load(id);
+                        var payload = confidentialStore.load(id)
                         if (payload == null) {
-                            payload = confidentialStore.randomBytes(256);
-                            confidentialStore.store(id, payload);
+                            payload = confidentialStore.randomBytes(256)
+                            confidentialStore.store(id, payload)
                         }
                         // Due to the stupid US export restriction JDK only ships 128bit version.
-                        secret = new SecretKeySpec(payload, 0, 128 / 8, ALGORITHM);
+                        secret = SecretKeySpec(payload, 0, 128 / 8, ALGORITHM)
                     }
                 }
             }
-            return secret;
-        } catch (IOException e) {
-            throw new Error("Failed to load the key: " + getId(), e);
+            secret
+        } catch (e: IOException) {
+            throw Error("Failed to load the key: $id", e)
         }
-    }
 
-    @Override
-    public String encrypt(String plain) {
-        try {
+    override fun encrypt(plain: String): String {
+        return try {
             // Creates a cipher
-            Cipher cipher = encrypt();
-            cipher.init(Cipher.ENCRYPT_MODE, getKey());
+            val cipher = encrypt()
+            cipher.init(Cipher.ENCRYPT_MODE, key)
             // Message as bytes
-            byte[] bytes = plain.getBytes("UTF-8");
+            val bytes = plain.toByteArray(charset("UTF-8"))
             // Encryption
-            byte[] encryptedBytes = cipher.doFinal(bytes);
+            val encryptedBytes = cipher.doFinal(bytes)
             // Base64 encoding
-            return Base64.getEncoder().encodeToString(encryptedBytes);
-        } catch (GeneralSecurityException | IOException ex) {
-            throw new EncryptionException(ex);
+            Base64.getEncoder().encodeToString(encryptedBytes)
+        } catch (ex: GeneralSecurityException) {
+            throw EncryptionException(ex)
+        } catch (ex: IOException) {
+            throw EncryptionException(ex)
         }
     }
 
-    @Override
-    public String decrypt(String crypted) {
-        try {
+    override fun decrypt(crypted: String): String {
+        return try {
             // Creates a cipher
-            Cipher cipher = decrypt();
-            cipher.init(Cipher.DECRYPT_MODE, getKey());
+            val cipher = decrypt()
+            cipher.init(Cipher.DECRYPT_MODE, key)
             // Decodes from Base64
-            byte[] encryptedBytes = Base64.getDecoder().decode(crypted);
+            val encryptedBytes = Base64.getDecoder().decode(crypted)
             // Decrypts
-            byte[] bytes = cipher.doFinal(encryptedBytes);
+            val bytes = cipher.doFinal(encryptedBytes)
             // As UTF-8 string
-            return new String(bytes, "UTF-8");
-        } catch (GeneralSecurityException | IOException ex) {
-            throw new EncryptionException(ex);
+            String(bytes, Charsets.UTF_8)
+        } catch (ex: GeneralSecurityException) {
+            throw EncryptionException(ex)
+        } catch (ex: IOException) {
+            throw EncryptionException(ex)
         }
     }
 
     /**
-     * Returns a {@link javax.crypto.Cipher} object for encrypting with this key.
+     * Returns a [javax.crypto.Cipher] object for encrypting with this key.
      */
-    @Override
-    public Cipher encrypt() {
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, getKey());
-            return cipher;
-        } catch (GeneralSecurityException e) {
-            throw new AssertionError(e);
+    override fun encrypt(): Cipher {
+        return try {
+            val cipher = Cipher.getInstance(ALGORITHM)
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            cipher
+        } catch (e: GeneralSecurityException) {
+            throw AssertionError(e)
         }
     }
 
     /**
-     * Returns a {@link javax.crypto.Cipher} object for decrypting with this key.
+     * Returns a [javax.crypto.Cipher] object for decrypting with this key.
      */
-    @Override
-    public Cipher decrypt() {
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, getKey());
-            return cipher;
-        } catch (GeneralSecurityException e) {
-            throw new AssertionError(e);
+    override fun decrypt(): Cipher {
+        return try {
+            val cipher = Cipher.getInstance(ALGORITHM)
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            cipher
+        } catch (e: GeneralSecurityException) {
+            throw AssertionError(e)
         }
     }
 
+    companion object {
+        private const val ALGORITHM = "AES"
+    }
 
-    private static final String ALGORITHM = "AES";
 }

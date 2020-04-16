@@ -348,11 +348,11 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
         constructor(name: String, role: SecurityRole) : this(of(name, name, "$name@test.com", role, none()).withId(of(1)))
 
-        fun with(fn: Class<out GlobalFunction>): T {
+        fun with(vararg fn: Class<out GlobalFunction>): T {
             authorisations = authorisations.withGlobalRole(
                     GlobalRole(
                             "test", "Test global role", "",
-                            setOf(fn),
+                            fn.toSet(),
                             emptySet()
                     )
             )

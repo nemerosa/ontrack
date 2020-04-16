@@ -1,82 +1,67 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.security.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
+import net.nemerosa.ontrack.model.security.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.stereotype.Component
+import java.io.IOException
 
 /**
  * Default encryption service
  */
 @Component
-public class EncryptionServiceImpl implements EncryptionService {
-
-    private final ConfidentialKey key;
-
-    public EncryptionServiceImpl(ConfidentialKey key) {
-        this.key = key;
-    }
+class EncryptionServiceImpl(private val key: ConfidentialKey) : EncryptionService {
 
     @Autowired
-    public EncryptionServiceImpl(ConfidentialStore confidentialStore) {
-        this(new CryptoConfidentialKey(
-                confidentialStore,
-                "net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption"
-        ));
-    }
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
+    constructor(confidentialStore: ConfidentialStore) : this(
+            CryptoConfidentialKey(
+                    confidentialStore,
+                    "net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption"
+            )
+    )
 
-    @Override
-    public String encrypt(String plain) {
-        return plain != null ? key.encrypt(plain) : null;
-    }
+    override fun encrypt(plain: String?): String? = plain?.let { key.encrypt(it) }
 
-    @Override
-    public String decrypt(String crypted) {
-        return crypted != null ? key.decrypt(crypted) : null;
-    }
+    override fun decrypt(crypted: String?): String? = crypted?.let { key.decrypt(it) }
 
-    @Override
-    public String exportKey() {
-        checkAdmin();
-        try {
-            return key.exportKey();
-        } catch (IOException e) {
-            throw new EncryptionException(e);
+    override fun exportKey(): String? {
+        checkAdmin()
+        return try {
+            key.exportKey()
+        } catch (e: IOException) {
+            throw EncryptionException(e)
         }
     }
 
-    @Override
-    public void importKey(String payload) {
-        checkAdmin();
+    override fun importKey(key: String) {
+        checkAdmin()
         try {
-            key.importKey(payload);
-        } catch (IOException e) {
-            throw new EncryptionException(e);
+            this.key.importKey(key)
+        } catch (e: IOException) {
+            throw EncryptionException(e)
         }
     }
 
-    private void checkAdmin() {
-        boolean authorised;
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof OntrackAuthenticatedUser)) {
-            OntrackAuthenticatedUser user = (OntrackAuthenticatedUser) authentication.getPrincipal();
-            authorised = user.isGranted(ApplicationManagement.class) &&
-                    user.isGranted(GlobalSettings.class);
+    private fun checkAdmin() {
+        val authorised: Boolean
+        val context = SecurityContextHolder.getContext()
+        val authentication = context.authentication
+        authorised = if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
+            val user = authentication.principal as OntrackAuthenticatedUser
+            user.isGranted(ApplicationManagement::class.java) &&
+                    user.isGranted(GlobalSettings::class.java)
         } else {
-            authorised = false;
+            false
         }
         // NOT GRANTED
         if (!authorised) {
-            throw new AccessDeniedException(
+            throw AccessDeniedException(
                     "The current used has attempted to import/export keys without being authorised: " +
-                            (authentication != null ? authentication.getName() : "anonymous")
-            );
+                            if (authentication != null) authentication.name else "anonymous"
+            )
         }
     }
+
 }

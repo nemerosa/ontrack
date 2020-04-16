@@ -1,17 +1,16 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
 /**
  * Service to decrypt and encrypt secrets.
  */
-public interface EncryptionService {
-
+interface EncryptionService {
     /**
      * Encrypts a secret, given in its plain form, and returns a string suitable for secure storage.
      *
      * @param plain Secret to encode
      * @return Encrypted secret
      */
-    String encrypt(String plain);
+    fun encrypt(plain: String?): String?
 
     /**
      * Decrypts a secret into a plain form from its encrypted version.
@@ -19,7 +18,7 @@ public interface EncryptionService {
      * @param crypted Encrypted secret
      * @return Plain secret
      */
-    String decrypt(String crypted);
+    fun decrypt(crypted: String?): String?
 
     /**
      * Gets the encryption key.
@@ -27,7 +26,7 @@ public interface EncryptionService {
      * @return Key encoded as Base64
      * @throws EncryptionException If the key cannot be exported
      */
-    String exportKey();
+    fun exportKey(): String?
 
     /**
      * Imports the encryption key.
@@ -35,5 +34,5 @@ public interface EncryptionService {
      * @param key Key encoded as Base64
      * @throws EncryptionException If the key cannot be imported
      */
-    void importKey(String key);
+    fun importKey(key: String)
 }

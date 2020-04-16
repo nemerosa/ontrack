@@ -1,14 +1,6 @@
-package net.nemerosa.ontrack.model.support;
-
-import lombok.Data;
+package net.nemerosa.ontrack.model.support
 
 /**
  * Password change request.
  */
-@Data
-public class PasswordChange {
-
-    private final String oldPassword;
-    private final String newPassword;
-
-}
+data class PasswordChange(val oldPassword: String, val newPassword: String)

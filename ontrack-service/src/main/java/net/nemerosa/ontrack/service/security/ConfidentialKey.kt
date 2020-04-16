@@ -1,24 +1,19 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import javax.crypto.Cipher;
-import java.io.IOException;
+import javax.crypto.Cipher
 
-public interface ConfidentialKey {
-
+interface ConfidentialKey {
     /**
      * Name of the key. This is used as the file name.
      */
-    String getId();
+    val id: String
 
-    Cipher encrypt();
+    fun encrypt(): Cipher
+    fun decrypt(): Cipher
+    fun encrypt(plain: String): String
+    fun decrypt(crypted: String): String
 
-    Cipher decrypt();
+    fun exportKey(): String?
 
-    String encrypt(String plain);
-
-    String decrypt(String crypted);
-
-    String exportKey() throws IOException;
-
-    void importKey(String key) throws IOException;
+    fun importKey(key: String)
 }
