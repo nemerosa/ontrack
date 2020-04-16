@@ -8,6 +8,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 
 
 @Configuration
@@ -23,7 +24,7 @@ class SecurityConfiguration(
     }
 
     @Bean
-    fun passwordEncoder() = PasswordEncoderFactories.createDelegatingPasswordEncoder().apply {
+    fun passwordEncoder(): PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder().apply {
         if (this is DelegatingPasswordEncoder) {
             /**
              * Legacy encoder

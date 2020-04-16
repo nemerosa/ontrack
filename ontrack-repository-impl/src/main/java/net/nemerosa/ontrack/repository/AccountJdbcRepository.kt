@@ -18,15 +18,6 @@ import javax.sql.DataSource
 @Repository
 class AccountJdbcRepository(dataSource: DataSource?) : AbstractJdbcRepository(dataSource), AccountRepository {
 
-    override fun checkPassword(accountId: Int, check: (String?) -> Boolean): Boolean {
-        val encodedPassword = getFirstItem(
-                "SELECT PASSWORD FROM ACCOUNTS WHERE MODE = 'password' AND ID = :id",
-                params("id", accountId),
-                String::class.java
-        )
-        return encodedPassword != null && check(encodedPassword)
-    }
-
     override fun findBuiltinAccount(username: String): BuiltinAccount? {
         return getFirstItem(
                 "SELECT * FROM ACCOUNTS WHERE MODE = 'password' AND NAME = :name",

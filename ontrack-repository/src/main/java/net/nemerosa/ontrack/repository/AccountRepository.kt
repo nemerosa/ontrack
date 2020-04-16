@@ -10,15 +10,6 @@ import java.util.*
 
 interface AccountRepository {
 
-    /**
-     * Checks if the stored password complies with the given check.
-     *
-     * @param accountId ID of the account to check
-     * @param check     Check again the stored password (might be encoded)
-     * @return Result of the check
-     */
-    fun checkPassword(accountId: Int, check: (String?) -> Boolean): Boolean
-
     @Deprecated("")
     fun findUserByNameAndSource(username: String, sourceProvider: AuthenticationSourceProvider): Optional<Account>
 
