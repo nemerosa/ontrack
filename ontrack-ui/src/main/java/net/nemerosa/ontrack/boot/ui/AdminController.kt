@@ -250,9 +250,10 @@ constructor(
      * Exporting the encryption key
      */
     @GetMapping("/encryption")
-    fun exportEncryptionKey(): HttpEntity<String> {
-        return ResponseEntity.ok(encryptionService.exportKey())
-    }
+    fun exportEncryptionKey(): ResponseEntity<String> =
+            encryptionService.exportKey()
+                    ?.let { ResponseEntity.ok(it) }
+                    ?: ResponseEntity.notFound().build()
 
     /**
      * Importing the encryption key

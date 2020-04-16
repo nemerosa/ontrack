@@ -1,57 +1,49 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import lombok.Data;
-import net.nemerosa.ontrack.model.security.AbstractConfidentialStore;
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
-import net.nemerosa.ontrack.model.support.StorageService;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
+import net.nemerosa.ontrack.model.security.AbstractConfidentialStore
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.model.support.StorageService
+import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Component
 
 /**
  * Storing the keys in the database.
- * <p>
+ *
+ *
  * This is easy to setup but is NOT secure.
  */
 @Component
-@ConditionalOnProperty(name = OntrackConfigProperties.KEY_STORE, havingValue = "jdbc")
-public class JdbcConfidentialStore extends AbstractConfidentialStore {
+@ConditionalOnProperty(name = [OntrackConfigProperties.KEY_STORE], havingValue = "jdbc")
+class JdbcConfidentialStore(
+        private val storageService: StorageService
+) : AbstractConfidentialStore() {
 
-    private final StorageService storageService;
-
-    @Autowired
-    public JdbcConfidentialStore(StorageService storageService) {
-        this.storageService = storageService;
-        LoggerFactory.getLogger(JdbcConfidentialStore.class).info(
-                "[key-store] Using JDBC based key store"
-        );
-    }
-
-    @Override
-    public void store(String key, byte[] payload) throws IOException {
+    override fun store(key: String, payload: ByteArray) {
         storageService.store(
-                JdbcConfidentialStore.class.getSimpleName(),
+                JdbcConfidentialStore::class.java.simpleName,
                 key,
-                new Key(payload)
-        );
-    }
-
-    @Override
-    public byte[] load(String key) throws IOException {
-        return storageService.retrieve(
-                JdbcConfidentialStore.class.getSimpleName(),
-                key,
-                Key.class
+                Key(payload)
         )
-                .map(Key::getPayload)
-                .orElse(null);
     }
 
-    @Data
-    public static class Key {
-        private final byte[] payload;
+    override fun load(key: String): ByteArray? {
+        return storageService.retrieve(
+                JdbcConfidentialStore::class.java.simpleName,
+                key,
+                Key::class.java
+        )
+                .map { obj: Key -> obj.payload }
+                .orElse(null)
+    }
+
+    class Key(
+            val payload: ByteArray
+    )
+
+    init {
+        LoggerFactory.getLogger(JdbcConfidentialStore::class.java).info(
+                "[key-store] Using JDBC based key store"
+        )
     }
 }
