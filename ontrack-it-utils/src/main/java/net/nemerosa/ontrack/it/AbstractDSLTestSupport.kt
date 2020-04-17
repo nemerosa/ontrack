@@ -75,7 +75,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     fun <T> ProjectEntity.asAccountWithProjectRole(role: String, code: () -> T): T {
         val account = doCreateAccountWithProjectRole(project, role)
-        return asAccount(account).call(code)
+        return asFixedAccount(account).call(code)
     }
 
     /**
@@ -83,7 +83,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      */
     fun <T> asAccountWithGlobalRole(role: String, code: () -> T): T {
         val account = doCreateAccountWithGlobalRole(role)
-        return asAccount(account).call(code)
+        return asFixedAccount(account).call(code)
     }
 
     fun <T> withDisabledConfigurationTest(code: () -> T): T {

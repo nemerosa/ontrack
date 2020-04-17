@@ -16,9 +16,6 @@ const val extProjectRole = "EXT_PARTICIPANT"
 
 class RolesServiceIT : AbstractServiceTestSupport() {
 
-    @Autowired
-    private lateinit var rolesService: RolesService
-
     interface TestGlobalFunction : GlobalFunction
     interface TestProject1Function : ProjectFunction
     interface TestProject2Function : ProjectFunction
@@ -152,7 +149,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun testing_a_global_role() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_CONTROLLER)).call {
+        asFixedAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_CONTROLLER)).call {
             assertTrue(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
@@ -162,7 +159,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun testing_a_contributed_global_role() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithGlobalRole(newGlobalRole)).call {
+        asFixedAccount(doCreateAccountWithGlobalRole(newGlobalRole)).call {
             assertTrue(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertTrue(securityService.isGlobalFunctionGranted(ProjectCreation::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
@@ -173,7 +170,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun testing_a_global_role_with_project_function() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_CREATOR)).call {
+        asFixedAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_CREATOR)).call {
             assertFalse(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
@@ -183,7 +180,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun testing_a_project_role() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithProjectRole(project, Roles.PROJECT_OWNER)).call {
+        asFixedAccount(doCreateAccountWithProjectRole(project, Roles.PROJECT_OWNER)).call {
             assertFalse(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
@@ -193,7 +190,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun testing_a_contributed_project_role() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithProjectRole(project, newProjectRole)).call {
+        asFixedAccount(doCreateAccountWithProjectRole(project, newProjectRole)).call {
             assertFalse(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
@@ -203,7 +200,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun testing_a_neutral_project_role() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithProjectRole(project, Roles.PROJECT_PARTICIPANT)).call {
+        asFixedAccount(doCreateAccountWithProjectRole(project, Roles.PROJECT_PARTICIPANT)).call {
             assertFalse(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
@@ -223,7 +220,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun `Contributed functions must be assigned by default to the administrator role`() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)).call {
+        asFixedAccount(doCreateAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)).call {
             assertTrue(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
@@ -233,7 +230,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun `Global role functions are inherited`() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithGlobalRole(extGlobalRole)).call {
+        asFixedAccount(doCreateAccountWithGlobalRole(extGlobalRole)).call {
             // Specific functions
             assertTrue(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))
@@ -267,7 +264,7 @@ class RolesServiceIT : AbstractServiceTestSupport() {
     @Test
     fun `Project role functions are inherited`() {
         val project = doCreateProject()
-        asAccount(doCreateAccountWithProjectRole(project, extProjectRole)).call {
+        asFixedAccount(doCreateAccountWithProjectRole(project, extProjectRole)).call {
             // Specific functions
             assertFalse(securityService.isGlobalFunctionGranted(TestGlobalFunction::class.java))
             assertTrue(securityService.isProjectFunctionGranted(project, TestProject1Function::class.java))

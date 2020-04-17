@@ -26,7 +26,7 @@ class ProjectFavouriteServiceIT : AbstractDSLTestSupport() {
     fun `Setting and unsetting a project as favourite`() {
         val project = project()
         val account = doCreateAccount()
-        asAccount(account).withView(project).call {
+        asConfigurableAccount(account).withView(project).call {
             assertFalse(service.isProjectFavourite(project))
             service.setProjectFavourite(project, true)
             assertTrue(service.isProjectFavourite(project))

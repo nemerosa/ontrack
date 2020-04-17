@@ -44,7 +44,7 @@ class SecurityServiceIT : AbstractServiceTestSupport() {
             val p2 = doCreateProject()
             // Creates an account authorised to access only one project
             val account = doCreateAccountWithProjectRole(p2, Roles.PROJECT_READ_ONLY)
-            asAccount(account).call {
+            asFixedAccount(account).call {
 
                 // With this account, gets the list of projects
                 val list = structureService.projectList
@@ -76,7 +76,7 @@ class SecurityServiceIT : AbstractServiceTestSupport() {
             val (id1, name1) = doCreateProject()
             // Creates an account authorised to access all projects
             val account = doCreateAccountWithGlobalRole(Roles.GLOBAL_READ_ONLY)
-            asAccount(account).call {
+            asFixedAccount(account).call {
 
                 // With this account, gets the list of projects
                 val list = structureService.projectList

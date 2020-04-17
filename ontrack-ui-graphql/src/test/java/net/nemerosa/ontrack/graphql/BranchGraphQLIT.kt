@@ -19,7 +19,7 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         val branch1 = project<Branch> {
             branch {}
             branch {
-                asAccount(account).withView(this).execute {
+                asConfigurableAccount(account).withView(this).execute {
                     branchFavouriteService.setBranchFavourite(this, true)
                 }
             }
@@ -27,13 +27,13 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         val branch2 = project<Branch> {
             branch {}
             branch {
-                asAccount(account).withView(this).execute {
+                asConfigurableAccount(account).withView(this).execute {
                     branchFavouriteService.setBranchFavourite(this, true)
                 }
             }
         }
         // Gets ALL the favourite branches
-        val data = asAccount(account).withView(branch1).withView(branch2).call {
+        val data = asConfigurableAccount(account).withView(branch1).withView(branch2).call {
             run("""
                     {
                         branches(favourite: true) {
@@ -54,13 +54,13 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         val account = doCreateAccount()
         project {
             val fav = branch {
-                asAccount(account).withView(this).execute {
+                asConfigurableAccount(account).withView(this).execute {
                     branchFavouriteService.setBranchFavourite(this, true)
                 }
             }
             branch {}
             // Gets the favourite branches
-            val data = asAccount(account).withView(this).call {
+            val data = asConfigurableAccount(account).withView(this).call {
                 run("""
                     {
                         branches(project: "${this.name}", favourite: true) {

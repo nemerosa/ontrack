@@ -45,6 +45,31 @@ interface RolesService {
     fun getProjectRole(id: String): Optional<ProjectRole>
 
     /**
+     * Registers a new global role.
+     *
+     * ℹ️ This is currently used for tests but could be used in future versions to allow the customization of roles.
+     *
+     * @param id ID of the role
+     * @param name Display name for the role
+     * @param description Short description of the role
+     * @param globalFunctions List of [GlobalFunction] which are granted to this role
+     * @param projectFunctions List of [ProjectFunction] which are granted to this role for _all_ projects
+     */
+    fun registerGlobalRole(id: String, name: String, description: String, globalFunctions: List<Class<out GlobalFunction>>, projectFunctions: List<Class<out ProjectFunction>>): GlobalRole
+
+    /**
+     * Registers a new project role
+     *
+     * ℹ️ This is currently used for tests but could be used in future versions to allow the customization of roles.
+     *
+     * @param id ID of the role
+     * @param name Display name for the role
+     * @param description Short description of the role
+     * @param projectFunctions List of [ProjectFunction] which are granted to this role
+     */
+    fun registerProjectRole(id: String, name: String, description: String, projectFunctions: List<Class<out ProjectFunction>>): ProjectRole
+
+    /**
      * Gets a project/role association
      *
      * @param project Project ID

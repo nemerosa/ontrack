@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.security;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
 
 import javax.validation.constraints.NotNull;
@@ -110,6 +109,10 @@ public interface AccountService {
     /**
      * Saves the permission for the {@link net.nemerosa.ontrack.model.security.PermissionTarget} defined
      * by the <code>type</code> and <code>id</code>.
+     *
+     * @param type  Group or account level permission
+     * @param id    ID of the group or account
+     * @param input Permissions to set
      */
     Ack saveGlobalPermission(PermissionTargetType type, int id, PermissionInput input);
 

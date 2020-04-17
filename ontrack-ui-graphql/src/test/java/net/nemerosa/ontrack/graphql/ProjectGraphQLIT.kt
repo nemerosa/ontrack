@@ -21,12 +21,12 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         project {
             branch {}
             val fav = branch {
-                asAccount(account).withView(this).execute {
+                asConfigurableAccount(account).withView(this).execute {
                     branchFavouriteService.setBranchFavourite(this, true)
                 }
             }
             // Gets the favourite branches in project
-            val data = asAccount(account).withView(this).call {
+            val data = asConfigurableAccount(account).withView(this).call {
                 run("""
                     {
                         projects(id: ${this.id}) {

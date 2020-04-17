@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.it
 
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.security.Account.Companion.of
-import net.nemerosa.ontrack.model.security.AuthenticationSource.Companion.none
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.SecuritySettings
 import net.nemerosa.ontrack.model.settings.SettingsManagerService
@@ -14,7 +12,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project.Companion.of
 import net.nemerosa.ontrack.model.structure.PromotionRun.Companion.of
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
-import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
@@ -45,9 +43,12 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     @Autowired
     protected lateinit var securityService: SecurityService
 
+    @Autowired
+    protected lateinit var rolesService: RolesService
+
     protected fun doCreateAccountGroup(): AccountGroup {
         return asUser().with(AccountGroupManagement::class.java).call {
-            val name = TestUtils.uid("G")
+            val name = uid("G")
             accountService.createGroup(
                     AccountGroupInput(name, "", false)
             )
@@ -60,7 +61,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected fun doCreateAccount(accountGroups: List<AccountGroup> = emptyList()): Account {
         return asUser().with(AccountManagement::class.java).call {
-            val name = TestUtils.uid("A")
+            val name = uid("A")
             accountService.create(
                     AccountInput(
                             name,
@@ -260,21 +261,24 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         return AnonymousCall()
     }
 
-    protected fun asUserWithView(vararg entities: ProjectEntity): UserCall {
-        var user = asUser()
+    protected fun asUserWithView(vararg entities: ProjectEntity): ConfigurableAccountCall {
+        var user: ConfigurableAccountCall = asUser()
         for (entity in entities) {
             user = user.withView(entity)
         }
         return user
     }
 
-    protected fun asAccount(account: Account): AccountCall<*> {
-        return ProvidedAccountCall(account)
+    protected fun asFixedAccount(account: Account): AccountCall<*> {
+        return FixedAccountCall(account)
     }
 
+    protected fun asConfigurableAccount(account: Account): ConfigurableAccountCall {
+        return ConfigurableAccountCall(account)
+    }
 
     protected fun asGlobalRole(role: String): AccountCall<*> {
-        return ProvidedAccountCall(doCreateAccountWithGlobalRole(role))
+        return FixedAccountCall(doCreateAccountWithGlobalRole(role))
     }
 
     protected fun <T> view(projectEntity: ProjectEntity, callable: Callable<T>): T {
@@ -342,43 +346,70 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected open inner class AccountCall<T : AccountCall<T>>(
-            protected val account: Account,
-            protected var authorisations: Authorisations = Authorisations()
+            protected val account: Account
     ) : AbstractContextCall() {
 
-        constructor(name: String, role: SecurityRole) : this(of(name, name, "$name@test.com", role, none()).withId(of(1)))
-
-        fun with(vararg fn: Class<out GlobalFunction>): T {
-            authorisations = authorisations.withGlobalRole(
-                    GlobalRole(
-                            "test", "Test global role", "",
-                            fn.toSet(),
-                            emptySet()
-                    )
+        override fun contextSetup() {
+            val context: SecurityContext = SecurityContextImpl()
+            val ontrackAuthenticatedUser = createOntrackAuthenticatedUser()
+            val authentication = TestingAuthenticationToken(
+                    ontrackAuthenticatedUser,
+                    "",
+                    account.role.name
             )
-            @Suppress("UNCHECKED_CAST")
-            return this as T
+            context.authentication = authentication
+            SecurityContextHolder.setContext(context)
         }
 
-        fun with(projectId: Int, fn: Class<out ProjectFunction>): T {
-            authorisations = authorisations.withProjectRole(
-                    ProjectRoleAssociation(
-                            projectId,
-                            ProjectRole(
-                                    "test", "Test", "",
-                                    setOf(fn)
-                            )
-                    )
-            )
-            @Suppress("UNCHECKED_CAST")
-            return this as T
+        protected open fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser =
+                accountService.withACL(TestOntrackUser(account))
+
+    }
+
+    protected inner class FixedAccountCall(account: Account) : AccountCall<FixedAccountCall>(account)
+
+    protected open inner class ConfigurableAccountCall(
+            account: Account
+    ) : AccountCall<ConfigurableAccountCall>(account) {
+
+        /**
+         * Global function associated to any global role to create
+         */
+        private val globalFunctions = mutableSetOf<Class<out GlobalFunction>>()
+
+        /**
+         * Project function associated to any project role to create
+         */
+        private val projectFunctions = mutableMapOf<Int, MutableSet<Class<out ProjectFunction>>>()
+
+        /**
+         * Associates a list of global functions to this account
+         */
+        fun with(vararg fn: Class<out GlobalFunction>): ConfigurableAccountCall {
+            globalFunctions.addAll(fn)
+            return this
         }
 
-        fun with(e: ProjectEntity, fn: Class<out ProjectFunction>): T {
+        /**
+         * Associates a list of project functions for a given project to this account
+         */
+        fun with(projectId: Int, fn: Class<out ProjectFunction>): ConfigurableAccountCall {
+            val projectFns = projectFunctions.getOrPut(projectId) { mutableSetOf() }
+            projectFns.add(fn)
+            return this
+        }
+
+        /**
+         * Associates a list of project functions for a given project (designated by the [entity][e]) to this account
+         */
+        fun with(e: ProjectEntity, fn: Class<out ProjectFunction>): ConfigurableAccountCall {
             return with(e.projectId(), fn)
         }
 
-        fun withView(e: ProjectEntity): T {
+        /**
+         * Grants the [ProjectView] function to this account and the project designated by the [entity][e].
+         */
+        fun withView(e: ProjectEntity): ConfigurableAccountCall {
             return with(e, ProjectView::class.java)
         }
 
@@ -394,30 +425,67 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
             SecurityContextHolder.setContext(context)
         }
 
-        protected open fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser {
-            val finalAuthorisations = authorisations.withProjectFunctions(securityService.autoProjectFunctions)
-            val authorizedAccount = AuthorizedAccount(account, finalAuthorisations)
-            return DefaultOntrackAuthenticatedUser(
-                    user = TestOntrackUser(account),
-                    authorizedAccount = authorizedAccount,
-                    groups = emptyList()
-            )
+        override fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser {
+            // Creating a global role if some global functions are required
+            if (globalFunctions.isNotEmpty()) {
+                val globalRoleId = uid("GR")
+                rolesService.registerGlobalRole(
+                        id = globalRoleId,
+                        name = "Test role $globalRoleId",
+                        description = "Test role $globalRoleId",
+                        globalFunctions = globalFunctions.toList(),
+                        projectFunctions = emptyList()
+                )
+                accountService.saveGlobalPermission(
+                        PermissionTargetType.ACCOUNT,
+                        account.id(),
+                        PermissionInput(globalRoleId)
+                )
+            }
+            // Project permissions
+            projectFunctions.forEach { (projectId, functions) ->
+                if (functions.isNotEmpty()) {
+                    val projectRoleId = uid("PR")
+                    rolesService.registerProjectRole(
+                            id = projectRoleId,
+                            name = "Test role $projectRoleId",
+                            description = "Test role $projectRoleId",
+                            projectFunctions = functions.toList()
+                    )
+                    accountService.saveProjectPermission(
+                            of(projectId),
+                            PermissionTargetType.ACCOUNT,
+                            account.id(),
+                            PermissionInput(projectRoleId)
+                    )
+                }
+            }
+            // Loading the account
+            return super.createOntrackAuthenticatedUser()
         }
-
     }
 
-    protected inner class ProvidedAccountCall(account: Account) : AccountCall<ProvidedAccountCall>(account) {
-        override fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser =
-                accountService.withACL(TestOntrackUser(account))
-    }
+    protected inner class UserCall : ConfigurableAccountCall(
+            securityService.asAdmin {
+                val name = uid("U")
+                accountService.create(
+                        AccountInput(
+                                name,
+                                "$name von Test",
+                                "$name@test.com",
+                                "xxx",
+                                emptyList()
+                        )
+                )
+            }
+    )
 
-    protected inner class UserCall : AccountCall<UserCall>("user", SecurityRole.USER) {
-        fun withId(id: Int): AccountCall<UserCall> {
-            return AccountCall(account.withId(of(id)))
-        }
-    }
-
-    protected inner class AdminCall : AccountCall<AdminCall>("admin", SecurityRole.ADMINISTRATOR)
+    protected inner class AdminCall : AccountCall<AdminCall>(
+            // Loading the predefined admin account
+            securityService.asAdmin {
+                accountService.getAccount(of(1))
+            }
+    )
 }
 
 private class TestOntrackUser(

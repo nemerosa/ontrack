@@ -27,11 +27,11 @@ class BranchFavouriteServiceIT: AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Setting and unsetting a project as favourite`() {
+    fun `Setting and unsetting a branch as favourite`() {
         val account = doCreateAccount()
         project {
             branch {
-                asAccount(account).withView(this).execute {
+                asConfigurableAccount(account).withView(this).execute {
                     // Sets as favourite
                     service.setBranchFavourite(this, true)
                     assertTrue(service.isBranchFavourite(this), "Branch is a favorite")

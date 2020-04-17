@@ -22,12 +22,12 @@ class RolesServiceImpl(
     /**
      * Index of global roles
      */
-    private val globalRolesIndex = LinkedHashMap<String, GlobalRole>()
+    private val globalRolesIndex = mutableMapOf<String, GlobalRole>()
 
     /**
      * Index of project roles
      */
-    private val projectRolesIndex = LinkedHashMap<String, ProjectRole>()
+    private val projectRolesIndex = mutableMapOf<String, ProjectRole>()
 
     override val globalRoles: List<GlobalRole>
         get() = globalRolesIndex.values.toList()
@@ -71,16 +71,16 @@ class RolesServiceImpl(
     private fun initProjectRoles() {
 
         // Owner
-        register(Roles.PROJECT_OWNER, "Project owner",
+        registerProjectRole(Roles.PROJECT_OWNER, "Project owner",
                 "The project owner is allowed to all functions in a project, but for its deletion.",
                 projectFunctions
                         .filter { t -> !ProjectDelete::class.java.isAssignableFrom(t) }
         )
 
         // Participant
-        register(Roles.PROJECT_PARTICIPANT, "Participant",
+        registerProjectRole(Roles.PROJECT_PARTICIPANT, "Participant",
                 "A participant in a project is allowed to change statuses in validation runs.",
-                Arrays.asList(
+                listOf(
                         ProjectView::class.java,
                         ValidationRunStatusChange::class.java,
                         ValidationRunStatusCommentEditOwn::class.java,
@@ -89,7 +89,7 @@ class RolesServiceImpl(
         )
 
         // Validation manager
-        val validationManagerFunctions = Arrays.asList(
+        val validationManagerFunctions = listOf(
                 ValidationStampCreate::class.java,
                 ValidationStampEdit::class.java,
                 ValidationStampDelete::class.java,
@@ -100,18 +100,18 @@ class RolesServiceImpl(
                 ValidationStampFilterShare::class.java,
                 ValidationStampFilterMgt::class.java
         )
-        register(Roles.PROJECT_VALIDATION_MANAGER, "Validation manager",
+        registerProjectRole(Roles.PROJECT_VALIDATION_MANAGER, "Validation manager",
                 "The validation manager can manage the validation stamps.",
                 validationManagerFunctions
         )
 
         // Promoter
-        val promoterFunctions = Arrays.asList(
+        val promoterFunctions = listOf(
                 PromotionRunCreate::class.java,
                 PromotionRunDelete::class.java,
                 ValidationRunStatusChange::class.java
         )
-        register(Roles.PROJECT_PROMOTER, "Promoter",
+        registerProjectRole(Roles.PROJECT_PROMOTER, "Promoter",
                 "The promoter can promote existing builds.",
                 promoterFunctions
         )
@@ -125,13 +125,13 @@ class RolesServiceImpl(
         projectManagerFunctions.add(BranchEdit::class.java)
         projectManagerFunctions.add(BranchDelete::class.java)
         projectManagerFunctions.add(ProjectLabelManagement::class.java)
-        register(Roles.PROJECT_MANAGER, "Project manager",
+        registerProjectRole(Roles.PROJECT_MANAGER, "Project manager",
                 "The project manager can promote existing builds, manage the validation stamps, " + "manage the shared build filters, manage the branches and edit some properties.",
                 projectManagerFunctions
         )
 
         // Read only on a project
-        register(Roles.PROJECT_READ_ONLY, "Read Only",
+        registerProjectRole(Roles.PROJECT_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all components of the projects",
                 RolesService.readOnlyProjectFunctions
         )
@@ -143,7 +143,7 @@ class RolesServiceImpl(
                     // Totally illegal - stopping everything
                     throw IllegalStateException("An existing project role cannot be overridden: " + roleDefinition.id)
                 } else {
-                    register(
+                    registerProjectRole(
                             roleDefinition.id,
                             roleDefinition.name,
                             roleDefinition.description,
@@ -155,7 +155,7 @@ class RolesServiceImpl(
 
     }
 
-    private fun register(id: String, name: String, description: String, projectFunctions: List<Class<out ProjectFunction>>) {
+    override fun registerProjectRole(id: String, name: String, description: String, projectFunctions: List<Class<out ProjectFunction>>): ProjectRole {
         val functions = LinkedHashSet(projectFunctions)
         // Contributions
         roleContributors.forEach { roleContributor ->
@@ -170,12 +170,12 @@ class RolesServiceImpl(
             }
         }
         // OK
-        register(ProjectRole(
+        return ProjectRole(
                 id,
                 name,
                 description,
                 functions
-        ))
+        ).apply { register(this) }
     }
 
     private fun checkFunctionForContribution(fn: Class<*>) {
@@ -195,7 +195,7 @@ class RolesServiceImpl(
 
         // Administrator
         // This particular role must have ALL functions
-        register(Roles.GLOBAL_ADMINISTRATOR, "Administrator",
+        registerGlobalRole(Roles.GLOBAL_ADMINISTRATOR, "Administrator",
                 "An administrator is allowed to do everything in the application.",
                 (globalFunctions +
                         roleContributors.flatMap {
@@ -211,7 +211,7 @@ class RolesServiceImpl(
         )
 
         // Creator
-        register(Roles.GLOBAL_CREATOR, "Creator",
+        registerGlobalRole(Roles.GLOBAL_CREATOR, "Creator",
                 "A creator is allowed to create new projects and to configure it. Once done, its rights on the " + "project are revoked immediately.",
                 listOf(
                         ProjectCreation::class.java,
@@ -227,13 +227,13 @@ class RolesServiceImpl(
         )
 
         // Creator
-        register(Roles.GLOBAL_AUTOMATION, "Automation",
+        registerGlobalRole(Roles.GLOBAL_AUTOMATION, "Automation",
                 "This role can be assigned to users or groups which must automate Ontrack. It aggregates both the " + "Creator and the Controller roles into one.",
-                Arrays.asList(
+                listOf(
                         ProjectCreation::class.java,
                         AccountGroupManagement::class.java
                 ),
-                Arrays.asList(
+                listOf(
                         // Structure creation functions only
                         ProjectConfig::class.java,
                         ProjectAuthorisationMgt::class.java,
@@ -252,10 +252,10 @@ class RolesServiceImpl(
         )
 
         // Controller
-        register(Roles.GLOBAL_CONTROLLER, "Controller",
+        registerGlobalRole(Roles.GLOBAL_CONTROLLER, "Controller",
                 "A controller, is allowed to create builds, promotion runs and validation runs. He can also " + "synchronise templates. This role is typically granted to continuous integration tools.",
                 emptyList(),
-                Arrays.asList(
+                listOf(
                         ProjectView::class.java,
                         BuildCreate::class.java,
                         BuildConfig::class.java,
@@ -265,7 +265,7 @@ class RolesServiceImpl(
         )
 
         // Global validation manager
-        register(Roles.GLOBAL_VALIDATION_MANAGER, "Global validation manager",
+        registerGlobalRole(Roles.GLOBAL_VALIDATION_MANAGER, "Global validation manager",
                 "A global validation manager can manage the validation stamps across all projects and edit validation run comments.",
                 listOf(
                         ValidationStampBulkUpdate::class.java
@@ -280,7 +280,7 @@ class RolesServiceImpl(
         )
 
         // Read only on all projects
-        register(Roles.GLOBAL_READ_ONLY, "Read Only",
+        registerGlobalRole(Roles.GLOBAL_READ_ONLY, "Read Only",
                 "This role grants a read-only access to all projects",
                 RolesService.readOnlyGlobalFunctions,
                 RolesService.readOnlyProjectFunctions
@@ -293,7 +293,7 @@ class RolesServiceImpl(
                     // Totally illegal - stopping everything
                     throw IllegalStateException("An existing global role cannot be overridden: " + roleDefinition.id)
                 } else {
-                    register(
+                    registerGlobalRole(
                             roleDefinition.id,
                             roleDefinition.name,
                             roleDefinition.description,
@@ -348,7 +348,11 @@ class RolesServiceImpl(
                 ?: listOf()
     }
 
-    private fun register(id: String, name: String, description: String, globalFunctions: List<Class<out GlobalFunction>>, projectFunctions: List<Class<out ProjectFunction>>) {
+    override fun registerGlobalRole(id: String, name: String, description: String, globalFunctions: List<Class<out GlobalFunction>>, projectFunctions: List<Class<out ProjectFunction>>): GlobalRole {
+        // Checks the role if not registered yet
+        if (globalRolesIndex.containsKey(id)) {
+            throw IllegalStateException("Global role $id is already registered.")
+        }
         // Global functions and contributions
         val gfns = LinkedHashSet(globalFunctions)
         roleContributors.forEach { roleContributor ->
@@ -370,13 +374,15 @@ class RolesServiceImpl(
             }
         }
         // OK
-        register(GlobalRole(
+        val globalRole = GlobalRole(
                 id,
                 name,
                 description,
                 gfns,
                 pfns
-        ))
+        )
+        register(globalRole)
+        return globalRole
     }
 
     private fun register(role: GlobalRole) {
