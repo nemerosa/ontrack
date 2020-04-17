@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.events.EventQueryService
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
 
 class EventQueryServiceIT : AbstractServiceTestSupport() {
 
@@ -22,9 +21,7 @@ class EventQueryServiceIT : AbstractServiceTestSupport() {
             eventQueryService.getLastEventSignature(branch.projectEntityType, branch.id, EventFactory.NEW_BRANCH)
         }
 
-        assertPresent(o) {
-            assertEquals("user", it.user.name)
-        }
+        assertPresent(o) {}
     }
 
 }

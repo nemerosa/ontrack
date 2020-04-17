@@ -273,6 +273,8 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         return FixedAccountCall(account)
     }
 
+    protected fun <T> asFixedAccount(account: Account, code: () -> T): T = asFixedAccount(account).call(code)
+
     protected fun asConfigurableAccount(account: Account): ConfigurableAccountCall {
         return ConfigurableAccountCall(account)
     }
@@ -280,6 +282,8 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     protected fun asGlobalRole(role: String): AccountCall<*> {
         return FixedAccountCall(doCreateAccountWithGlobalRole(role))
     }
+
+    protected fun <T> asGlobalRole(role: String, code: () -> T): T = asGlobalRole(role).call(code)
 
     protected fun <T> view(projectEntity: ProjectEntity, callable: Callable<T>): T {
         return asUser().with(projectEntity.projectId(), ProjectView::class.java).call { callable.call() }
@@ -385,6 +389,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         /**
          * Associates a list of global functions to this account
          */
+        @SafeVarargs
         fun with(vararg fn: Class<out GlobalFunction>): ConfigurableAccountCall {
             globalFunctions.addAll(fn)
             return this
@@ -426,38 +431,41 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
 
         override fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser {
-            // Creating a global role if some global functions are required
-            if (globalFunctions.isNotEmpty()) {
-                val globalRoleId = uid("GR")
-                rolesService.registerGlobalRole(
-                        id = globalRoleId,
-                        name = "Test role $globalRoleId",
-                        description = "Test role $globalRoleId",
-                        globalFunctions = globalFunctions.toList(),
-                        projectFunctions = emptyList()
-                )
-                accountService.saveGlobalPermission(
-                        PermissionTargetType.ACCOUNT,
-                        account.id(),
-                        PermissionInput(globalRoleId)
-                )
-            }
-            // Project permissions
-            projectFunctions.forEach { (projectId, functions) ->
-                if (functions.isNotEmpty()) {
-                    val projectRoleId = uid("PR")
-                    rolesService.registerProjectRole(
-                            id = projectRoleId,
-                            name = "Test role $projectRoleId",
-                            description = "Test role $projectRoleId",
-                            projectFunctions = functions.toList()
+            // Configures the account
+            securityService.asAdmin {
+                // Creating a global role if some global functions are required
+                if (globalFunctions.isNotEmpty()) {
+                    val globalRoleId = uid("GR")
+                    rolesService.registerGlobalRole(
+                            id = globalRoleId,
+                            name = "Test role $globalRoleId",
+                            description = "Test role $globalRoleId",
+                            globalFunctions = globalFunctions.toList(),
+                            projectFunctions = emptyList()
                     )
-                    accountService.saveProjectPermission(
-                            of(projectId),
+                    accountService.saveGlobalPermission(
                             PermissionTargetType.ACCOUNT,
                             account.id(),
-                            PermissionInput(projectRoleId)
+                            PermissionInput(globalRoleId)
                     )
+                }
+                // Project permissions
+                projectFunctions.forEach { (projectId, functions) ->
+                    if (functions.isNotEmpty()) {
+                        val projectRoleId = uid("PR")
+                        rolesService.registerProjectRole(
+                                id = projectRoleId,
+                                name = "Test role $projectRoleId",
+                                description = "Test role $projectRoleId",
+                                projectFunctions = functions.toList()
+                        )
+                        accountService.saveProjectPermission(
+                                of(projectId),
+                                PermissionTargetType.ACCOUNT,
+                                account.id(),
+                                PermissionInput(projectRoleId)
+                        )
+                    }
                 }
             }
             // Loading the account
