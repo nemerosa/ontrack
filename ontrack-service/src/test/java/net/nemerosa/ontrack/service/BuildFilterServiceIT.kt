@@ -143,7 +143,8 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         val account = doCreateAccount()
 
         // Creates a shared filter for this account
-        val ack = asConfigurableAccount(account).with(branch, BranchFilterMgt::class.java).call {
+        val creator = asConfigurableAccount(account).withView(branch).with(branch, BranchFilterMgt::class.java)
+        val ack = creator.call {
             buildFilterService.saveFilter(
                     branch.id,
                     true, // Shared
@@ -155,13 +156,13 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         assertTrue("Account filter saved", ack.isSuccess)
 
         // The filter is present for this account
-        var filters = asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
+        var filters = creator.call { buildFilterService.getBuildFilters(branch.id) }
         assertEquals(1, filters.size.toLong())
         var filter = filters.iterator().next()
         assertEquals("MyFilter", filter.name)
         assertTrue(filter.isShared)
 
-        // ... and that it is available also for not logged users
+        // ... and that it is available also for other users
         filters = asUser().withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
         assertEquals("Account filter available for everybody else", 1, filters.size.toLong())
         filter = filters.iterator().next()
@@ -169,13 +170,13 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         assertTrue(filter.isShared)
 
         // Deletes the filter
-        asFixedAccount(account).call { buildFilterService.deleteFilter(branch.id, "MyFilter") }
+        asAdmin { buildFilterService.deleteFilter(branch.id, "MyFilter") }
 
         // The filter is no longer there for the account
-        filters = asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
+        filters = creator.call { buildFilterService.getBuildFilters(branch.id) }
         assertEquals(0, filters.size.toLong())
 
-        // ... not for unlogged users
+        // ... not for other users
         filters = asUser().withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
         assertEquals("Account filter not available for everybody else", 0, filters.size.toLong())
     }
