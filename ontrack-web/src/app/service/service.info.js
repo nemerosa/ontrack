@@ -11,7 +11,7 @@ angular.module('ot.service.info', [
         };
 
         self.loadInfo = function () {
-            ot.call($http.get('info')).then(function (info) {
+            ot.call($http.get('rest/info')).then(function (info) {
                 $rootScope.info = info;
             });
         };

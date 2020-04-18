@@ -65,7 +65,7 @@ class Ontrack {
 
     @DSLMethod("Gets the version of the remote Ontrack server")
     String getVersion() {
-        return get('info').version.display as String
+        return get('rest/info').version.display as String
     }
 
     /**

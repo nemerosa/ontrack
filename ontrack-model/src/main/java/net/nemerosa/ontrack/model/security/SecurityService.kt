@@ -7,6 +7,11 @@ import kotlin.reflect.KClass
 
 interface SecurityService {
 
+    /**
+     * Checks that the current user is authenticated
+     */
+    fun checkAuthenticated()
+
     fun checkGlobalFunction(fn: Class<out GlobalFunction>)
     fun isGlobalFunctionGranted(fn: Class<out GlobalFunction>): Boolean
 

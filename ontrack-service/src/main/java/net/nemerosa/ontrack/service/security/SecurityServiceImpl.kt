@@ -20,6 +20,12 @@ class SecurityServiceImpl : SecurityService {
     @Autowired
     private lateinit var cachedSettingsService: CachedSettingsService
 
+    override fun checkAuthenticated() {
+        if (!isLogged) {
+            throw AccessDeniedException("Authentication is required.")
+        }
+    }
+
     override fun checkGlobalFunction(fn: Class<out GlobalFunction>) {
         if (!isGlobalFunctionGranted(fn)) {
             throw AccessDeniedException("Global function '${fn.simpleName}' is not granted.")
