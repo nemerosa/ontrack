@@ -87,10 +87,10 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
             val project = project {
                 gitProject(repo)
             }
-            // Re-indexes the commits
-            searchIndexService.index(gitCommitSearchExtension)
-            // Deletes the project
             asAdmin {
+                // Re-indexes the commits
+                searchIndexService.index(gitCommitSearchExtension)
+                // Deletes the project
                 structureService.deleteProject(project.id)
             }
             // Looks for every commit

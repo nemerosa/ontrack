@@ -383,7 +383,9 @@ class IssueReportingIT : AbstractGitTestSupport() {
                 }
             }
             // Running the test
-            code(project)
+            asUserWithView(project) {
+                code(project)
+            }
         }
     }
 

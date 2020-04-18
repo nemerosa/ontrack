@@ -28,19 +28,23 @@ class GitIssueSearchIndexerIT : AbstractGitSearchTestSupport() {
                 gitProject(repo)
             }
             // Indexation of issues (this goes through commit indexation)
-            searchIndexService.index(gitCommitSearchExtension)
-            // Looks for issue 1..3
-            (1..3).forEach { no ->
-                val results = searchService.paginatedSearch(SearchRequest("#$no", gitIssueSearchExtension.searchResultType.id)).items
-                val result = results.find { it.title == "Issue #$no" }
-                assertNotNull(result) {
-                    assertEquals("Issue #$no", it.title)
-                    assertEquals("Issue #$no found in project ${project.name}", it.description)
-                }
+            asAdmin {
+                searchIndexService.index(gitCommitSearchExtension)
             }
-            // Issue 4 not found
-            val results = searchService.paginatedSearch(SearchRequest("#4", gitIssueSearchExtension.searchResultType.id)).items
-            assertTrue(results.none { "#4" in it.title })
+            // Looks for issue 1..3
+            asUserWithView(project) {
+                (1..3).forEach { no ->
+                    val results = searchService.paginatedSearch(SearchRequest("#$no", gitIssueSearchExtension.searchResultType.id)).items
+                    val result = results.find { it.title == "Issue #$no" }
+                    assertNotNull(result) {
+                        assertEquals("Issue #$no", it.title)
+                        assertEquals("Issue #$no found in project ${project.name}", it.description)
+                    }
+                }
+                // Issue 4 not found
+                val results = searchService.paginatedSearch(SearchRequest("#4", gitIssueSearchExtension.searchResultType.id)).items
+                assertTrue(results.none { "#4" in it.title })
+            }
         }
     }
 
