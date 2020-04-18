@@ -113,7 +113,8 @@ public class ArtifactoryPromotionSyncServiceImpl implements ArtifactoryPromotion
                 .orElseThrow(() -> new IllegalStateException("Branch not configured for Artifactory"));
     }
 
-    private void sync(Branch branch, JobRunListener listener) {
+    @Override
+    public void sync(Branch branch, JobRunListener listener) {
         // Gets the sync properties
         Property<ArtifactoryPromotionSyncProperty> syncProperty = propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class);
         if (syncProperty.isEmpty()) {
@@ -146,7 +147,8 @@ public class ArtifactoryPromotionSyncServiceImpl implements ArtifactoryPromotion
         }
     }
 
-    protected void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, JobRunListener listener) {
+    @Override
+    public void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, JobRunListener listener) {
         // Looks for the build
         Optional<Build> buildOpt = structureService.findBuildByName(
                 branch.getProject().getName(),

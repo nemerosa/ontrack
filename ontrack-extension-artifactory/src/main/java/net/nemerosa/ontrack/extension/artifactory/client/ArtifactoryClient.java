@@ -14,6 +14,12 @@ public interface ArtifactoryClient {
 
     JsonNode getBuildInfo(String buildName, String buildNumber);
 
+    /**
+     * Gets the statuses (i.e. promotions) of a given build info in Artifactory.
+     *
+     * @param buildInfo Build info as returned by Artifactory
+     * @return List of statuses
+     */
     List<ArtifactoryStatus> getStatuses(JsonNode buildInfo);
 
     /**
