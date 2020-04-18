@@ -1,215 +1,233 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.common.Document;
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
-import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
-import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
-import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.test.TestUtils;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
+import net.nemerosa.ontrack.common.Document
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException
+import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException
+import net.nemerosa.ontrack.model.security.ProjectList
+import net.nemerosa.ontrack.model.security.ValidationRunCreate
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
+import net.nemerosa.ontrack.model.structure.ID.Companion.of
+import net.nemerosa.ontrack.test.TestUtils
+import org.junit.Test
+import org.springframework.security.access.AccessDeniedException
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
-import java.util.List;
+class StructureServiceIT : AbstractDSLTestSupport() {
 
-import static org.junit.Assert.*;
-
-public class StructureServiceIT extends AbstractServiceTestSupport {
-
-    @Autowired
-    private StructureService structureService;
-
-    @Test(expected = IllegalArgumentException.class)
-    public void newProject_null() {
-        structureService.newProject(null);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void newProject_existing() {
-        structureService.newProject(Project.of(nameDescription()).withId(ID.of(1)));
+    @Test(expected = IllegalStateException::class)
+    fun `Cannot accept an ID when creating a project`() {
+        asAdmin { structureService.newProject(Project.of(nameDescription()).withId(of(1))) }
     }
 
     @Test
-    public void newProject() throws Exception {
-        Project project = doCreateProject();
-        assertNotNull(project);
-        Entity.isEntityDefined(project, "Project must be defined");
-        Project p = asUser().with(project.id(), ProjectView.class).call(() -> structureService.getProject(project.getId()));
-        assertEquals(project, p);
+    fun `Creation of a project`() {
+        val project = asAdmin { structureService.newProject(Project.of(nameDescription())) }
+        isEntityDefined(project, "Project must be defined")
+        val p = asUser().withView(project).call { structureService.getProject(project.id) }
+        assertEquals(project, p)
     }
 
     @Test
-    public void newBranch() throws Exception {
-        Branch branch = doCreateBranch();
-        assertNotNull(branch);
-        Branch b = asUser().with(branch.getProject().id(), ProjectView.class).call(() -> structureService.getBranch(branch.getId()));
-        assertEquals(branch, b);
+    fun `Creation of a branch`() {
+        val branch = project<Branch> {
+            structureService.newBranch(
+                    Branch.of(this, nameDescription())
+            )
+        }
+        val b = asUser().withView(branch).call { structureService.getBranch(branch.id) }
+        assertEquals(branch, b)
     }
 
     @Test
-    public void newPromotionLevel() throws Exception {
-        PromotionLevel promotionLevel = doCreatePromotionLevel();
-        assertNotNull(promotionLevel);
-        PromotionLevel pl = asUser().with(promotionLevel, ProjectView.class).call(() -> structureService.getPromotionLevel(promotionLevel.getId()));
-        assertEquals(promotionLevel, pl);
+    fun `Creation of a promotion level`() {
+        val pl = project<PromotionLevel> {
+            branch<PromotionLevel> {
+                structureService.newPromotionLevel(PromotionLevel.of(this, nameDescription()))
+            }
+        }
+        val p = asUser().withView(pl).call { structureService.getPromotionLevel(pl.id) }
+        assertEquals(pl, p)
     }
 
     @Test
-    public void newValidationStamp() throws Exception {
-        ValidationStamp validationStamp = doCreateValidationStamp();
-        assertNotNull(validationStamp);
-        ValidationStamp vs = asUser().with(validationStamp, ProjectView.class).call(() -> structureService.getValidationStamp(validationStamp.getId()));
-        assertEquals(validationStamp, vs);
+    fun `Creation of a validation stamp`() {
+        val vs = project<ValidationStamp> {
+            branch<ValidationStamp> {
+                structureService.newValidationStamp(ValidationStamp.of(this, nameDescription()))
+            }
+        }
+        val v = asUser().withView(vs).call { structureService.getValidationStamp(vs.id) }
+        assertEquals(vs, v)
     }
 
     @Test
-    public void newBuild() throws Exception {
-        Build build = doCreateBuild();
-        assertNotNull(build);
-        Build b = asUser().with(build, ProjectView.class).call(() -> structureService.getBuild(build.getId()));
-        assertEquals(build, b);
+    fun `Creation of a build`() {
+        val build = project<Build> {
+            branch<Build> {
+                structureService.newBuild(Build.of(this, nameDescription(), securityService.currentSignature))
+            }
+        }
+        val b = asUser().withView(build).call { structureService.getBuild(build.id) }
+        assertEquals(build, b)
     }
 
     @Test
-    public void getProjectList_all() throws Exception {
-        int[] ids = doCreateProjects();
-        List<Project> list = asUser().with(ProjectList.class).call(structureService::getProjectList);
-        assertTrue(list.size() >= 3);
-        assertTrue(list.stream().anyMatch(p -> p.id() == ids[0]));
-        assertTrue(list.stream().anyMatch(p -> p.id() == ids[1]));
-        assertTrue(list.stream().anyMatch(p -> p.id() == ids[2]));
+    fun `Project list`() {
+        val projects = (1..3).map { project() }
+        val list = asUserWith<ProjectList, List<Project>> { structureService.projectList }
+        assertTrue(list.size >= 3)
+        assertTrue(list.containsAll(projects))
     }
 
     @Test
-    public void getProjectList_filtered() throws Exception {
-        grantViewToAll(false);
-        int[] ids = doCreateProjects();
-        List<Project> list = asUser()
-                .with(ids[0], ProjectView.class)
-                .with(ids[1], ProjectEdit.class)
-                .call(structureService::getProjectList);
-        assertEquals(2, list.size());
-        assertTrue(list.stream().anyMatch(p -> p.id() == ids[0]));
-        assertTrue(list.stream().anyMatch(p -> p.id() == ids[1]));
-        assertTrue(list.stream().noneMatch(p -> p.id() == ids[2]));
+    fun `Project list filtered by user rights`() {
+        withNoGrantViewToAll {
+            val projects = (1..3).map { project() }
+            val list = asUser().withView(projects[0]).withView(projects[1]).call {
+                structureService.projectList
+            }
+            assertEquals(
+                    listOf(projects[0], projects[1]),
+                    list
+            )
+        }
     }
 
     @Test
-    public void getProjectList_none() throws Exception {
-        grantViewToAll(false);
-        doCreateProjects();
-        List<Project> list = asUser()
-                .call(structureService::getProjectList);
-        assertEquals(0, list.size());
+    fun `Project list not accessible by default`() {
+        withNoGrantViewToAll {
+            (1..3).map { project() }
+            val list = asUser().call {
+                structureService.projectList
+            }
+            assertTrue(list.isEmpty())
+        }
     }
 
     @Test
-    public void promotionLevel_image_none() throws Exception {
-        PromotionLevel promotionLevel = doCreatePromotionLevel();
-        Document image = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
-        assertTrue("No image", image.isEmpty());
+    fun `Promotion levels have no image by default`() {
+        project {
+            branch {
+                promotionLevel {
+                    val image = structureService.getPromotionLevelImage(id)
+                    assertTrue(image.isEmpty, "No image")
+                }
+            }
+        }
     }
 
     @Test
-    public void promotionLevel_image_add() throws Exception {
-        PromotionLevel promotionLevel = doCreatePromotionLevel();
-        // Gets an image
-        Document image = new Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"));
-        // Sets the image
-        asUser().with(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class).call(() -> {
-            structureService.setPromotionLevelImage(promotionLevel.getId(), image);
-            return null;
-        });
-        // Gets the image
-        Document d = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
-        // Checks
-        assertEquals(image, d);
-    }
-
-    @Test(expected = ImageTypeNotAcceptedException.class)
-    public void promotionLevel_image_type_not_acceptable() throws Exception {
-        PromotionLevel promotionLevel = doCreatePromotionLevel();
-        // Gets an image
-        Document image = new Document("image/x", new byte[1]);
-        // Sets the image
-        structureService.setPromotionLevelImage(promotionLevel.getId(), image);
-    }
-
-    @Test(expected = ImageFileSizeException.class)
-    public void promotionLevel_image_size_not_acceptable() throws Exception {
-        PromotionLevel promotionLevel = doCreatePromotionLevel();
-        // Gets an image
-        Document image = new Document("image/png", new byte[16001]);
-        // Sets the image
-        structureService.setPromotionLevelImage(promotionLevel.getId(), image);
+    fun `Adding an image to a promotion level`() {
+        project {
+            branch {
+                promotionLevel {
+                    // Gets an image
+                    val image = Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
+                    // Sets the image
+                    structureService.setPromotionLevelImage(id, image)
+                    // Gets the image
+                    val savedImage = structureService.getPromotionLevelImage(id)
+                    assertEquals(image, savedImage)
+                }
+            }
+        }
     }
 
     @Test
-    public void promotionLevel_image_empty() throws Exception {
-        PromotionLevel promotionLevel = doCreatePromotionLevel();
-        // Gets an image
-        Document image = new Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"));
-        // Sets the image
-        asUser().with(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class).call(() -> {
-            // New image
-            structureService.setPromotionLevelImage(promotionLevel.getId(), image);
-            // Removes the image
-            structureService.setPromotionLevelImage(promotionLevel.getId(), null);
-            return null;
-        });
-        // Gets the image
-        Document d = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
-        // Checks
-        assertTrue("Empty image", d.isEmpty());
-    }
-
-    @Test(expected = AccessDeniedException.class)
-    public void validationRun_create_grant_check() throws Exception {
-        // Prerequisites
-        Branch branch = doCreateBranch();
-        ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
-        Build build = doCreateBuild(branch, nameDescription());
-        // Creation of the run
-        asUser().withView(branch).execute(() -> structureService.newValidationRun(
-                build,
-                new ValidationRunRequest(
-                        stamp.getName(),
-                        ValidationRunStatusID.STATUS_PASSED
-                )
-        ));
+    fun `Non acceptable image type`() {
+        project {
+            branch {
+                promotionLevel {
+                    // Gets an image
+                    val image = Document("image/x", ByteArray(1))
+                    // Sets the image
+                    assertFailsWith<ImageTypeNotAcceptedException> {
+                        structureService.setPromotionLevelImage(id, image)
+                    }
+                }
+            }
+        }
     }
 
     @Test
-    public void validationRun_create() throws Exception {
-        // Prerequisites
-        Branch branch = doCreateBranch();
-        ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
-        Build build = doCreateBuild(branch, nameDescription());
-        // Creation of the run
-        ValidationRun run = asUser().withView(branch).with(branch, ValidationRunCreate.class).call(() ->
-                structureService.newValidationRun(
-                        build,
-                        new ValidationRunRequest(
-                                stamp.getName(),
-                                ValidationRunStatusID.STATUS_PASSED
+    fun `Non acceptable image size`() {
+        project {
+            branch {
+                promotionLevel {
+                    // Gets an image
+                    val image = Document("image/png", ByteArray(16001))
+                    // Sets the image
+                    assertFailsWith<ImageFileSizeException> {
+                        structureService.setPromotionLevelImage(id, image)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Removing an image`() {
+        project {
+            branch {
+                promotionLevel {
+                    // Gets an image
+                    val image = Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
+                    // Sets the image
+                    structureService.setPromotionLevelImage(id, image)
+                    // Removes the image
+                    structureService.setPromotionLevelImage(id, null)
+                    // Gets the image back
+                    val savedImage = structureService.getPromotionLevelImage(id)
+                    assertTrue(savedImage.isEmpty, "Empty image")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creation of a validation run must be granted`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    asUser().withView(this).execute {
+                        assertFailsWith<AccessDeniedException> {
+                            structureService.newValidationRun(
+                                    this,
+                                    ValidationRunRequest(
+                                            vs.name,
+                                            ValidationRunStatusID.STATUS_PASSED
+                                    )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creation of a validation run`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    asUser().withView(this).with(this, ValidationRunCreate::class.java).execute {
+                        structureService.newValidationRun(
+                                this,
+                                ValidationRunRequest(
+                                        vs.name,
+                                        ValidationRunStatusID.STATUS_PASSED
+                                )
                         )
-                )
-        );
-        Entity.isEntityDefined(run, "Validation run is defined");
-        assertEquals("Validation run order must be 1", 1, run.getRunOrder());
-    }
-
-    private int[] doCreateProjects() throws Exception {
-        return asUser().with(ProjectCreation.class).call(() -> {
-            int[] ids = new int[3];
-            int i = 0;
-            ids[i++] = structureService.newProject(Project.of(nameDescription())).id();
-            ids[i++] = structureService.newProject(Project.of(nameDescription())).id();
-            //noinspection UnusedAssignment
-            ids[i++] = structureService.newProject(Project.of(nameDescription())).id();
-            return ids;
-        });
+                    }
+                }
+            }
+        }
     }
 
 }

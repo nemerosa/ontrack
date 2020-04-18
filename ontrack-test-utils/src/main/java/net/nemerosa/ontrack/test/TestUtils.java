@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -84,7 +85,8 @@ public final class TestUtils {
         return "2014-05-13T20:11:00Z";
     }
 
-    public static byte[] resourceBytes(String path) throws IOException {
+    public static @NotNull
+    byte[] resourceBytes(@NotNull String path) throws IOException {
         return IOUtils.toByteArray(TestUtils.class.getResource(path));
     }
 
