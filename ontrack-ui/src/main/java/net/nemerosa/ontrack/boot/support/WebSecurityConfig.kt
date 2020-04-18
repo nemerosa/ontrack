@@ -35,9 +35,9 @@ class WebSecurityConfig {
                 securityMatcher("/settings/**")
                 securityMatcher("/user/**")
                 securityMatcher("/validation-stamp-filters/**")
-                // Enabling JS Cookies for CSRF protection (for AngularJS)
+                // Disables CSRF for the API calls
                 csrf {
-                    csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+                    disable()
                 }
                 // Requires authentication
                 authorizeRequests {
