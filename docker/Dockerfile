@@ -42,8 +42,11 @@ VOLUME /var/ontrack/extensions
 # is used, with an external volume or in a child Dockerfile
 ENV EXTENSIONS_DIR /var/ontrack/extensions
 
-# Exposing the ports
+# Exposing the UI port
 EXPOSE 8080
+
+# Exporsing the management port
+EXPOSE 8800
 
 # Profile
 ENV PROFILE prod
@@ -66,4 +69,4 @@ COPY ontrack.jar /opt/ontrack/
 
 # Healthcheck
 HEALTHCHECK --interval=1m --timeout=10s \
-  CMD curl -f http://localhost:8080/info || exit 1
+  CMD curl -f http://localhost:8800/manage/info || exit 1

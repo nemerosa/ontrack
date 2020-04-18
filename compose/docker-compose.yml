@@ -22,6 +22,7 @@ services:
       - "ontrack_data:/var/ontrack/data"
     ports:
       - "8080:8080"
+      - "8800:8800"
 
   # Postgresql database
   postgres:

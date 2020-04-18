@@ -11,25 +11,32 @@ services:
       - "8083"
       - "8086"
 
-  # Grafana container
-  grafana:
-    image: grafana/grafana:4.1.1
-    ports:
-      - "3000"
-
   # Ontrack container
   ontrack:
     image: nemerosa/ontrack:latest
     environment:
       JAVA_OPTIONS: "${JAVA_OPTIONS}"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql/ontrack"
+      # InfluxDB being enabled
+      ONTRACK_INFLUXDB_ENABLED: "true"
+      ONTRACK_INFLUXDB_URI: "http://influxdb:8086"
+      # Elastic search
+      SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
       PROFILE: acceptance
+    depends_on:
+      postgresql:
+        condition: service_started
+      influxdb:
+        condition: service_started
+      elasticsearch:
+        condition: service_started
     volumes:
       - "./ci/ontrack:/var/ontrack/conf"
       # Better startup performances in CI and DO, do not use in Prod
       - "/dev/urandom:/dev/random"
     ports:
       - "8080"
+      - "8800"
 
   # Postgresql database
   postgresql:
@@ -40,3 +47,11 @@ services:
       POSTGRES_PASSWORD: ontrack
     ports:
       - "5432"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "discovery.type=single-node"
