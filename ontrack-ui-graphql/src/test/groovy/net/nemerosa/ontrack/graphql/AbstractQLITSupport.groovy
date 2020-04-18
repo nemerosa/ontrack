@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
+
 import graphql.ErrorType
 import graphql.ExceptionWhileDataFetching
 import graphql.ExecutionResult
@@ -16,6 +17,17 @@ abstract class AbstractQLITSupport extends AbstractServiceTestSupport {
     private GraphqlSchemaService schemaService
 
     def run(String query) {
+        // Making sure we're at least authenticated
+        if (securityService.isLogged()) {
+            return internalRun(query)
+        } else {
+            return asUser().call {
+                return internalRun(query)
+            }
+        }
+    }
+
+    def internalRun(String query) {
         def result = GraphQL.newGraphQL(schemaService.schema).build().execute(query)
         def error = getException(result)
         if (error != null) {

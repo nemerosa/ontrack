@@ -15,6 +15,17 @@ abstract class AbstractQLKTITSupport : AbstractDSLTestSupport() {
     private lateinit var schemaService: GraphqlSchemaService
 
     fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
+        // Task to run
+        val code = { internalRun(query, variables) }
+        // Making sure we're at least authenticated
+        return if (securityService.isLogged) {
+            code()
+        } else {
+            asUser().call(code)
+        }
+    }
+
+    private fun internalRun(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
         val result = GraphQL
                 .newGraphQL(schemaService.schema)
                 .build()
