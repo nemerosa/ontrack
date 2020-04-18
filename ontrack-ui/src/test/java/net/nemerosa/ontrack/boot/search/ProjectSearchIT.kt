@@ -17,7 +17,7 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
     fun `Searching for a project after its creation`() {
         val candidate = project {}
         // Searches for the candidate project
-        val results = searchService.paginatedSearch(SearchRequest(candidate.name)).items
+        val results = asUser { searchService.paginatedSearch(SearchRequest(candidate.name)).items }
         assertTrue(results.isNotEmpty(), "At least one result")
         results[0].apply {
             assertEquals(candidate.entityDisplayName, title)
@@ -33,7 +33,7 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
         // Launching indexation for the projects
         index(PROJECT_SEARCH_INDEX)
         // Searches for the candidate project
-        val results = searchService.paginatedSearch(SearchRequest(candidate.name)).items
+        val results = asUser { searchService.paginatedSearch(SearchRequest(candidate.name)).items }
         assertEquals(1, results.size)
         val result = results.first()
         result.apply {

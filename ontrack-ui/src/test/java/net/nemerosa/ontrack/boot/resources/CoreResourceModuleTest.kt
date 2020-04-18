@@ -568,12 +568,13 @@ class CoreResourceModuleTest {
         assertResourceJson(
                 mapper,
                 `object`()
-                        .with("id", 0)
+                        .with("id", 1)
                         .with("name", "Admins")
                         .with("description", "Administrators")
-                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroup:0")
-                        .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroupUpdateForm:0")
-                        .with("_delete", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#deleteGroup:0")
+                        .with("autoJoin", false)
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroup:1")
+                        .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroupUpdateForm:1")
+                        .with("_delete", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#deleteGroup:1")
                         .end(),
                 AccountGroup(ID.of(1), "Admins", "Administrators", false)
         )

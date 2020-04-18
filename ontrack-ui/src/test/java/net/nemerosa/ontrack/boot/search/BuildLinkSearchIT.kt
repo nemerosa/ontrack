@@ -16,7 +16,7 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
             // Indexation
             index(BUILD_LINK_SEARCH_INDEX)
             // Looks for the source using target complete reference
-            val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items
+            val results = asUser { searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items }
             assertTrue(results.isNotEmpty())
             results[0].apply {
                 assertEquals(source.entityDisplayName, title)
@@ -47,7 +47,7 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
         // Indexation
         index(BUILD_LINK_SEARCH_INDEX)
         // Looks for the source using target complete reference
-        val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:$version", "build-link")).items
+        val results = asUser { searchService.paginatedSearch(SearchRequest("${target.project.name}:$version", "build-link")).items }
         assertTrue(results.isNotEmpty())
         results[0].apply {
             assertEquals(source.entityDisplayName, title)
@@ -61,7 +61,7 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
             // Indexation
             index(BUILD_LINK_SEARCH_INDEX)
             // Looks for the source using target project only
-            val results = searchService.paginatedSearch(SearchRequest(target.project.name, "build-link")).items
+            val results = asUser { searchService.paginatedSearch(SearchRequest(target.project.name, "build-link")).items }
             assertTrue(results.isNotEmpty())
             results[0].apply {
                 assertEquals(source.entityDisplayName, title)

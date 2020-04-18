@@ -44,7 +44,7 @@ class BranchControllerIT : AbstractWebTestSupport() {
         // Disables it
         val disabled = asUser().with(branch, ProjectEdit::class.java).call { controller.disableBranch(branch.id) }
         assertTrue(disabled.isDisabled, "Branch is disabled")
-        val disabledEvent = eventQueryService.getLastEvent(branch, EventFactory.DISABLE_BRANCH)
+        val disabledEvent = asUser { eventQueryService.getLastEvent(branch, EventFactory.DISABLE_BRANCH) }
         assertNotNull(disabledEvent, "Disabled event is there") { event ->
             val eventBranch: Branch? = event.getEntity(ProjectEntityType.BRANCH)
             assertNotNull(eventBranch, "Branch associated to the event") {
@@ -54,7 +54,7 @@ class BranchControllerIT : AbstractWebTestSupport() {
         // Enables it
         val enabled = asUser().with(branch, ProjectEdit::class.java).call { controller.enableBranch(branch.id) }
         assertFalse(enabled.isDisabled, "Branch is enabled")
-        val enabledEvent = eventQueryService.getLastEvent(branch, EventFactory.ENABLE_BRANCH)
+        val enabledEvent = asUser { eventQueryService.getLastEvent(branch, EventFactory.ENABLE_BRANCH) }
         assertNotNull(enabledEvent, "Enabled event is there") { event ->
             val eventBranch: Branch? = event.getEntity(ProjectEntityType.BRANCH)
             assertNotNull(eventBranch, "Branch associated to the event") {

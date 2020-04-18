@@ -40,7 +40,7 @@ class ProjectControllerIT : AbstractWebTestSupport() {
         // Disables it
         val disabled = asUser().with(project, ProjectEdit::class.java).call { controller.disableProject(project.id) }
         assertTrue(disabled.isDisabled, "Project is disabled")
-        val disabledEvent = eventQueryService.getLastEvent(project, EventFactory.DISABLE_PROJECT)
+        val disabledEvent = asUser { eventQueryService.getLastEvent(project, EventFactory.DISABLE_PROJECT) }
         assertNotNull(disabledEvent, "Disabled event is there") { event ->
             val eventProject: Project? = event.getEntity(ProjectEntityType.PROJECT)
             assertNotNull(eventProject, "Project associated to the event") {
@@ -50,7 +50,7 @@ class ProjectControllerIT : AbstractWebTestSupport() {
         // Enables it
         val enabled = asUser().with(project, ProjectEdit::class.java).call { controller.enableProject(project.id) }
         assertFalse(enabled.isDisabled, "Project is enabled")
-        val enabledEvent = eventQueryService.getLastEvent(project, EventFactory.ENABLE_PROJECT)
+        val enabledEvent = asUser { eventQueryService.getLastEvent(project, EventFactory.ENABLE_PROJECT) }
         assertNotNull(enabledEvent, "Enabled event is there") { event ->
             val eventProject: Project? = event.getEntity(ProjectEntityType.PROJECT)
             assertNotNull(eventProject, "Project associated to the event") {

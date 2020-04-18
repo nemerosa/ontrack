@@ -35,7 +35,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
             )
         }
         // Gets the edition form
-        val form = validationStampController.updateValidationStampForm(vs.id)
+        val form = asUser { validationStampController.updateValidationStampForm(vs.id) }
         // Gets the service configurator field
         val field = form.fields.find { it.type == "service-configurator" }
         assertNotNull(field) {
@@ -68,7 +68,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
             )
         }
         // Loads the validation stamp
-        val loadedVs = validationStampController.getValidationStamp(vs.id)
+        val loadedVs = asUser { validationStampController.getValidationStamp(vs.id) }
         // Checks the data type is still there
         val dataType = loadedVs.dataType
         assertNotNull(dataType, "Data type is loaded")
