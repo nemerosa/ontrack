@@ -289,7 +289,10 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         return asUser().with(projectEntity.projectId(), ProjectView::class.java).call { callable.call() }
     }
 
-    fun grantViewToAll(grantViewToAll: Boolean): Boolean = asUser().with(GlobalSettings::class.java).call {
+    /**
+     * This must always be called from [withGrantViewToAll] or [withNoGrantViewToAll].
+     */
+    private fun grantViewToAll(grantViewToAll: Boolean): Boolean = asUser().with(GlobalSettings::class.java).call {
         val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java).isGrantProjectViewToAll
         settingsManagerService.saveSettings(
                 SecuritySettings(isGrantProjectViewToAll = grantViewToAll)

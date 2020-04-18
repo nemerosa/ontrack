@@ -32,17 +32,18 @@ class BuildLinkIT : AbstractDSLTestSupport() {
 
     @Test(expected = ProjectNotFoundException::class)
     fun `Edition of links - project not authorised`() {
-        grantViewToAll(false)
-        val source = doCreateBuild()
-        val target = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).call {
-            // Adds the link using a form
-            structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(false,
-                            BuildLinkFormItem(target.project.name, target.name)
-                    )
-            )
+        withNoGrantViewToAll {
+            val source = doCreateBuild()
+            val target = doCreateBuild()
+            asUser().with(source, BuildConfig::class.java).call {
+                // Adds the link using a form
+                structureService.editBuildLinks(
+                        source,
+                        BuildLinkForm(false,
+                                BuildLinkFormItem(target.project.name, target.name)
+                        )
+                )
+            }
         }
     }
 
@@ -151,65 +152,67 @@ class BuildLinkIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Edition of links - partial rights - adding one link`() {
-        grantViewToAll(false)
-        val source = doCreateBuild()
-        val target1 = doCreateBuild()
-        val target2 = doCreateBuild()
-        val target3 = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).withView(target1).call {
-            structureService.addBuildLink(source, target1)
-        }
-        asUser().with(source, BuildConfig::class.java).withView(target2).call {
-            structureService.addBuildLink(source, target2)
-        }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target3).call {
-            // Adds the link using a form
-            structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(false,
-                            BuildLinkFormItem(target1.project.name, target1.name), // Existing
-                            BuildLinkFormItem(target3.project.name, target3.name) // New
-                    )
-            )
-        }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
-            // Checks all builds are still linked
-            assertEquals(
-                    setOf(target1.id, target2.id, target3.id),
-                    structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
-            )
+        withNoGrantViewToAll {
+            val source = doCreateBuild()
+            val target1 = doCreateBuild()
+            val target2 = doCreateBuild()
+            val target3 = doCreateBuild()
+            asUser().with(source, BuildConfig::class.java).withView(target1).call {
+                structureService.addBuildLink(source, target1)
+            }
+            asUser().with(source, BuildConfig::class.java).withView(target2).call {
+                structureService.addBuildLink(source, target2)
+            }
+            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target3).call {
+                // Adds the link using a form
+                structureService.editBuildLinks(
+                        source,
+                        BuildLinkForm(false,
+                                BuildLinkFormItem(target1.project.name, target1.name), // Existing
+                                BuildLinkFormItem(target3.project.name, target3.name) // New
+                        )
+                )
+            }
+            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+                // Checks all builds are still linked
+                assertEquals(
+                        setOf(target1.id, target2.id, target3.id),
+                        structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                )
+            }
         }
     }
 
     @Test
     fun `Edition of links - partial rights - adding and removing`() {
-        grantViewToAll(false)
-        val source = doCreateBuild()
-        val target1 = doCreateBuild()
-        val target2 = doCreateBuild()
-        val target3 = doCreateBuild()
-        asUser().with(source, BuildConfig::class.java).withView(target1).call {
-            structureService.addBuildLink(source, target1)
-        }
-        asUser().with(source, BuildConfig::class.java).withView(target2).call {
-            structureService.addBuildLink(source, target2)
-        }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target3).call {
-            // Adds the link using a form
-            structureService.editBuildLinks(
-                    source,
-                    BuildLinkForm(false,
-                            // BuildLinkFormItem(target1.project.name, target1.name), // Removing
-                            BuildLinkFormItem(target3.project.name, target3.name) // New
-                    )
-            )
-        }
-        asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
-            // Checks all builds are still linked
-            assertEquals(
-                    setOf(target2.id, target3.id),
-                    structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
-            )
+        withNoGrantViewToAll {
+            val source = doCreateBuild()
+            val target1 = doCreateBuild()
+            val target2 = doCreateBuild()
+            val target3 = doCreateBuild()
+            asUser().with(source, BuildConfig::class.java).withView(target1).call {
+                structureService.addBuildLink(source, target1)
+            }
+            asUser().with(source, BuildConfig::class.java).withView(target2).call {
+                structureService.addBuildLink(source, target2)
+            }
+            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target3).call {
+                // Adds the link using a form
+                structureService.editBuildLinks(
+                        source,
+                        BuildLinkForm(false,
+                                // BuildLinkFormItem(target1.project.name, target1.name), // Removing
+                                BuildLinkFormItem(target3.project.name, target3.name) // New
+                        )
+                )
+            }
+            asUser().with(source, BuildConfig::class.java).withView(target1).withView(target2).withView(target3).call {
+                // Checks all builds are still linked
+                assertEquals(
+                        setOf(target2.id, target3.id),
+                        structureService.getBuildsUsedBy(source).pageItems.map { it.id }.toSet()
+                )
+            }
         }
     }
 
@@ -275,14 +278,15 @@ class BuildLinkIT : AbstractDSLTestSupport() {
 
     @Test(expected = AccessDeniedException::class)
     fun `Build view is needed on target build to create a link`() {
-        grantViewToAll(false)
-        // Creates a build
-        val build = doCreateBuild()
-        // Creates a second build to link
-        val target = doCreateBuild()
-        // Build link creation
-        asUser().with(build, BuildConfig::class.java).call {
-            structureService.addBuildLink(build, target)
+        withNoGrantViewToAll {
+            // Creates a build
+            val build = doCreateBuild()
+            // Creates a second build to link
+            val target = doCreateBuild()
+            // Build link creation
+            asUser().with(build, BuildConfig::class.java).call {
+                structureService.addBuildLink(build, target)
+            }
         }
     }
 
