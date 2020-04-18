@@ -44,7 +44,8 @@ class BranchQLIT extends AbstractQLITSupport {
     void 'Branch signature'() {
         def branch = doCreateBranch()
         def data = run("""{branches (id: ${branch.id}) { creation { user time } } }""")
-        assert data.branches.first().creation.user == 'user'
+        def user = data.branches.first().creation.user
+        assert user: "User is defined"
         assert data.branches.first().creation.time.charAt(10) == 'T'
     }
 
