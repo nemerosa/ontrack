@@ -76,13 +76,13 @@ class WebConfig(
         listOf(
                 "/graphql/**",
                 "/rest/**",
+                // TODO 👇 To migrate to /rest/
                 "/accounts/**",
                 "/admin/**",
                 "/api/**",
                 "/structure/**",
                 "/branches/**",
                 "/events/**",
-                "/info/**",
                 "/properties/**",
                 "/search/**",
                 "/settings/**",

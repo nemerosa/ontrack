@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.support
 
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -12,20 +13,42 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 @EnableWebSecurity
 class WebSecurityConfig {
 
-    // FIXME API login
-//    @Configuration
-//    @Order(1)
-//    class ApiWebSecurityConfigurationAdapter: WebSecurityConfigurerAdapter() {
-//        override fun configure(http: HttpSecurity) {
-//            http {
-//                securityMatcher("/api/**")
-//                authorizeRequests {
-//                    authorize(anyRequest, hasRole("ADMIN"))
-//                }
-//                httpBasic { }
-//            }
-//        }
-//    }
+    /**
+     * API login
+     */
+    @Configuration
+    @Order(1)
+    class ApiWebSecurityConfigurationAdapter: WebSecurityConfigurerAdapter() {
+        override fun configure(http: HttpSecurity) {
+            http {
+                securityMatcher("/rest/**")
+                securityMatcher("/graphql/**")
+                // TODO 👇 To migrate to /rest/
+                securityMatcher("/accounts/**")
+                securityMatcher("/admin/**")
+                securityMatcher("/api/**")
+                securityMatcher("/structure/**")
+                securityMatcher("/branches/**")
+                securityMatcher("/events/**")
+                securityMatcher("/properties/**")
+                securityMatcher("/search/**")
+                securityMatcher("/settings/**")
+                securityMatcher("/user/**")
+                securityMatcher("/validation-stamp-filters/**")
+                // Enabling JS Cookies for CSRF protection (for AngularJS)
+                csrf {
+                    csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+                }
+                // Requires authentication
+                authorizeRequests {
+                    authorize(anyRequest, authenticated)
+                }
+                // Requires BASIC authentication
+                httpBasic { }
+                // TODO Token based authentication
+            }
+        }
+    }
 
     /**
      * Default UI login
