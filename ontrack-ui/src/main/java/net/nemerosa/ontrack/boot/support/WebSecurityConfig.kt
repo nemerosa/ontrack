@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.support
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -36,6 +37,10 @@ class WebSecurityConfig {
                 // Enabling JS Cookies for CSRF protection (for AngularJS)
                 csrf {
                     csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+                }
+                // Management end points are accessible on a separate port without any authentication needed
+                authorizeRequests {
+                    authorize(EndpointRequest.toAnyEndpoint(), permitAll)
                 }
                 // Requires authentication always
                 authorizeRequests {
