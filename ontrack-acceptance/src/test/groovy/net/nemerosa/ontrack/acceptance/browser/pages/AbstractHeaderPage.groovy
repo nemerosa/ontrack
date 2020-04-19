@@ -31,10 +31,6 @@ public abstract class AbstractHeaderPage extends AbstractPage {
         browser.waitUntil("Page title") { pageTitle.displayed }
     }
 
-    public void login(String user, String password) {
-        header.login(user, password);
-    }
-
     /**
      * Navigates to a user menu item using its ID and returns the target page
      */
