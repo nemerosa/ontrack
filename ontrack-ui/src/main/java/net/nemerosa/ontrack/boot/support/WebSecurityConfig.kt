@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.support
 
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -18,6 +19,7 @@ class WebSecurityConfig {
      */
     @Configuration
     @Order(1)
+    @ConditionalOnWebApplication
     class ApiWebSecurityConfigurationAdapter: WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
             http {
@@ -52,6 +54,7 @@ class WebSecurityConfig {
      * Default UI login
      */
     @Configuration
+    @ConditionalOnWebApplication
     class UIWebSecurityConfigurerAdapter : WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
             http {
