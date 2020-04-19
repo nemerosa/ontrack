@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.acceptance.tests.dsl
+package net.nemerosa.ontrack.acceptance.tests.extensions
 
 import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.AcceptanceTestContext
@@ -18,7 +18,7 @@ class ACCExtension extends AbstractACCDSL {
 
     @Test
     void 'Information is accessible'() {
-        anonymous().get("info").withNode { info ->
+        admin().get("rest/info").withNode { info ->
             def displayVersion = info.path("version").path("display").asText()
             assert (StringUtils.isNotBlank(displayVersion))
         }
@@ -60,7 +60,7 @@ class ACCExtension extends AbstractACCDSL {
     @Test
     void 'Third party library test'() {
         // Just call a REST end point which relies on 3rd party dependency
-        anonymous().get("extension/test/3rdparty?value=2&power=3").withNode { json ->
+        admin().get("extension/test/3rdparty?value=2&power=3").withNode { json ->
             def result = json.path("result").asInt()
             assert (8 == result)
         }

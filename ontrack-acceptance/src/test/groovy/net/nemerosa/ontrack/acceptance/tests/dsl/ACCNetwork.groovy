@@ -46,13 +46,6 @@ class ACCNetwork extends AcceptanceTestClient {
         // ETag header
         def etag = response.getFirstHeader('ETag')
         assert etag && etag.value != ''
-        // Pragma no-cache
-        def pragmas = response.getHeaders('Pragma')
-        if (pragmas) {
-            pragmas.each { pragma ->
-                assert !pragma.value.contains('no-cache')
-            }
-        }
     }
 
 }

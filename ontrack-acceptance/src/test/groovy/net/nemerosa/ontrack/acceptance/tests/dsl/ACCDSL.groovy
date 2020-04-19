@@ -32,8 +32,8 @@ class ACCDSL extends AbstractACCDSL {
         def branchName = testBranch.name.asText()
         // Removes 'grant view to all'
         withNotGrantProjectViewToAll {
-            // Anonymous client
-            Ontrack ontrack = ontrackBuilder.build()
+            // Not authorised client
+            Ontrack ontrack = ontrackAsAnyUser
             // Branch cannot be found
             try {
                 ontrack.branch(projectName, branchName)
