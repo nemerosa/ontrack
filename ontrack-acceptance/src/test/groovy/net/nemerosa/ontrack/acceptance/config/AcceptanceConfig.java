@@ -216,7 +216,7 @@ public class AcceptanceConfig {
             while (true) {
                 try {
                     // Gets the info
-                    JsonNode info = jsonClient.get("info");
+                    JsonNode info = jsonClient.get("rest/info");
                     // Gets the version
                     return info.path("version").path("display").asText();
                 } catch (ClientException ex) {
