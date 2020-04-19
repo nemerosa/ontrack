@@ -85,7 +85,8 @@ class WebConfig(
                 "/properties/**",
                 "/search/**",
                 "/settings/**",
-                "/user/**"
+                "/user/**",
+                "/extension/**"
         ).forEach {
             registry.addMapping(it).allowedMethods(*ALLOWED_API_METHODS.toTypedArray())
         }

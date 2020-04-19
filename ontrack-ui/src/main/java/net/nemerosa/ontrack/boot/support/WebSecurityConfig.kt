@@ -35,6 +35,7 @@ class WebSecurityConfig {
                 securityMatcher("/search/**")
                 securityMatcher("/settings/**")
                 securityMatcher("/user/**")
+                securityMatcher("/extension/**")
                 // Disables CSRF for the API calls
                 csrf {
                     disable()
