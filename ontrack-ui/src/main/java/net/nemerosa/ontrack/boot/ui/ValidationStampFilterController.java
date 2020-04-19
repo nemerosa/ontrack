@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
-@RequestMapping("/validation-stamp-filters")
+@RequestMapping("/rest/validation-stamp-filters")
 public class ValidationStampFilterController extends AbstractResourceController {
 
     private final StructureService structureService;
