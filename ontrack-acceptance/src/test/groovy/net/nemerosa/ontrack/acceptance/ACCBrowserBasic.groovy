@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import net.nemerosa.ontrack.acceptance.browser.pages.APIPage
 import net.nemerosa.ontrack.acceptance.browser.pages.BuildPage
 import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
+import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.browser.pages.ProjectPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
@@ -22,9 +23,9 @@ class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
     @AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE, AcceptanceTestContext.BROWSER_TEST])
-    void 'Home page is accessible'() {
+    void 'Login page is accessible'() {
         browser {
-            goTo HomePage, [:]
+            goTo LoginPage, [:]
         }
     }
 
