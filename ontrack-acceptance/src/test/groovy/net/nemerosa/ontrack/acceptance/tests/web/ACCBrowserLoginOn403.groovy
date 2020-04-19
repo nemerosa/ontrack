@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.browser.pages.AccountManagementPage
 import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import org.junit.Ignore
 import org.junit.Test
 
 /**
@@ -13,6 +14,7 @@ import org.junit.Test
 class ACCBrowserLoginOn403 extends AcceptanceTestClient {
 
     @Test
+    @Ignore("#756 We want redirection to initial page")
     void 'Login redirection'() {
 
         browser { browser ->
@@ -27,6 +29,20 @@ class ACCBrowserLoginOn403 extends AcceptanceTestClient {
             // And we should be redirected to the account management page
             browser.screenshot 'access-granted'
             browser.at AccountManagementPage
+        }
+
+    }
+
+    @Test
+    void 'Login interception'() {
+
+        browser { browser ->
+            // Tries to go to unauthorised page
+            browser.goTo AccountManagementPage, [:], false
+            // This should be rejected - and we should be on the login page
+            browser.screenshot 'access-rejected'
+            LoginPage loginPage = browser.page(LoginPage)
+            loginPage.checkOnLogin()
         }
 
     }
