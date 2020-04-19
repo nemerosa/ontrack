@@ -28,7 +28,6 @@ class WebSecurityConfig {
                 securityMatcher("/admin/**")
                 securityMatcher("/api/**")
                 securityMatcher("/structure/**")
-                securityMatcher("/branches/**")
                 securityMatcher("/events/**")
                 securityMatcher("/properties/**")
                 securityMatcher("/search/**")

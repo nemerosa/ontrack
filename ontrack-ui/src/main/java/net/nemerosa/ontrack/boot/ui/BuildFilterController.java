@@ -22,6 +22,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
  * Management of build filters for the branches.
  */
 @RestController
+@RequestMapping("rest")
 public class BuildFilterController extends AbstractResourceController {
 
     private final BuildFilterService buildFilterService;
