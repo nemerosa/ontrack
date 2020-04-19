@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.acceptance.AbstractACCDSL
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
+import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -90,6 +91,7 @@ class ACCDSLAccounts extends AbstractACCDSL {
     }
 
     @Test
+    @Ignore("#756 Refactoring of security")
     void 'Creation of account with groups'() {
         // Groups
         def g1Name = uid('G')
