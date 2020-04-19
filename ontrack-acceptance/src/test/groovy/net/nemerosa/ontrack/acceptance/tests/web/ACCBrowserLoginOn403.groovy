@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.acceptance.tests.web
 
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.browser.pages.AccountManagementPage
-import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
+import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
@@ -12,7 +12,6 @@ import org.junit.Test
 @AcceptanceTestSuite
 class ACCBrowserLoginOn403 extends AcceptanceTestClient {
 
-
     @Test
     void 'Login redirection'() {
 
@@ -21,10 +20,10 @@ class ACCBrowserLoginOn403 extends AcceptanceTestClient {
             browser.goTo AccountManagementPage, [:], false
             // This should be rejected - and we should be on the login page
             browser.screenshot 'access-rejected'
-            HomePage home = browser.page(HomePage)
-            home.header.checkOnLogin()
+            LoginPage loginPage = browser.page(LoginPage)
+            loginPage.checkOnLogin()
             // Now, we login as admin
-            home.header.doLogin('admin', adminPassword, 3000)
+            loginPage.doLogin('admin', adminPassword, 3000)
             // And we should be redirected to the account management page
             browser.screenshot 'access-granted'
             browser.at AccountManagementPage
