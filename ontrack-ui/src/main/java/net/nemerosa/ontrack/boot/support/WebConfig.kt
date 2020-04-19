@@ -81,13 +81,11 @@ class WebConfig(
                 "/admin/**",
                 "/api/**",
                 "/structure/**",
-                "/branches/**",
                 "/events/**",
                 "/properties/**",
                 "/search/**",
                 "/settings/**",
-                "/user/**",
-                "/validation-stamp-filters/**"
+                "/user/**"
         ).forEach {
             registry.addMapping(it).allowedMethods(*ALLOWED_API_METHODS.toTypedArray())
         }

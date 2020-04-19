@@ -33,7 +33,6 @@ class WebSecurityConfig {
                 securityMatcher("/search/**")
                 securityMatcher("/settings/**")
                 securityMatcher("/user/**")
-                securityMatcher("/validation-stamp-filters/**")
                 // Disables CSRF for the API calls
                 csrf {
                     disable()
