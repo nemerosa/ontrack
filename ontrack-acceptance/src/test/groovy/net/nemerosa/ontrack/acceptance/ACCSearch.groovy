@@ -11,16 +11,6 @@ import org.junit.Test
 class ACCSearch extends AcceptanceTestClient {
 
     @Test
-    void 'With default security settings, all builds are accessible'() {
-        // Prerequisites
-        JsonNode build = doCreateBuild()
-        // Looking for this build as a different user
-        def results = anonymousOntrack.search(build.path('name').asText())
-        // Check
-        assert results.size() == 1
-    }
-
-    @Test
     void 'Looking for a non authorised build when does not return anything'() {
         withNotGrantProjectViewToAll {
             // Prerequisites
