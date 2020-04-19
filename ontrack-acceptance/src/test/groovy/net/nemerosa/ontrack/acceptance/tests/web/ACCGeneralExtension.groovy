@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.acceptance.tests.dsl
+package net.nemerosa.ontrack.acceptance.tests.web
 
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.browser.pages.BuildPage
