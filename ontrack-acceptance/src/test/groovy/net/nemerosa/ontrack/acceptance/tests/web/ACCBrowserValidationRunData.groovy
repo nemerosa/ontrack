@@ -66,14 +66,19 @@ class ACCBrowserValidationRunData extends AcceptanceTestClient {
             loginAsAdmin(browser)
             // Goes to the build page which must contains the link
             BuildPage buildPage = goTo(BuildPage, [id: bld.id])
+            browser.screenshot("build-page")
             // Validation link
             ValidationRunDialog dialog = buildPage.validate()
+            browser.screenshot("validation-run-dialog-open")
             // Selects the "Coverage" timestamp
             dialog.validationStamp = 'Coverage'
+            browser.screenshot("validation-run-dialog-vs")
             // Enters a value
             dialog.validationStampDataForm.findElement(By.name("value")).sendKeys("25")
+            browser.screenshot("validation-run-dialog-data")
             // Validates
             dialog.ok()
+            browser.screenshot("validation-run-dialog-ok")
         }
 
         // Checks the validation run
