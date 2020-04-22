@@ -24,6 +24,10 @@
         </label>
     </div>
     <input type="submit" value="Log in"/>
+    <script type="text/javascript">
+        var hash = window.location.hash;
+        document.cookie = "hashPart=" + window.btoa(hash);
+    </script>
 </form>
 </body>
 </html>

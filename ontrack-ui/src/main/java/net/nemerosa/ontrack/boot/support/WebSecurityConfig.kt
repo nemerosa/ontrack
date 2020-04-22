@@ -20,7 +20,7 @@ class WebSecurityConfig {
     @Configuration
     @Order(1)
     @ConditionalOnWebApplication
-    class ApiWebSecurityConfigurationAdapter: WebSecurityConfigurerAdapter() {
+    class ApiWebSecurityConfigurationAdapter : WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
             http {
                 securityMatcher("/rest/**")
@@ -82,6 +82,7 @@ class WebSecurityConfig {
                 formLogin {
                     loginPage = "/login"
                     permitAll()
+                    authenticationSuccessHandler = LoginSuccessHandler()
                 }
                 // Logout setup
                 logout {
