@@ -3,10 +3,25 @@ package net.nemerosa.ontrack.service.security
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.*
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AccountServiceIT : AbstractDSLTestSupport() {
+
+    @Test
+    fun `Account groups can be created with any character`() {
+        asAdmin {
+            val id = accountService.createGroup(AccountGroupInput(
+                    name = "Nom accentué",
+                    description = "Un nom avec des accents",
+                    autoJoin = false
+            )).id
+            // Loads the group again
+            val group = accountService.getAccountGroup(id)
+            assertEquals("Nom accentué", group.name)
+        }
+    }
 
     @Test
     fun account_with_no_role() {
