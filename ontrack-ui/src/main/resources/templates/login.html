@@ -15,15 +15,15 @@
 <form th:action="@{/login}" method="post">
     <div>
         <label>
-            <input type="text" name="username" placeholder="Username"/>
+            <input id="username" type="text" name="username" placeholder="Username"/>
         </label>
     </div>
     <div>
         <label>
-            <input type="password" name="password" placeholder="Password"/>
+            <input id="password" type="password" name="password" placeholder="Password"/>
         </label>
     </div>
-    <input type="submit" value="Log in"/>
+    <input id="submit" type="submit" value="Log in"/>
     <script type="text/javascript">
         var hash = window.location.hash;
         document.cookie = "hashPart=" + window.btoa(hash);

@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.browser.pages.AccountManagementPage
 import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import org.junit.Ignore
 import org.junit.Test
 
 /**
@@ -14,7 +13,6 @@ import org.junit.Test
 class ACCBrowserLoginOn403 extends AcceptanceTestClient {
 
     @Test
-    @Ignore("#756 We want redirection to initial page")
     void 'Login redirection'() {
 
         browser { browser ->

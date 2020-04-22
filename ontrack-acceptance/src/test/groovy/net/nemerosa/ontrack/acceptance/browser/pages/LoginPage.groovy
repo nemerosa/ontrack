@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.acceptance.browser.pages
 
 import net.nemerosa.ontrack.acceptance.browser.Browser
-import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
@@ -12,6 +11,9 @@ class LoginPage extends AbstractPage {
 
     @FindBy(id = 'password')
     protected WebElement password
+
+    @FindBy(id = 'submit')
+    protected WebElement submit
 
     LoginPage(Browser browser) {
         super(browser)
@@ -42,9 +44,8 @@ class LoginPage extends AbstractPage {
         this.password.sendKeys(password)
 
         // Sign in OK
-        WebElement okButton = $(".btn-primary")
-        browser.waitUntil { okButton.enabled }
-        okButton.click()
+        browser.waitUntil { submit.enabled }
+        submit.click()
 
         /**
          * Here, the whole page is now reloaded
