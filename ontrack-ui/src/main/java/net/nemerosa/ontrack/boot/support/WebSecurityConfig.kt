@@ -68,12 +68,21 @@ class WebSecurityConfig {
                 authorizeRequests {
                     authorize(EndpointRequest.toAnyEndpoint(), permitAll)
                 }
+                // Excludes assets and login page from authentication
+                authorizeRequests {
+                    authorize("/login", permitAll)
+                    authorize("/assets/**", permitAll)
+                    authorize("/favicon.ico", permitAll)
+                }
                 // Requires authentication always
                 authorizeRequests {
                     authorize(anyRequest, authenticated)
                 }
                 // Using a form login
-                formLogin { }
+                formLogin {
+                    loginPage = "/login"
+                    permitAll()
+                }
                 // Logout setup
                 logout {
                     logoutUrl = "/logout"

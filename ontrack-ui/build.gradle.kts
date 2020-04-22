@@ -9,12 +9,18 @@ plugins {
 
 apply(plugin = "org.springframework.boot")
 
+val developmentOnly by configurations.creating
+configurations.runtime {
+    extendsFrom(developmentOnly)
+}
+
 dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-security")
     api("org.springframework.boot:spring-boot-starter-actuator")
     api("org.springframework.boot:spring-boot-starter-aop")
     api("org.springframework.boot:spring-boot-starter-jdbc")
+    api("org.springframework.boot:spring-boot-starter-thymeleaf")
     api(project(":ontrack-ui-support"))
     api(project(":ontrack-ui-graphql"))
     api(project(":ontrack-extension-api"))
@@ -25,6 +31,8 @@ dependencies {
     implementation("org.apache.commons:commons-text")
     implementation("commons-io:commons-io")
     implementation("jakarta.validation:jakarta.validation-api")
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     runtimeOnly(project(":ontrack-service"))
     runtimeOnly(project(":ontrack-repository-impl"))
