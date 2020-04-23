@@ -18,7 +18,7 @@ angular.module('ot.view.user-profile', [
         view.breadcrumbs = ot.homeBreadcrumbs();
 
         // Password change form
-        let passwordForm = {
+        $scope.passwordForm = {
             oldPassword: "",
             newPassword: "",
             confirmPassword: ""
@@ -42,7 +42,15 @@ angular.module('ot.view.user-profile', [
         $scope.changeToken = () => {
             ot.pageCall($http.post($scope.localUser._changeToken)).then((tokenResponse) => {
                 $scope.token = tokenResponse;
+                $scope.copyToken();
             });
+        };
+
+        // Copying the token
+        $scope.copyToken = () => {
+            if ($scope.token.token.value) {
+                navigator.clipboard.writeText($scope.token.token.value);
+            }
         };
     })
 ;
