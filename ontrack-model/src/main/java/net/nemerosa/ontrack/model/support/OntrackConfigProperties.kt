@@ -3,8 +3,11 @@ package net.nemerosa.ontrack.model.support
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.convert.DurationUnit
 import org.springframework.stereotype.Component
 import org.springframework.validation.annotation.Validated
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 import javax.annotation.PostConstruct
 import javax.validation.Valid
 import javax.validation.constraints.Min
@@ -23,6 +26,7 @@ class OntrackConfigProperties {
      * Maximum number of days to keep the log entries
      */
     var applicationLogRetentionDays = 7
+
     /**
      * Number of fatal errors to notify into the GUI.
      *
@@ -30,24 +34,29 @@ class OntrackConfigProperties {
      */
     @Min(1)
     var applicationLogInfoMax = 10
+
     /**
      * Maximum number of builds which can be returned by a build filter
      */
     @Min(1)
     var buildFilterCountMax = 200
+
     /**
      * Home directory
      */
     var applicationWorkingDir = "work/files"
+
     /**
      * Testing the configurations of external configurations
      */
     var configurationTest = true
+
     /**
      * Job configuration
      */
     @Valid
     var jobs: JobConfigProperties = JobConfigProperties()
+
     /**
      * Label provider collection job activation
      */
@@ -58,11 +67,17 @@ class OntrackConfigProperties {
      */
     var search = SearchConfigProperties()
 
+    /**
+     * Security configuration
+     */
+    var security = SecurityProperties()
+
     @PostConstruct
     fun log() {
         if (!configurationTest) {
             logger.warn("[config] Tests of external configurations are disabled")
         }
+        logger.info("[security] Tokens validity: ${security.tokens.validity}")
         logger.info("[search] Index immediate refresh = ${search.index.immediate}")
         logger.info("[search] Index batch size = ${search.index.batch}")
         logger.info("[search] Index batch logging = ${search.index.logging}")
@@ -70,19 +85,43 @@ class OntrackConfigProperties {
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
     }
 
+    /**
+     * Security settings
+     */
+    class SecurityProperties {
+        /**
+         * Security token settings
+         */
+        val tokens = TokensProperties()
+    }
+
+    /**
+     * Security token settings
+     */
+    class TokensProperties {
+        /**
+         * Validity of the tokens
+         */
+        @DurationUnit(ChronoUnit.DAYS)
+        var validity: Duration = Duration.ofDays(30)
+    }
+
     companion object {
         /**
          * Properties prefix
          */
         const val PREFIX = "ontrack.config"
+
         /**
          * Search service key
          */
         internal const val SEARCH = "search"
+
         /**
          * Search complete key
          */
         const val SEARCH_PROPERTY = "$PREFIX.$SEARCH"
+
         /**
          * Key store type
          */
