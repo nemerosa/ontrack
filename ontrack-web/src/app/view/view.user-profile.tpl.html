@@ -56,11 +56,17 @@
                                     ng-disabled="!token.token.value">
                                 <i class="fa fa-copy"></i>
                             </button>
-                            <button class="btn btn-default"
+                            <button class="btn btn-warning"
                                     ng-if="localUser._changeToken"
                                     ng-click="changeToken()"
                                     title="Regenerate token">
                                 <i class="fa fa-cog"></i>
+                            </button>
+                            <button class="btn btn-danger"
+                                    ng-if="localUser._revokeToken"
+                                    ng-click="revokeToken()"
+                                    title="Revoke token">
+                                <i class="fa fa-trash"></i>
                             </button>
                         </span>
                         </div>

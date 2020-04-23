@@ -41,6 +41,13 @@ class TokensServiceImpl(
         return Token(token, time, null).validFor(ontrackConfigProperties.security.tokens.validity)
     }
 
+    override fun revokeToken() {
+        // Gets the current account
+        val account = securityService.currentAccount?.account
+        // Revokes its token
+        account?.apply { tokensRepository.invalidate(id()) }
+    }
+
     override fun getToken(account: Account): Token? {
         // Gets the raw token
         val token = tokensRepository.getForAccount(account)

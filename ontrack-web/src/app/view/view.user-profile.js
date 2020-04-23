@@ -52,5 +52,14 @@ angular.module('ot.view.user-profile', [
                 navigator.clipboard.writeText($scope.token.token.value);
             }
         };
+
+        // Revoking the token
+        $scope.revokeToken = () => {
+            otAlertService.confirm({title: "Revoking a token", message: "Are you sure to revoke this API token?"}).then(() => {
+                ot.pageCall($http.post($scope.localUser._revokeToken)).then((tokenResponse) => {
+                    $scope.token = tokenResponse;
+                });
+            });
+        };
     })
 ;

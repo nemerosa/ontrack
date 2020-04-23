@@ -18,6 +18,11 @@ interface TokensService {
     fun generateNewToken(): Token
 
     /**
+     * Revokes the token of the current user
+     */
+    fun revokeToken()
+
+    /**
      * Gets the token of an account
      */
     fun getToken(account: Account): Token?

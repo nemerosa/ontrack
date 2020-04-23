@@ -33,6 +33,12 @@ class ConnectedAccountResourceDecorator : AbstractResourceDecorator<ConnectedAcc
                         on(TokensController::class.java).generateNewToken(),
                         account.isLogged
                 )
+                // Changing the token value
+                .link(
+                        "_revokeToken",
+                        on(TokensController::class.java).revokeToken(),
+                        account.isLogged
+                )
                 // OK
                 .build()
     }

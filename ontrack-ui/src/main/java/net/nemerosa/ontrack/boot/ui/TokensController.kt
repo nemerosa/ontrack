@@ -34,6 +34,16 @@ class TokensController(
     }
 
     /**
+     * Revokes the current token
+     */
+    @PostMapping("revoke")
+    fun revokeToken(): ResponseEntity<TokenResponse> {
+        tokensService.revokeToken()
+        return ResponseEntity.ok(TokenResponse(null))
+    }
+
+
+    /**
      * Token response
      */
     data class TokenResponse(val token: Token?)
