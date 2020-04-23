@@ -1,0 +1,38 @@
+<ot-view>
+
+    <!-- Changing the password -->
+    <div ng-if="localUser._changePassword" class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Change password</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form-horizontal" ng-submit="changePassword()">
+                <div class="form-group">
+                    <label for="old-password" class="col-sm-2 control-label">Old password</label>
+                    <div class="col-sm-2">
+                        <input id="old-password" class="form-control" ng-model="passwordForm.oldPassword" type="password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new-password" class="col-sm-2 control-label">New password</label>
+                    <div class="col-sm-2">
+                        <input id="new-password" class="form-control" ng-model="passwordForm.newPassword" type="password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password" class="col-sm-2 control-label">Confirm password</label>
+                    <div class="col-sm-2">
+                        <input id="confirm-password" class="form-control" ng-model="passwordForm.confirmPassword" type="password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button id="password-submit" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{localUser}}
+</ot-view>

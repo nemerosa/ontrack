@@ -56,7 +56,8 @@ const ontrack = angular.module('ontrack', [
         'ot.view.admin.labels',
         'ot.view.admin.log-entries',
         'ot.view.admin.predefined-validation-stamps',
-        'ot.view.admin.predefined-promotion-levels'
+        'ot.view.admin.predefined-promotion-levels',
+        'ot.view.user-profile'
     ])
         // HTTP configuration
         .config(function ($httpProvider) {

@@ -14,10 +14,17 @@ angular.module('ot.service.user', [
         };
 
         /**
+         * Loads the user
+         */
+        self.getUser = function () {
+            return ot.call($http.get('user'));
+        };
+
+        /**
          * Reloading the user
          */
         self.loadUser = function () {
-            ot.call($http.get('user')).then(
+            self.getUser().then(
                 function success(userResource) {
                     $log.debug('[user] load user: ', userResource);
                     $log.debug('[user] logged: ', userResource.present);
