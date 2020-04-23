@@ -30,7 +30,31 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button id="password-submit" type="submit" class="btn btn-primary">Submit</button>
+                        <button id="password-submit" type="submit" class="btn btn-primary" ng-disabled="passwordForm.changing">
+                            <ot-loading ng-show="passwordForm.changing"></ot-loading>
+                            Submit
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="passwordForm.confirmIncorrect">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <div class="alert alert-danger">
+                            Password confirmation is not correct.
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="passwordForm.success">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <div class="alert alert-success">
+                            Password changed successfully.
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="passwordForm.error">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <div class="alert alert-danger">
+                            {{passwordForm.error}}
+                        </div>
                     </div>
                 </div>
             </form>

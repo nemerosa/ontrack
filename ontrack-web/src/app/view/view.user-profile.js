@@ -21,7 +21,11 @@ angular.module('ot.view.user-profile', [
         $scope.passwordForm = {
             oldPassword: "",
             newPassword: "",
-            confirmPassword: ""
+            confirmPassword: "",
+            confirmIncorrect: false,
+            success: false,
+            error: undefined,
+            changing: false
         };
 
         // Loading of the user profile
@@ -60,6 +64,35 @@ angular.module('ot.view.user-profile', [
                     $scope.token = tokenResponse;
                 });
             });
+        };
+
+        // Changing the password
+        $scope.changePassword = () => {
+            if ($scope.localUser._changePassword) {
+                $scope.passwordForm.changing = true;
+                $scope.passwordForm.success = false;
+                $scope.passwordForm.error = undefined;
+                let form = $scope.passwordForm;
+                if (form.newPassword !== form.confirmPassword) {
+                    $scope.passwordForm.confirmIncorrect = true;
+                } else {
+                    $scope.passwordForm.confirmIncorrect = false;
+                    let data = {
+                        oldPassword: form.oldPassword,
+                        newPassword: form.newPassword
+                    };
+                    ot.call($http.post($scope.localUser._changePassword, data)).then(
+                        function success() {
+                            $scope.passwordForm.success = true;
+                        },
+                        function error(e) {
+                            $scope.passwordForm.error = e.content;
+                        }
+                    ).finally(() => {
+                        $scope.passwordForm.changing = false;
+                    });
+                }
+            }
         };
     })
 ;
