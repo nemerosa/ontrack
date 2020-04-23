@@ -91,13 +91,13 @@ public class UserController extends AbstractResourceController {
         if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
             user.add(Action.of("settings", "Settings", "settings"));
         }
-        // Changing his password
-        if (user.getAccount().getAuthenticationSource().isAllowingPasswordChange()) {
+        // Access to the user profile
+        if (securityService.isLogged()) {
             user.add(
-                    Action.form(
-                            "user-password",
-                            "Change password",
-                            uri(on(getClass()).getChangePasswordForm())
+                    Action.of(
+                            "user-profile",
+                            "User profile",
+                            "user-profile"
                     )
             );
         }
