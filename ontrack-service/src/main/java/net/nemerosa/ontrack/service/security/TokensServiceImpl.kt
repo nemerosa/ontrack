@@ -45,8 +45,6 @@ class TokensServiceImpl(
         // Gets the raw token
         val token = tokensRepository.getForAccount(account)
         // Computes the validity date
-        val validToken = token?.apply { validFor(ontrackConfigProperties.security.tokens.validity) }
-        // OK
-        return validToken
+        return token?.run { validFor(ontrackConfigProperties.security.tokens.validity) }
     }
 }
