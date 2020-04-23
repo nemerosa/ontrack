@@ -28,16 +28,17 @@ class TokensServiceImpl(
             return account?.let { getToken(it) }
         }
 
-    override fun generateNewToken(): String {
+    override fun generateNewToken(): Token {
         // Gets the current account
         val account = securityService.currentAccount?.account
                 ?: throw TokenGenerationNoAccountException()
         // Generates a new token
         val token = tokenGenerator.generateToken()
         // Saves the token...
-        tokensRepository.save(account.id(), token, Time.now())
+        val time = Time.now()
+        tokensRepository.save(account.id(), token, time)
         // ... and returns it
-        return token
+        return Token(token, time, null).validFor(ontrackConfigProperties.security.tokens.validity)
     }
 
     override fun getToken(account: Account): Token? {

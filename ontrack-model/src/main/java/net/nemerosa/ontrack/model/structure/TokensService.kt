@@ -15,7 +15,7 @@ interface TokensService {
     /**
      * Generates a new token for the current user
      */
-    fun generateNewToken(): String
+    fun generateNewToken(): Token
 
     /**
      * Gets the token of an account

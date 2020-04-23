@@ -10,19 +10,22 @@
                 <div class="form-group">
                     <label for="old-password" class="col-sm-2 control-label">Old password</label>
                     <div class="col-sm-2">
-                        <input id="old-password" class="form-control" ng-model="passwordForm.oldPassword" type="password" required>
+                        <input id="old-password" class="form-control" ng-model="passwordForm.oldPassword"
+                               type="password" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="new-password" class="col-sm-2 control-label">New password</label>
                     <div class="col-sm-2">
-                        <input id="new-password" class="form-control" ng-model="passwordForm.newPassword" type="password" required>
+                        <input id="new-password" class="form-control" ng-model="passwordForm.newPassword"
+                               type="password" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="confirm-password" class="col-sm-2 control-label">Confirm password</label>
                     <div class="col-sm-2">
-                        <input id="confirm-password" class="form-control" ng-model="passwordForm.confirmPassword" type="password" required>
+                        <input id="confirm-password" class="form-control" ng-model="passwordForm.confirmPassword"
+                               type="password" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -34,5 +37,37 @@
         </div>
     </div>
 
-    {{localUser}}
+    <!-- Token management -->
+    <div ng-if="localUser._token" class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">API token</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="token" class="col-sm-2 control-label">Token</label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input id="token" class="form-control" ng-model="token.token.value" type="text" readonly>
+                            <span class="input-group-btn">
+                            <button class="btn btn-default"
+                                    title="Copy API token"
+                                    ng-disabled="!token.token.value">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                            <button class="btn btn-default"
+                                    ng-if="localUser._changeToken"
+                                    ng-click="changeToken()"
+                                    title="Regenerate token">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{token}}
 </ot-view>

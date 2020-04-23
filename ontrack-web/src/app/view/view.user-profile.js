@@ -28,9 +28,21 @@ angular.module('ot.view.user-profile', [
         function loadUser() {
             otUserService.getUser().then(function (userResource) {
                 $scope.localUser = userResource;
+                if ($scope.localUser._token) {
+                    ot.call($http.get($scope.localUser._token)).then(function (token) {
+                        $scope.token = token;
+                    });
+                }
             });
         }
 
         loadUser();
+
+        // Changing the token
+        $scope.changeToken = () => {
+            ot.pageCall($http.post($scope.localUser._changeToken)).then((tokenResponse) => {
+                $scope.token = tokenResponse;
+            });
+        };
     })
 ;

@@ -12,7 +12,7 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
 
     override fun invalidate(id: Int) {
         namedParameterJdbcTemplate!!.update(
-                "DELETE FROM TOKENS WHERE ACCOUNT :id",
+                "DELETE FROM TOKENS WHERE ACCOUNT = :id",
                 params("id", id)
         )
     }

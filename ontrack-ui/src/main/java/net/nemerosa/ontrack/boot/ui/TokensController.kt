@@ -29,8 +29,8 @@ class TokensController(
      * Generates a new token for the current user
      */
     @PostMapping("new")
-    fun generateNewToken(): ResponseEntity<String> {
-        return ResponseEntity.ok(tokensService.generateNewToken())
+    fun generateNewToken(): ResponseEntity<TokenResponse> {
+        return ResponseEntity.ok(TokenResponse(tokensService.generateNewToken()))
     }
 
     /**
