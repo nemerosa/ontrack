@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.structure.TokensService
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.AccountRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,7 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
 class SecurityConfiguration(
         private val accountService: AccountService,
         private val accountRepository: AccountRepository,
-        private val tokensService: TokensService
+        private val tokensService: TokensService,
+        private val ontrackConfigProperties: OntrackConfigProperties
 ) {
 
     @Bean
@@ -27,7 +29,7 @@ class SecurityConfiguration(
     )
 
     @Bean
-    fun tokenAsPasswordAuthenticationProvider() = TokenAsPasswordAuthenticationProvider(tokensService, accountService)
+    fun tokenAsPasswordAuthenticationProvider() = TokenAsPasswordAuthenticationProvider(tokensService, accountService, ontrackConfigProperties)
 
     @Bean
     fun builtinAuthenticationProvider() = DaoAuthenticationProvider().apply {
