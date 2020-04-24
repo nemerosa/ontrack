@@ -2,17 +2,19 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.structure.TokensService
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 
 class TokenAsPasswordAuthenticationProvider(
         private val tokensService: TokensService,
-        private val accountService: AccountService
+        private val accountService: AccountService,
+        private val ontrackConfigProperties: OntrackConfigProperties
 ) : AuthenticationProvider {
 
     override fun authenticate(authentication: Authentication): Authentication? {
-        return if (authentication is UsernamePasswordAuthenticationToken) {
+        return if (authentication is UsernamePasswordAuthenticationToken && ontrackConfigProperties.security.tokens.password) {
             val token = authentication.credentials?.toString() ?: ""
             val tokenAccount = tokensService.findAccountByToken(token)
             if (tokenAccount != null) {
