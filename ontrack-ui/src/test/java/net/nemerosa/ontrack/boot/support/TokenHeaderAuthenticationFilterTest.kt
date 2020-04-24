@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.boot.support
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.security.TokenAuthenticationToken
 import net.nemerosa.ontrack.test.assertIs
@@ -11,6 +9,7 @@ import org.junit.Test
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
@@ -33,7 +32,7 @@ class TokenHeaderAuthenticationFilterTest {
     private val authenticatedToken = TokenAuthenticationToken(
             "xxx",
             AuthorityUtils.createAuthorityList(SecurityRole.USER.roleName),
-            mock<UserDetails>()
+            mock()
     )
 
     @Before
@@ -76,10 +75,49 @@ class TokenHeaderAuthenticationFilterTest {
     }
 
     @Test
-    fun `Authentication is required`() {
+    fun `Authentication is required when no existing authentication`() {
         request.addHeader("X-Ontrack-Token", "xxx")
         whenever(authenticationManager.authenticate(token)).thenReturn(authenticatedToken)
         filter.doFilter(request, response, filterChain)
+        assertNotNull(SecurityContextHolder.getContext().authentication) {
+            assertIs<TokenAuthenticationToken>(it) { t ->
+                assertTrue(t.matches("xxx"), "Token matches")
+            }
+        }
+    }
+
+    @Test
+    fun `Authentication is required when existing authentication is not authenticated`() {
+        SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken("user", "test")
+        request.addHeader("X-Ontrack-Token", "xxx")
+        whenever(authenticationManager.authenticate(token)).thenReturn(authenticatedToken)
+        filter.doFilter(request, response, filterChain)
+        assertNotNull(SecurityContextHolder.getContext().authentication) {
+            assertIs<TokenAuthenticationToken>(it) { t ->
+                assertTrue(t.matches("xxx"), "Token matches")
+            }
+        }
+    }
+
+    @Test
+    fun `Authentication is required when existing token does not match`() {
+        SecurityContextHolder.getContext().authentication = TokenAuthenticationToken("yyy", AuthorityUtils.createAuthorityList(SecurityRole.USER.roleName), mock())
+        request.addHeader("X-Ontrack-Token", "xxx")
+        whenever(authenticationManager.authenticate(token)).thenReturn(authenticatedToken)
+        filter.doFilter(request, response, filterChain)
+        assertNotNull(SecurityContextHolder.getContext().authentication) {
+            assertIs<TokenAuthenticationToken>(it) { t ->
+                assertTrue(t.matches("xxx"), "Token matches")
+            }
+        }
+    }
+
+    @Test
+    fun `Authentication is not required when existing token matches`() {
+        SecurityContextHolder.getContext().authentication = authenticatedToken
+        request.addHeader("X-Ontrack-Token", "xxx")
+        filter.doFilter(request, response, filterChain)
+        verify(authenticationManager, never()).authenticate(any())
         assertNotNull(SecurityContextHolder.getContext().authentication) {
             assertIs<TokenAuthenticationToken>(it) { t ->
                 assertTrue(t.matches("xxx"), "Token matches")
