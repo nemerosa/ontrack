@@ -26,11 +26,11 @@ private constructor(
     /**
      * Constructor after authentication
      */
-    constructor(token: String, authorities: Collection<GrantedAuthority>, details: UserDetails) : this(
+    constructor(token: String, authorities: Collection<GrantedAuthority>, principal: UserDetails) : this(
             token = "",
             encodedToken = encode(token),
             authorities = authorities,
-            principal = details
+            principal = principal
     ) {
         super.setAuthenticated(true)
     }

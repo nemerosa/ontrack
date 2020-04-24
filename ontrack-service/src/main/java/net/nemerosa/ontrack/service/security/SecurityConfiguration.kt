@@ -25,11 +25,15 @@ class SecurityConfiguration(
     @Bean
     fun authenticationManager() = ProviderManager(
             tokenAsPasswordAuthenticationProvider(),
-            builtinAuthenticationProvider()
+            builtinAuthenticationProvider(),
+            tokenHeaderAuthenticationProvider()
     )
 
     @Bean
     fun tokenAsPasswordAuthenticationProvider() = TokenAsPasswordAuthenticationProvider(tokensService, accountService, ontrackConfigProperties)
+
+    @Bean
+    fun tokenHeaderAuthenticationProvider() = TokenHeaderAuthenticationProvider(tokensService, accountService)
 
     @Bean
     fun builtinAuthenticationProvider() = DaoAuthenticationProvider().apply {
