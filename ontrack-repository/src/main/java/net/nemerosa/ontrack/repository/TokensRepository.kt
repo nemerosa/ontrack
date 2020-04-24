@@ -34,6 +34,6 @@ interface TokensRepository {
     /**
      * Gets the account ID which is associated with this token, if any.
      */
-    fun findAccountByToken(token: String): Int?
+    fun findAccountByToken(token: String): Pair<Int, Token>?
 
 }

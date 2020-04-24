@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLObjectType
-import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.structure.Signature
 import org.springframework.stereotype.Component
@@ -37,7 +36,7 @@ class GQLTypeCreation : GQLType {
             if (signature != null) {
                 val user = signature.user
                 result = result.withUser(user.name)
-                result = result.withTime(Time.forStorage(signature.time))
+                result = result.withTime(Time.store(signature.time))
             }
             return result
         }

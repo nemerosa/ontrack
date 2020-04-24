@@ -4,10 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.Token
-import net.nemerosa.ontrack.model.structure.TokenGenerator
-import net.nemerosa.ontrack.model.structure.TokensService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.TokensRepository
 import org.springframework.stereotype.Service
@@ -55,14 +52,16 @@ class TokensServiceImpl(
 
     override fun getToken(account: Account): Token? = tokensRepository.getForAccount(account)
 
-    override fun findAccountByToken(token: String): Account? {
+    override fun findAccountByToken(token: String): TokenAccount? {
         // Find the account ID
-        val accountId = tokensRepository.findAccountByToken(token)
-        // Loads the account
-        return accountId?.let { id ->
-            securityService.asAdmin {
-                accountService.getAccount(ID.of(id))
-            }
+        val result = tokensRepository.findAccountByToken(token)
+        return result?.let { (accountId, token) ->
+            TokenAccount(
+                    securityService.asAdmin {
+                        accountService.getAccount(ID.of(accountId))
+                    },
+                    token
+            )
         }
     }
 }

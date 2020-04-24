@@ -8,7 +8,10 @@ import org.springframework.security.core.authority.AuthorityUtils
 /**
  * [Account] based [OntrackUser].
  */
-open class AccountOntrackUser(private val account: Account) : OntrackUser {
+open class AccountOntrackUser(
+        private val account: Account,
+        private val credentialNonExpired: Boolean = true
+) : OntrackUser {
 
     override val accountId: Int = account.id()
 
@@ -18,7 +21,7 @@ open class AccountOntrackUser(private val account: Account) : OntrackUser {
 
     override fun getUsername(): String = account.name
 
-    override fun isCredentialsNonExpired(): Boolean = true
+    override fun isCredentialsNonExpired(): Boolean = credentialNonExpired
 
     override fun getPassword(): String = ""
 

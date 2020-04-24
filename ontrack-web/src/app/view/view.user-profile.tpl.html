@@ -108,9 +108,12 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Valid until</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static">
+                        <p class="form-control-static" ng-if="token.token.validUntil">
                             {{ token.token.validUntil | date:'fullDate'}}
                             {{ token.token.validUntil | date:'mediumTime'}}
+                        </p>
+                        <p class="form-control-static" ng-if="!token.token.validUntil">
+                            <i>Does not expire</i>
                         </p>
                     </div>
                 </div>

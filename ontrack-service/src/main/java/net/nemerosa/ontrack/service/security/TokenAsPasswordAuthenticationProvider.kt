@@ -14,13 +14,15 @@ class TokenAsPasswordAuthenticationProvider(
     override fun authenticate(authentication: Authentication): Authentication? {
         return if (authentication is UsernamePasswordAuthenticationToken) {
             val token = authentication.credentials?.toString() ?: ""
-            val account = tokensService.findAccountByToken(token)
-            if (account != null) {
-                if (account.name != authentication.name) {
+            val tokenAccount = tokensService.findAccountByToken(token)
+            if (tokenAccount != null) {
+                if (tokenAccount.account.name != authentication.name) {
                     throw TokenNameMismatchException()
                 } else {
-                    // FIXME Tests the token validity
-                    val user = AccountOntrackUser(account)
+                    // Validity of the token
+                    val tokenValid = tokenAccount.token.isValid()
+                    // Wrapping the account
+                    val user = AccountOntrackUser(tokenAccount.account, credentialNonExpired = tokenValid)
                     // Provides the ACL
                     val authenticatedUser = accountService.withACL(user)
                     // Authentication OK

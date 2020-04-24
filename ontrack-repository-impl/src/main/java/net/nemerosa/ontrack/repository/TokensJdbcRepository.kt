@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.structure.Token
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 import java.time.LocalDateTime
 import javax.sql.DataSource
 
@@ -33,17 +34,22 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
                 "SELECT * FROM TOKENS WHERE ACCOUNT = :id",
                 params("id", account.id())
         ) { rs, _ ->
-            Token(
-                    value = rs.getString("VALUE"),
-                    creation = dateTimeFromDB(rs.getString("CREATION"))!!,
-                    validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL"))
-            )
+            toToken(rs)
         }
     }
 
-    override fun findAccountByToken(token: String): Int? = getFirstItem(
-            "SELECT ACCOUNT FROM TOKENS WHERE VALUE = :token",
-            params("token", token),
-            Int::class.java
-    )
+    override fun findAccountByToken(token: String): Pair<Int, Token>? = getFirstItem(
+            "SELECT * FROM TOKENS WHERE VALUE = :token",
+            params("token", token)
+    ) { rs, _ ->
+        rs.getInt("ACCOUNT") to toToken(rs)
+    }
+
+    private fun toToken(rs: ResultSet): Token {
+        return Token(
+                value = rs.getString("VALUE"),
+                creation = dateTimeFromDB(rs.getString("CREATION"))!!,
+                validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL"))
+        )
+    }
 }

@@ -36,28 +36,28 @@ class TimeTest {
     @Test
     fun `Stored format length check`() {
         val time = Time.now()
-        val stored = Time.forStorage(time)
+        val stored = Time.store(time)
         assertTrue(stored.length <= 24, "Stored time must be <= 24 characters longs")
     }
 
     @Test
     fun `Stored format check`() {
         val time = LocalDateTime.of(2020, 4, 7, 12, 36, 57, 123456789)
-        val stored = Time.forStorage(time)
+        val stored = Time.store(time)
         assertEquals("2020-04-07T12:36:57.1234", stored)
     }
 
     @Test
     fun `Stored format check shorter`() {
         val time = LocalDateTime.of(2020, 4, 7, 12, 36, 57, 120000000)
-        val stored = Time.forStorage(time)
+        val stored = Time.store(time)
         assertEquals("2020-04-07T12:36:57.12", stored)
     }
 
     @Test
     fun `Stored format check zero`() {
         val time = LocalDateTime.of(2020, 4, 7, 12, 36, 57)
-        val stored = Time.forStorage(time)
+        val stored = Time.store(time)
         assertEquals("2020-04-07T12:36:57", stored)
     }
 
@@ -79,7 +79,7 @@ class TimeTest {
         val time = Time.now()
         System.out.format("Server time: %s%n", time)
         // For storage
-        val stored = Time.forStorage(time)
+        val stored = Time.store(time)
         System.out.format("Stored time: %s%n", stored)
         // From storage
         val retrieved = Time.fromStorage(stored)
