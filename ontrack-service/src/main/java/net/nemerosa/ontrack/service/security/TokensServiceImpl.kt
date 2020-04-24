@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Token
 import net.nemerosa.ontrack.model.structure.TokenGenerator
 import net.nemerosa.ontrack.model.structure.TokensService
@@ -17,7 +19,8 @@ class TokensServiceImpl(
         private val tokensRepository: TokensRepository,
         private val securityService: SecurityService,
         private val tokenGenerator: TokenGenerator,
-        private val ontrackConfigProperties: OntrackConfigProperties
+        private val ontrackConfigProperties: OntrackConfigProperties,
+        private val accountService: AccountService
 ) : TokensService {
 
     override val currentToken: Token?
@@ -53,5 +56,16 @@ class TokensServiceImpl(
         val token = tokensRepository.getForAccount(account)
         // Computes the validity date
         return token?.run { validFor(ontrackConfigProperties.security.tokens.validity) }
+    }
+
+    override fun findAccountByToken(token: String): Account? {
+        // Find the account ID
+        val accountId = tokensRepository.findAccountByToken(token)
+        // Loads the account
+        return accountId?.let { id ->
+            securityService.asAdmin {
+                accountService.getAccount(ID.of(id))
+            }
+        }
     }
 }

@@ -27,4 +27,9 @@ interface TokensService {
      */
     fun getToken(account: Account): Token?
 
+    /**
+     * Gets the account which is associated with this token, if any.
+     */
+    fun findAccountByToken(token: String): Account?
+
 }

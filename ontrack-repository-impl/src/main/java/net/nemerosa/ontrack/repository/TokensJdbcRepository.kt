@@ -39,4 +39,10 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
             )
         }
     }
+
+    override fun findAccountByToken(token: String): Int? = getFirstItem(
+            "SELECT ACCOUNT FROM TOKENS WHERE VALUE = :token",
+            params("token", token),
+            Int::class.java
+    )
 }
