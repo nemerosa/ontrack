@@ -100,10 +100,14 @@ class OntrackConfigProperties {
      */
     class TokensProperties {
         /**
-         * Validity of the tokens
+         * Default validity duration for the tokens.
+         *
+         * If set to 0 or negative, the generated tokens do not expire.
+         *
+         * By default, the tokens do not expire.
          */
         @DurationUnit(ChronoUnit.DAYS)
-        var validity: Duration = Duration.ofDays(30)
+        var validity: Duration = Duration.ofDays(0)
     }
 
     companion object {

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.Duration
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -44,8 +45,22 @@ class TokensServiceIT : AbstractDSLTestSupport() {
             assertNotNull(tokensService.currentToken) {
                 assertTrue(it.value.isNotBlank())
                 assertNotNull(it.creation)
-                assertNotNull(it.validUntil) { validUntil ->
-                    assertTrue(validUntil > it.creation)
+                assertNull(it.validUntil)
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the current token with a validity period being set`() {
+        asUser {
+            withCustomTokenValidityDuration(Duration.ofDays(1)) {
+                tokensService.generateNewToken()
+            }
+            assertNotNull(tokensService.currentToken) {
+                assertTrue(it.value.isNotBlank())
+                assertNotNull(it.creation)
+                assertNotNull(it.validUntil) { until ->
+                    assertTrue(until > it.creation, "Validity is set and in the future of the creation period")
                 }
             }
         }
@@ -58,6 +73,16 @@ class TokensServiceIT : AbstractDSLTestSupport() {
             assertNotNull(tokensService.currentToken)
             tokensService.revokeToken()
             assertNull(tokensService.currentToken)
+        }
+    }
+
+    private fun <T> withCustomTokenValidityDuration(duration: Duration, code: () -> T): T {
+        val old = ontrackConfigProperties.security.tokens.validity
+        return try {
+            ontrackConfigProperties.security.tokens.validity = duration
+            code()
+        } finally {
+            ontrackConfigProperties.security.tokens.validity = old
         }
     }
 

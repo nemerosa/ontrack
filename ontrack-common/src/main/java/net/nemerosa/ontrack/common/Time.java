@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.common;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -63,7 +64,7 @@ public final class Time {
     /**
      * Keeps only the 4 first digits of the nano seconds field.
      */
-    public static String forStorage(LocalDateTime time) {
+    public static @Nullable String forStorage(@Nullable LocalDateTime time) {
         if (time == null) {
             return null;
         } else {
@@ -74,7 +75,7 @@ public final class Time {
     /**
      * Keeps only the 4 first digits of the nano seconds field.
      */
-    public static LocalDateTime fromStorage(String value) {
+    public static @Nullable LocalDateTime fromStorage(@Nullable String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         } else {

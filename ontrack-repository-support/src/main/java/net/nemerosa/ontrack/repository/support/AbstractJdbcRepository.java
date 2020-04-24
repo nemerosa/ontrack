@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.exceptions.JsonWritingException;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Signature;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -96,11 +97,13 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return ID.of(id);
     }
 
-    protected static String dateTimeForDB(LocalDateTime time) {
+    protected static @Nullable
+    String dateTimeForDB(@Nullable LocalDateTime time) {
         return Time.forStorage(time);
     }
 
-    protected static LocalDateTime dateTimeFromDB(String value) {
+    protected static @Nullable
+    LocalDateTime dateTimeFromDB(@Nullable String value) {
         return Time.fromStorage(value);
     }
 

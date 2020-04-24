@@ -20,8 +20,9 @@ interface TokensRepository {
      * @param id ID of the account
      * @param token Token to save
      * @param time Creation time
+     * @param until End of the validity time
      */
-    fun save(id: Int, token: String, time: LocalDateTime)
+    fun save(id: Int, token: String, time: LocalDateTime, until: LocalDateTime?)
 
     /**
      * Gets the token for an account.

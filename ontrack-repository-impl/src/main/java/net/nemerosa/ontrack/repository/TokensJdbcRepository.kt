@@ -17,13 +17,14 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         )
     }
 
-    override fun save(id: Int, token: String, time: LocalDateTime) {
+    override fun save(id: Int, token: String, time: LocalDateTime, until: LocalDateTime?) {
         invalidate(id)
         namedParameterJdbcTemplate!!.update(
-                "INSERT INTO TOKENS (ACCOUNT, VALUE, CREATION) VALUES (:id, :token, :creation)",
+                "INSERT INTO TOKENS (ACCOUNT, VALUE, CREATION, VALID_UNTIL) VALUES (:id, :token, :creation, :until)",
                 params("id", id)
                         .addValue("token", token)
                         .addValue("creation", dateTimeForDB(time))
+                        .addValue("until", dateTimeForDB(until))
         )
     }
 
@@ -34,8 +35,8 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         ) { rs, _ ->
             Token(
                     value = rs.getString("VALUE"),
-                    creation = dateTimeFromDB(rs.getString("CREATION")),
-                    validUntil = null
+                    creation = dateTimeFromDB(rs.getString("CREATION"))!!,
+                    validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL"))
             )
         }
     }

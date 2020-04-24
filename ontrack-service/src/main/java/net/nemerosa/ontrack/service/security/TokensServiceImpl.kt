@@ -37,11 +37,13 @@ class TokensServiceImpl(
                 ?: throw TokenGenerationNoAccountException()
         // Generates a new token
         val token = tokenGenerator.generateToken()
-        // Saves the token...
         val time = Time.now()
-        tokensRepository.save(account.id(), token, time)
+        // Token object
+        val tokenObject = Token(token, time, null).validFor(ontrackConfigProperties.security.tokens.validity)
+        // Saves the token...
+        tokensRepository.save(account.id(), token, tokenObject.creation, tokenObject.validUntil)
         // ... and returns it
-        return Token(token, time, null).validFor(ontrackConfigProperties.security.tokens.validity)
+        return tokenObject
     }
 
     override fun revokeToken() {
@@ -51,12 +53,7 @@ class TokensServiceImpl(
         account?.apply { tokensRepository.invalidate(id()) }
     }
 
-    override fun getToken(account: Account): Token? {
-        // Gets the raw token
-        val token = tokensRepository.getForAccount(account)
-        // Computes the validity date
-        return token?.run { validFor(ontrackConfigProperties.security.tokens.validity) }
-    }
+    override fun getToken(account: Account): Token? = tokensRepository.getForAccount(account)
 
     override fun findAccountByToken(token: String): Account? {
         // Find the account ID

@@ -19,14 +19,23 @@ data class Token(
     /**
      * Returns a new token with same [value] and [creation]
      * but with [validUntil] computed from [creation] according
-     * to the given [validity] period.
+     * to the given [validity] period. If the [validity] is [zero][Duration.isZero] or [negative][Duration.isNegative],
+     * the validity end date is set to `null`, meaning that the token never expires.
      */
     fun validFor(validity: Duration): Token =
-            Token(
-                    value,
-                    creation,
-                    creation + validity
-            )
+            if (validity.isZero || validity.isNegative) {
+                Token(
+                        value,
+                        creation,
+                        null
+                )
+            } else {
+                Token(
+                        value,
+                        creation,
+                        creation + validity
+                )
+            }
 
     /**
      * Checks if this token is valid
