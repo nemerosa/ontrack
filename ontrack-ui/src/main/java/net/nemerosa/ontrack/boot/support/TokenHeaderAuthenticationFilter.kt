@@ -37,8 +37,7 @@ class TokenHeaderAuthenticationFilter(
             if (token.isNullOrBlank()) {
                 chain.doFilter(request, response)
                 return
-            }
-            if (authenticationIsRequired(token)) {
+            } else if (authenticationIsRequired(token)) {
                 val authRequest = TokenAuthenticationToken(token)
                 val authResult = authenticationManager.authenticate(authRequest)
                 if (debug) {
