@@ -5,10 +5,8 @@ import net.nemerosa.ontrack.model.structure.TokensService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import java.util.*
+import kotlin.test.*
 
 class TokensServiceIT : AbstractDSLTestSupport() {
 
@@ -73,6 +71,42 @@ class TokensServiceIT : AbstractDSLTestSupport() {
             assertNotNull(tokensService.currentToken)
             tokensService.revokeToken()
             assertNull(tokensService.currentToken)
+        }
+    }
+
+    @Test
+    fun `Unknown token`() {
+        val t = tokensService.findAccountByToken(UUID.randomUUID().toString())
+        assertNull(t, "Token not found")
+    }
+
+    @Test
+    fun `Bound user`() {
+        asUser {
+            val accountId = securityService.currentAccount!!.id()
+            tokensService.generateNewToken()
+            val token = tokensService.currentToken!!.value
+            val t = tokensService.findAccountByToken(token)
+            assertNotNull(t, "Token found") {
+                assertEquals(token, it.token.value)
+                assertNotNull(it.token.creation)
+                assertNull(it.token.validUntil)
+                assertEquals(accountId, it.account.id(), "Same account")
+            }
+        }
+    }
+
+    @Test
+    fun `Token not found when invalidated`() {
+        asUser {
+            tokensService.generateNewToken()
+            val token = tokensService.currentToken!!.value
+            val t = tokensService.findAccountByToken(token)
+            assertNotNull(t, "Token found")
+            // Invalidates the token
+            tokensService.revokeToken()
+            val tt = tokensService.findAccountByToken(token)
+            assertNull(tt)
         }
     }
 
