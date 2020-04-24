@@ -4,10 +4,12 @@ import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointR
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.web.servlet.invoke
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
 @Configuration
@@ -47,7 +49,8 @@ class WebSecurityConfig {
                 }
                 // Requires BASIC authentication
                 httpBasic { }
-                // TODO Token based authentication
+                // Token based authentication (for API only)
+                addFilterAt(TokenHeaderAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter::class.java)
             }
         }
     }
