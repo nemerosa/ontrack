@@ -24,12 +24,8 @@ class AccountJdbcRepository(dataSource: DataSource?) : AbstractJdbcRepository(da
                 params("name", username)
         ) { rs: ResultSet, _: Int ->
             BuiltinAccount(
-                    rs.getInt("ID"),
-                    rs.getString("name"),
-                    rs.getString("fullName"),
-                    rs.getString("email"),
-                    rs.getString("password"),
-                    getEnum(SecurityRole::class.java, rs, "role")
+                    toAccount(rs) { BuiltinAuthenticationSourceProvider.SOURCE },
+                    rs.getString("password")
             )
         }
     }

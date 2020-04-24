@@ -26,7 +26,7 @@ class UserServiceImpl(
             throw AccessDeniedException("Password change is not allowed from ontrack.")
         } else {
             val existing = accountRepository.findBuiltinAccount(user.account.name)
-            if (existing != null && existing.id == user.account.id()) {
+            if (existing != null && existing.account.id() == user.account.id()) {
                 val matchingOldPassword = passwordEncoder.matches(input.oldPassword, existing.password)
                 if (matchingOldPassword) {
                     accountRepository.setPassword(

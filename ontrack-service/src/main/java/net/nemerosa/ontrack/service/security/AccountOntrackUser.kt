@@ -8,7 +8,7 @@ import org.springframework.security.core.authority.AuthorityUtils
 /**
  * [Account] based [OntrackUser].
  */
-class AccountOntrackUser(private val account: Account) : OntrackUser {
+open class AccountOntrackUser(private val account: Account) : OntrackUser {
 
     override val accountId: Int = account.id()
 
