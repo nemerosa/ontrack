@@ -15,6 +15,9 @@ class LoginPage extends AbstractPage {
     @FindBy(id = 'submit')
     protected WebElement submit
 
+    @FindBy(id = 'error-invalid-credentials')
+    private WebElement invalidCredentials
+
     LoginPage(Browser browser) {
         super(browser)
     }
@@ -54,4 +57,9 @@ class LoginPage extends AbstractPage {
          */
         sleep waitMs
     }
+
+    boolean isInvalidCredentialsDisplayed() {
+        return invalidCredentials.displayed
+    }
+
 }

@@ -14,10 +14,10 @@
 <form class="form-signin" th:action="@{/login}" method="post">
     <img class="mb-4" src="assets/logo-128.png" alt="Ontrack sign in" width="72" height="72">
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+    <div id="error-invalid-credentials" th:if="${param.error}" class="alert alert-danger" role="alert">
         Invalid username and password.
     </div>
-    <div th:if="${param.logout}" class="alert alert-success" role="alert">
+    <div id="message-logout" th:if="${param.logout}" class="alert alert-success" role="alert">
         You have been logged out.
     </div>
     <label for="username" class="sr-only">User name</label>

@@ -83,6 +83,7 @@ class ACCBrowserTokens extends AcceptanceTestClient {
         browser { Browser browser ->
             def loginPage = goTo(LoginPage, [:])
             loginPage.login(username, token.value)
+            assert loginPage.invalidCredentialsDisplayed : "Invalid credentials message is displayed."
         }
     }
 
