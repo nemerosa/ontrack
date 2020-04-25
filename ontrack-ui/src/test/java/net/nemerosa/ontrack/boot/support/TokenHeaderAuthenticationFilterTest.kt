@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.boot.support
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.security.TokenAuthenticationToken
-import net.nemerosa.ontrack.service.security.TokenNameMismatchException
+import net.nemerosa.ontrack.model.security.TokenNameMismatchException
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
