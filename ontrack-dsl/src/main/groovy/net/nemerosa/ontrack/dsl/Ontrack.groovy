@@ -177,6 +177,11 @@ class Ontrack {
         new Config(this)
     }
 
+    @DSLMethod("Access to the token management")
+    TokenManagement getTokens() {
+        new TokenManagement(this)
+    }
+
     @DSLMethod(value = "Access to the administration of Ontrack")
     Admin getAdmin() {
         new Admin(this)
