@@ -237,6 +237,6 @@ class OTHttpClient {
      * HTTP call context
      */
     HttpClientContext getHttpClientContext() {
-        httpClientContext
+        httpContext
     }
 }
