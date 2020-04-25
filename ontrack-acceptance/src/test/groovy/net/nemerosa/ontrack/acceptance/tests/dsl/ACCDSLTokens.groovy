@@ -25,6 +25,21 @@ class ACCDSLTokens extends AbstractACCDSL {
     }
 
     @Test
+    void 'Connecting with a token as a password'() {
+        // Creating a project
+        def name = uid("P")
+        ontrack.project(name, "Test project")
+        // Generates a token for current user
+        def user = uid("U")
+        def token = getOntrackAsAnyUser(user).tokens.generate()
+        // Creates a connection using this token as a password
+        def ontrackWithToken = ontrackBuilder.authenticate(user, token.value).build()
+        // Checks we can still connect, and get the list of projects
+        def project = ontrackWithToken.projects.find { it.name == name }
+        assert project != null: "Project still accessible through token authentication"
+    }
+
+    @Test
     void 'Connecting with a token is not possible after it has been revoked'() {
         // Creating a project
         def name = uid("P")

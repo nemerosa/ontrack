@@ -40,8 +40,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
                 .build()
     }
 
-    protected Ontrack getOntrackAsAnyUser() {
-        def name = uid('U')
+    protected Ontrack getOntrackAsAnyUser(String name = uid('U')) {
         def password = uid('P')
         ontrack.admin.account(name, name, "${name}@nemerosa.net", password)
         return ontrackBuilder
