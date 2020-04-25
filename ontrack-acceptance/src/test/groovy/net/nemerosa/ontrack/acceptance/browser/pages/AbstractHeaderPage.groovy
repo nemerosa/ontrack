@@ -7,19 +7,19 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
-public abstract class AbstractHeaderPage extends AbstractPage {
+abstract class AbstractHeaderPage extends AbstractPage {
 
     @FindBy(className = 'ot-view-title')
-    protected WebElement pageTitle;
+    protected WebElement pageTitle
 
     @FindBy(id = 'header-user-menu')
     protected WebElement userMenu
 
-    private final HeaderModule header;
+    private final HeaderModule header
 
-    public AbstractHeaderPage(Browser browser) {
-        super(browser);
-        header = new HeaderModule(browser);
+    AbstractHeaderPage(Browser browser) {
+        super(browser)
+        header = new HeaderModule(browser)
     }
 
     HeaderModule getHeader() {
@@ -27,7 +27,7 @@ public abstract class AbstractHeaderPage extends AbstractPage {
     }
 
     @Override
-    public void waitFor() {
+    void waitFor() {
         browser.waitUntil("Page title") { pageTitle.displayed }
     }
 
@@ -51,6 +51,10 @@ public abstract class AbstractHeaderPage extends AbstractPage {
         return page
     }
 
+    UserProfilePage goToUserProfile() {
+        return selectUserMenu(UserProfilePage, "user-profile-link")
+    }
+
     APIPage goToAPI() {
         $('.ot-command-api').click()
         browser.at(APIPage)
@@ -60,5 +64,9 @@ public abstract class AbstractHeaderPage extends AbstractPage {
         return browser.findElements(By.className(
                 "ot-decoration-${decorationType}"
         ))
+    }
+
+    LoginPage logout() {
+        return selectUserMenu(LoginPage, "user-logout")
     }
 }

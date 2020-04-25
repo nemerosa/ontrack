@@ -75,18 +75,21 @@
                             <input id="token" class="form-control" ng-model="token.token.value" type="text" readonly>
                             <span class="input-group-btn">
                             <button class="btn btn-default"
+                                    id="token-copy"
                                     title="Copy API token"
                                     ng-click="copyToken()"
                                     ng-disabled="!token.token.value">
                                 <i class="fa fa-copy"></i>
                             </button>
                             <button class="btn btn-warning"
+                                    id="token-generate"
                                     ng-if="localUser._changeToken"
                                     ng-click="changeToken()"
                                     title="Regenerate token">
                                 <i class="fa fa-cog"></i>
                             </button>
                             <button class="btn btn-danger"
+                                    id="token-revoke"
                                     ng-if="localUser._revokeToken"
                                     ng-click="revokeToken()"
                                     title="Revoke token">
