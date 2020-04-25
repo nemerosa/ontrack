@@ -1,11 +1,32 @@
 package net.nemerosa.ontrack.model.structure
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.json.asJson
 import org.junit.Test
 import java.time.Duration
+import java.time.LocalDateTime
 import kotlin.test.*
 
 class TokenTest {
+
+    @Test
+    fun json() {
+        val token = Token(
+                "xxx",
+                LocalDateTime.of(2019, 4, 25, 18, 22, 0),
+                LocalDateTime.of(2019, 5, 25, 18, 22, 0)
+        )
+        assertFalse(token.valid, "Invalid token, in the past")
+        assertEquals(
+                mapOf(
+                        "value" to "xxx",
+                        "creation" to "2019-04-25T18:22:00Z",
+                        "validUntil" to "2019-05-25T18:22:00Z",
+                        "valid" to false
+                ).asJson(),
+                token.asJson()
+        )
+    }
 
     @Test
     fun obfuscation() {

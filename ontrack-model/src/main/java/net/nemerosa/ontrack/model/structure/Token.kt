@@ -48,4 +48,9 @@ data class Token(
      */
     fun isValid(time: LocalDateTime = Time.now()) =
             validUntil == null || validUntil >= time
+
+    /**
+     * Validity now
+     */
+    val valid: Boolean get() = isValid()
 }
