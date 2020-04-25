@@ -47,4 +47,34 @@ class ACCDSLTokens extends AbstractACCDSL {
         }
     }
 
+    @Test
+    void 'Generating a token'() {
+        def ontrack = ontrackAsAnyUser
+        // Generates a token for current user
+        def token = ontrack.tokens.generate()
+        assert token.value != null && token.value != ""
+        assert token.creation != null
+        assert token.validUntil == null
+    }
+
+    @Test
+    void 'Getting the current token returns null when not generated yet'() {
+        def ontrack = ontrackAsAnyUser
+        // Gets the current token
+        def current = ontrack.tokens.current
+        // Null
+        assert current == null
+    }
+
+    @Test
+    void 'Getting the current token'() {
+        def ontrack = ontrackAsAnyUser
+        // Generates a token for current user
+        def token = ontrack.tokens.generate()
+        // Gets the current token
+        def current = ontrack.tokens.current
+        // Equality
+        assert current == token
+    }
+
 }

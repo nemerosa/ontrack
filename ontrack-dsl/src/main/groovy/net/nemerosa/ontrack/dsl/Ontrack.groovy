@@ -15,11 +15,29 @@ import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
 
+import java.text.SimpleDateFormat
+
 /**
  * Entry point for the DSL.
  */
 @DSL(value = "An Ontrack instance is usually bound to the `ontrack` identifier and is the root for all DSL calls.")
 class Ontrack {
+
+    /**
+     * General date format
+     */
+    static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+
+    /**
+     * Parsing a date
+     */
+    static Date parseTimestamp(String value) {
+        if (value == null || value.isBlank()) {
+            return null
+        } else {
+            return TIMESTAMP_FORMAT.parse(value)
+        }
+    }
 
     /**
      * HTTP client

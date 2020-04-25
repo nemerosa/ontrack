@@ -12,13 +12,29 @@ class TokenManagement {
         this.ontrack = ontrack
     }
 
+    @DSLMethod("Getting the current token for the user")
+    Token getCurrent() {
+        def response = ontrack.get("rest/tokens/current")
+        if (response.token) {
+            return parseToken(response)
+        } else {
+            return null
+        }
+    }
+
+    private static Token parseToken(response) {
+        return new Token(
+                response.token.value as String,
+                Ontrack.parseTimestamp(response.token.creation as String),
+                Ontrack.parseTimestamp(response.token.validUntil as String)
+        )
+    }
+
     @DSLMethod("Generates a token for the current user")
     Token generate() {
         def response = ontrack.post("rest/tokens/new", null)
         if (response.token) {
-            return new Token(
-                    response.token.value as String
-            )
+            return parseToken(response)
         } else {
             throw new IllegalStateException("Could not generate a token.")
         }
