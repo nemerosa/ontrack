@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.support
 import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.security.TokenAuthenticationToken
+import net.nemerosa.ontrack.service.security.TokenNameMismatchException
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.web.AuthenticationEntryPoint
 import javax.servlet.FilterChain
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
@@ -123,6 +124,36 @@ class TokenHeaderAuthenticationFilterTest {
                 assertTrue(t.matches("xxx"), "Token matches")
             }
         }
+    }
+
+    @Test
+    fun `Authentication failure to ignore`() {
+        filter = TokenHeaderAuthenticationFilter(
+                authenticationManager = authenticationManager,
+                isIgnoreFailure = true
+        )
+        request.addHeader("X-Ontrack-Token", "xxx")
+        whenever(authenticationManager.authenticate(token)).thenThrow(TokenNameMismatchException())
+        filter.doFilter(request, response, filterChain)
+        assertNull(SecurityContextHolder.getContext().authentication)
+        verify(filterChain, times(1)).doFilter(request, response)
+    }
+
+    @Test
+    fun `Authentication failure not to ignore`() {
+        val authenticationEntryPoint = mock<AuthenticationEntryPoint>()
+        filter = TokenHeaderAuthenticationFilter(
+                authenticationManager = authenticationManager,
+                isIgnoreFailure = false,
+                authenticationEntryPoint = authenticationEntryPoint
+        )
+        request.addHeader("X-Ontrack-Token", "xxx")
+        val exception = TokenNameMismatchException()
+        whenever(authenticationManager.authenticate(token)).thenThrow(exception)
+        filter.doFilter(request, response, filterChain)
+        assertNull(SecurityContextHolder.getContext().authentication)
+        verify(filterChain, never()).doFilter(request, response)
+        verify(authenticationEntryPoint, times(1)).commence(request, response, exception)
     }
 
 }
