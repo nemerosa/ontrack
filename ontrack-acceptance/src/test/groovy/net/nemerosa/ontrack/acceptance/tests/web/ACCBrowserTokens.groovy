@@ -36,4 +36,25 @@ class ACCBrowserTokens extends AcceptanceTestClient {
         }
     }
 
+    @Test
+    void 'Generate a token with the UI and use it in the API'() {
+        // Creates an account
+        def username = uid("U")
+        def password = uid("P")
+        doCreateAccount(username, password)
+        // Login with this account
+        browser { Browser browser ->
+            def homePage = login(browser, username, password, username)
+            // Go to the user profile
+            def userProfilePage = homePage.goToUserProfile()
+            // Generates and copies the token
+            def token = userProfilePage.generateToken()
+            // Uses the token in the API
+            def client = ontrackBuilder.authenticate(token).build()
+            // Fetches projects for examples
+            def projects = client.projects
+            assert projects != null: "Projects were fetched using the token"
+        }
+    }
+
 }
