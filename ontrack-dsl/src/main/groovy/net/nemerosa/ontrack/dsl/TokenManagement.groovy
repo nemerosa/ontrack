@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.dsl
 import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.doc.DSLMethod
 
+import java.util.concurrent.TimeUnit
+
 @DSL("Management of tokens")
 class TokenManagement {
 
@@ -53,5 +55,18 @@ class TokenManagement {
     @DSLMethod("Revokes the token for a specific account")
     void revokeAccount(int accountId) {
         ontrack.post("rest/tokens/account/$accountId/revoke", null)
+    }
+
+    @DSLMethod("Generates a token for a specific user")
+    Token generateForAccount(int accountId, int duration, TimeUnit unit) {
+        def response = ontrack.post("rest/tokens/account/$accountId/generate", [
+                duration: duration,
+                unit: unit
+        ])
+        if (response.token) {
+            return parseToken(response)
+        } else {
+            throw new IllegalStateException("Could not generate a token.")
+        }
     }
 }

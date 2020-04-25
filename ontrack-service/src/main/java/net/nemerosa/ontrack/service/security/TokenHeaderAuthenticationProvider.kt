@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.TokenAuthenticationToken
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.core.Authentication
 
 class TokenHeaderAuthenticationProvider(
@@ -18,8 +19,11 @@ class TokenHeaderAuthenticationProvider(
             if (tokenAccount != null) {
                 // Validity of the token
                 val tokenValid = tokenAccount.token.isValid()
+                if (!tokenValid) {
+                    throw CredentialsExpiredException("Token is expired.")
+                }
                 // Wrapping the account
-                val user = AccountOntrackUser(tokenAccount.account, credentialNonExpired = tokenValid)
+                val user = AccountOntrackUser(tokenAccount.account)
                 // Provides the ACL
                 val authenticatedUser = accountService.withACL(user)
                 // Authentication OK

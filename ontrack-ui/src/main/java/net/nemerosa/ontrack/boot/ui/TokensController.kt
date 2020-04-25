@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.model.structure.Token
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 /**
  * Management of tokens
@@ -58,6 +60,20 @@ class TokensController(
     }
 
     /**
+     * Generates or prolongates a token for an account
+     */
+    @PostMapping("account/{account}/generate")
+    fun generateForAccount(@PathVariable account: Int, @RequestBody request: TokenGenerationRequest): ResponseEntity<TokenResponse> {
+        val actualDuration = if (request.duration <= 0) {
+            null
+        } else {
+            Duration.of(request.duration.toLong(), request.unit.toChronoUnit())
+        }
+        val token = tokensService.generateToken(account, actualDuration, actualDuration == null)
+        return ResponseEntity.ok(TokenResponse(token))
+    }
+
+    /**
      * Gets the token for an account
      */
     @GetMapping("account/{account}")
@@ -75,5 +91,13 @@ class TokensController(
      * Revoke all tokens response
      */
     data class RevokeAllResponse(val count: Int)
+
+    /**
+     * Token creation parameters
+     */
+    data class TokenGenerationRequest(
+            val duration: Int,
+            val unit: TimeUnit
+    )
 
 }

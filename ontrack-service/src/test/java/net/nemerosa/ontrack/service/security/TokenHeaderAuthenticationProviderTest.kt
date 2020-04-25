@@ -9,11 +9,12 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Token
 import net.nemerosa.ontrack.model.structure.TokenAccount
 import net.nemerosa.ontrack.model.structure.TokensService
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
+import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import java.time.Duration
 import kotlin.test.*
 
 class TokenHeaderAuthenticationProviderTest {
@@ -48,6 +49,30 @@ class TokenHeaderAuthenticationProviderTest {
         val auth = TokenAuthenticationToken("xxx")
         val result = provider.authenticate(auth)
         assertNull(result)
+    }
+
+    @Test
+    fun `Token found but invalid`() {
+        val auth = UsernamePasswordAuthenticationToken("user", "xxx")
+        val tokenAccount = TokenAccount(
+                account = Account(
+                        ID.of(1),
+                        "user",
+                        "User",
+                        "user@test.com",
+                        BuiltinAuthenticationSourceProvider.SOURCE,
+                        SecurityRole.USER
+                ),
+                token = Token(
+                        "xxx",
+                        Time.now() - Duration.ofHours(24),
+                        Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
+                )
+        )
+        whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
+        assertFailsWith<CredentialsExpiredException> {
+            provider.authenticate(auth)
+        }
     }
 
     @Test

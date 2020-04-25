@@ -3,9 +3,12 @@ package net.nemerosa.ontrack.acceptance.tests.web
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
 import net.nemerosa.ontrack.acceptance.AcceptanceTestContext
 import net.nemerosa.ontrack.acceptance.browser.Browser
+import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
+
+import java.util.concurrent.TimeUnit
 
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.login
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -54,6 +57,32 @@ class ACCBrowserTokens extends AcceptanceTestClient {
             // Fetches projects for examples
             def projects = client.projects
             assert projects != null: "Projects were fetched using the token"
+        }
+    }
+
+    @Test
+    void 'Trying the connect with an invalid token'() {
+        // Creates an account
+        def username = uid("U")
+        def password = uid("P")
+        def accountId = doCreateAccount(username, password)
+        // Generates a token for this account, for one day
+        def token = ontrack.tokens.generateForAccount(accountId, 1, TimeUnit.DAYS)
+        assert token.validUntil != null
+        // Connects with this token
+        browser { Browser browser ->
+            def homePage = login(browser, username, token.value, username)
+            homePage.waitFor()
+            homePage.logout()
+        }
+        // Regenerates the token, for one second of validity only
+        token = ontrack.tokens.generateForAccount(accountId, 1, TimeUnit.SECONDS)
+        // Waits for its expiration
+        sleep(2000)
+        // Connects with this token
+        browser { Browser browser ->
+            def loginPage = goTo(LoginPage, [:])
+            loginPage.login(username, token.value)
         }
     }
 

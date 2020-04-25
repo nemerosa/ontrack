@@ -13,7 +13,9 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
+import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import java.time.Duration
 import kotlin.test.*
 
 class TokenAsPasswordAuthenticationProviderTest {
@@ -66,7 +68,7 @@ class TokenAsPasswordAuthenticationProviderTest {
     }
 
     @Test
-    fun `Token not found but name mismatch`() {
+    fun `Token found but name mismatch`() {
         val auth = UsernamePasswordAuthenticationToken("user", "xxx")
         val tokenAccount = TokenAccount(
                 account = Account(
@@ -85,6 +87,30 @@ class TokenAsPasswordAuthenticationProviderTest {
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
         assertFailsWith<TokenNameMismatchException> {
+            provider.authenticate(auth)
+        }
+    }
+
+    @Test
+    fun `Token found but invalid`() {
+        val auth = UsernamePasswordAuthenticationToken("user", "xxx")
+        val tokenAccount = TokenAccount(
+                account = Account(
+                        ID.of(1),
+                        "user",
+                        "User",
+                        "user@test.com",
+                        BuiltinAuthenticationSourceProvider.SOURCE,
+                        SecurityRole.USER
+                ),
+                token = Token(
+                        "xxx",
+                        Time.now() - Duration.ofHours(24),
+                        Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
+                )
+        )
+        whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
+        assertFailsWith<CredentialsExpiredException> {
             provider.authenticate(auth)
         }
     }
