@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
 import net.nemerosa.ontrack.model.security.Account
+import java.time.Duration
 
 /**
  * Management of account tokens.
@@ -14,8 +15,11 @@ interface TokensService {
 
     /**
      * Generates a new token for the current user
+     *
+     * @param validity Optional duration (if not set, defaults
+     * to the system settings). Cannot exceeds the system default settings.
      */
-    fun generateNewToken(): Token
+    fun generateNewToken(validity: Duration?): Token
 
     /**
      * Revokes the token of the current user

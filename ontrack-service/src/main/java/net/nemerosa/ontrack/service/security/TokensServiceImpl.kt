@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.TokensRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 
 @Service
 @Transactional
@@ -38,15 +39,26 @@ class TokensServiceImpl(
             }
         }
 
-    override fun generateNewToken(): Token {
+    override fun generateNewToken(validity: Duration?): Token {
         // Gets the current account
         val account = securityService.currentAccount?.account
                 ?: throw TokenGenerationNoAccountException()
         // Generates a new token
         val token = tokenGenerator.generateToken()
         val time = Time.now()
+        // Gets the validity
+        val systemValidity = ontrackConfigProperties.security.tokens.validity
+        val actualValidity = if (systemValidity.isNegative || systemValidity.isZero) {
+            validity
+        } else if (validity != null) {
+            // Checks that the validity is <= system validity
+            check(validity <= systemValidity) { "The validity must be lower or equal to the system validity." }
+            validity
+        } else {
+            throw IllegalStateException("Cannot set an unlimited validity.")
+        }
         // Token object
-        val tokenObject = Token(token, time, null).validFor(ontrackConfigProperties.security.tokens.validity)
+        val tokenObject = Token(token, time, null).validFor(actualValidity)
         // Saves the token...
         tokensRepository.save(account.id(), token, tokenObject.creation, tokenObject.validUntil)
         // ... and returns it

@@ -34,6 +34,12 @@ class TokenTest {
     }
 
     @Test
+    fun `Token valid with null value`() {
+        val token = Token("x", Time.now(), null).validFor(null)
+        assertNull(token.validUntil, "Always valid")
+    }
+
+    @Test
     fun `Token valid with negative value`() {
         val token = Token("x", Time.now(), null).validFor(Duration.ofDays(-1))
         assertNull(token.validUntil, "Always valid")
