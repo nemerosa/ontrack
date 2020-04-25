@@ -17,7 +17,8 @@ class GQLTypeAccount(
         private val tokensService: TokensService,
         private val globalRole: GQLTypeGlobalRole,
         private val authorizedProject: GQLTypeAuthorizedProject,
-        private val token: GQLTypeToken
+        private val token: GQLTypeToken,
+        private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
     override fun getTypeName(): String = ACCOUNT
@@ -65,6 +66,9 @@ class GQLTypeAccount(
                                 }
                             }
                 }
+                // Links
+                .fields(Account::class.java.graphQLFieldContributions(fieldContributors))
+                // OK
                 .build()
     }
 

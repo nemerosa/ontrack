@@ -7,10 +7,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class AdminQLIT : AbstractQLKTITSupport() {
 
@@ -646,6 +643,28 @@ class AdminQLIT : AbstractQLKTITSupport() {
                 }""")
                 val token = data["accounts"][0]["token"]
                 assertTrue(token["valid"].booleanValue())
+            }
+        }
+    }
+
+    @Test
+    fun `Account token links`() {
+        asUser {
+            val id = securityService.currentAccount!!.id()
+            asAdmin {
+                val data = run("""{
+                    accounts(id: $id) {
+                        links {
+                            _revokeToken
+                            _generateToken
+                            _token
+                        }
+                    }
+                }""")
+                val links = data["accounts"][0]["links"]
+                assertFalse(links["_revokeToken"].isNull)
+                assertFalse(links["_generateToken"].isNull)
+                assertFalse(links["_token"].isNull)
             }
         }
     }
