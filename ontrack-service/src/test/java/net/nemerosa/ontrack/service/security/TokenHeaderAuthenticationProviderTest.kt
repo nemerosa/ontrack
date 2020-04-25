@@ -53,7 +53,7 @@ class TokenHeaderAuthenticationProviderTest {
 
     @Test
     fun `Token found but invalid`() {
-        val auth = UsernamePasswordAuthenticationToken("user", "xxx")
+        val auth = TokenAuthenticationToken("xxx")
         val tokenAccount = TokenAccount(
                 account = Account(
                         ID.of(1),
