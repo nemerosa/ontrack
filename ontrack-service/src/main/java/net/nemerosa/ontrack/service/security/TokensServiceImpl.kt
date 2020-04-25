@@ -58,6 +58,10 @@ class TokensServiceImpl(
         return tokensRepository.getForAccount(account)
     }
 
+    override fun getToken(accountId: Int): Token? {
+        return getToken(accountService.getAccount(ID.of(accountId)))
+    }
+
     override fun findAccountByToken(token: String): TokenAccount? {
         // Find the account ID
         val result = tokensRepository.findAccountByToken(token)

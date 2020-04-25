@@ -28,6 +28,11 @@ interface TokensService {
     fun getToken(account: Account): Token?
 
     /**
+     * Gets the token of an account using its ID
+     */
+    fun getToken(accountId: Int): Token?
+
+    /**
      * Gets the account which is associated with this token, if any.
      *
      * @return Association of the actual token and its account.

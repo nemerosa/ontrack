@@ -51,12 +51,20 @@ class TokensController(
     /**
      * Revokes for an account
      */
-    @PostMapping("revoke/{account}")
+    @PostMapping("account/{account}/revoke")
     fun revokeForAccount(@PathVariable account: Int): ResponseEntity<TokenResponse> {
         tokensService.revokeToken(account)
         return ResponseEntity.ok(TokenResponse(null))
     }
 
+    /**
+     * Gets the token for an account
+     */
+    @GetMapping("account/{account}")
+    fun getTokenForAccount(@PathVariable account: Int): ResponseEntity<TokenResponse> {
+        val token = tokensService.getToken(account)?.obfuscate()
+        return ResponseEntity.ok(TokenResponse(token))
+    }
 
     /**
      * Token response
