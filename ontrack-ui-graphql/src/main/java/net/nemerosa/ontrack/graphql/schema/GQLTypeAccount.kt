@@ -7,13 +7,17 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeAccount(
         private val accountService: AccountService,
+        private val securityService: SecurityService,
+        private val tokensService: TokensService,
         private val globalRole: GQLTypeGlobalRole,
-        private val authorizedProject: GQLTypeAuthorizedProject
+        private val authorizedProject: GQLTypeAuthorizedProject,
+        private val token: GQLTypeToken
 ) : GQLType {
 
     override fun getTypeName(): String = ACCOUNT
@@ -49,6 +53,17 @@ class GQLTypeAccount(
                             .description("List of authorized projects")
                             .type(GraphqlUtils.stdList(authorizedProject.typeRef))
                             .dataFetcher(accountAuthorizedProjectsFetcher())
+                }
+                .field {
+                    it.name("token")
+                            .description("Authentication token, if any, linked to this account.")
+                            .type(token.typeRef)
+                            .dataFetcher { env ->
+                                val account: Account = env.getSource()
+                                securityService.asAdmin {
+                                    tokensService.getToken(account.id())
+                                }
+                            }
                 }
                 .build()
     }
