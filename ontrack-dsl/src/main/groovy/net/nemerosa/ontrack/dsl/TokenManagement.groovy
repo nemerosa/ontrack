@@ -50,4 +50,8 @@ class TokenManagement {
         ontrack.post("rest/tokens/revokeAll", null)
     }
 
+    @DSLMethod("Revokes the token for a specific account")
+    void revokeAccount(int accountId) {
+        ontrack.post("rest/tokens/account/$accountId/revoke", null)
+    }
 }
