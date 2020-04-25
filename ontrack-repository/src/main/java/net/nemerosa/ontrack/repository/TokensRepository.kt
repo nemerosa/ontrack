@@ -11,8 +11,10 @@ interface TokensRepository {
 
     /**
      * Invalidates any token for the account designated by its [id].
+     *
+     * @return Previous token or `null` if not existing.
      */
-    fun invalidate(id: Int)
+    fun invalidate(id: Int): String?
 
     /**
      * Saves a token.

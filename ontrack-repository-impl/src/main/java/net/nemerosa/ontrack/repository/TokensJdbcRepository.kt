@@ -11,11 +11,17 @@ import javax.sql.DataSource
 @Repository
 class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(dataSource), TokensRepository {
 
-    override fun invalidate(id: Int) {
+    override fun invalidate(id: Int): String? {
+        val previous: String? = getFirstItem(
+                "SELECT VALUE FROM TOKENS WHERE ACCOUNT = :id",
+                params("id", id),
+                String::class.java
+        )
         namedParameterJdbcTemplate!!.update(
                 "DELETE FROM TOKENS WHERE ACCOUNT = :id",
                 params("id", id)
         )
+        return previous
     }
 
     override fun save(id: Int, token: String, time: LocalDateTime, until: LocalDateTime?) {

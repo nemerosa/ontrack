@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.support
 
+import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Configuration
@@ -22,7 +23,9 @@ class WebSecurityConfig {
     @Configuration
     @Order(1)
     @ConditionalOnWebApplication
-    class ApiWebSecurityConfigurationAdapter : WebSecurityConfigurerAdapter() {
+    class ApiWebSecurityConfigurationAdapter(
+            private val tokensService: TokensService
+    ) : WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
             http {
                 securityMatcher("/rest/**")
@@ -50,7 +53,7 @@ class WebSecurityConfig {
                 // Requires BASIC authentication
                 httpBasic { }
                 // Token based authentication (for API only)
-                addFilterAt(TokenHeaderAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter::class.java)
+                addFilterAt(TokenHeaderAuthenticationFilter(authenticationManager(), tokensService = tokensService), BasicAuthenticationFilter::class.java)
             }
         }
     }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.support
 
 import net.nemerosa.ontrack.model.security.TokenAuthenticationToken
+import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse
  */
 class TokenHeaderAuthenticationFilter(
         private val authenticationManager: AuthenticationManager,
+        private val tokensService: TokensService,
         private val headerName: String = "X-Ontrack-Token",
         private val authenticationEntryPoint: AuthenticationEntryPoint? = null,
         private val rememberMeServices: RememberMeServices = NullRememberMeServices(),
@@ -71,9 +73,10 @@ class TokenHeaderAuthenticationFilter(
         }
 
         // Only reauthenticate if token does not match the digest
-        if (existingAuth is TokenAuthenticationToken
-                && !existingAuth.matches(token)) {
-            return true
+        if (existingAuth is TokenAuthenticationToken) {
+            if (!existingAuth.matches(token) || !tokensService.isValid(token)) {
+                return true
+            }
         }
 
         // OK

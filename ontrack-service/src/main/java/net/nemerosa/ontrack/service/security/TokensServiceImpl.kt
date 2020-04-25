@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountManagement
@@ -20,6 +22,11 @@ class TokensServiceImpl(
         private val ontrackConfigProperties: OntrackConfigProperties,
         private val accountService: AccountService
 ) : TokensService {
+
+    private val cache: Cache<String, Boolean> = Caffeine.newBuilder()
+            .maximumSize(ontrackConfigProperties.security.tokens.cache.maxCount)
+            .expireAfterAccess(ontrackConfigProperties.security.tokens.cache.validity)
+            .build()
 
     override val currentToken: Token?
         get() {
@@ -50,7 +57,11 @@ class TokensServiceImpl(
         // Gets the current account
         val account = securityService.currentAccount?.account
         // Revokes its token
-        account?.apply { tokensRepository.invalidate(id()) }
+        account?.apply {
+            val token = tokensRepository.invalidate(id())
+            // Removes any cache token
+            token?.let { cache.invalidate(token) }
+        }
     }
 
     override fun getToken(account: Account): Token? {
@@ -61,6 +72,29 @@ class TokensServiceImpl(
     override fun getToken(accountId: Int): Token? {
         return getToken(accountService.getAccount(ID.of(accountId)))
     }
+
+    override fun isValid(token: String): Boolean {
+        if (ontrackConfigProperties.security.tokens.cache.enabled) {
+            val valid = cache.getIfPresent(token)
+            return if (valid != null) {
+                valid
+            } else {
+                val stillValid = internalValidityCheck(token)
+                cache.put(token, stillValid)
+                return stillValid
+            }
+        } else {
+            return internalValidityCheck(token)
+        }
+    }
+
+    private fun internalValidityCheck(token: String): Boolean =
+            tokensRepository
+                    .findAccountByToken(token)
+                    ?.let { (_, result) ->
+                        result.isValid()
+                    }
+                    ?: false
 
     override fun findAccountByToken(token: String): TokenAccount? {
         // Find the account ID
@@ -77,11 +111,13 @@ class TokensServiceImpl(
 
     override fun revokeAll(): Int {
         securityService.checkGlobalFunction(AccountManagement::class.java)
+        cache.invalidateAll()
         return tokensRepository.revokeAll()
     }
 
     override fun revokeToken(accountId: Int) {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        tokensRepository.invalidate(accountId)
+        val token = tokensRepository.invalidate(accountId)
+        token?.let { cache.invalidate(token) }
     }
 }

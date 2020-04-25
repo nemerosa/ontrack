@@ -51,4 +51,11 @@ interface TokensService {
      */
     fun revokeToken(accountId: Int)
 
+    /**
+     * Checks if this token is still valid. This method must return fast
+     * because it's used to quickly check the validity of tokens
+     * upon authentication.
+     */
+    fun isValid(token: String): Boolean
+
 }
