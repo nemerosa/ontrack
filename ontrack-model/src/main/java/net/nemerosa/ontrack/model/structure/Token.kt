@@ -16,6 +16,12 @@ data class Token(
         val creation: LocalDateTime,
         val validUntil: LocalDateTime?
 ) {
+
+    /**
+     * Returns an obfuscated version of this token.
+     */
+    fun obfuscate() = Token("", creation, validUntil)
+
     /**
      * Returns a new token with same [value] and [creation]
      * but with [validUntil] computed from [creation] according

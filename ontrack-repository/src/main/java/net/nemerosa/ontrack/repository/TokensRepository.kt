@@ -36,4 +36,11 @@ interface TokensRepository {
      */
     fun findAccountByToken(token: String): Pair<Int, Token>?
 
+    /**
+     * Revokes all tokens
+     *
+     * @return Number of tokens having been revoked
+     */
+    fun revokeAll(): Int
+
 }

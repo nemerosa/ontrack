@@ -8,6 +8,15 @@ import kotlin.test.*
 class TokenTest {
 
     @Test
+    fun obfuscation() {
+        val token = Token("xxx", Time.now(), Time.now() + Duration.ofDays(14))
+        val ob = token.obfuscate()
+        assertEquals("", ob.value)
+        assertEquals(token.creation, ob.creation)
+        assertEquals(token.validUntil, ob.validUntil)
+    }
+
+    @Test
     fun `Always valid when valid until is null`() {
         val now = Time.now()
         val token = Token("x", now, null)

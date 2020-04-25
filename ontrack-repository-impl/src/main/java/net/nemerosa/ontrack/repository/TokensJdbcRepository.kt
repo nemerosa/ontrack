@@ -45,6 +45,11 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         rs.getInt("ACCOUNT") to toToken(rs)
     }
 
+    override fun revokeAll(): Int {
+        @Suppress("SqlWithoutWhere")
+        return jdbcTemplate!!.update("DELETE FROM TOKENS")
+    }
+
     private fun toToken(rs: ResultSet): Token {
         return Token(
                 value = rs.getString("VALUE"),

@@ -34,4 +34,16 @@ interface TokensService {
      */
     fun findAccountByToken(token: String): TokenAccount?
 
+    /**
+     * Revokes all tokens
+     *
+     * @return Number of tokens having been revoked
+     */
+    fun revokeAll(): Int
+
+    /**
+     * Revokes the token for a given account
+     */
+    fun revokeToken(accountId: Int)
+
 }

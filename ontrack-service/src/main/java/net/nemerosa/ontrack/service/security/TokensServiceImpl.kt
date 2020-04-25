@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountManagement
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -25,7 +26,9 @@ class TokensServiceImpl(
             // Gets the current account
             val account = securityService.currentAccount?.account
             // Gets the token of this account
-            return account?.let { getToken(it) }
+            return account?.let {
+                tokensRepository.getForAccount(account)
+            }
         }
 
     override fun generateNewToken(): Token {
@@ -50,7 +53,10 @@ class TokensServiceImpl(
         account?.apply { tokensRepository.invalidate(id()) }
     }
 
-    override fun getToken(account: Account): Token? = tokensRepository.getForAccount(account)
+    override fun getToken(account: Account): Token? {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        return tokensRepository.getForAccount(account)
+    }
 
     override fun findAccountByToken(token: String): TokenAccount? {
         // Find the account ID
@@ -63,5 +69,15 @@ class TokensServiceImpl(
                     token
             )
         }
+    }
+
+    override fun revokeAll(): Int {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        return tokensRepository.revokeAll()
+    }
+
+    override fun revokeToken(accountId: Int) {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        tokensRepository.invalidate(accountId)
     }
 }

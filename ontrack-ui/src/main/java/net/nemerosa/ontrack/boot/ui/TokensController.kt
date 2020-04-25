@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.boot.ui
 import net.nemerosa.ontrack.model.structure.Token
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 /**
  * Management of tokens
@@ -42,10 +39,33 @@ class TokensController(
         return ResponseEntity.ok(TokenResponse(null))
     }
 
+    /**
+     * Revokes all tokens
+     */
+    @PostMapping("revokeAll")
+    fun revokeAll(): ResponseEntity<RevokeAllResponse> {
+        val count = tokensService.revokeAll()
+        return ResponseEntity.ok(RevokeAllResponse(count))
+    }
+
+    /**
+     * Revokes for an account
+     */
+    @PostMapping("revoke/{account}")
+    fun revokeForAccount(@PathVariable account: Int): ResponseEntity<TokenResponse> {
+        tokensService.revokeToken(account)
+        return ResponseEntity.ok(TokenResponse(null))
+    }
+
 
     /**
      * Token response
      */
     data class TokenResponse(val token: Token?)
+
+    /**
+     * Revoke all tokens response
+     */
+    data class RevokeAllResponse(val count: Int)
 
 }
