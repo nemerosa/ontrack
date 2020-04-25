@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.*
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.security.TokenAuthenticationToken
 import net.nemerosa.ontrack.model.security.TokenNameMismatchException
+import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
@@ -22,6 +23,7 @@ import kotlin.test.assertTrue
 
 class TokenHeaderAuthenticationFilterTest {
 
+    private lateinit var tokensService: TokensService
     private lateinit var authenticationManager: AuthenticationManager
     private lateinit var filter: TokenHeaderAuthenticationFilter
 
@@ -41,9 +43,11 @@ class TokenHeaderAuthenticationFilterTest {
         request = MockHttpServletRequest()
         response = MockHttpServletResponse()
         filterChain = mock()
+        tokensService = mock()
         authenticationManager = mock()
         filter = TokenHeaderAuthenticationFilter(
-                authenticationManager = authenticationManager
+                authenticationManager = authenticationManager,
+                tokensService = tokensService
         )
         SecurityContextHolder.getContext().authentication = null
     }
@@ -52,6 +56,7 @@ class TokenHeaderAuthenticationFilterTest {
     fun `Authentication entry point must not be null if we do not ignore the failures`() {
         filter = TokenHeaderAuthenticationFilter(
                 authenticationManager = authenticationManager,
+                tokensService = tokensService,
                 isIgnoreFailure = false
         )
         assertFailsWith<IllegalStateException> {
@@ -63,6 +68,7 @@ class TokenHeaderAuthenticationFilterTest {
     fun `Authentication entry point can be null if we ignore the failures`() {
         filter = TokenHeaderAuthenticationFilter(
                 authenticationManager = authenticationManager,
+                tokensService = tokensService,
                 isIgnoreFailure = true
         )
         filter.afterPropertiesSet()
@@ -114,9 +120,24 @@ class TokenHeaderAuthenticationFilterTest {
     }
 
     @Test
+    fun `Authentication is required when existing token has been invalidated`() {
+        SecurityContextHolder.getContext().authentication = TokenAuthenticationToken("xxx", AuthorityUtils.createAuthorityList(SecurityRole.USER.roleName), mock())
+        request.addHeader("X-Ontrack-Token", "xxx")
+        whenever(tokensService.isValid("xxx")).thenReturn(true)
+        whenever(authenticationManager.authenticate(token)).thenReturn(authenticatedToken)
+        filter.doFilter(request, response, filterChain)
+        assertNotNull(SecurityContextHolder.getContext().authentication) {
+            assertIs<TokenAuthenticationToken>(it) { t ->
+                assertTrue(t.matches("xxx"), "Token matches")
+            }
+        }
+    }
+
+    @Test
     fun `Authentication is not required when existing token matches`() {
         SecurityContextHolder.getContext().authentication = authenticatedToken
         request.addHeader("X-Ontrack-Token", "xxx")
+        whenever(tokensService.isValid("xxx")).thenReturn(true)
         filter.doFilter(request, response, filterChain)
         verify(authenticationManager, never()).authenticate(any())
         assertNotNull(SecurityContextHolder.getContext().authentication) {
@@ -130,6 +151,7 @@ class TokenHeaderAuthenticationFilterTest {
     fun `Authentication failure to ignore`() {
         filter = TokenHeaderAuthenticationFilter(
                 authenticationManager = authenticationManager,
+                tokensService = tokensService,
                 isIgnoreFailure = true
         )
         request.addHeader("X-Ontrack-Token", "xxx")
@@ -144,6 +166,7 @@ class TokenHeaderAuthenticationFilterTest {
         val authenticationEntryPoint = mock<AuthenticationEntryPoint>()
         filter = TokenHeaderAuthenticationFilter(
                 authenticationManager = authenticationManager,
+                tokensService = tokensService,
                 isIgnoreFailure = false,
                 authenticationEntryPoint = authenticationEntryPoint
         )
