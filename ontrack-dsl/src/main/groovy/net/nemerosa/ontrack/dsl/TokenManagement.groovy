@@ -24,4 +24,9 @@ class TokenManagement {
         }
     }
 
+    @DSLMethod("Revokes all tokens")
+    void revokeAll() {
+        ontrack.post("rest/tokens/revokeAll", null)
+    }
+
 }
