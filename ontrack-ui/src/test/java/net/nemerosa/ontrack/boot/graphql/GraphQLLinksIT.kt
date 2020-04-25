@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class GraphQLLinksIT : AbstractQLKTITSupport() {
 
@@ -60,5 +61,27 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
         }
         assertEquals(p.name, data["projects"][0]["name"].asText())
         assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:${p.id},", data["projects"][0]["links"]["_update"].asText())
+    }
+
+    @Test
+    fun `Account token links`() {
+        asUser {
+            val id = securityService.currentAccount!!.id()
+            asAdmin {
+                val data = run("""{
+                    accounts(id: $id) {
+                        links {
+                            _revokeToken
+                            _generateToken
+                            _token
+                        }
+                    }
+                }""")
+                val links = data["accounts"][0]["links"]
+                assertFalse(links["_revokeToken"].isNull)
+                assertFalse(links["_generateToken"].isNull)
+                assertFalse(links["_token"].isNull)
+            }
+        }
     }
 }
