@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +16,9 @@ class AdminQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var mappingService: AccountGroupMappingService
+
+    @Autowired
+    private lateinit var tokensService: TokensService
 
     private val JsonNode.name: String? get() = get("name").asText()
     private val JsonNode.id: Int? get() = get("id").asInt()
@@ -602,6 +606,47 @@ class AdminQLIT : AbstractQLKTITSupport() {
             assertEquals(null, p["projectRoles"].find { it["id"].asText() == "PARTICIPANT" })
             // Other role
             assertEquals(null, p["projectRoles"].find { it["id"].asText() == "VALIDATION_MANAGER" })
+        }
+    }
+
+    @Test
+    fun `Account token not filled in when not generated`() {
+        asUser {
+            val id = securityService.currentAccount!!.id()
+            asAdmin {
+                val data = run("""{
+                    accounts(id: $id) {
+                        token {
+                            creation
+                            validUntil
+                            valid
+                        }
+                    }
+                }""")
+                val token = data["accounts"][0]["token"]
+                assertTrue(token.isNull)
+            }
+        }
+    }
+
+    @Test
+    fun `Account token filled in when generated`() {
+        asUser {
+            tokensService.generateNewToken()
+            val id = securityService.currentAccount!!.id()
+            asAdmin {
+                val data = run("""{
+                    accounts(id: $id) {
+                        token {
+                            creation
+                            validUntil
+                            valid
+                        }
+                    }
+                }""")
+                val token = data["accounts"][0]["token"]
+                assertTrue(token["valid"].booleanValue())
+            }
         }
     }
 
