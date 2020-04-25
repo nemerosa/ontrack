@@ -15,11 +15,8 @@ interface TokensService {
 
     /**
      * Generates a new token for the current user
-     *
-     * @param validity Optional duration (if not set, defaults
-     * to the system settings). Cannot exceeds the system default settings.
      */
-    fun generateNewToken(validity: Duration?): Token
+    fun generateNewToken(): Token
 
     /**
      * Revokes the token of the current user
@@ -35,6 +32,14 @@ interface TokensService {
      * Gets the token of an account using its ID
      */
     fun getToken(accountId: Int): Token?
+
+    /**
+     * Sets a different validity for a given token. Generates the token if needed.
+     *
+     * @param accountId ID of teh account to generate an account for
+     * @param forceUnlimited If [validity] is `null`, forces this value
+     */
+    fun generateToken(accountId: Int, validity: Duration?, forceUnlimited: Boolean): Token
 
     /**
      * Gets the account which is associated with this token, if any.

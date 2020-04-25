@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountManagement
@@ -186,6 +187,47 @@ class TokensServiceIT : AbstractDSLTestSupport() {
                 asAdmin { tokensService.revokeToken(id) }
                 assertFalse(tokensService.isValid(token.value), "Token has been revoked")
                 assertFalse(tokensService.isValid(token.value), "Token has been revoked")
+            }
+        }
+    }
+
+    @Test
+    fun `Changing the validity of a token to a shorter one with unlimited defaults`() {
+        asUser {
+            val id = securityService.currentAccount!!.id()
+            asAdmin {
+                val t = tokensService.generateToken(id, Duration.ofDays(14), false)
+                assertNotNull(t.validUntil) {
+                    assertFalse(t.isValid(Time.now() + Duration.ofDays(15)))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Generating a token with default duration`() {
+        withCustomTokenValidityDuration(Duration.ofDays(14)) {
+            asUser {
+                val id = securityService.currentAccount!!.id()
+                asAdmin {
+                    val t = tokensService.generateToken(id, null, false)
+                    assertNotNull(t.validUntil) {
+                        assertFalse(t.isValid(Time.now() + Duration.ofDays(15)))
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Generating a token with unlimited duration`() {
+        withCustomTokenValidityDuration(Duration.ofDays(14)) {
+            asUser {
+                val id = securityService.currentAccount!!.id()
+                asAdmin {
+                    val t = tokensService.generateToken(id, null, true)
+                    assertNull(t.validUntil, "Unlimited token")
+                }
             }
         }
     }

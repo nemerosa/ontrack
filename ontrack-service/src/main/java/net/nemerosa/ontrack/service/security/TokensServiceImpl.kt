@@ -39,28 +39,29 @@ class TokensServiceImpl(
             }
         }
 
-    override fun generateNewToken(validity: Duration?): Token {
+    override fun generateNewToken(): Token {
         // Gets the current account
         val account = securityService.currentAccount?.account
                 ?: throw TokenGenerationNoAccountException()
         // Generates a new token
+        return securityService.asAdmin {  generateToken(account.id(), null, false) }
+    }
+
+    override fun generateToken(accountId: Int, validity: Duration?, forceUnlimited: Boolean): Token {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        // Generates a new token
         val token = tokenGenerator.generateToken()
-        val time = Time.now()
-        // Gets the validity
+        // Validity
         val systemValidity = ontrackConfigProperties.security.tokens.validity
-        val actualValidity = if (systemValidity.isNegative || systemValidity.isZero) {
-            validity
-        } else if (validity != null) {
-            // Checks that the validity is <= system validity
-            check(validity <= systemValidity) { "The validity must be lower or equal to the system validity." }
+        val actualValidity = if (forceUnlimited) {
             validity
         } else {
-            throw IllegalStateException("Cannot set an unlimited validity.")
+            validity ?: systemValidity
         }
         // Token object
-        val tokenObject = Token(token, time, null).validFor(actualValidity)
+        val tokenObject = Token(token, Time.now(), null).validFor(actualValidity)
         // Saves the token...
-        tokensRepository.save(account.id(), token, tokenObject.creation, tokenObject.validUntil)
+        tokensRepository.save(accountId, token, tokenObject.creation, tokenObject.validUntil)
         // ... and returns it
         return tokenObject
     }
