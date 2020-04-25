@@ -40,6 +40,11 @@ class TokenManagement {
         }
     }
 
+    @DSLMethod("Revokes the token of the current user")
+    void revoke() {
+        ontrack.post("rest/tokens/revoke", null)
+    }
+
     @DSLMethod("Revokes all tokens")
     void revokeAll() {
         ontrack.post("rest/tokens/revokeAll", null)
