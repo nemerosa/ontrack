@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.dsl.http
 
+import org.apache.http.Header
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
@@ -14,6 +15,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.auth.BasicScheme
 import org.apache.http.impl.client.*
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
+import org.apache.http.message.BasicHeader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -34,6 +36,8 @@ class OTHttpClientBuilder {
     private final HttpHost host
     private String username
     private String password
+    private String tokenHeader
+    private String token
     private int maxTries = 1
     private int retryDelaySeconds = 10
     private Closure clientLogger = { message -> println message }
@@ -69,9 +73,17 @@ class OTHttpClientBuilder {
         return this
     }
 
+    OTHttpClientBuilder withToken(String tokenHeader, String token) {
+        this.tokenHeader = tokenHeader
+        this.token = token
+        return this
+    }
+
     public OTHttpClient build() {
 
         HttpClientContext httpContext = HttpClientContext.create()
+
+        List<Header> headers = []
 
         // Basic authentication
         if (username && password) {
@@ -87,6 +99,10 @@ class OTHttpClientBuilder {
 
             httpContext.credentialsProvider = credentialsProvider
             httpContext.authCache = authCache
+        }
+        // Token identification
+        else if (tokenHeader && token) {
+            headers.add(new BasicHeader(tokenHeader, token))
         }
 
         httpContext.cookieStore = new BasicCookieStore()
@@ -129,6 +145,7 @@ class OTHttpClientBuilder {
 
         Closure<CloseableHttpClient> httpClientSupplier = {
             HttpClientBuilder.create()
+                    .setDefaultHeaders(headers)
                     .setConnectionManager(new PoolingHttpClientConnectionManager(registry)).build()
         }
 

@@ -8,6 +8,7 @@ class OntrackConnection {
     private boolean disableSsl = false
     private String user
     private String password
+    private String token
     private OntrackLogger logger
     private int maxTries = 1
     private int retryDelaySeconds = 10
@@ -46,11 +47,25 @@ class OntrackConnection {
         this
     }
 
+    /**
+     * Uses a token-based authentication
+     * @param token Token to use
+     * @return This connection
+     */
+    OntrackConnection authenticate(String token) {
+        this.token = token
+        this
+    }
+
     Ontrack build() {
         def builder = new OTHttpClientBuilder(url, disableSsl)
         // Credentials
         if (user) {
             builder = builder.withCredentials(user, password)
+        }
+        // Token
+        if (token) {
+            builder = builder.withToken("X-Ontrack-Token", token)
         }
         // Logger
         if (logger) {
