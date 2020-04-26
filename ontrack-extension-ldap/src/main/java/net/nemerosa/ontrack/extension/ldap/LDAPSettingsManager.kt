@@ -1,68 +1,63 @@
-package net.nemerosa.ontrack.extension.ldap;
+package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Password;
-import net.nemerosa.ontrack.model.form.Text;
-import net.nemerosa.ontrack.model.form.YesNo;
-import net.nemerosa.ontrack.model.security.EncryptionService;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.settings.AbstractSettingsManager;
-import net.nemerosa.ontrack.model.settings.CachedSettingsService;
-import net.nemerosa.ontrack.model.support.SettingsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Objects;
+import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Form.Companion.create
+import net.nemerosa.ontrack.model.form.Password
+import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.form.YesNo
+import net.nemerosa.ontrack.model.security.EncryptionService
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.support.SettingsRepository
+import net.nemerosa.ontrack.model.support.setString
+import org.springframework.stereotype.Component
 
 @Component
-public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
+class LDAPSettingsManager(
+        cachedSettingsService: CachedSettingsService,
+        securityService: SecurityService,
+        private val settingsRepository: SettingsRepository,
+        private val encryptionService: EncryptionService,
+        private val ldapProviderFactory: LDAPProviderFactory
+) : AbstractSettingsManager<LDAPSettings>(
+        LDAPSettings::class.java,
+        cachedSettingsService,
+        securityService
+) {
 
-    private final SettingsRepository settingsRepository;
-    private final EncryptionService encryptionService;
-    private final LDAPProviderFactory ldapProviderFactory;
-
-    @Autowired
-    public LDAPSettingsManager(CachedSettingsService cachedSettingsService, SecurityService securityService, SettingsRepository settingsRepository, EncryptionService encryptionService, LDAPProviderFactory ldapProviderFactory) {
-        super(LDAPSettings.class, cachedSettingsService, securityService);
-        this.settingsRepository = settingsRepository;
-        this.encryptionService = encryptionService;
-        this.ldapProviderFactory = ldapProviderFactory;
-    }
-
-    @Override
-    protected void doSaveSettings(LDAPSettings settings) {
-        ldapProviderFactory.invalidate();
-        settingsRepository.setBoolean(LDAPSettings.class, "enabled", settings.isEnabled());
-        if (settings.isEnabled()) {
-            settingsRepository.setString(LDAPSettings.class, "url", settings.getUrl());
-            settingsRepository.setString(LDAPSettings.class, "searchBase", settings.getSearchBase());
-            settingsRepository.setString(LDAPSettings.class, "searchFilter", settings.getSearchFilter());
-            settingsRepository.setString(LDAPSettings.class, "user", settings.getUser());
-            settingsRepository.setPassword(LDAPSettings.class, "password", settings.getPassword(), true, encryptionService::encrypt);
-            settingsRepository.setString(LDAPSettings.class, "fullNameAttribute", Objects.toString(settings.getFullNameAttribute(), ""));
-            settingsRepository.setString(LDAPSettings.class, "emailAttribute", Objects.toString(settings.getEmailAttribute(), ""));
-            settingsRepository.setString(LDAPSettings.class, "groupAttribute", Objects.toString(settings.getGroupAttribute(), ""));
-            settingsRepository.setString(LDAPSettings.class, "groupFilter", Objects.toString(settings.getGroupFilter(), ""));
-            settingsRepository.setString(LDAPSettings.class, "groupNameAttribute", Objects.toString(settings.getGroupNameAttribute(), ""));
-            settingsRepository.setString(LDAPSettings.class, "groupSearchBase", Objects.toString(settings.getGroupSearchBase(), ""));
-            settingsRepository.setString(LDAPSettings.class, "groupSearchFilter", Objects.toString(settings.getGroupSearchFilter(), ""));
+    override fun doSaveSettings(settings: LDAPSettings) {
+        ldapProviderFactory.invalidate()
+        settingsRepository.setBoolean(LDAPSettings::class.java, "enabled", settings.isEnabled)
+        if (settings.isEnabled) {
+            settingsRepository.setString<LDAPSettings>(settings::url)
+            settingsRepository.setString<LDAPSettings>(settings::searchBase)
+            settingsRepository.setString<LDAPSettings>(settings::searchFilter)
+            settingsRepository.setString<LDAPSettings>(settings::user)
+            settingsRepository.setPassword(LDAPSettings::class.java, LDAPSettings::password.name, settings.password, true) { plain: String? -> encryptionService.encrypt(plain) }
+            settingsRepository.setString<LDAPSettings>(settings::fullNameAttribute)
+            settingsRepository.setString<LDAPSettings>(settings::emailAttribute)
+            settingsRepository.setString<LDAPSettings>(settings::groupAttribute)
+            settingsRepository.setString<LDAPSettings>(settings::groupFilter)
+            settingsRepository.setString<LDAPSettings>(settings::groupNameAttribute)
+            settingsRepository.setString<LDAPSettings>(settings::groupSearchBase)
+            settingsRepository.setString<LDAPSettings>(settings::groupSearchFilter)
         }
     }
 
-    @Override
-    protected Form getSettingsForm(LDAPSettings settings) {
-        return Form.create()
+    override fun getSettingsForm(settings: LDAPSettings): Form {
+        return create()
                 .with(
                         YesNo.of("enabled")
                                 .label("Enable LDAP authentication")
-                                .value(settings.isEnabled())
+                                .value(settings.isEnabled)
                 )
                 .with(
                         Text.of("url")
                                 .visibleIf("enabled")
                                 .label("URL")
                                 .help("URL to the LDAP server. For example: https://ldap.nemerosa.com:636")
-                                .value(settings.getUrl())
+                                .value(settings.url)
                 )
                 .with(
                         Text.of("user")
@@ -70,7 +65,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("User")
                                 .help("Name of the user used to connect to the LDAP server.")
                                 .optional()
-                                .value(settings.getUser())
+                                .value(settings.user)
                 )
                 .with(
                         Password.of("password")
@@ -86,7 +81,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Search base")
                                 .help("Query to get the user. For example: dc=nemerosa,dc=com")
                                 .optional()
-                                .value(settings.getSearchBase())
+                                .value(settings.searchBase)
                 )
                 .with(
                         Text.of("searchFilter")
@@ -94,7 +89,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Search filter")
                                 .help("Filter on the user query. {0} will be replaced by the user name. For example: (sAMAccountName={0})")
                                 .optional()
-                                .value(settings.getSearchFilter())
+                                .value(settings.searchFilter)
                 )
                 .with(
                         Text.of("fullNameAttribute")
@@ -102,7 +97,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Full name attribute")
                                 .help("Name of the attribute that contains the full name of the user. Defaults to cn")
                                 .optional()
-                                .value(settings.getFullNameAttribute())
+                                .value(settings.fullNameAttribute)
                 )
                 .with(
                         Text.of("emailAttribute")
@@ -110,7 +105,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Email attribute")
                                 .help("Name of the attribute that contains the email of the user. Defaults to email")
                                 .optional()
-                                .value(settings.getEmailAttribute())
+                                .value(settings.emailAttribute)
                 )
                 .with(
                         Text.of("groupAttribute")
@@ -118,7 +113,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Group attribute")
                                 .help("Name of the attribute that contains the groups the user belongs to. Defaults to memberOf)")
                                 .optional()
-                                .value(settings.getGroupAttribute())
+                                .value(settings.groupAttribute)
                 )
                 .with(
                         Text.of("groupFilter")
@@ -126,7 +121,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Group filter")
                                 .help("Name of the OU field used to filter groups a user belongs to (optional).")
                                 .optional()
-                                .value(settings.getGroupFilter())
+                                .value(settings.groupFilter)
                 )
                 .with(
                         Text.of("groupNameAttribute")
@@ -134,7 +129,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Group name attribute")
                                 .help("The ID of the attribute which contains the name for a group (optional, defaults to cn)")
                                 .optional()
-                                .value(settings.getGroupNameAttribute())
+                                .value(settings.groupNameAttribute)
                 )
                 .with(
                         Text.of("groupSearchBase")
@@ -142,7 +137,7 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Group search base")
                                 .help("The base DN from which the search for group membership should be performed (optional)")
                                 .optional()
-                                .value(settings.getGroupSearchBase())
+                                .value(settings.groupSearchBase)
                 )
                 .with(
                         Text.of("groupSearchFilter")
@@ -150,18 +145,13 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
                                 .label("Group search filter")
                                 .help("The pattern to be used for the user search. {0} is the user's DN (optional, default to (member={0}))")
                                 .optional()
-                                .value(settings.getGroupSearchFilter())
+                                .value(settings.groupSearchFilter)
                 )
-                ;
     }
 
-    @Override
-    public String getId() {
-        return "ldap";
-    }
+    override fun getId(): String = "ldap"
 
-    @Override
-    public String getTitle() {
-        return "LDAP settings";
-    }
+    override fun getTitle(): String = "LDAP settings"
+
 }
+

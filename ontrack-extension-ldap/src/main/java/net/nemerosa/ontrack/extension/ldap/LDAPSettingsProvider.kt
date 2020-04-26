@@ -1,44 +1,34 @@
-package net.nemerosa.ontrack.extension.ldap;
+package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.model.security.EncryptionService;
-import net.nemerosa.ontrack.model.settings.SettingsProvider;
-import net.nemerosa.ontrack.model.support.SettingsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import net.nemerosa.ontrack.model.security.EncryptionService
+import net.nemerosa.ontrack.model.settings.SettingsProvider
+import net.nemerosa.ontrack.model.support.SettingsRepository
+import net.nemerosa.ontrack.model.support.getPassword
+import net.nemerosa.ontrack.model.support.getString
+import org.springframework.stereotype.Component
 
 @Component
-public class LDAPSettingsProvider implements SettingsProvider<LDAPSettings> {
+class LDAPSettingsProvider(
+        private val settingsRepository: SettingsRepository,
+        private val encryptionService: EncryptionService
+) : SettingsProvider<LDAPSettings> {
 
-    private final SettingsRepository settingsRepository;
-    private final EncryptionService encryptionService;
+    override fun getSettings(): LDAPSettings = LDAPSettings(
+            settingsRepository.getBoolean(LDAPSettings::class.java, "enabled", false),
+            settingsRepository.getString(LDAPSettings::url, ""),
+            settingsRepository.getString(LDAPSettings::searchBase, ""),
+            settingsRepository.getString(LDAPSettings::searchFilter, ""),
+            settingsRepository.getString(LDAPSettings::user, ""),
+            settingsRepository.getPassword(LDAPSettings::password, "", encryptionService::decrypt),
+            settingsRepository.getString(LDAPSettings::fullNameAttribute, ""),
+            settingsRepository.getString(LDAPSettings::emailAttribute, ""),
+            settingsRepository.getString(LDAPSettings::groupAttribute, ""),
+            settingsRepository.getString(LDAPSettings::groupFilter, ""),
+            settingsRepository.getString(LDAPSettings::groupNameAttribute, "cn"),
+            settingsRepository.getString(LDAPSettings::groupSearchBase, ""),
+            settingsRepository.getString(LDAPSettings::groupSearchFilter, "(member={0})")
+    )
 
-    @Autowired
-    public LDAPSettingsProvider(SettingsRepository settingsRepository, EncryptionService encryptionService) {
-        this.settingsRepository = settingsRepository;
-        this.encryptionService = encryptionService;
-    }
+    override fun getSettingsClass(): Class<LDAPSettings> = LDAPSettings::class.java
 
-    @Override
-    public LDAPSettings getSettings() {
-        return new LDAPSettings(
-                settingsRepository.getBoolean(LDAPSettings.class, "enabled", false),
-                settingsRepository.getString(LDAPSettings.class, "url", ""),
-                settingsRepository.getString(LDAPSettings.class, "searchBase", ""),
-                settingsRepository.getString(LDAPSettings.class, "searchFilter", ""),
-                settingsRepository.getString(LDAPSettings.class, "user", ""),
-                settingsRepository.getPassword(LDAPSettings.class, "password", "", encryptionService::decrypt),
-                settingsRepository.getString(LDAPSettings.class, "fullNameAttribute", ""),
-                settingsRepository.getString(LDAPSettings.class, "emailAttribute", ""),
-                settingsRepository.getString(LDAPSettings.class, "groupAttribute", ""),
-                settingsRepository.getString(LDAPSettings.class, "groupFilter", ""),
-                settingsRepository.getString(LDAPSettings.class, "groupNameAttribute", "cn"),
-                settingsRepository.getString(LDAPSettings.class, "groupSearchBase", ""),
-                settingsRepository.getString(LDAPSettings.class, "groupSearchFilter", "(member={0})")
-        );
-    }
-
-    @Override
-    public Class<LDAPSettings> getSettingsClass() {
-        return LDAPSettings.class;
-    }
 }

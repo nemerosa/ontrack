@@ -53,6 +53,7 @@ dependencies {
 
     // List of extensions to include in core
     runtimeOnly(project(":ontrack-extension-general"))
+    runtimeOnly(project(":ontrack-extension-ldap"))
     runtimeOnly(project(":ontrack-extension-jenkins"))
     runtimeOnly(project(":ontrack-extension-jira"))
     runtimeOnly(project(":ontrack-extension-artifactory"))
