@@ -37,7 +37,7 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/rest/api")
 @Profile({RunProfile.DEV, RunProfile.ACC, RunProfile.PROD})
 public class APIController extends AbstractResourceController {
 

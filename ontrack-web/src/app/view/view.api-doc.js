@@ -60,7 +60,7 @@ angular.module('ot.view.api-doc', [
         // Loading the whole API
         function loadApi() {
             $scope.apiLoading = true;
-            ot.pageCall($http.get('api/list'))
+            ot.pageCall($http.get('rest/api/list'))
                 .then(function (list) {
                     /**
                      * Preprocessing - collecting root access points

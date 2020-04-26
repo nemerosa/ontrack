@@ -54,7 +54,7 @@ angular.module('ot.view.api', [
 
             // Calls
 
-            ot.pageCall($http.get("api/describe", {params: {path: path}}))
+            ot.pageCall($http.get("rest/api/describe", {params: {path: path}}))
                 .then(function (description) {
                     $scope.description = description;
                     var d = $q.defer();
