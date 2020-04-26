@@ -17,7 +17,7 @@ angular.module('ot.view.settings', [
 
         // Loading of the settings
         function loadSettings() {
-            ot.call($http.get('settings')).then(function (forms) {
+            ot.call($http.get('rest/settings')).then(function (forms) {
                 view.commands = [
                     ot.viewApiCommand(forms._self),
                     ot.viewCloseCommand('/home')

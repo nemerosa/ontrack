@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
  * Global settings management.
  */
 @RestController
-@RequestMapping("/settings")
+@RequestMapping("/rest/settings")
 class SettingsController(
         private val securityService: SecurityService,
         private val settingsManagers: Collection<SettingsManager<*>>

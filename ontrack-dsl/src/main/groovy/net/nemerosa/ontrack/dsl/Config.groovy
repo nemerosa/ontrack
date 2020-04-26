@@ -14,7 +14,7 @@ class Config {
 
     @DSLMethod("Checks if the projects are accessible in anonymous mode.")
     boolean getGrantProjectViewToAll() {
-        def settings = ontrack.get('settings/general-security')
+        def settings = ontrack.get('rest/settings/general-security')
         return settings.grantProjectViewToAll
     }
 
@@ -24,7 +24,7 @@ class Config {
     @DSLMethod("Sets if the projects are accessible in anonymous mode.")
     def setGrantProjectViewToAll(boolean grantProjectViewToAll) {
         ontrack.put(
-                'settings/general-security',
+                'rest/settings/general-security',
                 [
                         grantProjectViewToAll: grantProjectViewToAll
                 ]
@@ -267,13 +267,13 @@ class Config {
 
     @DSLMethod("Gets the global LDAP settings")
     LDAPSettings getLdapSettings() {
-        def json = ontrack.get('settings/ldap').data
+        def json = ontrack.get('rest/settings/ldap').data
         return new LDAPSettings(json as Map)
     }
 
     @DSLMethod("Sets the global LDAP settings")
     def setLdapSettings(LDAPSettings settings) {
-        ontrack.put('settings/ldap', settings)
+        ontrack.put('rest/settings/ldap', settings)
     }
 
     /**
@@ -362,13 +362,13 @@ class Config {
 
     @DSLMethod("Gets the main build links settings")
     List<String> getMainBuildLinks() {
-        def json = ontrack.get('settings/main-build-links').data
+        def json = ontrack.get('rest/settings/main-build-links').data
         return json.labels as List<String>
     }
 
     @DSLMethod("Sets the main build links settings")
     void setMainBuildLinks(List<String> labels) {
-        ontrack.put('settings/main-build-links', [
+        ontrack.put('rest/settings/main-build-links', [
                 labels: labels
         ])
     }
@@ -379,13 +379,13 @@ class Config {
 
     @DSLMethod("Gets the previous promotion condition settings")
     boolean getPreviousPromotionRequired() {
-        def json = ontrack.get('settings/previous-promotion-condition')
+        def json = ontrack.get('rest/settings/previous-promotion-condition')
         return json.previousPromotionRequired as boolean
     }
 
     @DSLMethod("Sets the previous promotion condition settings")
     void setPreviousPromotionRequired(boolean previousPromotionRequired) {
-        ontrack.put('settings/previous-promotion-condition', [
+        ontrack.put('rest/settings/previous-promotion-condition', [
                 previousPromotionRequired: previousPromotionRequired
         ])
     }
@@ -412,12 +412,12 @@ class Config {
 
     @DSLMethod("Gets the global SonarQube settings")
     SonarQubeMeasuresSettings getSonarQubeSettings() {
-        def json = ontrack.get('settings/sonarqube-measures')
+        def json = ontrack.get('rest/settings/sonarqube-measures')
         return new SonarQubeMeasuresSettings(json.measures as List<String>, json.disabled as boolean)
     }
 
     @DSLMethod("Sets the global SonarQube settings")
     def setSonarQubeSettings(SonarQubeMeasuresSettings settings) {
-        ontrack.put('settings/sonarqube-measures', settings)
+        ontrack.put('rest/settings/sonarqube-measures', settings)
     }
 }
