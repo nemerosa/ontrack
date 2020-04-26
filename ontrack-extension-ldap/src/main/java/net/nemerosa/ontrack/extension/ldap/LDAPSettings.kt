@@ -5,15 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class LDAPSettings(
         @JsonProperty("enabled")
         val isEnabled: Boolean,
-        val url: String?,
-        val searchBase: String?,
-        val searchFilter: String?,
-        val user: String?,
-        val password: String?,
-        val fullNameAttribute: String?,
-        val emailAttribute: String?,
-        val groupAttribute: String?,
-        val groupFilter: String?,
+        val url: String = "",
+        val searchBase: String = "",
+        val searchFilter: String = "",
+        val user: String = "",
+        val password: String = "",
+        val fullNameAttribute: String? = "",
+        val emailAttribute: String? = "",
+        val groupAttribute: String? = "",
+        val groupFilter: String? = "",
         /**
          * The ID of the attribute which contains the name for a group
          */

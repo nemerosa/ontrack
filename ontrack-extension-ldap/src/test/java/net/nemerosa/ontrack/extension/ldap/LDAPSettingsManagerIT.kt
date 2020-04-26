@@ -26,6 +26,27 @@ class LDAPSettingsManagerIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Minimal LDAP settings save and restore`() {
+        // Settings to save
+        val settings = LDAPSettings(
+                true,
+                "ldap://server",
+                "searchBase",
+                "searchFilter",
+                "user",
+                "verysecret"
+        )
+        val restoredSettings = asUserWith<GlobalSettings, LDAPSettings> {
+            // Saves the settings
+            service.saveSettings(settings)
+            // Gets them back
+            service.settings
+        }
+        // Checks they are the same
+        assertEquals(restoredSettings, settings)
+    }
+
+    @Test
     fun `LDAP settings password not saved when blank`() {
         // Settings to save
         val settings = createSettings()

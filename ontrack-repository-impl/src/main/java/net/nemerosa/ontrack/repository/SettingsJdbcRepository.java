@@ -90,9 +90,10 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
                 "DELETE FROM SETTINGS WHERE CATEGORY = :category AND NAME = :name",
                 params
         );
+        String actualValue = value != null ? value : "";
         getNamedParameterJdbcTemplate().update(
                 "INSERT INTO SETTINGS (CATEGORY, NAME, VALUE) VALUES (:category, :name, :value)",
-                params.addValue("value", value)
+                params.addValue("value", actualValue)
         );
     }
 
