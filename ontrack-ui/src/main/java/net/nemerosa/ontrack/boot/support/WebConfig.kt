@@ -77,15 +77,7 @@ class WebConfig(
                 "/graphql/**",
                 "/rest/**",
                 // TODO 👇 To migrate to /rest/
-                "/accounts/**",
-                "/admin/**",
-                "/api/**",
                 "/structure/**",
-                "/events/**",
-                "/properties/**",
-                "/search/**",
-                "/settings/**",
-                "/user/**",
                 "/extension/**",
                 "/extensions/**"
         ).forEach {

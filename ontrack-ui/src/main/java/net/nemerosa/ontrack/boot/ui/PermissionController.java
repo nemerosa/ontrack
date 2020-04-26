@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
-@RequestMapping("/accounts/permissions")
+@RequestMapping("/rest/accounts/permissions")
 public class PermissionController extends AbstractResourceController {
 
     private final AccountService accountService;
