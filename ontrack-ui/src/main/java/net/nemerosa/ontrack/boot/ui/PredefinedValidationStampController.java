@@ -27,7 +27,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
  * @see PredefinedValidationStamp
  */
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/rest/admin")
 public class PredefinedValidationStampController extends AbstractResourceController {
 
     private final PredefinedValidationStampService predefinedValidationStampService;

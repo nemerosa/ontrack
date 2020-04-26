@@ -27,7 +27,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
  * @see PredefinedPromotionLevel
  */
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/rest/admin")
 public class PredefinedPromotionLevelController extends AbstractResourceController {
 
     private final PredefinedPromotionLevelService predefinedPromotionLevelService;

@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import java.util.concurrent.Callable
 
 @RestController
-@RequestMapping("/decorations")
+@RequestMapping("/rest/decorations")
 class DecorationsController(
         structureService: StructureService,
         private val decorationService: DecorationService
