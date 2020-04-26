@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider
 import org.springframework.security.core.Authentication
@@ -112,7 +113,7 @@ class LDAPCachedAuthenticationProvider(
     override fun additionalAuthenticationChecks(userDetails: UserDetails, authentication: UsernamePasswordAuthenticationToken) {
     }
 
-    override fun retrieveUser(username: String, authentication: UsernamePasswordAuthenticationToken): UserDetails? =
-            findUser(username, authentication)
+    override fun retrieveUser(username: String, authentication: UsernamePasswordAuthenticationToken): UserDetails =
+            findUser(username, authentication) ?: throw AuthenticationServiceException("Cannot authenticate against LDAP")
 
 }
