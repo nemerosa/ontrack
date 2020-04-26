@@ -1,20 +1,14 @@
-package net.nemerosa.ontrack.extension.ldap;
+package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
-import org.springframework.stereotype.Component;
+import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator
+import org.springframework.stereotype.Component
 
 /**
  * Obfuscation of the password.
  */
 @Component
-public class LDAPSettingsResourceDecorator extends AbstractResourceDecorator<LDAPSettings> {
+class LDAPSettingsResourceDecorator : AbstractResourceDecorator<LDAPSettings>(LDAPSettings::class.java) {
 
-    public LDAPSettingsResourceDecorator() {
-        super(LDAPSettings.class);
-    }
+    override fun decorateBeforeSerialization(bean: LDAPSettings): LDAPSettings = bean.withPassword("")
 
-    @Override
-    public LDAPSettings decorateBeforeSerialization(LDAPSettings bean) {
-        return bean.withPassword("");
-    }
 }

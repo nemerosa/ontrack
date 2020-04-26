@@ -123,7 +123,7 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
         get() = LDAPSettings(
                 isEnabled = true,
                 url = "ldap://localhost:${ldapContainer.port}",
-                user = "uid=admin,ou=people,dc=nemerosa,dc=net",
+                user = "uid=damien.coraboeuf,ou=people,dc=nemerosa,dc=net",
                 password = "admin",
                 searchBase = "dc=nemerosa,dc=net",
                 searchFilter = "(uid={0})"

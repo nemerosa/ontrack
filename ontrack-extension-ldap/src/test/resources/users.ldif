@@ -8,7 +8,7 @@ objectclass: top
 objectclass: organizationalUnit
 ou: people
 
-dn: uid=admin,ou=people,dc=nemerosa,dc=net
+dn: uid=damien.coraboeuf,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -19,7 +19,7 @@ uid: damien.coraboeuf
 email: damien.coraboeuf@nemerosa.net
 userPassword: admin
 
-dn: uid=user,ou=people,dc=nemerosa,dc=net
+dn: uid=bilbo,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
