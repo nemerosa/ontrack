@@ -23,7 +23,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
  * Access to the events
  */
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/rest/events")
 public class EventController extends AbstractResourceController {
 
     private final Logger logger = LoggerFactory.getLogger(EventController.class);
