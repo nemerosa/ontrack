@@ -17,4 +17,5 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
+    testRuntimeOnly("com.unboundid:unboundid-ldapsdk:4.0.14")
 }
