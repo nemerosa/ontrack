@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
-@RequestMapping("/structure")
+@RequestMapping("/rest/structure")
 public class BuildController extends AbstractResourceController {
 
     private final StructureService structureService;

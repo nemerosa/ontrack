@@ -10,7 +10,7 @@ angular.module('ot.service.structure', [
          * Loading the projects
          */
         self.getProjects = function () {
-            return ot.call($http.get('structure/projects'));
+            return ot.call($http.get('rest/structure/projects'));
         };
 
         /**
@@ -35,7 +35,7 @@ angular.module('ot.service.structure', [
          * Getting a project
          */
         self.getProject = function (id) {
-            return ot.call($http.get('structure/projects/' + id));
+            return ot.call($http.get('rest/structure/projects/' + id));
         };
 
         /**
@@ -55,21 +55,21 @@ angular.module('ot.service.structure', [
          * Getting a branch
          */
         self.getBranch = function (id) {
-            return ot.call($http.get('structure/branches/' + id));
+            return ot.call($http.get('rest/structure/branches/' + id));
         };
 
         /**
          * Getting a promotion level
          */
         self.getPromotionLevel = function (id) {
-            return ot.call($http.get('structure/promotionLevels/' + id));
+            return ot.call($http.get('rest/structure/promotionLevels/' + id));
         };
 
         /**
          * Getting a validation stamp
          */
         self.getValidationStamp = function (id) {
-            return ot.call($http.get('structure/validationStamps/' + id));
+            return ot.call($http.get('rest/structure/validationStamps/' + id));
         };
 
         /**
@@ -83,7 +83,7 @@ angular.module('ot.service.structure', [
          * Getting a build
          */
         self.getBuild = function (id) {
-            return ot.call($http.get('structure/builds/' + id));
+            return ot.call($http.get('rest/structure/builds/' + id));
         };
 
         /**

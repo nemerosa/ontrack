@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/structure/run-info")
+@RequestMapping("/rest/structure/run-info")
 class RunInfoController(
         private val runInfoService: RunInfoService
 ) : AbstractResourceController() {

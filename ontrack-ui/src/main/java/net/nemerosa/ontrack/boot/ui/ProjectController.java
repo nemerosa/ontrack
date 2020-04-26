@@ -22,7 +22,7 @@ import javax.validation.Valid;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
-@RequestMapping("/structure/projects")
+@RequestMapping("/rest/structure/projects")
 @API("Management of projects")
 public class ProjectController extends AbstractResourceController {
 

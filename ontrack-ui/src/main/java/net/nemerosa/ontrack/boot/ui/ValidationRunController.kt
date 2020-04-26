@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
-@RequestMapping("/structure")
+@RequestMapping("/rest/structure")
 class ValidationRunController
 @Autowired
 constructor(

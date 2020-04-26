@@ -19,7 +19,7 @@ import java.util.Objects;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
-@RequestMapping("/structure")
+@RequestMapping("/rest/structure")
 public class PromotionRunController extends AbstractResourceController {
 
     private final StructureService structureService;

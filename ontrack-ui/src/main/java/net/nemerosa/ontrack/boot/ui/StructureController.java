@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the list of entities that are mapped.
  */
 @RestController
-@RequestMapping("/structure")
+@RequestMapping("/rest/structure")
 public class StructureController extends AbstractProjectEntityController {
 
     @Autowired

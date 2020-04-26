@@ -80,12 +80,12 @@ class AcceptanceTestClient extends AcceptanceSupport {
     }
 
     JsonNode doCreateProject(JsonNode nameDescription) {
-        admin().post(nameDescription, "structure/projects/create").get()
+        admin().post(nameDescription, "rest/structure/projects/create").get()
     }
 
     def doDeleteProject(String name) {
         logger.debug "Deleting project ${name}"
-        def project = admin().get("structure/entity/project/$name").get()
+        def project = admin().get("rest/structure/entity/project/$name").get()
         def link = project._delete.asText()
         logger.debug "Deleting project at ${link}"
         admin().delete(link).get()
@@ -97,7 +97,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
     }
 
     JsonNode doCreateBranch(int projectId, JsonNode nameDescription) {
-        admin().post(nameDescription, "structure/projects/$projectId/branches/create").get()
+        admin().post(nameDescription, "rest/structure/projects/$projectId/branches/create").get()
     }
 
     JsonNode doCreateBuild() {
@@ -106,7 +106,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
     }
 
     JsonNode doCreateBuild(int branchId, JsonNode nameDescription) {
-        admin().post(nameDescription, "structure/branches/$branchId/builds/create").get()
+        admin().post(nameDescription, "rest/structure/branches/$branchId/builds/create").get()
     }
 
     int doCreateController(String name, String password) {
@@ -123,7 +123,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
 
     int doCreateAccountWithGlobalRole(String name, String password, String role) {
         def accountId = doCreateAccount(name, password)
-        admin().put([role: role], "accounts/permissions/globals/ACCOUNT/${accountId}")
+        admin().put([role: role], "rest/accounts/permissions/globals/ACCOUNT/${accountId}")
         return accountId
     }
 
@@ -134,7 +134,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
                 email   : "${name}@test.com".toString(),
                 password: password,
         ]
-        def account = admin().post(input, "accounts/create").get()
+        def account = admin().post(input, "rest/accounts/create").get()
         return account['id'].asText() as int
     }
 

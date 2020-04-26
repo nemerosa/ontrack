@@ -33,7 +33,7 @@ fun Build.asBuildLinkDecoration(uriBuilder: URIBuilder, promotionRuns: List<Prom
                             it.promotionLevel.name,
                             // See PromotionLevelController
                             uriBuilder.url(
-                                    "/structure/promotionLevels/${it.promotionLevel.id}/image"
+                                    "/rest/structure/promotionLevels/${it.promotionLevel.id}/image"
                             ).toString()
                     )
                 }

@@ -91,7 +91,7 @@ class Ontrack {
      */
     @DSLMethod("Gets the list of projects")
     List<Project> getProjects() {
-        return get('structure/projects').resources.collect {
+        return get('rest/structure/projects').resources.collect {
             new Project(this, it)
         }
     }
@@ -104,7 +104,7 @@ class Ontrack {
     @DSLMethod("Finds a project using its name. Returns null if not found.")
     Project findProject(String name) {
         try {
-            def projectNode = get("structure/entity/project/${name}")
+            def projectNode = get("rest/structure/entity/project/${name}")
             return new Project(this, projectNode)
         } catch (OTNotFoundException ignored) {
             return null
@@ -122,7 +122,7 @@ class Ontrack {
             new Project(
                     this,
                     post(
-                            'structure/projects/create',
+                            'rest/structure/projects/create',
                             [
                                     name       : name,
                                     description: description
@@ -143,7 +143,7 @@ class Ontrack {
     Branch branch(String project, String branch) {
         new Branch(
                 this,
-                get("structure/entity/branch/${project}/${branch}")
+                get("rest/structure/entity/branch/${project}/${branch}")
         )
     }
 
@@ -151,7 +151,7 @@ class Ontrack {
     PromotionLevel promotionLevel(String project, String branch, String promotionLevel) {
         new PromotionLevel(
                 this,
-                get("structure/entity/promotionLevel/${project}/${branch}/${promotionLevel}")
+                get("rest/structure/entity/promotionLevel/${project}/${branch}/${promotionLevel}")
         )
     }
 
@@ -159,7 +159,7 @@ class Ontrack {
     ValidationStamp validationStamp(String project, String branch, String validationStamp) {
         new ValidationStamp(
                 this,
-                get("structure/entity/validationStamp/${project}/${branch}/${validationStamp}")
+                get("rest/structure/entity/validationStamp/${project}/${branch}/${validationStamp}")
         )
     }
 
@@ -167,7 +167,7 @@ class Ontrack {
     Build build(String project, String branch, String build) {
         new Build(
                 this,
-                get("structure/entity/build/${project}/${branch}/${build}")
+                get("rest/structure/entity/build/${project}/${branch}/${build}")
         )
     }
 

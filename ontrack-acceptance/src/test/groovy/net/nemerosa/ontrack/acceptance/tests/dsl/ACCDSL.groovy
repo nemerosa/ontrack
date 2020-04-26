@@ -267,7 +267,7 @@ class ACCDSL extends AbstractACCDSL {
         def runs = ontrack.build(branch.project, branch.name, '2').promotionRuns
         def run = runs.get(0)
         def deleteLink = run.link('delete')
-        assert deleteLink == "/structure/promotionRuns/${run.id}" as String
+        assert deleteLink == "/rest/structure/promotionRuns/${run.id}" as String
     }
 
     @Test
