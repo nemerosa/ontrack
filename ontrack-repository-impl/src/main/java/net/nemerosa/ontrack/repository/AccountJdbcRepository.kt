@@ -30,15 +30,6 @@ class AccountJdbcRepository(dataSource: DataSource?) : AbstractJdbcRepository(da
         }
     }
 
-    override fun findUserByNameAndSource(username: String, sourceProvider: AuthenticationSourceProvider): Optional<Account> {
-        return Optional.ofNullable(
-                getFirstItem(
-                        "SELECT * FROM ACCOUNTS WHERE MODE = :mode AND NAME = :name",
-                        params("name", username).addValue("mode", sourceProvider.source.id)
-                ) { rs: ResultSet, _ -> toAccount(rs) { sourceProvider.source } }
-        )
-    }
-
     private fun toAccount(rs: ResultSet, authenticationSourceFunction: (String) -> AuthenticationSource): Account {
         return of(
                 rs.getString("name"),

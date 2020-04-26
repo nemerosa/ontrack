@@ -36,7 +36,7 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
         setLDAPSettings()
         val user = authenticationProvider.findUser(ADMIN_USER, UsernamePasswordAuthenticationToken(ADMIN_USER, ADMIN_PASSWORD))
         assertNotNull(user) {
-            assertEquals(LDAPAuthenticationSource.id, it.account.authenticationSource.id)
+            assertEquals(LDAPAuthenticationSourceProvider.SOURCE.id, it.account.authenticationSource.id)
             assertEquals(ADMIN_USER, it.username)
             assertEquals("", it.password)
             assertEquals("Damien Coraboeuf", it.account.fullName)

@@ -50,7 +50,7 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                AuthenticationSource.none().withAllowingPasswordChange(false)
+                authenticationSourceWithPasswordChangeAllowed(false)
         )
         whenever(user.account).thenReturn(account)
         whenever(securityService.currentAccount).thenReturn(user)
@@ -64,7 +64,7 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                AuthenticationSource.none().withAllowingPasswordChange(true)
+                authenticationSourceWithPasswordChangeAllowed(true)
         ).withId(ID.of(1))
         whenever(user.account).thenReturn(account)
         whenever(securityService.currentAccount).thenReturn(user)
@@ -79,7 +79,7 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                AuthenticationSource.none().withAllowingPasswordChange(true)
+                authenticationSourceWithPasswordChangeAllowed(true)
         ).withId(ID.of(1))
         val builtinAccount = BuiltinAccount(account, "old-encoded")
         whenever(user.account).thenReturn(account)
@@ -96,7 +96,7 @@ class UserServiceImplTest {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                AuthenticationSource.none().withAllowingPasswordChange(true)
+                authenticationSourceWithPasswordChangeAllowed(true)
         ).withId(ID.of(1))
         val builtinAccount = BuiltinAccount(account, "old-encoded")
         whenever(user.account).thenReturn(account)
@@ -108,5 +108,14 @@ class UserServiceImplTest {
         assertTrue(ack.isSuccess)
         verify(accountRepository, times(1)).setPassword(1, "new-encoded")
     }
+
+    private fun authenticationSourceWithPasswordChangeAllowed(allowingPasswordChange: Boolean) =
+            AuthenticationSource.none().run {
+                AuthenticationSource(
+                        id = id,
+                        name = name,
+                        isAllowingPasswordChange = allowingPasswordChange
+                )
+            }
 
 }

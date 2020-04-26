@@ -10,9 +10,6 @@ import java.util.*
 
 interface AccountRepository {
 
-    @Deprecated("")
-    fun findUserByNameAndSource(username: String, sourceProvider: AuthenticationSourceProvider): Optional<Account>
-
     /**
      * Gets a built-in if it exists. The criteria is based on the [username] and on the [mode][Account.authenticationSource]
      * being stored.

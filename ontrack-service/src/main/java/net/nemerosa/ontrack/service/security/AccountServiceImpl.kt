@@ -42,7 +42,7 @@ class AccountServiceImpl(
 
     override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
         // Loads the account
-        val account = accountRepository.getAccount(ID.of(raw.accountId)) { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
+        val account = accountRepository.getAccount(ID.of(raw.accountId)) { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }
         // Direct account authorisations
         val authorisations = Authorisations()
                 .withProjectFunctions(securityService.autoProjectFunctions)
@@ -66,7 +66,7 @@ class AccountServiceImpl(
 
     override fun getAccounts(): List<Account> {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        return accountRepository.findAll { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }.toList()
+        return accountRepository.findAll { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }.toList()
     }
 
     override fun create(input: AccountInput): Account {
@@ -169,7 +169,7 @@ class AccountServiceImpl(
         val targets: MutableList<PermissionTarget> = ArrayList()
         // Users first
         targets.addAll(
-                accountRepository.findByNameToken(token) { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
+                accountRepository.findByNameToken(token) { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }
                         .map { obj: Account -> obj.asPermissionTarget() }
         )
         // ... then groups
@@ -199,7 +199,7 @@ class AccountServiceImpl(
         val permissions: MutableCollection<GlobalPermission> = ArrayList()
         // Users first
         permissions.addAll(
-                accountRepository.findAll { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
+                accountRepository.findAll { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }
                         .mapNotNull { account: Account -> getGlobalPermission(account) }
         )
         // ... then groups
@@ -230,7 +230,7 @@ class AccountServiceImpl(
         val permissions: MutableCollection<ProjectPermission> = ArrayList()
         // Users first
         permissions.addAll(
-                accountRepository.findAll { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
+                accountRepository.findAll { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }
                         .mapNotNull { account: Account -> getProjectPermission(projectId, account) }
         )
         // ... then groups
@@ -279,7 +279,7 @@ class AccountServiceImpl(
     }
 
     override fun getAccountsForGroup(accountGroup: AccountGroup): List<Account> {
-        return accountRepository.getAccountsForGroup(accountGroup) { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
+        return accountRepository.getAccountsForGroup(accountGroup) { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }
     }
 
     override fun getGlobalRoleForAccountGroup(group: AccountGroup): Optional<GlobalRole> {
@@ -377,7 +377,7 @@ class AccountServiceImpl(
 
     override fun getAccount(accountId: ID): Account {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        return accountRepository.getAccount(accountId) { mode: String? -> authenticationSourceService.getAuthenticationSource(mode) }
+        return accountRepository.getAccount(accountId) { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }
     }
 
     override fun getGroupsForAccount(accountId: ID): List<AccountGroup> {

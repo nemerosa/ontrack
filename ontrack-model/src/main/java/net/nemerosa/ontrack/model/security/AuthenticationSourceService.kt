@@ -1,13 +1,9 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceProviderNotFoundException;
+interface AuthenticationSourceService {
 
-public interface AuthenticationSourceService {
+    fun getAuthenticationSourceProvider(mode: String): AuthenticationSourceProvider
 
-    AuthenticationSourceProvider getAuthenticationSourceProvider(String mode) throws AuthenticationSourceProviderNotFoundException;
-
-    default AuthenticationSource getAuthenticationSource(String mode) throws AuthenticationSourceProviderNotFoundException {
-        return getAuthenticationSourceProvider(mode).getSource();
-    }
+    fun getAuthenticationSource(mode: String): AuthenticationSource = getAuthenticationSourceProvider(mode).source
 
 }

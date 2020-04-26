@@ -6,12 +6,15 @@ import org.springframework.stereotype.Component
 class BuiltinAuthenticationSourceProvider : AuthenticationSourceProvider {
 
     companion object {
+
         const val ID = "password"
 
-        val SOURCE = AuthenticationSource.of(
-                ID,
-                "Built-in"
-        ).withAllowingPasswordChange(true)
+        val SOURCE = AuthenticationSource(
+                id = ID,
+                name = "Built-in",
+                isAllowingPasswordChange = true
+        )
+
     }
 
     override val source = SOURCE

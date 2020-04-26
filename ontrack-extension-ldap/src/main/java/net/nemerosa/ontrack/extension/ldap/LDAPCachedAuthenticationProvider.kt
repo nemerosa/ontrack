@@ -84,7 +84,7 @@ class LDAPCachedAuthenticationProvider(
                                         password = "",
                                         groups = emptyList()
                                 ),
-                                LDAPAuthenticationSource.id
+                                LDAPAuthenticationSourceProvider.SOURCE.id
                         )
                     }
                     // Wrapping the account
@@ -99,7 +99,7 @@ class LDAPCachedAuthenticationProvider(
             }
         } else {
             // Checks the source
-            if (existingAccount.authenticationSource == LDAPAuthenticationSource) {
+            if (existingAccount.authenticationSource == LDAPAuthenticationSourceProvider.SOURCE) {
                 // Wrapping the account
                 val user = AccountOntrackUser(existingAccount)
                 // Provides the ACL

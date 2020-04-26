@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceProviderNotFoun
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider
 import net.nemerosa.ontrack.model.security.AuthenticationSourceService
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class AuthenticationSourceServiceImpl(providers: Collection<AuthenticationSourceProvider>) : AuthenticationSourceService {
@@ -14,7 +13,7 @@ class AuthenticationSourceServiceImpl(providers: Collection<AuthenticationSource
     }
 
     override fun getAuthenticationSourceProvider(mode: String): AuthenticationSourceProvider {
-        return Optional.ofNullable(providers[mode]).orElseThrow { AuthenticationSourceProviderNotFoundException(mode) }
+        return providers[mode] ?: throw AuthenticationSourceProviderNotFoundException(mode)
     }
 
 }
