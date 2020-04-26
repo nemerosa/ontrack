@@ -27,6 +27,20 @@ services:
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
+  # LDAP service
+  ldap:
+    image: osixia/openldap:1.3.0
+    volumes:
+      - ./dev/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/50-bootstrap.ldif
+    environment:
+      LDAP_DOMAIN: nemerosa.net
+      LDAP_ORGANISATION: Nemerosa
+      LDAP_TLS: "false"
+    command: "--copy-service --loglevel debug"
+    ports:
+      - "389:389"
+      - "636:636"
+
   # Vault
   # Non production setup
   # See https://hub.docker.com/_/vault/

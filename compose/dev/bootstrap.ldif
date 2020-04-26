@@ -1,0 +1,44 @@
+dn: ou=groups,dc=nemerosa,dc=net
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=nemerosa,dc=net
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+dn: uid=admin,ou=people,dc=nemerosa,dc=net
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Damien Coraboeuf
+sn: Coraboeuf
+uid: damien.coraboeuf
+email: damien.coraboeuf@nemerosa.net
+userPassword: admin
+
+dn: uid=user,ou=people,dc=nemerosa,dc=net
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Bilbo the Hobbit
+sn: Hobbit
+uid: bilbo
+email: bilbo@nemerosa.net
+userPassword: password
+
+dn: cn=user,ou=groups,dc=nemerosa,dc=net
+objectclass: top
+objectclass: groupOfNames
+cn: user
+member: uid=damien.coraboeuf,ou=people,dc=nemerosa,dc=net
+member: uid=bilbo,ou=people,dc=nemerosa,dc=net
+
+dn: cn=admin,ou=groups,dc=nemerosa,dc=net
+objectclass: top
+objectclass: groupOfNames
+cn: admin
+member: uid=damien.coraboeuf,ou=people,dc=nemerosa,dc=net
