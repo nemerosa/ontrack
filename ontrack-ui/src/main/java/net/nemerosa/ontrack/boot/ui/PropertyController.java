@@ -20,7 +20,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
  * UI end point for the management of properties.
  */
 @RestController
-@RequestMapping("/properties")
+@RequestMapping("/rest/properties")
 public class PropertyController extends AbstractProjectEntityController {
 
     private final PropertyService propertyService;
