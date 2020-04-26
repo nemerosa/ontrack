@@ -76,7 +76,6 @@ class WebConfig(
         listOf(
                 "/graphql/**",
                 "/rest/**",
-                // TODO 👇 To migrate to /rest/
                 "/extension/**"
         ).forEach {
             registry.addMapping(it).allowedMethods(*ALLOWED_API_METHODS.toTypedArray())
