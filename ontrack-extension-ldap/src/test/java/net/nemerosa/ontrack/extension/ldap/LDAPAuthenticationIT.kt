@@ -126,7 +126,9 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
                 user = "uid=damien.coraboeuf,ou=people,dc=nemerosa,dc=net",
                 password = "admin",
                 searchBase = "dc=nemerosa,dc=net",
-                searchFilter = "(uid={0})"
+                searchFilter = "(uid={0})",
+                groupSearchBase = "ou=groups,dc=nemerosa,dc=net",
+                groupSearchFilter = "(member={0})"
         )
 
     companion object {
