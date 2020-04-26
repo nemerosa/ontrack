@@ -85,7 +85,7 @@ angular.module('ot.view.admin.jobs', [
 
         function loadJobs() {
             $scope.loadingJobs = true;
-            ot.pageCall($http.get('admin/jobs/filter'))
+            ot.pageCall($http.get('rest/admin/jobs/filter'))
                 .then(jobFilterResources => {
                     $scope.jobFilterResources = jobFilterResources;
                     // Parameters
@@ -98,7 +98,7 @@ angular.module('ot.view.admin.jobs', [
                     params.offset = $scope.page.offset ? $scope.page.offset : 0;
                     params.count = $scope.page.count ? $scope.page.count : 30;
                     // Call
-                    return ot.pageCall($http.get('admin/jobs', {
+                    return ot.pageCall($http.get('rest/admin/jobs', {
                         params: params
                     }));
                 })

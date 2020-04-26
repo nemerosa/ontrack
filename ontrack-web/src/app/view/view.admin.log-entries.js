@@ -79,7 +79,7 @@ angular.module('ot.view.admin.log-entries', [
             params.offset = $scope.offset;
             params.count = $scope.pageSize;
             $scope.loadingEntries = true;
-            ot.call($http.get('admin/logs', {
+            ot.call($http.get('rest/admin/logs', {
                 params: params
             })).then(function (logs) {
                 $scope.logs = logs;
@@ -121,7 +121,7 @@ angular.module('ot.view.admin.log-entries', [
                 title: "Delete log entries",
                 message: "Do you really want to delete all log entries?"
             }).then(function () {
-                ot.pageCall($http.delete('admin/logs')).then(loadLogs);
+                ot.pageCall($http.delete('rest/admin/logs')).then(loadLogs);
             });
         };
 

@@ -22,7 +22,7 @@ angular.module('ot.view.admin.health', [
         // Loads the statuses
         function loadHealth() {
             $scope.loadingStatus = true;
-            ot.call($http.get('admin/status')).then(status => {
+            ot.call($http.get('rest/admin/status')).then(status => {
                 $scope.status = status;
             }).finally(() => {
                 $scope.loadingStatus = false;

@@ -20,7 +20,7 @@ class Admin {
      */
     @DSLMethod("Gets the health/status of the application")
     def getStatus() {
-        return ontrack.get("admin/status")
+        return ontrack.get("rest/admin/status")
     }
 
     /**

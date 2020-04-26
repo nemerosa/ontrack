@@ -25,7 +25,7 @@ angular.module('ot.view.admin.predefined-promotion-levels', [
         ];
 
         function loadPredefinedPromotionLevels() {
-            ot.pageCall($http.get('admin/predefinedPromotionLevels')).then(function (predefinedPromotionLevels) {
+            ot.pageCall($http.get('rest/admin/predefinedPromotionLevels')).then(function (predefinedPromotionLevels) {
                 $scope.predefinedPromotionLevels = predefinedPromotionLevels;
                 $scope.predefinedPromotionLevelSortOptions = {
                     disabled: !$scope.predefinedPromotionLevels._reorderPromotionLevels,

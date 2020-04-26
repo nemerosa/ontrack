@@ -179,7 +179,7 @@ class Config {
 
     @DSLMethod("Gets the list of validation stamps. See <<dsl-projectproperties-autoValidationStamp,`autoValidationStamp`>>.")
     List<PredefinedValidationStamp> getPredefinedValidationStamps() {
-        ontrack.get('admin/predefinedValidationStamps').resources.collect {
+        ontrack.get('rest/admin/predefinedValidationStamps').resources.collect {
             new PredefinedValidationStamp(
                     ontrack,
                     it
@@ -202,7 +202,7 @@ class Config {
         } else {
             new PredefinedValidationStamp(
                     ontrack,
-                    ontrack.post(ontrack.get('admin/predefinedValidationStamps')._create, [
+                    ontrack.post(ontrack.get('rest/admin/predefinedValidationStamps')._create, [
                             name       : name,
                             description: description
                     ])
@@ -223,7 +223,7 @@ class Config {
 
     @DSLMethod("Gets the list of promotion levels. See <<dsl-projectproperties-autoPromotionLevel,`autoPromotionLevel`>>.")
     List<PredefinedPromotionLevel> getPredefinedPromotionLevels() {
-        ontrack.get('admin/predefinedPromotionLevels').resources.collect {
+        ontrack.get('rest/admin/predefinedPromotionLevels').resources.collect {
             new PredefinedPromotionLevel(
                     ontrack,
                     it
@@ -246,7 +246,7 @@ class Config {
         } else {
             new PredefinedPromotionLevel(
                     ontrack,
-                    ontrack.post(ontrack.get('admin/predefinedPromotionLevels')._create, [
+                    ontrack.post(ontrack.get('rest/admin/predefinedPromotionLevels')._create, [
                             name       : name,
                             description: description
                     ])

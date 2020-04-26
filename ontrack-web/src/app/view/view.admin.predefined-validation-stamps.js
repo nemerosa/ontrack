@@ -25,7 +25,7 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
         ];
 
         function loadPredefinedValidationStamps() {
-            ot.pageCall($http.get('admin/predefinedValidationStamps')).then(function (predefinedValidationStamps) {
+            ot.pageCall($http.get('rest/admin/predefinedValidationStamps')).then(function (predefinedValidationStamps) {
                 $scope.predefinedValidationStamps = predefinedValidationStamps;
             });
         }

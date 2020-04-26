@@ -21,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/rest/admin")
 class AdminController
 @Autowired
 constructor(
