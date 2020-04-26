@@ -25,7 +25,7 @@ angular.module('ot.view.admin.project-acl', [
         function load() {
             otStructureService.getProject(projectId).then(function (project) {
                 view.breadcrumbs = ot.projectBreadcrumbs(project);
-                return ot.pageCall($http.get('accounts/permissions/projects/' + projectId));
+                return ot.pageCall($http.get('rest/accounts/permissions/projects/' + projectId));
             }).then(function (projectPermissions) {
                 view.commands = [
                     ot.viewApiCommand(projectPermissions._self),
@@ -41,7 +41,7 @@ angular.module('ot.view.admin.project-acl', [
 
         // Loading the permission targets
         $scope.loadPermissionTargets = function (token) {
-            return ot.call($http.get('accounts/permissions/search/' + token)).then(function (permissionTargets) {
+            return ot.call($http.get('rest/accounts/permissions/search/' + token)).then(function (permissionTargets) {
                 return permissionTargets.resources;
             });
         };
@@ -57,7 +57,7 @@ angular.module('ot.view.admin.project-acl', [
         $scope.saveProjectPermission = function () {
             ot.call(
                 $http.put(
-                    $interpolate('accounts/permissions/projects/{{projectId}}/{{type}}/{{id}}')({
+                    $interpolate('rest/accounts/permissions/projects/{{projectId}}/{{type}}/{{id}}')({
                         projectId: projectId,
                         type: $scope.form.permissionTarget.type,
                         id: $scope.form.permissionTarget.id

@@ -21,7 +21,7 @@ import javax.validation.Valid
  * Management of accounts
  */
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/rest/accounts")
 class AccountController(
         private val accountService: AccountService,
         private val extensionManager: ExtensionManager

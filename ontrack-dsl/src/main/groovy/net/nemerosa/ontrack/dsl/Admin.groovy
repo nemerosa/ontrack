@@ -28,7 +28,7 @@ class Admin {
      */
     @DSLMethod("Returns the list of all accounts.")
     List<Account> getAccounts() {
-        ontrack.get('accounts').resources.collect {
+        ontrack.get('rest/accounts').resources.collect {
             new Account(ontrack, it)
         }
     }
@@ -39,7 +39,7 @@ class Admin {
     @DSLMethod(value = "Creates or updates an account.", count = 5)
     Account account(String name, String fullName, String email, String password = '', List<String> groupNames = []) {
         // Gets the accounts
-        def accounts = ontrack.get('accounts')
+        def accounts = ontrack.get('rest/accounts')
         // Gets the groups by name
         def groups = groupNames.collect { findGroupByName(it) }
         // Looks for an existing account
@@ -82,7 +82,7 @@ class Admin {
      */
     @DSLMethod("Returns the list of all groups.")
     List<AccountGroup> getGroups() {
-        ontrack.get('accounts/groups').resources.collect {
+        ontrack.get('rest/accounts/groups').resources.collect {
             new AccountGroup(ontrack, it)
         }
     }
@@ -93,7 +93,7 @@ class Admin {
     @DSLMethod("Creates or updates an account group.")
     AccountGroup accountGroup(String name, String description) {
         // Gets the groups
-        def groups = ontrack.get('accounts/groups')
+        def groups = ontrack.get('rest/accounts/groups')
         // Looks for an existing group
         def group = groups.resources.find { it.name == name }
         if (group != null) {
@@ -196,7 +196,7 @@ class Admin {
     public void setAccountGlobalPermission(String accountName, String globalRole) {
         def account = findAccountByName(accountName)
         ontrack.put(
-                "/accounts/permissions/globals/ACCOUNT/${account.id}",
+                "rest/accounts/permissions/globals/ACCOUNT/${account.id}",
                 [
                         role: globalRole
                 ]
@@ -211,7 +211,7 @@ class Admin {
     @DSLMethod("Gets the list of global roles an account has. See <<dsl-usecases-security-account-permissions>>.")
     List<Role> getAccountGlobalPermissions(String accountName) {
         def account = findAccountByName(accountName)
-        ontrack.get("/accounts/permissions/globals").resources
+        ontrack.get("rest/accounts/permissions/globals").resources
                 .findAll { it.target.type == 'ACCOUNT' && it.target.id == account.id }
                 .collect {
             new Role(
@@ -229,7 +229,7 @@ class Admin {
         def project = ontrack.project(projectName)
         def account = findAccountByName(accountName)
         ontrack.put(
-                "/accounts/permissions/projects/${project.id}/ACCOUNT/${account.id}",
+                "rest/accounts/permissions/projects/${project.id}/ACCOUNT/${account.id}",
                 [
                         role: projectRole
                 ]
@@ -245,7 +245,7 @@ class Admin {
     List<Role> getAccountProjectPermissions(String projectName, String accountName) {
         def project = ontrack.project(projectName)
         def account = findAccountByName(accountName)
-        ontrack.get("/accounts/permissions/projects/${project.id}").resources
+        ontrack.get("rest/accounts/permissions/projects/${project.id}").resources
                 .findAll { it.target.type == 'ACCOUNT' && it.target.id == account.id }
                 .collect {
             new Role(
@@ -262,7 +262,7 @@ class Admin {
     public void setAccountGroupGlobalPermission(String groupName, String globalRole) {
         def group = findGroupByName(groupName)
         ontrack.put(
-                "/accounts/permissions/globals/GROUP/${group.id}",
+                "rest/accounts/permissions/globals/GROUP/${group.id}",
                 [
                         role: globalRole
                 ]
@@ -277,7 +277,7 @@ class Admin {
     @DSLMethod("Gets the list of global roles an account group has. See <<dsl-usecases-security-account-group-permissions>>.")
     List<Role> getAccountGroupGlobalPermissions(String groupName) {
         def group = findGroupByName(groupName)
-        ontrack.get("/accounts/permissions/globals").resources
+        ontrack.get("rest/accounts/permissions/globals").resources
                 .findAll { it.target.type == 'GROUP' && it.target.id == group.id }
                 .collect {
             new Role(
@@ -295,7 +295,7 @@ class Admin {
         def project = ontrack.project(projectName)
         def group = findGroupByName(groupName)
         ontrack.put(
-                "/accounts/permissions/projects/${project.id}/GROUP/${group.id}",
+                "rest/accounts/permissions/projects/${project.id}/GROUP/${group.id}",
                 [
                         role: projectRole
                 ]
@@ -311,7 +311,7 @@ class Admin {
     List<Role> getAccountGroupProjectPermissions(String projectName, String groupName) {
         def project = ontrack.project(projectName)
         def group = findGroupByName(groupName)
-        ontrack.get("/accounts/permissions/projects/${project.id}").resources
+        ontrack.get("rest/accounts/permissions/projects/${project.id}").resources
                 .findAll { it.target.type == 'GROUP' && it.target.id == group.id }
                 .collect {
             new Role(

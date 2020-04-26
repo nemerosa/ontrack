@@ -16,7 +16,7 @@ angular.module('ot.view.admin.accounts', [
 
         // Loading the accounts
         function load() {
-            ot.call($http.get('accounts')).then(function (accounts) {
+            ot.call($http.get('rest/accounts')).then(function (accounts) {
                 $scope.accounts = accounts;
                 // Initial commands
                 view.commands = [
@@ -42,7 +42,7 @@ angular.module('ot.view.admin.accounts', [
                     });
                 });
                 // Loads the groups
-                return ot.call($http.get('accounts/groups'));
+                return ot.call($http.get('rest/accounts/groups'));
             }).then(function (groups) {
                 $scope.groups = groups;
             });

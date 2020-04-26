@@ -19,7 +19,7 @@ angular.module('ot.view.admin.global-acl', [
 
         // Loading the global permissions
         function load() {
-            ot.pageCall($http.get("accounts/permissions/globals")).then(function (globalPermissions) {
+            ot.pageCall($http.get("rest/accounts/permissions/globals")).then(function (globalPermissions) {
                 $scope.globalPermissions = globalPermissions;
                 view.commands = [
                     ot.viewApiCommand(globalPermissions._self),
@@ -36,7 +36,7 @@ angular.module('ot.view.admin.global-acl', [
 
         // Loading the permission targets
         $scope.loadPermissionTargets = function (token) {
-            return ot.call($http.get('accounts/permissions/search/' + token)).then(function (permissionTargets) {
+            return ot.call($http.get('rest/accounts/permissions/search/' + token)).then(function (permissionTargets) {
                 return permissionTargets.resources;
             });
         };
@@ -52,7 +52,7 @@ angular.module('ot.view.admin.global-acl', [
         $scope.saveGlobalPermission = function () {
             ot.call(
                 $http.put(
-                    $interpolate('accounts/permissions/globals/{{type}}/{{id}}')($scope.form.permissionTarget),
+                    $interpolate('rest/accounts/permissions/globals/{{type}}/{{id}}')($scope.form.permissionTarget),
                     {
                         role: $scope.form.role.id
                     }
