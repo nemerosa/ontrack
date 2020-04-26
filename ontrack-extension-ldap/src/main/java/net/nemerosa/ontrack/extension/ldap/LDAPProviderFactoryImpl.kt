@@ -1,73 +1,84 @@
-package net.nemerosa.ontrack.extension.ldap;
+package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.model.security.SecurityRole;
-import net.nemerosa.ontrack.model.settings.CachedSettingsService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
-import org.springframework.stereotype.Service;
+import net.nemerosa.ontrack.model.security.SecurityRole
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import org.springframework.ldap.core.DirContextOperations
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.ldap.DefaultSpringSecurityContextSource
+import org.springframework.security.ldap.authentication.BindAuthenticator
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider
+import org.springframework.security.ldap.search.FilterBasedLdapUserSearch
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator
+import org.springframework.stereotype.Service
+import java.util.concurrent.ConcurrentHashMap
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+/**
+ * Creates, configures and caches a fully configured [LdapAuthenticationProvider] based
+ * on the [LDAP settings][LDAPSettings].
+ */
 @Service
-public class LDAPProviderFactoryImpl implements LDAPProviderFactory {
+class LDAPProviderFactoryImpl(
+        private val cachedSettingsService: CachedSettingsService
+) : LDAPProviderFactory {
 
-    private final CachedSettingsService cachedSettingsService;
-    private final LdapAuthoritiesPopulator authoritiesPopulator = (userData, username) -> AuthorityUtils.createAuthorityList(SecurityRole.USER.name());
+    private val authoritiesPopulator = LdapAuthoritiesPopulator { userData: DirContextOperations?, username: String? -> AuthorityUtils.createAuthorityList(SecurityRole.USER.name) }
 
-    private static final String CACHE_KEY = "0";
-    private final Map<String, LdapAuthenticationProvider> cache = new ConcurrentHashMap<>();
+    private val cache: MutableMap<String, CachedLdap> = ConcurrentHashMap()
 
-    @Autowired
-    public LDAPProviderFactoryImpl(CachedSettingsService cachedSettingsService) {
-        this.cachedSettingsService = cachedSettingsService;
+    /**
+     * Clears the internal cache.
+     */
+    override fun invalidate() {
+        cache.clear()
     }
 
-    @Override
-    public void invalidate() {
-        cache.clear();
-    }
+    /**
+     * Checks the cache
+     */
+    override val provider: LdapAuthenticationProvider?
+        get() = cache.computeIfAbsent(CACHE_KEY) { loadProvider() }.provider
 
-    public LdapAuthenticationProvider getProvider() {
-        return cache.computeIfAbsent(CACHE_KEY, x -> loadProvider());
-    }
-
-    private LdapAuthenticationProvider loadProvider() {
-        LDAPSettings settings = cachedSettingsService.getCachedSettings(LDAPSettings.class);
-        if (settings.isEnabled()) {
+    private fun loadProvider(): CachedLdap {
+        val settings = cachedSettingsService.getCachedSettings(LDAPSettings::class.java)
+        return if (settings.isEnabled) {
             // LDAP context
-            DefaultSpringSecurityContextSource ldapContextSource = new DefaultSpringSecurityContextSource(settings.getUrl());
-            ldapContextSource.setUserDn(settings.getUser());
-            ldapContextSource.setPassword(settings.getPassword());
+            val ldapContextSource = DefaultSpringSecurityContextSource(settings.url)
+            ldapContextSource.userDn = settings.user
+            ldapContextSource.password = settings.password
             try {
-                ldapContextSource.afterPropertiesSet();
-            } catch (Exception e) {
-                throw new CannotInitializeLDAPException(e);
+                ldapContextSource.afterPropertiesSet()
+            } catch (e: Exception) {
+                throw CannotInitializeLDAPException(e)
             }
             // User search
-            FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(
-                    settings.getSearchBase(),
-                    settings.getSearchFilter(),
-                    ldapContextSource);
-            userSearch.setSearchSubtree(true);
+            val userSearch = FilterBasedLdapUserSearch(
+                    settings.searchBase,
+                    settings.searchFilter,
+                    ldapContextSource)
+            userSearch.setSearchSubtree(true)
             // Bind authenticator
-            BindAuthenticator bindAuthenticator = new BindAuthenticator(ldapContextSource);
-            bindAuthenticator.setUserSearch(userSearch);
+            val bindAuthenticator = BindAuthenticator(ldapContextSource)
+            bindAuthenticator.setUserSearch(userSearch)
             // Provider
-            LdapAuthenticationProvider ldapAuthenticationProvider = new LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator);
-            ldapAuthenticationProvider.setUserDetailsContextMapper(new ConfigurableUserDetailsContextMapper(settings, ldapContextSource));
+            val ldapAuthenticationProvider = LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator)
+            ldapAuthenticationProvider.setUserDetailsContextMapper(ConfigurableUserDetailsContextMapper(settings, ldapContextSource))
             // OK
-            return ldapAuthenticationProvider;
-        }
-        // LDAP not enabled
-        else {
-            return null;
+            CachedLdap(ldapAuthenticationProvider)
+        } else {
+            CachedLdap(null)
         }
     }
+
+    companion object {
+        /**
+         * Internal cache key for the LDAP
+         */
+        private const val CACHE_KEY = "0"
+    }
+
+    /**
+     * Cache entry (to distinguish between "not initialized" and "not configured")
+     */
+    private class CachedLdap(val provider: LdapAuthenticationProvider?)
 
 }

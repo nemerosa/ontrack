@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.security.AccountOntrackUser
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.TokenNameMismatchException
 import net.nemerosa.ontrack.model.structure.TokensService

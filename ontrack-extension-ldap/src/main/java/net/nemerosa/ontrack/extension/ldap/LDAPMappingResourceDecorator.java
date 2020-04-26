@@ -18,10 +18,10 @@ public class LDAPMappingResourceDecorator extends AbstractResourceDecorator<LDAP
     @Override
     public List<Link> links(LDAPMapping resource, ResourceContext resourceContext) {
         return resourceContext.links()
-                // Update
-                .link(Link.UPDATE, MvcUriComponentsBuilder.on(LDAPController.class).getMappingUpdateForm(resource.getId()))
-                        // Delete
-                .link(Link.DELETE, MvcUriComponentsBuilder.on(LDAPController.class).deleteMapping(resource.getId()))
+//                // Update
+//                .link(Link.UPDATE, MvcUriComponentsBuilder.on(LDAPController.class).getMappingUpdateForm(resource.getId()))
+//                        // Delete
+//                .link(Link.DELETE, MvcUriComponentsBuilder.on(LDAPController.class).deleteMapping(resource.getId()))
                         // OK
                 .build();
     }

@@ -62,4 +62,9 @@ interface AccountRepository {
      * @return List of accounts
      */
     fun getAccountsForGroup(accountGroup: AccountGroup, authenticationSourceFunction: (String) -> AuthenticationSource): List<Account>
+
+    /**
+     * Finds an account using its name only.
+     */
+    fun findAccountByName(username: String, function: (String) -> AuthenticationSource): Account?
 }

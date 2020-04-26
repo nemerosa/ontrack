@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.security.AccountOntrackUser
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.repository.BuiltinAccount

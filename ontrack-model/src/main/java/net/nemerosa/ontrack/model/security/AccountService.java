@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
+import org.jetbrains.annotations.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
@@ -217,4 +218,13 @@ public interface AccountService {
      * @return List of matching accounts
      */
     Collection<Account> findAccountsByProjectRole(Project project, ProjectRole projectRole);
+
+    /**
+     * Finds an account using its name.
+     *
+     * @param username Name to look for
+     * @return Account or null if not found
+     */
+    @Nullable
+    Account findAccountByName(@NotNull String username);
 }

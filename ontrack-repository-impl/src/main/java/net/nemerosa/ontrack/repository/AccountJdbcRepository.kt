@@ -148,4 +148,16 @@ class AccountJdbcRepository(dataSource: DataSource?) : AbstractJdbcRepository(da
             )
         }
     }
+
+    override fun findAccountByName(username: String, function: (String) -> AuthenticationSource): Account? {
+        return getFirstItem(
+                "SELECT * FROM ACCOUNTS WHERE NAME = :name",
+                params("name", username)
+        ) { rs: ResultSet, _ ->
+            toAccount(
+                    rs,
+                    function
+            )
+        }
+    }
 }

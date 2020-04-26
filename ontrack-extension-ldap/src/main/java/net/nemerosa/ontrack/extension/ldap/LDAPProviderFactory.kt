@@ -1,11 +1,21 @@
-package net.nemerosa.ontrack.extension.ldap;
+package net.nemerosa.ontrack.extension.ldap
 
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider
 
-public interface LDAPProviderFactory {
+/**
+ * Facade to get an actual LDAP authentication provider, based on checking if the
+ * LDAP settings are enabled or not.
+ */
+interface LDAPProviderFactory {
 
-    LdapAuthenticationProvider getProvider();
+    /**
+     * Gets a configured LDAP authentication provider
+     */
+    val provider: LdapAuthenticationProvider?
 
-    void invalidate();
+    /**
+     * Invalidates any configured LDAP authentication provider
+     */
+    fun invalidate()
 
 }

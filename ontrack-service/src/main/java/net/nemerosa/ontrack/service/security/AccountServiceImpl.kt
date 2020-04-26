@@ -385,6 +385,11 @@ class AccountServiceImpl(
         return accountGroupRepository.findByAccount(accountId.value).toList()
     }
 
+    override fun findAccountByName(username: String): Account? {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        return accountRepository.findAccountByName(username) { mode: String -> authenticationSourceService.getAuthenticationSource(mode) }
+    }
+
     private fun getGroupACL(group: AccountGroup): Authorisations =
             Authorisations()
                     // Global role
