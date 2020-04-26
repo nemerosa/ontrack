@@ -23,7 +23,7 @@ class ACCAPI extends AcceptanceTestClient {
         }
         def vs = ontrack.validationStamp(project, 'master', 'VS')
         // Gets its API
-        def api = ontrack.get("rest/api/describe?path=/structure/validationStamps/${vs.id}")
+        def api = ontrack.get("rest/api/describe?path=/rest/structure/validationStamps/${vs.id}")
         def getMethod = api.methods.find { it.path == 'rest/structure/validationStamps/{validationStampId}' && it.methods == ['GET'] }
         assert getMethod != null
         assert getMethod.name == 'Get validation stamp'
