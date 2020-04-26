@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
  * Getting the list of extensions and their properties.
  */
 @RestController
-@RequestMapping("/extensions")
+@RequestMapping("/rest/extensions")
 public class ExtensionController extends AbstractResourceController {
 
     private final ExtensionManager extensionManager;

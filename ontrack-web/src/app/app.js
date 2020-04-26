@@ -100,7 +100,7 @@ const ontrack = angular.module('ontrack', [
              * Loading the extensions
              */
             $log.debug('[app] Loading extensions...');
-            ot.pageCall($http.get('extensions')).then(function (extensionList) {
+            ot.pageCall($http.get('rest/extensions')).then(function (extensionList) {
                 // Creates a start promise
                 var d = $q.defer();
                 d.resolve();

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Controller used to get extensions on project entities.
  */
 @RestController
-@RequestMapping("/extensions/entity")
+@RequestMapping("/rest/extensions/entity")
 public class ProjectEntityExtensionController extends AbstractProjectEntityController {
 
     private final ExtensionManager extensionManager;

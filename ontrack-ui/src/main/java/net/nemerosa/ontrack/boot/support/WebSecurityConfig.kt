@@ -32,7 +32,6 @@ class WebSecurityConfig {
                 securityMatcher("/graphql/**")
                 // TODO 👇 To migrate to /rest/
                 securityMatcher("/extension/**")
-                securityMatcher("/extensions/**")
                 // Disables CSRF for the API calls
                 csrf {
                     disable()

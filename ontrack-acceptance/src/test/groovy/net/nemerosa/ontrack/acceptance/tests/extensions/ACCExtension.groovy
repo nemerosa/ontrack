@@ -26,7 +26,7 @@ class ACCExtension extends AbstractACCDSL {
 
     @Test
     void 'Extension loaded'() {
-        admin().get("extensions").withNode { extensionList ->
+        admin().get("rest/extensions").withNode { extensionList ->
             def extensionFeatureDescription = extensionList.path("extensions").find {
                 "test" == it.path("id").asText()
             }

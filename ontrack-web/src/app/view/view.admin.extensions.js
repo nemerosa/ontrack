@@ -18,7 +18,7 @@ angular.module('ot.view.admin.extensions', [
 
         // Loads the extensions
         function loadExtensions() {
-            ot.call($http.get('extensions')).then(function (extensions) {
+            ot.call($http.get('rest/extensions')).then(function (extensions) {
                 $scope.extensions = extensions;
             });
         }
