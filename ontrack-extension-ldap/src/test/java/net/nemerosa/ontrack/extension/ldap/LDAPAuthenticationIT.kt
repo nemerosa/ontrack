@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.ldap
 
 import net.nemerosa.ontrack.extension.ldap.support.UnboundIdContainer
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.security.AccountInput
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -9,6 +10,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -32,14 +34,84 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Unknown account`() {
+        setLDAPSettings()
+        val user = authenticationProvider.findUser("xxxx", UsernamePasswordAuthenticationToken("xxxx", ADMIN_PASSWORD))
+        assertNull(user, "Cannot find user")
+    }
+
+    @Test
+    fun `Wrong password`() {
+        setLDAPSettings()
+        val user = authenticationProvider.findUser(ADMIN_USER, UsernamePasswordAuthenticationToken(ADMIN_USER, "xxxx"))
+        assertNull(user, "Wrong user password")
+    }
+
+    @Test
+    fun `Missing email`() {
+        setLDAPSettings()
+        assertFailsWith<LDAPEmailRequiredException> {
+            authenticationProvider.findUser("gollum", UsernamePasswordAuthenticationToken("gollum", "password"))
+        }
+    }
+
+    @Test
     fun `Creation of new account`() {
         setLDAPSettings()
+        deleteAccount(ADMIN_USER)
         val user = authenticationProvider.findUser(ADMIN_USER, UsernamePasswordAuthenticationToken(ADMIN_USER, ADMIN_PASSWORD))
         assertNotNull(user) {
             assertEquals(LDAPAuthenticationSourceProvider.SOURCE.id, it.account.authenticationSource.id)
             assertEquals(ADMIN_USER, it.username)
             assertEquals("", it.password)
             assertEquals("Damien Coraboeuf", it.account.fullName)
+        }
+    }
+
+    @Test
+    fun `Login a second time`() {
+        setLDAPSettings()
+        deleteAccount("bilbo")
+        val user = authenticationProvider.findUser("bilbo", UsernamePasswordAuthenticationToken("bilbo", "password"))
+        assertNotNull(user) {
+            val id = it.account.id()
+            // Login a second time
+            val second = authenticationProvider.findUser("bilbo", UsernamePasswordAuthenticationToken("bilbo", "password"))
+            // Checks the user is the same
+            assertNotNull(second) { s ->
+                assertEquals(id, s.account.id())
+            }
+        }
+    }
+
+    @Test
+    fun `Cannot override a non LDAP account`() {
+        setLDAPSettings()
+        // Makes sure the account with name `sauron` is built-in
+        asAdmin {
+            deleteAccount("sauron")
+            accountService.create(
+                    AccountInput(
+                            name = "sauron",
+                            fullName = "The enemy",
+                            email = "sauron@mordor.com",
+                            password = "the-ring",
+                            groups = emptyList()
+                    )
+            )
+        }
+        // Logs and fails
+        assertFailsWith<LDAPNotALDAPAccountException> {
+            authenticationProvider.findUser("sauron", UsernamePasswordAuthenticationToken("sauron", "password"))
+        }
+    }
+
+    private fun deleteAccount(name: String) {
+        asAdmin {
+            val account = accountService.findAccountByName(name)
+            if (account != null) {
+                accountService.deleteAccount(account.id)
+            }
         }
     }
 

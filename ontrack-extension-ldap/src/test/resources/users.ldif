@@ -30,6 +30,26 @@ uid: bilbo
 email: bilbo@nemerosa.net
 userPassword: password
 
+dn: uid=gollum,ou=people,dc=nemerosa,dc=net
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Gollum
+sn: Gollum
+uid: gollum
+userPassword: password
+
+dn: uid=sauron,ou=people,dc=nemerosa,dc=net
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Sauron
+sn: Sauron
+uid: sauron
+userPassword: password
+
 dn: cn=user,ou=groups,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
