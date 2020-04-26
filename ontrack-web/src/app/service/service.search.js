@@ -21,7 +21,7 @@ angular.module('ot.service.search', [
 
         self.loadSearchResultTypes = () => {
             let d = $q.defer();
-            ot.call($http.get('search/types')).then(
+            ot.call($http.get('rest/search/types')).then(
                 function success(searchResultTypes) {
                     $log.debug('[search] result types: ', searchResultTypes);
                     otNotificationService.clear();

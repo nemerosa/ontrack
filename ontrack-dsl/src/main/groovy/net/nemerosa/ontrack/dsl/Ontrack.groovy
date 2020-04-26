@@ -173,14 +173,14 @@ class Ontrack {
 
     @DSLMethod(value = "Launches a global search based on a token.", count = 4)
     List<SearchResult> search(String token, String type = null, int offset = 0, int size = 20) {
-        post('search', [token: token, type: type, offset: offset, size: size]).items.collect {
+        post('rest/search', [token: token, type: type, offset: offset, size: size]).items.collect {
             new SearchResult(this, it)
         }
     }
 
     @DSLMethod(value = "Resets all search indexes and re-index optionally", count = 1)
     void searchIndexReset(boolean reindex = false) {
-        post('search/index/reset', [reindex: reindex])
+        post('rest/search/index/reset', [reindex: reindex])
     }
 
     @DSLMethod(value = "Configures the general settings of Ontrack. See <<dsl-config>>.")
