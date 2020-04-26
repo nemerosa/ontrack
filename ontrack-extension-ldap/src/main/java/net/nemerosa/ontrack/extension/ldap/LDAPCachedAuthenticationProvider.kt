@@ -103,7 +103,7 @@ class LDAPCachedAuthenticationProvider(
         // Wrapping the account
         val user = AccountOntrackUser(account)
         // Provides the ACL
-        return accountService.withACL(user)
+        return LDAPOntrackAuthenticatedUser(accountService.withACL(user), userDetails)
     }
 
     override fun additionalAuthenticationChecks(userDetails: UserDetails, authentication: UsernamePasswordAuthenticationToken) {

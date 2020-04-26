@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.ldap
 import net.nemerosa.ontrack.extension.ldap.support.UnboundIdContainer
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.AccountInput
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -65,6 +66,13 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
             assertEquals(ADMIN_USER, it.username)
             assertEquals("", it.password)
             assertEquals("Damien Coraboeuf", it.account.fullName)
+            // Groups
+            assertIs<LDAPOntrackAuthenticatedUser>(it) { l ->
+                assertEquals(
+                        setOf("admin", "user"),
+                        l.ldapGroups.toSet()
+                )
+            }
         }
     }
 
@@ -80,6 +88,13 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
             // Checks the user is the same
             assertNotNull(second) { s ->
                 assertEquals(id, s.account.id())
+            }
+            // Groups
+            assertIs<LDAPOntrackAuthenticatedUser>(it) { l ->
+                assertEquals(
+                        setOf("user"),
+                        l.ldapGroups.toSet()
+                )
             }
         }
     }
