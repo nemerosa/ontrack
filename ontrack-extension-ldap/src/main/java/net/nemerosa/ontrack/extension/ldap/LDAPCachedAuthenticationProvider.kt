@@ -52,10 +52,10 @@ class LDAPCachedAuthenticationProvider(
                 // Gets the account name
                 val name = ldapAuthentication.name
                 val principal = ldapAuthentication.principal
-                val userDetails: ExtendedLDAPUserDetails? = if (principal is ExtendedLDAPUserDetails) {
+                val userDetails: ExtendedLDAPUserDetails = if (principal is ExtendedLDAPUserDetails) {
                     principal
                 } else {
-                    null
+                    throw LDAPMissingDetailsException()
                 }
                 // If not found, auto-registers the account using the LDAP details
                 getOrCreateAccount(name, userDetails)
@@ -65,55 +65,52 @@ class LDAPCachedAuthenticationProvider(
         }
     }
 
-    private fun getOrCreateAccount(username: String, userDetails: ExtendedLDAPUserDetails?): OntrackAuthenticatedUser? {
+    private fun getOrCreateAccount(username: String, userDetails: ExtendedLDAPUserDetails): OntrackAuthenticatedUser? {
         // Gets an existing account using user name only
         val existingAccount = securityService.asAdmin { accountService.findAccountByName(username) }
         return if (existingAccount == null) {
-            // If found, auto-registers the account using the LDAP details
-            if (userDetails != null) {
-                // Auto-registration if email is OK
-                if (userDetails.email.isNotBlank()) {
-                    // Registration
-                    val account = securityService.asAdmin {
-                        // Creates the account
-                        accountService.create(
-                                AccountInput(
-                                        name = username,
-                                        fullName = userDetails.fullName,
-                                        email = userDetails.email,
-                                        password = "",
-                                        groups = emptyList()
-                                ),
-                                LDAPAuthenticationSourceProvider.SOURCE.id
-                        )
-                    }
-                    // Wrapping the account
-                    val user = AccountOntrackUser(account)
-                    // Provides the ACL
-                    accountService.withACL(user)
-                } else {
-                    throw LDAPEmailRequiredException()
+            // Auto-registration if email is OK
+            if (userDetails.email.isNotBlank()) {
+                // Registration
+                val account = securityService.asAdmin {
+                    // Creates the account
+                    accountService.create(
+                            AccountInput(
+                                    name = username,
+                                    fullName = userDetails.fullName,
+                                    email = userDetails.email,
+                                    password = "",
+                                    groups = emptyList()
+                            ),
+                            LDAPAuthenticationSourceProvider.SOURCE.id
+                    )
                 }
+                createOntrackAuthenticatedUser(account, userDetails)
             } else {
-                throw LDAPMissingDetailsException()
+                throw LDAPEmailRequiredException()
             }
         } else {
             // Checks the source
             if (existingAccount.authenticationSource == LDAPAuthenticationSourceProvider.SOURCE) {
-                // Wrapping the account
-                val user = AccountOntrackUser(existingAccount)
-                // Provides the ACL
-                accountService.withACL(user)
+                createOntrackAuthenticatedUser(existingAccount, userDetails)
             } else {
                 throw LDAPNotALDAPAccountException(username)
             }
         }
     }
 
+    private fun createOntrackAuthenticatedUser(account: Account, userDetails: ExtendedLDAPUserDetails): OntrackAuthenticatedUser {
+        // Wrapping the account
+        val user = AccountOntrackUser(account)
+        // Provides the ACL
+        return accountService.withACL(user)
+    }
+
     override fun additionalAuthenticationChecks(userDetails: UserDetails, authentication: UsernamePasswordAuthenticationToken) {
     }
 
     override fun retrieveUser(username: String, authentication: UsernamePasswordAuthenticationToken): UserDetails =
-            findUser(username, authentication) ?: throw AuthenticationServiceException("Cannot authenticate against LDAP")
+            findUser(username, authentication)
+                    ?: throw AuthenticationServiceException("Cannot authenticate against LDAP")
 
 }
