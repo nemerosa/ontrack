@@ -23,7 +23,7 @@ class ACCGeneral extends AbstractACCDSL {
     @Test
     void access_control() {
         try {
-            anonymous().get("admin/logs")
+            anonymous().get("rest/admin/logs")
             fail("The access should have been denied.")
         } catch (ClientCannotLoginException ignored) {
             // OK
