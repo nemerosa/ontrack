@@ -17,7 +17,7 @@ angular.module('ot.service.user', [
          * Loads the user
          */
         self.getUser = function () {
-            return ot.call($http.get('user'));
+            return ot.call($http.get('rest/user'));
         };
 
         /**

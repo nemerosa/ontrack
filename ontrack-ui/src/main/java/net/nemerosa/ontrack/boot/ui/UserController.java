@@ -20,7 +20,7 @@ import java.util.Collection;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/rest/user")
 public class UserController extends AbstractResourceController {
 
     private final SecurityService securityService;
