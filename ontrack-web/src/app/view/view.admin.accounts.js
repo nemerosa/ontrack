@@ -18,29 +18,26 @@ angular.module('ot.view.admin.accounts', [
         function load() {
             ot.call($http.get('rest/accounts')).then(function (accounts) {
                 $scope.accounts = accounts;
-                // Initial commands
+                // Commands
                 view.commands = [
+                    // Global permissions
                     {
                         id: 'admin-global-acl',
                         name: "Global permissions",
                         cls: 'ot-command-admin-global-acl',
                         link: '/admin-global-acl'
-
                     },
+                    // Group mappings
+                    {
+                        id: 'admin-group-mappings',
+                        name: "Group mappings",
+                        cls: 'ot-command-admin-action',
+                        link: '/admin-group-mappings'
+                    },
+                    // API for this page
                     ot.viewApiCommand(accounts._self),
                     ot.viewCloseCommand('/home')
                 ];
-                // Loads the actions
-                ot.call($http.get(accounts._actions)).then(function (actionResources) {
-                    actionResources.resources.forEach(function (action) {
-                        view.commands.unshift({
-                            id: action.id,
-                            name: action.name,
-                            cls: 'ot-command-admin-action',
-                            link: action.uri
-                        });
-                    });
-                });
                 // Loads the groups
                 return ot.call($http.get('rest/accounts/groups'));
             }).then(function (groups) {
