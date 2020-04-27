@@ -1,30 +1,23 @@
-package net.nemerosa.ontrack.extension.ldap;
+package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.extension.api.AccountMgtActionExtension;
-import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.model.settings.CachedSettingsService;
-import net.nemerosa.ontrack.model.support.Action;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import net.nemerosa.ontrack.extension.api.AccountMgtActionExtension
+import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.support.Action
+import org.springframework.stereotype.Component
 
 @Component
-public class LDAPMappingAccountMgtActionExtension extends AbstractExtension implements AccountMgtActionExtension {
+class LDAPMappingAccountMgtActionExtension(
+        extensionFeature: LDAPExtensionFeature,
+        private val cachedSettingsService: CachedSettingsService
+) : AbstractExtension(extensionFeature), AccountMgtActionExtension {
 
-    private final CachedSettingsService cachedSettingsService;
-
-    @Autowired
-    public LDAPMappingAccountMgtActionExtension(LDAPExtensionFeature extensionFeature, CachedSettingsService cachedSettingsService) {
-        super(extensionFeature);
-        this.cachedSettingsService = cachedSettingsService;
-    }
-
-    @Override
-    public Action getAction() {
-        LDAPSettings settings = cachedSettingsService.getCachedSettings(LDAPSettings.class);
-        if (settings.isEnabled()) {
-            return Action.of("ldap-mapping", "LDAP Mapping", "ldap-mapping");
+    override fun getAction(): Action? {
+        val isEnabled = cachedSettingsService.getCachedSettings(LDAPSettings::class.java).isEnabled
+        return if (isEnabled) {
+            Action.of("ldap-mapping", "LDAP Mapping", "ldap-mapping")
         } else {
-            return null;
+            null
         }
     }
 
