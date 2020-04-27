@@ -1,32 +1,16 @@
-package net.nemerosa.ontrack.extension.ldap;
+package net.nemerosa.ontrack.extension.ldap
 
-// @Component
-public class LDAPAccountGroupContributor /* implements AccountGroupContributor */ {
+import net.nemerosa.ontrack.model.security.AbstractProvidedGroupAccountGroupContributor
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService
+import net.nemerosa.ontrack.model.security.ProvidedGroupsService
+import org.springframework.stereotype.Component
 
-//    private final AccountGroupMappingService accountGroupMappingService;
-//
-//    @Autowired
-//    public LDAPAccountGroupContributor(AccountGroupMappingService accountGroupMappingService) {
-//        this.accountGroupMappingService = accountGroupMappingService;
-//    }
-//
-//    @Override
-//    public Collection<AccountGroup> collectGroups(@NotNull AuthenticatedAccount authenticatedAccount) {
-//        // Gets the list of LDAP groups from the account
-//        Collection<String> ldapGroups = getLdapGroups(authenticatedAccount);
-//        // Maps them to the account groups
-//        return ldapGroups.stream()
-//                .flatMap(ldapGroup -> accountGroupMappingService.getGroups(LDAPExtensionFeature.LDAP_GROUP_MAPPING, ldapGroup).stream())
-//                .collect(Collectors.toList());
-//    }
-//
-//    public static Collection<String> getLdapGroups(@NotNull AuthenticatedAccount authenticatedAccount) {
-//        UserDetails userDetails = authenticatedAccount.getUserDetails();
-//        if (userDetails instanceof ExtendedLDAPUserDetails) {
-//            return ((ExtendedLDAPUserDetails) userDetails).getGroups();
-//        } else {
-//            return Collections.emptyList();
-//        }
-//    }
-
-}
+@Component
+class LDAPAccountGroupContributor(
+        providedGroupsService: ProvidedGroupsService,
+        accountGroupMappingService: AccountGroupMappingService
+) : AbstractProvidedGroupAccountGroupContributor(
+        providedGroupsService,
+        LDAPAuthenticationSourceProvider.SOURCE,
+        accountGroupMappingService
+)

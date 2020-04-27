@@ -1,19 +1,16 @@
-package net.nemerosa.ontrack.model.security;
-
-import javax.validation.constraints.NotNull;
-import java.util.Collection;
+package net.nemerosa.ontrack.model.security
 
 /**
- * FIXME Contributes a list of groups to an account.
+ * Contributes a list of groups to an account.
  */
-public interface AccountGroupContributor {
+interface AccountGroupContributor {
 
     /**
      * Collects the list of groups for this account
      *
-     * @param authenticatedAccount Account with authentication information to collect groups for
-     * @return List of groups (can be empty but not null)
+     * @param account Account
+     * @return List of groups
      */
-    // Collection<AccountGroup> collectGroups(@NotNull AuthenticatedAccount authenticatedAccount);
+    fun collectGroups(account: Account): Collection<AccountGroup>
 
 }
