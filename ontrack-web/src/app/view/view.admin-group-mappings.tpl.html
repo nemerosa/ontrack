@@ -12,7 +12,12 @@
         <thead>
         <tr>
             <td>
-                <input id="filter-provider" class="form-control" ng-model="filterMapping.provider" type="text" placeholder="Filter on provider">
+                <select id="filter-provider" class="form-control"
+                        ng-options="item.source.id as item.source.name for item in sourceProviders"
+                        ng-model="filterMapping.provider"
+                >
+                    <option value="">All</option>
+                </select>
             </td>
             <td>
                 <input id="filter-mapping" class="form-control" ng-model="filterMapping.mapping" type="text" placeholder="Filter on provided group">
