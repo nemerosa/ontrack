@@ -19,7 +19,6 @@ class ProvidedGroupsServiceImpl(
     }
 
     override fun getProvidedGroups(account: Int, source: AuthenticationSource): Set<String> {
-        securityService.checkGlobalFunction(AccountManagement::class.java)
         return providedGroupsRepository.getProvidedGroups(account, source)
     }
 }

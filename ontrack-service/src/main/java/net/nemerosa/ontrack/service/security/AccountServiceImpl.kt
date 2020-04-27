@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.repository.AccountGroupRepository
 import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.repository.RoleRepository
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -28,17 +27,11 @@ class AccountServiceImpl(
         private val accountRepository: AccountRepository,
         private val accountGroupRepository: AccountGroupRepository,
         private val securityService: SecurityService,
-        private val authenticationSourceService: AuthenticationSourceService
+        private val authenticationSourceService: AuthenticationSourceService,
+        private val accountGroupContributors: List<AccountGroupContributor>
 ) : AccountService {
 
     private val passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
-
-    private var accountGroupContributors: Collection<AccountGroupContributor> = emptyList()
-
-    @Autowired(required = false)
-    fun setAccountGroupContributors(accountGroupContributors: Collection<AccountGroupContributor>) {
-        this.accountGroupContributors = accountGroupContributors
-    }
 
     override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
         // Loads the account
@@ -59,7 +52,17 @@ class AccountServiceImpl(
                     )
                 }
         )
-        // FIXME Authorisations from groups contributors
+        // Authorisations from groups contributors
+        groups.addAll(
+                accountGroupContributors.flatMap { contributor ->
+                    contributor.collectGroups(account)
+                }.map { group ->
+                    AuthorizedGroup(
+                            group = group,
+                            authorisations = getGroupACL(group)
+                    )
+                }
+        )
         // OK
         return DefaultOntrackAuthenticatedUser(raw, AuthorizedAccount(account, authorisations), groups.toList())
     }
