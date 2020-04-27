@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class GQLRootQueryAuthenticationSourceProviders(
-        private val authenticationSource: GQLTypeAuthenticationSource,
+        private val authenticationSourceProvider: GQLTypeAuthenticationSourceProvider,
         private val authenticationSourceService: AuthenticationSourceService
 ) : GQLRootQuery {
 
@@ -42,7 +42,7 @@ class GQLRootQueryAuthenticationSourceProviders(
                                 .description("Filters on authentication sources which allow the user's password to be changed")
                                 .type(GraphQLBoolean)
                     }
-                    .type(stdList(authenticationSource.typeRef))
+                    .type(stdList(authenticationSourceProvider.typeRef))
                     .dataFetcher(authenticationSourcesDataFetcher())
                     .build()
 
