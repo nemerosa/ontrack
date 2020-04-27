@@ -21,25 +21,29 @@ angular.module('ot.view.admin-group-mappings', [
 
         let query = `
             query Mappings($provider: String, $mapping: String, $group: String) {
-                authenticationSourceProviders(groupMappingSupported: true) {
-                    enabled
-                    source {
-                      id
-                      name
-                      allowingPasswordChange
-                      groupMappingSupported
-                    }
-                  }
-                  accountGroupMappings(type: $provider, name: $mapping, group: $group) {
-                    id
-                    name
-                    group {
-                      id
-                      name
-                      description
-                    }
-                    type
-                  }
+              authenticationSourceProviders(groupMappingSupported: true) {
+                enabled
+                source {
+                  id
+                  name
+                  allowingPasswordChange
+                  groupMappingSupported
+                }
+              }
+              accountGroupMappings(type: $provider, name: $mapping, group: $group) {
+                id
+                name
+                group {
+                  id
+                  name
+                  description
+                }
+                type
+              }
+              accountGroups {
+                id
+                name
+              }
             }
         `;
 
@@ -55,8 +59,15 @@ angular.module('ot.view.admin-group-mappings', [
             group: ""
         };
 
+        $scope.mappingForm = {
+            provider: "",
+            mapping: "",
+            group: ""
+        };
+
         let loadMappings = () => {
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.groups = data.accountGroups;
                 $scope.mappings = data.accountGroupMappings;
                 $scope.sourceProviders = data.authenticationSourceProviders;
                 $scope.sourceProvidersIndex = {};
@@ -83,6 +94,25 @@ angular.module('ot.view.admin-group-mappings', [
             queryVariables.mapping = $scope.filterMapping.mapping;
             queryVariables.group = $scope.filterMapping.group;
             loadMappings();
+        };
+
+        $scope.formClear = () => {
+            $scope.mappingForm.mapping = "";
+            $scope.mappingForm.provider = "";
+            $scope.mappingForm.group = "";
+        };
+
+        $scope.createMapping = () => {
+            let data = $scope.mappingForm;
+            if (data.mapping && data.provider && data.group) {
+                ot.pageCall($http.post(`rest/group-mappings/${data.provider}`, {
+                    name: data.mapping,
+                    group: data.group
+                })).then((groupMapping) => {
+                    loadMappings();
+                    $scope.formClear();
+                });
+            }
         };
     })
 ;

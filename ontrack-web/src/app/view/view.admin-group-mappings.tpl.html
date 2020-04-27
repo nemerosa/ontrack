@@ -10,6 +10,37 @@
         </tr>
         </thead>
         <thead>
+            <tr class="info">
+                <td>
+                    <select id="form-provider" class="form-control"
+                            ng-options="item.source.id as item.source.name for item in sourceProviders"
+                            ng-model="mappingForm.provider"
+                    >
+                        <option value=""></option>
+                    </select>
+                </td>
+                <td>
+                    <input id="form-mapping" class="form-control" ng-model="mappingForm.mapping" type="text" placeholder="Provided group">
+                </td>
+                <td>
+                    <select id="form-group" class="form-control"
+                            ng-options="group.id as group.name for group in groups"
+                            ng-model="mappingForm.group"
+                    >
+                        <option value=""></option>
+                    </select>
+                </td>
+                <td>
+                    <button id="form-button" class="btn btn-primary" ng-click="createMapping()" title="Creates a new mapping">
+                        <span class="fa fa-plus"></span>
+                    </button>
+                    <button id="form-clear" class="btn btn-default" ng-click="formClear()" title="Clears the mapping form">
+                        <span class="fa fa-ban"></span>
+                    </button>
+                </td>
+            </tr>
+        </thead>
+        <thead>
         <tr>
             <td>
                 <select id="filter-provider" class="form-control"
