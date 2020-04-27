@@ -2,18 +2,16 @@ package net.nemerosa.ontrack.extension.ldap
 
 import net.nemerosa.ontrack.extension.ldap.support.UnboundIdContainer
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.security.AccountInput
-import net.nemerosa.ontrack.model.security.ProvidedGroupsService
+import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 /**
  * Integration tests for authentication w/ LDAP.
@@ -25,6 +23,9 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var providedGroupsService: ProvidedGroupsService
+
+    @Autowired
+    private lateinit var accountGroupMappingService: AccountGroupMappingService
 
     @After
     fun after() {
@@ -77,6 +78,30 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
                         setOf("admin", "user"),
                         groups
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `Group mapping`() {
+
+        // Creates some Ontrack groups
+        val ontrackGroupName = uid("G")
+        val ontrackGroup = asAdmin {
+            accountService.createGroup(AccountGroupInput(ontrackGroupName, "", false))
+        }
+
+        // Creates a mapping between a LDAP group and this group
+        accountGroupMappingService.newMapping("ldap", AccountGroupMappingInput("user", ontrackGroup.id))
+
+        // Cleanup & Authentication
+        setLDAPSettings()
+        deleteAccount("bilbo")
+        val user = authenticationProvider.findUser("bilbo", UsernamePasswordAuthenticationToken("bilbo", "password"))
+        assertNotNull(user) {
+            assertIs<DefaultOntrackAuthenticatedUser>(it) { user ->
+                val groups = user.groups.map { ag -> ag.group }
+                assertTrue(ontrackGroup in groups, "Group granted through LDAP")
             }
         }
     }
