@@ -31,7 +31,9 @@
                     </select>
                 </td>
                 <td>
-                    <button id="form-button" class="btn btn-primary" ng-click="createMapping()" title="Creates a new mapping">
+                    <button id="form-button" class="btn btn-primary" ng-click="createMapping()"
+                            ng-disabled="!mappingForm.group || !mappingForm.provider || !mappingForm.mapping"
+                            title="Creates a new mapping">
                         <span class="fa fa-plus"></span>
                     </button>
                     <button id="form-clear" class="btn btn-default" ng-click="formClear()" title="Clears the mapping form">
@@ -78,7 +80,9 @@
                 <p class="ot-description">{{mapping.group.description}}</p>
             </td>
             <td>
-
+                <button class="btn btn-warning" ng-click="deleteMapping(mapping)" title="Deletes this mapping">
+                    <span class="fa fa-trash"></span>
+                </button>
             </td>
         </tr>
         </tbody>

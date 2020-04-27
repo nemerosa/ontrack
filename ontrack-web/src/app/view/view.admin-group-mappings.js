@@ -114,5 +114,9 @@ angular.module('ot.view.admin-group-mappings', [
                 });
             }
         };
+
+        $scope.deleteMapping = (mapping) => {
+            ot.pageCall($http.delete(`rest/group-mappings/${mapping.provider.source.id}/${mapping.id}`)).then(loadMappings);
+        };
     })
 ;
