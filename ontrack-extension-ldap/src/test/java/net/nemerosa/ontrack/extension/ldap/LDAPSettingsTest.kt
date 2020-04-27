@@ -32,16 +32,16 @@ class LDAPSettingsTest {
 
     @Test
     fun `Parsing of default JSON`() {
-        val json = """{"enabled":false,"url":null,"searchBase":null,"searchFilter":null,"user":null,"password":null,"fullNameAttribute":null,"emailAttribute":null,"groupAttribute":null,"groupFilter":null,"groupNameAttribute":null,"groupSearchBase":null,"groupSearchFilter":null}"""
+        val json = """{"enabled":false,"url":"","searchBase":"","searchFilter":"","user":"","password":"","fullNameAttribute":null,"emailAttribute":null,"groupAttribute":null,"groupFilter":null,"groupNameAttribute":null,"groupSearchBase":null,"groupSearchFilter":null}"""
         val node = json.parseAsJson()
         val settings = node.parse<LDAPSettings>()
         settings.apply {
             assertEquals(false, isEnabled)
-            assertNull(url)
-            assertNull(searchBase)
-            assertNull(searchFilter)
-            assertNull(user)
-            assertNull(password)
+            assertEquals("", url)
+            assertEquals("", searchBase)
+            assertEquals("", searchFilter)
+            assertEquals("", user)
+            assertEquals("", password)
             assertNull(fullNameAttribute)
             assertNull(emailAttribute)
             assertNull(groupAttribute)
