@@ -10,4 +10,9 @@ interface AuthenticationSourceProvider {
      * Gets the source descriptor
      */
     val source: AuthenticationSource
+
+    /**
+     * Is this provided enabled?
+     */
+    val isEnabled: Boolean
 }

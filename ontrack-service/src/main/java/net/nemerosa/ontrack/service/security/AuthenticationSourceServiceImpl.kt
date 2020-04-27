@@ -13,6 +13,9 @@ class AuthenticationSourceServiceImpl(providers: Collection<AuthenticationSource
         it.source.id
     }
 
+    override val authenticationSourceProviders: List<AuthenticationSourceProvider>
+        get() = providers.values.sortedBy { it.source.id }
+
     override val authenticationSources: List<AuthenticationSource>
         get() = providers.values.map { it.source }.sortedBy { it.id }
 

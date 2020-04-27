@@ -19,4 +19,5 @@ class BuiltinAuthenticationSourceProvider : AuthenticationSourceProvider {
 
     override val source = SOURCE
 
+    override val isEnabled: Boolean = true
 }

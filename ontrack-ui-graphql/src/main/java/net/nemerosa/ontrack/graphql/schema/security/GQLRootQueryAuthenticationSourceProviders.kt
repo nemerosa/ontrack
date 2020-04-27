@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql.schema.security.mappings
+package net.nemerosa.ontrack.graphql.schema.security
 
 import graphql.Scalars.GraphQLBoolean
 import graphql.schema.DataFetcher
@@ -12,20 +12,26 @@ import org.springframework.stereotype.Component
  * List of all authentication sources.
  */
 @Component
-class GQLRootQueryAuthenticationSources(
+class GQLRootQueryAuthenticationSourceProviders(
         private val authenticationSource: GQLTypeAuthenticationSource,
         private val authenticationSourceService: AuthenticationSourceService
 ) : GQLRootQuery {
 
     companion object {
+        const val ARG_ENABLED = "enabled"
         const val ARG_GROUP_MAPPING_SUPPORTED = "groupMappingSupported"
         const val ARG_ALLOWING_PASSWORD_CHANGE = "allowingPasswordChange"
     }
 
     override fun getFieldDefinition(): GraphQLFieldDefinition =
             GraphQLFieldDefinition.newFieldDefinition()
-                    .name("authenticationSources")
-                    .description("List of all authentication sources.")
+                    .name("authenticationSourceProviders")
+                    .description("List of all authentication source providers.")
+                    .argument {
+                        it.name(ARG_ENABLED)
+                                .description("Filters on authentication source providers which are enabled")
+                                .type(GraphQLBoolean)
+                    }
                     .argument {
                         it.name(ARG_GROUP_MAPPING_SUPPORTED)
                                 .description("Filters on authentication sources which support group mapping")
@@ -41,11 +47,13 @@ class GQLRootQueryAuthenticationSources(
                     .build()
 
     private fun authenticationSourcesDataFetcher() = DataFetcher { env ->
+        val enabled: Boolean? = env.getArgument(ARG_ENABLED)
         val groupMappingSupported: Boolean? = env.getArgument(ARG_GROUP_MAPPING_SUPPORTED)
         val allowingPasswordChange: Boolean? = env.getArgument(ARG_ALLOWING_PASSWORD_CHANGE)
-        authenticationSourceService.authenticationSources
-                .filter { groupMappingSupported == null || groupMappingSupported == it.isGroupMappingSupported }
-                .filter { allowingPasswordChange == null || allowingPasswordChange == it.isAllowingPasswordChange }
+        authenticationSourceService.authenticationSourceProviders
+                .filter { enabled == null || enabled == it.isEnabled }
+                .filter { groupMappingSupported == null || groupMappingSupported == it.source.isGroupMappingSupported }
+                .filter { allowingPasswordChange == null || allowingPasswordChange == it.source.isAllowingPasswordChange }
     }
 
 }

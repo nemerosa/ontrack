@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.graphql.schema.security.mappings
+package net.nemerosa.ontrack.graphql.schema.security
 
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
