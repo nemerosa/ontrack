@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.ldap
 import net.nemerosa.ontrack.extension.ldap.support.UnboundIdContainer
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.AccountInput
-import net.nemerosa.ontrack.test.assertIs
+import net.nemerosa.ontrack.model.security.ProvidedGroupsService
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -22,6 +22,9 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var authenticationProvider: LDAPCachedAuthenticationProvider
+
+    @Autowired
+    private lateinit var providedGroupsService: ProvidedGroupsService
 
     @After
     fun after() {
@@ -62,15 +65,17 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
         deleteAccount(ADMIN_USER)
         val user = authenticationProvider.findUser(ADMIN_USER, UsernamePasswordAuthenticationToken(ADMIN_USER, ADMIN_PASSWORD))
         assertNotNull(user) {
+            val id = it.account.id()
             assertEquals(LDAPAuthenticationSourceProvider.SOURCE.id, it.account.authenticationSource.id)
             assertEquals(ADMIN_USER, it.username)
             assertEquals("", it.password)
             assertEquals("Damien Coraboeuf", it.account.fullName)
             // Groups
-            assertIs<LDAPOntrackAuthenticatedUser>(it) { l ->
+            asAdmin {
+                val groups = providedGroupsService.getProvidedGroups(id, LDAPAuthenticationSourceProvider.SOURCE)
                 assertEquals(
                         setOf("admin", "user"),
-                        l.ldapGroups.toSet()
+                        groups
                 )
             }
         }
@@ -90,10 +95,11 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
                 assertEquals(id, s.account.id())
             }
             // Groups
-            assertIs<LDAPOntrackAuthenticatedUser>(it) { l ->
+            asAdmin {
+                val groups = providedGroupsService.getProvidedGroups(id, LDAPAuthenticationSourceProvider.SOURCE)
                 assertEquals(
                         setOf("user"),
-                        l.ldapGroups.toSet()
+                        groups
                 )
             }
         }

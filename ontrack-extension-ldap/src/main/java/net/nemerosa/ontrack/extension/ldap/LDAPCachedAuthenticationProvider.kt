@@ -21,7 +21,8 @@ class LDAPCachedAuthenticationProvider(
         private val accountService: AccountService,
         private val ldapProviderFactory: LDAPProviderFactory,
         private val securityService: SecurityService,
-        private val applicationLogService: ApplicationLogService
+        private val applicationLogService: ApplicationLogService,
+        private val providedGroupsService: ProvidedGroupsService
 ) : AbstractUserDetailsAuthenticationProvider() {
 
     internal fun findUser(username: String, authentication: UsernamePasswordAuthenticationToken): OntrackAuthenticatedUser? {
@@ -102,8 +103,14 @@ class LDAPCachedAuthenticationProvider(
     private fun createOntrackAuthenticatedUser(account: Account, userDetails: ExtendedLDAPUserDetails): OntrackAuthenticatedUser {
         // Wrapping the account
         val user = AccountOntrackUser(account)
+        // Gets the groups provided by the LDAP
+        val groups = userDetails.groups.toSet()
+        // Registers the groups
+        securityService.asAdmin {
+            providedGroupsService.saveProvidedGroups(account.id(), LDAPAuthenticationSourceProvider.SOURCE, groups)
+        }
         // Provides the ACL
-        return LDAPOntrackAuthenticatedUser(accountService.withACL(user), userDetails)
+        return accountService.withACL(user)
     }
 
     override fun additionalAuthenticationChecks(userDetails: UserDetails, authentication: UsernamePasswordAuthenticationToken) {

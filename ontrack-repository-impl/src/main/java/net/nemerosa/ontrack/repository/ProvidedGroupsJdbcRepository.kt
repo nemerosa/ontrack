@@ -6,6 +6,11 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository
 import javax.sql.DataSource
 
+/**
+ * Maximum length for a group name
+ */
+const val GROUP_NAME_MAX_LENGTH = 80
+
 @Repository
 class ProvidedGroupsJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(dataSource), ProvidedGroupsRepository {
 
@@ -19,8 +24,10 @@ class ProvidedGroupsJdbcRepository(dataSource: DataSource) : AbstractJdbcReposit
         val params = params("account", account).addValue("mode", source.id)
         namedParameterJdbcTemplate!!.batchUpdate(
                 "INSERT INTO PROVIDED_GROUPS(ACCOUNT, MODE, GROUP_NAME) VALUES (:account, :mode, :groupName)",
-                groups.map { group ->
-                    MapSqlParameterSource(params.values).addValue("group", group)
+                groups.filter { group ->
+                    group.length <= GROUP_NAME_MAX_LENGTH
+                }.map { group ->
+                    MapSqlParameterSource(params.values).addValue("groupName", group)
                 }.toTypedArray()
         )
     }
