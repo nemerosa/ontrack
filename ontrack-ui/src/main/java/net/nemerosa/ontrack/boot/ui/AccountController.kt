@@ -1,15 +1,11 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.extension.api.AccountMgtActionExtension
-import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.form.Form.Companion.create
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.Action
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
@@ -23,8 +19,7 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/rest/accounts")
 class AccountController(
-        private val accountService: AccountService,
-        private val extensionManager: ExtensionManager
+        private val accountService: AccountService
 ) : AbstractResourceController() {
     /**
      * List of accounts
@@ -35,18 +30,6 @@ class AccountController(
             uri(MvcUriComponentsBuilder.on(javaClass).getAccounts())
     )
             .with(Link.CREATE, uri(MvcUriComponentsBuilder.on(AccountController::class.java).getCreationForm()))
-            .with("_actions", uri(MvcUriComponentsBuilder.on(AccountController::class.java).getAccountMgtActions()))
-
-    /**
-     * Action management contributions
-     */
-    @GetMapping("actions")
-    fun getAccountMgtActions(): Resources<Action> = Resources.of(
-            extensionManager.getExtensions(AccountMgtActionExtension::class.java).stream()
-                    .map { actionExtension: AccountMgtActionExtension? -> this.resolveExtensionAction(actionExtension) }
-                    .filter { action: Action? -> action != null },
-            uri(MvcUriComponentsBuilder.on(AccountController::class.java).getAccountMgtActions())
-    )
 
     /**
      * Form to create a built-in account
