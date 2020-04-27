@@ -9,6 +9,27 @@
             <th>&nbsp;</th>
         </tr>
         </thead>
+        <thead>
+        <tr>
+            <td>
+                <input id="filter-provider" class="form-control" ng-model="filterMapping.provider" type="text" placeholder="Filter on provider">
+            </td>
+            <td>
+                <input id="filter-mapping" class="form-control" ng-model="filterMapping.mapping" type="text" placeholder="Filter on provided group">
+            </td>
+            <td>
+                <input id="filter-group" class="form-control" ng-model="filterMapping.group" type="text" placeholder="Filter on Ontrack group">
+            </td>
+            <td>
+                <button id="filter-button" class="btn btn-default" ng-click="filterLaunch()" title="Filter">
+                    <span class="fa fa-search"></span>
+                </button>
+                <button id="filter-clear" class="btn btn-default" ng-click="filterClear()" title="Clears the filter">
+                    <span class="fa fa-ban"></span>
+                </button>
+            </td>
+        </tr>
+        </thead>
         <tbody>
         <tr ng-repeat="mapping in mappings">
             <td>

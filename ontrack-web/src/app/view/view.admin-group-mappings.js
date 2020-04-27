@@ -20,7 +20,7 @@ angular.module('ot.view.admin-group-mappings', [
         ];
 
         let query = `
-            query Mappings {
+            query Mappings($provider: String, $mapping: String, $group: String) {
                 authenticationSourceProviders(groupMappingSupported: true) {
                     enabled
                     source {
@@ -30,7 +30,7 @@ angular.module('ot.view.admin-group-mappings', [
                       groupMappingSupported
                     }
                   }
-                  accountGroupMappings {
+                  accountGroupMappings(type: $provider, name: $mapping, group: $group) {
                     id
                     name
                     group {
@@ -43,7 +43,17 @@ angular.module('ot.view.admin-group-mappings', [
             }
         `;
 
-        let queryVariables = {};
+        let queryVariables = {
+            provider: "",
+            mapping: "",
+            group: ""
+        };
+
+        $scope.filterMapping = {
+            provider: "",
+            mapping: "",
+            group: ""
+        };
 
         let loadMappings = () => {
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
@@ -60,5 +70,19 @@ angular.module('ot.view.admin-group-mappings', [
         };
 
         loadMappings();
+
+        $scope.filterClear = () => {
+            $scope.filterMapping.mapping = "";
+            $scope.filterMapping.provider = "";
+            $scope.filterMapping.group = "";
+            $scope.filterLaunch();
+        };
+
+        $scope.filterLaunch = () => {
+            queryVariables.provider = $scope.filterMapping.provider;
+            queryVariables.mapping = $scope.filterMapping.mapping;
+            queryVariables.group = $scope.filterMapping.group;
+            loadMappings();
+        };
     })
 ;

@@ -46,18 +46,18 @@ class GQLRootQueryAdminAccountGroupMappings(
         var filter = { _: AccountGroupMapping -> true }
         // Filter on name
         val nameArgument: String? = environment.getArgument<String>(MAPPING_NAME_ARGUMENT)
-        if (nameArgument != null) {
+        if (nameArgument != null && nameArgument.isNotBlank()) {
             filter = filter and { agm: AccountGroupMapping -> agm.name.contains(nameArgument, ignoreCase = true) }
         }
         // Filter on group
         val groupArgument: String? = environment.getArgument<String>(MAPPING_GROUP_ARGUMENT)
-        if (groupArgument != null) {
+        if (groupArgument != null && groupArgument.isNotBlank()) {
             filter = filter.and { agm: AccountGroupMapping -> agm.group.name.contains(groupArgument, ignoreCase = true) }
         }
         // Filter on type
         val typeArgument: String? = environment.getArgument<String>(MAPPING_TYPE_ARGUMENT)
         // Getting the unfiltered list
-        val unfiltered = if (typeArgument != null) {
+        val unfiltered = if (typeArgument != null && typeArgument.isNotBlank()) {
             accountGroupMappingService.getMappings(typeArgument)
         } else {
             accountGroupMappingService.mappings
