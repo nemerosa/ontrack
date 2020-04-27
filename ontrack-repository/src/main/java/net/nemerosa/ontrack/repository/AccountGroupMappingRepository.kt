@@ -70,4 +70,9 @@ interface AccountGroupMappingRepository {
      * @return List of mappings (never null)
      */
     fun getMappingsForGroup(group: AccountGroup): List<AccountGroupMapping>
+
+    /**
+     * Gets all mappings
+     */
+    fun findAll(): List<AccountGroupMapping>
 }

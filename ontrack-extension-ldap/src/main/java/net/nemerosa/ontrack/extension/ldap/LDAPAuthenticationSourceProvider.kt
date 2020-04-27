@@ -13,7 +13,8 @@ class LDAPAuthenticationSourceProvider : AuthenticationSourceProvider {
         val SOURCE = AuthenticationSource(
                 id = "ldap",
                 name = "LDAP authentication",
-                isAllowingPasswordChange = false
+                isAllowingPasswordChange = false,
+                isGroupMappingSupported = true
         )
     }
 }

@@ -35,10 +35,18 @@ class AccountGroupMappingJdbcRepository(
     override fun getMappings(mapping: String): List<AccountGroupMapping> {
         return namedParameterJdbcTemplate!!
                 .query(
-                        "SELECT * FROM ACCOUNT_GROUP_MAPPING WHERE MAPPING = :mapping ORDER BY SOURCE",
+                        "SELECT * FROM ACCOUNT_GROUP_MAPPING WHERE MAPPING = :mapping ORDER BY SOURCE, MAPPING",
                         params("mapping", mapping)) { rs: ResultSet, rowNum: Int ->
                     toAccountGroupMapping(rs, rowNum)
                 }
+    }
+
+    override fun findAll(): List<AccountGroupMapping> {
+        return jdbcTemplate!!.query(
+                "SELECT * FROM ACCOUNT_GROUP_MAPPING ORDER BY SOURCE, MAPPING"
+        ) { rs: ResultSet, rowNum: Int ->
+            toAccountGroupMapping(rs, rowNum)
+        }
     }
 
     override fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping {

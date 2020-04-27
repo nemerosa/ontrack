@@ -19,6 +19,11 @@ interface AccountGroupMappingService {
     fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup>
 
     /**
+     * Gets ALL the mappings
+     */
+    val mappings: List<AccountGroupMapping>
+
+    /**
      * For the given [mapping][AuthenticationSource.id] type, collects the [mappings][AccountGroupMapping].
      *
      * @param mapping Mapping type, for example: "ldap"

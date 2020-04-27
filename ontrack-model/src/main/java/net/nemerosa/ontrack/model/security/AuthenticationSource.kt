@@ -10,7 +10,9 @@ data class AuthenticationSource(
         val id: String,
         val name: String,
         @JsonProperty("allowingPasswordChange")
-        val isAllowingPasswordChange: Boolean = false
+        val isAllowingPasswordChange: Boolean = false,
+        @JsonProperty("groupMappingSupported")
+        val isGroupMappingSupported: Boolean = false
 ) : Serializable {
 
     companion object {

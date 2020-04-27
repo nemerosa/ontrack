@@ -20,6 +20,9 @@ class AccountGroupMappingServiceImpl(
     override fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup> =
             accountGroupMappingRepository.getGroups(mapping, mappedName)
 
+    override val mappings: List<AccountGroupMapping>
+        get() = accountGroupMappingRepository.findAll()
+
     override fun getMappings(mapping: String): List<AccountGroupMapping> =
             accountGroupMappingRepository.getMappings(mapping)
 
