@@ -48,6 +48,14 @@ angular.module('ot.view.admin-group-mappings', [
         let loadMappings = () => {
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.mappings = data.accountGroupMappings;
+                $scope.sourceProviders = data.authenticationSourceProviders;
+                $scope.sourceProvidersIndex = {};
+                $scope.sourceProviders.forEach((sourceProvider) => {
+                    $scope.sourceProvidersIndex[sourceProvider.source.id] = sourceProvider;
+                });
+                $scope.mappings.forEach((mapping) => {
+                    mapping.provider =  $scope.sourceProvidersIndex[mapping.type];
+                });
             });
         };
 

@@ -12,7 +12,10 @@
         <tbody>
         <tr ng-repeat="mapping in mappings">
             <td>{{mapping.name}}</td>
-            <td>{{mapping.type}}</td>
+            <td>
+                <span ng-if="mapping.provider.enabled" title="This mapping is active."><span class="fa fa-check text-success"></span> {{mapping.provider.source.name}}</span>
+                <span ng-if="!mapping.provider.enabled" title="This mapping is inactive."><span class="fa times text-danger"></span> {{mapping.provider.source.name}}</span>
+            </td>
             <td>
                 {{mapping.group.name}}
                 <p class="ot-description">{{mapping.group.description}}</p>
