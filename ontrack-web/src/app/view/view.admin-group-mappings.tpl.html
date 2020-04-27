@@ -1,0 +1,24 @@
+<ot-view>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Provided group</th>
+            <th>Provider</th>
+            <th>Ontrack group</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="mapping in mappings">
+            <td>{{mapping.name}}</td>
+            <td>{{mapping.type}}</td>
+            <td>
+                {{mapping.group.name}}
+                <p class="ot-description">{{mapping.group.description}}</p>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>
