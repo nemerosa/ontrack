@@ -1,71 +1,52 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingWrongTypeException;
-import net.nemerosa.ontrack.model.security.AccountGroup;
-import net.nemerosa.ontrack.model.security.AccountGroupMapping;
-import net.nemerosa.ontrack.model.security.AccountGroupMappingInput;
-import net.nemerosa.ontrack.model.security.AccountGroupMappingService;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.repository.AccountGroupMappingRepository;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collection;
-import java.util.List;
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingWrongTypeException
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AccountGroupMapping
+import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.repository.AccountGroupMappingRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-public class AccountGroupMappingServiceImpl implements AccountGroupMappingService {
+class AccountGroupMappingServiceImpl(
+        private val accountGroupMappingRepository: AccountGroupMappingRepository
+) : AccountGroupMappingService {
 
-    private final AccountGroupMappingRepository accountGroupMappingRepository;
+    override fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup> =
+            accountGroupMappingRepository.getGroups(mapping, mappedName)
 
-    @Autowired
-    public AccountGroupMappingServiceImpl(AccountGroupMappingRepository accountGroupMappingRepository) {
-        this.accountGroupMappingRepository = accountGroupMappingRepository;
-    }
+    override fun getMappings(mapping: String): List<AccountGroupMapping> =
+            accountGroupMappingRepository.getMappings(mapping)
 
-    @Override
-    public Collection<AccountGroup> getGroups(String mapping, String mappedName) {
-        return accountGroupMappingRepository.getGroups(mapping, mappedName);
-    }
+    override fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping =
+            accountGroupMappingRepository.newMapping(mapping, input)
 
-    @Override
-    public List<AccountGroupMapping> getMappings(String mapping) {
-        return accountGroupMappingRepository.getMappings(mapping);
-    }
-
-    @Override
-    public AccountGroupMapping newMapping(String mapping, AccountGroupMappingInput input) {
-        return accountGroupMappingRepository.newMapping(mapping, input);
-    }
-
-    @Override
-    public AccountGroupMapping getMapping(String mapping, ID id) {
-        AccountGroupMapping o = accountGroupMappingRepository.getMapping(id);
-        if (StringUtils.equals(mapping, o.getType())) {
-            return o;
+    override fun getMapping(mapping: String, id: ID): AccountGroupMapping {
+        val o = accountGroupMappingRepository.getMapping(id)
+        return if (mapping == o.type) {
+            o
         } else {
-            throw new AccountGroupMappingWrongTypeException(mapping, o.getType());
+            throw AccountGroupMappingWrongTypeException(mapping, o.type)
         }
     }
 
-    @Override
-    public AccountGroupMapping updateMapping(String mapping, ID id, AccountGroupMappingInput input) {
-        getMapping(mapping, id);
-        return accountGroupMappingRepository.updateMapping(id, input);
+    override fun updateMapping(mapping: String, id: ID, input: AccountGroupMappingInput): AccountGroupMapping {
+        getMapping(mapping, id)
+        return accountGroupMappingRepository.updateMapping(id, input)
     }
 
-    @Override
-    public Ack deleteMapping(String mapping, ID id) {
-        getMapping(mapping, id);
-        return accountGroupMappingRepository.deleteMapping(id);
+    override fun deleteMapping(mapping: String, id: ID): Ack {
+        getMapping(mapping, id)
+        return accountGroupMappingRepository.deleteMapping(id)
     }
 
-    @Override
-    public List<AccountGroupMapping> getMappingsForGroup(AccountGroup group) {
-        return accountGroupMappingRepository.getMappingsForGroup(group);
+    override fun getMappingsForGroup(group: AccountGroup): List<AccountGroupMapping> {
+        return accountGroupMappingRepository.getMappingsForGroup(group)
     }
+
 }

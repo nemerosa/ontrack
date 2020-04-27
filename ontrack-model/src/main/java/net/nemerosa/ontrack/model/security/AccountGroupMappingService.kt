@@ -1,33 +1,30 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.security
 
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.structure.ID;
-
-import java.util.Collection;
-import java.util.List;
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.structure.ID
 
 /**
- * Generic mapping for the account groups.
+ * Management of mappings between provided groups (by a LDAP system for example)
+ * and actual Ontrack [group][AccountGroup].
  */
-public interface AccountGroupMappingService {
-
+interface AccountGroupMappingService {
     /**
-     * For the given {@code mapping} type, collects the {@link AccountGroup} which are associated
-     * with the {@code mappedName} name.
+     * For the given [mapping][AuthenticationSource.id] type, collects the [AccountGroup] which are associated
+     * with the [mappedName] name.
      *
-     * @param mapping    Mapping type, for example: "ldap"
+     * @param mapping    Mapping type, for example: "ldap", mapped to [AuthenticationSource.id]
      * @param mappedName Mapping name, for example: "Administrator"
-     * @return List of mapped groups, can be empty, but not null
+     * @return List of mapped groups
      */
-    Collection<AccountGroup> getGroups(String mapping, String mappedName);
+    fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup>
 
     /**
-     * For the given {@code mapping} type, collects the {@linkplain AccountGroupMapping mappings}.
+     * For the given [mapping][AuthenticationSource.id] type, collects the [mappings][AccountGroupMapping].
      *
      * @param mapping Mapping type, for example: "ldap"
-     * @return List of mappings, can be empty, but not null
+     * @return List of mappings
      */
-    List<AccountGroupMapping> getMappings(String mapping);
+    fun getMappings(mapping: String): List<AccountGroupMapping>
 
     /**
      * Creates a new mapping
@@ -36,7 +33,7 @@ public interface AccountGroupMappingService {
      * @param input   Input data for the mapping
      * @return Created mapping
      */
-    AccountGroupMapping newMapping(String mapping, AccountGroupMappingInput input);
+    fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping
 
     /**
      * Gets a mapping by its ID
@@ -45,7 +42,7 @@ public interface AccountGroupMappingService {
      * @param id      ID of the mapping
      * @return Mapping
      */
-    AccountGroupMapping getMapping(String mapping, ID id);
+    fun getMapping(mapping: String, id: ID): AccountGroupMapping
 
     /**
      * Updates a mapping
@@ -53,9 +50,9 @@ public interface AccountGroupMappingService {
      * @param mapping Mapping type, for example: "ldap"
      * @param id      ID of the mapping
      * @param input   Input data for the mapping
-     * @return Created mapping
+     * @return Updated mapping
      */
-    AccountGroupMapping updateMapping(String mapping, ID id, AccountGroupMappingInput input);
+    fun updateMapping(mapping: String, id: ID, input: AccountGroupMappingInput): AccountGroupMapping
 
     /**
      * Deletes a mapping
@@ -64,7 +61,7 @@ public interface AccountGroupMappingService {
      * @param id      ID of the mapping
      * @return Acknowledgment
      */
-    Ack deleteMapping(String mapping, ID id);
+    fun deleteMapping(mapping: String, id: ID): Ack
 
     /**
      * Gets the list of mappings for a given group.
@@ -72,5 +69,6 @@ public interface AccountGroupMappingService {
      * @param group Group to get the mappings to
      * @return List of mappings (never null)
      */
-    List<AccountGroupMapping> getMappingsForGroup(AccountGroup group);
+    fun getMappingsForGroup(group: AccountGroup): List<AccountGroupMapping>
+
 }

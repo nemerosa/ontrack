@@ -1,36 +1,33 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.security.AccountGroup;
-import net.nemerosa.ontrack.model.security.AccountGroupMapping;
-import net.nemerosa.ontrack.model.security.AccountGroupMappingInput;
-import net.nemerosa.ontrack.model.structure.ID;
-
-import java.util.Collection;
-import java.util.List;
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AccountGroupMapping
+import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
+import net.nemerosa.ontrack.model.structure.ID
 
 /**
  * Generic mapping for the account groups.
  */
-public interface AccountGroupMappingRepository {
+interface AccountGroupMappingRepository {
 
     /**
-     * For the given {@code mapping} type, collects the {@link AccountGroup} which are associated
-     * with the {@code mappedName} name.
+     * For the given `mapping` type, collects the [AccountGroup] which are associated
+     * with the `mappedName` name.
      *
      * @param mapping    Mapping type, for example: "ldap"
      * @param mappedName Mapping name, for example: "Administrator"
      * @return List of mapped groups, can be empty, but not null
      */
-    Collection<AccountGroup> getGroups(String mapping, String mappedName);
+    fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup>
 
     /**
-     * For the given {@code mapping} type, collects the {@linkplain AccountGroupMapping mappings}.
+     * For the given `mapping` type, collects the [mappings][AccountGroupMapping].
      *
      * @param mapping Mapping type, for example: "ldap"
      * @return List of mappings, can be empty, but not null
      */
-    List<AccountGroupMapping> getMappings(String mapping);
+    fun getMappings(mapping: String): List<AccountGroupMapping>
 
     /**
      * Creates a new mapping
@@ -39,7 +36,7 @@ public interface AccountGroupMappingRepository {
      * @param input   Input data for the mapping
      * @return Created mapping
      */
-    AccountGroupMapping newMapping(String mapping, AccountGroupMappingInput input);
+    fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping
 
     /**
      * Gets a mapping by its ID
@@ -47,7 +44,7 @@ public interface AccountGroupMappingRepository {
      * @param id ID of the mapping
      * @return Mapping
      */
-    AccountGroupMapping getMapping(ID id);
+    fun getMapping(id: ID): AccountGroupMapping
 
     /**
      * Updates a mapping
@@ -56,7 +53,7 @@ public interface AccountGroupMappingRepository {
      * @param input Input data for the mapping
      * @return Updated mapping
      */
-    AccountGroupMapping updateMapping(ID id, AccountGroupMappingInput input);
+    fun updateMapping(id: ID, input: AccountGroupMappingInput): AccountGroupMapping
 
     /**
      * Deletes a mapping
@@ -64,7 +61,7 @@ public interface AccountGroupMappingRepository {
      * @param id ID of the mapping
      * @return Acknowledgment
      */
-    Ack deleteMapping(ID id);
+    fun deleteMapping(id: ID): Ack
 
     /**
      * Gets the list of mappings for a given group.
@@ -72,5 +69,5 @@ public interface AccountGroupMappingRepository {
      * @param group Group to get the mappings to
      * @return List of mappings (never null)
      */
-    List<AccountGroupMapping> getMappingsForGroup(AccountGroup group);
+    fun getMappingsForGroup(group: AccountGroup): List<AccountGroupMapping>
 }
