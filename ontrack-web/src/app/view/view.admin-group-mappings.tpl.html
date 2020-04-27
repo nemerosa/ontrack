@@ -3,22 +3,25 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>Provided group</th>
             <th>Provider</th>
+            <th>Provided group</th>
             <th>Ontrack group</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="mapping in mappings">
-            <td>{{mapping.name}}</td>
             <td>
                 <span ng-if="mapping.provider.enabled" title="This mapping is active."><span class="fa fa-check text-success"></span> {{mapping.provider.source.name}}</span>
                 <span ng-if="!mapping.provider.enabled" title="This mapping is inactive."><span class="fa times text-danger"></span> {{mapping.provider.source.name}}</span>
             </td>
+            <td>{{mapping.name}}</td>
             <td>
                 {{mapping.group.name}}
                 <p class="ot-description">{{mapping.group.description}}</p>
+            </td>
+            <td>
+
             </td>
         </tr>
         </tbody>
