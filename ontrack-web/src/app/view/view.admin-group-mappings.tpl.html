@@ -20,7 +20,13 @@
                     </select>
                 </td>
                 <td>
-                    <input id="form-mapping" class="form-control" ng-model="mappingForm.mapping" type="text" placeholder="Provided group">
+                    <input type="text" class="form-control"
+                           id="form-mapping"
+                           placeholder="Provided group"
+                           ng-model="mappingForm.mapping"
+                           typeahead="mapping as mapping for mapping in getSuggestedMappings($viewValue)"
+                           typeahead-editable="true"
+                    />
                 </td>
                 <td>
                     <select id="form-group" class="form-control"

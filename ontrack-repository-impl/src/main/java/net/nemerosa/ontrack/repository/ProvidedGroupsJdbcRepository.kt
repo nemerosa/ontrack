@@ -39,4 +39,11 @@ class ProvidedGroupsJdbcRepository(dataSource: DataSource) : AbstractJdbcReposit
                     String::class.java
             ).toSet()
 
+    override fun getSuggestedGroups(type: String, token: String): List<String> =
+            namedParameterJdbcTemplate!!.queryForList(
+                    "SELECT GROUP_NAME FROM PROVIDED_GROUPS WHERE MODE = :mode AND LOWER(GROUP_NAME) LIKE :token ORDER BY GROUP_NAME",
+                    params("mode", type).addValue("token", "%${token.toLowerCase()}%"),
+                    String::class.java
+            )
+
 }

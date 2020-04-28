@@ -26,4 +26,10 @@ interface ProvidedGroupsService {
      */
     fun getProvidedGroups(account: Int, source: AuthenticationSource): Set<String>
 
+    /**
+     * Given an authentication source id - [type] - and an arbitrary text, returns a list
+     * of provided group names.
+     */
+    fun getSuggestedGroups(type: String, token: String): List<String>
+
 }

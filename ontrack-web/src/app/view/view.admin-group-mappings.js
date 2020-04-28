@@ -115,6 +115,14 @@ angular.module('ot.view.admin-group-mappings', [
             }
         };
 
+        $scope.getSuggestedMappings = (token) => {
+            if ($scope.mappingForm.provider) {
+                return ot.call($http.get(`/rest/group-mappings/${$scope.mappingForm.provider}/search/${token}`)).then(names => names);
+            } else {
+                return [];
+            }
+        };
+
         $scope.deleteMapping = (mapping) => {
             ot.pageCall($http.delete(`rest/group-mappings/${mapping.provider.source.id}/${mapping.id}`)).then(loadMappings);
         };

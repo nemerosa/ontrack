@@ -21,4 +21,8 @@ class ProvidedGroupsServiceImpl(
     override fun getProvidedGroups(account: Int, source: AuthenticationSource): Set<String> {
         return providedGroupsRepository.getProvidedGroups(account, source)
     }
+
+    override fun getSuggestedGroups(type: String, token: String): List<String> {
+        return providedGroupsRepository.getSuggestedGroups(type, token)
+    }
 }
