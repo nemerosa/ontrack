@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.ConnectedAccount;
@@ -18,7 +17,7 @@ import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 public class ResourceAccountTest {
 
     @Test
-    public void logged_to_json() throws JsonProcessingException {
+    public void logged_to_json() {
         assertJsonWrite(
                 object()
                         .with("_self", "urn:user")
@@ -32,6 +31,7 @@ public class ResourceAccountTest {
                                         .with("id", "none")
                                         .with("name", "Not defined")
                                         .with("allowingPasswordChange", false)
+                                        .with("groupMappingSupported", false)
                                         .end())
                                 .with("role", "ADMINISTRATOR")
                                 .with("defaultAdmin", true)
@@ -51,7 +51,7 @@ public class ResourceAccountTest {
     }
 
     @Test
-    public void not_logged_to_json() throws JsonProcessingException {
+    public void not_logged_to_json() {
         assertJsonWrite(
                 object()
                         .with("_self", "urn:user")
