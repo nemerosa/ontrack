@@ -65,7 +65,7 @@ class WebSecurityConfig {
                 }
                 // Excludes assets and login page from authentication
                 authorizeRequests {
-                    authorize("/login", permitAll)
+                    authorize("/login/**", permitAll)
                     authorize("/assets/**", permitAll)
                     authorize("/favicon.ico", permitAll)
                 }
@@ -73,6 +73,9 @@ class WebSecurityConfig {
                 authorizeRequests {
                     authorize(anyRequest, authenticated)
                 }
+                // OAuth setup
+                oauth2Client {  }
+                oauth2Login {  }
                 // Using a form login
                 formLogin {
                     loginPage = "/login"

@@ -32,6 +32,10 @@ dependencies {
     implementation("commons-io:commons-io")
     implementation("jakarta.validation:jakarta.validation-api")
 
+    implementation("org.springframework.security:spring-security-oauth2-client")
+    runtimeOnly("org.springframework.security:spring-security-oauth2-jose")
+//    implementation("com.okta.spring:okta-spring-boot-starter:1.4.0")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     runtimeOnly(project(":ontrack-service"))

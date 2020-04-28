@@ -4,3 +4,50 @@ management:
     web:
       exposure:
         include: "*"
+
+#spring:
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          my-okta:
+#            client-id: 0oa3prwngqXvuHmcJ357
+#            client-secret: Ym7SFacOkH9ARisax5IpqVXhiW4m9GnFs6pRHV2J
+#            client-name: ontrack
+#            provider: okta
+#            scope: user
+#            authorizationUri: https://dev-991108.okta.com/oauth2/default/
+#            redirect-uri-template: http://localhost:8080/login/oauth2/code/okta
+
+#spring:
+#  security:
+#    oauth2:
+#      client:
+#        provider:
+#          okta:
+#            issuer-uri: "https://dev-991108.okta.com/oauth2/default/"
+
+
+#spring:
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          my-okta:
+#            client-id: 0oa3prwngqXvuHmcJ357
+#            client-secret: Ym7SFacOkH9ARisax5IpqVXhiW4m9GnFs6pRHV2J
+#            provider: okta
+#            authorization-uri: "https://dev-991108.okta.com/oauth2/default/"
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          okta:
+            client-id: 0oa3prwngqXvuHmcJ357
+            client-secret: Ym7SFacOkH9ARisax5IpqVXhiW4m9GnFs6pRHV2J
+        provider:
+          okta:
+            issuer-uri: "https://dev-991108.okta.com/oauth2/default"
+            redirect-uri: "http://localhost:8080"
