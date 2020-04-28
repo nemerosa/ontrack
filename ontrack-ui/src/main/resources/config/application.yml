@@ -59,9 +59,3 @@ info:
 #    timeout: 3600
 #    cookie:
 #      max-age: 3600
-
-okta:
-  oauth2:
-    issuer: "https://dev-991108.okta.com/oauth2/default"
-    client-id: "0oa3prwngqXvuHmcJ357"
-    client-secret: "Ym7SFacOkH9ARisax5IpqVXhiW4m9GnFs6pRHV2J"

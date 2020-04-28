@@ -34,7 +34,7 @@ dependencies {
 
     implementation("org.springframework.security:spring-security-oauth2-client")
     runtimeOnly("org.springframework.security:spring-security-oauth2-jose")
-    implementation("com.okta.spring:okta-spring-boot-starter:1.4.0")
+//    implementation("com.okta.spring:okta-spring-boot-starter:1.4.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
