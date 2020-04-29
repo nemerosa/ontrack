@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.boot.support
 
+import net.nemerosa.ontrack.model.security.AccountService
+import net.nemerosa.ontrack.model.security.ProvidedGroupsService
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -52,7 +54,11 @@ class WebSecurityConfig {
      */
     @Configuration
     @ConditionalOnWebApplication
-    class UIWebSecurityConfigurerAdapter : WebSecurityConfigurerAdapter() {
+    class UIWebSecurityConfigurerAdapter(
+            private val accountService: AccountService,
+            private val securityService: SecurityService,
+            private val providedGroupsService: ProvidedGroupsService
+    ) : WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
             http {
                 // Enabling JS Cookies for CSRF protection (for AngularJS)
@@ -74,8 +80,14 @@ class WebSecurityConfig {
                     authorize(anyRequest, authenticated)
                 }
                 // OAuth setup
-                oauth2Client {  }
-                oauth2Login {  }
+                oauth2Client { }
+                oauth2Login {
+                    // TODO clientRegistrationRepository
+                    userInfoEndpoint {
+                        // TODO Use an extension point for this
+                        oidcUserService = OntrackOidcUserService(accountService, securityService, providedGroupsService)
+                    }
+                }
                 // Using a form login
                 formLogin {
                     loginPage = "/login"
