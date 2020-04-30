@@ -106,22 +106,4 @@ class WebSecurityConfig {
         }
     }
 
-    // TODO Use an extension point for this
-    @Bean
-    fun clientRegistrationRepository(): ClientRegistrationRepository {
-        val properties = OAuth2ClientProperties()
-        properties.provider["okta"] = OAuth2ClientProperties.Provider().apply {
-            issuerUri = "https://dev-991108.okta.com/oauth2/default"
-        }
-        properties.registration["okta"] = OAuth2ClientProperties.Registration().apply {
-            provider = "okta"
-            clientName = "Okta"
-            clientId = "0oa3prwngqXvuHmcJ357"
-            clientSecret = "Ym7SFacOkH9ARisax5IpqVXhiW4m9GnFs6pRHV2J"
-        }
-        return InMemoryClientRegistrationRepository(
-                OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties)
-        )
-    }
-
 }
