@@ -95,6 +95,12 @@ class WebSecurityConfig {
                         oidcUserService = OntrackOidcUserService(accountService, securityService, providedGroupsService)
                     }
                 }
+                // Using a form login
+                formLogin {
+                    loginPage = "/login"
+                    permitAll()
+                    authenticationSuccessHandler = LoginSuccessHandler()
+                }
                 // Logout setup
                 logout {
                     logoutUrl = "/logout"
