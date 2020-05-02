@@ -87,16 +87,13 @@ class WebSecurityConfig {
                 // OAuth setup
                 oauth2Client { }
                 oauth2Login {
+                    loginPage = "/login"
+                    permitAll()
+                    authenticationSuccessHandler = LoginSuccessHandler()
                     // TODO Use an extension point for this
                     userInfoEndpoint {
                         oidcUserService = OntrackOidcUserService(accountService, securityService, providedGroupsService)
                     }
-                }
-                // Using a form login
-                formLogin {
-                    loginPage = "/login"
-                    permitAll()
-                    authenticationSuccessHandler = LoginSuccessHandler()
                 }
                 // Logout setup
                 logout {
