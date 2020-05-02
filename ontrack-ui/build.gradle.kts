@@ -27,7 +27,7 @@ dependencies {
     implementation("commons-io:commons-io")
     implementation("jakarta.validation:jakarta.validation-api")
 
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    "developmentOnly"("org.springframework.boot:spring-boot-devtools")
 
     runtimeOnly(project(":ontrack-service"))
     runtimeOnly(project(":ontrack-repository-impl"))
