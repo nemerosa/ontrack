@@ -9,11 +9,6 @@ plugins {
 
 apply(plugin = "org.springframework.boot")
 
-val developmentOnly by configurations.creating
-configurations.runtime {
-    extendsFrom(developmentOnly)
-}
-
 dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-security")
@@ -34,9 +29,8 @@ dependencies {
 
     implementation("org.springframework.security:spring-security-oauth2-client")
     runtimeOnly("org.springframework.security:spring-security-oauth2-jose")
-//    implementation("com.okta.spring:okta-spring-boot-starter:1.4.0")
 
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    "developmentOnly"("org.springframework.boot:spring-boot-devtools")
 
     runtimeOnly(project(":ontrack-service"))
     runtimeOnly(project(":ontrack-repository-impl"))
