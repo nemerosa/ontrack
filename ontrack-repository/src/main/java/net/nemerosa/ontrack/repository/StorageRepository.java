@@ -47,4 +47,13 @@ public interface StorageRepository {
      * Deletes an entry
      */
     void delete(String store, String key);
+
+    /**
+     * Checks if an entry already exists.
+     *
+     * @param store Store to check
+     * @param key Key to check
+     * @return <code>true</code> if the entry exists
+     */
+    boolean exists(String store, String key);
 }

@@ -9,7 +9,7 @@ angular.module('ontrack.extension.oidc', [
             controller: 'OidcSettingsCtrl'
         });
     })
-    .controller('OidcSettingsCtrl', function ($scope, $http, ot, otFormService) {
+    .controller('OidcSettingsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
         const view = ot.view();
         view.title = "OIDC Providers";
         view.breadcrumbs = ot.homeBreadcrumbs();
@@ -46,6 +46,13 @@ angular.module('ontrack.extension.oidc', [
 
         $scope.createProvider = () => {
             otFormService.create($scope.resources._create, "Create provider").then(loadProviders);
+        };
+
+        $scope.deleteProvider = (provider) => {
+              otAlertService.confirm({
+                  title: "OIDC provider deletion",
+                  message: `Do you want to delete the ${provider.name} provider? It won't be available for authentication any longer.`
+              }).then(() => ot.pageCall($http.delete(provider._delete))).then(loadProviders);
         };
     })
 ;

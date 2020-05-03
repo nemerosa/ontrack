@@ -35,7 +35,9 @@
             <td>{{provider.issuerId}}</td>
             <td>{{provider.clientId}}</td>
             <td>****</td>
-            <td></td>
+            <td>
+                <span class="fa fa-trash ot-command" title="Remove this OIDC provider" ng-if="provider._delete" ng-click="deleteProvider(provider)"></span>
+            </td>
         </tr>
         </tbody>
     </table>

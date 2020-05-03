@@ -74,6 +74,14 @@ public interface StorageService {
      */
     void delete(String store, String key);
 
+    /**
+     * Checks if an entry already exists.
+     *
+     * @param store Store to check
+     * @param key Key to check
+     * @return <code>true</code> if the entry exists
+     */
+    boolean exists(String store, String key);
 
     /**
      * Gets all the data for a store

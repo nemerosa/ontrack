@@ -32,6 +32,15 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
     }
 
     @Override
+    public boolean exists(String store, String key) {
+        return getFirstItem(
+                "SELECT NAME FROM STORAGE WHERE STORE = :store AND NAME = :key",
+                params("store", store).addValue("key", key),
+                String.class
+        ) != null;
+    }
+
+    @Override
     public void storeJson(String store, String key, JsonNode node) {
         MapSqlParameterSource params = params("store", store).addValue("key", key);
         // Deleting first

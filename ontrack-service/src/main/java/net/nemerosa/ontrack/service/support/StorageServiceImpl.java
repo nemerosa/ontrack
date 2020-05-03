@@ -46,4 +46,9 @@ public class StorageServiceImpl implements StorageService {
     public Map<String, JsonNode> getData(String store) {
         return repository.getData(store);
     }
+
+    @Override
+    public boolean exists(String store, String key) {
+        return repository.exists(store, key);
+    }
 }

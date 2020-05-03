@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
-import net.nemerosa.ontrack.model.support.retrieve
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.ConcurrentHashMap
@@ -38,13 +38,23 @@ class OIDCSettingsServiceImpl(
 
     override fun createProvider(input: OntrackOIDCProvider): OntrackOIDCProvider {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        val existing = storageService.retrieve<OntrackOIDCProvider>(OIDC_PROVIDERS_STORE, input.id)
-        if (existing != null) {
+        if (storageService.exists(OIDC_PROVIDERS_STORE, input.id)) {
             throw OntrackOIDCProviderIDAlreadyExistsException(input.id)
         } else {
             storageService.store(OIDC_PROVIDERS_STORE, input.id, encrypt(input))
             providersCache.clear()
             return input
+        }
+    }
+
+    override fun deleteProvider(id: String): Ack {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        return if (storageService.exists(OIDC_PROVIDERS_STORE, id)) {
+            storageService.delete(OIDC_PROVIDERS_STORE, id)
+            providersCache.clear()
+            Ack.OK
+        } else {
+            Ack.NOK
         }
     }
 

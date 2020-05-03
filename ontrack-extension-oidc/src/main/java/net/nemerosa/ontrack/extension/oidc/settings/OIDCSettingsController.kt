@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.form.Text
@@ -44,6 +45,13 @@ class OIDCSettingsController(
             ResponseEntity.ok(
                     oidcSettingsService.createProvider(input)
             )
+
+    /**
+     * Deletion of a provider
+     */
+    @DeleteMapping("{id}")
+    fun deleteProvider(@PathVariable id: String): Ack =
+            oidcSettingsService.deleteProvider(id)
 
     private fun getForm(provider: OntrackOIDCProvider?): Form = Form.create()
             .with(
