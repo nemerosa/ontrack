@@ -36,6 +36,7 @@
             <td>{{provider.clientId}}</td>
             <td>****</td>
             <td>
+                <span class="fa fa-pencil ot-command" title="Edits this OIDC provider" ng-if="provider._update" ng-click="updateProvider(provider)"></span>
                 <span class="fa fa-trash ot-command" title="Remove this OIDC provider" ng-if="provider._delete" ng-click="deleteProvider(provider)"></span>
             </td>
         </tr>

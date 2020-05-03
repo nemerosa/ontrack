@@ -53,11 +53,34 @@ class OIDCSettingsController(
     fun deleteProvider(@PathVariable id: String): Ack =
             oidcSettingsService.deleteProvider(id)
 
+    /**
+     * Get the form to update a provider
+     */
+    @GetMapping("update/{id}")
+    fun getUpdateForm(@PathVariable id: String): Form {
+        val provider = oidcSettingsService.getProviderById(id)
+                ?.obfuscate()
+                ?: throw OntrackOIDCProviderIDNotFoundException(id)
+        return getForm(provider)
+    }
+
+    /**
+     * Updates a provider
+     */
+    @PutMapping("update/{id}")
+    fun updateProvider(@PathVariable id: String, @RequestBody input: OntrackOIDCProvider): OntrackOIDCProvider =
+            if (input.id != id) {
+                throw OntrackOIDCProviderIDMustMatchException(id, input.id)
+            } else {
+                oidcSettingsService.updateProvider(input).obfuscate()
+            }
+
     private fun getForm(provider: OntrackOIDCProvider?): Form = Form.create()
             .with(
                     Text.of("id").label("ID")
                             .help("Unique ID for this provider")
                             .value(provider?.id)
+                            .readOnly(provider != null)
             )
             .with(
                     Text.of("name").label("Name")
@@ -82,6 +105,8 @@ class OIDCSettingsController(
             .with(
                     Password.of("clientSecret").label("Client secret")
                             .help("OIDC client secret")
+                            .value("")
+                            .optional(provider != null)
             )
 
 }

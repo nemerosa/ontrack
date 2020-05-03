@@ -11,6 +11,9 @@ class OntrackOIDCProviderResourceDecorator : AbstractLinkResourceDecorator<Ontra
     override fun getLinkDefinitions(): List<LinkDefinition<OntrackOIDCProvider>> = listOf(
             Link.DELETE linkTo { provider: OntrackOIDCProvider ->
                 on(OIDCSettingsController::class.java).deleteProvider(provider.id)
+            } linkIfGlobal GlobalSettings::class,
+            Link.UPDATE linkTo { provider: OntrackOIDCProvider ->
+                on(OIDCSettingsController::class.java).getUpdateForm(provider.id)
             } linkIfGlobal GlobalSettings::class
     )
 

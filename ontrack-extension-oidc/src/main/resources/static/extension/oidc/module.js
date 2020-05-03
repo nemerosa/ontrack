@@ -48,6 +48,10 @@ angular.module('ontrack.extension.oidc', [
             otFormService.create($scope.resources._create, "Create provider").then(loadProviders);
         };
 
+        $scope.updateProvider = (provider) => {
+            otFormService.update(provider._update, "Update provider").then(loadProviders);
+        };
+
         $scope.deleteProvider = (provider) => {
               otAlertService.confirm({
                   title: "OIDC provider deletion",

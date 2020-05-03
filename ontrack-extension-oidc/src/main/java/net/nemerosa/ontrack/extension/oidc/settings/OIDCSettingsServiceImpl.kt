@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
+import net.nemerosa.ontrack.model.support.retrieve
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.ConcurrentHashMap
@@ -56,6 +57,35 @@ class OIDCSettingsServiceImpl(
         } else {
             Ack.NOK
         }
+    }
+
+    override fun getProviderById(id: String): OntrackOIDCProvider? {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        return storageService.retrieve<StoredOntrackOIDCProvider>(OIDC_PROVIDERS_STORE, id)?.let {
+            decrypt(it)
+        }
+    }
+
+    override fun updateProvider(input: OntrackOIDCProvider): OntrackOIDCProvider {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        val existing = storageService.retrieve<StoredOntrackOIDCProvider>(OIDC_PROVIDERS_STORE, input.id)
+                ?.let { decrypt(it) }
+                ?: throw OntrackOIDCProviderIDNotFoundException(input.id)
+        val record = OntrackOIDCProvider(
+                id = input.id,
+                name = input.name,
+                description = input.description,
+                issuerId = input.issuerId,
+                clientId = input.clientId,
+                clientSecret = if (input.clientSecret.isNotBlank()) {
+                    input.clientSecret
+                } else {
+                    existing.clientSecret
+                }
+        )
+        storageService.store(OIDC_PROVIDERS_STORE, input.id, encrypt(record))
+        providersCache.clear()
+        return record
     }
 
     companion object {

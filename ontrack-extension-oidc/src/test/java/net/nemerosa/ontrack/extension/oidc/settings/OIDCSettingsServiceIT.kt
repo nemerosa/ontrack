@@ -54,11 +54,47 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Deletion of a unknown provider`() {
+    fun `Deletion of an unknown provider`() {
         val id = uid("I")
         asAdmin {
             val ack = service.deleteProvider(id)
             assertFalse(ack.isSuccess)
+        }
+    }
+
+    @Test
+    fun `Updating an unknown provider`() {
+        val id = uid("I")
+        asAdmin {
+            assertFailsWith<OntrackOIDCProviderIDNotFoundException> {
+                service.updateProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            }
+        }
+    }
+
+    @Test
+    fun `Updating a provider`() {
+        val id = uid("I")
+        asAdmin {
+            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "yyyy"))
+            val provider = service.getProviderById(id) ?: error("Cannot find provider")
+            assertEquals("Test 2", provider.name)
+            assertEquals("xxxx", provider.clientId)
+            assertEquals("yyyy", provider.clientSecret)
+        }
+    }
+
+    @Test
+    fun `Updating a provider does not update its secret if left blank in input`() {
+        val id = uid("I")
+        asAdmin {
+            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "xxxx", "yyyy"))
+            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", ""))
+            val provider = service.getProviderById(id) ?: error("Cannot find provider")
+            assertEquals("Test 2", provider.name)
+            assertEquals("xxxx", provider.clientId)
+            assertEquals("yyyy", provider.clientSecret)
         }
     }
 

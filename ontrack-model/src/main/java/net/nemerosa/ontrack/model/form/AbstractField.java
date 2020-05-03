@@ -24,13 +24,21 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
     }
 
     public F optional() {
-        this.required = false;
+        return optional(true);
+    }
+
+    public F optional(boolean optional) {
+        this.required = !optional;
         //noinspection unchecked
         return (F) this;
     }
 
     public F readOnly() {
-        this.readOnly = true;
+        return readOnly(true);
+    }
+
+    public F readOnly(boolean readOnly) {
+        this.readOnly = readOnly;
         //noinspection unchecked
         return (F) this;
     }
