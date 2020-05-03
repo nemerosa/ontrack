@@ -32,7 +32,7 @@ angular.module('ontrack.extension.oidc', [
                             return $scope.resources._create;
                         },
                         id: 'createProvider',
-                        name: "Create providre",
+                        name: "Create provider",
                         cls: 'ot-command-new',
                         action: $scope.createProvider
                     });
