@@ -14,6 +14,7 @@ class OIDCUILoginExtension(
     override val contributions: List<UILogin>
         get() = clientRegistrationRepository.map { registration ->
             UILogin(
+                    id = registration.registrationId,
                     link = "/oauth2/authorization/${registration.registrationId}",
                     name = registration.clientName
             )

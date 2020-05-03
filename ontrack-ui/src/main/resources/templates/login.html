@@ -11,34 +11,93 @@
     <title>Ontrack - Sign in</title>
 </head>
 <body class="text-center">
-<form class="form-signin" th:action="@{/login}" method="post">
-    <img class="mb-4" src="assets/logo-128.png" alt="Ontrack sign in" width="72" height="72">
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <div id="error-invalid-credentials" th:if="${param.error}" class="alert alert-danger" role="alert">
-        Invalid username and password.
+<div class="container form-signin">
+    <div class="row">
+        <div class="col-sm-12">
+            <img class="mb-4" src="assets/logo-128.png" alt="Ontrack sign in" width="72" height="72">
+        </div>
     </div>
-    <div id="message-logout" th:if="${param.logout}" class="alert alert-success" role="alert">
-        You have been logged out.
+    <div class="row" th:if="${param.error}">
+        <div class="col-sm-12">
+            <div id="error-invalid-credentials" class="alert alert-danger" role="alert">
+                Invalid username and password.
+            </div>
+        </div>
     </div>
-    <label for="username" class="sr-only">User name</label>
-    <input type="text" id="username" name="username" class="form-control" placeholder="User name" required autofocus>
-    <label for="password" class="sr-only">Password</label>
-    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
-    <!--    <div class="checkbox mb-3">-->
-    <!--        <label>-->
-    <!--            <input type="checkbox" value="remember-me"> Remember me-->
-    <!--        </label>-->
-    <!--    </div>-->
-    <button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-
-    <div th:each="extension : ${extensions}">
-        <a th:href="${extension.link}" th:text="${extension.name}"></a>
+    <div class="row" th:if="${param.logout}">
+        <div class="col-sm-12">
+            <div id="message-logout" th:if="${param.logout}" class="alert alert-success" role="alert">
+                You have been logged out.
+            </div>
+        </div>
     </div>
 
-    <script type="text/javascript">
-        var hash = window.location.hash;
-        document.cookie = "hashPart=" + window.btoa(hash);
-    </script>
-</form>
+    <div th:if="${extensionsEnabled}">
+
+        <!-- Initial divider -->
+        <div class="row">
+            <div class="col-sm-4">
+                <hr>
+            </div>
+            <div class="col-sm-4">
+                Login with
+            </div>
+            <div class="col-sm-4">
+                <hr>
+            </div>
+        </div>
+
+        <!-- Extension links -->
+        <div class="row" th:each="extension : ${extensions}">
+            <div class="col-sm-12">
+                <a th:id="${extension.id}"
+                   th:href="${extension.link}"
+                   th:text="${extension.name}"
+                   class="btn btn-outline-info btn-block"></a>
+            </div>
+        </div>
+
+        <!-- OR divider -->
+        <div class="row">
+            <div class="col-sm-5">
+                <hr>
+            </div>
+            <div class="col-sm-2">
+                or
+            </div>
+            <div class="col-sm-5">
+                <hr>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form th:action="@{/login}" method="post">
+
+                <div class="form-group">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="User name" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+
+                <div class="form-group">
+                    <button id="submit" class="btn btn-outline-primary btn-block" type="submit">Sign in</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Management of redirection. See LoginSuccessHandler -->
+<script type="text/javascript">
+    var hash = window.location.hash;
+    document.cookie = "hashPart=" + window.btoa(hash);
+</script>
+
 </body>
 </html>

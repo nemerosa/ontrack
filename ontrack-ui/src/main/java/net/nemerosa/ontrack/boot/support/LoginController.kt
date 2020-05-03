@@ -17,6 +17,7 @@ class LoginController(
             it.contributions
         }
         model.addAttribute("extensions", extensions)
+        model.addAttribute("extensionsEnabled", extensions.isNotEmpty())
         return "login"
     }
 

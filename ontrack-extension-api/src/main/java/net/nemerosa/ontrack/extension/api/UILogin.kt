@@ -5,6 +5,11 @@ package net.nemerosa.ontrack.extension.api
  */
 data class UILogin(
         /**
+         * Unique ID for this extension
+         */
+        val id: String,
+
+        /**
          * Gets the link to go to
          */
         val link: String,
