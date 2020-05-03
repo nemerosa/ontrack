@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.stereotype.Component
-import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class OntrackClientRegistrationRepository(
@@ -16,13 +15,9 @@ class OntrackClientRegistrationRepository(
         private val securityService: SecurityService
 ) : ClientRegistrationRepository, Iterable<ClientRegistration> {
 
-    private val registrationsCache = ConcurrentHashMap<String, Map<String, ClientRegistration>>()
-
     private val registrations: Map<String, ClientRegistration>
-        get() = registrationsCache.getOrPut(CACHE_KEY) {
-            securityService.asAdmin {
-                toRegistrations(oidcSettingsService.cachedProviders)
-            }
+        get() = securityService.asAdmin {
+            toRegistrations(oidcSettingsService.cachedProviders)
         }
 
     private fun toRegistrations(providers: List<OntrackOIDCProvider>): Map<String, ClientRegistration> {
