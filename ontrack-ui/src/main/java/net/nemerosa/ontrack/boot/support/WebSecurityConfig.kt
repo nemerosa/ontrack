@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.boot.support
 
-import net.nemerosa.ontrack.model.security.AccountService
-import net.nemerosa.ontrack.model.security.ProvidedGroupsService
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.extension.api.ExtensionManager
+import net.nemerosa.ontrack.extension.api.UISecurityExtension
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
@@ -55,11 +54,13 @@ class WebSecurityConfig {
     @Configuration
     @ConditionalOnWebApplication
     class UIWebSecurityConfigurerAdapter(
-            private val accountService: AccountService,
-            private val securityService: SecurityService,
-            private val providedGroupsService: ProvidedGroupsService
+            private val extensionManager: ExtensionManager
     ) : WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
+
+            // Gets the UI extensions
+            val uiSecurityExtensions = extensionManager.getExtensions(UISecurityExtension::class.java)
+
             http {
                 // Enabling JS Cookies for CSRF protection (for AngularJS)
                 csrf {
@@ -79,15 +80,9 @@ class WebSecurityConfig {
                 authorizeRequests {
                     authorize(anyRequest, authenticated)
                 }
-                // OAuth setup
-                oauth2Login {
-                    loginPage = "/login"
-                    permitAll()
-                    authenticationSuccessHandler = LoginSuccessHandler()
-                    // TODO Use an extension point for this
-                    userInfoEndpoint {
-                        oidcUserService = OntrackOidcUserService(accountService, securityService, providedGroupsService)
-                    }
+                // UI extensions
+                uiSecurityExtensions.forEach { extension ->
+                    extension.configure(this, LoginSuccessHandler())
                 }
                 // Using a form login
                 formLogin {

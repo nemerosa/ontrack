@@ -31,8 +31,8 @@
     <!--    </div>-->
     <button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 
-    <div th:each="registration : ${registrations}">
-        <a th:href="@{/oauth2/authorization/{registrationId}(registrationId=${registration.registrationId})}" th:text="${registration.clientName}"></a>
+    <div th:each="extension : ${extensions}">
+        <a th:href="${extension.link}" th:text="${extension.name}"></a>
     </div>
 
     <script type="text/javascript">

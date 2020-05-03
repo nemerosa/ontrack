@@ -44,6 +44,7 @@ include(":ontrack-docs")
 
 // Core extensions
 include(":ontrack-extension-ldap")
+include(":ontrack-extension-oidc")
 include(":ontrack-extension-artifactory")
 include(":ontrack-extension-general")
 include(":ontrack-extension-issues")

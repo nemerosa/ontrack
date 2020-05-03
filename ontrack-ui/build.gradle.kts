@@ -27,9 +27,6 @@ dependencies {
     implementation("commons-io:commons-io")
     implementation("jakarta.validation:jakarta.validation-api")
 
-    implementation("org.springframework.security:spring-security-oauth2-client")
-    runtimeOnly("org.springframework.security:spring-security-oauth2-jose")
-
     "developmentOnly"("org.springframework.boot:spring-boot-devtools")
 
     runtimeOnly(project(":ontrack-service"))
@@ -52,6 +49,7 @@ dependencies {
     // List of extensions to include in core
     runtimeOnly(project(":ontrack-extension-general"))
     runtimeOnly(project(":ontrack-extension-ldap"))
+    runtimeOnly(project(":ontrack-extension-oidc"))
     runtimeOnly(project(":ontrack-extension-jenkins"))
     runtimeOnly(project(":ontrack-extension-jira"))
     runtimeOnly(project(":ontrack-extension-artifactory"))

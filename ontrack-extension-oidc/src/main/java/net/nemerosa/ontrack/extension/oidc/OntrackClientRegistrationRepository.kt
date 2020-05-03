@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.support
+package net.nemerosa.ontrack.extension.oidc
 
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesRegistrationAdapter
@@ -6,7 +6,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.stereotype.Component
 
-// TODO Put this class in its own extension
 @Component
 class OntrackClientRegistrationRepository : ClientRegistrationRepository, Iterable<ClientRegistration> {
 

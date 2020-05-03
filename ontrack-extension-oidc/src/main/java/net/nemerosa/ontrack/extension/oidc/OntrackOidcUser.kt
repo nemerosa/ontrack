@@ -1,9 +1,8 @@
-package net.nemerosa.ontrack.boot.support
+package net.nemerosa.ontrack.extension.oidc
 
 import net.nemerosa.ontrack.model.security.*
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 
-// TODO Move to its own extension
 class OntrackOidcUser(
         private val base: OidcUser,
         private val ontrackAuthenticatedUser: OntrackAuthenticatedUser
