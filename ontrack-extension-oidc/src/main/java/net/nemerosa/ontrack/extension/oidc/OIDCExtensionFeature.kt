@@ -9,5 +9,5 @@ class OIDCExtensionFeature : AbstractExtensionFeature(
         "oidc",
         "OIDC",
         "Support for OIDC authentication",
-        ExtensionFeatureOptions.DEFAULT
+        ExtensionFeatureOptions.DEFAULT.withGui(true)
 )
