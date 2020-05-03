@@ -1,28 +1,44 @@
 package net.nemerosa.ontrack.extension.oidc
 
+import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
+import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesRegistrationAdapter
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.stereotype.Component
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
-class OntrackClientRegistrationRepository : ClientRegistrationRepository, Iterable<ClientRegistration> {
+class OntrackClientRegistrationRepository(
+        private val oidcSettingsService: OIDCSettingsService,
+        private val securityService: SecurityService
+) : ClientRegistrationRepository, Iterable<ClientRegistration> {
+
+    private val registrationsCache = ConcurrentHashMap<String, Map<String, ClientRegistration>>()
 
     private val registrations: Map<String, ClientRegistration>
+        get() = registrationsCache.getOrPut(CACHE_KEY) {
+            securityService.asAdmin {
+                toRegistrations(oidcSettingsService.cachedProviders)
+            }
+        }
 
-    init {
+    private fun toRegistrations(providers: List<OntrackOIDCProvider>): Map<String, ClientRegistration> {
         val properties = OAuth2ClientProperties()
-        properties.provider["okta"] = OAuth2ClientProperties.Provider().apply {
-            issuerUri = "https://dev-991108.okta.com/oauth2/default"
+        providers.forEach { settings ->
+            properties.provider[settings.id] = OAuth2ClientProperties.Provider().apply {
+                issuerUri = settings.issuerId
+            }
+            properties.registration[settings.id] = OAuth2ClientProperties.Registration().apply {
+                provider = settings.id
+                clientName = settings.name
+                clientId = settings.clientId
+                clientSecret = settings.clientSecret
+            }
         }
-        properties.registration["okta"] = OAuth2ClientProperties.Registration().apply {
-            provider = "okta"
-            clientName = "Okta"
-            clientId = "0oa3prwngqXvuHmcJ357"
-            clientSecret = "Ym7SFacOkH9ARisax5IpqVXhiW4m9GnFs6pRHV2J"
-        }
-        registrations = OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties)
+        return OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties)
     }
 
     override fun findByRegistrationId(registrationId: String): ClientRegistration? {
@@ -31,5 +47,12 @@ class OntrackClientRegistrationRepository : ClientRegistrationRepository, Iterab
 
     override fun iterator(): Iterator<ClientRegistration> {
         return registrations.values.iterator()
+    }
+
+    companion object {
+        /**
+         * Cache unique key
+         */
+        private const val CACHE_KEY = "0"
     }
 }

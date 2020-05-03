@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.model.support.retrieve
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 @Transactional
@@ -15,6 +16,16 @@ class OIDCSettingsServiceImpl(
         private val storageService: StorageService,
         private val encryptionService: EncryptionService
 ) : OIDCSettingsService {
+
+    /**
+     * Caching the list of providers
+     */
+    private val providersCache = ConcurrentHashMap<String, List<OntrackOIDCProvider>>()
+
+    override val cachedProviders: List<OntrackOIDCProvider>
+        get() = providersCache.getOrPut(CACHE_KEY) {
+            providers
+        }
 
     override val providers: List<OntrackOIDCProvider>
         get() {
@@ -32,11 +43,17 @@ class OIDCSettingsServiceImpl(
             throw OntrackOIDCProviderIDAlreadyExistsException(input.id)
         } else {
             storageService.store(OIDC_PROVIDERS_STORE, input.id, encrypt(input))
+            providersCache.clear()
             return input
         }
     }
 
     companion object {
+        /**
+         * Cache unique key
+         */
+        private const val CACHE_KEY = "0"
+
         /**
          * Name of the store
          */
