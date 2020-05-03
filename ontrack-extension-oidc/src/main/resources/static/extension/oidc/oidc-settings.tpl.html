@@ -1,3 +1,42 @@
 <ot-view>
 
+    <div class="row" ng-show="loadingProviders">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the providers...
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Issuer</th>
+            <th>Client ID</th>
+            <th>Client Secret</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-if="resources.resources.length == 0" class="info">
+            <td colspan="7">
+                No OIDC provider has been registered yet.
+            </td>
+        </tr>
+        <tr ng-repeat="provider in resources.resources">
+            <td><code>{{provider.id}}</code></td>
+            <td>{{provider.name}}</td>
+            <td>{{provider.description}}</td>
+            <td>{{provider.issuerId}}</td>
+            <td>{{provider.clientId}}</td>
+            <td>****</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+
 </ot-view>
