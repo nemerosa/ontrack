@@ -23,7 +23,9 @@ class OIDCSettingsController(
     @GetMapping("")
     fun getProviders(): Resources<OntrackOIDCProvider> =
             Resources.of(
-                    oidcSettingsService.providers,
+                    oidcSettingsService.providers.map {
+                        it.obfuscate()
+                    },
                     uri(on(OIDCSettingsController::class.java).getProviders())
             )
                     .with(Link.CREATE, uri(on(OIDCSettingsController::class.java).getCreationForm()))
