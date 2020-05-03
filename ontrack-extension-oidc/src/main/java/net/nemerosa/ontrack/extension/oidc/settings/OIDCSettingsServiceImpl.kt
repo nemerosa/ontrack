@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.model.support.retrieve
 import org.springframework.stereotype.Service
@@ -26,6 +27,13 @@ class OIDCSettingsServiceImpl(
     override val cachedProviders: List<OntrackOIDCProvider>
         get() = providersCache.getOrPut(CACHE_KEY) {
             providers
+        }
+
+    override val cachedProviderNames: List<NameDescription>
+        get() = securityService.asAdmin {
+            cachedProviders.map {
+                NameDescription(it.id, it.name)
+            }
         }
 
     override val providers: List<OntrackOIDCProvider>

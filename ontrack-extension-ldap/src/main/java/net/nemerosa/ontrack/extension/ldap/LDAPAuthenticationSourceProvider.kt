@@ -10,14 +10,15 @@ class LDAPAuthenticationSourceProvider(
         private val cachedSettingsService: CachedSettingsService
 ) : AuthenticationSourceProvider {
 
-    override val source: AuthenticationSource = SOURCE
+    override val sources get() = listOf(SOURCE.enabled(cachedSettingsService.getCachedSettings(LDAPSettings::class.java).isEnabled))
 
-    override val isEnabled: Boolean
-        get() = cachedSettingsService.getCachedSettings(LDAPSettings::class.java).isEnabled
+    override val id: String = ID
 
     companion object {
-        val SOURCE = AuthenticationSource(
-                id = "ldap",
+        const val ID = "ldap"
+        private val SOURCE = AuthenticationSource(
+                provider = ID,
+                key = "ldap",
                 name = "LDAP authentication",
                 isAllowingPasswordChange = false,
                 isGroupMappingSupported = true

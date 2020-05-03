@@ -8,6 +8,7 @@ import java.io.Serializable
  */
 data class AuthenticationSource(
         val provider: String,
+        val key: String,
         val name: String,
         @JsonProperty("enabled")
         val isEnabled: Boolean = true,
@@ -17,12 +18,21 @@ data class AuthenticationSource(
         val isGroupMappingSupported: Boolean = false
 ) : Serializable {
 
+    fun enabled(enabled: Boolean) = AuthenticationSource(
+            provider = provider,
+            key = key,
+            name = name,
+            isEnabled = enabled,
+            isAllowingPasswordChange = isAllowingPasswordChange,
+            isGroupMappingSupported = isGroupMappingSupported
+    )
+
     companion object {
         /**
          * Authentication source used for tests
          */
         @JvmStatic
-        fun none() = AuthenticationSource("none", "Not defined")
+        fun none() = AuthenticationSource("none", "none", "Not defined")
     }
 
 }

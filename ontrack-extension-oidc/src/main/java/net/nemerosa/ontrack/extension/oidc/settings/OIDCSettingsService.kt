@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.structure.NameDescription
 
 /**
  * Management of OIDC providers.
@@ -16,6 +17,11 @@ interface OIDCSettingsService {
      * Cache of providers
      */
     val cachedProviders: List<OntrackOIDCProvider>
+
+    /**
+     * Cache of provider names (unsecured)
+     */
+    val cachedProviderNames: List<NameDescription>
 
     /**
      * Creation of a OIDC provider

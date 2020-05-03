@@ -10,14 +10,17 @@ class BuiltinAuthenticationSourceProvider : AuthenticationSourceProvider {
         const val ID = "password"
 
         val SOURCE = AuthenticationSource(
-                id = ID,
+                provider = ID,
+                key = "built-in",
                 name = "Built-in",
+                isEnabled = true,
                 isAllowingPasswordChange = true
         )
 
     }
 
-    override val source = SOURCE
+    override val id: String = ID
 
-    override val isEnabled: Boolean = true
+    override val sources = listOf(SOURCE)
+
 }

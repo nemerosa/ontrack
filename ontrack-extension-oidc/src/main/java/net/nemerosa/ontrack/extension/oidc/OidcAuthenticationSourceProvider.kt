@@ -1,19 +1,31 @@
 package net.nemerosa.ontrack.extension.oidc
 
+import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider
 import org.springframework.stereotype.Component
 
 @Component
-class OidcAuthenticationSourceProvider : AuthenticationSourceProvider {
+class OidcAuthenticationSourceProvider(
+        private val oidcSettingsService: OIDCSettingsService
+) : AuthenticationSourceProvider {
 
-    override val source: AuthenticationSource = SOURCE
+    override val id: String = ID
 
-    override val isEnabled: Boolean
-        get() = TODO("Must check that at least one OIDC provider is enabled")
+    override val sources: List<AuthenticationSource>
+        get() = oidcSettingsService.cachedProviderNames.map {
+            AuthenticationSource(
+                    provider = ID,
+                    key = it.name,
+                    name = it.description ?: it.name,
+                    isEnabled = true,
+                    isAllowingPasswordChange = false,
+                    isGroupMappingSupported = true
+            )
+        }
 
     companion object {
-        val SOURCE = AuthenticationSource("oidc", "OIDC", isAllowingPasswordChange = false, isGroupMappingSupported = true)
+        const val ID = "oidc"
     }
 
 }
