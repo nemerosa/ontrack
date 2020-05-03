@@ -17,5 +17,11 @@ data class UILogin(
         /**
          * Gets the display name
          */
-        val name: String
+        val name: String,
+
+        /**
+         * Description
+         */
+        val description: String
+
 )

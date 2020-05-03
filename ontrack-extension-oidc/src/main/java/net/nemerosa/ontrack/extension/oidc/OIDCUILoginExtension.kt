@@ -20,7 +20,8 @@ class OIDCUILoginExtension(
                 UILogin(
                         id = provider.id,
                         link = "/oauth2/authorization/${provider.id}",
-                        name = provider.name
+                        name = provider.name,
+                        description = provider.description
                 )
             }
         }
