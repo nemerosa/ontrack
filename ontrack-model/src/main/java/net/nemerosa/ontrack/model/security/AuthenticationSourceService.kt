@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.security
 
+import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceNotFoundException
+
 interface AuthenticationSourceService {
 
     /**
@@ -12,8 +14,18 @@ interface AuthenticationSourceService {
      */
     val authenticationSourceProviders: List<AuthenticationSourceProvider>
 
-    fun getAuthenticationSourceProvider(mode: String): AuthenticationSourceProvider
+    /**
+     * Gets an authentication source provider using its ID.
+     */
+    fun getAuthenticationSourceProvider(id: String): AuthenticationSourceProvider
 
-    fun getAuthenticationSource(mode: String): AuthenticationSource = getAuthenticationSourceProvider(mode).source
+    /**
+     * Gets an authentication source using the provider ID and the source name.
+     */
+    fun getAuthenticationSource(id: String, name: String): AuthenticationSource =
+            getAuthenticationSourceProvider(id)
+                    .sources
+                    .find { it.name == name }
+                    ?: throw AuthenticationSourceNotFoundException(id, name)
 
 }

@@ -10,17 +10,17 @@ import org.springframework.stereotype.Service
 class AuthenticationSourceServiceImpl(providers: Collection<AuthenticationSourceProvider>) : AuthenticationSourceService {
 
     private val providers: Map<String, AuthenticationSourceProvider> = providers.associateBy {
-        it.source.id
+        it.id
     }
 
     override val authenticationSourceProviders: List<AuthenticationSourceProvider>
-        get() = providers.values.sortedBy { it.source.id }
+        get() = providers.values.sortedBy { it.id }
 
     override val authenticationSources: List<AuthenticationSource>
-        get() = providers.values.map { it.source }.sortedBy { it.id }
+        get() = providers.values.flatMap { it.sources }.sortedBy { it.id }
 
-    override fun getAuthenticationSourceProvider(mode: String): AuthenticationSourceProvider {
-        return providers[mode] ?: throw AuthenticationSourceProviderNotFoundException(mode)
+    override fun getAuthenticationSourceProvider(id: String): AuthenticationSourceProvider {
+        return providers[id] ?: throw AuthenticationSourceProviderNotFoundException(id)
     }
 
 }

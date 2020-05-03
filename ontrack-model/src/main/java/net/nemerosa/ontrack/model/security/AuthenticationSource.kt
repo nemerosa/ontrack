@@ -7,8 +7,10 @@ import java.io.Serializable
  * Authentication source for an account or group.
  */
 data class AuthenticationSource(
-        val id: String,
+        val provider: String,
         val name: String,
+        @JsonProperty("enabled")
+        val isEnabled: Boolean = true,
         @JsonProperty("allowingPasswordChange")
         val isAllowingPasswordChange: Boolean = false,
         @JsonProperty("groupMappingSupported")

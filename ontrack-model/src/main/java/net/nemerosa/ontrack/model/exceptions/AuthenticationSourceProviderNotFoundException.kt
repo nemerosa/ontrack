@@ -1,10 +1,7 @@
-package net.nemerosa.ontrack.model.exceptions;
+package net.nemerosa.ontrack.model.exceptions
 
-import net.nemerosa.ontrack.common.BaseException;
+import net.nemerosa.ontrack.common.BaseException
 
-public class AuthenticationSourceProviderNotFoundException extends BaseException {
-
-    public AuthenticationSourceProviderNotFoundException(String id) {
-        super("Authentication source with ID %s cannot be found.", id);
-    }
-}
+class AuthenticationSourceProviderNotFoundException(id: String) : BaseException(
+        "Authentication source provider with ID $id cannot be found."
+)

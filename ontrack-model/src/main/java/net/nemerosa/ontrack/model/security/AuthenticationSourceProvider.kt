@@ -6,13 +6,14 @@ package net.nemerosa.ontrack.model.security
  * @see net.nemerosa.ontrack.model.security.AuthenticationSource
  */
 interface AuthenticationSourceProvider {
-    /**
-     * Gets the source descriptor
-     */
-    val source: AuthenticationSource
 
     /**
-     * Is this provided enabled?
+     * ID of this provider
      */
-    val isEnabled: Boolean
+    val id: String
+
+    /**
+     * Gets the sources from this provider
+     */
+    val sources: List<AuthenticationSource>
 }
