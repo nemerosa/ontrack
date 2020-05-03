@@ -25,6 +25,7 @@
         <tr ng-if="resources.resources.length == 0" class="info">
             <td colspan="7">
                 No OIDC provider has been registered yet.
+                Click <a class="ot-action" ng-click="createProvider()">here</a> to create one.
             </td>
         </tr>
         <tr ng-repeat="provider in resources.resources">

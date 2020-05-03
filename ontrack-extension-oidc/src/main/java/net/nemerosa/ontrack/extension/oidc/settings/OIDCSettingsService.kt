@@ -10,4 +10,9 @@ interface OIDCSettingsService {
      */
     val providers: List<OntrackOIDCProvider>
 
+    /**
+     * Creation of a OIDC provider
+     */
+    fun createProvider(input: OntrackOIDCProvider): OntrackOIDCProvider
+
 }
