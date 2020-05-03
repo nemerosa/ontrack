@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.support
 
-import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.UISecurityExtension
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
@@ -54,13 +53,9 @@ class WebSecurityConfig {
     @Configuration
     @ConditionalOnWebApplication
     class UIWebSecurityConfigurerAdapter(
-            private val extensionManager: ExtensionManager
+            private val uiSecurityExtensions: List<UISecurityExtension>
     ) : WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
-
-            // Gets the UI extensions
-            val uiSecurityExtensions = extensionManager.getExtensions(UISecurityExtension::class.java)
-
             http {
                 // Enabling JS Cookies for CSRF protection (for AngularJS)
                 csrf {
