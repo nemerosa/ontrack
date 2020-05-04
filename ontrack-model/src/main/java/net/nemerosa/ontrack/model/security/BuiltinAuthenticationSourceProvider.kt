@@ -11,7 +11,7 @@ class BuiltinAuthenticationSourceProvider : AuthenticationSourceProvider {
 
         val SOURCE = AuthenticationSource(
                 provider = ID,
-                key = "built-in",
+                key = "",
                 name = "Built-in",
                 isEnabled = true,
                 isAllowingPasswordChange = true

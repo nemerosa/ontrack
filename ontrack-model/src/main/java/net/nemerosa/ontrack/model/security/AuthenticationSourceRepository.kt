@@ -25,7 +25,7 @@ interface AuthenticationSourceRepository {
     fun getAuthenticationSource(provider: String, source: String): AuthenticationSource? =
             getAuthenticationSourceProvider(provider)
                     .sources
-                    .find { it.name == source }
+                    .find { it.key == source }
 
     /**
      * Gets an authentication source using the provider ID and the source name.

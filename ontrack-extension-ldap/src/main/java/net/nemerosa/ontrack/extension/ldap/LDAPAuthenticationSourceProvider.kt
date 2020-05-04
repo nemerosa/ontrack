@@ -18,7 +18,7 @@ class LDAPAuthenticationSourceProvider(
         const val ID = "ldap"
         val SOURCE = AuthenticationSource(
                 provider = ID,
-                key = "ldap",
+                key = "",
                 name = "LDAP authentication",
                 isAllowingPasswordChange = false,
                 isGroupMappingSupported = true
