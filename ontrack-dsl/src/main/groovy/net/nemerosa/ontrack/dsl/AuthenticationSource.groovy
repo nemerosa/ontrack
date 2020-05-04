@@ -10,9 +10,14 @@ class AuthenticationSource extends AbstractResource {
         super(ontrack, node)
     }
 
-    @DSLMethod("Identifier for the source: ldap, password")
-    String getId() {
-        return node.id as String
+    @DSLMethod("Identifier for the source provider: ldap, built-in, oidc, etc.")
+    String getProvider() {
+        return node.provider as String
+    }
+
+    @DSLMethod("Identifier for the source itself. Might be blank.")
+    String getKey() {
+        return node.key as String
     }
 
     @DSLMethod("Display name for the source")

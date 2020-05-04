@@ -27,8 +27,8 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert account.fullName == "Damien Coraboeuf"
         assert account.email == "dcoraboeuf@nemerosa.net"
         assert account.authenticationSource.allowingPasswordChange
-        assert account.authenticationSource.id == "password"
-        assert account.authenticationSource.name == "Built-in"
+        assert account.authenticationSource.provider == "built-in"
+        assert account.authenticationSource.key == ""
         assert account.role == "USER"
         assert account.accountGroups == []
     }
@@ -45,8 +45,8 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert account.fullName == "Damien Coraboeuf"
         assert account.email == "dcoraboeuf@nemerosa.net"
         assert account.authenticationSource.allowingPasswordChange
-        assert account.authenticationSource.id == "password"
-        assert account.authenticationSource.name == "Built-in"
+        assert account.authenticationSource.provider == "built-in"
+        assert account.authenticationSource.key == ""
         assert account.role == "USER"
         assert account.accountGroups == []
     }
@@ -63,7 +63,8 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert account.fullName == "Damien Coraboeuf"
         assert account.email == "dcoraboeuf@nemerosa.net"
         assert account.authenticationSource.allowingPasswordChange
-        assert account.authenticationSource.id == "password"
+        assert account.authenticationSource.provider == "built-in"
+        assert account.authenticationSource.key == ""
         assert account.authenticationSource.name == "Built-in"
         assert account.role == "USER"
         assert account.accountGroups == []
@@ -87,8 +88,8 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert account.fullName == "Damien Coraboeuf"
         assert account.email == "dcoraboeuf@nemerosa.net"
         assert account.authenticationSource.allowingPasswordChange
-        assert account.authenticationSource.id == "password"
-        assert account.authenticationSource.name == "Built-in"
+        assert account.authenticationSource.provider == "built-in"
+        assert account.authenticationSource.key == ""
         assert account.role == "USER"
         assert account.accountGroups == []
     }
@@ -104,7 +105,8 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert account.fullName == "Damien Coraboeuf"
         assert account.email == "dcoraboeuf@nemerosa.net"
         assert account.authenticationSource.allowingPasswordChange
-        assert account.authenticationSource.id == "password"
+        assert account.authenticationSource.provider == "built-in"
+        assert account.authenticationSource.key == ""
         assert account.authenticationSource.name == "Built-in"
         assert account.role == "USER"
         assert account.accountGroups == []
