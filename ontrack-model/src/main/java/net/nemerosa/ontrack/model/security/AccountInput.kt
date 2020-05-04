@@ -17,7 +17,7 @@ data class AccountInput(
         @get:NotNull(message = "The account email is required.")
         @get:Size(min = 1, max = 200, message = "The account email must be between 1 and 200 long.")
         val email: String,
-        val password: String,
+        val password: String?,
         /**
          * List of selected groups. It can be `null`, meaning that the list of groups
          * must be empty.

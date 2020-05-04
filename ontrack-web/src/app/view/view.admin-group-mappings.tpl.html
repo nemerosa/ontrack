@@ -3,7 +3,7 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>Provider</th>
+            <th>Authentication source</th>
             <th>Provided group</th>
             <th>Ontrack group</th>
             <th>&nbsp;</th>
@@ -13,8 +13,8 @@
             <tr class="info">
                 <td>
                     <select id="form-provider" class="form-control"
-                            ng-options="item.source.id as item.source.name for item in sourceProviders"
-                            ng-model="mappingForm.provider"
+                            ng-options="source as sourceDisplayName(source) for source in sources"
+                            ng-model="mappingForm.source"
                     >
                         <option value=""></option>
                     </select>
@@ -38,7 +38,7 @@
                 </td>
                 <td>
                     <button id="form-button" class="btn btn-primary" ng-click="createMapping()"
-                            ng-disabled="!mappingForm.group || !mappingForm.provider || !mappingForm.mapping"
+                            ng-disabled="!mappingForm.group || !mappingForm.source || !mappingForm.mapping"
                             title="Creates a new mapping">
                         <span class="fa fa-plus"></span>
                     </button>
@@ -52,8 +52,8 @@
         <tr>
             <td>
                 <select id="filter-provider" class="form-control"
-                        ng-options="item.source.id as item.source.name for item in sourceProviders"
-                        ng-model="filterMapping.provider"
+                        ng-options="source as sourceDisplayName(source) for source in sources"
+                        ng-model="filterMapping.source"
                 >
                     <option value="">All</option>
                 </select>
@@ -77,8 +77,8 @@
         <tbody>
         <tr ng-repeat="mapping in mappings">
             <td>
-                <span ng-if="mapping.provider.enabled" title="This mapping is active."><span class="fa fa-check text-success"></span> {{mapping.provider.source.name}}</span>
-                <span ng-if="!mapping.provider.enabled" title="This mapping is inactive."><span class="fa times text-danger"></span> {{mapping.provider.source.name}}</span>
+                <span ng-if="mapping.authenticationSource.enabled" title="This mapping is active."><span class="fa fa-check text-success"></span> {{sourceDisplayName(mapping.authenticationSource)}}</span>
+                <span ng-if="!mapping.authenticationSource.enabled" title="This mapping is inactive."><span class="fa times text-danger"></span> {{sourceDisplayName(mapping.authenticationSource)}}</span>
             </td>
             <td>{{mapping.name}}</td>
             <td>

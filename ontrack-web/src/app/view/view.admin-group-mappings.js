@@ -20,17 +20,11 @@ angular.module('ot.view.admin-group-mappings', [
         ];
 
         let query = `
-            query Mappings($provider: String, $mapping: String, $group: String) {
-              authenticationSourceProviders(groupMappingSupported: true) {
-                enabled
-                source {
-                  id
-                  name
-                  allowingPasswordChange
-                  groupMappingSupported
-                }
+            query Mappings($provider: String, $source: String, $mapping: String, $group: String) {
+              authenticationSources(groupMappingSupported: true) {
+                ...sourceFields
               }
-              accountGroupMappings(type: $provider, name: $mapping, group: $group) {
+              accountGroupMappings(provider: $provider, source: $source, name: $mapping, group: $group) {
                 id
                 name
                 group {
@@ -38,59 +32,83 @@ angular.module('ot.view.admin-group-mappings', [
                   name
                   description
                 }
-                type
+                authenticationSource {
+                  ...sourceFields
+                }
               }
               accountGroups {
                 id
                 name
               }
             }
+            
+            fragment sourceFields on AuthenticationSource {
+              provider
+              key
+              name
+              enabled
+              allowingPasswordChange
+              groupMappingSupported
+            }
         `;
 
         let queryVariables = {
             provider: "",
+            source: "",
             mapping: "",
             group: ""
         };
 
         $scope.filterMapping = {
-            provider: "",
+            source: "",
             mapping: "",
             group: ""
         };
 
         $scope.mappingForm = {
-            provider: "",
+            source: "",
             mapping: "",
             group: ""
         };
 
+        let viewInitialized = false;
+
         let loadMappings = () => {
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
-                $scope.groups = data.accountGroups;
+                if (!viewInitialized) {
+                    $scope.groups = data.accountGroups;
+                    $scope.sources = data.authenticationSources;
+                    viewInitialized = true;
+                }
                 $scope.mappings = data.accountGroupMappings;
-                $scope.sourceProviders = data.authenticationSourceProviders;
-                $scope.sourceProvidersIndex = {};
-                $scope.sourceProviders.forEach((sourceProvider) => {
-                    $scope.sourceProvidersIndex[sourceProvider.source.id] = sourceProvider;
-                });
-                $scope.mappings.forEach((mapping) => {
-                    mapping.provider =  $scope.sourceProvidersIndex[mapping.type];
-                });
             });
         };
 
         loadMappings();
 
+        $scope.sourceDisplayName = (source) => {
+            if (source.key) {
+                return `${source.name} (${source.provider})`;
+            } else {
+                return source.name;
+            }
+        };
+
         $scope.filterClear = () => {
             $scope.filterMapping.mapping = "";
-            $scope.filterMapping.provider = "";
+            $scope.filterMapping.source = "";
             $scope.filterMapping.group = "";
             $scope.filterLaunch();
         };
 
         $scope.filterLaunch = () => {
-            queryVariables.provider = $scope.filterMapping.provider;
+            if ($scope.filterMapping.source) {
+                queryVariables.provider = $scope.filterMapping.source.provider;
+                queryVariables.source = $scope.filterMapping.source.key;
+            } else {
+                queryVariables.provider = "";
+                queryVariables.source = "";
+            }
             queryVariables.mapping = $scope.filterMapping.mapping;
             queryVariables.group = $scope.filterMapping.group;
             loadMappings();
@@ -98,33 +116,35 @@ angular.module('ot.view.admin-group-mappings', [
 
         $scope.formClear = () => {
             $scope.mappingForm.mapping = "";
-            $scope.mappingForm.provider = "";
+            $scope.mappingForm.source = "";
             $scope.mappingForm.group = "";
         };
 
         $scope.createMapping = () => {
             let data = $scope.mappingForm;
-            if (data.mapping && data.provider && data.group) {
-                ot.pageCall($http.post(`rest/group-mappings/${data.provider}`, {
+            if (data.mapping && data.source && data.group) {
+                ot.pageCall($http.post(`rest/group-mappings/${data.source.provider}/${data.source.key}`, {
                     name: data.mapping,
                     group: data.group
                 })).then((groupMapping) => {
                     loadMappings();
-                    $scope.formClear();
+                    $scope.mappingForm.mapping = "";
+                    $scope.mappingForm.group = "";
                 });
             }
         };
 
         $scope.getSuggestedMappings = (token) => {
-            if ($scope.mappingForm.provider) {
-                return ot.call($http.get(`/rest/group-mappings/${$scope.mappingForm.provider}/search/${token}`)).then(names => names);
+            if ($scope.mappingForm.source) {
+                let source = $scope.mappingForm.source;
+                return ot.call($http.get(`/rest/group-mappings/${source.provider}/${source.key}/search/${token}`)).then(names => names);
             } else {
                 return [];
             }
         };
 
         $scope.deleteMapping = (mapping) => {
-            ot.pageCall($http.delete(`rest/group-mappings/${mapping.provider.source.id}/${mapping.id}`)).then(loadMappings);
+            ot.pageCall($http.delete(`rest/group-mappings/${mapping.authenticationSource.provider}/${mapping.authenticationSource.key}/${mapping.id}`)).then(loadMappings);
         };
     })
 ;
