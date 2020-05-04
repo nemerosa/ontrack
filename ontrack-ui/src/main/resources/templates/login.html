@@ -50,11 +50,15 @@
         <!-- Extension links -->
         <div class="row" th:each="extension : ${extensions}">
             <div class="col-sm-12">
-                <a th:id="${extension.id}"
-                   th:href="${extension.link}"
-                   th:text="${extension.name}"
-                   th:title="${extension.description}"
-                   class="btn btn-outline-info btn-block"></a>
+                <form>
+                    <div class="form-group">
+                        <a th:id="${extension.id}"
+                           th:href="${extension.link}"
+                           th:text="${extension.name}"
+                           th:title="${extension.description}"
+                           class="btn btn-outline-info btn-block"></a>
+                    </div>
+                </form>
             </div>
         </div>
 
