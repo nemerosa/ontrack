@@ -9,7 +9,7 @@ import javax.validation.constraints.Size
  */
 data class AccountInput(
         @get:NotNull(message = "The account name is required.")
-        @get:Pattern(regexp = "[a-zA-Z0-9_.-]+", message = "The account name must contain only letters, digits, underscores, dashes and dots.")
+        @get:Pattern(regexp = "[a-zA-Z0-9@_.-]+", message = "The account name must contain only letters, digits, underscores, @, dashes and dots.")
         val name: String,
         @get:NotNull(message = "The account full name is required.")
         @get:Size(min = 1, max = 100, message = "The account full name must be between 1 and 100 long.")

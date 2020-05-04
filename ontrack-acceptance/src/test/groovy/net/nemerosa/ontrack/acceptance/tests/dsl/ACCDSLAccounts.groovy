@@ -23,6 +23,7 @@ class ACCDSLAccounts extends AbstractACCDSL {
         // Checks it has been created
         def account = ontrack.admin.accounts.find { it.name == name }
         assert account != null
+        assert account.name == name
         assert account.fullName == "Damien Coraboeuf"
         assert account.email == "dcoraboeuf@nemerosa.net"
         assert account.authenticationSource.allowingPasswordChange
@@ -40,6 +41,25 @@ class ACCDSLAccounts extends AbstractACCDSL {
         // Checks it has been created
         def account = ontrack.admin.accounts.find { it.name == name }
         assert account != null
+        assert account.name == name
+        assert account.fullName == "Damien Coraboeuf"
+        assert account.email == "dcoraboeuf@nemerosa.net"
+        assert account.authenticationSource.allowingPasswordChange
+        assert account.authenticationSource.id == "password"
+        assert account.authenticationSource.name == "Built-in"
+        assert account.role == "USER"
+        assert account.accountGroups == []
+    }
+
+    @Test
+    void 'Creation of account with a @ in its name'() {
+        // Account
+        def name = "damien.${uid('N')}@nemerosa.net"
+        ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net", "xxxx")
+        // Checks it has been created
+        def account = ontrack.admin.accounts.find { it.name == name }
+        assert account != null
+        assert account.name == name
         assert account.fullName == "Damien Coraboeuf"
         assert account.email == "dcoraboeuf@nemerosa.net"
         assert account.authenticationSource.allowingPasswordChange
