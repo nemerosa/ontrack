@@ -27,8 +27,6 @@ dependencies {
     implementation("commons-io:commons-io")
     implementation("jakarta.validation:jakarta.validation-api")
 
-    "developmentOnly"("org.springframework.boot:spring-boot-devtools")
-
     runtimeOnly(project(":ontrack-service"))
     runtimeOnly(project(":ontrack-repository-impl"))
     runtimeOnly("org.postgresql:postgresql")
@@ -154,10 +152,6 @@ tasks.named<BootRun>("bootRun") {
 val bootJar = tasks.getByName<BootJar>("bootJar") {
     // Specific classifier
     archiveClassifier.set("app")
-    // Allowing the declaration of external extensions, packaged using the Spring Boot Module format
-    manifest {
-        attributes("Main-Class" to "org.springframework.boot.loader.PropertiesLauncher")
-    }
 }
 
 publishing {
