@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
+
 /**
  * Definition of an OIDC provider so that it's useable by Ontrack.
  *
@@ -11,6 +14,8 @@ package net.nemerosa.ontrack.extension.oidc.settings
  * @property clientSecret OIDC client secret
  */
 data class OntrackOIDCProvider(
+        @get:NotNull(message = "The account name is required.")
+        @get:Pattern(regexp = "[a-zA-Z0-9_-]+", message = "The ID must contain only letters, digits, underscores and dashes.")
         val id: String,
         val name: String,
         val description: String,

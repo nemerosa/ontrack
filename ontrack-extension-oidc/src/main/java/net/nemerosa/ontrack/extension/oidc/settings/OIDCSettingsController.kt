@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/extension/oidc/providers")
@@ -41,7 +42,7 @@ class OIDCSettingsController(
      * Creation of a provider
      */
     @PostMapping("create")
-    fun createProvider(@RequestBody input: OntrackOIDCProvider) =
+    fun createProvider(@RequestBody @Valid input: OntrackOIDCProvider) =
             ResponseEntity.ok(
                     oidcSettingsService.createProvider(input)
             )
@@ -68,7 +69,7 @@ class OIDCSettingsController(
      * Updates a provider
      */
     @PutMapping("update/{id}")
-    fun updateProvider(@PathVariable id: String, @RequestBody input: OntrackOIDCProvider): OntrackOIDCProvider =
+    fun updateProvider(@PathVariable id: String, @RequestBody @Valid input: OntrackOIDCProvider): OntrackOIDCProvider =
             if (input.id != id) {
                 throw OntrackOIDCProviderIDMustMatchException(id, input.id)
             } else {
@@ -106,7 +107,7 @@ class OIDCSettingsController(
                     Password.of("clientSecret").label("Client secret")
                             .help("OIDC client secret")
                             .value("")
-                            .optional(provider != null)
+                            .optional()
             )
 
 }
