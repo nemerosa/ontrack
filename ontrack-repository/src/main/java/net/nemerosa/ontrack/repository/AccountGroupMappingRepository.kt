@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.AccountGroup
 import net.nemerosa.ontrack.model.security.AccountGroupMapping
 import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
+import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.structure.ID
 
 /**
@@ -15,28 +16,28 @@ interface AccountGroupMappingRepository {
      * For the given `mapping` type, collects the [AccountGroup] which are associated
      * with the `mappedName` name.
      *
-     * @param mapping    Mapping type, for example: "ldap"
-     * @param mappedName Mapping name, for example: "Administrator"
+     * @param  authenticationSource    Authentication source
+     * @param origin Mapping name, for example: "Administrator"
      * @return List of mapped groups, can be empty, but not null
      */
-    fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup>
+    fun getGroups(authenticationSource: AuthenticationSource, origin: String): Collection<AccountGroup>
 
     /**
      * For the given `mapping` type, collects the [mappings][AccountGroupMapping].
      *
-     * @param mapping Mapping type, for example: "ldap"
+     * @param  authenticationSource    Authentication source
      * @return List of mappings, can be empty, but not null
      */
-    fun getMappings(mapping: String): List<AccountGroupMapping>
+    fun getMappings(authenticationSource: AuthenticationSource): List<AccountGroupMapping>
 
     /**
      * Creates a new mapping
      *
-     * @param mapping Mapping type, for example: "ldap"
+     * @param  authenticationSource    Authentication source
      * @param input   Input data for the mapping
      * @return Created mapping
      */
-    fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping
+    fun newMapping(authenticationSource: AuthenticationSource, input: AccountGroupMappingInput): AccountGroupMapping
 
     /**
      * Gets a mapping by its ID

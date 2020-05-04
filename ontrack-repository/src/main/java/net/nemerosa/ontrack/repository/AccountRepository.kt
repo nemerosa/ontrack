@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountGroup
-import net.nemerosa.ontrack.model.security.AuthenticationSource
-import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider
 import net.nemerosa.ontrack.model.structure.ID
-import java.util.*
 
 interface AccountRepository {
 
@@ -19,7 +16,7 @@ interface AccountRepository {
     /**
      * Gets the list of all accounts
      */
-    fun findAll(authenticationSourceFunction: (String) -> AuthenticationSource): Collection<Account>
+    fun findAll(): Collection<Account>
 
     /**
      * Creates a new account
@@ -44,24 +41,23 @@ interface AccountRepository {
     /**
      * Loads an account by ID
      */
-    fun getAccount(accountId: ID, authenticationSourceFunction: (String) -> AuthenticationSource): Account
+    fun getAccount(accountId: ID): Account
 
     /**
      * Looks for accounts based on some text.
      */
-    fun findByNameToken(token: String, authenticationSourceFunction: (String) -> AuthenticationSource): List<Account>
+    fun findByNameToken(token: String): List<Account>
 
     /**
      * Gets the list of accounts associated with this account group.
      *
      * @param accountGroup                 Account group
-     * @param authenticationSourceFunction Access to the authentication sources
      * @return List of accounts
      */
-    fun getAccountsForGroup(accountGroup: AccountGroup, authenticationSourceFunction: (String) -> AuthenticationSource): List<Account>
+    fun getAccountsForGroup(accountGroup: AccountGroup): List<Account>
 
     /**
      * Finds an account using its name only.
      */
-    fun findAccountByName(username: String, function: (String) -> AuthenticationSource): Account?
+    fun findAccountByName(username: String): Account?
 }

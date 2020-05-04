@@ -24,17 +24,22 @@ class GQLRootQueryAdminAccountGroupMappings(
                 .name("accountGroupMappings")
                 .type(GraphqlUtils.stdList(accountGroupMapping.typeRef))
                 .argument { a: GraphQLArgument.Builder ->
-                    a.name(MAPPING_TYPE_ARGUMENT)
-                            .description("Mapping type")
+                    a.name(ARG_PROVIDER)
+                            .description("Authentication source provider")
                             .type(GraphQLString)
                 }
                 .argument { a: GraphQLArgument.Builder ->
-                    a.name(MAPPING_NAME_ARGUMENT)
+                    a.name(ARG_SOURCE)
+                            .description("Authentication source name")
+                            .type(GraphQLString)
+                }
+                .argument { a: GraphQLArgument.Builder ->
+                    a.name(ARG_NAME)
                             .description("Mapping name")
                             .type(GraphQLString)
                 }
                 .argument { a: GraphQLArgument.Builder ->
-                    a.name(MAPPING_GROUP_ARGUMENT)
+                    a.name(ARG_GROUP)
                             .description("Group name")
                             .type(GraphQLString)
                 }
@@ -45,31 +50,34 @@ class GQLRootQueryAdminAccountGroupMappings(
     private fun adminAccountGroupMappingsFetcher() = DataFetcher { environment: DataFetchingEnvironment ->
         var filter = { _: AccountGroupMapping -> true }
         // Filter on name
-        val nameArgument: String? = environment.getArgument<String>(MAPPING_NAME_ARGUMENT)
+        val nameArgument: String? = environment.getArgument<String>(ARG_NAME)
         if (nameArgument != null && nameArgument.isNotBlank()) {
             filter = filter and { agm: AccountGroupMapping -> agm.name.contains(nameArgument, ignoreCase = true) }
         }
         // Filter on group
-        val groupArgument: String? = environment.getArgument<String>(MAPPING_GROUP_ARGUMENT)
+        val groupArgument: String? = environment.getArgument<String>(ARG_GROUP)
         if (groupArgument != null && groupArgument.isNotBlank()) {
             filter = filter.and { agm: AccountGroupMapping -> agm.group.name.contains(groupArgument, ignoreCase = true) }
         }
-        // Filter on type
-        val typeArgument: String? = environment.getArgument<String>(MAPPING_TYPE_ARGUMENT)
-        // Getting the unfiltered list
-        val unfiltered = if (typeArgument != null && typeArgument.isNotBlank()) {
-            accountGroupMappingService.getMappings(typeArgument)
-        } else {
-            accountGroupMappingService.mappings
+        // Filter on provider
+        val providerArgument: String? = environment.getArgument<String>(ARG_PROVIDER)
+        if (providerArgument != null && providerArgument.isNotBlank()) {
+            filter = filter and { agm: AccountGroupMapping -> agm.authenticationSource.provider.equals(providerArgument, ignoreCase = true) }
         }
-        // Filtering
-        unfiltered.filter(filter)
+        // Filter on source
+        val sourceArgument: String? = environment.getArgument<String>(ARG_SOURCE)
+        if (sourceArgument != null && sourceArgument.isNotBlank()) {
+            filter = filter and { agm: AccountGroupMapping -> agm.authenticationSource.key.equals(sourceArgument, ignoreCase = true) }
+        }
+        // Getting the filtered list
+        accountGroupMappingService.mappings.filter(filter)
     }
 
     companion object {
-        private const val MAPPING_TYPE_ARGUMENT = "type"
-        private const val MAPPING_NAME_ARGUMENT = "name"
-        private const val MAPPING_GROUP_ARGUMENT = "group"
+        private const val ARG_PROVIDER = "provider"
+        private const val ARG_SOURCE = "source"
+        private const val ARG_NAME = "origin"
+        private const val ARG_GROUP = "group"
     }
 
 }

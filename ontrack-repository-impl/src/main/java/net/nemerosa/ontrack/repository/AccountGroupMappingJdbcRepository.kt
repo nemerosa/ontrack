@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingNotFoundException
-import net.nemerosa.ontrack.model.security.AccountGroup
-import net.nemerosa.ontrack.model.security.AccountGroupMapping
-import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
@@ -19,45 +17,48 @@ import javax.sql.DataSource
 @Repository
 class AccountGroupMappingJdbcRepository(
         dataSource: DataSource,
-        private val accountGroupRepository: AccountGroupRepository
+        private val accountGroupRepository: AccountGroupRepository,
+        private val authenticationSourceRepository: AuthenticationSourceRepository
 ) : AbstractJdbcRepository(dataSource), AccountGroupMappingRepository {
 
-    override fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup> {
+    override fun getGroups(authenticationSource: AuthenticationSource, origin: String): Collection<AccountGroup> {
         return namedParameterJdbcTemplate!!
                 .queryForList(
-                        "SELECT GROUPID FROM ACCOUNT_GROUP_MAPPING WHERE MAPPING = :mapping AND SOURCE = :mappedName",
-                        params("mapping", mapping).addValue("mappedName", mappedName),
+                        "SELECT GROUPID FROM ACCOUNT_GROUP_MAPPING WHERE PROVIDER = :provider AND SOURCE = :source AND ORIGIN = :origin",
+                        authenticationSource.asParams()
+                                .addValue("origin", origin),
                         Int::class.java
                 )
                 .map { groupId: Int -> accountGroupRepository.getById(of(groupId)) }
     }
 
-    override fun getMappings(mapping: String): List<AccountGroupMapping> {
+    override fun getMappings(authenticationSource: AuthenticationSource): List<AccountGroupMapping> {
         return namedParameterJdbcTemplate!!
                 .query(
-                        "SELECT * FROM ACCOUNT_GROUP_MAPPING WHERE MAPPING = :mapping ORDER BY SOURCE, MAPPING",
-                        params("mapping", mapping)) { rs: ResultSet, rowNum: Int ->
+                        "SELECT * FROM ACCOUNT_GROUP_MAPPING WHERE PROVIDER = :provider AND SOURCE = :source  ORDER BY ORIGIN, PROVIDER, SOURCE",
+                        authenticationSource.asParams()
+                ) { rs: ResultSet, rowNum: Int ->
                     toAccountGroupMapping(rs, rowNum)
                 }
     }
 
     override fun findAll(): List<AccountGroupMapping> {
         return jdbcTemplate!!.query(
-                "SELECT * FROM ACCOUNT_GROUP_MAPPING ORDER BY SOURCE, MAPPING"
+                "SELECT * FROM ACCOUNT_GROUP_MAPPING ORDER BY ORIGIN, PROVIDER, SOURCE"
         ) { rs: ResultSet, rowNum: Int ->
             toAccountGroupMapping(rs, rowNum)
         }
     }
 
-    override fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping {
+    override fun newMapping(authenticationSource: AuthenticationSource, input: AccountGroupMappingInput): AccountGroupMapping {
         return try {
             getMapping(
                     of(
                             dbCreate(
-                                    "INSERT INTO ACCOUNT_GROUP_MAPPING(MAPPING, SOURCE, GROUPID) " +
-                                            "VALUES(:mapping, :source, :groupId)",
-                                    params("mapping", mapping)
-                                            .addValue("source", input.name)
+                                    "INSERT INTO ACCOUNT_GROUP_MAPPING(PROVIDER, SOURCE, ORIGIN, GROUPID) " +
+                                            "VALUES(:provider, :source, :origin, :groupId)",
+                                    authenticationSource.asParams()
+                                            .addValue("origin", input.name)
                                             .addValue("groupId", input.group.get())
                             )
                     )
@@ -108,10 +109,13 @@ class AccountGroupMappingJdbcRepository(
 
     @Throws(SQLException::class)
     protected fun toAccountGroupMapping(rs: ResultSet, rowNum: Int): AccountGroupMapping {
+        val provider = rs.getString("PROVIDER")
+        val source = rs.getString("SOURCE")
+        val authenticationSource = authenticationSourceRepository.getRequiredAuthenticationSource(provider, source)
         return AccountGroupMapping(
                 id(rs),
-                rs.getString("MAPPING"),
-                rs.getString("SOURCE"),
+                authenticationSource,
+                rs.getString("ORIGIN"),
                 accountGroupRepository.getById(id(rs, "GROUPID"))
         )
     }

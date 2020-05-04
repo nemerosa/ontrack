@@ -37,10 +37,9 @@ public interface AccountService {
      * Creates an account and allows for further customisation
      *
      * @param input                    Account data
-     * @param authenticationSourceMode Authentication mode
-     * @see AuthenticationSourceService#getAuthenticationSource(String)
+     * @param authenticationSource Authentication source
      */
-    Account create(AccountInput input, String authenticationSourceMode);
+    Account create(AccountInput input, AuthenticationSource authenticationSource);
 
     /**
      * Gets an account using its ID

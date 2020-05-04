@@ -5,7 +5,7 @@ import graphql.schema.DataFetcher
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
-import net.nemerosa.ontrack.model.security.AuthenticationSourceService
+import net.nemerosa.ontrack.model.security.AuthenticationSourceRepository
 import org.springframework.stereotype.Component
 
 /**
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class GQLRootQueryAuthenticationSourceProviders(
-        private val authenticationSourceProvider: GQLTypeAuthenticationSourceProvider,
-        private val authenticationSourceService: AuthenticationSourceService
+        private val authenticationSource: GQLTypeAuthenticationSource,
+        private val authenticationSourceRepository: AuthenticationSourceRepository
 ) : GQLRootQuery {
 
     companion object {
@@ -25,11 +25,11 @@ class GQLRootQueryAuthenticationSourceProviders(
 
     override fun getFieldDefinition(): GraphQLFieldDefinition =
             GraphQLFieldDefinition.newFieldDefinition()
-                    .name("authenticationSourceProviders")
-                    .description("List of all authentication source providers.")
+                    .name("authenticationSources")
+                    .description("List of all authentication sources.")
                     .argument {
                         it.name(ARG_ENABLED)
-                                .description("Filters on authentication source providers which are enabled")
+                                .description("Filters on authentication source which are enabled")
                                 .type(GraphQLBoolean)
                     }
                     .argument {
@@ -42,7 +42,7 @@ class GQLRootQueryAuthenticationSourceProviders(
                                 .description("Filters on authentication sources which allow the user's password to be changed")
                                 .type(GraphQLBoolean)
                     }
-                    .type(stdList(authenticationSourceProvider.typeRef))
+                    .type(stdList(authenticationSource.typeRef))
                     .dataFetcher(authenticationSourcesDataFetcher())
                     .build()
 
@@ -50,10 +50,10 @@ class GQLRootQueryAuthenticationSourceProviders(
         val enabled: Boolean? = env.getArgument(ARG_ENABLED)
         val groupMappingSupported: Boolean? = env.getArgument(ARG_GROUP_MAPPING_SUPPORTED)
         val allowingPasswordChange: Boolean? = env.getArgument(ARG_ALLOWING_PASSWORD_CHANGE)
-        authenticationSourceService.authenticationSourceProviders
+        authenticationSourceRepository.authenticationSources
                 .filter { enabled == null || enabled == it.isEnabled }
-                .filter { groupMappingSupported == null || groupMappingSupported == it.source.isGroupMappingSupported }
-                .filter { allowingPasswordChange == null || allowingPasswordChange == it.source.isAllowingPasswordChange }
+                .filter { groupMappingSupported == null || groupMappingSupported == it.isGroupMappingSupported }
+                .filter { allowingPasswordChange == null || allowingPasswordChange == it.isAllowingPasswordChange }
     }
 
 }

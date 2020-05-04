@@ -21,9 +21,9 @@ class ProvidedGroupsJdbcRepository(dataSource: DataSource) : AbstractJdbcReposit
                 params("account", account)
         )
         // Adds the groups
-        val params = params("account", account).addValue("mode", source.id)
+        val params = source.asParams().addValue("account", account)
         namedParameterJdbcTemplate!!.batchUpdate(
-                "INSERT INTO PROVIDED_GROUPS(ACCOUNT, MODE, GROUP_NAME) VALUES (:account, :mode, :groupName)",
+                "INSERT INTO PROVIDED_GROUPS(ACCOUNT, PROVIDER, SOURCE, GROUP_NAME) VALUES (:account, :provider, :source, :groupName)",
                 groups.filter { group ->
                     group.length <= GROUP_NAME_MAX_LENGTH
                 }.map { group ->
@@ -34,15 +34,15 @@ class ProvidedGroupsJdbcRepository(dataSource: DataSource) : AbstractJdbcReposit
 
     override fun getProvidedGroups(account: Int, source: AuthenticationSource): Set<String> =
             namedParameterJdbcTemplate!!.queryForList(
-                    "SELECT GROUP_NAME FROM PROVIDED_GROUPS WHERE ACCOUNT = :account AND MODE = :mode",
-                    params("account", account).addValue("mode", source.id),
+                    "SELECT GROUP_NAME FROM PROVIDED_GROUPS WHERE ACCOUNT = :account AND PROVIDER = :provider AND SOURCE = :source",
+                    source.asParams().addValue("account", account),
                     String::class.java
             ).toSet()
 
-    override fun getSuggestedGroups(type: String, token: String): List<String> =
+    override fun getSuggestedGroups(source: AuthenticationSource, token: String): List<String> =
             namedParameterJdbcTemplate!!.queryForList(
-                    "SELECT GROUP_NAME FROM PROVIDED_GROUPS WHERE MODE = :mode AND LOWER(GROUP_NAME) LIKE :token ORDER BY GROUP_NAME",
-                    params("mode", type).addValue("token", "%${token.toLowerCase()}%"),
+                    "SELECT GROUP_NAME FROM PROVIDED_GROUPS WHERE PROVIDER = :provider AND SOURCE = :source AND LOWER(GROUP_NAME) LIKE :token ORDER BY GROUP_NAME",
+                    source.asParams().addValue("token", "%${token.toLowerCase()}%"),
                     String::class.java
             )
 

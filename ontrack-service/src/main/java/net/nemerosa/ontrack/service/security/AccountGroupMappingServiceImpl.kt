@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingWrongTypeException
-import net.nemerosa.ontrack.model.security.AccountGroup
-import net.nemerosa.ontrack.model.security.AccountGroupMapping
-import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
-import net.nemerosa.ontrack.model.security.AccountGroupMappingService
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.repository.AccountGroupMappingRepository
 import org.springframework.stereotype.Service
@@ -17,34 +14,34 @@ class AccountGroupMappingServiceImpl(
         private val accountGroupMappingRepository: AccountGroupMappingRepository
 ) : AccountGroupMappingService {
 
-    override fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup> =
-            accountGroupMappingRepository.getGroups(mapping, mappedName)
+    override fun getGroups(authenticationSource: AuthenticationSource, mappedName: String): Collection<AccountGroup> =
+            accountGroupMappingRepository.getGroups(authenticationSource, mappedName)
 
     override val mappings: List<AccountGroupMapping>
         get() = accountGroupMappingRepository.findAll()
 
-    override fun getMappings(mapping: String): List<AccountGroupMapping> =
-            accountGroupMappingRepository.getMappings(mapping)
+    override fun getMappings(authenticationSource: AuthenticationSource): List<AccountGroupMapping> =
+            accountGroupMappingRepository.getMappings(authenticationSource)
 
-    override fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping =
-            accountGroupMappingRepository.newMapping(mapping, input)
+    override fun newMapping(authenticationSource: AuthenticationSource, input: AccountGroupMappingInput): AccountGroupMapping =
+            accountGroupMappingRepository.newMapping(authenticationSource, input)
 
-    override fun getMapping(mapping: String, id: ID): AccountGroupMapping {
+    override fun getMapping(authenticationSource: AuthenticationSource, id: ID): AccountGroupMapping {
         val o = accountGroupMappingRepository.getMapping(id)
-        return if (mapping == o.type) {
+        return if (authenticationSource sameThan o.authenticationSource) {
             o
         } else {
-            throw AccountGroupMappingWrongTypeException(mapping, o.type)
+            throw AccountGroupMappingWrongTypeException(authenticationSource, o.authenticationSource)
         }
     }
 
-    override fun updateMapping(mapping: String, id: ID, input: AccountGroupMappingInput): AccountGroupMapping {
-        getMapping(mapping, id)
+    override fun updateMapping(authenticationSource: AuthenticationSource, id: ID, input: AccountGroupMappingInput): AccountGroupMapping {
+        getMapping(authenticationSource, id)
         return accountGroupMappingRepository.updateMapping(id, input)
     }
 
-    override fun deleteMapping(mapping: String, id: ID): Ack {
-        getMapping(mapping, id)
+    override fun deleteMapping(authenticationSource: AuthenticationSource, id: ID): Ack {
+        getMapping(authenticationSource, id)
         return accountGroupMappingRepository.deleteMapping(id)
     }
 

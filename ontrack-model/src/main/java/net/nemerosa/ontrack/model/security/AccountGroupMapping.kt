@@ -11,13 +11,13 @@ import net.nemerosa.ontrack.model.structure.ID
  * and an actual Ontrack [group][AccountGroup].
  *
  * @property id Unique ID of this mapping
- * @property type Type of mapping (maps to [AuthenticationSource.id])
+ * @property authenticationSource Authentication source
  * @property name Name of the provided group
  * @property group ID of the [AccountGroup]
  */
 data class AccountGroupMapping(
         override val id: ID,
-        val type: String,
+        val authenticationSource: AuthenticationSource,
         val name: String,
         val group: AccountGroup
 ) : Entity {

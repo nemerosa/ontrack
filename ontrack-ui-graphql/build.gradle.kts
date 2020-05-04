@@ -23,6 +23,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":ontrack-repository-impl"))
     testImplementation(project(":ontrack-extension-general"))
+    testImplementation(project(":ontrack-extension-ldap"))
 
     testRuntimeOnly(project(":ontrack-service"))
 }

@@ -112,7 +112,8 @@ class UserServiceImplTest {
     private fun authenticationSourceWithPasswordChangeAllowed(allowingPasswordChange: Boolean) =
             AuthenticationSource.none().run {
                 AuthenticationSource(
-                        id = id,
+                        provider = provider,
+                        key = key,
                         name = name,
                         isAllowingPasswordChange = allowingPasswordChange
                 )

@@ -83,7 +83,7 @@ class LDAPCachedAuthenticationProvider(
                                     password = "",
                                     groups = emptyList()
                             ),
-                            LDAPAuthenticationSourceProvider.SOURCE.id
+                            LDAPAuthenticationSourceProvider.SOURCE
                     )
                 }
                 createOntrackAuthenticatedUser(account, userDetails)

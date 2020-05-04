@@ -67,7 +67,7 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
         val user = authenticationProvider.findUser(ADMIN_USER, UsernamePasswordAuthenticationToken(ADMIN_USER, ADMIN_PASSWORD))
         assertNotNull(user) {
             val id = it.account.id()
-            assertEquals(LDAPAuthenticationSourceProvider.SOURCE.id, it.account.authenticationSource.id)
+            assertEquals(LDAPAuthenticationSourceProvider.SOURCE, it.account.authenticationSource)
             assertEquals(ADMIN_USER, it.username)
             assertEquals("", it.password)
             assertEquals("Damien Coraboeuf", it.account.fullName)
@@ -92,7 +92,7 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
         }
 
         // Creates a mapping between a LDAP group and this group
-        accountGroupMappingService.newMapping("ldap", AccountGroupMappingInput("user", ontrackGroup.id))
+        accountGroupMappingService.newMapping(LDAPAuthenticationSourceProvider.SOURCE, AccountGroupMappingInput("user", ontrackGroup.id))
 
         // Cleanup & Authentication
         setLDAPSettings()

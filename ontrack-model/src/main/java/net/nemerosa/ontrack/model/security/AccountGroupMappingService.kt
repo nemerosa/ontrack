@@ -12,11 +12,11 @@ interface AccountGroupMappingService {
      * For the given [mapping][AuthenticationSource.id] type, collects the [AccountGroup] which are associated
      * with the [mappedName] name.
      *
-     * @param mapping    Mapping type, for example: "ldap", mapped to [AuthenticationSource.id]
+     * @param authenticationSource    Authentication source
      * @param mappedName Mapping name, for example: "Administrator"
      * @return List of mapped groups
      */
-    fun getGroups(mapping: String, mappedName: String): Collection<AccountGroup>
+    fun getGroups(authenticationSource: AuthenticationSource, mappedName: String): Collection<AccountGroup>
 
     /**
      * Gets ALL the mappings
@@ -26,47 +26,47 @@ interface AccountGroupMappingService {
     /**
      * For the given [mapping][AuthenticationSource.id] type, collects the [mappings][AccountGroupMapping].
      *
-     * @param mapping Mapping type, for example: "ldap"
+     * @param authenticationSource    Authentication source
      * @return List of mappings
      */
-    fun getMappings(mapping: String): List<AccountGroupMapping>
+    fun getMappings(authenticationSource: AuthenticationSource): List<AccountGroupMapping>
 
     /**
      * Creates a new mapping
      *
-     * @param mapping Mapping type, for example: "ldap"
+     * @param authenticationSource Authentication source
      * @param input   Input data for the mapping
      * @return Created mapping
      */
-    fun newMapping(mapping: String, input: AccountGroupMappingInput): AccountGroupMapping
+    fun newMapping(authenticationSource: AuthenticationSource, input: AccountGroupMappingInput): AccountGroupMapping
 
     /**
      * Gets a mapping by its ID
      *
-     * @param mapping Mapping type, for example: "ldap"
+     * @param authenticationSource Authentication source
      * @param id      ID of the mapping
      * @return Mapping
      */
-    fun getMapping(mapping: String, id: ID): AccountGroupMapping
+    fun getMapping(authenticationSource: AuthenticationSource, id: ID): AccountGroupMapping
 
     /**
      * Updates a mapping
      *
-     * @param mapping Mapping type, for example: "ldap"
+     * @param authenticationSource Authentication source
      * @param id      ID of the mapping
      * @param input   Input data for the mapping
      * @return Updated mapping
      */
-    fun updateMapping(mapping: String, id: ID, input: AccountGroupMappingInput): AccountGroupMapping
+    fun updateMapping(authenticationSource: AuthenticationSource, id: ID, input: AccountGroupMappingInput): AccountGroupMapping
 
     /**
      * Deletes a mapping
      *
-     * @param mapping Mapping type, for example: "ldap"
+     * @param authenticationSource Authentication source
      * @param id      ID of the mapping
      * @return Acknowledgment
      */
-    fun deleteMapping(mapping: String, id: ID): Ack
+    fun deleteMapping(authenticationSource: AuthenticationSource, id: ID): Ack
 
     /**
      * Gets the list of mappings for a given group.

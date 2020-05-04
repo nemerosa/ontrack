@@ -16,7 +16,7 @@ class LDAPAuthenticationSourceProvider(
 
     companion object {
         const val ID = "ldap"
-        private val SOURCE = AuthenticationSource(
+        val SOURCE = AuthenticationSource(
                 provider = ID,
                 key = "ldap",
                 name = "LDAP authentication",

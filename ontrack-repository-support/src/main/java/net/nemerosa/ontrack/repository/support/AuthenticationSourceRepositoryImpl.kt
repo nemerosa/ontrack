@@ -1,13 +1,13 @@
-package net.nemerosa.ontrack.service.security
+package net.nemerosa.ontrack.repository.support
 
 import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceProviderNotFoundException
 import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider
-import net.nemerosa.ontrack.model.security.AuthenticationSourceService
+import net.nemerosa.ontrack.model.security.AuthenticationSourceRepository
 import org.springframework.stereotype.Service
 
 @Service
-class AuthenticationSourceServiceImpl(providers: Collection<AuthenticationSourceProvider>) : AuthenticationSourceService {
+class AuthenticationSourceRepositoryImpl(providers: Collection<AuthenticationSourceProvider>) : AuthenticationSourceRepository {
 
     private val providers: Map<String, AuthenticationSourceProvider> = providers.associateBy {
         it.id
@@ -17,10 +17,10 @@ class AuthenticationSourceServiceImpl(providers: Collection<AuthenticationSource
         get() = providers.values.sortedBy { it.id }
 
     override val authenticationSources: List<AuthenticationSource>
-        get() = providers.values.flatMap { it.sources }.sortedBy { it.id }
+        get() = providers.values.flatMap { it.sources }.sortedBy { it.key }
 
-    override fun getAuthenticationSourceProvider(id: String): AuthenticationSourceProvider {
-        return providers[id] ?: throw AuthenticationSourceProviderNotFoundException(id)
+    override fun getAuthenticationSourceProvider(provider: String): AuthenticationSourceProvider {
+        return providers[provider] ?: throw AuthenticationSourceProviderNotFoundException(provider)
     }
 
 }

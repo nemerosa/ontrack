@@ -22,7 +22,7 @@ class ProvidedGroupsServiceImpl(
         return providedGroupsRepository.getProvidedGroups(account, source)
     }
 
-    override fun getSuggestedGroups(type: String, token: String): List<String> {
-        return providedGroupsRepository.getSuggestedGroups(type, token)
+    override fun getSuggestedGroups(source: AuthenticationSource, token: String): List<String> {
+        return providedGroupsRepository.getSuggestedGroups(source, token)
     }
 }

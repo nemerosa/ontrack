@@ -18,6 +18,10 @@ data class AuthenticationSource(
         val isGroupMappingSupported: Boolean = false
 ) : Serializable {
 
+    override fun toString(): String = "$provider::$key"
+
+    infix fun sameThan(other: AuthenticationSource) = provider == other.provider && key == other.key
+
     fun enabled(enabled: Boolean) = AuthenticationSource(
             provider = provider,
             key = key,

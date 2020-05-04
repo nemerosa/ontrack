@@ -14,6 +14,7 @@ class OntrackOidcUserService(
 
     override fun loadUser(userRequest: OidcUserRequest): OidcUser {
         val oidcUser: OidcUser = super.loadUser(userRequest)
+        val authenticationSource = OidcAuthenticationSourceProvider.asSource(userRequest)
         // Gets the user name (as email)
         val email: String? = oidcUser.userInfo.email
         if (email.isNullOrBlank()) {
@@ -36,28 +37,28 @@ class OntrackOidcUserService(
                                 password = "",
                                 groups = emptyList()
                         ),
-                        OidcAuthenticationSourceProvider.SOURCE.id
+                        authenticationSource
                 )
             }
-            createOntrackAuthenticatedUser(account, oidcUser)
+            createOntrackAuthenticatedUser(account, oidcUser, authenticationSource)
         } else {
             // Checks the source
-            if (existingAccount.authenticationSource == OidcAuthenticationSourceProvider.SOURCE) {
-                createOntrackAuthenticatedUser(existingAccount, oidcUser)
+            if (existingAccount.authenticationSource sameThan authenticationSource) {
+                createOntrackAuthenticatedUser(existingAccount, oidcUser, authenticationSource)
             } else {
                 throw OidcNonOidcExistingUserException(email)
             }
         }
     }
 
-    private fun createOntrackAuthenticatedUser(account: Account, oidcUser: OidcUser): OidcUser {
+    private fun createOntrackAuthenticatedUser(account: Account, oidcUser: OidcUser, authenticationSource: AuthenticationSource): OidcUser {
         // Wrapping the account
         val ontrackUser = AccountOntrackUser(account)
         // Gets the groups provided by OIDC
         val groups = oidcUser.getClaimAsStringList("groups").toSet()
         // Registers the groups
         securityService.asAdmin {
-            providedGroupsService.saveProvidedGroups(account.id(), OidcAuthenticationSourceProvider.SOURCE, groups)
+            providedGroupsService.saveProvidedGroups(account.id(), authenticationSource, groups)
         }
         // Provides the ACL
         val ontrackAuthenticatedUser = accountService.withACL(ontrackUser)

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.ldap.LDAPAuthenticationSourceProvider
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -290,7 +291,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val group = doCreateAccountGroup()
         asAdmin().execute {
             val mapping = mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName,
                             group.id
@@ -322,7 +323,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
         doCreateAccountGroup()
         asAdmin().execute {
             mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName,
                             group1.id
@@ -344,14 +345,14 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val group1 = doCreateAccountGroup()
         asAdmin().execute {
             mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName1,
                             group1.id
                     )
             )
             mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName2,
                             group1.id
@@ -384,14 +385,14 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val group1 = doCreateAccountGroup()
         asAdmin().execute {
             mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName1,
                             group1.id
                     )
             )
             mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName2,
                             group1.id
@@ -423,14 +424,14 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val group2 = doCreateAccountGroup()
         asAdmin().execute {
             mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName1,
                             group1.id
                     )
             )
             mappingService.newMapping(
-                    "ldap",
+                    LDAPAuthenticationSourceProvider.SOURCE,
                     AccountGroupMappingInput(
                             mappingName2,
                             group2.id

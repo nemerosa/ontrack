@@ -38,10 +38,10 @@ class AbstractProvidedGroupAccountGroupContributorTest {
     @Test
     fun `Getting the groups`() {
         whenever(providedGroupsService.getProvidedGroups(1, authenticationSource)).thenReturn(setOf("org-admins", "org-users"))
-        whenever(accountGroupMappingService.getGroups("none", "org-admins")).thenReturn(
+        whenever(accountGroupMappingService.getGroups(AuthenticationSource.none(), "org-admins")).thenReturn(
                 setOf(adminGroup)
         )
-        whenever(accountGroupMappingService.getGroups("none", "org-users")).thenReturn(
+        whenever(accountGroupMappingService.getGroups(AuthenticationSource.none(), "org-users")).thenReturn(
                 setOf(readOnlyGroup, participantGroup)
         )
 

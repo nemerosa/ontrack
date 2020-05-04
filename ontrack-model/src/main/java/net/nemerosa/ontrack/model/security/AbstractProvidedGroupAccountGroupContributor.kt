@@ -19,7 +19,7 @@ abstract class AbstractProvidedGroupAccountGroupContributor(
         val groupNames = providedGroupsService.getProvidedGroups(account.id(), authenticationSource)
         // Maps the group names to actual groups
         return groupNames.map { groupName ->
-            accountGroupMappingService.getGroups(authenticationSource.id, groupName)
+            accountGroupMappingService.getGroups(authenticationSource, groupName)
         }.flatten()
     }
 }

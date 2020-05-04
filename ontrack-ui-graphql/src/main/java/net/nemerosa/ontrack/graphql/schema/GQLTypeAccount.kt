@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars
 import graphql.schema.DataFetcher
-import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.graphql.schema.security.GQLTypeAuthenticationSource
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
@@ -18,7 +17,8 @@ class GQLTypeAccount(
         private val globalRole: GQLTypeGlobalRole,
         private val authorizedProject: GQLTypeAuthorizedProject,
         private val token: GQLTypeToken,
-        private val fieldContributors: List<GQLFieldContributor>
+        private val fieldContributors: List<GQLFieldContributor>,
+        private val authenticationSource: GQLTypeAuthenticationSource
 ) : GQLType {
 
     override fun getTypeName(): String = ACCOUNT
@@ -33,8 +33,7 @@ class GQLTypeAccount(
                 .field {
                     it.name("authenticationSource")
                             .description("Source of authentication (builtin, ldap, etc.)")
-                            .type(Scalars.GraphQLString)
-                            .dataFetcher { environment: DataFetchingEnvironment -> (environment.getSource<Any>() as Account).authenticationSource.id }
+                            .type(authenticationSource.typeRef)
                 }
                 .field(GraphqlUtils.stringField("role", "Security role (admin or none)"))
                 .field {

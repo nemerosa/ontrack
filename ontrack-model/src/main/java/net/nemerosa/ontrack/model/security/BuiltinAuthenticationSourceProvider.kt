@@ -7,7 +7,7 @@ class BuiltinAuthenticationSourceProvider : AuthenticationSourceProvider {
 
     companion object {
 
-        const val ID = "password"
+        const val ID = "built-in"
 
         val SOURCE = AuthenticationSource(
                 provider = ID,

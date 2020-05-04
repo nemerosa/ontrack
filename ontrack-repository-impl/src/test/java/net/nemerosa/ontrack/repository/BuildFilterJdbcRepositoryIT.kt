@@ -29,7 +29,8 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         branch = do_create_branch()
         // Creates an account
         val authenticationSource = AuthenticationSource(
-                id = "test",
+                provider = "test",
+                key = "test",
                 name = "Test authentication source",
                 isAllowingPasswordChange = false
         )
