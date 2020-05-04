@@ -76,7 +76,7 @@ class GQLRootQueryAdminAccountGroupMappings(
     companion object {
         private const val ARG_PROVIDER = "provider"
         private const val ARG_SOURCE = "source"
-        private const val ARG_NAME = "origin"
+        private const val ARG_NAME = "name"
         private const val ARG_GROUP = "group"
     }
 

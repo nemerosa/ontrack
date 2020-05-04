@@ -301,7 +301,9 @@ class AdminQLIT : AbstractQLKTITSupport() {
                 accountGroups (id: ${group.id}) {
                     mappings {
                         id
-                        type
+                        authenticationSource {
+                            provider
+                        }
                         name
                     }
                 }
@@ -310,7 +312,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
             val mappings = g["mappings"]
             assertEquals(1, mappings.size())
             assertEquals(mapping.id(), mappings.first()["id"].asInt())
-            assertEquals("ldap", mappings.first()["type"].asText())
+            assertEquals("ldap", mappings.first()["authenticationSource"]["provider"].asText())
             assertEquals(mappingName, mappings.first().name)
         }
     }
@@ -359,9 +361,11 @@ class AdminQLIT : AbstractQLKTITSupport() {
                     )
             )
             val data = run("""{
-                accountGroupMappings(type: "ldap") {
+                accountGroupMappings(provider: "ldap") {
                     name
-                    type
+                    authenticationSource {
+                        provider
+                    }
                     group {
                         id
                     }
@@ -369,11 +373,11 @@ class AdminQLIT : AbstractQLKTITSupport() {
             }""")
             val mapping1 = data["accountGroupMappings"].find { it.name == mappingName1 }
             assertNotNull(mapping1)
-            assertEquals("ldap", mapping1["type"].asText())
+            assertEquals("ldap", mapping1["authenticationSource"]["provider"].asText())
             assertEquals(group1.id(), mapping1["group"]["id"].asInt())
             val mapping2 = data["accountGroupMappings"].find { it.name == mappingName2 }
             assertNotNull(mapping2)
-            assertEquals("ldap", mapping2["type"].asText())
+            assertEquals("ldap", mapping2["authenticationSource"]["provider"].asText())
             assertEquals(group1.id(), mapping2["group"]["id"].asInt())
         }
     }
@@ -399,9 +403,11 @@ class AdminQLIT : AbstractQLKTITSupport() {
                     )
             )
             val data = run("""{
-                accountGroupMappings(type: "ldap", name: "$mappingName1") {
+                accountGroupMappings(provider: "ldap", name: "$mappingName1") {
                     name
-                    type
+                    authenticationSource {
+                        provider
+                    }
                     group {
                         id
                     }
@@ -409,7 +415,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
             }""")
             val mapping1 = data["accountGroupMappings"].find { it.name == mappingName1 }
             assertNotNull(mapping1)
-            assertEquals("ldap", mapping1["type"].asText())
+            assertEquals("ldap", mapping1["authenticationSource"]["provider"].asText())
             assertEquals(group1.id(), mapping1["group"]["id"].asInt())
             val mapping2 = data["accountGroupMappings"].find { it.name == mappingName2 }
             assertEquals(null, mapping2)
@@ -438,9 +444,11 @@ class AdminQLIT : AbstractQLKTITSupport() {
                     )
             )
             val data = run("""{
-                accountGroupMappings(type: "ldap", group: "${group1.name}") {
+                accountGroupMappings(provider: "ldap", group: "${group1.name}") {
                     name
-                    type
+                    authenticationSource {
+                        provider
+                    }
                     group {
                         id
                     }
@@ -448,7 +456,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
             }""")
             val mapping1 = data["accountGroupMappings"].find { it.name == mappingName1 }
             assertNotNull(mapping1)
-            assertEquals("ldap", mapping1["type"].asText())
+            assertEquals("ldap", mapping1["authenticationSource"]["provider"].asText())
             assertEquals(group1.id(), mapping1["group"]["id"].asInt())
             val mapping2 = data["accountGroupMappings"].find { it.name == mappingName2 }
             assertEquals(null, mapping2)

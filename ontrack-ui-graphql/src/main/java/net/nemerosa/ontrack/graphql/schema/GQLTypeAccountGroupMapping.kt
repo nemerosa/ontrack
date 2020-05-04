@@ -1,36 +1,40 @@
-package net.nemerosa.ontrack.graphql.schema;
+package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
-import org.springframework.stereotype.Component;
-
-import static graphql.schema.GraphQLObjectType.newObject;
+import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.graphql.schema.security.GQLTypeAuthenticationSource
+import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.model.security.AccountGroupMapping
+import org.springframework.stereotype.Component
 
 /**
  * @see net.nemerosa.ontrack.model.security.AccountGroupMapping
  */
 @Component
-public class GQLTypeAccountGroupMapping implements GQLType {
+class GQLTypeAccountGroupMapping(
+        private val authenticationSource: GQLTypeAuthenticationSource
+) : GQLType {
 
-    public static final String ACCOUNT_GROUP_MAPPING = "AccountGroupMapping";
+    override fun getTypeName(): String = ACCOUNT_GROUP_MAPPING
 
-    @Override
-    public String getTypeName() {
-        return ACCOUNT_GROUP_MAPPING;
-    }
-
-    @Override
-    public GraphQLObjectType createType(GQLTypeCache cache) {
-        return newObject()
-                .name(ACCOUNT_GROUP_MAPPING)
-                .field(GraphqlUtils.idField())
-                .field(GraphqlUtils.stringField("name", "Name of the mapping"))
-                .field(GraphqlUtils.stringField("type", "Type of the mapping"))
-                .field(f -> f.name("group")
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
+            .name(ACCOUNT_GROUP_MAPPING)
+            .field(GraphqlUtils.idField())
+            .field {
+                it.name(AccountGroupMapping::authenticationSource.name)
+                        .description("Associated authentication source")
+                        .type(authenticationSource.typeRef)
+            }
+            .field(GraphqlUtils.stringField("name", "Name of the mapping"))
+            .field {
+                it.name("group")
                         .description("Associated group")
-                        .type(new GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
-                .build();
-    }
+                        .type(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP))
+            }
+            .build()
 
+    companion object {
+        @JvmStatic
+        val ACCOUNT_GROUP_MAPPING = AccountGroupMapping::class.java.simpleName
+    }
 }
