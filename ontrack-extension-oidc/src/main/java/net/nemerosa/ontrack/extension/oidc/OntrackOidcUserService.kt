@@ -18,7 +18,12 @@ class OntrackOidcUserService(
     override fun loadUser(userRequest: OidcUserRequest): OidcUser {
         val oidcUser: OidcUser = super.loadUser(userRequest)
         val clientRegistration: ClientRegistration = userRequest.clientRegistration
-        val authenticationSource = OidcAuthenticationSourceProvider.asSource(userRequest)
+        val wrappedOntrackClientRegistration = WrappedOntrackClientRegistration(clientRegistration)
+        return linkOidcUser(wrappedOntrackClientRegistration, oidcUser)
+    }
+
+    internal fun linkOidcUser(clientRegistration: OntrackClientRegistration, oidcUser: OidcUser): OidcUser {
+        val authenticationSource = OidcAuthenticationSourceProvider.asSource(clientRegistration)
         // Gets the user name (as email)
         val email: String? = oidcUser.userInfo.email
         if (email.isNullOrBlank()) {
@@ -58,7 +63,7 @@ class OntrackOidcUserService(
     private fun createOntrackAuthenticatedUser(
             account: Account,
             oidcUser: OidcUser,
-            clientRegistration: ClientRegistration,
+            clientRegistration: OntrackClientRegistration,
             authenticationSource: AuthenticationSource
     ): OidcUser {
         // Wrapping the account
