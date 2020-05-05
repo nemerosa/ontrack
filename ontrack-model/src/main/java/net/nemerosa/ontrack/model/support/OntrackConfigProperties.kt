@@ -72,6 +72,11 @@ class OntrackConfigProperties {
      */
     var security = SecurityProperties()
 
+    /**
+     * Document storage properties
+     */
+    var documents = DocumentProperties()
+
     @PostConstruct
     fun log() {
         if (!configurationTest) {
@@ -83,6 +88,30 @@ class OntrackConfigProperties {
         logger.info("[search] Index batch logging = ${search.index.logging}")
         logger.info("[search] Index batch tracing = ${search.index.tracing}")
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
+        logger.info("[document] Documents engine = ${documents.engine}")
+    }
+
+    /**
+     * Document storage properties
+     */
+    class DocumentProperties {
+        /**
+         * Engine to be used
+         */
+        var engine: String = DEFAULT
+        /**
+         * Properties & default values
+         */
+        companion object {
+            /**
+             * JDBC based
+             */
+            const val JDBC = "jdbc"
+            /**
+             * Default value
+             */
+            const val DEFAULT = JDBC
+        }
     }
 
     /**
@@ -148,6 +177,16 @@ class OntrackConfigProperties {
          * Search service key
          */
         internal const val SEARCH = "search"
+
+        /**
+         * Documents service key
+         */
+        internal const val DOCUMENTS = "documents"
+
+        /**
+         * Documents engine
+         */
+        const val DOCUMENTS_ENGINE = "$DOCUMENTS.engine"
 
         /**
          * Search complete key

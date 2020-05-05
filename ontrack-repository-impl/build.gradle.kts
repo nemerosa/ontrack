@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":ontrack-database"))
     implementation(project(":ontrack-repository-support"))
     implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-actuator")
     implementation("org.slf4j:slf4j-api")
     implementation("org.flywaydb:flyway-core")

@@ -169,8 +169,12 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
     }
 
     protected Document toDocument(ResultSet rs) throws SQLException {
-        String type = rs.getString("imagetype");
-        byte[] bytes = rs.getBytes("imagebytes");
+        return toDocument(rs, "imagetype", "imagebytes");
+    }
+
+    protected Document toDocument(ResultSet rs, String typeColumn, String bytesColumn) throws SQLException {
+        String type = rs.getString(typeColumn);
+        byte[] bytes = rs.getBytes(bytesColumn);
         if (StringUtils.isNotBlank(type) && bytes != null && bytes.length > 0) {
             return new Document(type, bytes);
         } else {
