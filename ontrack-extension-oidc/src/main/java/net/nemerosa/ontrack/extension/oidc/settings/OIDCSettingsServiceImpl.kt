@@ -89,7 +89,8 @@ class OIDCSettingsServiceImpl(
                     input.clientSecret
                 } else {
                     existing.clientSecret
-                }
+                },
+                groupFilter = input.groupFilter
         )
         storageService.store(OIDC_PROVIDERS_STORE, input.id, encrypt(record))
         providersCache.clear()
@@ -117,7 +118,8 @@ class OIDCSettingsServiceImpl(
             val description: String,
             val issuerId: String,
             val clientId: String,
-            val clientEncryptedSecret: String
+            val clientEncryptedSecret: String,
+            val groupFilter: String?
     )
 
     private fun decrypt(stored: StoredOntrackOIDCProvider) = OntrackOIDCProvider(
@@ -126,7 +128,8 @@ class OIDCSettingsServiceImpl(
             description = stored.description,
             issuerId = stored.issuerId,
             clientId = stored.clientId,
-            clientSecret = encryptionService.decrypt(stored.clientEncryptedSecret) ?: ""
+            clientSecret = encryptionService.decrypt(stored.clientEncryptedSecret) ?: "",
+            groupFilter = stored.groupFilter
     )
 
     private fun encrypt(input: OntrackOIDCProvider) = StoredOntrackOIDCProvider(
@@ -136,6 +139,7 @@ class OIDCSettingsServiceImpl(
             issuerId = input.issuerId,
             clientId = input.clientId,
             clientEncryptedSecret = (encryptionService.encrypt(input.clientSecret)
-                    ?: throw OntrackOIDCProviderCannotEncryptSecretException())
+                    ?: throw OntrackOIDCProviderCannotEncryptSecretException()),
+            groupFilter = input.groupFilter
     )
 }

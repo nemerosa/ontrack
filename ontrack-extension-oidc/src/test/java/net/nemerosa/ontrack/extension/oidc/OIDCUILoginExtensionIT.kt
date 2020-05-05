@@ -32,7 +32,7 @@ class OIDCUILoginExtensionIT : AbstractDSLTestSupport() {
     fun `UI login extension after creation and after deletion of a provider`() {
         val id = TestUtils.uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "Some link", "", "", ""))
+            service.createProvider(OntrackOIDCProvider(id, "Test", "Some link", "", "", "", null))
         }
         asAnonymous {
             val logins = uiLoginExtension.contributions

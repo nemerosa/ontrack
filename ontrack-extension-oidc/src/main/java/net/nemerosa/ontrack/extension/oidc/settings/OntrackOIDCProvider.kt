@@ -12,6 +12,7 @@ import javax.validation.constraints.Pattern
  * @property issuerId OIDC issueId URL
  * @property clientId OIDC client ID
  * @property clientSecret OIDC client secret
+ * @property groupFilter Regular expression used to filter groups associated with the OIDC user
  */
 data class OntrackOIDCProvider(
         @get:NotNull(message = "The account name is required.")
@@ -21,14 +22,15 @@ data class OntrackOIDCProvider(
         val description: String,
         val issuerId: String,
         val clientId: String,
-        val clientSecret: String
+        val clientSecret: String,
+        val groupFilter: String?
 ) {
 
     /**
      * Erases the [clientSecret].
      */
     fun obfuscate() = OntrackOIDCProvider(
-            id, name, description, issuerId, clientId, ""
+            id, name, description, issuerId, clientId, "", groupFilter
     )
 
 }

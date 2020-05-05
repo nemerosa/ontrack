@@ -25,7 +25,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Creating a provider`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            service.createProvider(testProvider(id))
             assertTrue(service.providers.any { it.id == id }, "Provider created")
         }
     }
@@ -34,7 +34,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Client secret must be decrypted`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", "xxxx"))
+            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", "xxxx", null))
             val provider = service.providers.find { it.id == id }
             assertNotNull(provider) {
                 assertEquals("xxxx", it.clientSecret)
@@ -46,7 +46,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Deletion of a provider`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            service.createProvider(testProvider(id))
             assertTrue(service.providers.any { it.id == id }, "Provider created")
             service.deleteProvider(id)
             assertTrue(service.providers.none { it.id == id }, "Provider deleted")
@@ -67,7 +67,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
         val id = uid("I")
         asAdmin {
             assertFailsWith<OntrackOIDCProviderIDNotFoundException> {
-                service.updateProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+                service.updateProvider(testProvider(id))
             }
         }
     }
@@ -76,8 +76,8 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Updating a provider`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
-            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "yyyy"))
+            service.createProvider(testProvider(id))
+            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "yyyy", null))
             val provider = service.getProviderById(id) ?: error("Cannot find provider")
             assertEquals("Test 2", provider.name)
             assertEquals("xxxx", provider.clientId)
@@ -89,8 +89,8 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Updating a provider does not update its secret if left blank in input`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "xxxx", "yyyy"))
-            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", ""))
+            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "xxxx", "yyyy", null))
+            service.updateProvider(OntrackOIDCProvider(id, "Test 2", "", "", "xxxx", "", null))
             val provider = service.getProviderById(id) ?: error("Cannot find provider")
             assertEquals("Test 2", provider.name)
             assertEquals("xxxx", provider.clientId)
@@ -102,9 +102,9 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Creating a duplicate provider`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            service.createProvider(testProvider(id))
             assertFailsWith<OntrackOIDCProviderIDAlreadyExistsException> {
-                service.createProvider(OntrackOIDCProvider(id, "Test 2", "", "", "", ""))
+                service.createProvider(OntrackOIDCProvider(id, "Test 2", "", "", "", "", null))
             }
         }
     }
@@ -113,7 +113,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Cached providers`() {
         val id = uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            service.createProvider(testProvider(id))
             val cache = service.cachedProviders
             val check = service.cachedProviders
             assertSame(cache, check, "Cached list")
@@ -127,7 +127,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
             val check = service.cachedProviders
             assertSame(cache, check, "Cached list")
             val id = uid("I")
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            service.createProvider(testProvider(id))
             val checkAgain = service.cachedProviders
             assertNotSame(check, checkAgain, "New cached list")
         }
@@ -137,7 +137,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
     fun `Cache cleaned after deleting a provider`() {
         asAdmin {
             val id = uid("I")
-            service.createProvider(OntrackOIDCProvider(id, "Test", "", "", "", ""))
+            service.createProvider(testProvider(id))
             val cache = service.cachedProviders
             val check = service.cachedProviders
             assertSame(cache, check, "Cached list")
@@ -146,5 +146,17 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
             assertNotSame(check, checkAgain, "New cached list")
         }
     }
+
+    private fun testProvider(
+            id: String,
+            name: String = "Test"
+    ) = OntrackOIDCProvider(
+            id = id,
+            name = name,
+            description = "",
+            issuerId = "",
+            clientId = "",
+            clientSecret = "",
+            groupFilter = null)
 
 }

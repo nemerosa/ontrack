@@ -109,5 +109,10 @@ class OIDCSettingsController(
                             .value("")
                             .optional()
             )
+            .with(
+                    Text.of("groupFilter").label("Group filter")
+                            .help("Regular expression used to filter groups associated with the OIDC user.")
+                            .value(provider?.groupFilter)
+            )
 
 }

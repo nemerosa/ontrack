@@ -18,6 +18,7 @@
             <th>Issuer</th>
             <th>Client ID</th>
             <th>Client Secret</th>
+            <th>Group filter</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -35,6 +36,9 @@
             <td>{{provider.issuerId}}</td>
             <td>{{provider.clientId}}</td>
             <td>****</td>
+            <td>
+                <code>{{provider.groupFilter}}</code>
+            </td>
             <td>
                 <span class="fa fa-pencil ot-command" title="Edits this OIDC provider" ng-if="provider._update" ng-click="updateProvider(provider)"></span>
                 <span class="fa fa-trash ot-command" title="Remove this OIDC provider" ng-if="provider._delete" ng-click="deleteProvider(provider)"></span>

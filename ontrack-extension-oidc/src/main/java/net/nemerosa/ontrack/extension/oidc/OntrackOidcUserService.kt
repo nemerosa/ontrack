@@ -1,19 +1,23 @@
 package net.nemerosa.ontrack.extension.oidc
 
+import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.model.security.*
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService
+import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 
 class OntrackOidcUserService(
         private val accountService: AccountService,
         private val securityService: SecurityService,
-        private val providedGroupsService: ProvidedGroupsService
+        private val providedGroupsService: ProvidedGroupsService,
+        private val oidcSettingsService: OIDCSettingsService
 ) : OidcUserService() {
 
     override fun loadUser(userRequest: OidcUserRequest): OidcUser {
         val oidcUser: OidcUser = super.loadUser(userRequest)
+        val clientRegistration: ClientRegistration = userRequest.clientRegistration
         val authenticationSource = OidcAuthenticationSourceProvider.asSource(userRequest)
         // Gets the user name (as email)
         val email: String? = oidcUser.userInfo.email
@@ -40,22 +44,37 @@ class OntrackOidcUserService(
                         authenticationSource
                 )
             }
-            createOntrackAuthenticatedUser(account, oidcUser, authenticationSource)
+            createOntrackAuthenticatedUser(account, oidcUser, clientRegistration, authenticationSource)
         } else {
             // Checks the source
             if (existingAccount.authenticationSource sameThan authenticationSource) {
-                createOntrackAuthenticatedUser(existingAccount, oidcUser, authenticationSource)
+                createOntrackAuthenticatedUser(existingAccount, oidcUser, clientRegistration, authenticationSource)
             } else {
                 throw OidcNonOidcExistingUserException(email)
             }
         }
     }
 
-    private fun createOntrackAuthenticatedUser(account: Account, oidcUser: OidcUser, authenticationSource: AuthenticationSource): OidcUser {
+    private fun createOntrackAuthenticatedUser(
+            account: Account,
+            oidcUser: OidcUser,
+            clientRegistration: ClientRegistration,
+            authenticationSource: AuthenticationSource
+    ): OidcUser {
         // Wrapping the account
         val ontrackUser = AccountOntrackUser(account)
+        // Filter on the groups
+        val groupFilter = securityService.asAdmin {
+            oidcSettingsService
+                    .getProviderById(clientRegistration.registrationId)
+                    ?.groupFilter
+                    ?: ".*"
+        }
+        val groupFilterRegex = groupFilter.toRegex(RegexOption.IGNORE_CASE)
         // Gets the groups provided by OIDC
-        val groups = oidcUser.getClaimAsStringList("groups").toSet()
+        val groups = oidcUser.getClaimAsStringList("groups")
+                .filter { groupFilterRegex.matches(it) }
+                .toSet()
         // Registers the groups
         securityService.asAdmin {
             providedGroupsService.saveProvidedGroups(account.id(), authenticationSource, groups)
