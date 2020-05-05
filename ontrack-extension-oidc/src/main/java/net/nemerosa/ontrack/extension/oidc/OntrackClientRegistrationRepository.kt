@@ -1,24 +1,47 @@
 package net.nemerosa.ontrack.extension.oidc
 
+import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsListener
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
 import net.nemerosa.ontrack.model.security.SecurityService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesRegistrationAdapter
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.stereotype.Component
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
-class OntrackClientRegistrationRepository(
+final class OntrackClientRegistrationRepository(
         private val oidcSettingsService: OIDCSettingsService,
         private val securityService: SecurityService
-) : ClientRegistrationRepository, Iterable<ClientRegistration> {
+) : ClientRegistrationRepository, Iterable<ClientRegistration>, OIDCSettingsListener {
 
-    private val registrations: Map<String, ClientRegistration>
-        get() = securityService.asAdmin {
-            toRegistrations(oidcSettingsService.cachedProviders)
+    private val logger: Logger = LoggerFactory.getLogger(OntrackClientRegistrationRepository::class.java)
+
+    init {
+        logger.debug("Registering as a OIDC settings listener")
+        oidcSettingsService.addOidcSettingsListener(this)
+    }
+
+    private val registrationsCache = ConcurrentHashMap<String, Map<String, ClientRegistration>>()
+
+    internal val registrations: Map<String, ClientRegistration>
+        get() = registrationsCache.getOrPut(CACHE_KEY) {
+            val map = securityService.asAdmin {
+                toRegistrations(oidcSettingsService.cachedProviders)
+            }
+            logger.debug("Loading OIDC registrations from OIDC settings: ${map.keys}")
+            map
         }
+
+    override fun onOidcSettingsChanged() {
+        logger.debug("Forcing the load of OIDC registrations from the OIDC settings")
+        // Forces a reload of the registrations
+        registrationsCache.clear()
+    }
 
     private fun toRegistrations(providers: List<OntrackOIDCProvider>): Map<String, ClientRegistration> {
         val properties = OAuth2ClientProperties()

@@ -20,6 +20,11 @@ class OIDCSettingsServiceImpl(
 ) : OIDCSettingsService {
 
     /**
+     * Settings listeners
+     */
+    private val listeners = mutableListOf<OIDCSettingsListener>()
+
+    /**
      * Caching the list of providers
      */
     private val providersCache = ConcurrentHashMap<String, List<OntrackOIDCProvider>>()
@@ -51,7 +56,7 @@ class OIDCSettingsServiceImpl(
             throw OntrackOIDCProviderIDAlreadyExistsException(input.id)
         } else {
             storageService.store(OIDC_PROVIDERS_STORE, input.id, encrypt(input))
-            providersCache.clear()
+            clearCache()
             return input
         }
     }
@@ -60,7 +65,7 @@ class OIDCSettingsServiceImpl(
         securityService.checkGlobalFunction(GlobalSettings::class.java)
         return if (storageService.exists(OIDC_PROVIDERS_STORE, id)) {
             storageService.delete(OIDC_PROVIDERS_STORE, id)
-            providersCache.clear()
+            clearCache()
             Ack.OK
         } else {
             Ack.NOK
@@ -93,8 +98,23 @@ class OIDCSettingsServiceImpl(
                 groupFilter = input.groupFilter
         )
         storageService.store(OIDC_PROVIDERS_STORE, input.id, encrypt(record))
-        providersCache.clear()
+        clearCache()
         return record
+    }
+
+    private fun clearCache() {
+        providersCache.clear()
+        notifyListeners()
+    }
+
+    private fun notifyListeners() {
+        listeners.forEach {
+            it.onOidcSettingsChanged()
+        }
+    }
+
+    override fun addOidcSettingsListener(listener: OIDCSettingsListener) {
+        listeners += listener
     }
 
     companion object {

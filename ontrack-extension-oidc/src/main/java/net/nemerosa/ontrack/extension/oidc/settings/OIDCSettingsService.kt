@@ -51,4 +51,9 @@ interface OIDCSettingsService {
      */
     fun updateProvider(input: OntrackOIDCProvider): OntrackOIDCProvider
 
+    /**
+     * Adds an [OIDCSettingsListener] to this service.
+     */
+    fun addOidcSettingsListener(listener: OIDCSettingsListener)
+
 }
