@@ -17,11 +17,14 @@ class OIDCUILoginExtension(
     override val contributions: List<UILogin>
         get() = securityService.asAdmin {
             oidcSettingsService.providers.map { provider ->
+                val hasImage = oidcSettingsService.hasProviderImage(provider.id)
                 UILogin(
                         id = provider.id,
                         link = "/oauth2/authorization/${provider.id}",
                         name = provider.name,
-                        description = provider.description
+                        description = provider.description,
+                        image = oidcSettingsService.hasProviderImage(provider.id),
+                        imageLoader = { oidcSettingsService.getProviderImage(provider.id) }
                 )
             }
         }

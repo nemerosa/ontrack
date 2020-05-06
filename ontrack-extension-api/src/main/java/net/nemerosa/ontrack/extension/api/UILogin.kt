@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.api
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.common.Document
+
 /**
  * Contribution to the login page
  */
@@ -22,6 +25,17 @@ data class UILogin(
         /**
          * Description
          */
-        val description: String
+        val description: String,
+
+        /**
+         * Is there an image associated with this login?
+         */
+        val image: Boolean = false,
+
+        /**
+         * Optional loader for an image
+         */
+        @JsonIgnore
+        val imageLoader: () -> Document? = { null }
 
 )
