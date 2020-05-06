@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.support.DocumentsRepository
 import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.model.support.retrieve
 import org.springframework.stereotype.Service
@@ -16,7 +18,8 @@ import java.util.concurrent.ConcurrentHashMap
 class OIDCSettingsServiceImpl(
         private val securityService: SecurityService,
         private val storageService: StorageService,
-        private val encryptionService: EncryptionService
+        private val encryptionService: EncryptionService,
+        private val documentsRepository: DocumentsRepository
 ) : OIDCSettingsService {
 
     /**
@@ -102,6 +105,32 @@ class OIDCSettingsServiceImpl(
         return record
     }
 
+    override fun getProviderImage(id: String): Document? {
+        checkProviderId(id)
+        return documentsRepository.loadDocument(OIDC_PROVIDERS_IMAGES, id)
+    }
+
+    override fun hasProviderImage(id: String): Boolean {
+        checkProviderId(id)
+        return documentsRepository.documentExists(OIDC_PROVIDERS_IMAGES, id)
+    }
+
+    override fun setProviderImage(id: String, image: Document?) {
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        checkProviderId(id)
+        if (image != null) {
+            documentsRepository.storeDocument(OIDC_PROVIDERS_IMAGES, id, image)
+        } else {
+            documentsRepository.deleteDocument(OIDC_PROVIDERS_IMAGES, id)
+        }
+    }
+
+    private fun checkProviderId(id: String) {
+        if (!storageService.exists(OIDC_PROVIDERS_STORE, id)) {
+            throw OntrackOIDCProviderIDNotFoundException(id)
+        }
+    }
+
     private fun clearCache() {
         providersCache.clear()
         notifyListeners()
@@ -124,9 +153,14 @@ class OIDCSettingsServiceImpl(
         private const val CACHE_KEY = "0"
 
         /**
-         * Name of the store
+         * Name of the store for the storage of the data
          */
         private val OIDC_PROVIDERS_STORE = OntrackOIDCProvider::class.java.name
+
+        /**
+         * Name of the store for the images
+         */
+        private val OIDC_PROVIDERS_IMAGES = OntrackOIDCProvider::class.java.name
     }
 
     /**

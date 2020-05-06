@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
-import static net.nemerosa.ontrack.boot.ui.UIUtils.setupDefaultImageCache;
+import static net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController

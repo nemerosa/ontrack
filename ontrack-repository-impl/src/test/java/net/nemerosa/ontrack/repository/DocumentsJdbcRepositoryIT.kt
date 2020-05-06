@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.common.Document
+import net.nemerosa.ontrack.model.support.DocumentsRepository
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired

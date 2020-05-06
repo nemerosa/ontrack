@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.ui
+package net.nemerosa.ontrack.ui.support
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Document

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.common.Document;
+import net.nemerosa.ontrack.ui.support.UIUtils;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 

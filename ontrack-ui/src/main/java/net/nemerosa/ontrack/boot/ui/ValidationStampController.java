@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import static net.nemerosa.ontrack.boot.ui.UIUtils.setupDefaultImageCache;
+import static net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController

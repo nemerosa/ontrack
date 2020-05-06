@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Password
@@ -8,9 +9,13 @@ import net.nemerosa.ontrack.model.form.Url
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
+import net.nemerosa.ontrack.ui.support.UIUtils
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 @RestController
@@ -75,6 +80,28 @@ class OIDCSettingsController(
             } else {
                 oidcSettingsService.updateProvider(input).obfuscate()
             }
+
+    /**
+     * Gets the image, if any, associated to a provider.
+     */
+    @GetMapping("{id}/image")
+    fun getProviderImage(response: HttpServletResponse?, @PathVariable id: String): Document {
+        val document = oidcSettingsService.getProviderImage(id) ?: Document.EMPTY
+        response?.also { UIUtils.setupDefaultImageCache(response, document) }
+        return document
+    }
+
+    @PostMapping("{id}/image")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun setProviderImage(@PathVariable id: String, @RequestParam file: MultipartFile) {
+        val contentType = file.contentType
+        if (contentType != null) {
+            oidcSettingsService.setProviderImage(id, Document(
+                    contentType,
+                    file.bytes
+            ))
+        }
+    }
 
     private fun getForm(provider: OntrackOIDCProvider?): Form = Form.create()
             .with(

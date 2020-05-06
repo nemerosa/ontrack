@@ -22,7 +22,7 @@ import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.nemerosa.ontrack.boot.ui.UIUtils.requestParametersToJson;
+import static net.nemerosa.ontrack.ui.support.UIUtils.requestParametersToJson;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController

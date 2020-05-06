@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.common.DocumentInfo
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.support.DocumentsRepository
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
