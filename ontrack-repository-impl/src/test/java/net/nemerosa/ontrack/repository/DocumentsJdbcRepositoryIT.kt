@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.util.unit.DataSize
 import kotlin.test.*
 
 class DocumentsJdbcRepositoryIT : AbstractRepositoryTestSupport() {
@@ -90,6 +91,18 @@ class DocumentsJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         names.forEach { repository.storeDocument(store, it, document) }
         val stores = repository.getDocumentStores()
         assertEquals(1, stores.count { it == store }, "Store counted once")
+    }
+
+    @Test
+    fun `Max size exceeded`() {
+        val store = uid("S")
+        val name = uid("N")
+        val bytes = ByteArray(DataSize.ofKilobytes(16).toBytes().toInt() + 1).apply {
+            fill(1)
+        }
+        assertFailsWith<DocumentMaxSizeExceededException> {
+            repository.storeDocument(store, name, Document(type, bytes))
+        }
     }
 
 }

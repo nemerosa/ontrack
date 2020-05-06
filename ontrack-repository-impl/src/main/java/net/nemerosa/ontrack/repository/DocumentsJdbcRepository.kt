@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Repository
+import org.springframework.util.unit.DataSize
 import javax.sql.DataSource
 
 @Repository
@@ -15,9 +16,18 @@ import javax.sql.DataSource
         havingValue = OntrackConfigProperties.DocumentProperties.JDBC,
         matchIfMissing = true
 )
-class DocumentsJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(dataSource), DocumentsRepository {
+class DocumentsJdbcRepository(
+        dataSource: DataSource,
+        private val ontrackConfigProperties: OntrackConfigProperties
+) : AbstractJdbcRepository(dataSource), DocumentsRepository {
 
     override fun storeDocument(store: String, name: String, document: Document) {
+        if (document.content.size > ontrackConfigProperties.documents.maxSize.toBytes()) {
+            throw DocumentMaxSizeExceededException(
+                    maxSize = ontrackConfigProperties.documents.maxSize.toString(),
+                    actualSize = DataSize.ofBytes(document.content.size.toLong()).toString()
+            )
+        }
         deleteDocument(store, name)
         namedParameterJdbcTemplate!!.update(
                 "INSERT INTO DOCUMENTS(STORE, NAME, DOCTYPE, DOCBYTES) VALUES (:store, :name, :doctype, :docbytes)",

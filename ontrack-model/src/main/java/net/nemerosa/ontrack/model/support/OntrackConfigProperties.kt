@@ -3,14 +3,18 @@ package net.nemerosa.ontrack.model.support
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.convert.DataSizeUnit
 import org.springframework.boot.convert.DurationUnit
 import org.springframework.stereotype.Component
+import org.springframework.util.unit.DataSize
+import org.springframework.util.unit.DataUnit
 import org.springframework.validation.annotation.Validated
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import javax.annotation.PostConstruct
 import javax.validation.Valid
 import javax.validation.constraints.Min
+
 
 /**
  * Configuration properties for Ontrack.
@@ -99,6 +103,13 @@ class OntrackConfigProperties {
          * Engine to be used
          */
         var engine: String = DEFAULT
+
+        /**
+         * Maximum size
+         */
+        @DataSizeUnit(DataUnit.KILOBYTES)
+        var maxSize: DataSize = DataSize.ofKilobytes(16)
+
         /**
          * Properties & default values
          */
