@@ -6,7 +6,7 @@ package net.nemerosa.ontrack.common
  * @property type MIME type
  * @property content Binary content
  */
-data class Document(val type: String, val content: ByteArray) {
+open class Document(val type: String, val content: ByteArray) {
 
     /**
      * Is the document not valid or empty?

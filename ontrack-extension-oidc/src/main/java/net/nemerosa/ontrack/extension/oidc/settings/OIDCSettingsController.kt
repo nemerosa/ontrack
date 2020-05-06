@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.form.Url
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
-import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import net.nemerosa.ontrack.ui.support.UIUtils
 import org.springframework.http.HttpStatus
@@ -86,10 +85,10 @@ class OIDCSettingsController(
      * Gets the image, if any, associated to a provider.
      */
     @GetMapping("{id}/image")
-    fun getProviderImage(response: HttpServletResponse?, @PathVariable id: String): Resource<Document> {
+    fun getProviderImage(response: HttpServletResponse?, @PathVariable id: String): Document {
         val document = oidcSettingsService.getProviderImage(id) ?: Document.EMPTY
         response?.also { UIUtils.setupDefaultImageCache(response, document) }
-        return Resource.of(document, uri(on(this::class.java).getProviderImage(response, id)))
+        return document
     }
 
     @PostMapping("{id}/image")
