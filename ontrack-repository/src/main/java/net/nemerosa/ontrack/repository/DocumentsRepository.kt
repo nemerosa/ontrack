@@ -21,6 +21,11 @@ interface DocumentsRepository {
     fun storeDocument(store: String, name: String, document: Document)
 
     /**
+     * Gets the list of store names
+     */
+    fun getDocumentStores(): List<String>
+
+    /**
      * List of names inside a store
      * @param store ID of the store
      * @return List of names
@@ -49,6 +54,15 @@ interface DocumentsRepository {
      * @return Stored document or `null` if not found
      */
     fun loadDocument(store: String, name: String): Document?
+
+    /**
+     * Does a document exist?
+     *
+     * @param store ID of the store
+     * @param name Name inside the store
+     * @return `true` if the document exists
+     */
+    fun documentExists(store: String, name: String): Boolean
 
     /**
      * Gets info about a document

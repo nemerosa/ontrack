@@ -12,7 +12,8 @@ import javax.sql.DataSource
 @Repository
 @ConditionalOnProperty(
         name = [OntrackConfigProperties.DOCUMENTS_ENGINE],
-        havingValue = OntrackConfigProperties.DocumentProperties.JDBC
+        havingValue = OntrackConfigProperties.DocumentProperties.JDBC,
+        matchIfMissing = true
 )
 class DocumentsJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(dataSource), DocumentsRepository {
 
@@ -25,6 +26,13 @@ class DocumentsJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(d
                         .addValue(DOCTYPE, document.type)
                         .addValue(DOCBYTES, document.content)
         )
+    }
+
+    override fun getDocumentStores(): List<String> {
+        return jdbcTemplate!!.queryForList(
+                "SELECT DISTINCT(STORE) FROM DOCUMENTS",
+                String::class.java
+        ).sorted()
     }
 
     override fun getDocumentNames(store: String): List<String> {
@@ -53,7 +61,7 @@ class DocumentsJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(d
 
     override fun loadDocument(store: String, name: String): Document? {
         return getFirstItem(
-                "SELECT NAME FROM DOCUMENTS WHERE STORE = :store AND NAME = :name",
+                "SELECT * FROM DOCUMENTS WHERE STORE = :store AND NAME = :name",
                 params("store", store).addValue("name", name)
         ) { rs, _ ->
             toDocument(rs, "DOCTYPE", "DOCBYTES")
@@ -70,6 +78,14 @@ class DocumentsJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(d
                     rs.getLong("SIZE")
             )
         }
+    }
+
+    override fun documentExists(store: String, name: String): Boolean {
+        return getFirstItem(
+                "SELECT NAME FROM DOCUMENTS WHERE STORE = :store AND NAME = :name",
+                params("store", store).addValue("name", name),
+                String::class.java
+        ) != null
     }
 
     override fun deleteDocument(store: String, name: String): Ack {
