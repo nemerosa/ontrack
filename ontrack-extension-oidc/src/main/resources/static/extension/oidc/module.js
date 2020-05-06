@@ -1,6 +1,7 @@
 angular.module('ontrack.extension.oidc', [
     'ot.service.core',
-    'ot.service.form'
+    'ot.service.form',
+    'ot.service.structure'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('oidc-settings', {
@@ -9,7 +10,7 @@ angular.module('ontrack.extension.oidc', [
             controller: 'OidcSettingsCtrl'
         });
     })
-    .controller('OidcSettingsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
+    .controller('OidcSettingsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otStructureService) {
         const view = ot.view();
         view.title = "OIDC Providers";
         view.breadcrumbs = ot.homeBreadcrumbs();
@@ -58,5 +59,18 @@ angular.module('ontrack.extension.oidc', [
                   message: `Do you want to delete the ${provider.name} provider? It won't be available for authentication any longer.`
               }).then(() => ot.pageCall($http.delete(provider._delete))).then(loadProviders);
         };
+
+        $scope.providerImage = (provider) => {
+            let entity = {
+                image: !!provider._image,
+                _image: provider._image,
+                _imageUpdate: provider._imageUpdate
+            };
+            otStructureService.changeImage(entity, {
+                title: `Image for OIDC provider ${provider.name}`
+            }).then(loadProviders);
+
+        };
+
     })
 ;

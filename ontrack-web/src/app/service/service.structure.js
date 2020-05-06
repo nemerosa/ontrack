@@ -92,6 +92,12 @@ angular.module('ot.service.structure', [
          */
         self.changeImage = function (entity, config) {
             var d = $q.defer();
+            var updateLink;
+            if (entity._imageUpdate) {
+                updateLink = entity._imageUpdate;
+            } else {
+                updateLink = entity._image;
+            }
             $modal.open({
                 templateUrl: 'app/dialog/dialog.image.tpl.html',
                 controller: 'otDialogImage',
@@ -107,7 +113,7 @@ angular.module('ot.service.structure', [
                                 var fd = new FormData();
                                 fd.append('file', file);
                                 return ot.call($http.post(
-                                    entity._image,
+                                    updateLink,
                                     fd, {
                                         transformRequest: angular.identity,
                                         headers: {'Content-Type': undefined}

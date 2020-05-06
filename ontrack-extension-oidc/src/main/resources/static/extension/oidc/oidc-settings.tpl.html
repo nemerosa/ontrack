@@ -14,6 +14,7 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Image</th>
             <th>Description</th>
             <th>Issuer</th>
             <th>Client ID</th>
@@ -24,7 +25,7 @@
         </thead>
         <tbody>
         <tr ng-if="resources.resources.length == 0" class="info">
-            <td colspan="7">
+            <td colspan="9">
                 No OIDC provider has been registered yet.
                 Click <a class="ot-action" ng-click="createProvider()">here</a> to create one.
             </td>
@@ -32,6 +33,9 @@
         <tr ng-repeat="provider in resources.resources">
             <td><code>{{provider.id}}</code></td>
             <td>{{provider.name}}</td>
+            <td>
+                <img ng-if="provider._image" class="ot-icon" ng-src="{{provider._image}}" alt="Image for {{provider.name}}">
+            </td>
             <td>{{provider.description}}</td>
             <td>{{provider.issuerId}}</td>
             <td>{{provider.clientId}}</td>
@@ -40,6 +44,10 @@
                 <code>{{provider.groupFilter}}</code>
             </td>
             <td>
+                <span
+                        class="fa fa-image ot-command"
+                        ng-click="providerImage(provider)"
+                        title="Edits the image for the OIDC provider"></span>
                 <span class="fa fa-pencil ot-command" title="Edits this OIDC provider" ng-if="provider._update" ng-click="updateProvider(provider)"></span>
                 <span class="fa fa-trash ot-command" title="Remove this OIDC provider" ng-if="provider._delete" ng-click="deleteProvider(provider)"></span>
             </td>
