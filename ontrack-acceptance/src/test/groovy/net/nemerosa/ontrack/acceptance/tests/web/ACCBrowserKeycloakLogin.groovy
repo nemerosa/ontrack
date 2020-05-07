@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance.tests.web
 
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
+import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 import org.keycloak.admin.client.Keycloak
@@ -18,7 +19,11 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
     @Test
     void 'Login with Keycloak'() {
         withKeycloakConfigured { realm ->
-
+            browser { browser ->
+                def loginPage = goTo(LoginPage, [:])
+                assert loginPage.hasExtension(realm) : "OIDC extension is present"
+                loginPage.useExtension(realm)
+            }
         }
     }
 

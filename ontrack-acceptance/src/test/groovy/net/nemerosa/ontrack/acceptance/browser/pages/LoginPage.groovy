@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance.browser.pages
 
 import net.nemerosa.ontrack.acceptance.browser.Browser
+import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
@@ -30,6 +31,16 @@ class LoginPage extends AbstractPage {
     @Override
     void waitFor() {
         browser.waitUntil("User name") { username.displayed }
+    }
+
+    boolean hasExtension(String id) {
+        def extension = browser.findElement(By.id(id))
+        return extension.displayed
+    }
+
+    void useExtension(String id) {
+        def extension = browser.findElement(By.id(id))
+        extension.click()
     }
 
     void login(String name, String password) {
