@@ -40,7 +40,8 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
         def realm = uid("r")
         def representation = new RealmRepresentation()
-        representation.setRealm(realm)
+        representation.realm = realm
+        representation.enabled = true
         adminClient.realms().create(representation)
 
         try {
