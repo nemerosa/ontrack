@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.model.security.Roles
+import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 

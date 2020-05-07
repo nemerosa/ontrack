@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-client")
     runtimeOnly("org.springframework.security:spring-security-oauth2-jose")
 
+    testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation("com.squareup.okhttp3:mockwebserver")
 

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProviderFixtures.testProvider
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.After
@@ -146,17 +147,5 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
             assertNotSame(check, checkAgain, "New cached list")
         }
     }
-
-    private fun testProvider(
-            id: String,
-            name: String = "Test"
-    ) = OntrackOIDCProvider(
-            id = id,
-            name = name,
-            description = "",
-            issuerId = "",
-            clientId = "",
-            clientSecret = "",
-            groupFilter = null)
 
 }

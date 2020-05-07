@@ -36,6 +36,7 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-influx")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
+    testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-general"))
