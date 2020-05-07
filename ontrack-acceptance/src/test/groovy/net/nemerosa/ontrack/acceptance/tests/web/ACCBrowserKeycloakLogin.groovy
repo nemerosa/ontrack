@@ -21,7 +21,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         withKeycloakConfigured { realm ->
             browser { browser ->
                 def loginPage = goTo(LoginPage, [:])
-                assert loginPage.hasExtension(realm) : "OIDC extension is present"
+                assert loginPage.hasExtension(realm): "OIDC extension is present"
                 loginPage.useExtension(realm)
             }
         }
