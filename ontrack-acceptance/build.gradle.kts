@@ -24,6 +24,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter")
 
     testImplementation("org.influxdb:influxdb-java")
+    testImplementation("org.keycloak:keycloak-admin-client:10.0.0")
 
     testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumVersion")
     testImplementation("org.seleniumhq.selenium:selenium-support:$seleniumVersion")

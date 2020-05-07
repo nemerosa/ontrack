@@ -78,6 +78,21 @@ public class AcceptanceConfig {
      */
     private String influxdbUri = "http://localhost:8086";
 
+    /**
+     * URI to the Keycloak server
+     */
+    private String keycloakUri = "http://localhost:8008";
+
+    /**
+     * Username for the Keycloak server
+     */
+    private String keycloakUsername = "admin";
+
+    /**
+     * Password for the Keycloak server
+     */
+    private String keycloakPassword = "admin";
+
     @PostConstruct
     public void check() throws InterruptedException, ExecutionException, TimeoutException {
         // Checks the URL is defined
@@ -142,6 +157,9 @@ public class AcceptanceConfig {
         logger.accept(String.format(">>> Output directory:    %s", outputDir));
         logger.accept(String.format(">>> Result file name:    %s", resultFileName));
         logger.accept(String.format(">>> InfluxDB URI:        %s", influxdbUri));
+        logger.accept(String.format(">>> Keycloak URI:        %s", keycloakUri));
+        logger.accept(String.format(">>> Keycloak username:   %s", keycloakUsername));
+        logger.accept(String.format(">>> Keycloak password:   %s", "admin".equals(keycloakPassword) ? "admin" : "****"));
     }
 
     public static AcceptanceConfig fromEnv() {
@@ -158,6 +176,9 @@ public class AcceptanceConfig {
         c.setOutputDir(envAsFile("ontrack.acceptance.output-dir", c.getOutputDir(), "Output directory"));
         c.setResultFileName(env("ontrack.acceptance.result-file-name", "ontrack-acceptance.xml", "Output directory"));
         c.setInfluxdbUri(env("ontrack.acceptance.influxdb-uri", "http://localhost:8086", "URI to the InfluxDB database"));
+        c.setKeycloakUri(env("ontrack.acceptance.keycloak-uri", "http://localhost:8008", "URI to the Keycloak server"));
+        c.setKeycloakUsername(env("ontrack.acceptance.keycloak-username", "admin", "User name to the Keycloak server"));
+        c.setKeycloakPassword(env("ontrack.acceptance.keycloak-password", "admin", "Password to the Keycloak server"));
         return c;
     }
 
