@@ -420,4 +420,9 @@ class Config {
     def setSonarQubeSettings(SonarQubeMeasuresSettings settings) {
         ontrack.put('rest/settings/sonarqube-measures', settings)
     }
+
+    @DSLMethod("Configuration of the OIDC settings")
+    OidcSettings getOidcSettings() {
+        return new OidcSettings(ontrack)
+    }
 }
