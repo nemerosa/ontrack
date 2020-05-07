@@ -2,14 +2,13 @@ package net.nemerosa.ontrack.extension.oidc
 
 import net.nemerosa.ontrack.extension.api.UILogin
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
-import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProvider
+import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProviderFixtures
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class OIDCUILoginExtensionIT : AbstractDSLTestSupport() {
 
@@ -29,10 +28,40 @@ class OIDCUILoginExtensionIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `UI login extension without an image`() {
+        val id = TestUtils.uid("I")
+        asAdmin {
+            service.createProvider(OntrackOIDCProviderFixtures.testProvider(id = id))
+        }
+        asAnonymous {
+            val login = uiLoginExtension.contributions.first { it.id == id }
+            assertFalse(login.image, "No image associated")
+            assertNull(login.imageLoader(), "No image being loaded")
+        }
+    }
+
+    @Test
+    fun `UI login extension with an image`() {
+        val id = TestUtils.uid("I")
+        val image = OntrackOIDCProviderFixtures.image()
+        asAdmin {
+            service.createProvider(OntrackOIDCProviderFixtures.testProvider(id = id))
+            service.setProviderImage(id, image)
+        }
+        asAnonymous {
+            val login = uiLoginExtension.contributions.first { it.id == id }
+            assertTrue(login.image, "Image associated")
+            assertNotNull(login.imageLoader(), "Image being loaded") {
+                assertEquals(image, it)
+            }
+        }
+    }
+
+    @Test
     fun `UI login extension after creation and after deletion of a provider`() {
         val id = TestUtils.uid("I")
         asAdmin {
-            service.createProvider(OntrackOIDCProvider(id, "Test", "Some link", "", "", "", null))
+            service.createProvider(OntrackOIDCProviderFixtures.testProvider(id = id, description = "Some link"))
         }
         asAnonymous {
             val logins = uiLoginExtension.contributions

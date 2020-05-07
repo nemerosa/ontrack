@@ -41,16 +41,10 @@ class OntrackOIDCProviderResourceDecoratorIT : AbstractResourceDecoratorTestSupp
 
     @Test
     fun `Image link present when image`() {
-        val bytes = OntrackOIDCProviderResourceDecoratorIT::class.java
-                .getResourceAsStream("/image.png")
-                .readAllBytes()
         asUserWith<GlobalSettings> {
             val provider = OntrackOIDCProviderFixtures.testProvider(uid("P"))
             oidcSettingsService.createProvider(provider)
-            oidcSettingsService.setProviderImage(provider.id, Document(
-                    "image/png",
-                    bytes
-            ))
+            oidcSettingsService.setProviderImage(provider.id, OntrackOIDCProviderFixtures.image())
             provider.decorate(decorator) {
                 assertLinkPresent("_image")
                 assertLinkPresent("_imageUpdate")
