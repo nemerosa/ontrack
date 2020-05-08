@@ -11,7 +11,9 @@ interface IndicatorValueType<T, C> {
     fun status(config: C, value: T): IndicatorStatus
 
     fun toClientJson(config: C, value: T): JsonNode
+    fun fromClientJson(config: C, value: JsonNode): T?
 
     fun fromStoredJson(valueConfig: C, value: JsonNode): T?
+    fun toStoredJson(config: C, value: T): JsonNode
 
 }

@@ -1,5 +1,6 @@
 angular.module('ontrack.extension.indicators', [
     'ot.service.core',
+    'ot.service.form',
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
@@ -9,7 +10,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'ProjectIndicatorsCtrl'
         });
     })
-    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
 
         const projectId = $stateParams.project;
         $scope.loadingIndicators = true;
@@ -79,6 +80,11 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadIndicators();
+
+        $scope.editIndicator = (indicator) => {
+            otFormService.update(indicator.links._update, "Edit indicator value").then(loadIndicators);
+        };
+
     })
 
 ;

@@ -6,4 +6,6 @@ interface IndicatorStore {
 
     fun loadIndicator(project: Project, type: Int): StoredIndicator?
 
+    fun storeIndicator(project: Project, type: Int, indicator: StoredIndicator)
+
 }

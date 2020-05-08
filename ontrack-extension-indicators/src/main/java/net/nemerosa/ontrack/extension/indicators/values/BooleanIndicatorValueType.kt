@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.values
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.BooleanNode
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.json.asJson
@@ -44,10 +45,19 @@ class BooleanIndicatorValueType : IndicatorValueType<Boolean, BooleanIndicatorVa
                     "value" to toClientValue(value)
             ).asJson()
 
+    override fun fromClientJson(config: BooleanIndicatorValueTypeConfig, value: JsonNode): Boolean? {
+        val text = value.path("value").asText()
+        return fromClientValue(text)
+    }
+
     override fun fromStoredJson(valueConfig: BooleanIndicatorValueTypeConfig, value: JsonNode): Boolean? = when {
         value.isNull -> null
         value.isBoolean -> value.asBoolean()
         else -> null
+    }
+
+    override fun toStoredJson(config: BooleanIndicatorValueTypeConfig, value: Boolean): JsonNode {
+        return BooleanNode.valueOf(value)
     }
 
     companion object {
@@ -60,6 +70,13 @@ class BooleanIndicatorValueType : IndicatorValueType<Boolean, BooleanIndicatorVa
                     null -> CLIENT_NULL
                     true -> CLIENT_TRUE
                     else -> CLIENT_FALSE
+                }
+
+        private fun fromClientValue(value: String) =
+                when (value) {
+                    CLIENT_TRUE -> true
+                    CLIENT_FALSE -> false
+                    else -> null
                 }
     }
 }

@@ -15,8 +15,10 @@ data class IndicatorType<T, C>(
         val valueComputer: IndicatorComputer<T>?
 ) {
     fun toClientJson(value: T) = valueType.toClientJson(valueConfig, value)
+    fun fromClientJson(value: JsonNode): T? = valueType.fromClientJson(valueConfig, value)
 
     fun fromStoredJson(value: JsonNode): T? = valueType.fromStoredJson(valueConfig, value)
+    fun toStoredJson(value: T) = valueType.toStoredJson(valueConfig, value)
 
     fun getUpdateForm(value: T?): Form = valueType.form(
             nameDescription = toNameDescription(),
@@ -28,4 +30,7 @@ data class IndicatorType<T, C>(
             shortName,
             longName
     )
+
+    fun getStatus(value: T) = valueType.status(valueConfig, value)
+
 }

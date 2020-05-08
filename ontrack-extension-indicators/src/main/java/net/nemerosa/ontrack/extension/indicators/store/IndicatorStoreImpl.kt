@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.store
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
@@ -25,13 +26,27 @@ class IndicatorStoreImpl(
                 ?.let { record ->
                     val rep = record.data.parse<StoredIndicatorRepresentation>()
                     StoredIndicator(
-                            id = record.id,
                             value = rep.value,
                             status = rep.status,
                             comment = rep.comment,
                             signature = record.signature
                     )
                 }
+    }
+
+    override fun storeIndicator(project: Project, type: Int, indicator: StoredIndicator) {
+        entityDataStore.add(
+                project,
+                STORE_CATEGORY,
+                type.toString(),
+                indicator.signature,
+                null,
+                StoredIndicatorRepresentation(
+                        value = indicator.value,
+                        status = indicator.status,
+                        comment = indicator.comment
+                ).asJson()
+        )
     }
 
     companion object {

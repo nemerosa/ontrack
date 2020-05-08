@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.structure.ID
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/extension/indicators")
@@ -27,6 +25,16 @@ class IndicatorController(
             @PathVariable projectId: ID,
             @PathVariable typeId: Int
     ) = projectIndicatorService.getUpdateFormForIndicator(projectId, typeId)
+
+    /**
+     * Updates a project indicator
+     */
+    @PutMapping("project/{projectId}/indicator/{typeId}/update")
+    fun updateIndicator(
+            @PathVariable projectId: ID,
+            @PathVariable typeId: Int,
+            @RequestBody input: JsonNode
+    ) = projectIndicatorService.updateIndicator(projectId, typeId, input)
 
 
 }

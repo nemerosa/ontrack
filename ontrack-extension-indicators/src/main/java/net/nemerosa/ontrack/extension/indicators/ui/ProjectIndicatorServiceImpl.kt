@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,14 +30,7 @@ class ProjectIndicatorServiceImpl(
                     ProjectCategoryIndicators(
                             category = category,
                             indicators = indicators.map { indicator ->
-                                ProjectIndicator(
-                                        project = project,
-                                        type = ProjectIndicatorType(indicator.type),
-                                        value = indicator.toClientJson(),
-                                        status = indicator.status,
-                                        comment = indicator.comment,
-                                        signature = indicator.signature
-                                )
+                                toProjectIndicator(project, indicator)
                             }
                     )
                 }
@@ -46,4 +42,19 @@ class ProjectIndicatorServiceImpl(
         val indicator = indicatorService.getProjectIndicator(project, typeId)
         return indicator.getUpdateForm()
     }
+
+    override fun updateIndicator(projectId: ID, typeId: Int, input: JsonNode): ProjectIndicator {
+        val project = structureService.getProject(projectId)
+        val indicator = indicatorService.updateProjectIndicator<Any>(project, typeId, input)
+        return toProjectIndicator(project, indicator)
+    }
+
+    private fun toProjectIndicator(project: Project, indicator: Indicator<*>) = ProjectIndicator(
+            project = project,
+            type = ProjectIndicatorType(indicator.type),
+            value = indicator.toClientJson(),
+            status = indicator.status,
+            comment = indicator.comment,
+            signature = indicator.signature
+    )
 }
