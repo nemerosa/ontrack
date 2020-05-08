@@ -38,9 +38,10 @@ class LoginPage extends AbstractPage {
         return extension.displayed
     }
 
-    void useExtension(String id) {
+    KeycloakLoginPage useExtension(String id) {
         def extension = browser.findElement(By.id(id))
         extension.click()
+        return browser.at(KeycloakLoginPage)
     }
 
     void login(String name, String password) {

@@ -6,10 +6,8 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
-import org.keycloak.representations.idm.ClientRepresentation
-import org.keycloak.representations.idm.GroupRepresentation
-import org.keycloak.representations.idm.RealmRepresentation
-import org.keycloak.representations.idm.UserRepresentation
+import org.keycloak.admin.client.resource.UsersResource
+import org.keycloak.representations.idm.*
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
@@ -22,7 +20,10 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             browser { browser ->
                 def loginPage = goTo(LoginPage, [:])
                 assert loginPage.hasExtension(realm): "OIDC extension is present"
-                loginPage.useExtension(realm)
+                def keycloakLoginPage = loginPage.useExtension(realm)
+                def homePage = keycloakLoginPage.login("ontrack-user", "secret")
+                def userName = homePage.header.userName
+                assert userName == "User"
             }
         }
     }
@@ -57,23 +58,23 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             // Creates two users
             def users = adminClient.realm(realm).users()
 
-            def userAdmin = new UserRepresentation()
-            userAdmin.username = "ontrack-admin"
-            userAdmin.firstName = "Admin"
-            userAdmin.lastName = "Ontrack"
-            userAdmin.groups = ["ontrack-admin", "ontrack-user", "other-group"]
-            userAdmin.email = "ontrack-admin@nemerosa.net"
-            userAdmin.emailVerified = true
-            users.create(userAdmin)
+            createUser(
+                    users,
+                    "ontrack-admin",
+                    "Admin",
+                    "Ontrack",
+                    ["ontrack-admin", "ontrack-user", "other-group"],
+                    "ontrack-admin@nemerosa.net"
+            )
 
-            def user = new UserRepresentation()
-            user.username = "ontrack-user"
-            user.firstName = "User"
-            user.lastName = "Ontrack"
-            user.groups = ["ontrack-user", "other-group"]
-            user.email = "ontrack-user@nemerosa.net"
-            user.emailVerified = true
-            users.create(user)
+            createUser(
+                    users,
+                    "ontrack-user",
+                    "User",
+                    "Ontrack",
+                    ["ontrack-user", "other-group"],
+                    "ontrack-user@nemerosa.net"
+            )
 
             // Creates an application
             def clientAdmin = adminClient.realm(realm).clients()
@@ -99,12 +100,41 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             try {
                 code(realm)
             } finally {
-                ontrack.config.oidcSettings.deleteProvider(realm)
+                if (configRule.config.keycloakCleanup) {
+                    ontrack.config.oidcSettings.deleteProvider(realm)
+                }
             }
 
         } finally {
-            adminClient.realm(realm).remove()
+            if (configRule.config.keycloakCleanup) {
+                adminClient.realm(realm).remove()
+            }
         }
+    }
+
+    private static void createUser(
+            UsersResource users,
+            String username,
+            String firstName,
+            String lastName,
+            List<String> groups,
+            String email
+    ) {
+        def credentials = new CredentialRepresentation()
+        credentials.type = CredentialRepresentation.PASSWORD
+        credentials.temporary = false
+        credentials.value = "secret"
+
+        def user = new UserRepresentation()
+        user.credentials = [credentials]
+        user.username = username
+        user.firstName = firstName
+        user.lastName = lastName
+        user.groups = groups
+        user.email = email
+        user.emailVerified = true
+        user.enabled = true
+        users.create(user)
     }
 
 }

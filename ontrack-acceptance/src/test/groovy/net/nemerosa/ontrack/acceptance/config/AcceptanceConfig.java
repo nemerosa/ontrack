@@ -93,6 +93,11 @@ public class AcceptanceConfig {
      */
     private String keycloakPassword = "admin";
 
+    /**
+     * Cleaning the Keycloak registration after test?
+     */
+    private boolean keycloakCleanup = true;
+
     @PostConstruct
     public void check() throws InterruptedException, ExecutionException, TimeoutException {
         // Checks the URL is defined
@@ -160,6 +165,7 @@ public class AcceptanceConfig {
         logger.accept(String.format(">>> Keycloak URI:        %s", keycloakUri));
         logger.accept(String.format(">>> Keycloak username:   %s", keycloakUsername));
         logger.accept(String.format(">>> Keycloak password:   %s", "admin".equals(keycloakPassword) ? "admin" : "****"));
+        logger.accept(String.format(">>> Keycloak cleanup:    %s", keycloakCleanup));
     }
 
     public static AcceptanceConfig fromEnv() {
@@ -179,6 +185,7 @@ public class AcceptanceConfig {
         c.setKeycloakUri(env("ontrack.acceptance.keycloak-uri", "http://localhost:8008", "URI to the Keycloak server"));
         c.setKeycloakUsername(env("ontrack.acceptance.keycloak-username", "admin", "User name to the Keycloak server"));
         c.setKeycloakPassword(env("ontrack.acceptance.keycloak-password", "admin", "Password to the Keycloak server"));
+        c.setKeycloakCleanup(envAsBoolean("ontrack.acceptance.keycloak-cleanup", true, "Cleanup of Keycloak resources"));
         return c;
     }
 
