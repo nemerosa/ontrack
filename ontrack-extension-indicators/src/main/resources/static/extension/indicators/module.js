@@ -86,5 +86,14 @@ angular.module('ontrack.extension.indicators', [
         };
 
     })
+    .directive('otExtensionIndicatorsStatus', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-status.tpl.html',
+            scope: {
+                status: '='
+            }
+        };
+    })
 
 ;

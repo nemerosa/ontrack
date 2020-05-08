@@ -1,0 +1,12 @@
+<span ng-if="status"
+      class="fa fa-circle fa-lg"
+      title="Status {{status}}"
+      ng-class="{
+        'text-danger': status == 'RED',
+        'text-warning': status == 'YELLOW',
+        'text-success': status == 'GREEN'
+      }"
+></span>
+<span ng-if="!status"
+      class="fa fa-ban text-muted"
+      title="No indicator yet"></span>
