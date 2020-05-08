@@ -9,4 +9,32 @@
         </div>
     </div>
 
+    <table class="table table-bordered">
+        <tbody ng-repeat="categoryIndicators in projectIndicators.categories">
+        <tr class="info">
+            <th colspan="6">{{categoryIndicators.category.name}}</th>
+        </tr>
+        <tr ng-repeat="indicator in categoryIndicators.indicators">
+            <td>
+                {{indicator.type.name}}
+            </td>
+            <td>
+                {{indicator.status}}
+            </td>
+            <td>
+                {{indicator.value}}
+            </td>
+            <td>
+                {{indicator.comment}}
+            </td>
+            <td>
+                <span ng-if="indicator.value">{{indicator.signature}}</span>
+            </td>
+            <td>
+                <span ng-if="indicator.links._update" class="fa fa-pencil ot-command" title="Edit value"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </ot-view>

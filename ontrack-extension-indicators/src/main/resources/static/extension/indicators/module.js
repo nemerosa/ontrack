@@ -18,7 +18,67 @@ angular.module('ontrack.extension.indicators', [
         view.title = "";
 
         const query = `
+            query Indicators($project: Int!) {
+              projects(id: $project) {
+                id
+                name
+                projectIndicators {
+                  categories {
+                    category {
+                      name
+                    }
+                    indicators {
+                      links {
+                        _update
+                      }
+                      type {
+                        name
+                      }
+                      value
+                      status
+                      comment
+                      signature {
+                        user
+                        time
+                      }
+                    }
+                  }
+                }
+              }
+            }
         `;
+
+        const queryVars = {
+            project: projectId
+        };
+
+        let viewInitialized = false;
+
+        const loadIndicators = () => {
+            $scope.loadingIndicators = true;
+            otGraphqlService.pageGraphQLCall(query, queryVars).then((data) => {
+
+                $scope.project = data.projects[0];
+                $scope.projectIndicators = $scope.project.projectIndicators;
+
+                if (!viewInitialized) {
+                    // Title
+                    view.title = `Project indicators for ${$scope.project.name}`;
+                    // View configuration
+                    view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
+                    // Commands
+                    view.commands = [
+                        ot.viewCloseCommand('/project/' + $scope.project.id)
+                    ];
+                    // OK
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingIndicators = false;
+            });
+        };
+
+        loadIndicators();
     })
 
 ;
