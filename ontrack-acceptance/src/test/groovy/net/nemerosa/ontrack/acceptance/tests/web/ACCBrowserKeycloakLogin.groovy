@@ -82,7 +82,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             def client = new ClientRepresentation()
             client.clientId = clientId
             client.baseUrl = baseURL
-            client.rootUrl = baseURL
+            client.enabled = true
             client.redirectUris = [
                     "${baseURL}/login/oauth2/code/$realm" as String
             ]
@@ -123,7 +123,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         def credentials = new CredentialRepresentation()
         credentials.type = CredentialRepresentation.PASSWORD
         credentials.temporary = false
-        credentials.value = "secret"
+        credentials.secretData = "secret"
 
         def user = new UserRepresentation()
         user.credentials = [credentials]
