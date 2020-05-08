@@ -28,7 +28,9 @@
                 {{indicator.comment}}
             </td>
             <td>
-                <span ng-if="indicator.value">{{indicator.signature}}</span>
+                <span ng-if="indicator.value">
+                    <ot-creation creation="indicator.signature"></ot-creation>
+                </span>
             </td>
             <td>
                 <span ng-if="indicator.links._update" class="fa fa-pencil ot-command" title="Edit value" ng-click="editIndicator(indicator)"></span>
