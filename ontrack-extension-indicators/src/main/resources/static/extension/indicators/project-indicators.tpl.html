@@ -22,7 +22,9 @@
                 <ot-extension-indicators-status status="indicator.status"></ot-extension-indicators-status>
             </td>
             <td>
-                {{indicator.value}}
+                <span ng-if="indicator.value">
+                    <ot-include value="indicator.value" template="extension/{{indicator.type.valueType.feature.id}}/indicators/{{indicator.type.valueType.name}}.tpl.html"></ot-include>
+                </span>
             </td>
             <td>
                 {{indicator.comment}}

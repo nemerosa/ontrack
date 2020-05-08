@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.extension.indicators.values
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.BooleanNode
+import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
+import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
@@ -12,7 +14,9 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import org.springframework.stereotype.Component
 
 @Component
-class BooleanIndicatorValueType : IndicatorValueType<Boolean, BooleanIndicatorValueTypeConfig> {
+class BooleanIndicatorValueType(
+        extension: IndicatorsExtensionFeature
+) : AbstractExtension(extension), IndicatorValueType<Boolean, BooleanIndicatorValueTypeConfig> {
 
     override fun status(config: BooleanIndicatorValueTypeConfig, value: Boolean): IndicatorStatus =
             when {

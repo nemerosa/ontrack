@@ -34,6 +34,12 @@ angular.module('ontrack.extension.indicators', [
                       }
                       type {
                         name
+                        valueType {
+                          name
+                          feature {
+                            id
+                          }
+                        }
                       }
                       value
                       status

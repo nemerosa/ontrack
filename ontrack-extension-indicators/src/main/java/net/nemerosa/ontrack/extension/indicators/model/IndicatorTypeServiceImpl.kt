@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class IndicatorTypeServiceImpl(
-        private val indicatorCategoryService: IndicatorCategoryService
+        private val indicatorCategoryService: IndicatorCategoryService,
+        private val booleanIndicatorValueType: BooleanIndicatorValueType
 ) : IndicatorTypeService {
 
     private val types: Map<Int, IndicatorType<*, *>> = listOf(
@@ -16,7 +17,7 @@ class IndicatorTypeServiceImpl(
                     shortName = "Java stack",
                     longName = "SHOULD Use Java & spring boot stack",
                     link = null,
-                    valueType = BooleanIndicatorValueType(),
+                    valueType = booleanIndicatorValueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = false),
                     valueComputer = null
             ),
@@ -26,7 +27,7 @@ class IndicatorTypeServiceImpl(
                     shortName = "Java 11 Zulu",
                     longName = "MUST Use zulu JDK 11 LTS for JVM services",
                     link = null,
-                    valueType = BooleanIndicatorValueType(),
+                    valueType = booleanIndicatorValueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = true),
                     valueComputer = null
             ),
@@ -36,7 +37,7 @@ class IndicatorTypeServiceImpl(
                     shortName = "Docker name",
                     longName = "MUST follow Docker artifact naming conventions",
                     link = null,
-                    valueType = BooleanIndicatorValueType(),
+                    valueType = booleanIndicatorValueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = true),
                     valueComputer = null
             )
