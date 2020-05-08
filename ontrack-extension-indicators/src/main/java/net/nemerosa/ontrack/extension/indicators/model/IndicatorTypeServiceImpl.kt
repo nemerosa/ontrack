@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.indicators.model
 
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import org.springframework.stereotype.Service
 
 @Service
@@ -51,4 +50,7 @@ class IndicatorTypeServiceImpl(
                 )
         )
     }
+
+    override fun getTypeById(typeId: Int): IndicatorType<*, *> =
+            types[typeId] ?: throw IndicatorTypeNotFoundException(typeId)
 }

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
 import net.nemerosa.ontrack.extension.indicators.store.IndicatorStore
-import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.Signature
 import org.springframework.stereotype.Service
@@ -23,6 +22,11 @@ class IndicatorServiceImpl(
         }.filter {
             all || it.value != null
         }
+    }
+
+    override fun getProjectIndicator(project: Project, typeId: Int): Indicator<*> {
+        val type = indicatorTypeService.getTypeById(typeId)
+        return loadIndicator(project, type)
     }
 
     private fun <T, C> loadIndicator(project: Project, type: IndicatorType<T, C>): Indicator<T> {

@@ -16,6 +16,9 @@ angular.module('ontrack.extension.indicators', [
 
         const view = ot.view();
         view.title = "";
+
+        const query = `
+        `;
     })
 
 ;

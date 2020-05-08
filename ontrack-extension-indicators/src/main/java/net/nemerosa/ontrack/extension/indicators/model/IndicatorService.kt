@@ -6,6 +6,6 @@ interface IndicatorService {
 
     fun getProjectIndicators(project: Project, all: Boolean): List<Indicator<*>>
 
-    fun getProjectIndicator(project: Project, indicatorId: Int): Indicator<*>
+    fun getProjectIndicator(project: Project, typeId: Int): Indicator<*>
 
 }
