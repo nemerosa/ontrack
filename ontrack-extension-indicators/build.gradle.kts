@@ -9,6 +9,7 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
+    api(project(":ontrack-ui-graphql"))
 
     testImplementation(project(":ontrack-it-utils"))
 
