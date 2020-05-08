@@ -11,6 +11,8 @@ dependencies {
     api(project(":ontrack-extension-support"))
     api(project(":ontrack-ui-graphql"))
 
+    implementation(project(":ontrack-repository-support"))
+
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

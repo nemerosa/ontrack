@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.store
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
