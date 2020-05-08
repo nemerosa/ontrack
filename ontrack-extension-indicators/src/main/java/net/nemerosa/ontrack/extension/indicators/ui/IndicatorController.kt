@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
-import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorService
 import net.nemerosa.ontrack.model.structure.ID
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,6 +18,15 @@ class IndicatorController(
     @GetMapping("project/{projectId}")
     fun getAllProjectIndicators(@PathVariable projectId: ID) =
             projectIndicatorService.getProjectIndicators(projectId, all = true)
+
+    /**
+     * Gets the update form for a project indicator
+     */
+    @GetMapping("project/{projectId}/indicator/{typeId}/update")
+    fun getUpdateFormForIndicator(
+            @PathVariable projectId: ID,
+            @PathVariable typeId: Int
+    ) = projectIndicatorService.getUpdateFormForIndicator(projectId, typeId)
 
 
 }

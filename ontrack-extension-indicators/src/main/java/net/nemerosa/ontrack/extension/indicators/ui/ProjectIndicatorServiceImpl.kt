@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
+import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Service
@@ -27,6 +28,7 @@ class ProjectIndicatorServiceImpl(
                             category = category,
                             indicators = indicators.map { indicator ->
                                 ProjectIndicator(
+                                        project = project,
                                         type = ProjectIndicatorType(indicator.type),
                                         value = indicator.toClientJson(),
                                         status = indicator.status,
@@ -39,4 +41,9 @@ class ProjectIndicatorServiceImpl(
         )
     }
 
+    override fun getUpdateFormForIndicator(projectId: ID, typeId: Int): Form {
+        val project = structureService.getProject(projectId)
+        val indicator = indicatorService.getProjectIndicator(project, typeId)
+        return indicator.getUpdateForm()
+    }
 }
