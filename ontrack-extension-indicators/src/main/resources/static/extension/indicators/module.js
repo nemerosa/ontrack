@@ -214,9 +214,9 @@ angular.module('ontrack.extension.indicators', [
                 $scope.portfolio = data.indicatorPortfolios[0];
                 $scope.types = data.indicatorTypes;
                 $scope.types.forEach((type) => {
-                    type.selected = $scope.portfolio.types.some((i) => {
+                    type.selected = $scope.portfolio.types.some((i) =>
                         i.id === type.id
-                    });
+                    );
                 });
             }).finally(() => {
                 $scope.loadingPortfolio = false;
