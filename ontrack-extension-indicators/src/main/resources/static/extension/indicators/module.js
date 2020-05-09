@@ -138,6 +138,9 @@ angular.module('ontrack.extension.indicators', [
                   name
                   link
                 }
+                links {
+                  _update
+                }
               }
             }
         `;

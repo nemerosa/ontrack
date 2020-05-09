@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered table-hover">
         <tr ng-repeat="portfolio in portfolios">
             <td>
                 {{portfolio.name}}
@@ -27,7 +27,10 @@
                 {{portfolio.label}}
             </td>
             <td>
-                View | Edit | Delete
+                <a ng-if="portfolio.links._update"
+                   href="#/extension/indicators/portfolios/{{portfolio.id}}/edit"
+                   title="Edit the content of the {{portfolio.name}} portfolio"><span class="fa fa-pencil ot-command"></span></a>
+                View | Delete
             </td>
         </tr>
     </table>
