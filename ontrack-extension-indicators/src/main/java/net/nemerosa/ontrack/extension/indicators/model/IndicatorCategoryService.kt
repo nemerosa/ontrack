@@ -5,10 +5,10 @@ import net.nemerosa.ontrack.model.exceptions.NotFoundException
 
 interface IndicatorCategoryService {
 
-    fun findCategoryById(id: Int): IndicatorCategory?
+    fun findCategoryById(id: String): IndicatorCategory?
 
-    fun getCategory(id: Int): IndicatorCategory
+    fun getCategory(id: String): IndicatorCategory
 
 }
 
-class IndicatorCategoryNotFoundException(id: Int) : NotFoundException("Indicator category not found: $id")
+class IndicatorCategoryNotFoundException(id: String) : NotFoundException("Indicator category not found: $id")

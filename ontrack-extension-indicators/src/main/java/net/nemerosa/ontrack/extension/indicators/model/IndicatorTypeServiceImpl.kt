@@ -10,9 +10,9 @@ class IndicatorTypeServiceImpl(
         private val booleanIndicatorValueType: BooleanIndicatorValueType
 ) : IndicatorTypeService {
 
-    private val types: Map<Int, IndicatorType<*, *>> = listOf(
+    private val types: Map<String, IndicatorType<*, *>> = listOf(
             IndicatorType(
-                    id = 1,
+                    id = "36083450-cacb-4e30-bbed-fd6682f336fd",
                     category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.SERVICES),
                     shortName = "Java stack",
                     longName = "SHOULD Use Java & spring boot stack",
@@ -22,7 +22,7 @@ class IndicatorTypeServiceImpl(
                     valueComputer = null
             ),
             IndicatorType(
-                    id = 2,
+                    id = "7291c0ba-a038-4ca4-907e-364b57cba8bd",
                     category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.SERVICES),
                     shortName = "Java 11 Zulu",
                     longName = "MUST Use zulu JDK 11 LTS for JVM services",
@@ -32,7 +32,7 @@ class IndicatorTypeServiceImpl(
                     valueComputer = null
             ),
             IndicatorType(
-                    id = 3,
+                    id = "91f0ac82-0442-4ae0-9995-ed2e8fc9e6f9",
                     category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.DELIVERY),
                     shortName = "Docker name",
                     longName = "MUST follow Docker artifact naming conventions",
@@ -52,6 +52,6 @@ class IndicatorTypeServiceImpl(
         )
     }
 
-    override fun getTypeById(typeId: Int): IndicatorType<*, *> =
+    override fun getTypeById(typeId: String): IndicatorType<*, *> =
             types[typeId] ?: throw IndicatorTypeNotFoundException(typeId)
 }

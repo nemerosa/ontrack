@@ -7,9 +7,9 @@ import net.nemerosa.ontrack.model.structure.ID
 interface ProjectIndicatorService {
     fun getProjectIndicators(projectId: ID, all: Boolean): ProjectIndicators
 
-    fun getUpdateFormForIndicator(projectId: ID, typeId: Int): Form
+    fun getUpdateFormForIndicator(projectId: ID, typeId: String): Form
 
-    fun updateIndicator(projectId: ID, typeId: Int, input: JsonNode): ProjectIndicator
+    fun updateIndicator(projectId: ID, typeId: String, input: JsonNode): ProjectIndicator
 
 
 }

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
 
 class ProjectIndicatorType(
-        val id: Int,
+        val id: String,
         val name: String,
         val link: String?
 ) {

@@ -15,11 +15,11 @@ class IndicatorStoreImpl(
         private val entityDataStore: EntityDataStore
 ) : IndicatorStore {
 
-    override fun loadIndicator(project: Project, type: Int): StoredIndicator? {
+    override fun loadIndicator(project: Project, type: String): StoredIndicator? {
         return entityDataStore.getByFilter(
                 EntityDataStoreFilter(project)
                         .withCategory(STORE_CATEGORY)
-                        .withName(type.toString())
+                        .withName(type)
                         .withCount(1)
         )
                 .firstOrNull()
@@ -34,11 +34,11 @@ class IndicatorStoreImpl(
                 }
     }
 
-    override fun storeIndicator(project: Project, type: Int, indicator: StoredIndicator) {
+    override fun storeIndicator(project: Project, type: String, indicator: StoredIndicator) {
         entityDataStore.add(
                 project,
                 STORE_CATEGORY,
-                type.toString(),
+                type,
                 indicator.signature,
                 null,
                 StoredIndicatorRepresentation(

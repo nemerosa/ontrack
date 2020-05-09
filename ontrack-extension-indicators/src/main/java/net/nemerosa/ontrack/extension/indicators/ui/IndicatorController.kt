@@ -23,7 +23,7 @@ class IndicatorController(
     @GetMapping("project/{projectId}/indicator/{typeId}/update")
     fun getUpdateFormForIndicator(
             @PathVariable projectId: ID,
-            @PathVariable typeId: Int
+            @PathVariable typeId: String
     ) = projectIndicatorService.getUpdateFormForIndicator(projectId, typeId)
 
     /**
@@ -32,7 +32,7 @@ class IndicatorController(
     @PutMapping("project/{projectId}/indicator/{typeId}/update")
     fun updateIndicator(
             @PathVariable projectId: ID,
-            @PathVariable typeId: Int,
+            @PathVariable typeId: String,
             @RequestBody input: JsonNode
     ) = projectIndicatorService.updateIndicator(projectId, typeId, input)
 

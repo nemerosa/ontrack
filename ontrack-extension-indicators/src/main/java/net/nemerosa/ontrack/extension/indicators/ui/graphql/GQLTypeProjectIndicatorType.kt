@@ -19,7 +19,7 @@ class GQLTypeProjectIndicatorType(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
             .name(typeName)
             .description("Type of indicator")
-            .idField()
+            .stringField("id", "Unique ID for the type")
             .stringField("name", "Long name for the indicator type")
             .stringField("link", "Link to the definition of the indicator")
             .field {

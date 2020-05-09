@@ -6,8 +6,8 @@ interface IndicatorTypeService {
 
     fun findAll(): List<IndicatorType<*, *>>
 
-    fun getTypeById(typeId: Int): IndicatorType<*, *>
+    fun getTypeById(typeId: String): IndicatorType<*, *>
 
 }
 
-class IndicatorTypeNotFoundException(id: Int) : NotFoundException("Indicator type not found: $id")
+class IndicatorTypeNotFoundException(id: String) : NotFoundException("Indicator type not found: $id")

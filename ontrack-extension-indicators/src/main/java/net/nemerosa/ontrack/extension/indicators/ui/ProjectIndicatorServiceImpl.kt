@@ -37,13 +37,13 @@ class ProjectIndicatorServiceImpl(
         )
     }
 
-    override fun getUpdateFormForIndicator(projectId: ID, typeId: Int): Form {
+    override fun getUpdateFormForIndicator(projectId: ID, typeId: String): Form {
         val project = structureService.getProject(projectId)
         val indicator = indicatorService.getProjectIndicator(project, typeId)
         return indicator.getUpdateForm()
     }
 
-    override fun updateIndicator(projectId: ID, typeId: Int, input: JsonNode): ProjectIndicator {
+    override fun updateIndicator(projectId: ID, typeId: String, input: JsonNode): ProjectIndicator {
         val project = structureService.getProject(projectId)
         val indicator = indicatorService.updateProjectIndicator<Any>(project, typeId, input)
         return toProjectIndicator(project, indicator)

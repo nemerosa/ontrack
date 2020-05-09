@@ -4,8 +4,8 @@ import net.nemerosa.ontrack.model.structure.Project
 
 interface IndicatorStore {
 
-    fun loadIndicator(project: Project, type: Int): StoredIndicator?
+    fun loadIndicator(project: Project, type: String): StoredIndicator?
 
-    fun storeIndicator(project: Project, type: Int, indicator: StoredIndicator)
+    fun storeIndicator(project: Project, type: String, indicator: StoredIndicator)
 
 }

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.NameDescription
 
 data class IndicatorType<T, C>(
-        val id: Int,
+        val id: String,
         val category: IndicatorCategory,
         val shortName: String,
         val longName: String,
