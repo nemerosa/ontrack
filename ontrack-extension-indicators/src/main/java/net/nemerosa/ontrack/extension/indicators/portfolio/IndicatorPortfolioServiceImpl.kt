@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorPortfolioManagement
+import net.nemerosa.ontrack.model.labels.Label
+import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -11,7 +13,8 @@ import java.util.*
 @Transactional
 class IndicatorPortfolioServiceImpl(
         private val securityService: SecurityService,
-        private val storageService: StorageService
+        private val storageService: StorageService,
+        private val labelManagementService: LabelManagementService
 ) : IndicatorPortfolioService {
 
     override fun createPortfolio(name: String): IndicatorPortfolio {
@@ -25,6 +28,18 @@ class IndicatorPortfolioServiceImpl(
         )
         storageService.store(STORE, id, portfolio)
         return portfolio
+    }
+
+    override fun getPortfolioLabels(portfolio: IndicatorPortfolio): List<Label> {
+        return portfolio.labels.mapNotNull {
+            labelManagementService.findLabelById(it)
+        }
+    }
+
+    override fun findAll(): List<IndicatorPortfolio> {
+        return storageService.getKeys(STORE).mapNotNull { key ->
+            storageService.retrieve(STORE, key, IndicatorPortfolio::class.java).orElse(null)
+        }
     }
 
     companion object {

@@ -20,6 +20,7 @@ class GQLTypeProjectIndicatorType(
             .name(typeName)
             .description("Type of indicator")
             .stringField("id", "Unique ID for the type")
+            .stringField("shortName", "Short name for the indicator type")
             .stringField("name", "Long name for the indicator type")
             .stringField("link", "Link to the definition of the indicator")
             .field {

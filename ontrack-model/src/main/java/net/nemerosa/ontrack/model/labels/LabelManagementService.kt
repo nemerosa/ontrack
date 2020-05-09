@@ -15,6 +15,11 @@ interface LabelManagementService {
     fun newLabel(form: LabelForm): Label
 
     /**
+     * Gets a label using its ID, returning `null` if not found
+     */
+    fun findLabelById(labelId: Int): Label?
+
+    /**
      * Gets a label using its ID
      *
      * @throws LabelIdNotFoundException If ID cannot be found

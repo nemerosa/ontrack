@@ -52,6 +52,9 @@ class IndicatorTypeServiceImpl(
         )
     }
 
+    override fun findTypeById(typeId: String): IndicatorType<*, *>? =
+            types[typeId]
+
     override fun getTypeById(typeId: String): IndicatorType<*, *> =
-            types[typeId] ?: throw IndicatorTypeNotFoundException(typeId)
+            findTypeById(typeId) ?: throw IndicatorTypeNotFoundException(typeId)
 }

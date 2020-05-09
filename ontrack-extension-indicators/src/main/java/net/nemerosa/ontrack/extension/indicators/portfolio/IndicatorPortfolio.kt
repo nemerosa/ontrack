@@ -11,6 +11,6 @@ package net.nemerosa.ontrack.extension.indicators.portfolio
 class IndicatorPortfolio(
         val id: String,
         val name: String,
-        val labels: List<String>,
+        val labels: List<Int>,
         val types: List<String>
 )
