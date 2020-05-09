@@ -35,6 +35,25 @@ class IndicatorPortfolioServiceImpl(
         return portfolio
     }
 
+    override fun updatePortfolio(id: String, input: PortfolioUpdateForm): IndicatorPortfolio {
+        val existing = findPortfolioById(id) ?: throw IndicatorPortfolioNotFoundException(id)
+        val name = if (!input.name.isNullOrBlank()) {
+            input.name
+        } else {
+            existing.name
+        }
+        val label = input.label ?: existing.label
+        val types = input.types ?: existing.types
+        val newRecord = IndicatorPortfolio(
+                id = id,
+                name = name,
+                label = label,
+                types = types
+        )
+        storageService.store(STORE, id, newRecord)
+        return newRecord
+    }
+
     override fun getPortfolioLabel(portfolio: IndicatorPortfolio): Label? =
             portfolio.label?.let {
                 labelManagementService.findLabelById(it)
@@ -46,6 +65,10 @@ class IndicatorPortfolioServiceImpl(
             }?.map {
                 structureService.getProject(it)
             } ?: emptyList()
+
+    override fun findPortfolioById(id: String): IndicatorPortfolio? {
+        return storageService.retrieve(STORE, id, IndicatorPortfolio::class.java).orElse(null)
+    }
 
     override fun findAll(): List<IndicatorPortfolio> {
         return storageService.getKeys(STORE).mapNotNull { key ->

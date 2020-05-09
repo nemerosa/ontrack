@@ -25,4 +25,14 @@ interface IndicatorPortfolioService {
      */
     fun getPortfolioProjects(portfolio: IndicatorPortfolio): List<Project>
 
+    /**
+     * Finds a portfolio using its ID
+     */
+    fun findPortfolioById(id: String): IndicatorPortfolio?
+
+    /**
+     * Updates a portfolio
+     */
+    fun updatePortfolio(id: String, input: PortfolioUpdateForm): IndicatorPortfolio
+
 }
