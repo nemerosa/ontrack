@@ -156,6 +156,63 @@ angular.module('ontrack.extension.indicators', [
 
         loadPortfolios();
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('portfolio-edit', {
+            url: '/extension/indicators/portfolios/{portfolioId}/edit',
+            templateUrl: 'extension/indicators/portfolio-edit.tpl.html',
+            controller: 'PortfolioEditionCtrl'
+        });
+    })
+    .controller('PortfolioEditionCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+        const portfolioId = $stateParams.portfolioId;
+        $scope.loadingPortfolio = true;
+
+        const view = ot.view();
+        view.title = "Portfolio: edition";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            ot.viewCloseCommand('/extension/indicators/portfolios')
+        ];
+
+        const query = `
+            query LoadPortfolio($id: String!) {
+              indicatorPortfolios(id: $id) {
+                id
+                name
+                label {
+                  id
+                  display
+                  color
+                  description
+                }
+                types {
+                  id
+                  shortName
+                  name
+                  link
+                }
+                links {
+                  _update
+                }
+              }
+            }
+        `;
+
+        const queryVariables = {
+            id: portfolioId
+        };
+
+        const loadPortfolio = () => {
+            $scope.loadingPortfolio = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.portfolio = data.indicatorPortfolios[0];
+            }).finally(() => {
+                $scope.loadingPortfolio = false;
+            });
+        };
+
+        loadPortfolio();
+    })
     .directive('otExtensionIndicatorsStatus', function () {
         return {
             restrict: 'E',
