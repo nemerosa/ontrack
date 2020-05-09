@@ -10,8 +10,13 @@
     </div>
 
     <table class="table table-hover table-bordered">
-        <tbody>
-        <tr ng-repeat="type in types">
+        <tbody ng-repeat="category in categories" ng-if="category.types.length > 0">
+        <tr class="info">
+            <td colspan="2">
+                {{category.name}}
+            </td>
+        </tr>
+        <tr ng-repeat="type in category.types">
             <td style="width: 30px;">
                 Selection
             </td>
