@@ -16,8 +16,7 @@
         </tr>
         <tr ng-repeat="indicator in categoryIndicators.indicators">
             <td>
-                <span ng-if="indicator.type.link"><a href="{{indicator.type.link}}" target="_blank">{{indicator.type.name}}</a></span>
-                <span ng-if="!indicator.type.link">{{indicator.type.name}}</span>
+                <ot-extension-indicators-type-name type="indicator.type"></ot-extension-indicators-type-name>
             </td>
             <td>
                 <ot-extension-indicators-status status="indicator.status"></ot-extension-indicators-status>

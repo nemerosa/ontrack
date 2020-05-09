@@ -9,6 +9,17 @@
         </div>
     </div>
 
-    {{types}}
+    <table class="table table-hover table-bordered">
+        <tbody>
+        <tr ng-repeat="type in types">
+            <td style="width: 30px;">
+                Selection
+            </td>
+            <td>
+                <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 </ot-view>

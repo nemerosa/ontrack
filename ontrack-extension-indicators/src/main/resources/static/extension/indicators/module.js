@@ -234,5 +234,14 @@ angular.module('ontrack.extension.indicators', [
             }
         };
     })
+    .directive('otExtensionIndicatorsTypeName', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-type-name.tpl.html',
+            scope: {
+                type: '='
+            }
+        };
+    })
 
 ;
