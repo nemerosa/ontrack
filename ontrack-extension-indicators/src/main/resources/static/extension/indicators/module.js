@@ -34,6 +34,7 @@ angular.module('ontrack.extension.indicators', [
                       }
                       type {
                         name
+                        link
                         valueType {
                           name
                           feature {

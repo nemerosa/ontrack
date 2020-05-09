@@ -16,7 +16,7 @@ class IndicatorTypeServiceImpl(
                     category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.SERVICES),
                     shortName = "Java stack",
                     longName = "SHOULD Use Java & spring boot stack",
-                    link = null,
+                    link = "https://start.spring.io",
                     valueType = booleanIndicatorValueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = false),
                     valueComputer = null
