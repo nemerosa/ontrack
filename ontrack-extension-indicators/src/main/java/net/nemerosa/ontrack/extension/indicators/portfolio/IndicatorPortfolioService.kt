@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
 import net.nemerosa.ontrack.model.labels.Label
+import net.nemerosa.ontrack.model.structure.Project
 
 interface IndicatorPortfolioService {
 
@@ -10,13 +11,18 @@ interface IndicatorPortfolioService {
     fun createPortfolio(name: String): IndicatorPortfolio
 
     /**
-     * Gets the list of labels for this portfolio
+     * Gets the label for this portfolio
      */
-    fun getPortfolioLabels(portfolio: IndicatorPortfolio): List<Label>
+    fun getPortfolioLabel(portfolio: IndicatorPortfolio): Label?
 
     /**
      * Gets the list of all portfolios
      */
     fun findAll(): List<IndicatorPortfolio>
+
+    /**
+     * Gets the list of projects for this portfolio
+     */
+    fun getPortfolioProjects(portfolio: IndicatorPortfolio): List<Project>
 
 }

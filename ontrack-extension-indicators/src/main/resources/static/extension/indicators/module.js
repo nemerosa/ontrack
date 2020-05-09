@@ -126,7 +126,7 @@ angular.module('ontrack.extension.indicators', [
               indicatorPortfolios {
                 id
                 name
-                labels {
+                label {
                   id
                   display
                   color

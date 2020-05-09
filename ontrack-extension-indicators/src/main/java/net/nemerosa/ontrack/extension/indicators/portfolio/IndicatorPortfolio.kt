@@ -5,12 +5,12 @@ package net.nemerosa.ontrack.extension.indicators.portfolio
  *
  * @property id ID of the portfolio
  * @property name Name of the portfolio
- * @property labels List of labels used to identify the projects belonging to this portfolio
+ * @property label Label ID. If set to `null`, the portfolio is not ready to use
  * @property types List of indicator types to show for this portfolio
  */
 class IndicatorPortfolio(
         val id: String,
         val name: String,
-        val labels: List<Int>,
+        val label: Int?,
         val types: List<String>
 )
