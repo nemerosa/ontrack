@@ -93,6 +93,66 @@ angular.module('ontrack.extension.indicators', [
         };
 
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('portfolios', {
+            url: '/extension/indicators/portfolios',
+            templateUrl: 'extension/indicators/portfolios.tpl.html',
+            controller: 'PortfoliosCtrl'
+        });
+    })
+    .controller('PortfoliosCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+
+        $scope.loadingPortfolios = true;
+
+        $scope.createPortfolio = () => {
+            otFormService.create("/extension/indicators/portfolios/create", "New portfolio").then(loadPortfolios);
+        };
+
+        const view = ot.view();
+        view.title = "Indicator portfolios";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            {
+                id: 'portfolio-create',
+                name: "Create a portfolio",
+                cls: 'ot-command-new',
+                action: $scope.createPortfolio
+            },
+            ot.viewCloseCommand('/home')
+        ];
+
+        const query = `
+            {
+              indicatorPortfolios {
+                id
+                name
+                labels {
+                  id
+                  display
+                  color
+                  description
+                }
+                types {
+                  id
+                  shortName
+                  name
+                  link
+                }
+              }
+            }
+        `;
+
+        const loadPortfolios = () => {
+            $scope.loadingPortfolios = true;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                $scope.portfolios = data.indicatorPortfolios;
+            }).finally(() => {
+                $scope.loadingPortfolios = false;
+            });
+        };
+
+        loadPortfolios();
+    })
     .directive('otExtensionIndicatorsStatus', function () {
         return {
             restrict: 'E',
