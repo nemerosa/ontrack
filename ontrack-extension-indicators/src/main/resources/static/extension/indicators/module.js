@@ -168,7 +168,7 @@ angular.module('ontrack.extension.indicators', [
         $scope.loadingPortfolio = true;
 
         const view = ot.view();
-        view.title = "Portfolio: edition";
+        view.title = "Portfolio edition";
         view.breadcrumbs = ot.homeBreadcrumbs();
         view.commands = [
             ot.viewCloseCommand('/extension/indicators/portfolios')
@@ -194,6 +194,12 @@ angular.module('ontrack.extension.indicators', [
                 links {
                   _update
                 }
+              }
+              indicatorTypes {
+                id
+                shortName
+                name
+                link
               }
             }
         `;
