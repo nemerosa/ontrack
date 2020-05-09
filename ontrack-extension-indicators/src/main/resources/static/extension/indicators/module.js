@@ -215,6 +215,10 @@ angular.module('ontrack.extension.indicators', [
             $scope.loadingPortfolio = true;
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolio = data.indicatorPortfolios[0];
+                $scope.portfolioForm = {
+                    name: $scope.portfolio.name,
+                    nameEdited: false
+                };
                 $scope.categories = data.indicatorCategories;
                 $scope.categories.forEach((category) => {
                     category.types.forEach((type) => {
@@ -229,6 +233,15 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadPortfolio();
+
+        $scope.startPortfolioNameEdition = () => {
+            $scope.portfolioForm.nameEdited = true;
+        };
+
+        $scope.cancelPortfolioNameEdition = () => {
+            $scope.portfolioForm.nameEdited = false;
+            $scope.portfolioForm.name = $scope.portfolio.name;
+        };
     })
     .directive('otExtensionIndicatorsStatus', function () {
         return {

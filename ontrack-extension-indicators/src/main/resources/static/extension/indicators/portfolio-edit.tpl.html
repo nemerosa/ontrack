@@ -9,6 +9,30 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-12">
+            <form>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input id="portfolioName" class="form-control" ng-model="portfolioForm.name" ng-readonly="!portfolioForm.nameEdited"/>
+                        <span class="input-group-btn">
+                    <button ng-if="!portfolioForm.nameEdited" class="btn btn-default" type="button"
+                            ng-click="startPortfolioNameEdition()"
+                            title="Edit the portfolio name"><span class="fa fa-pencil"></span></button>
+                    <button ng-if="portfolioForm.nameEdited" class="btn btn-primary" type="button"
+                            ng-click="validatePortfolioNameEdition()"
+                            title="Validate the edition of the portfolio name"><span
+                            class="fa fa-check"></span></button>
+                    <button ng-if="portfolioForm.nameEdited" class="btn btn-default" type="button"
+                            ng-click="cancelPortfolioNameEdition()"
+                            title="Cancels the edition of the portfolio name"><span class="fa fa-ban"></span></button>
+                </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <table class="table table-hover table-bordered">
         <tbody ng-repeat="category in categories" ng-if="category.types.length > 0">
         <tr class="info">
