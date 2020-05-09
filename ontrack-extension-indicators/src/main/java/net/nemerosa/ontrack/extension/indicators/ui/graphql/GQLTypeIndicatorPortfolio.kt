@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
-import net.nemerosa.ontrack.graphql.schema.GQLType
-import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.schema.GQLTypeLabel
-import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
+import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
@@ -19,7 +16,8 @@ class GQLTypeIndicatorPortfolio(
         private val label: GQLTypeLabel,
         private val projectIndicatorType: GQLTypeProjectIndicatorType,
         private val indicatorPortfolioService: IndicatorPortfolioService,
-        private val indicatorTypeService: IndicatorTypeService
+        private val indicatorTypeService: IndicatorTypeService,
+        private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
@@ -62,6 +60,8 @@ class GQLTypeIndicatorPortfolio(
                                     indicatorPortfolioService.getPortfolioProjects(portfolio)
                                 }
                     }
+                    // Links
+                    .fields(IndicatorPortfolio::class.java.graphQLFieldContributions(fieldContributors))
                     //OK
                     .build()
 
