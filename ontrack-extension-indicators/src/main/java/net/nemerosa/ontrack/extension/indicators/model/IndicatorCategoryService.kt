@@ -9,6 +9,8 @@ interface IndicatorCategoryService {
 
     fun getCategory(id: String): IndicatorCategory
 
+    fun findAll(): List<IndicatorCategory>
+
 }
 
 class IndicatorCategoryNotFoundException(id: String) : NotFoundException("Indicator category not found: $id")

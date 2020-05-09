@@ -10,6 +10,8 @@ interface IndicatorTypeService {
 
     fun findTypeById(typeId: String): IndicatorType<*, *>?
 
+    fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>>
+
 }
 
 class IndicatorTypeNotFoundException(id: String) : NotFoundException("Indicator type not found: $id")

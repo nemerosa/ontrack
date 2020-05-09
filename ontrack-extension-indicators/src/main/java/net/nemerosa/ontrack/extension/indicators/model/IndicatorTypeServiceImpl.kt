@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class IndicatorTypeServiceImpl(
-        private val indicatorCategoryService: IndicatorCategoryService,
-        private val booleanIndicatorValueType: BooleanIndicatorValueType
+        indicatorCategoryService: IndicatorCategoryService,
+        booleanIndicatorValueType: BooleanIndicatorValueType
 ) : IndicatorTypeService {
 
     private val types: Map<String, IndicatorType<*, *>> = listOf(
@@ -57,4 +57,15 @@ class IndicatorTypeServiceImpl(
 
     override fun getTypeById(typeId: String): IndicatorType<*, *> =
             findTypeById(typeId) ?: throw IndicatorTypeNotFoundException(typeId)
+
+    override fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>> {
+        return types.values.filter {
+            it.category.id == category.id
+        }.sortedWith(
+                compareBy(
+                        { it.category.name },
+                        { it.shortName }
+                )
+        )
+    }
 }

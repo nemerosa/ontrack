@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryNotFoundException
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import org.springframework.stereotype.Service
 
 @Service
@@ -24,6 +21,10 @@ class IndicatorCategoryServiceImpl : IndicatorCategoryService {
 
     override fun getCategory(id: String): IndicatorCategory {
         return findCategoryById(id) ?: throw IndicatorCategoryNotFoundException(id)
+    }
+
+    override fun findAll(): List<IndicatorCategory> {
+        return categories.values.sortedBy { it.name }
     }
 
 }
