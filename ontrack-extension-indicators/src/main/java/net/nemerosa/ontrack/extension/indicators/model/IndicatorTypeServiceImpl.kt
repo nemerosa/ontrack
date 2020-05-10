@@ -10,9 +10,15 @@ class IndicatorTypeServiceImpl(
         booleanIndicatorValueType: BooleanIndicatorValueType
 ) : IndicatorTypeService {
 
+    companion object {
+        const val SPRING_BOOT = "36083450-cacb-4e30-bbed-fd6682f336fd"
+        const val JAVA_11_ZULU = "7291c0ba-a038-4ca4-907e-364b57cba8bd"
+        const val DOCKER_NAME = "91f0ac82-0442-4ae0-9995-ed2e8fc9e6f9"
+    }
+
     private val types: Map<String, IndicatorType<*, *>> = listOf(
             IndicatorType(
-                    id = "36083450-cacb-4e30-bbed-fd6682f336fd",
+                    id = SPRING_BOOT,
                     category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.SERVICES),
                     shortName = "Java stack",
                     longName = "SHOULD Use Java & spring boot stack",
@@ -22,7 +28,7 @@ class IndicatorTypeServiceImpl(
                     valueComputer = null
             ),
             IndicatorType(
-                    id = "7291c0ba-a038-4ca4-907e-364b57cba8bd",
+                    id = JAVA_11_ZULU,
                     category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.SERVICES),
                     shortName = "Java 11 Zulu",
                     longName = "MUST Use zulu JDK 11 LTS for JVM services",
@@ -32,7 +38,7 @@ class IndicatorTypeServiceImpl(
                     valueComputer = null
             ),
             IndicatorType(
-                    id = "91f0ac82-0442-4ae0-9995-ed2e8fc9e6f9",
+                    id = DOCKER_NAME,
                     category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.DELIVERY),
                     shortName = "Docker name",
                     longName = "MUST follow Docker artifact naming conventions",
