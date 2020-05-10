@@ -128,7 +128,8 @@ angular.module('ontrack.extension.indicators', [
                 name
                 label {
                   id
-                  display
+                  category
+                  name
                   color
                   description
                 }
@@ -181,7 +182,8 @@ angular.module('ontrack.extension.indicators', [
                 name
                 label {
                   id
-                  display
+                  category
+                  name
                   color
                   description
                 }
@@ -224,10 +226,16 @@ angular.module('ontrack.extension.indicators', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.labels = data.labels;
                 $scope.portfolio = data.indicatorPortfolios[0];
+                let currentLabel;
+                if ($scope.portfolio.label) {
+                    currentLabel = $scope.labels.find((l) => l.id === $scope.portfolio.label.id);
+                } else {
+                    currentLabel = undefined;
+                }
                 $scope.portfolioForm = {
                     name: $scope.portfolio.name,
                     nameEdited: false,
-                    label: $scope.labels.find((l) => l.id === $scope.portfolio.label.id)
+                    label: currentLabel
                 };
                 $scope.categories = data.indicatorCategories;
                 $scope.categories.forEach((category) => {
