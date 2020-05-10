@@ -172,7 +172,7 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Portfolio edition";
         view.breadcrumbs = ot.homeBreadcrumbs();
         view.commands = [
-            ot.viewCloseCommand('/extension/indicators/portfolios')
+            ot.viewCloseCommand(`/extension/indicators/portfolios/${portfolioId}`)
         ];
 
         const query = `
