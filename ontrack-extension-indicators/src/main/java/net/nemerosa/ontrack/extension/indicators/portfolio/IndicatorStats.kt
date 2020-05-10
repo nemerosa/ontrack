@@ -10,7 +10,9 @@ data class IndicatorStats(
         val count: Int,
         val min: IndicatorStatus?,
         val avg: IndicatorStatus?,
-        val max: IndicatorStatus?
+        val max: IndicatorStatus?,
+        val minCount: Int,
+        val maxCount: Int
 ) {
 
     init {
@@ -32,19 +34,25 @@ data class IndicatorStats(
             val actualStatuses = statuses.filterNotNull()
             val total = statuses.size
             val count = actualStatuses.size
-            val min = actualStatuses.min()
-            val max = actualStatuses.max()
+            val min = actualStatuses.minBy { it.value }
+            val max = actualStatuses.maxBy { it.value }
             val avg = if (count > 0) {
-                actualStatuses.map { it.ordinal }.average().toInt().let { IndicatorStatus.values()[it] }
+                actualStatuses.map { it.value }.average().toInt().let { IndicatorStatus(it) }
             } else {
                 null
             }
+
+            val minCount = actualStatuses.count { it.value == min?.value }
+            val maxCount = actualStatuses.count { it.value == max?.value }
+
             return IndicatorStats(
                     total = total,
                     count = count,
                     min = min,
                     avg = avg,
-                    max = max
+                    max = max,
+                    minCount = minCount,
+                    maxCount = maxCount
             )
         }
 

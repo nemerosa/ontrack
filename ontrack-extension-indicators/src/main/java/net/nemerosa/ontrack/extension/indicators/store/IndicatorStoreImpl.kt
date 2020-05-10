@@ -27,7 +27,12 @@ class IndicatorStoreImpl(
                     val rep = record.data.parse<StoredIndicatorRepresentation>()
                     StoredIndicator(
                             value = rep.value,
-                            status = rep.status,
+                            status = rep.status
+                                    ?.takeIf { value ->
+                                        IndicatorStatus.inRange(value)
+                                    }?.let { value ->
+                                        IndicatorStatus(value)
+                                    },
                             comment = rep.comment,
                             signature = record.signature
                     )
@@ -43,7 +48,7 @@ class IndicatorStoreImpl(
                 null,
                 StoredIndicatorRepresentation(
                         value = indicator.value,
-                        status = indicator.status,
+                        status = indicator.status?.value,
                         comment = indicator.comment
                 ).asJson()
         )
@@ -55,7 +60,7 @@ class IndicatorStoreImpl(
 
     private class StoredIndicatorRepresentation(
             val value: JsonNode,
-            val status: IndicatorStatus?,
+            val status: Int?,
             val comment: String?
     )
 

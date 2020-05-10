@@ -20,9 +20,9 @@ class BooleanIndicatorValueType(
 
     override fun status(config: BooleanIndicatorValueTypeConfig, value: Boolean): IndicatorStatus =
             when {
-                value -> IndicatorStatus.GREEN
-                config.required -> IndicatorStatus.RED
-                else -> IndicatorStatus.YELLOW
+                value -> IndicatorStatus.HIGHEST
+                config.required -> IndicatorStatus.LOWEST
+                else -> IndicatorStatus.MEDIUM
             }
 
     override fun form(

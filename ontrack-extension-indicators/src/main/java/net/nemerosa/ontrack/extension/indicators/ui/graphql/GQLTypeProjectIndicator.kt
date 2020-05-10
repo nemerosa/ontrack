@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
+import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component
 class GQLTypeProjectIndicator(
         private val projectIndicatorType: GQLTypeProjectIndicatorType,
         private val signature: GQLTypeCreation,
+        private val scaleValues: GQLTypeScaleValues,
         private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
@@ -30,7 +32,10 @@ class GQLTypeProjectIndicator(
             .field {
                 it.name(ProjectIndicator::status.name)
                         .description("Status for the indicator")
-                        .type(GraphQLString)
+                        .type(GraphQLInt)
+                        .dataFetcher { env ->
+                            env.getSource<ProjectIndicator>().status?.value
+                        }
             }
             .field {
                 it.name(ProjectIndicator::comment.name)
@@ -43,6 +48,9 @@ class GQLTypeProjectIndicator(
                         .type(signature.typeRef)
                         .dataFetcher(GQLTypeCreation.dataFetcher<ProjectIndicator> { it.signature })
             }
+            // Scales
+            .scaleValues(scaleValues)
+            // Links
             .fields(ProjectIndicator::class.java.graphQLFieldContributions(fieldContributors))
             .build()
 
