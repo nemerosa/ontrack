@@ -9,6 +9,8 @@ interface IndicatorService {
 
     fun getProjectIndicators(project: Project, all: Boolean): List<Indicator<*>>
 
+    fun <T> getProjectIndicator(project: Project, type: IndicatorType<T, *>): Indicator<T>
+
     fun getProjectIndicator(project: Project, typeId: String): Indicator<*>
 
     fun <T> updateProjectIndicator(project: Project, typeId: String, input: JsonNode): Indicator<T>

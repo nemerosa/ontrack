@@ -35,6 +35,10 @@ class IndicatorServiceImpl(
         return loadIndicator(project, type)
     }
 
+    override fun <T> getProjectIndicator(project: Project, type: IndicatorType<T, *>): Indicator<T> {
+        return loadIndicator(project, type)
+    }
+
     override fun <T> updateProjectIndicator(project: Project, typeId: String, input: JsonNode): Indicator<T> {
         @Suppress("UNCHECKED_CAST")
         val type = indicatorTypeService.getTypeById(typeId) as IndicatorType<T, *>
