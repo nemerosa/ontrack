@@ -254,6 +254,7 @@ angular.module('ontrack.extension.indicators', [
                             i.id === type.id
                         );
                     });
+                    category.selected = category.types.every((type) => type.selected);
                 });
             }).finally(() => {
                 $scope.loadingPortfolio = false;
@@ -302,6 +303,13 @@ angular.module('ontrack.extension.indicators', [
             ot.pageCall($http.put($scope.portfolio.links._update, {
                 types: selectedTypes
             }));
+        };
+
+        $scope.selectCategory = (category) => {
+            category.types.forEach((type) => {
+                type.selected = category.selected;
+            });
+            $scope.selectType();
         };
 
     })

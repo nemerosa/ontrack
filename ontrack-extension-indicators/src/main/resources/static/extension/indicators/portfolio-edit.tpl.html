@@ -61,7 +61,10 @@
     <table class="table table-hover table-bordered">
         <tbody ng-repeat="category in categories" ng-if="category.types.length > 0">
         <tr class="info">
-            <td colspan="2">
+            <td style="width: 30px;">
+                <input type="checkbox" ng-model="category.selected" ng-change="selectCategory(category)">
+            </td>
+            <td>
                 {{category.name}}
             </td>
         </tr>
