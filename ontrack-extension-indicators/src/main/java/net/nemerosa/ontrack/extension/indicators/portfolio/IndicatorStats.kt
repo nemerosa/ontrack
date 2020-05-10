@@ -8,9 +8,9 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
 data class IndicatorStats(
         val total: Int,
         val count: Int,
-        val min: IndicatorStatus,
-        val avg: IndicatorStatus,
-        val max: IndicatorStatus
+        val min: IndicatorStatus?,
+        val avg: IndicatorStatus?,
+        val max: IndicatorStatus?
 ) {
 
     init {
@@ -32,9 +32,13 @@ data class IndicatorStats(
             val actualStatuses = statuses.filterNotNull()
             val total = statuses.size
             val count = actualStatuses.size
-            val min = actualStatuses.min() ?: IndicatorStatus.RED
-            val max = actualStatuses.max() ?: IndicatorStatus.RED
-            val avg = actualStatuses.map { it.ordinal }.average().toInt().let { IndicatorStatus.values()[it] }
+            val min = actualStatuses.min()
+            val max = actualStatuses.max()
+            val avg = if (count > 0) {
+                actualStatuses.map { it.ordinal }.average().toInt().let { IndicatorStatus.values()[it] }
+            } else {
+                null
+            }
             return IndicatorStats(
                     total = total,
                     count = count,

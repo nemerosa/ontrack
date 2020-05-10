@@ -16,6 +16,8 @@ class GQLTypeIndicatorTypeStats(
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()
+                    .name(typeName)
+                    .description("Association of a type and statistics over several items")
                     .field {
                         it.name(IndicatorTypeStats::type.name)
                                 .description("Associated indicator type")
@@ -29,7 +31,7 @@ class GQLTypeIndicatorTypeStats(
                     .field {
                         it.name(IndicatorTypeStats::stats.name)
                                 .description("Statistics")
-                                .type(stdList(indicatorStats.typeRef))
+                                .type(indicatorStats.typeRef)
                     }
                     .build()
 
