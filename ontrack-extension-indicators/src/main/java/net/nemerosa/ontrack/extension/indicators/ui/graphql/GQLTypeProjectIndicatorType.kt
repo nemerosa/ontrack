@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.idField
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
@@ -23,6 +23,13 @@ class GQLTypeProjectIndicatorType(
             .stringField("shortName", "Short name for the indicator type")
             .stringField("name", "Long name for the indicator type")
             .stringField("link", "Link to the definition of the indicator")
+            // Category
+            .field {
+                it.name(ProjectIndicatorType::category.name)
+                        .description("Associated category")
+                        .type(GraphQLTypeReference(GQLTypeIndicatorCategory.INDICATOR_CATEGORY))
+            }
+            // Value type
             .field {
                 it.name(IndicatorType<*, *>::valueType.name)
                         .description("Value type")
@@ -33,6 +40,7 @@ class GQLTypeProjectIndicatorType(
                             type.valueType
                         }
             }
+            // OK
             .build()
 
     override fun getTypeName(): String = ProjectIndicatorType::class.java.simpleName

@@ -318,21 +318,43 @@ angular.module('ontrack.extension.indicators', [
               indicatorPortfolios(id: $id) {
                 id
                 name
-                label {
-                  id
-                  category
-                  name
-                  color
-                  description
+                links {
+                  _update
                 }
                 types {
                   id
                   shortName
                   name
                   link
+                  category {
+                    id
+                    name
+                  }
+                  valueType {
+                    name
+                    feature {
+                      id
+                    }
+                  }
                 }
-                links {
-                  _update
+                projects {
+                  id
+                  name
+                  links {
+                    _page
+                  }
+                  projectIndicators {
+                    categories {
+                      indicators {
+                        type {
+                          id
+                        }
+                        value
+                        comment
+                        status
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -347,12 +369,61 @@ angular.module('ontrack.extension.indicators', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolio = data.indicatorPortfolios[0];
                 view.title = `Portfolio: ${$scope.portfolio.name}`;
+
+                // Grouping portfolio types per categories
+                let categories = [];
+                let categoriesIndex = {};
+                $scope.portfolio.types.forEach((type) => {
+                    let category = type.category;
+                    let categoryRecord = categoriesIndex[category.id];
+                    if (!categoryRecord) {
+                        categoryRecord = category;
+                        categoryRecord.types = [];
+                        categories.push(categoryRecord);
+                        categoriesIndex[category.id] = categoryRecord;
+                    }
+                    type.category = undefined;
+                    categoryRecord.types.push(type);
+                });
+                $scope.categories = categories;
+
+                // Flattens the list of types per category
+                let types = [];
+                categories.forEach((category) => {
+                    category.types.forEach((type) => {
+                        types.push(type);
+                    });
+                });
+                $scope.types = types;
+
+                // Indexation of types in projects
+
+                $scope.portfolio.projects.forEach((project) => {
+                    project.types = {};
+                    types.forEach((type) => {
+                        project.projectIndicators.categories.forEach((projectCategory) => {
+                            projectCategory.indicators.forEach((projectIndicator) => {
+                                if (projectIndicator.type.id === type.id) {
+                                    project.types[type.id] = projectIndicator;
+                                }
+                            });
+                        });
+                    });
+                });
+
             }).finally(() => {
                 $scope.loadingPortfolio = false;
             });
         };
 
         loadPortfolio();
+
+        /**
+         * Gets the project indicator for the given type
+         */
+        $scope.indicator = (project, type) => {
+            return project.types[type.id];
+        };
 
     })
     .directive('otExtensionIndicatorsStatus', function () {
@@ -369,7 +440,8 @@ angular.module('ontrack.extension.indicators', [
             restrict: 'E',
             templateUrl: 'extension/indicators/directive.indicators-type-name.tpl.html',
             scope: {
-                type: '='
+                type: '=',
+                shortName: '@'
             }
         };
     })

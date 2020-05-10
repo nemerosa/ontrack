@@ -37,5 +37,9 @@ class GQLTypeIndicatorCategory(
             // OK
             .build()
 
-    override fun getTypeName(): String = IndicatorCategory::class.java.simpleName
+    override fun getTypeName(): String = INDICATOR_CATEGORY
+
+    companion object {
+        val INDICATOR_CATEGORY =  IndicatorCategory::class.java.simpleName
+    }
 }

@@ -1,2 +1,4 @@
-<span ng-if="type.link"><a href="{{type.link}}" target="_blank">{{type.name}}</a></span>
-<span ng-if="!type.link">{{type.name}}</span>
+<span ng-if="!shortName && type.link"><a href="{{type.link}}" target="_blank">{{type.name}}</a></span>
+<span ng-if="!shortName && !type.link">{{type.name}}</span>
+<span ng-if="shortName && type.link"><a href="{{type.link}}" target="_blank" title="{{type.name}}">{{type.shortName}}</a></span>
+<span ng-if="shortName && !type.link" title="{{type.name}}">{{type.shortName}}</span>

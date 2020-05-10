@@ -9,6 +9,34 @@
         </div>
     </div>
 
-    {{portfolio}}
+    <table ng-if="portfolio" class="table table-bordered">
+        <thead>
+        <tr>
+            <th rowspan="2">Projects</th>
+            <th ng-repeat="category in categories" colspan="{{category.types.length}}">
+                {{category.name}}
+            </th>
+        </tr>
+        <tr>
+            <th ng-repeat="type in types">
+                <ot-extension-indicators-type-name type="type" short-name="true"></ot-extension-indicators-type-name>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="project in portfolio.projects">
+            <td>
+                <a href="{{project.links._page}}" title="Project page">{{project.name}}</a>
+                <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Project indicators for {{project.name}}"><span class="fa fa-file-text ot-command"></span></a>
+            </td>
+            <td ng-repeat="type in types">
+                <span ng-if="indicator(project,type).value" title="{{indicator(project,type).comment}}">
+                    <ot-extension-indicators-status status="indicator(project,type).status"></ot-extension-indicators-status>
+                    <ot-include value="indicator(project,type).value" template="extension/{{type.valueType.feature.id}}/indicators/{{type.valueType.name}}.tpl.html"></ot-include>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 </ot-view>
