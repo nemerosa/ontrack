@@ -5,6 +5,7 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorStatsService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
@@ -15,8 +16,10 @@ import org.springframework.stereotype.Component
 class GQLTypeIndicatorPortfolio(
         private val label: GQLTypeLabel,
         private val projectIndicatorType: GQLTypeProjectIndicatorType,
+        private val indicatorTypeStats: GQLTypeIndicatorTypeStats,
         private val indicatorPortfolioService: IndicatorPortfolioService,
         private val indicatorTypeService: IndicatorTypeService,
+        private val indicatorStatsService: IndicatorStatsService,
         private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
@@ -58,6 +61,16 @@ class GQLTypeIndicatorPortfolio(
                                 .dataFetcher { env ->
                                     val portfolio: IndicatorPortfolio = env.getSource()
                                     indicatorPortfolioService.getPortfolioProjects(portfolio)
+                                }
+                    }
+                    // Stats
+                    .field {
+                        it.name("globalStats")
+                                .description("Global indicator stats")
+                                .type(stdList(indicatorTypeStats.typeRef))
+                                .dataFetcher { env ->
+                                    val portfolio: IndicatorPortfolio = env.getSource()
+                                    indicatorStatsService.getGlobalStats(portfolio)
                                 }
                     }
                     // Links
