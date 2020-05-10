@@ -38,7 +38,7 @@
             <div class="row">
                 <div class="col-md-2" ng-repeat="typeStats in portfolio.globalStats">
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <span class="fa fa-circle fa-5x" ng-if="typeStats.stats.count == 0"
                                   ng-style="{
                                     'color': getIndicatorStatusColor(null)
@@ -50,7 +50,8 @@
                                   }"
                                   title="Average status over {{typeStats.stats.count}} project(s)."></span>
                         </div>
-                        <div class="col-md-7">
+                        <div class="col-md-9">
+                            <strong title="{{typeStats.type.name}}">{{typeStats.type.shortName}}</strong>
                         </div>
                     </div>
                 </div>
