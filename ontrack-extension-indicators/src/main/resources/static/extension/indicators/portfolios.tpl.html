@@ -34,6 +34,28 @@
                    title="Delete the {{portfolio.name}} portfolio"><span class="fa fa-trash ot-command"></span></a>
             </h4>
         </div>
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-2" ng-repeat="typeStats in portfolio.globalStats">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <span class="fa fa-circle fa-5x" ng-if="typeStats.stats.count == 0"
+                                  ng-style="{
+                                    'color': getIndicatorStatusColor(null)
+                                  }"
+                                  title="Not enough data."></span>
+                            <span class="fa fa-circle fa-5x" ng-if="typeStats.stats.count > 0"
+                                  ng-style="{
+                                    'color': getIndicatorStatusColor(typeStats.stats.avg)
+                                  }"
+                                  title="Average status over {{typeStats.stats.count}} project(s)."></span>
+                        </div>
+                        <div class="col-md-7">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </ot-view>

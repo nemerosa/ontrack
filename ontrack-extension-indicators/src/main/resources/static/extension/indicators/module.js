@@ -111,31 +111,12 @@ angular.module('ontrack.extension.indicators', [
         const view = ot.view();
         view.title = "Indicator portfolios";
         view.breadcrumbs = ot.homeBreadcrumbs();
-        view.commands = [
-            {
-                condition: () => $scope.portfolioOfPortolios.links._create,
-                id: 'portfolio-create',
-                name: "Create a portfolio",
-                cls: 'ot-command-new',
-                action: $scope.createPortfolio
-            },
-            ot.viewCloseCommand('/home')
-        ];
 
         const query = `
             {
               indicatorPortfolioOfPortfolios {
                 links {
                   _create
-                }
-                types {
-                  id
-                  name
-                  shortName
-                  category {
-                    id
-                    name
-                  }
                 }
                 portfolios {
                   id
@@ -147,11 +128,23 @@ angular.module('ontrack.extension.indicators', [
                     color
                     description
                   }
-                  types {
-                    id
-                    shortName
-                    name
-                    link
+                  globalStats {
+                    type {
+                      id
+                      name
+                      shortName
+                      category {
+                        id
+                        name
+                      }
+                    }
+                    stats {
+                      total
+                      count
+                      min
+                      avg
+                      max
+                    }
                   }
                   links {
                     _update
@@ -162,17 +155,46 @@ angular.module('ontrack.extension.indicators', [
             }
         `;
 
+        let viewInitialized = false;
+
         const loadPortfolios = () => {
             $scope.loadingPortfolios = true;
             otGraphqlService.pageGraphQLCall(query).then((data) => {
                 $scope.portfolioOfPortolios = data.indicatorPortfolioOfPortfolios;
                 $scope.portfolios = data.indicatorPortfolioOfPortfolios.portfolios;
+
+                if (!viewInitialized) {
+                    view.commands = [
+                        {
+                            condition: () => $scope.portfolioOfPortolios.links._create,
+                            id: 'portfolio-create',
+                            name: "Create a portfolio",
+                            cls: 'ot-command-new',
+                            action: $scope.createPortfolio
+                        },
+                        ot.viewCloseCommand('/home')
+                    ];
+                    viewInitialized = true;
+                }
             }).finally(() => {
                 $scope.loadingPortfolios = false;
             });
         };
 
         loadPortfolios();
+
+        $scope.getIndicatorStatusColor = (status) => {
+            switch (status) {
+                case 'RED':
+                    return '#ff3300';
+                case 'YELLOW':
+                    return '#ff9900';
+                case 'GREEN':
+                    return '#33cc33';
+                default:
+                    return '#bfbfbf';
+            }
+        };
 
         $scope.deletePortfolio = (portfolio) => {
             otAlertService.confirm({
