@@ -309,9 +309,6 @@ angular.module('ontrack.extension.indicators', [
         const view = ot.view();
         view.title = "Portfolio";
         view.breadcrumbs = ot.homeBreadcrumbs();
-        view.commands = [
-            ot.viewCloseCommand('/extension/indicators/portfolios')
-        ];
 
         const query = `
             query LoadPortfolio($id: String!) {
@@ -369,6 +366,17 @@ angular.module('ontrack.extension.indicators', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolio = data.indicatorPortfolios[0];
                 view.title = `Portfolio: ${$scope.portfolio.name}`;
+
+                view.commands = [
+                    {
+                        id: 'editProtfolio',
+                        name: 'Edit portfolio',
+                        cls: 'ot-command-update',
+                        condition: () => $scope.portfolio.links._update,
+                        link: `/extension/indicators/portfolios/${portfolioId}/edit`
+                    },
+                    ot.viewCloseCommand('/extension/indicators/portfolios')
+                ];
 
                 // Grouping portfolio types per categories
                 let categories = [];
