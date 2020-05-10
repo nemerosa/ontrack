@@ -82,8 +82,20 @@ class IndicatorPortfolioServiceImpl(
         }.sortedBy { it.name }
     }
 
+    override fun getPortfolioOfPortfolios(): IndicatorPortfolioOfPortfolios {
+        return storageService.retrieve(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, IndicatorPortfolioOfPortfolios::class.java)
+                .orElse(IndicatorPortfolioOfPortfolios(types = emptyList()))
+    }
+
+    override fun savePortfolioOfPortfolios(input: IndicatorPortfolioOfPortfolios): IndicatorPortfolioOfPortfolios {
+        storageService.store(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, input)
+        return input
+    }
+
     companion object {
         private val STORE = IndicatorPortfolio::class.java.name
+        private val STORE_PORTFOLIO_OF_PORTFOLIOS = IndicatorPortfolioOfPortfolios::class.java.name
+        private const val PORTFOLIO_OF_PORTFOLIOS = "0"
     }
 
 }

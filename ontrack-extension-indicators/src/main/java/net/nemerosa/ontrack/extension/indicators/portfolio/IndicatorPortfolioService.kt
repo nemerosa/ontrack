@@ -40,4 +40,14 @@ interface IndicatorPortfolioService {
      */
     fun deletePortfolio(id: String)
 
+    /**
+     * Gets the portfolio of portfolios
+     */
+    fun getPortfolioOfPortfolios(): IndicatorPortfolioOfPortfolios
+
+    /**
+     * Saves the portfolio of portfolios
+     */
+    fun savePortfolioOfPortfolios(input: IndicatorPortfolioOfPortfolios): IndicatorPortfolioOfPortfolios
+
 }
