@@ -113,6 +113,7 @@ angular.module('ontrack.extension.indicators', [
         view.breadcrumbs = ot.homeBreadcrumbs();
         view.commands = [
             {
+                condition: () => $scope.portfolioOfPortolios.links._create,
                 id: 'portfolio-create',
                 name: "Create a portfolio",
                 cls: 'ot-command-new',
@@ -123,25 +124,39 @@ angular.module('ontrack.extension.indicators', [
 
         const query = `
             {
-              indicatorPortfolios {
-                id
-                name
-                label {
-                  id
-                  category
-                  name
-                  color
-                  description
+              indicatorPortfolioOfPortfolios {
+                links {
+                  _create
                 }
                 types {
                   id
-                  shortName
                   name
-                  link
+                  shortName
+                  category {
+                    id
+                    name
+                  }
                 }
-                links {
-                  _update
-                  _delete
+                portfolios {
+                  id
+                  name
+                  label {
+                    id
+                    category
+                    name
+                    color
+                    description
+                  }
+                  types {
+                    id
+                    shortName
+                    name
+                    link
+                  }
+                  links {
+                    _update
+                    _delete
+                  }
                 }
               }
             }
@@ -150,7 +165,8 @@ angular.module('ontrack.extension.indicators', [
         const loadPortfolios = () => {
             $scope.loadingPortfolios = true;
             otGraphqlService.pageGraphQLCall(query).then((data) => {
-                $scope.portfolios = data.indicatorPortfolios;
+                $scope.portfolioOfPortolios = data.indicatorPortfolioOfPortfolios;
+                $scope.portfolios = data.indicatorPortfolioOfPortfolios.portfolios;
             }).finally(() => {
                 $scope.loadingPortfolios = false;
             });
