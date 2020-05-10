@@ -238,6 +238,16 @@ angular.module('ontrack.extension.indicators', [
             $scope.portfolioForm.nameEdited = true;
         };
 
+        $scope.validatePortfolioNameEdition = () => {
+            ot.pageCall($http.put($scope.portfolio.links._update, {
+                name: $scope.portfolioForm.name
+            })).then(() => {
+                $scope.portfolio.name = $scope.portfolioForm.name;
+            }).finally(() => {
+                $scope.portfolioForm.nameEdited = false;
+            });
+        };
+
         $scope.cancelPortfolioNameEdition = () => {
             $scope.portfolioForm.nameEdited = false;
             $scope.portfolioForm.name = $scope.portfolio.name;

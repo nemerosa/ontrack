@@ -39,7 +39,7 @@ class IndicatorPortfolioController(
     @PutMapping("{id}/update")
     fun updatePortfolio(@PathVariable id: String, @RequestBody input: PortfolioUpdateForm): ResponseEntity<String> {
         val portfolio = indicatorPortfolioService.findPortfolioById(id)
-        return if (portfolio != null) {
+        return if (portfolio == null) {
             ResponseEntity.notFound().build()
         } else {
             ResponseEntity.ok(
