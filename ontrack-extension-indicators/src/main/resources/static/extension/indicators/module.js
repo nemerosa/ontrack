@@ -204,6 +204,14 @@ angular.module('ontrack.extension.indicators', [
                   link
                 }
               }
+              labels {
+                id
+                category
+                name
+                description
+                color
+                foregroundColor
+              }
             }
         `;
 
@@ -214,10 +222,12 @@ angular.module('ontrack.extension.indicators', [
         const loadPortfolio = () => {
             $scope.loadingPortfolio = true;
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.labels = data.labels;
                 $scope.portfolio = data.indicatorPortfolios[0];
                 $scope.portfolioForm = {
                     name: $scope.portfolio.name,
-                    nameEdited: false
+                    nameEdited: false,
+                    label: $scope.labels.find((l) => l.id === $scope.portfolio.label.id)
                 };
                 $scope.categories = data.indicatorCategories;
                 $scope.categories.forEach((category) => {
@@ -252,6 +262,16 @@ angular.module('ontrack.extension.indicators', [
             $scope.portfolioForm.nameEdited = false;
             $scope.portfolioForm.name = $scope.portfolio.name;
         };
+
+        $scope.selectLabel = (label) => {
+            $scope.portfolioForm.label = label;
+            ot.pageCall($http.put($scope.portfolio.links._update, {
+                label: $scope.portfolioForm.label.id
+            })).then(() => {
+                $scope.portfolio.label = $scope.portfolioForm.label;
+            });
+        };
+
     })
     .directive('otExtensionIndicatorsStatus', function () {
         return {

@@ -10,7 +10,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <form>
                 <div class="form-group">
                     <div class="input-group">
@@ -27,6 +27,29 @@
                             ng-click="cancelPortfolioNameEdition()"
                             title="Cancels the edition of the portfolio name"><span class="fa fa-ban"></span></button>
                 </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="label">Label selector</label>
+                    <div class="dropdown input-group">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="label" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <ot-project-label label="portfolioForm.label" color-box="true"></ot-project-label>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="label">
+                            <li class="ot-action" ng-repeat="label in labels">
+                                <a ng-click="selectLabel(label)">
+                                    <ot-project-label label="label" color-box="true"></ot-project-label>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </form>
