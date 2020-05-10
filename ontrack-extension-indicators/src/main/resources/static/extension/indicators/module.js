@@ -291,7 +291,7 @@ angular.module('ontrack.extension.indicators', [
             });
         };
 
-        $scope.selectType = () => {
+        $scope.updateTypes = () => {
             let selectedTypes = [];
             $scope.categories.forEach((category) => {
                 category.types.forEach((type) => {
@@ -305,11 +305,16 @@ angular.module('ontrack.extension.indicators', [
             }));
         };
 
+        $scope.selectType = (type) => {
+            type.selected = !type.selected;
+            $scope.updateTypes();
+        };
+
         $scope.selectCategory = (category) => {
             category.types.forEach((type) => {
                 type.selected = category.selected;
             });
-            $scope.selectType();
+            $scope.updateTypes();
         };
 
     })

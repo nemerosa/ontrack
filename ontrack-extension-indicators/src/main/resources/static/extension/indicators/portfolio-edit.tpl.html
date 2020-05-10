@@ -68,11 +68,14 @@
                 {{category.name}}
             </td>
         </tr>
-        <tr ng-repeat="type in category.types">
+        <tr ng-repeat="type in category.types" ng-class="{
+            'success': type.selected,
+            '': !type.selected
+        }">
             <td style="width: 30px;">
-                <input type="checkbox" ng-model="type.selected" ng-change="selectType(type)">
+                <input type="checkbox" ng-model="type.selected" ng-change="updateTypes()">
             </td>
-            <td>
+            <td ng-click="selectType(type)">
                 <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
             </td>
         </tr>
