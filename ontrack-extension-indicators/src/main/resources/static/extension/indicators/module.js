@@ -295,6 +295,66 @@ angular.module('ontrack.extension.indicators', [
         };
 
     })
+    .config(function ($stateProvider) {
+        $stateProvider.state('portfolio-view', {
+            url: '/extension/indicators/portfolios/{portfolioId}',
+            templateUrl: 'extension/indicators/portfolio-view.tpl.html',
+            controller: 'PortfolioViewCtrl'
+        });
+    })
+    .controller('PortfolioViewCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+        const portfolioId = $stateParams.portfolioId;
+        $scope.loadingPortfolio = true;
+
+        const view = ot.view();
+        view.title = "Portfolio";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+        view.commands = [
+            ot.viewCloseCommand('/extension/indicators/portfolios')
+        ];
+
+        const query = `
+            query LoadPortfolio($id: String!) {
+              indicatorPortfolios(id: $id) {
+                id
+                name
+                label {
+                  id
+                  category
+                  name
+                  color
+                  description
+                }
+                types {
+                  id
+                  shortName
+                  name
+                  link
+                }
+                links {
+                  _update
+                }
+              }
+            }
+        `;
+
+        const queryVariables = {
+            id: portfolioId
+        };
+
+        const loadPortfolio = () => {
+            $scope.loadingPortfolio = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.portfolio = data.indicatorPortfolios[0];
+                view.title = `Portfolio: ${$scope.portfolio.name}`;
+            }).finally(() => {
+                $scope.loadingPortfolio = false;
+            });
+        };
+
+        loadPortfolio();
+
+    })
     .directive('otExtensionIndicatorsStatus', function () {
         return {
             restrict: 'E',
