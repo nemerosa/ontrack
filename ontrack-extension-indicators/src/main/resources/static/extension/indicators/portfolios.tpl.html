@@ -18,23 +18,22 @@
         </div>
     </div>
 
-    <table class="table table-bordered table-hover">
-        <tr ng-repeat="portfolio in portfolios">
-            <td>
-                <a href="#/extension/indicators/portfolios/{{portfolio.id}}">{{portfolio.name}}</a>
-            </td>
-            <td>
-                <ot-project-label label="portfolio.label" color-box="true"></ot-project-label>
-            </td>
-            <td>
+    <div class="row" ng-repeat="portfolio in portfolios">
+        <div class="col-md-12">
+            <h4>
+                <a href="#/extension/indicators/portfolios/{{portfolio.id}}">
+                    <span class="fa fa-folder-open-o"></span>
+                    {{portfolio.name}}
+                </a>
                 <a ng-if="portfolio.links._update"
                    href="#/extension/indicators/portfolios/{{portfolio.id}}/edit"
-                   title="Edit the content of the {{portfolio.name}} portfolio"><span class="fa fa-pencil ot-command"></span></a>
+                   title="Edit the content of the {{portfolio.name}} portfolio"><span
+                        class="fa fa-pencil ot-command"></span></a>
                 <a ng-if="portfolio.links._delete"
                    ng-click="deletePortfolio(portfolio)"
                    title="Delete the {{portfolio.name}} portfolio"><span class="fa fa-trash ot-command"></span></a>
-            </td>
-        </tr>
-    </table>
+            </h4>
+        </div>
+    </div>
 
 </ot-view>
