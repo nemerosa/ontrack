@@ -35,4 +35,9 @@ interface IndicatorPortfolioService {
      */
     fun updatePortfolio(id: String, input: PortfolioUpdateForm): IndicatorPortfolio
 
+    /**
+     * Deletes a portfolio
+     */
+    fun deletePortfolio(id: String)
+
 }

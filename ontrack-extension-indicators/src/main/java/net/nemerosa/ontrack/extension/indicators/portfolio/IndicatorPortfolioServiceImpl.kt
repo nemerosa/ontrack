@@ -36,6 +36,7 @@ class IndicatorPortfolioServiceImpl(
     }
 
     override fun updatePortfolio(id: String, input: PortfolioUpdateForm): IndicatorPortfolio {
+        securityService.checkGlobalFunction(IndicatorPortfolioManagement::class.java)
         val existing = findPortfolioById(id) ?: throw IndicatorPortfolioNotFoundException(id)
         val name = if (!input.name.isNullOrBlank()) {
             input.name
@@ -52,6 +53,11 @@ class IndicatorPortfolioServiceImpl(
         )
         storageService.store(STORE, id, newRecord)
         return newRecord
+    }
+
+    override fun deletePortfolio(id: String) {
+        securityService.checkGlobalFunction(IndicatorPortfolioManagement::class.java)
+        storageService.delete(STORE, id)
     }
 
     override fun getPortfolioLabel(portfolio: IndicatorPortfolio): Label? =

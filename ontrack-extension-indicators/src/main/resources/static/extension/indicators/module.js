@@ -100,7 +100,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'PortfoliosCtrl'
         });
     })
-    .controller('PortfoliosCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+    .controller('PortfoliosCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
 
         $scope.loadingPortfolios = true;
 
@@ -141,6 +141,7 @@ angular.module('ontrack.extension.indicators', [
                 }
                 links {
                   _update
+                  _delete
                 }
               }
             }
@@ -156,6 +157,15 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadPortfolios();
+
+        $scope.deletePortfolio = (portfolio) => {
+            otAlertService.confirm({
+                title: "Portfolio deletion",
+                message: `Do you want to delete the "${portfolio.name}" portfolio?`
+            }).then(() => {
+                return ot.pageCall($http.delete(portfolio.links._delete));
+            }).then(loadPortfolios);
+        };
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-edit', {
@@ -302,7 +312,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'PortfolioViewCtrl'
         });
     })
-    .controller('PortfolioViewCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+    .controller('PortfolioViewCtrl', function ($stateParams, $scope, $http, $location, ot, otGraphqlService, otAlertService) {
         const portfolioId = $stateParams.portfolioId;
         $scope.loadingPortfolio = true;
 
@@ -317,6 +327,7 @@ angular.module('ontrack.extension.indicators', [
                 name
                 links {
                   _update
+                  _delete
                 }
                 types {
                   id
@@ -375,6 +386,13 @@ angular.module('ontrack.extension.indicators', [
                         condition: () => $scope.portfolio.links._update,
                         link: `/extension/indicators/portfolios/${portfolioId}/edit`
                     },
+                    {
+                        id: 'deletePortfolio',
+                        name: 'Delete portfolio',
+                        cls: 'ot-command-delete',
+                        condition: () => $scope.portfolio.links._delete,
+                        action: deletePortfolio
+                    },
                     ot.viewCloseCommand('/extension/indicators/portfolios')
                 ];
 
@@ -425,6 +443,17 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadPortfolio();
+
+        const deletePortfolio = () => {
+              otAlertService.confirm({
+                  title: "Portfolio deletion",
+                  message: `Do you want to delete the "${$scope.portfolio.name}" portfolio?`
+              }).then(() => {
+                  return ot.pageCall($http.delete($scope.portfolio.links._delete));
+              }).then(() => {
+                  $location.path(`/extension/indicators/portfolios`);
+              });
+        };
 
         /**
          * Gets the project indicator for the given type

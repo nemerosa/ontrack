@@ -13,6 +13,10 @@ class IndicatorPortfolioResourceDecorator : AbstractLinkResourceDecorator<Indica
 
             Link.UPDATE linkTo { p: IndicatorPortfolio ->
                 on(IndicatorPortfolioController::class.java).updatePortfolio(p.id, PortfolioUpdateForm())
+            } linkIfGlobal IndicatorPortfolioManagement::class,
+
+            Link.DELETE linkTo { p: IndicatorPortfolio ->
+                on(IndicatorPortfolioController::class.java).deletePortfolio(p.id)
             } linkIfGlobal IndicatorPortfolioManagement::class
 
     )
