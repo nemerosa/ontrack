@@ -14,7 +14,8 @@
             <form>
                 <div class="form-group">
                     <div class="input-group">
-                        <input id="portfolioName" class="form-control" ng-model="portfolioForm.name" ng-readonly="!portfolioForm.nameEdited"/>
+                        <input id="portfolioName" class="form-control" ng-model="portfolioForm.name"
+                               ng-readonly="!portfolioForm.nameEdited"/>
                         <span class="input-group-btn">
                     <button ng-if="!portfolioForm.nameEdited" class="btn btn-default" type="button"
                             ng-click="startPortfolioNameEdition()"
@@ -39,7 +40,8 @@
                 <div class="form-group">
                     <label for="label">Label selector</label>
                     <div class="dropdown input-group">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="label" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="label" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="true">
                             <ot-project-label label="portfolioForm.label" color-box="true"></ot-project-label>
                             <span class="caret"></span>
                         </button>
@@ -65,7 +67,7 @@
         </tr>
         <tr ng-repeat="type in category.types">
             <td style="width: 30px;">
-                Selection
+                <input type="checkbox" ng-model="type.selected" ng-change="selectType(type)">
             </td>
             <td>
                 <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>

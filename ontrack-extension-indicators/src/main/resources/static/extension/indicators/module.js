@@ -272,6 +272,20 @@ angular.module('ontrack.extension.indicators', [
             });
         };
 
+        $scope.selectType = () => {
+            let selectedTypes = [];
+            $scope.categories.forEach((category) => {
+                category.types.forEach((type) => {
+                    if (type.selected) {
+                        selectedTypes.push(type.id);
+                    }
+                });
+            });
+            ot.pageCall($http.put($scope.portfolio.links._update, {
+                types: selectedTypes
+            }));
+        };
+
     })
     .directive('otExtensionIndicatorsStatus', function () {
         return {
