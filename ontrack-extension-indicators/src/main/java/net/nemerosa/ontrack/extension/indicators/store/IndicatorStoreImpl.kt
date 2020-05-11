@@ -33,17 +33,21 @@ class IndicatorStoreImpl(
     }
 
     override fun storeIndicator(project: Project, type: String, indicator: StoredIndicator) {
-        entityDataStore.add(
-                project,
-                STORE_CATEGORY,
-                type,
-                indicator.signature,
-                null,
-                StoredIndicatorRepresentation(
-                        value = indicator.value,
-                        comment = indicator.comment
-                ).asJson()
-        )
+        // Gets the last version of the indicator
+        val last = loadIndicator(project, type)
+        if (last == null || last.value != indicator.value || last.comment != indicator.comment) {
+            entityDataStore.add(
+                    project,
+                    STORE_CATEGORY,
+                    type,
+                    indicator.signature,
+                    null,
+                    StoredIndicatorRepresentation(
+                            value = indicator.value,
+                            comment = indicator.comment
+                    ).asJson()
+            )
+        }
     }
 
     companion object {
