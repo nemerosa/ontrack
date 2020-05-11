@@ -56,7 +56,7 @@
                                 ></ot-extension-indicators-status>
                             </span>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-9" style="border-right: solid 1px gray;">
                             <p><strong title="{{typeStats.type.name}}">{{typeStats.type.shortName}}</strong></p>
                             <p ng-if="typeStats.stats.total > 0">
                                 {{typeStats.stats.count}}/{{typeStats.stats.total}} project<span
@@ -79,6 +79,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-md-12" style="margin-bottom: 30px;">
+            <hr>
         </div>
     </div>
 
