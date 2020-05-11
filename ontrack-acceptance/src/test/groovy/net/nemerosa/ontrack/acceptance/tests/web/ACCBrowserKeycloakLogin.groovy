@@ -80,12 +80,16 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             def clientAdmin = adminClient.realm(realm).clients()
             def clientId = uid("C")
             def client = new ClientRepresentation()
+            client.protocol = "openid-connect"
             client.clientId = clientId
             client.baseUrl = baseURL
             client.enabled = true
             client.redirectUris = [
-                    "${baseURL}/login/oauth2/code/$realm" as String
+                    "${baseURL}/*" as String
             ]
+            client.baseUrl = "${baseURL}/login/oauth2/code/$realm" as String
+            client.webOrigins = [baseURL]
+            client.directAccessGrantsEnabled = true
             clientAdmin.create(client)
 
             ontrack.config.oidcSettings.createProvider(
