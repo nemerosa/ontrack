@@ -16,7 +16,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
     @Test
     void 'Login with Keycloak'() {
-        withKeycloakConfigured { realm, userAdmin, userSimple ->
+        withKeycloakConfigured { realm, _, userSimple ->
             browser { browser ->
                 def loginPage = goTo(LoginPage, [:])
                 assert loginPage.hasExtension(realm): "OIDC extension is present"
@@ -24,6 +24,24 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
                 def homePage = keycloakLoginPage.login(userSimple, "secret")
                 def userName = homePage.header.userName
                 assert userName == "User ${userSimple}"
+            }
+        }
+    }
+
+    @Test
+    void 'Login with Keycloak and sets as admin'() {
+        withKeycloakConfigured { realm, userAdmin, _ ->
+            browser { browser ->
+                // Initial login
+                def loginPage = goTo(LoginPage, [:])
+                assert loginPage.hasExtension(realm): "OIDC extension is present"
+                def keycloakLoginPage = loginPage.useExtension(realm)
+                def homePage = keycloakLoginPage.login(userAdmin, "secret")
+                def userName = homePage.header.userName
+                assert userName == "Admin ${userAdmin}"
+                // TODO Setup of group mappings
+                // TODO Re-login
+                // TODO Check the group
             }
         }
     }
@@ -47,12 +65,12 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
         try {
 
-            // Creates three groups
-            def groups = adminClient.realm(realm).groups()
-            ["ontrack-admin", "ontrack-user", "other-group"].each { group ->
-                def rep = new GroupRepresentation()
-                rep.setName(group)
-                groups.add(rep)
+            // Creates three roles
+            def roles = adminClient.realm(realm).roles()
+            ["ontrack-admin", "ontrack-user", "other-role"].each { role ->
+                def rep = new RoleRepresentation()
+                rep.setName(role)
+                roles.create(rep)
             }
 
             // Creates two users
@@ -61,13 +79,13 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             def userAdmin = createUser(
                     users,
                     "Admin",
-                    ["ontrack-admin", "ontrack-user", "other-group"]
+                    ["ontrack-admin", "ontrack-user", "other-role"]
             )
 
             def userSimple = createUser(
                     users,
                     "User",
-                    ["ontrack-user", "other-group"]
+                    ["ontrack-user", "other-role"]
             )
 
             // Creates an application
@@ -113,7 +131,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
     private static String createUser(
             UsersResource users,
             String firstName,
-            List<String> groups
+            List<String> roles
     ) {
 
         def username = uid("U")
@@ -123,7 +141,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         user.username = username
         user.firstName = firstName
         user.lastName = username
-        user.groups = groups
+        user.realmRoles = roles
         user.email = "${username}@nemerosa.net"
         user.emailVerified = true
         user.enabled = true
