@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.structure.Signature
 
 class StoredIndicator(
         val value: JsonNode,
-        val status: IndicatorStatus?,
         val comment: String?,
         val signature: Signature
 )

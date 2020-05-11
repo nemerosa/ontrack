@@ -54,12 +54,9 @@ class IndicatorServiceImpl(
         val value = type.fromClientJson(input)
         // Signature
         val signature = securityService.currentSignature
-        // Computes the status
-        val status = value?.let { type.getStatus(value) }
         // Storing the indicator
         indicatorStore.storeIndicator(project, type.id, StoredIndicator(
                 value = value?.run { type.toStoredJson(this) } ?: NullNode.instance,
-                status = status,
                 comment = comment,
                 signature = signature
         ))
@@ -74,7 +71,7 @@ class IndicatorServiceImpl(
             Indicator(
                     type = type,
                     value = value,
-                    status = stored.status,
+                    status = value?.let { type.getStatus(it) },
                     comment = stored.comment,
                     signature = stored.signature
             )
