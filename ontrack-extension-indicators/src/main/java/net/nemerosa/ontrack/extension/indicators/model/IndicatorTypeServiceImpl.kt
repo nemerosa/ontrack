@@ -1,15 +1,22 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
+@Transactional
 class IndicatorTypeServiceImpl(
         private val indicatorCategoryService: IndicatorCategoryService,
         private val indicatorValueTypeService: IndicatorValueTypeService,
-        private val storageService: StorageService
+        private val storageService: StorageService,
+        private val securityService: SecurityService
 ) : IndicatorTypeService {
 
     override fun findAll(): List<IndicatorType<*, *>> {
@@ -62,6 +69,31 @@ class IndicatorTypeServiceImpl(
         } else {
             null
         }
+    }
+
+    override fun createType(input: CreateTypeForm): IndicatorType<*, *> {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        val category = indicatorCategoryService.getCategory(input.category)
+        val valueType = indicatorValueTypeService.getValueType<Any, Any>(input.valueType.id)
+        val valueConfig = valueType.toConfigStoredJson(
+                valueType.fromConfigForm(input.valueType.data ?: NullNode.instance)
+        )
+        val id = UUID.randomUUID().toString()
+        val stored = StoredIndicatorType(
+                id = id,
+                category = category.id,
+                shortName = input.shortName,
+                longName = input.longName,
+                link = input.link,
+                valueType = valueType.id,
+                valueConfig = valueConfig
+        )
+        storageService.store(
+                STORE,
+                id,
+                stored
+        )
+        return getTypeById(id)
     }
 
     private class StoredIndicatorType(

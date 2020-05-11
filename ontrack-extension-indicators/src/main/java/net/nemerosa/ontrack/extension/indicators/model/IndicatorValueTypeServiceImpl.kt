@@ -14,4 +14,7 @@ class IndicatorValueTypeServiceImpl(
     @Suppress("UNCHECKED_CAST")
     override fun <T, C> findValueTypeById(id: String): IndicatorValueType<T, C>? = index[id] as IndicatorValueType<T, C>?
 
+    override fun <T, C> getValueType(id: String): IndicatorValueType<T, C> = findValueTypeById(id)
+            ?: throw IndicatorValueTypeNotFoundException(id)
+
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
 import net.nemerosa.ontrack.model.exceptions.NotFoundException
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 
 interface IndicatorTypeService {
 
@@ -12,6 +13,16 @@ interface IndicatorTypeService {
 
     fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>>
 
+    fun createType(input: CreateTypeForm): IndicatorType<*, *>
+
 }
 
 class IndicatorTypeNotFoundException(id: String) : NotFoundException("Indicator type not found: $id")
+
+class CreateTypeForm(
+        val category: String,
+        val shortName: String,
+        val longName: String,
+        val link: String?,
+        val valueType: ServiceConfiguration
+)
