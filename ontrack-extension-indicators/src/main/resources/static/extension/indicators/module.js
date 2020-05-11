@@ -156,6 +156,7 @@ angular.module('ontrack.extension.indicators', [
                       compliance
                       rating
                       comment
+                      annotatedComment
                       signature {
                         user
                         time
