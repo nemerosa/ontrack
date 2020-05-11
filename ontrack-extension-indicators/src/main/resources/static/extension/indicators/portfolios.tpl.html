@@ -53,7 +53,11 @@
                             </span>
                         </div>
                         <div class="col-md-9">
-                            <strong title="{{typeStats.type.name}}">{{typeStats.type.shortName}}</strong>
+                            <p><strong title="{{typeStats.type.name}}">{{typeStats.type.shortName}}</strong></p>
+                            <p ng-if="typeStats.stats.minRating != typeStats.stats.avgRating">
+                                {{typeStats.stats.minCount}} project<span ng-if="typeStats.stats.minCount > 1">s</span> are rated
+                                <ot-extension-indicators-status status="{compliance: typeStats.stats.min, rating: typeStats.stats.minRating }" size="sm"></ot-extension-indicators-status>
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -88,6 +88,7 @@ class IndicatorPortfolioServiceImpl(
                 // TODO Empty list
                 .orElse(IndicatorPortfolioOfPortfolios(types = listOf(
                         IndicatorTypeServiceImpl.DOCKER_NAME,
+                        IndicatorTypeServiceImpl.JAVA_11_ZULU,
                         IndicatorTypeServiceImpl.SPRING_BOOT
                 )))
     }
