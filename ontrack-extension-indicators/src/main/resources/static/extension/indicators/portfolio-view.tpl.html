@@ -36,6 +36,14 @@
             </td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr class="active">
+            <td>Average</td>
+            <td ng-repeat="type in types">
+                <ot-extension-indicators-status status="averageStatus(type)" size="md"></ot-extension-indicators-status>
+            </td>
+        </tr>
+        </tfoot>
     </table>
 
 </ot-view>
