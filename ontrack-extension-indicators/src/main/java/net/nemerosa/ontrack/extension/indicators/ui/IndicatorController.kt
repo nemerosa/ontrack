@@ -36,5 +36,14 @@ class IndicatorController(
             @RequestBody input: JsonNode
     ) = projectIndicatorService.updateIndicator(projectId, typeId, input)
 
+    /**
+     * Deletes a project indicator
+     */
+    @DeleteMapping("project/{projectId}/indicator/{typeId}/delete")
+    fun deleteIndicator(
+            @PathVariable projectId: ID,
+            @PathVariable typeId: String
+    ) = projectIndicatorService.deleteIndicator(projectId, typeId)
+
 
 }

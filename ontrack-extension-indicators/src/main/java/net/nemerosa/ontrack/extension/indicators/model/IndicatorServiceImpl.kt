@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import net.nemerosa.ontrack.extension.indicators.store.IndicatorStore
 import net.nemerosa.ontrack.extension.indicators.store.StoredIndicator
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.Signature
@@ -67,6 +68,10 @@ class IndicatorServiceImpl(
         ))
         // OK
         return loadIndicator(project, type)
+    }
+
+    override fun deleteProjectIndicator(project: Project, typeId: String): Ack {
+        return indicatorStore.deleteIndicator(project, typeId)
     }
 
     private fun <T, C> loadIndicator(project: Project, type: IndicatorType<T, C>): Indicator<T> {

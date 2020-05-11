@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
@@ -11,7 +13,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class IndicatorStoreImpl(
-        private val entityDataStore: EntityDataStore
+        private val entityDataStore: EntityDataStore,
+        private val securityService: SecurityService
 ) : IndicatorStore {
 
     override fun loadIndicator(project: Project, type: String): StoredIndicator? {
@@ -24,11 +27,15 @@ class IndicatorStoreImpl(
                 .firstOrNull()
                 ?.let { record ->
                     val rep = record.data.parse<StoredIndicatorRepresentation>()
-                    StoredIndicator(
-                            value = rep.value,
-                            comment = rep.comment,
-                            signature = record.signature
-                    )
+                    if (rep.value != null) {
+                        StoredIndicator(
+                                value = rep.value,
+                                comment = rep.comment,
+                                signature = record.signature
+                        )
+                    } else {
+                        null
+                    }
                 }
     }
 
@@ -50,12 +57,30 @@ class IndicatorStoreImpl(
         }
     }
 
+    override fun deleteIndicator(project: Project, typeId: String): Ack {
+        val existing = loadIndicator(project, typeId)
+        if (existing != null) {
+            entityDataStore.add(
+                    project,
+                    STORE_CATEGORY,
+                    typeId,
+                    securityService.currentSignature,
+                    null,
+                    StoredIndicatorRepresentation(
+                            value = null,
+                            comment = null
+                    ).asJson()
+            )
+        }
+        return Ack.validate(existing != null)
+    }
+
     companion object {
         private val STORE_CATEGORY = Indicator::class.java.name
     }
 
     private class StoredIndicatorRepresentation(
-            val value: JsonNode,
+            val value: JsonNode?,
             val comment: String?
     )
 

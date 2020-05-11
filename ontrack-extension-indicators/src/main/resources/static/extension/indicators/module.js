@@ -119,7 +119,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'ProjectIndicatorsCtrl'
         });
     })
-    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
 
         const projectId = $stateParams.project;
         $scope.loadingIndicators = true;
@@ -140,6 +140,7 @@ angular.module('ontrack.extension.indicators', [
                     indicators {
                       links {
                         _update
+                        _delete
                       }
                       type {
                         name
@@ -200,6 +201,15 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.editIndicator = (indicator) => {
             otFormService.update(indicator.links._update, "Edit indicator value").then(loadIndicators);
+        };
+
+        $scope.deleteIndicator = (indicator) => {
+            otAlertService.confirm({
+                title: "Indicator deletion",
+                message: "Do you want to delete this indicator? History will be kept."
+            }).then(() => {
+                return ot.pageCall($http.delete(indicator.links._delete));
+            }).then(loadIndicators);
         };
 
     })

@@ -10,8 +10,16 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 @Component
 class ProjectIndicatorResourceIndicator : AbstractLinkResourceDecorator<ProjectIndicator>(ProjectIndicator::class.java) {
     override fun getLinkDefinitions(): Iterable<LinkDefinition<ProjectIndicator>> = listOf(
+
             Link.UPDATE linkTo { i: ProjectIndicator ->
                 on(IndicatorController::class.java).getUpdateFormForIndicator(
+                        i.project.id,
+                        i.type.id
+                )
+            },
+
+            Link.DELETE linkTo { i: ProjectIndicator ->
+                on(IndicatorController::class.java).deleteIndicator(
                         i.project.id,
                         i.type.id
                 )

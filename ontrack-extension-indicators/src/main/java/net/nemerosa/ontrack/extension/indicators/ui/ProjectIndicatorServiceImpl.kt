@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
@@ -47,6 +48,11 @@ class ProjectIndicatorServiceImpl(
         val project = structureService.getProject(projectId)
         val indicator = indicatorService.updateProjectIndicator<Any>(project, typeId, input)
         return toProjectIndicator(project, indicator)
+    }
+
+    override fun deleteIndicator(projectId: ID, typeId: String): Ack {
+        val project = structureService.getProject(projectId)
+        return indicatorService.deleteProjectIndicator(project, typeId)
     }
 
     private fun toProjectIndicator(project: Project, indicator: Indicator<*>) = ProjectIndicator(
