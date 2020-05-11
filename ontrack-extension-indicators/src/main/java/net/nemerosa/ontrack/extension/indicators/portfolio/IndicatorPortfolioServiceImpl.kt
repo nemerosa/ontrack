@@ -84,6 +84,8 @@ class IndicatorPortfolioServiceImpl(
     }
 
     override fun getPortfolioOfPortfolios(): IndicatorPortfolioOfPortfolios {
+        // Checks we have access to the projects
+        structureService.projectList
         return storageService.retrieve(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, IndicatorPortfolioOfPortfolios::class.java)
                 // TODO Empty list
                 .orElse(IndicatorPortfolioOfPortfolios(types = listOf(
