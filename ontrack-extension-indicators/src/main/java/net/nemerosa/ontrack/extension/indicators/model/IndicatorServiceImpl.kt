@@ -44,9 +44,14 @@ class IndicatorServiceImpl(
         val type = indicatorTypeService.getTypeById(typeId) as IndicatorType<T, *>
         // Comment extraction
         val comment = if (input is ObjectNode && input.has(FIELD_COMMENT)) {
-            val comment = input.get(FIELD_COMMENT).asText()
+            val commentNode = input.get(FIELD_COMMENT)
             input.remove(FIELD_COMMENT)
-            comment
+            if (commentNode.isNull) {
+                null
+            } else {
+                val comment = commentNode.asText()
+                comment
+            }
         } else {
             null
         }
