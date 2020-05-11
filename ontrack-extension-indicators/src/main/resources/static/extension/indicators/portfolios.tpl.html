@@ -21,10 +21,12 @@
     <div class="row" ng-repeat="portfolio in portfolios">
         <div class="col-md-12">
             <h4>
-                <a href="#/extension/indicators/portfolios/{{portfolio.id}}">
+                <a href="#/extension/indicators/portfolios/{{portfolio.id}}" title="Portfolio details">
                     <span class="fa fa-folder-open-o"></span>
                     {{portfolio.name}}
                 </a>
+                <a ng-click="portfolioProjects(portfolio)"
+                   title="Displays the list of projects for this portfolio"><span class="fa fa-arrow-right ot-command"></span></a>
                 <a ng-if="portfolio.links._update"
                    href="#/extension/indicators/portfolios/{{portfolio.id}}/edit"
                    title="Edit the content of the {{portfolio.name}} portfolio"><span
@@ -45,24 +47,29 @@
                                         size="lg"
                                 ></ot-extension-indicators-status>
                             </span>
-                            <span ng-if="typeStats.stats.count > 0" title="Average status over {{typeStats.stats.count}} project(s).">
+                            <span ng-if="typeStats.stats.count > 0"
+                                  title="Average status over {{typeStats.stats.count}} project(s).">
                                 <ot-extension-indicators-status
                                         status="{compliance: typeStats.stats.avg, rating: typeStats.stats.avgRating }"
                                         size="lg"
-                                    ></ot-extension-indicators-status>
+                                ></ot-extension-indicators-status>
                             </span>
                         </div>
                         <div class="col-md-9">
                             <p><strong title="{{typeStats.type.name}}">{{typeStats.type.shortName}}</strong></p>
                             <p ng-if="typeStats.stats.total > 0">
-                                {{typeStats.stats.count}}/{{typeStats.stats.total}} project<span ng-if="typeStats.stats.count > 1">s</span> are rated.
+                                {{typeStats.stats.count}}/{{typeStats.stats.total}} project<span
+                                    ng-if="typeStats.stats.count > 1">s</span> are rated.
                             </p>
                             <p ng-if="typeStats.stats.total == 0">
                                 No project is part of this portfolio.
                             </p>
                             <p ng-if="typeStats.stats.minRating != typeStats.stats.avgRating">
-                                {{typeStats.stats.minCount}} project<span ng-if="typeStats.stats.minCount > 1">s</span> are rated
-                                <ot-extension-indicators-status status="{compliance: typeStats.stats.min, rating: typeStats.stats.minRating }" size="sm"></ot-extension-indicators-status>
+                                {{typeStats.stats.minCount}} project<span ng-if="typeStats.stats.minCount > 1">s</span>
+                                are rated
+                                <ot-extension-indicators-status
+                                        status="{compliance: typeStats.stats.min, rating: typeStats.stats.minRating }"
+                                        size="sm"></ot-extension-indicators-status>
                             </p>
                         </div>
                     </div>

@@ -101,7 +101,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'PortfoliosCtrl'
         });
     })
-    .controller('PortfoliosCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+    .controller('PortfoliosCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService, otLabelService) {
 
         $scope.loadingPortfolios = true;
 
@@ -188,6 +188,10 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadPortfolios();
+
+        $scope.portfolioProjects = (portfolio) => {
+            location.href = '#/home?label=' + otLabelService.formatLabel(portfolio.label);
+        };
 
         $scope.deletePortfolio = (portfolio) => {
             otAlertService.confirm({
