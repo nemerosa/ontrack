@@ -18,6 +18,8 @@ class BooleanIndicatorValueType(
         extension: IndicatorsExtensionFeature
 ) : AbstractExtension(extension), IndicatorValueType<Boolean, BooleanIndicatorValueTypeConfig> {
 
+    override val name: String = "Yes/No"
+
     override fun status(config: BooleanIndicatorValueTypeConfig, value: Boolean): IndicatorCompliance =
             when {
                 value -> IndicatorCompliance.HIGHEST

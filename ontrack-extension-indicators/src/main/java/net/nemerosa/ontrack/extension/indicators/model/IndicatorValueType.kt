@@ -7,6 +7,11 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 
 interface IndicatorValueType<T, C> : Extension {
 
+    /**
+     * Display name
+     */
+    val name: String
+
     fun form(nameDescription: NameDescription, config: C, value: T?): Form
 
     fun status(config: C, value: T): IndicatorCompliance
@@ -18,3 +23,8 @@ interface IndicatorValueType<T, C> : Extension {
     fun toStoredJson(config: C, value: T): JsonNode
 
 }
+
+/**
+ * ID if the FQCN of the value type.
+ */
+val IndicatorValueType<*, *>.id: String get() = this::class.java.name
