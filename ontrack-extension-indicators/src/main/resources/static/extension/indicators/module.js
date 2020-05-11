@@ -4,6 +4,19 @@ angular.module('ontrack.extension.indicators', [
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
+        $stateProvider.state('indicator-types', {
+            url: '/extension/indicators/types',
+            templateUrl: 'extension/indicators/types.tpl.html',
+            controller: 'IndicatorTypesCtrl'
+        });
+    })
+    .controller('IndicatorTypesCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+        $scope.loadingTypes = true;
+
+        const view = ot.view();
+        view.title = "Indicator types";
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('project-indicators', {
             url: '/extension/indicators/project-indicators/{project}',
             templateUrl: 'extension/indicators/project-indicators.tpl.html',

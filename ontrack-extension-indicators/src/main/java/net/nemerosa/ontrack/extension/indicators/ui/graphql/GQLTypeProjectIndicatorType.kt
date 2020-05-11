@@ -4,7 +4,6 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
@@ -45,7 +44,7 @@ class GQLTypeProjectIndicatorType(
                         }
             }
             // Links
-            .fields(IndicatorPortfolio::class.java.graphQLFieldContributions(fieldContributors))
+            .fields(ProjectIndicatorType::class.java.graphQLFieldContributions(fieldContributors))
             // OK
             .build()
 
