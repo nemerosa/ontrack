@@ -46,7 +46,7 @@ class GQLTypeIndicatorStats : GQLType {
 
     fun GraphQLObjectType.Builder.ratingField(property: KProperty1<IndicatorStats, IndicatorCompliance?>, description: String): GraphQLObjectType.Builder =
             field {
-                it.name("${property.name}Scales")
+                it.name("${property.name}Rating")
                         .description(description)
                         .type(GraphQLString)
                         .dataFetcher { env ->

@@ -143,8 +143,13 @@ angular.module('ontrack.extension.indicators', [
                       total
                       count
                       min
+                      minCount
+                      minRating
                       avg
+                      avgRating
                       max
+                      maxCount
+                      maxRating
                     }
                   }
                   links {
@@ -183,19 +188,6 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadPortfolios();
-
-        $scope.getIndicatorStatusColor = (status) => {
-            switch (status) {
-                case 'RED':
-                    return '#ff3300';
-                case 'YELLOW':
-                    return '#ff9900';
-                case 'GREEN':
-                    return '#33cc33';
-                default:
-                    return '#bfbfbf';
-            }
-        };
 
         $scope.deletePortfolio = (portfolio) => {
             otAlertService.confirm({
@@ -532,7 +524,8 @@ angular.module('ontrack.extension.indicators', [
                     'C': '#eabe06',
                     'D': '#ed7d20',
                     'E': '#ee0000',
-                    'F': '#aa0000'
+                    'F': '#aa0000',
+                    '-': '#dddddd'
                 };
 
                 switch (scope.size) {

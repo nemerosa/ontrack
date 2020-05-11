@@ -39,16 +39,18 @@
                 <div class="col-md-2" ng-repeat="typeStats in portfolio.globalStats">
                     <div class="row">
                         <div class="col-md-3">
-                            <span class="fa fa-circle fa-5x" ng-if="typeStats.stats.count == 0"
-                                  ng-style="{
-                                    'color': getIndicatorStatusColor(null)
-                                  }"
-                                  title="Not enough data."></span>
-                            <span class="fa fa-circle fa-5x" ng-if="typeStats.stats.count > 0"
-                                  ng-style="{
-                                    'color': getIndicatorStatusColor(typeStats.stats.avg)
-                                  }"
-                                  title="Average status over {{typeStats.stats.count}} project(s)."></span>
+                            <span ng-if="typeStats.stats.count == 0" title="Not enough data.">
+                                <ot-extension-indicators-status
+                                        status="{compliance: 0, rating: '-' }"
+                                        size="lg"
+                                ></ot-extension-indicators-status>
+                            </span>
+                            <span ng-if="typeStats.stats.count > 0" title="Average status over {{typeStats.stats.count}} project(s).">
+                                <ot-extension-indicators-status
+                                        status="{compliance: typeStats.stats.avg, rating: typeStats.stats.avgRating }"
+                                        size="lg"
+                                    ></ot-extension-indicators-status>
+                            </span>
                         </div>
                         <div class="col-md-9">
                             <strong title="{{typeStats.type.name}}">{{typeStats.type.shortName}}</strong>
