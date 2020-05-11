@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
+import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
@@ -41,6 +42,17 @@ class GQLTypeProjectIndicatorType(
                             val typeRef = env.getSource<ProjectIndicatorType>()
                             val type = indicatorTypeService.getTypeById(typeRef.id)
                             type.valueType
+                        }
+            }
+            // Value config
+            .field {
+                it.name(IndicatorType<*, *>::valueConfig.name)
+                        .description("Configuration for the value type")
+                        .type(GQLScalarJSON.INSTANCE)
+                        .dataFetcher { env ->
+                            val typeRef = env.getSource<ProjectIndicatorType>()
+                            val type = indicatorTypeService.getTypeById(typeRef.id)
+                            type.toConfigClientJson()
                         }
             }
             // Links

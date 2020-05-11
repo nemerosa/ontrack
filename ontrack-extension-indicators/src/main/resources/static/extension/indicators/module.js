@@ -38,6 +38,7 @@ angular.module('ontrack.extension.indicators', [
                       id
                     }
                   }
+                  valueConfig
                 }
               }
             }

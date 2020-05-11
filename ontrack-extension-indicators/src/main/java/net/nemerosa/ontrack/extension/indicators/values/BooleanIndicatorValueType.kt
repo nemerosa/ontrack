@@ -102,6 +102,9 @@ class BooleanIndicatorValueType(
         return BooleanIndicatorValueTypeConfig(required)
     }
 
+    override fun toConfigClientJson(config: BooleanIndicatorValueTypeConfig): JsonNode =
+            config.asJson()
+
     override fun toConfigStoredJson(config: BooleanIndicatorValueTypeConfig): JsonNode =
             config.asJson()
 

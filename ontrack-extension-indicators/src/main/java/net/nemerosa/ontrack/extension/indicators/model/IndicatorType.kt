@@ -20,6 +20,8 @@ data class IndicatorType<T, C>(
     fun fromStoredJson(value: JsonNode): T? = valueType.fromStoredJson(valueConfig, value)
     fun toStoredJson(value: T) = valueType.toStoredJson(valueConfig, value)
 
+    fun toConfigClientJson(): JsonNode = valueType.toConfigClientJson(valueConfig)
+
     fun getUpdateForm(value: T?): Form = valueType.form(
             nameDescription = toNameDescription(),
             config = valueConfig,

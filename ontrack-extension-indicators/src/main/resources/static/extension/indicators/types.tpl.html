@@ -16,12 +16,13 @@
             <th>Description</th>
             <th>Link</th>
             <th>Type</th>
+            <th>Configuration</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody ng-repeat="category in categories">
         <tr class="info">
-            <th colspan="5">
+            <th colspan="6">
                 {{category.name}}
             </th>
         </tr>
@@ -37,6 +38,9 @@
             </td>
             <td>
                 {{type.valueType.name}}
+            </td>
+            <td>
+                <ot-include value="type.valueConfig" template="extension/{{type.valueType.feature.id}}/indicators/{{type.valueType.id}}-config.tpl.html"></ot-include>
             </td>
             <td>
                 Edit | Delete
