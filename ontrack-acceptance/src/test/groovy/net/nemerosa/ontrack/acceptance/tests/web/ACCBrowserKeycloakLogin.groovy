@@ -16,14 +16,14 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
     @Test
     void 'Login with Keycloak'() {
-        withKeycloakConfigured { realm ->
+        withKeycloakConfigured { realm, userAdmin, userSimple ->
             browser { browser ->
                 def loginPage = goTo(LoginPage, [:])
                 assert loginPage.hasExtension(realm): "OIDC extension is present"
                 def keycloakLoginPage = loginPage.useExtension(realm)
-                def homePage = keycloakLoginPage.login("ontrack-user", "secret")
+                def homePage = keycloakLoginPage.login(userSimple, "secret")
                 def userName = homePage.header.userName
-                assert userName == "User"
+                assert userName == "User ${userSimple}"
             }
         }
     }
@@ -58,22 +58,16 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             // Creates two users
             def users = adminClient.realm(realm).users()
 
-            createUser(
+            def userAdmin = createUser(
                     users,
-                    "ontrack-admin",
                     "Admin",
-                    "Ontrack",
-                    ["ontrack-admin", "ontrack-user", "other-group"],
-                    "ontrack-admin@nemerosa.net"
+                    ["ontrack-admin", "ontrack-user", "other-group"]
             )
 
-            createUser(
+            def userSimple = createUser(
                     users,
-                    "ontrack-user",
                     "User",
-                    "Ontrack",
-                    ["ontrack-user", "other-group"],
-                    "ontrack-user@nemerosa.net"
+                    ["ontrack-user", "other-group"]
             )
 
             // Creates an application
@@ -102,7 +96,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
                     ".*"
             )
             try {
-                code(realm)
+                code(realm, userAdmin, userSimple)
             } finally {
                 if (configRule.config.keycloakCleanup) {
                     ontrack.config.oidcSettings.deleteProvider(realm)
@@ -116,22 +110,21 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         }
     }
 
-    private static void createUser(
+    private static String createUser(
             UsersResource users,
-            String username,
             String firstName,
-            String lastName,
-            List<String> groups,
-            String email
+            List<String> groups
     ) {
+
+        def username = uid("U")
 
         def user = new UserRepresentation()
         user.requiredActions = []
         user.username = username
         user.firstName = firstName
-        user.lastName = lastName
+        user.lastName = username
         user.groups = groups
-        user.email = email
+        user.email = "${username}@nemerosa.net"
         user.emailVerified = true
         user.enabled = true
         users.create(user)
@@ -144,6 +137,8 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         credentials.temporary = false
         credentials.value = "secret"
         userClient.resetPassword(credentials)
+
+        return username
     }
 
 }
