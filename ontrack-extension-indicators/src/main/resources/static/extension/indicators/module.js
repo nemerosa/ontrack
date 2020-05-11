@@ -497,14 +497,14 @@ angular.module('ontrack.extension.indicators', [
         loadPortfolio();
 
         const deletePortfolio = () => {
-              otAlertService.confirm({
-                  title: "Portfolio deletion",
-                  message: `Do you want to delete the "${$scope.portfolio.name}" portfolio?`
-              }).then(() => {
-                  return ot.pageCall($http.delete($scope.portfolio.links._delete));
-              }).then(() => {
-                  $location.path(`/extension/indicators/portfolios`);
-              });
+            otAlertService.confirm({
+                title: "Portfolio deletion",
+                message: `Do you want to delete the "${$scope.portfolio.name}" portfolio?`
+            }).then(() => {
+                return ot.pageCall($http.delete($scope.portfolio.links._delete));
+            }).then(() => {
+                $location.path(`/extension/indicators/portfolios`);
+            });
         };
 
         /**
@@ -524,6 +524,16 @@ angular.module('ontrack.extension.indicators', [
                 size: "@" // lg, md, sm
             },
             link: (scope) => {
+
+                const backgroundColours = {
+                    'A': '#00aa00',
+                    'B': '#b0d513',
+                    'C': '#eabe06',
+                    'D': '#ed7d20',
+                    'E': '#ee0000',
+                    'F': '#aa0000'
+                };
+
                 switch (scope.size) {
                     case 'lg':
                         scope.dimension = '60px';
@@ -541,7 +551,7 @@ angular.module('ontrack.extension.indicators', [
                         scope.statusFontSize = '10px';
                         break;
                 }
-                scope.statusBackgroundColor = '#aaaaaa';
+                scope.statusBackgroundColor = backgroundColours[scope.status.rating];
                 scope.statusForegroundColor = '#ffffff';
             }
         };
