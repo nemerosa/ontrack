@@ -15,6 +15,27 @@ angular.module('ontrack.extension.indicators', [
 
         const view = ot.view();
         view.title = "Indicator types";
+
+        const query = `
+            {
+              indicatorTypes {
+                id
+                shortName
+                name
+                link
+                category {
+                  id
+                  name
+                }
+                valueType {
+                  name
+                  feature {
+                    id
+                  }
+                }
+              }
+            }
+        `;
     })
     .config(function ($stateProvider) {
         $stateProvider.state('project-indicators', {
