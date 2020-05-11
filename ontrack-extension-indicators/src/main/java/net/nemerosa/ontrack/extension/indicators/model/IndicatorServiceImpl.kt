@@ -71,7 +71,7 @@ class IndicatorServiceImpl(
             Indicator(
                     type = type,
                     value = value,
-                    status = value?.let { type.getStatus(it) },
+                    compliance = value?.let { type.getStatus(it) },
                     comment = stored.comment,
                     signature = stored.signature
             )
@@ -79,7 +79,7 @@ class IndicatorServiceImpl(
             Indicator(
                     type = type,
                     value = null,
-                    status = null,
+                    compliance = null,
                     comment = null,
                     signature = Signature.anonymous()
             )

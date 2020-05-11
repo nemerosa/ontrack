@@ -53,7 +53,7 @@ class ProjectIndicatorServiceImpl(
             project = project,
             type = ProjectIndicatorType(indicator.type),
             value = indicator.toClientJson(),
-            status = indicator.status,
+            compliance = indicator.compliance,
             comment = indicator.comment,
             signature = indicator.signature
     )

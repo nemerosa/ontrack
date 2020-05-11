@@ -43,7 +43,7 @@ angular.module('ontrack.extension.indicators', [
                         }
                       }
                       value
-                      status
+                      compliance
                       scales {
                         RAG
                         AF
@@ -414,7 +414,7 @@ angular.module('ontrack.extension.indicators', [
                         }
                         value
                         comment
-                        status
+                        compliance
                       }
                     }
                   }

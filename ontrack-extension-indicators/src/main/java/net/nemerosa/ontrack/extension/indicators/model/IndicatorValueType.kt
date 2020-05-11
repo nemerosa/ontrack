@@ -9,7 +9,7 @@ interface IndicatorValueType<T, C> : Extension {
 
     fun form(nameDescription: NameDescription, config: C, value: T?): Form
 
-    fun status(config: C, value: T): IndicatorStatus
+    fun status(config: C, value: T): IndicatorCompliance
 
     fun toClientJson(config: C, value: T): JsonNode
     fun fromClientJson(config: C, value: JsonNode): T?

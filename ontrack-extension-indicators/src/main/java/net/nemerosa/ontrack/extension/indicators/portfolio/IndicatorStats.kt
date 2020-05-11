@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 
 /**
  * Aggregation of statuses over several items.
@@ -8,9 +8,9 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
 data class IndicatorStats(
         val total: Int,
         val count: Int,
-        val min: IndicatorStatus?,
-        val avg: IndicatorStatus?,
-        val max: IndicatorStatus?,
+        val min: IndicatorCompliance?,
+        val avg: IndicatorCompliance?,
+        val max: IndicatorCompliance?,
         val minCount: Int,
         val maxCount: Int
 ) {
@@ -30,14 +30,14 @@ data class IndicatorStats(
 
     companion object {
 
-        fun compute(statuses: List<IndicatorStatus?>): IndicatorStats {
-            val actualStatuses = statuses.filterNotNull()
-            val total = statuses.size
+        fun compute(compliances: List<IndicatorCompliance?>): IndicatorStats {
+            val actualStatuses = compliances.filterNotNull()
+            val total = compliances.size
             val count = actualStatuses.size
             val min = actualStatuses.minBy { it.value }
             val max = actualStatuses.maxBy { it.value }
             val avg = if (count > 0) {
-                actualStatuses.map { it.value }.average().toInt().let { IndicatorStatus(it) }
+                actualStatuses.map { it.value }.average().toInt().let { IndicatorCompliance(it) }
             } else {
                 null
             }

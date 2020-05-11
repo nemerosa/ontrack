@@ -21,7 +21,7 @@ class IndicatorStatsServiceImpl(
         // For each type
         return types.map { type ->
             val statuses = projects.map { project ->
-                indicatorService.getProjectIndicator(project, type).status
+                indicatorService.getProjectIndicator(project, type).compliance
             }
             IndicatorTypeStats(
                     type = type,

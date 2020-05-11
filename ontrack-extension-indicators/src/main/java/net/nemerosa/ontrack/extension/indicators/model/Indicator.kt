@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.structure.Signature
 data class Indicator<T>(
         val type: IndicatorType<T, *>,
         val value: T?,
-        val status: IndicatorStatus?,
+        val compliance: IndicatorCompliance?,
         val comment: String?,
         val signature: Signature
 ) {

@@ -31,7 +31,7 @@
             </td>
             <td ng-repeat="type in types">
                 <span ng-if="indicator(project,type).value" title="{{indicator(project,type).comment}}">
-                    <ot-extension-indicators-status status="indicator(project,type).status"></ot-extension-indicators-status>
+                    <ot-extension-indicators-status status="indicator(project,type).compliance"></ot-extension-indicators-status>
                     <ot-include value="indicator(project,type).value" template="extension/{{type.valueType.feature.id}}/indicators/{{type.valueType.name}}.tpl.html"></ot-include>
                 </span>
             </td>

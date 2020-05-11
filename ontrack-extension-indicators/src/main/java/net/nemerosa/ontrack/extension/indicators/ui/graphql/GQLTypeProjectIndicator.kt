@@ -30,11 +30,11 @@ class GQLTypeProjectIndicator(
                         .type(GQLScalarJSON.INSTANCE)
             }
             .field {
-                it.name(ProjectIndicator::status.name)
-                        .description("Status for the indicator")
+                it.name(ProjectIndicator::compliance.name)
+                        .description("Compliance for the indicator")
                         .type(GraphQLInt)
                         .dataFetcher { env ->
-                            env.getSource<ProjectIndicator>().status?.value
+                            env.getSource<ProjectIndicator>().compliance?.value
                         }
             }
             .field {

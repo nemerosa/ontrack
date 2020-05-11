@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.values
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.BooleanNode
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorStatus
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.asJson
@@ -18,11 +18,11 @@ class BooleanIndicatorValueType(
         extension: IndicatorsExtensionFeature
 ) : AbstractExtension(extension), IndicatorValueType<Boolean, BooleanIndicatorValueTypeConfig> {
 
-    override fun status(config: BooleanIndicatorValueTypeConfig, value: Boolean): IndicatorStatus =
+    override fun status(config: BooleanIndicatorValueTypeConfig, value: Boolean): IndicatorCompliance =
             when {
-                value -> IndicatorStatus.HIGHEST
-                config.required -> IndicatorStatus.LOWEST
-                else -> IndicatorStatus.MEDIUM
+                value -> IndicatorCompliance.HIGHEST
+                config.required -> IndicatorCompliance.LOWEST
+                else -> IndicatorCompliance.MEDIUM
             }
 
     override fun form(
