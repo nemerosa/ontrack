@@ -21,6 +21,7 @@ data class Indicator<T>(
                             .label("Comment")
                             .rows(4)
                             .length(3000)
+                            .optional()
                             .value(comment)
             )
 }
