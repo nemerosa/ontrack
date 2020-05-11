@@ -11,7 +11,7 @@ angular.module('ontrack.extension.indicators', [
         });
     })
     .controller('IndicatorTypesCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
-        $scope.loadingTypes = true;
+        $scope.loadingTypes = false;
 
         const view = ot.view();
         view.title = "Indicator types";
@@ -19,23 +19,59 @@ angular.module('ontrack.extension.indicators', [
         const query = `
             {
               indicatorTypes {
-                id
-                shortName
-                name
-                link
-                category {
-                  id
-                  name
+                links {
+                  _create
                 }
-                valueType {
+                types {
+                  id
+                  shortName
                   name
-                  feature {
+                  link
+                  category {
                     id
+                    name
+                  }
+                  valueType {
+                    id
+                    name
+                    feature {
+                      id
+                    }
                   }
                 }
               }
             }
         `;
+
+        const loadTypes = () => {
+            $scope.loadingTypes = true;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                $scope.indicatorTypes = data.indicatorTypes;
+                const types = data.indicatorTypes.types;
+
+                // Indexation per category
+                let categories = [];
+                let categoriesIndex = {};
+                types.forEach((type) => {
+                    let category = categoriesIndex[type.category.id];
+                    if (!category) {
+                        category = type.category;
+                        type.category = undefined;
+                        category.types = [];
+                        categories.push(category);
+                        categoriesIndex[category.id] = category;
+                    }
+                    category.types.push(type);
+                });
+                $scope.categories = categories;
+
+            }).finally(() => {
+                $scope.loadingTypes = false;
+            });
+        };
+
+        loadTypes();
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('project-indicators', {

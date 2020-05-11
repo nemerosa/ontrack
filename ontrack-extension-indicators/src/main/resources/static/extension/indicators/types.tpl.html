@@ -9,4 +9,40 @@
         </div>
     </div>
 
+    <table class="table table-hover table-bordered" ng-if="categories">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Link</th>
+            <th>Type</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="category in categories">
+        <tr class="info">
+            <th colspan="5">
+                {{category.name}}
+            </th>
+        </tr>
+        <tr ng-repeat="type in category.types">
+            <td>
+                {{type.shortName}}
+            </td>
+            <td>
+                {{type.name}}
+            </td>
+            <td>
+                <a href="{{type.link}}" ng-if="type.link">{{type.link}}</a>
+            </td>
+            <td>
+                {{type.valueType.name}}
+            </td>
+            <td>
+                Edit | Delete
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </ot-view>
