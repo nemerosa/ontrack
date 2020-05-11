@@ -44,11 +44,27 @@ angular.module('ontrack.extension.indicators', [
             }
         `;
 
+        let viewInitialized = false;
+
         const loadTypes = () => {
             $scope.loadingTypes = true;
             otGraphqlService.pageGraphQLCall(query).then((data) => {
                 $scope.indicatorTypes = data.indicatorTypes;
                 const types = data.indicatorTypes.types;
+
+                if (!viewInitialized) {
+                    view.commands = [
+                        {
+                            condition: () => data.indicatorTypes.links._create,
+                            id: 'indicator-type-create',
+                            name: "Create a type",
+                            cls: 'ot-command-new',
+                            action: createType
+                        },
+                        ot.viewCloseCommand('/home')
+                    ];
+                    viewInitialized = true;
+                }
 
                 // Indexation per category
                 let categories = [];
@@ -72,6 +88,11 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadTypes();
+
+        const createType = () => {
+            otFormService.create($scope.indicatorTypes.links._create, "New indicator type").then(loadTypes);
+        };
+        $scope.createType = createType;
 
     })
     .config(function ($stateProvider) {
