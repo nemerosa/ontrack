@@ -120,13 +120,9 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
             List<String> groups,
             String email
     ) {
-        def credentials = new CredentialRepresentation()
-        credentials.type = CredentialRepresentation.PASSWORD
-        credentials.temporary = false
-        credentials.secretData = "secret"
 
         def user = new UserRepresentation()
-        user.credentials = [credentials]
+        user.requiredActions = []
         user.username = username
         user.firstName = firstName
         user.lastName = lastName
@@ -135,6 +131,15 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         user.emailVerified = true
         user.enabled = true
         users.create(user)
+
+        def userId = users.search(username).first().id
+        def userClient = users.get(userId)
+
+        def credentials = new CredentialRepresentation()
+        credentials.type = CredentialRepresentation.PASSWORD
+        credentials.temporary = false
+        credentials.value = "secret"
+        userClient.resetPassword(credentials)
     }
 
 }
