@@ -52,7 +52,11 @@
                 <ot-include value="type.valueConfig" template="extension/{{type.valueType.feature.id}}/indicators/{{type.valueType.id}}-config.tpl.html"></ot-include>
             </td>
             <td>
-                Edit | Delete
+                <a ng-if="type.links._update"
+                   ng-click="editType(type)"
+                   title="Edit this type"
+                   ><span class="fa fa-pencil ot-command"></span></a>
+                 | Delete
             </td>
         </tr>
         </tbody>

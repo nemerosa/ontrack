@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 import net.nemerosa.ontrack.model.structure.ServiceConfigurationSource
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
@@ -44,45 +45,70 @@ class IndicatorTypeController(
      * Gets the creation form for a type
      */
     @GetMapping("create")
-    fun getCreationForm(): Form = Form.create()
-            .with(
-                    Selection.of(CreateTypeForm::category.name)
-                            .label("Indicator category")
-                            .items(indicatorCategoryService.findAll())
-                            .itemId(IndicatorCategory::id.name)
-                            .itemName(IndicatorCategory::name.name)
-            )
-            .with(
-                    Text.of(CreateTypeForm::shortName.name)
-                            .label("Short name")
-            )
-            .with(
-                    Text.of(CreateTypeForm::longName.name)
-                            .label("Long name")
-            )
-            .with(
-                    Url.of(CreateTypeForm::link.name)
-                            .label("Link to longer description")
-                            .optional()
-            )
-            .with(
-                    ServiceConfigurator.of(CreateTypeForm::valueType.name)
-                            .label("Value type")
-                            .sources(
-                                    indicatorValueTypeService.findAll()
-                                            .map { valueType ->
-                                                ServiceConfigurationSource(
-                                                        valueType.id,
-                                                        valueType.name,
-                                                        valueType.configForm(null)
-                                                )
-                                            }
-                            )
-            )
+    fun getCreationForm(): Form = getTypeForm<Any,Any>()
 
     @PostMapping("create")
     fun createType(@RequestBody input: CreateTypeForm): Resource<ProjectIndicatorType> =
             getTypeById(indicatorTypeService.createType(input).id)
+
+    @GetMapping("{id}/update")
+    fun getUpdateForm(@PathVariable id: String): Form {
+        val type = indicatorTypeService.getTypeById(id)
+        return getTypeForm(type)
+    }
+
+    @PutMapping("{id}/update")
+    fun updateType(@PathVariable id: String, @RequestBody input: CreateTypeForm): Resource<ProjectIndicatorType> =
+            getTypeById(indicatorTypeService.updateType(id, input).id)
+
+    private fun <T, C> getTypeForm(type: IndicatorType<T, C>? = null): Form {
+        return Form.create()
+                .with(
+                        Selection.of(CreateTypeForm::category.name)
+                                .label("Indicator category")
+                                .items(indicatorCategoryService.findAll())
+                                .itemId(IndicatorCategory::id.name)
+                                .itemName(IndicatorCategory::name.name)
+                                .value(type?.category?.id)
+                )
+                .with(
+                        Text.of(CreateTypeForm::shortName.name)
+                                .label("Short name")
+                                .value(type?.shortName)
+                )
+                .with(
+                        Text.of(CreateTypeForm::longName.name)
+                                .label("Long name")
+                                .value(type?.longName)
+                )
+                .with(
+                        Url.of(CreateTypeForm::link.name)
+                                .label("Link to longer description")
+                                .optional()
+                                .value(type?.link)
+                )
+                .with(
+                        ServiceConfigurator.of(CreateTypeForm::valueType.name)
+                                .label("Value type")
+                                .readOnly(type != null)
+                                .sources(
+                                        indicatorValueTypeService.findAll()
+                                                .map { valueType ->
+                                                    ServiceConfigurationSource(
+                                                            valueType.id,
+                                                            valueType.name,
+                                                            valueType.configForm(null)
+                                                    )
+                                                }
+                                )
+                                .value(type?.let { toValueTypeConfiguration(it) })
+                )
+    }
+
+    private fun <T, C> toValueTypeConfiguration(type: IndicatorType<T, C>) = ServiceConfiguration(
+            type.valueType.id,
+            type.valueType.toConfigForm(type.valueConfig)
+    )
 
     @GetMapping("{id}")
     fun getTypeById(@PathVariable id: String): Resource<ProjectIndicatorType> =

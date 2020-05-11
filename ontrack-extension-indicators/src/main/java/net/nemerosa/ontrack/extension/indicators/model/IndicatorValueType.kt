@@ -23,8 +23,10 @@ interface IndicatorValueType<T, C> : Extension {
     fun toStoredJson(config: C, value: T): JsonNode
 
     fun configForm(config: C?): Form
-    fun toConfigClientJson(config: C): JsonNode
+    fun toConfigForm(config: C): JsonNode
     fun fromConfigForm(config: JsonNode): C
+
+    fun toConfigClientJson(config: C): JsonNode
     fun toConfigStoredJson(config: C): JsonNode
     fun fromConfigStoredJson(config: JsonNode): C
 

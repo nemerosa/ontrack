@@ -97,6 +97,8 @@ class BooleanIndicatorValueType(
                                     .value(config?.required ?: true)
                     )
 
+    override fun toConfigForm(config: BooleanIndicatorValueTypeConfig): JsonNode = config.asJson()
+
     override fun fromConfigForm(config: JsonNode): BooleanIndicatorValueTypeConfig {
         val required = JsonUtils.getBoolean(config, BooleanIndicatorValueTypeConfig::required.name, true)
         return BooleanIndicatorValueTypeConfig(required)

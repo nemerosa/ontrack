@@ -72,13 +72,17 @@ class IndicatorTypeServiceImpl(
     }
 
     override fun createType(input: CreateTypeForm): IndicatorType<*, *> {
+        val id = UUID.randomUUID().toString()
+        return updateType(id, input)
+    }
+
+    override fun updateType(id: String, input: CreateTypeForm): IndicatorType<*, *> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val category = indicatorCategoryService.getCategory(input.category)
         val valueType = indicatorValueTypeService.getValueType<Any, Any>(input.valueType.id)
         val valueConfig = valueType.toConfigStoredJson(
                 valueType.fromConfigForm(input.valueType.data ?: NullNode.instance)
         )
-        val id = UUID.randomUUID().toString()
         val stored = StoredIndicatorType(
                 id = id,
                 category = category.id,

@@ -39,6 +39,9 @@ angular.module('ontrack.extension.indicators', [
                     }
                   }
                   valueConfig
+                  links {
+                    _update
+                  }
                 }
               }
             }
@@ -93,6 +96,10 @@ angular.module('ontrack.extension.indicators', [
             otFormService.create($scope.indicatorTypes.links._create, "New indicator type").then(loadTypes);
         };
         $scope.createType = createType;
+
+        $scope.editType = (type) => {
+            otFormService.update(type.links._update, "Edit indicator type").then(loadTypes);
+        };
 
     })
     .config(function ($stateProvider) {

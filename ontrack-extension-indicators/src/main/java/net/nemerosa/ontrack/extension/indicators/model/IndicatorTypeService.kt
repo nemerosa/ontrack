@@ -15,6 +15,8 @@ interface IndicatorTypeService {
 
     fun createType(input: CreateTypeForm): IndicatorType<*, *>
 
+    fun updateType(id: String, input: CreateTypeForm): IndicatorType<*, *>
+
 }
 
 class IndicatorTypeNotFoundException(id: String) : NotFoundException("Indicator type not found: $id")
