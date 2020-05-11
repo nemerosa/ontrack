@@ -21,6 +21,9 @@ fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectTyp
             it.name(name).description(description).type(GraphQLString)
         }
 
+fun TypeBuilder.stringField(property: KProperty<String?>, description: String): GraphQLObjectType.Builder =
+        field { it.name(property.name).description(description).type(GraphQLString) }
+
 fun TypeBuilder.creationField(name: String, description: String): GraphQLObjectType.Builder =
         field {
             it.name(name).description(description).type(GraphQLString)

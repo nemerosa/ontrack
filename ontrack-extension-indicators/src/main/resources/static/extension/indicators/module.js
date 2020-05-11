@@ -49,7 +49,7 @@ angular.module('ontrack.extension.indicators', [
                         name
                         link
                         valueType {
-                          name
+                          id
                           feature {
                             id
                           }
@@ -410,7 +410,7 @@ angular.module('ontrack.extension.indicators', [
                     name
                   }
                   valueType {
-                    name
+                    id
                     feature {
                       id
                     }
