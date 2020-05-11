@@ -11,6 +11,7 @@ class IndicatorValueTypeServiceImpl(
 
     override fun findAll(): List<IndicatorValueType<*, *>> = index.values.sortedBy { it.name }
 
-    override fun findValueTypeById(id: String): IndicatorValueType<*, *>? = index[id]
+    @Suppress("UNCHECKED_CAST")
+    override fun <T, C> findValueTypeById(id: String): IndicatorValueType<T, C>? = index[id] as IndicatorValueType<T, C>?
 
 }

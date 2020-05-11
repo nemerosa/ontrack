@@ -12,8 +12,8 @@
     <div class="row" ng-show="!loadingTypes && categories.length == 0">
         <div class="col-md-12">
             <div class="alert alert-info">
-                No indicator type is defined yet. Create one by clicking on this
-                <a class="ot-action" ng-click="createType()">link</a>.
+                No indicator type is defined yet. <span ng-if="indicatorTypes.links._create">Create one by clicking on this
+                <a class="ot-action" ng-click="createType()">link</a>.</span>
             </div>
         </div>
     </div>
