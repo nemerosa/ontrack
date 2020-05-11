@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorPortfolioManagement
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeServiceImpl
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
@@ -87,12 +86,7 @@ class IndicatorPortfolioServiceImpl(
         // Checks we have access to the projects
         structureService.projectList
         return storageService.retrieve(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, IndicatorPortfolioOfPortfolios::class.java)
-                // TODO Empty list
-                .orElse(IndicatorPortfolioOfPortfolios(types = listOf(
-                        IndicatorTypeServiceImpl.DOCKER_NAME,
-                        IndicatorTypeServiceImpl.JAVA_11_ZULU,
-                        IndicatorTypeServiceImpl.SPRING_BOOT
-                )))
+                .orElse(IndicatorPortfolioOfPortfolios(types = emptyList()))
     }
 
     override fun savePortfolioOfPortfolios(input: IndicatorPortfolioOfPortfolios): IndicatorPortfolioOfPortfolios {

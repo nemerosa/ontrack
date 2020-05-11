@@ -9,6 +9,15 @@
         </div>
     </div>
 
+    <div class="row" ng-show="!loadingTypes && categories.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No indicator type is defined yet. Create one by clicking on this
+                <a class="ot-action" ng-click="createType()">link</a>.
+            </div>
+        </div>
+    </div>
+
     <table class="table table-hover table-bordered" ng-if="categories">
         <thead>
         <tr>

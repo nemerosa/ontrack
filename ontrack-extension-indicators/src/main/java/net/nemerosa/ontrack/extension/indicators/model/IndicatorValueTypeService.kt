@@ -13,6 +13,6 @@ interface IndicatorValueTypeService {
     /**
      * Gets a value type using its [id][IndicatorValueType.id].
      */
-    fun findValueTypeById(id: String): IndicatorValueType<*, *>?
+    fun <T, C> findValueTypeById(id: String): IndicatorValueType<T, C>?
 
 }

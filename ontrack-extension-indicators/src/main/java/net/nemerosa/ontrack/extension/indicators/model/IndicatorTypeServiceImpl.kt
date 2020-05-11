@@ -1,56 +1,23 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
-import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
-import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 
 @Service
 class IndicatorTypeServiceImpl(
-        indicatorCategoryService: IndicatorCategoryService,
-        booleanIndicatorValueType: BooleanIndicatorValueType
+        private val indicatorCategoryService: IndicatorCategoryService,
+        private val indicatorValueTypeService: IndicatorValueTypeService,
+        private val storageService: StorageService
 ) : IndicatorTypeService {
 
-    companion object {
-        const val SPRING_BOOT = "36083450-cacb-4e30-bbed-fd6682f336fd"
-        const val JAVA_11_ZULU = "7291c0ba-a038-4ca4-907e-364b57cba8bd"
-        const val DOCKER_NAME = "91f0ac82-0442-4ae0-9995-ed2e8fc9e6f9"
-    }
-
-    private val types: Map<String, IndicatorType<*, *>> = listOf(
-            IndicatorType(
-                    id = SPRING_BOOT,
-                    category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.SERVICES),
-                    shortName = "Java stack",
-                    longName = "SHOULD Use Java & spring boot stack",
-                    link = "https://start.spring.io",
-                    valueType = booleanIndicatorValueType,
-                    valueConfig = BooleanIndicatorValueTypeConfig(required = false),
-                    valueComputer = null
-            ),
-            IndicatorType(
-                    id = JAVA_11_ZULU,
-                    category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.SERVICES),
-                    shortName = "Java 11 Zulu",
-                    longName = "MUST Use zulu JDK 11 LTS for JVM services",
-                    link = null,
-                    valueType = booleanIndicatorValueType,
-                    valueConfig = BooleanIndicatorValueTypeConfig(required = true),
-                    valueComputer = null
-            ),
-            IndicatorType(
-                    id = DOCKER_NAME,
-                    category = indicatorCategoryService.getCategory(IndicatorCategoryServiceImpl.DELIVERY),
-                    shortName = "Docker name",
-                    longName = "MUST follow Docker artifact naming conventions",
-                    link = null,
-                    valueType = booleanIndicatorValueType,
-                    valueConfig = BooleanIndicatorValueTypeConfig(required = true),
-                    valueComputer = null
-            )
-    ).associateBy { it.id }
-
     override fun findAll(): List<IndicatorType<*, *>> {
-        return types.values.sortedWith(
+        return storageService.getKeys(STORE).mapNotNull { key ->
+            storageService.retrieve(STORE, key, StoredIndicatorType::class.java).getOrNull()
+        }.mapNotNull {
+            fromStorage<Any, Any>(it)
+        }.sortedWith(
                 compareBy(
                         { it.category.name },
                         { it.shortName }
@@ -59,13 +26,15 @@ class IndicatorTypeServiceImpl(
     }
 
     override fun findTypeById(typeId: String): IndicatorType<*, *>? =
-            types[typeId]
+            storageService.retrieve(STORE, typeId, StoredIndicatorType::class.java)
+                    .getOrNull()
+                    ?.let { fromStorage<Any, Any>(it) }
 
     override fun getTypeById(typeId: String): IndicatorType<*, *> =
             findTypeById(typeId) ?: throw IndicatorTypeNotFoundException(typeId)
 
     override fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>> {
-        return types.values.filter {
+        return findAll().filter {
             it.category.id == category.id
         }.sortedWith(
                 compareBy(
@@ -74,4 +43,39 @@ class IndicatorTypeServiceImpl(
                 )
         )
     }
+
+    private fun <T, C> fromStorage(stored: StoredIndicatorType): IndicatorType<T, C>? {
+        val category = indicatorCategoryService.findCategoryById(stored.category)
+        val valueType = indicatorValueTypeService.findValueTypeById<T, C>(stored.valueType)
+        return if (category != null && valueType != null) {
+            val valueConfig = valueType.fromConfigStoredJson(stored.valueConfig)
+            IndicatorType(
+                    id = stored.id,
+                    category = category,
+                    shortName = stored.shortName,
+                    longName = stored.longName,
+                    link = stored.link,
+                    valueType = valueType,
+                    valueConfig = valueConfig,
+                    valueComputer = null
+            )
+        } else {
+            null
+        }
+    }
+
+    private class StoredIndicatorType(
+            val id: String,
+            val category: String,
+            val shortName: String,
+            val longName: String,
+            val link: String?,
+            val valueType: String,
+            val valueConfig: JsonNode
+    )
+
+    companion object {
+        private val STORE: String get() = IndicatorType::class.java.name
+    }
+
 }
