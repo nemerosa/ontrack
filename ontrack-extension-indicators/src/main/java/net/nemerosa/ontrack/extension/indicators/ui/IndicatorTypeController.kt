@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.ui
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
@@ -45,7 +47,7 @@ class IndicatorTypeController(
      * Gets the creation form for a type
      */
     @GetMapping("create")
-    fun getCreationForm(): Form = getTypeForm<Any,Any>()
+    fun getCreationForm(): Form = getTypeForm<Any, Any>()
 
     @PostMapping("create")
     fun createType(@RequestBody input: CreateTypeForm): Resource<ProjectIndicatorType> =
@@ -60,6 +62,10 @@ class IndicatorTypeController(
     @PutMapping("{id}/update")
     fun updateType(@PathVariable id: String, @RequestBody input: CreateTypeForm): Resource<ProjectIndicatorType> =
             getTypeById(indicatorTypeService.updateType(id, input).id)
+
+    @DeleteMapping("{id}/delete")
+    fun deleteType(@PathVariable id: String): ResponseEntity<Ack> =
+            ResponseEntity.ok(indicatorTypeService.deleteType(id))
 
     private fun <T, C> getTypeForm(type: IndicatorType<T, C>? = null): Form {
         return Form.create()

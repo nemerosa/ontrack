@@ -12,9 +12,11 @@ class ProjectIndicatorTypeResourceDecorator : AbstractLinkResourceDecorator<Proj
 
             Link.UPDATE linkTo { t: ProjectIndicatorType ->
                 on(IndicatorTypeController::class.java).getUpdateForm(t.id)
-            } linkIfGlobal IndicatorTypeManagement::class
+            } linkIfGlobal IndicatorTypeManagement::class,
 
-            // TODO Delete
+            Link.DELETE linkTo { t: ProjectIndicatorType ->
+                on(IndicatorTypeController::class.java).deleteType(t.id)
+            } linkIfGlobal IndicatorTypeManagement::class
 
     )
 

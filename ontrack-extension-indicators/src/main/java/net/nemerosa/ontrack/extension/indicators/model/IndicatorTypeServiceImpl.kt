@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -74,6 +75,11 @@ class IndicatorTypeServiceImpl(
     override fun createType(input: CreateTypeForm): IndicatorType<*, *> {
         val id = UUID.randomUUID().toString()
         return updateType(id, input)
+    }
+
+    override fun deleteType(id: String): Ack {
+        storageService.delete(STORE, id)
+        return Ack.OK
     }
 
     override fun updateType(id: String, input: CreateTypeForm): IndicatorType<*, *> {

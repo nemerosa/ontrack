@@ -41,6 +41,7 @@ angular.module('ontrack.extension.indicators', [
                   valueConfig
                   links {
                     _update
+                    _delete
                   }
                 }
               }
@@ -99,6 +100,15 @@ angular.module('ontrack.extension.indicators', [
 
         $scope.editType = (type) => {
             otFormService.update(type.links._update, "Edit indicator type").then(loadTypes);
+        };
+
+        $scope.deleteType = (type) => {
+            otAlertService.confirm({
+                title: "Delete type",
+                message: `Do you want to delete the ${type.name} type?`
+            }).then(() => {
+                return ot.pageCall($http.delete(type.links._delete));
+            }).then(loadTypes);
         };
 
     })

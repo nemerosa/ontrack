@@ -56,7 +56,10 @@
                    ng-click="editType(type)"
                    title="Edit this type"
                    ><span class="fa fa-pencil ot-command"></span></a>
-                 | Delete
+                <a ng-if="type.links._delete"
+                   ng-click="deleteType(type)"
+                   title="Deletes this type"
+                   ><span class="fa fa-trash ot-command"></span></a>
             </td>
         </tr>
         </tbody>

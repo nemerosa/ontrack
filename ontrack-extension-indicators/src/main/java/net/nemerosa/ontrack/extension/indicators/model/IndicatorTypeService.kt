@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.NotFoundException
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 
@@ -16,6 +17,8 @@ interface IndicatorTypeService {
     fun createType(input: CreateTypeForm): IndicatorType<*, *>
 
     fun updateType(id: String, input: CreateTypeForm): IndicatorType<*, *>
+
+    fun deleteType(id: String): Ack
 
 }
 
