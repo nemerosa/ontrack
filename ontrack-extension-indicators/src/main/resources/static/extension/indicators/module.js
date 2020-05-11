@@ -412,6 +412,7 @@ angular.module('ontrack.extension.indicators', [
                         value
                         comment
                         compliance
+                        rating
                       }
                     }
                   }
