@@ -1,15 +1,12 @@
-package net.nemerosa.ontrack.extension.indicators.model.scale
+package net.nemerosa.ontrack.extension.indicators.model
 
-enum class AFScale : Scale<AFScale> {
+enum class Rating {
 
     A, B, C, D, E, F;
 
-    companion object : ScaleFactory<AFScale> {
+    companion object {
 
-        override val name: String = "AF"
-        override val description: String = "A to F"
-
-        override fun toScale(value: Int): AFScale =
+        fun asRating(value: Int): Rating =
                 when {
                     value <= 20 -> F
                     value in 20..39 -> E

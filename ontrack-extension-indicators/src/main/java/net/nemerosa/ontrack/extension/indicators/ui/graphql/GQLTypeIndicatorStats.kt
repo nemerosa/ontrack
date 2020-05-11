@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.Scalars.GraphQLInt
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
+import net.nemerosa.ontrack.extension.indicators.model.Rating
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorStats
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -11,9 +13,7 @@ import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty1
 
 @Component
-class GQLTypeIndicatorStats(
-        private val scaleValues: GQLTypeScaleValues
-) : GQLType {
+class GQLTypeIndicatorStats : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()
@@ -26,9 +26,9 @@ class GQLTypeIndicatorStats(
                     .statField(IndicatorStats::max, "Maximal value (undefined if no stat available)")
                     .intField(IndicatorStats::minCount, "Number of items having the minimum value")
                     .intField(IndicatorStats::maxCount, "Number of items having the maximum value")
-                    .scaleValues(scaleValues, IndicatorStats::min, "Scales for the min value")
-                    .scaleValues(scaleValues, IndicatorStats::avg, "Scales for the min value")
-                    .scaleValues(scaleValues, IndicatorStats::max, "Scales for the min value")
+                    .ratingField(IndicatorStats::min, "Rating for the min value")
+                    .ratingField(IndicatorStats::avg, "Rating for the min value")
+                    .ratingField(IndicatorStats::max, "Rating for the min value")
                     .build()
 
     override fun getTypeName(): String = IndicatorStats::class.java.simpleName
@@ -44,14 +44,16 @@ class GQLTypeIndicatorStats(
                         }
             }
 
-    fun GraphQLObjectType.Builder.scaleValues(scaleValues: GQLTypeScaleValues, property: KProperty1<IndicatorStats, IndicatorCompliance?>, description: String): GraphQLObjectType.Builder =
+    fun GraphQLObjectType.Builder.ratingField(property: KProperty1<IndicatorStats, IndicatorCompliance?>, description: String): GraphQLObjectType.Builder =
             field {
                 it.name("${property.name}Scales")
                         .description(description)
-                        .type(scaleValues.typeRef)
+                        .type(GraphQLString)
                         .dataFetcher { env ->
                             val stats = env.getSource<IndicatorStats>()
-                            property.get(stats)
+                            property.get(stats)?.let { compliance ->
+                                Rating.asRating(compliance.value)
+                            }
                         }
             }
 

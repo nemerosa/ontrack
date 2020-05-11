@@ -44,10 +44,7 @@ angular.module('ontrack.extension.indicators', [
                       }
                       value
                       compliance
-                      scales {
-                        RAG
-                        AF
-                      }
+                      rating
                       comment
                       signature {
                         user
@@ -523,14 +520,27 @@ angular.module('ontrack.extension.indicators', [
             restrict: 'E',
             templateUrl: 'extension/indicators/directive.indicators-status.tpl.html',
             scope: {
-                status: '=',
-                scales: '=',
-                size: '@'
+                status: '=', // Requires: compliance, rating
+                size: "@" // lg, md, sm
             },
             link: (scope) => {
-                scope.dimension = '60px';
-                scope.radius = '30px';
-                scope.statusFontSize = '40px';
+                switch (scope.size) {
+                    case 'lg':
+                        scope.dimension = '60px';
+                        scope.radius = '30px';
+                        scope.statusFontSize = '40px';
+                        break;
+                    case 'md':
+                        scope.dimension = '30px';
+                        scope.radius = '15px';
+                        scope.statusFontSize = '20px';
+                        break;
+                    default:
+                        scope.dimension = '16px';
+                        scope.radius = '8px';
+                        scope.statusFontSize = '10px';
+                        break;
+                }
                 scope.statusBackgroundColor = '#aaaaaa';
                 scope.statusForegroundColor = '#ffffff';
             }

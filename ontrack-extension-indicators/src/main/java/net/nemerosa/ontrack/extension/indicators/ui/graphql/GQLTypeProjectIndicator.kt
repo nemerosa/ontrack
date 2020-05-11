@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.extension.indicators.model.Rating
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component
 class GQLTypeProjectIndicator(
         private val projectIndicatorType: GQLTypeProjectIndicatorType,
         private val signature: GQLTypeCreation,
-        private val scaleValues: GQLTypeScaleValues,
         private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
@@ -46,10 +46,19 @@ class GQLTypeProjectIndicator(
                 it.name(ProjectIndicator::signature.name)
                         .description("Signature for the indicator")
                         .type(signature.typeRef)
-                        .dataFetcher(GQLTypeCreation.dataFetcher<ProjectIndicator> { it.signature })
+                        .dataFetcher(GQLTypeCreation.dataFetcher(ProjectIndicator::signature))
             }
-            // Scales
-            .scaleValues(scaleValues)
+            // Rating
+            .field {
+                it.name("rating")
+                        .description("Rating for this indicator")
+                        .type(GraphQLString)
+                        .dataFetcher { env ->
+                            env.getSource<ProjectIndicator>().compliance?.let { compliance ->
+                                Rating.asRating(compliance.value)
+                            }
+                        }
+            }
             // Links
             .fields(ProjectIndicator::class.java.graphQLFieldContributions(fieldContributors))
             .build()
