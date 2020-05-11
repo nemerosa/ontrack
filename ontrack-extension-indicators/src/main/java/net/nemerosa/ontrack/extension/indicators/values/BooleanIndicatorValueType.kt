@@ -6,9 +6,12 @@ import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
+import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.structure.Description
 import net.nemerosa.ontrack.model.structure.NameDescription
 import org.springframework.stereotype.Component
@@ -85,6 +88,25 @@ class BooleanIndicatorValueType(
                     else -> null
                 }
     }
+
+    override fun configForm(config: BooleanIndicatorValueTypeConfig?): Form =
+            Form.create()
+                    .with(
+                            YesNo.of(BooleanIndicatorValueTypeConfig::required.name)
+                                    .label("Required")
+                                    .value(config?.required ?: true)
+                    )
+
+    override fun fromConfigForm(config: JsonNode): BooleanIndicatorValueTypeConfig {
+        val required = JsonUtils.getBoolean(config, BooleanIndicatorValueTypeConfig::required.name, true)
+        return BooleanIndicatorValueTypeConfig(required)
+    }
+
+    override fun toConfigStoredJson(config: BooleanIndicatorValueTypeConfig): JsonNode =
+            config.asJson()
+
+    override fun fromConfigStoredJson(config: JsonNode): BooleanIndicatorValueTypeConfig =
+            config.parse()
 }
 
 class BooleanIndicatorValueTypeConfig(
