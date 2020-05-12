@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.YesNo
@@ -111,7 +111,8 @@ class BooleanIndicatorValueType(
             config.asJson()
 
     override fun fromConfigStoredJson(config: JsonNode): BooleanIndicatorValueTypeConfig =
-            config.parse()
+            config.parseOrNull<BooleanIndicatorValueTypeConfig>()
+                    ?: BooleanIndicatorValueTypeConfig(required = true)
 }
 
 class BooleanIndicatorValueTypeConfig(
