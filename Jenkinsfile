@@ -172,11 +172,6 @@ pipeline {
                             --file docker-compose-jacoco.yml \\
                             up \\
                             --exit-code-from ontrack_acceptance
-                        docker-compose  \\
-                            --project-name local \\
-                            --file docker-compose.yml \\
-                            --file docker-compose-jacoco.yml \\
-                            logs > docker-compose-acceptance.log
                         '''
                 }
             }
@@ -215,6 +210,14 @@ pipeline {
                     '''
                 }
                 always {
+                    sh '''
+                        cd ontrack-acceptance/src/main/compose
+                        docker-compose  \\
+                            --project-name local \\
+                            --file docker-compose.yml \\
+                            --file docker-compose-jacoco.yml \\
+                            logs > docker-compose-acceptance.log
+                    '''
                     archiveArtifacts(artifacts: "docker-compose-acceptance.log", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
