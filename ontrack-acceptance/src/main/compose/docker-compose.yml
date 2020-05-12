@@ -18,10 +18,11 @@ services:
     image: influxdb:1.5.2
 
   keycloak:
-    image: quay.io/keycloak/keycloak:10.0.0
+    image: quay.io/keycloak/keycloak:10.0.1
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: h2
 
   ontrack:
     image: "nemerosa/ontrack:${VERSION:-latest}"
