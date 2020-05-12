@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
+import javax.validation.Valid
 
 /**
  * Controller for the management of types.
@@ -50,7 +51,7 @@ class IndicatorTypeController(
     fun getCreationForm(): Form = getTypeForm<Any, Any>()
 
     @PostMapping("create")
-    fun createType(@RequestBody input: CreateTypeForm): Resource<ProjectIndicatorType> =
+    fun createType(@RequestBody @Valid input: CreateTypeForm): Resource<ProjectIndicatorType> =
             getTypeById(indicatorTypeService.createType(input).id)
 
     @GetMapping("{id}/update")
@@ -60,8 +61,12 @@ class IndicatorTypeController(
     }
 
     @PutMapping("{id}/update")
-    fun updateType(@PathVariable id: String, @RequestBody input: CreateTypeForm): Resource<ProjectIndicatorType> =
-            getTypeById(indicatorTypeService.updateType(id, input).id)
+    fun updateType(@PathVariable id: String, @RequestBody @Valid input: CreateTypeForm): Resource<ProjectIndicatorType> {
+        if (id != input.id) {
+            throw IndicatorTypeIdMismatchException(id, input.id)
+        }
+        return getTypeById(indicatorTypeService.updateType(input).id)
+    }
 
     @DeleteMapping("{id}/delete")
     fun deleteType(@PathVariable id: String): ResponseEntity<Ack> =
@@ -69,6 +74,13 @@ class IndicatorTypeController(
 
     private fun <T, C> getTypeForm(type: IndicatorType<T, C>? = null): Form {
         return Form.create()
+                .with(
+                        Text.of("id")
+                                .label("ID")
+                                .regex(CREATE_TYPE_FORM_ID_PATTERN)
+                                .readOnly(type != null)
+                                .value(type?.id)
+                )
                 .with(
                         Selection.of(CreateTypeForm::category.name)
                                 .label("Indicator category")

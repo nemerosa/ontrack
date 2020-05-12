@@ -73,8 +73,12 @@ class IndicatorTypeServiceImpl(
     }
 
     override fun createType(input: CreateTypeForm): IndicatorType<*, *> {
-        val id = UUID.randomUUID().toString()
-        return updateType(id, input)
+        val type = findTypeById(input.id)
+        if (type != null) {
+            throw IndicatorTypeIdAlreadyExistsException(input.id)
+        } else {
+            return updateType(input)
+        }
     }
 
     override fun deleteType(id: String): Ack {
@@ -82,7 +86,7 @@ class IndicatorTypeServiceImpl(
         return Ack.OK
     }
 
-    override fun updateType(id: String, input: CreateTypeForm): IndicatorType<*, *> {
+    override fun updateType(input: CreateTypeForm): IndicatorType<*, *> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val category = indicatorCategoryService.getCategory(input.category)
         val valueType = indicatorValueTypeService.getValueType<Any, Any>(input.valueType.id)
@@ -90,7 +94,7 @@ class IndicatorTypeServiceImpl(
                 valueType.fromConfigForm(input.valueType.data ?: NullNode.instance)
         )
         val stored = StoredIndicatorType(
-                id = id,
+                id = input.id,
                 category = category.id,
                 shortName = input.shortName,
                 longName = input.longName,
@@ -100,10 +104,10 @@ class IndicatorTypeServiceImpl(
         )
         storageService.store(
                 STORE,
-                id,
+                input.id,
                 stored
         )
-        return getTypeById(id)
+        return getTypeById(input.id)
     }
 
     private class StoredIndicatorType(
