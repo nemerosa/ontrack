@@ -12,7 +12,7 @@ class OidcSettings {
         this.ontrack = ontrack
     }
 
-    @DSLMethod("Creates an OIDC provider")
+    @DSLMethod(value = "Creates an OIDC provider", count = 7)
     void createProvider(
             String id,
             String name,
