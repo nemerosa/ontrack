@@ -24,17 +24,21 @@ class IndicatorPortfolioServiceImpl(
         private val indicatorTypeService: IndicatorTypeService
 ) : IndicatorPortfolioService {
 
-    override fun createPortfolio(name: String): IndicatorPortfolio {
+    override fun createPortfolio(id: String, name: String): IndicatorPortfolio {
         securityService.checkGlobalFunction(IndicatorPortfolioManagement::class.java)
-        val id = UUID.randomUUID().toString()
-        val portfolio = IndicatorPortfolio(
-                id = id,
-                name = name,
-                label = null,
-                types = emptyList()
-        )
-        storageService.store(STORE, id, portfolio)
-        return portfolio
+        val existing = findPortfolioById(id)
+        if (existing != null) {
+            throw IndicatorPortfolioIdAlreadyExistingException(id)
+        } else {
+            val portfolio = IndicatorPortfolio(
+                    id = id,
+                    name = name,
+                    label = null,
+                    types = emptyList()
+            )
+            storageService.store(STORE, id, portfolio)
+            return portfolio
+        }
     }
 
     override fun updatePortfolio(id: String, input: PortfolioUpdateForm): IndicatorPortfolio {

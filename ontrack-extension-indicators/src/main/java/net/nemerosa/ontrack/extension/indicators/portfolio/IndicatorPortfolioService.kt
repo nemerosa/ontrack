@@ -7,8 +7,11 @@ interface IndicatorPortfolioService {
 
     /**
      * Creates a new portfolio
+     *
+     * @param id Unique ID for the portfolio
+     * @param name Display name for the portfolio
      */
-    fun createPortfolio(name: String): IndicatorPortfolio
+    fun createPortfolio(id: String, name: String): IndicatorPortfolio
 
     /**
      * Gets the label for this portfolio

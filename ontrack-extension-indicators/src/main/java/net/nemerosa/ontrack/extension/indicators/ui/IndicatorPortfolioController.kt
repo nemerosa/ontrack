@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
 import net.nemerosa.ontrack.model.Ack
@@ -7,6 +9,8 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
+import javax.validation.constraints.Pattern
 
 @RestController
 @RequestMapping("/extension/indicators/portfolios")
@@ -20,7 +24,12 @@ class IndicatorPortfolioController(
     @GetMapping("create")
     fun getPortfolioCreationForm(): Form = Form.create()
             .with(
-                    Text.of("name")
+                    Text.of(IndicatorPortfolio::id.name)
+                            .label("ID")
+                            .regex(IndicatorConstants.INDICATOR_ID_PATTERN)
+            )
+            .with(
+                    Text.of(IndicatorPortfolio::name.name)
                             .label("Name")
             )
 
@@ -28,9 +37,9 @@ class IndicatorPortfolioController(
      * Creating a portfolio
      */
     @PostMapping("create")
-    fun createPortfolio(@RequestBody input: PortfolioCreationForm): ResponseEntity<String> {
+    fun createPortfolio(@RequestBody @Valid input: PortfolioCreationForm): ResponseEntity<String> {
         return ResponseEntity.ok(
-                indicatorPortfolioService.createPortfolio(input.name).id
+                indicatorPortfolioService.createPortfolio(input.id, input.name).id
         )
     }
 
@@ -59,6 +68,8 @@ class IndicatorPortfolioController(
     }
 
     class PortfolioCreationForm(
+            @get:Pattern(regexp = IndicatorConstants.INDICATOR_ID_PATTERN)
+            val id: String,
             val name: String
     )
 
