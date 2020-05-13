@@ -584,6 +584,13 @@ angular.module('ontrack.extension.indicators', [
               indicatorPortfolios(id: $id) {
                 id
                 name
+                label {
+                  id
+                  category
+                  name
+                  color
+                  description
+                }
                 links {
                   _update
                   _delete
@@ -710,7 +717,7 @@ angular.module('ontrack.extension.indicators', [
                 // Collecting the averages
                 let averages = {};
                 $scope.portfolio.globalStats.forEach((stats) => {
-                    if (stats.stats.count > 0) {
+                    if (stats.stats.count > 0 && stats.stats.avg) {
                         averages[stats.type.id] = {
                             compliance: stats.stats.avg,
                             rating: stats.stats.avgRating

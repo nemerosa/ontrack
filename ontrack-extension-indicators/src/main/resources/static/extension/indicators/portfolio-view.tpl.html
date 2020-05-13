@@ -9,7 +9,24 @@
         </div>
     </div>
 
-    <table ng-if="portfolio" class="table table-bordered">
+    <div class="row" ng-if="portfolio && portfolio.projects.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                This portfolio does not contain any project.
+                <span ng-if="portfolio.links._update && !portfolio.label">
+                    In order to associate projects to this portfolio, you need
+                    to <a href="#/extension/indicators/portfolios/{{portfolio.id}}/edit">edit this portfolio</a>,
+                    set a label and associate some projects to this label.
+                </span>
+                <span ng-if="portfolio.links._update && portfolio.label">
+                    In order to associate projects to this portfolio, you need to associate some projects to
+                    the <ot-project-label label="portfolio.label"></ot-project-label> label.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <table ng-if="portfolio && portfolio.projects.length > 0" class="table table-bordered">
         <thead>
         <tr>
             <th rowspan="2">Projects</th>
