@@ -67,23 +67,17 @@
     </div>
 
     <table class="table table-hover table-bordered">
-        <tbody ng-repeat="category in categories" ng-if="category.types.length > 0">
+        <tbody ng-repeat="category in categories">
         <tr class="info">
             <td style="width: 30px;">
-                <input type="checkbox" ng-model="category.selected" ng-change="selectCategory(category)">
+                <input type="checkbox" ng-model="category.selected" ng-change="updateCategories()">
             </td>
             <td>
                 {{category.name}}
             </td>
         </tr>
-        <tr ng-repeat="type in category.types" ng-class="{
-            'success': type.selected,
-            '': !type.selected
-        }">
-            <td style="width: 30px;">
-                <input type="checkbox" ng-model="type.selected" ng-change="updateTypes()">
-            </td>
-            <td ng-click="selectType(type)">
+        <tr ng-repeat="type in category.types">
+            <td colspan="2">
                 <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
             </td>
         </tr>

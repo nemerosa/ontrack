@@ -12,8 +12,11 @@
     <div class="row" ng-show="!loadingPortfolios && portfolios.length == 0">
         <div class="col-md-12">
             <div class="alert alert-info">
-                No indicator portfolio is set yet. Create one by clicking on this
-                <a class="ot-action" ng-click="createPorfolio()">link</a>.
+                No indicator portfolio is set yet.
+                <span ng-if="portfolioOfPortolios.links._create">
+                    Create one by clicking on this
+                    <a class="ot-action" ng-click="createPortfolio()">link</a>.
+                </span>
             </div>
         </div>
     </div>

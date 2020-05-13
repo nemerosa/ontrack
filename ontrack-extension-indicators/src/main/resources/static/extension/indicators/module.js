@@ -339,14 +339,9 @@ angular.module('ontrack.extension.indicators', [
                     description
                   }
                   globalStats {
-                    type {
+                    category {
                       id
                       name
-                      shortName
-                      category {
-                        id
-                        name
-                      }
                     }
                     stats {
                       total
@@ -441,11 +436,8 @@ angular.module('ontrack.extension.indicators', [
                   color
                   description
                 }
-                types {
+                categories {
                   id
-                  shortName
-                  name
-                  link
                 }
                 links {
                   _update
@@ -453,6 +445,7 @@ angular.module('ontrack.extension.indicators', [
               }
               indicatorCategories {
                 categories {
+                  id
                   name
                   types {
                     id
@@ -482,6 +475,7 @@ angular.module('ontrack.extension.indicators', [
             otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.labels = data.labels;
                 $scope.portfolio = data.indicatorPortfolios[0];
+                $scope.categories = data.indicatorCategories.categories;
                 let currentLabel;
                 if ($scope.portfolio.label) {
                     currentLabel = $scope.labels.find((l) => l.id === $scope.portfolio.label.id);
@@ -493,15 +487,13 @@ angular.module('ontrack.extension.indicators', [
                     nameEdited: false,
                     label: currentLabel
                 };
-                $scope.categories = data.indicatorCategories.categories;
-                $scope.categories.forEach((category) => {
-                    category.types.forEach((type) => {
-                        type.selected = $scope.portfolio.types.some((i) =>
-                            i.id === type.id
-                        );
-                    });
-                    category.selected = category.types.every((type) => type.selected);
-                });
+
+                $scope.categories.forEach((category => {
+                    category.selected = $scope.portfolio.categories.find((c) => {
+                        return c.id === category.id;
+                    }) !== undefined;
+                }));
+
             }).finally(() => {
                 $scope.loadingPortfolio = false;
             });
@@ -537,30 +529,16 @@ angular.module('ontrack.extension.indicators', [
             });
         };
 
-        $scope.updateTypes = () => {
-            let selectedTypes = [];
+        $scope.updateCategories = () => {
+            let selectedCategories = [];
             $scope.categories.forEach((category) => {
-                category.types.forEach((type) => {
-                    if (type.selected) {
-                        selectedTypes.push(type.id);
-                    }
-                });
+                if (category.selected) {
+                    selectedCategories.push(category.id);
+                }
             });
             ot.pageCall($http.put($scope.portfolio.links._update, {
-                types: selectedTypes
+                categories: selectedCategories
             }));
-        };
-
-        $scope.selectType = (type) => {
-            type.selected = !type.selected;
-            $scope.updateTypes();
-        };
-
-        $scope.selectCategory = (category) => {
-            category.types.forEach((type) => {
-                type.selected = category.selected;
-            });
-            $scope.updateTypes();
         };
 
     })
