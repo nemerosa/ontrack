@@ -574,8 +574,9 @@ angular.module('ontrack.extension.indicators', [
                   _delete
                 }
                 globalStats {
-                  type {
+                  category {
                     id
+                    name
                   }
                   stats {
                     count
@@ -583,40 +584,15 @@ angular.module('ontrack.extension.indicators', [
                     avgRating
                   }
                 }
-                types {
+                categories {
                   id
-                  shortName
                   name
-                  link
-                  category {
-                    id
-                    name
-                  }
-                  valueType {
-                    id
-                    feature {
-                      id
-                    }
-                  }
                 }
                 projects {
                   id
                   name
                   links {
                     _page
-                  }
-                  projectIndicators {
-                    categories {
-                      indicators {
-                        type {
-                          id
-                        }
-                        value
-                        comment
-                        compliance
-                        rating
-                      }
-                    }
                   }
                 }
               }
