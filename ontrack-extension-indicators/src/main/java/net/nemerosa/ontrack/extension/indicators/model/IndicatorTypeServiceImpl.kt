@@ -82,6 +82,24 @@ class IndicatorTypeServiceImpl(
         }
     }
 
+    override fun <T, C> createType(id: String, category: IndicatorCategory, shortName: String, longName: String, link: String?, valueType: IndicatorValueType<T, C>, valueConfig: C): IndicatorType<T, C> {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        val type = findTypeById(id)
+        if (type != null) {
+            throw IndicatorTypeIdAlreadyExistsException(id)
+        } else {
+            return updateType(
+                    id,
+                    category,
+                    shortName,
+                    longName,
+                    link,
+                    valueType,
+                    valueConfig
+            )
+        }
+    }
+
     override fun deleteType(id: String): Ack {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         storageService.delete(STORE, id)
@@ -110,6 +128,34 @@ class IndicatorTypeServiceImpl(
                 stored
         )
         return getTypeById(input.id)
+    }
+
+    private fun <T, C> updateType(
+            id: String,
+            category: IndicatorCategory,
+            shortName: String,
+            longName: String,
+            link: String?,
+            valueType: IndicatorValueType<T, C>,
+            valueConfig: C
+    ): IndicatorType<T, C> {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        val stored = StoredIndicatorType(
+                id = id,
+                category = category.id,
+                shortName = shortName,
+                longName = longName,
+                link = link,
+                valueType = valueType.id,
+                valueConfig = valueType.toConfigStoredJson(valueConfig)
+        )
+        storageService.store(
+                STORE,
+                id,
+                stored
+        )
+        @Suppress("UNCHECKED_CAST")
+        return getTypeById(id) as IndicatorType<T, C>
     }
 
     private class StoredIndicatorType(

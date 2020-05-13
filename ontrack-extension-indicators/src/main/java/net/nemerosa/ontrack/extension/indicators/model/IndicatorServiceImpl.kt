@@ -43,6 +43,8 @@ class IndicatorServiceImpl(
     override fun <T> updateProjectIndicator(project: Project, typeId: String, input: JsonNode): Indicator<T> {
         @Suppress("UNCHECKED_CAST")
         val type = indicatorTypeService.getTypeById(typeId) as IndicatorType<T, *>
+        // Parsing
+        val value = type.fromClientJson(input)
         // Comment extraction
         val comment = if (input is ObjectNode && input.has(FIELD_COMMENT)) {
             val commentNode = input.get(FIELD_COMMENT)
@@ -56,8 +58,11 @@ class IndicatorServiceImpl(
         } else {
             null
         }
-        // Parsing
-        val value = type.fromClientJson(input)
+        // OK
+        return updateProjectIndicator(project, type, value, comment)
+    }
+
+    override fun <T> updateProjectIndicator(project: Project, type: IndicatorType<T, *>, value: T?, comment: String?): Indicator<T> {
         // Signature
         val signature = securityService.currentSignature
         // Storing the indicator
