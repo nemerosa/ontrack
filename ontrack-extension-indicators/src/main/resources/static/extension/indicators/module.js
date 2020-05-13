@@ -739,5 +739,15 @@ angular.module('ontrack.extension.indicators', [
             }
         };
     })
+    .directive('otExtensionIndicatorsStatsSummary', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-stats-summary.tpl.html',
+            scope: {
+                stats: '=',
+                item: '@'
+            }
+        };
+    })
 
 ;

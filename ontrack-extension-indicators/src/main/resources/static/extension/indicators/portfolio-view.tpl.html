@@ -48,23 +48,7 @@
             </td>
             <td ng-repeat-end>
                 <p><b>{{categoryStats.category.name}}</b></p>
-                <p ng-if="categoryStats.stats.total > 0">
-                    {{categoryStats.stats.count}}/{{categoryStats.stats.total}} indicator<span
-                        ng-if="categoryStats.stats.count > 1">s</span> <span
-                        ng-if="categoryStats.stats.count > 1">are</span><span
-                        ng-if="categoryStats.stats.count <= 1">is</span> rated.
-                </p>
-                <p ng-if="categoryStats.stats.total == 0">
-                    No indicator has been rated for this portfolio.
-                </p>
-                <p ng-if="categoryStats.stats.minRating != categoryStats.stats.avgRating">
-                    {{categoryStats.stats.minCount}} indicator<span ng-if="categoryStats.stats.minCount > 1">s</span>
-                    <span ng-if="categoryStats.stats.minCount > 1">are</span><span
-                        ng-if="categoryStats.stats.minCount <= 1">is</span> rated
-                    <ot-extension-indicators-status
-                            status="{compliance: categoryStats.stats.min, rating: categoryStats.stats.minRating }"
-                            size="sm"></ot-extension-indicators-status>
-                </p>
+                <ot-extension-indicators-stats-summary stats="categoryStats.stats" item="portfolio and category"></ot-extension-indicators-stats-summary>
             </td>
         </tr>
         </thead>
@@ -78,6 +62,7 @@
                 <ot-extension-indicators-status status="projectCategory.stats" size="md"></ot-extension-indicators-status>
             </td>
             <td ng-repeat-end>
+                <ot-extension-indicators-stats-summary stats="projectCategory.categoryStats.stats" item="project and category"></ot-extension-indicators-stats-summary>
             </td>
         </tr>
         </tbody>
