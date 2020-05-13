@@ -27,6 +27,10 @@ angular.module('ontrack.extension.indicators', [
                   shortName
                   name
                   link
+                  source {
+                    id
+                    name
+                  }
                   category {
                     id
                     name

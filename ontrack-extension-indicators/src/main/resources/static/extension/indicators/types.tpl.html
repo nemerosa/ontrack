@@ -25,6 +25,7 @@
             <th>Name</th>
             <th>Description</th>
             <th>Link</th>
+            <th>Source</th>
             <th>Type</th>
             <th>Configuration</th>
             <th>&nbsp;</th>
@@ -32,7 +33,7 @@
         </thead>
         <tbody ng-repeat="category in categories">
         <tr class="info">
-            <th colspan="7">
+            <th colspan="8">
                 {{category.name}}
             </th>
         </tr>
@@ -48,6 +49,10 @@
             </td>
             <td>
                 <a href="{{type.link}}" ng-if="type.link">{{type.link}}</a>
+            </td>
+            <td>
+                <span ng-if="type.source">{{type.source.name}}</span>
+                <span ng-if="!type.source"><i title="This type has been provisioned manually">Manual</i></span>
             </td>
             <td>
                 {{type.valueType.name}}
