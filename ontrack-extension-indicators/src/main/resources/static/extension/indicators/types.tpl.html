@@ -34,7 +34,7 @@
         <tbody ng-repeat="category in categories">
         <tr class="info">
             <th colspan="8">
-                {{category.name}}
+                <a href="#/extension/indicators/categories" title="Goes to the list of categories">{{category.name}}</a>
             </th>
         </tr>
         <tr ng-repeat="type in category.types">

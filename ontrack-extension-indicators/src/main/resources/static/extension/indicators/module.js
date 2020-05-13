@@ -4,6 +4,91 @@ angular.module('ontrack.extension.indicators', [
     'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
+        $stateProvider.state('indicator-categories', {
+            url: '/extension/indicators/categories',
+            templateUrl: 'extension/indicators/categories.tpl.html',
+            controller: 'IndicatorCategoriesCtrl'
+        });
+    })
+    .controller('IndicatorCategoriesCtrl', function ($scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+        $scope.loadingCategories = false;
+
+        const view = ot.view();
+        view.title = "Indicator categories";
+
+        const query = `
+            {
+              indicatorCategories {
+                categories {
+                  id
+                  name
+                  source {
+                    id
+                    name
+                  }
+                  links {
+                    _update
+                    _delete
+                  }
+                  types {
+                    id
+                  }
+                }
+                links {
+                  _create
+                }
+              }
+            }
+        `;
+
+        let viewInitialized = false;
+
+        $scope.createCategory = () => {
+            otFormService.create($scope.indicatorCategories.links._create, "New indicator category").then(loadCategories);
+        };
+
+        const loadCategories = () => {
+            $scope.loadingCategories = true;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                $scope.indicatorCategories = data.indicatorCategories;
+                $scope.categories = data.indicatorCategories.categories;
+
+                if (!viewInitialized) {
+                    view.commands = [
+                        {
+                            condition: () => data.indicatorCategories.links._create,
+                            id: 'indicator-category-create',
+                            name: "Create a category",
+                            cls: 'ot-command-new',
+                            action: $scope.createCategory
+                        },
+                        ot.viewCloseCommand('/home')
+                    ];
+                    viewInitialized = true;
+                }
+
+            }).finally(() => {
+                $scope.loadingCategories = false;
+            });
+        };
+
+        loadCategories();
+
+        $scope.editCategory = (category) => {
+            otFormService.update(category.links._update, "Edit indicator category").then(loadCategories);
+        };
+
+        $scope.deleteCategory = (category) => {
+            otAlertService.confirm({
+                title: "Delete category",
+                message: `Do you want to delete the ${category.name} category?`
+            }).then(() => {
+                return ot.pageCall($http.delete(category.links._delete));
+            }).then(loadCategories);
+        };
+
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('indicator-types', {
             url: '/extension/indicators/types',
             templateUrl: 'extension/indicators/types.tpl.html',
