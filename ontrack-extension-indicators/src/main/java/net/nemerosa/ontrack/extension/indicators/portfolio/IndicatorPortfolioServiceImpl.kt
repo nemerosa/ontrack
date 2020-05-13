@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorPortfolioManagement
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 @Transactional
@@ -21,7 +20,7 @@ class IndicatorPortfolioServiceImpl(
         private val storageService: StorageService,
         private val labelManagementService: LabelManagementService,
         private val projectLabelManagementService: ProjectLabelManagementService,
-        private val indicatorTypeService: IndicatorTypeService
+        private val indicatorCategoryService: IndicatorCategoryService
 ) : IndicatorPortfolioService {
 
     override fun createPortfolio(id: String, name: String): IndicatorPortfolio {
@@ -34,7 +33,7 @@ class IndicatorPortfolioServiceImpl(
                     id = id,
                     name = name,
                     label = null,
-                    types = emptyList()
+                    categories = emptyList()
             )
             storageService.store(STORE, id, portfolio)
             return portfolio
@@ -50,12 +49,12 @@ class IndicatorPortfolioServiceImpl(
             existing.name
         }
         val label = input.label ?: existing.label
-        val types = input.types ?: existing.types
+        val categories = input.categories ?: existing.categories
         val newRecord = IndicatorPortfolio(
                 id = id,
                 name = name,
                 label = label,
-                types = types
+                categories = categories
         )
         storageService.store(STORE, id, newRecord)
         return newRecord
@@ -93,8 +92,8 @@ class IndicatorPortfolioServiceImpl(
         structureService.projectList
         return storageService.retrieve(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, IndicatorPortfolioOfPortfolios::class.java)
                 .orElse(IndicatorPortfolioOfPortfolios(
-                        // TODO Replace by empty when edition of global types is ready
-                        types = indicatorTypeService.findAll().map { it.id }
+                        // TODO Replace by empty when edition of global categories is ready
+                        categories = indicatorCategoryService.findAll().map { it.id }
                 ))
     }
 

@@ -2,11 +2,10 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorStatsService
-import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.stringField
@@ -14,11 +13,11 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeIndicatorPortfolio(
-        private val label: GQLTypeLabel,
-        private val projectIndicatorType: GQLTypeProjectIndicatorType,
-        private val indicatorTypeStats: GQLTypeIndicatorTypeStats,
         private val indicatorPortfolioService: IndicatorPortfolioService,
-        private val indicatorTypeService: IndicatorTypeService,
+        private val label: GQLTypeLabel,
+        private val indicatorCategory: GQLTypeIndicatorCategory,
+        private val indicatorCategoryService: IndicatorCategoryService,
+        private val indicatorCategoryStats: GQLTypeIndicatorCategoryStats,
         private val indicatorStatsService: IndicatorStatsService,
         private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
@@ -29,7 +28,7 @@ class GQLTypeIndicatorPortfolio(
                     .description("Grouping indicators for a group of projects identified by labels.")
                     .stringField("id", "ID of the portfolio")
                     .stringField("name", "Name of the portfolio")
-                    // Label for this protfolio
+                    // Label for this portfolio
                     .field {
                         it.name(IndicatorPortfolio::label.name)
                                 .description("Label for this portfolio")
@@ -39,17 +38,15 @@ class GQLTypeIndicatorPortfolio(
                                     indicatorPortfolioService.getPortfolioLabel(portfolio)
                                 }
                     }
-                    // Types
+                    // Categories
                     .field {
-                        it.name(IndicatorPortfolio::types.name)
-                                .description("Indicators being shown for this portfolio")
-                                .type(stdList(projectIndicatorType.typeRef))
+                        it.name(IndicatorPortfolio::categories.name)
+                                .description("Indicator categories being shown for this portfolio")
+                                .type(stdList(indicatorCategory.typeRef))
                                 .dataFetcher { env ->
                                     val portfolio: IndicatorPortfolio = env.getSource()
-                                    portfolio.types.mapNotNull { id ->
-                                        indicatorTypeService.findTypeById(id)
-                                    }.map { type ->
-                                        ProjectIndicatorType(type)
+                                    portfolio.categories.mapNotNull { id ->
+                                        indicatorCategoryService.findCategoryById(id)
                                     }
                                 }
                     }
@@ -67,7 +64,7 @@ class GQLTypeIndicatorPortfolio(
                     .field {
                         it.name("globalStats")
                                 .description("Global indicator stats")
-                                .type(stdList(indicatorTypeStats.typeRef))
+                                .type(stdList(indicatorCategoryStats.typeRef))
                                 .dataFetcher { env ->
                                     val portfolio: IndicatorPortfolio = env.getSource()
                                     indicatorStatsService.getGlobalStats(portfolio)

@@ -3,8 +3,8 @@ package net.nemerosa.ontrack.extension.indicators.portfolio
 /**
  * Aggregation of all portfolios
  *
- * @property types List of indicator types to show for all portfolios
+ * @property categories List of indicator categories to show for all portfolios
  */
 class IndicatorPortfolioOfPortfolios(
-        val types: List<String>
+        val categories: List<String>
 )

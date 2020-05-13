@@ -5,6 +5,6 @@ interface IndicatorStatsService {
     /**
      * Gets global stats for a portfolio
      */
-    fun getGlobalStats(portfolio: IndicatorPortfolio): List<IndicatorTypeStats>
+    fun getGlobalStats(portfolio: IndicatorPortfolio): List<IndicatorCategoryStats>
 
 }
