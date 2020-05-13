@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "id": "delivery",
+      "name": "Delivery and Build Principles",
+      "types": [
+        {
+          "id": "delivery:gradle",
+          "shortName": "Gradle",
+          "longName": "MUST use Gradle for builds",
+          "link": "https://documentation-dev.collibra.com/architecture-principles/latest/delivery_and_build.html",
+          "required": true
+        },
+        {
+          "id": "delivery:gradle-kotlin",
+          "shortName": "Gradle Kotlin",
+          "longName": "SHOULD standardize on Kotlin for Gradle build scripts",
+          "link": "https://documentation-dev.collibra.com/architecture-principles/latest/delivery_and_build.html",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

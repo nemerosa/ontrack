@@ -33,6 +33,16 @@ interface IndicatorTypeService {
 
     fun updateType(input: CreateTypeForm): IndicatorType<*, *>
 
+    fun <T, C> updateType(
+            id: String,
+            category: IndicatorCategory,
+            shortName: String,
+            longName: String,
+            link: String?,
+            valueType: IndicatorValueType<T, C>,
+            valueConfig: C
+    ): IndicatorType<T, C>
+
     fun deleteType(id: String): Ack
 
 }

@@ -152,7 +152,7 @@ class IndicatorTypeServiceImpl(
         return getTypeById(input.id)
     }
 
-    private fun <T, C> updateType(
+    override fun <T, C> updateType(
             id: String,
             category: IndicatorCategory,
             shortName: String,
