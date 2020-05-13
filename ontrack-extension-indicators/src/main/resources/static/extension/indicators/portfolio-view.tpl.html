@@ -26,30 +26,25 @@
         </div>
     </div>
 
-    <div class="row" ng-if="portfolio && portfolio.projects.length > 0 && types.length == 0">
+    <div class="row" ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length == 0">
         <div class="col-md-12">
             <div class="alert alert-info">
-                This portfolio does not contain any type.
+                This portfolio does not contain any category.
                 <span ng-if="portfolio.links._update">
                     In order to associate projects to this portfolio, you need
                     to <a href="#/extension/indicators/portfolios/{{portfolio.id}}/edit">edit this portfolio</a>
-                    and associate some types with it.
+                    and associate some categories with it.
                 </span>
             </div>
         </div>
     </div>
 
-    <table ng-if="portfolio && portfolio.projects.length > 0 && types.length > 0" class="table table-bordered">
+    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0" class="table table-bordered">
         <thead>
         <tr>
-            <th rowspan="2">Projects</th>
-            <th ng-repeat="category in categories" colspan="{{category.types.length}}">
-                {{category.name}}
-            </th>
-        </tr>
-        <tr>
-            <th ng-repeat="type in types">
-                <ot-extension-indicators-type-name type="type" short-name="true"></ot-extension-indicators-type-name>
+            <th>Projects</th>
+            <th ng-repeat="categoryStats in portfolio.categoryStats">
+                {{categoryStats.category.name}}
             </th>
         </tr>
         </thead>
@@ -59,10 +54,11 @@
                 <a href="{{project.links._page}}" title="Project page">{{project.name}}</a>
                 <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Manage the project indicators for the {{project.name}} project"><span class="fa fa-pencil ot-command"></span></a>
             </td>
-            <td ng-repeat="type in types">
-                <span ng-if="indicator(project,type).value" title="{{indicator(project,type).comment}}">
-                    <ot-extension-indicators-status status="indicator(project,type)" size="md"></ot-extension-indicators-status>
-                </span>
+            <td ng-repeat="projectCategory in project.projectIndicators.categories">
+                <ot-extension-indicators-status status="{
+                    compliance: projectCategory.categoryStats.stats.avg,
+                    rating: projectCategory.categoryStats.stats.avgRatin
+                }" size="md"></ot-extension-indicators-status>
             </td>
         </tr>
         </tbody>

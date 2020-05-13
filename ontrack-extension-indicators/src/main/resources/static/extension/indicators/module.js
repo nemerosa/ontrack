@@ -631,63 +631,17 @@ angular.module('ontrack.extension.indicators', [
                     ot.viewCloseCommand('/extension/indicators/portfolios')
                 ];
 
-                // Grouping portfolio types per categories
-                let categories = [];
-                let categoriesIndex = {};
-                $scope.portfolio.types.forEach((type) => {
-                    let category = type.category;
-                    let categoryRecord = categoriesIndex[category.id];
-                    if (!categoryRecord) {
-                        categoryRecord = category;
-                        categoryRecord.types = [];
-                        categories.push(categoryRecord);
-                        categoriesIndex[category.id] = categoryRecord;
-                    }
-                    type.category = undefined;
-                    categoryRecord.types.push(type);
-                });
-                $scope.categories = categories;
-
-                // Flattens the list of types per category
-                let types = [];
-                categories.forEach((category) => {
-                    category.types.forEach((type) => {
-                        types.push(type);
-                    });
-                });
-                $scope.types = types;
-
-                // Indexation of types in projects
-
+                // Filtering projecct categories out
                 $scope.portfolio.projects.forEach((project) => {
-                    project.types = {};
-                    types.forEach((type) => {
-                        project.projectIndicators.categories.forEach((projectCategory) => {
-                            projectCategory.indicators.forEach((projectIndicator) => {
-                                if (projectIndicator.type.id === type.id) {
-                                    project.types[type.id] = projectIndicator;
-                                }
-                            });
-                        });
-                    });
-                });
-
-                // Collecting the averages
-                $scope.portfolio.globalStats.forEach((stats) => {
-                    let type = types.find((t) => t.id === stats.type.id);
-                    if (type) {
-                        if (stats.stats.count > 0 && stats.stats.avg) {
-                            type.stats = {
-                                compliance: stats.stats.avg,
-                                rating: stats.stats.avgRating
-                            };
-                        } else {
-                            type.stats = {
-                                compliance: 0,
-                                rating: '-'
-                            };
+                    project.projectIndicators.categories.forEach((category) => {
+                        let portfolioCategory = $scope.portfolio.categoryStats.find((stats) => stats.category.id === category.id);
+                        category.enabled = !!portfolioCategory;
+                        if (category.categoryStats.stats.avg === undefined) {
+                            category.categoryStats.stats.avg = 0;
+                            category.categoryStats.stats.avgRating = '-';
                         }
-                    }
+                    });
+                    project.projectIndicators.categories = project.projectIndicators.categories.filter((category) => category.enabled);
                 });
 
             }).finally(() => {
@@ -706,13 +660,6 @@ angular.module('ontrack.extension.indicators', [
             }).then(() => {
                 $location.path(`/extension/indicators/portfolios`);
             });
-        };
-
-        /**
-         * Gets the project indicator for the given type
-         */
-        $scope.indicator = (project, type) => {
-            return project.types[type.id];
         };
 
     })
