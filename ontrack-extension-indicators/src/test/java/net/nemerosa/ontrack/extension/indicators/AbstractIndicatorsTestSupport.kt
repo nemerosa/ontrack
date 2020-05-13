@@ -1,6 +1,9 @@
-package net.nemerosa.ontrack.extension.indicators.ui.graphql
+package net.nemerosa.ontrack.extension.indicators
 
 import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
@@ -11,16 +14,19 @@ import org.springframework.beans.factory.annotation.Autowired
 abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
-    private lateinit var booleanIndicatorValueType: BooleanIndicatorValueType
+    protected lateinit var booleanIndicatorValueType: BooleanIndicatorValueType
 
     @Autowired
-    private lateinit var indicatorCategoryService: IndicatorCategoryService
+    protected lateinit var indicatorCategoryService: IndicatorCategoryService
 
     @Autowired
-    private lateinit var indicatorTypeService: IndicatorTypeService
+    protected lateinit var indicatorTypeService: IndicatorTypeService
 
     @Autowired
-    private lateinit var indicatorService: IndicatorService
+    protected lateinit var indicatorService: IndicatorService
+
+    @Autowired
+    protected lateinit var indicatorPortfolioService: IndicatorPortfolioService
 
     protected fun clearIndicators() {
         asAdmin {
@@ -67,6 +73,25 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
                     comment = null
             )
         }
+    }
+
+    protected fun portfolio(
+            categories: List<IndicatorCategory> = emptyList()
+    ): IndicatorPortfolio = asAdmin {
+        val id = uid("P")
+        val portfolio = indicatorPortfolioService.createPortfolio(
+                id = id,
+                name = "$id portfolio"
+        )
+        if (categories.isNotEmpty()) {
+            indicatorPortfolioService.updatePortfolio(
+                    id,
+                    PortfolioUpdateForm(
+                            categories = categories.map { it.id }
+                    )
+            )
+        }
+        portfolio
     }
 
 }

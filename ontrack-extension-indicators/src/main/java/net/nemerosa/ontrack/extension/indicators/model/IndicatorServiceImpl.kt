@@ -18,7 +18,15 @@ class IndicatorServiceImpl(
         private val securityService: SecurityService,
         private val indicatorStore: IndicatorStore,
         private val indicatorTypeService: IndicatorTypeService
-) : IndicatorService {
+) : IndicatorService, IndicatorTypeListener {
+
+    init {
+        indicatorTypeService.registerTypeListener(this)
+    }
+
+    override fun onTypeDeleted(type: IndicatorType<*, *>) {
+        TODO("Not yet implemented")
+    }
 
     override fun getProjectIndicators(project: Project, all: Boolean): List<Indicator<*>> {
         // Gets all the types

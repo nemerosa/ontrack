@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
+import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.json.asJson
 import org.junit.Test
 import kotlin.test.assertEquals

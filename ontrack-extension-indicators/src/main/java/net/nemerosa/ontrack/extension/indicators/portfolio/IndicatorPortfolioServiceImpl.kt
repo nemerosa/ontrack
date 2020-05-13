@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorPortfolioManagement
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryListener
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelManagementService
@@ -21,7 +23,25 @@ class IndicatorPortfolioServiceImpl(
         private val labelManagementService: LabelManagementService,
         private val projectLabelManagementService: ProjectLabelManagementService,
         private val indicatorCategoryService: IndicatorCategoryService
-) : IndicatorPortfolioService {
+) : IndicatorPortfolioService, IndicatorCategoryListener {
+
+    init {
+        indicatorCategoryService.registerCategoryListener(this)
+    }
+
+    override fun onCategoryDeleted(category: IndicatorCategory) {
+        findAll().forEach { portfolio ->
+            if (category.id in portfolio.categories) {
+                val newCategories = portfolio.categories - category.id
+                updatePortfolio(
+                        portfolio.id,
+                        PortfolioUpdateForm(
+                                categories = newCategories
+                        )
+                )
+            }
+        }
+    }
 
     override fun createPortfolio(id: String, name: String): IndicatorPortfolio {
         securityService.checkGlobalFunction(IndicatorPortfolioManagement::class.java)

@@ -17,7 +17,23 @@ class IndicatorTypeServiceImpl(
         private val indicatorValueTypeService: IndicatorValueTypeService,
         private val storageService: StorageService,
         private val securityService: SecurityService
-) : IndicatorTypeService {
+) : IndicatorTypeService, IndicatorCategoryListener {
+
+    init {
+        indicatorCategoryService.registerCategoryListener(this)
+    }
+
+    override fun onCategoryDeleted(category: IndicatorCategory) {
+        findByCategory(category).forEach {
+            deleteType(it.id)
+        }
+    }
+
+    private val listeners = mutableListOf<IndicatorTypeListener>()
+
+    override fun registerTypeListener(listener: IndicatorTypeListener) {
+        listeners += listener
+    }
 
     override fun findAll(): List<IndicatorType<*, *>> {
         return storageService.getKeys(STORE).mapNotNull { key ->
@@ -102,8 +118,14 @@ class IndicatorTypeServiceImpl(
 
     override fun deleteType(id: String): Ack {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
-        storageService.delete(STORE, id)
-        return Ack.OK
+        val type = findTypeById(id)
+        return if (type != null) {
+            listeners.forEach { it.onTypeDeleted(type) }
+            storageService.delete(STORE, id)
+            Ack.OK
+        } else {
+            Ack.NOK
+        }
     }
 
     override fun updateType(input: CreateTypeForm): IndicatorType<*, *> {

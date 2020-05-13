@@ -9,6 +9,8 @@ import javax.validation.constraints.Pattern
 
 interface IndicatorTypeService {
 
+    fun registerTypeListener(listener: IndicatorTypeListener)
+
     fun findAll(): List<IndicatorType<*, *>>
 
     fun getTypeById(typeId: String): IndicatorType<*, *>

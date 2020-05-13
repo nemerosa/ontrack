@@ -7,6 +7,8 @@ import javax.validation.constraints.Pattern
 
 interface IndicatorCategoryService {
 
+    fun registerCategoryListener(listener: IndicatorCategoryListener)
+
     fun findCategoryById(id: String): IndicatorCategory?
 
     fun getCategory(id: String): IndicatorCategory

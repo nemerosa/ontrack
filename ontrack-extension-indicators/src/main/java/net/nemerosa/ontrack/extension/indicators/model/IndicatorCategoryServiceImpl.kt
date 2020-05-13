@@ -15,6 +15,12 @@ class IndicatorCategoryServiceImpl(
         private val storageService: StorageService
 ) : IndicatorCategoryService {
 
+    private val listeners = mutableListOf<IndicatorCategoryListener>()
+
+    override fun registerCategoryListener(listener: IndicatorCategoryListener) {
+        listeners += listener
+    }
+
     override fun createCategory(input: IndicatorForm): IndicatorCategory {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val type = findCategoryById(input.id)
@@ -41,8 +47,14 @@ class IndicatorCategoryServiceImpl(
 
     override fun deleteCategory(id: String): Ack {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
-        storageService.delete(STORE, id)
-        return Ack.OK
+        val category = findCategoryById(id)
+        return if (category != null) {
+            listeners.forEach { it.onCategoryDeleted(category) }
+            storageService.delete(STORE, id)
+            Ack.OK
+        } else {
+            Ack.NOK
+        }
     }
 
     override fun findCategoryById(id: String): IndicatorCategory? =
