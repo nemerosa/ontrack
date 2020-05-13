@@ -452,12 +452,14 @@ angular.module('ontrack.extension.indicators', [
                 }
               }
               indicatorCategories {
-                name
-                types {
-                  id
-                  shortName
+                categories {
                   name
-                  link
+                  types {
+                    id
+                    shortName
+                    name
+                    link
+                  }
                 }
               }
               labels {
@@ -491,7 +493,7 @@ angular.module('ontrack.extension.indicators', [
                     nameEdited: false,
                     label: currentLabel
                 };
-                $scope.categories = data.indicatorCategories;
+                $scope.categories = data.indicatorCategories.categories;
                 $scope.categories.forEach((category) => {
                     category.types.forEach((type) => {
                         type.selected = $scope.portfolio.types.some((i) =>
