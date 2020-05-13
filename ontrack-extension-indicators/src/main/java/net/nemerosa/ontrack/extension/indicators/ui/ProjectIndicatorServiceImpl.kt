@@ -29,6 +29,7 @@ class ProjectIndicatorServiceImpl(
                         }
                 ).map { (category, indicators) ->
                     ProjectCategoryIndicators(
+                            project = project,
                             category = category,
                             indicators = indicators.map { indicator ->
                                 toProjectIndicator(project, indicator)

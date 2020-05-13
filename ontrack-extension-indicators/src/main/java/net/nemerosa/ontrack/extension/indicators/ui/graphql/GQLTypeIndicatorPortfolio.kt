@@ -60,6 +60,16 @@ class GQLTypeIndicatorPortfolio(
                                     indicatorPortfolioService.getPortfolioProjects(portfolio)
                                 }
                     }
+                    // Categories and stats
+                    .field {
+                        it.name("categoryStats")
+                                .description("Stats per category")
+                                .type(stdList(indicatorCategoryStats.typeRef))
+                                .dataFetcher { env ->
+                                    val portfolio: IndicatorPortfolio = env.getSource()
+                                    indicatorStatsService.getStatsPortfolio(portfolio)
+                                }
+                    }
                     // Stats
                     .field {
                         it.name("globalStats")

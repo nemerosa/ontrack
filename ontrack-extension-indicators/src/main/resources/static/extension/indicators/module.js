@@ -562,18 +562,11 @@ angular.module('ontrack.extension.indicators', [
               indicatorPortfolios(id: $id) {
                 id
                 name
-                label {
-                  id
-                  category
-                  name
-                  color
-                  description
-                }
                 links {
                   _update
                   _delete
                 }
-                globalStats {
+                categoryStats {
                   category {
                     id
                     name
@@ -584,15 +577,26 @@ angular.module('ontrack.extension.indicators', [
                     avgRating
                   }
                 }
-                categories {
-                  id
-                  name
-                }
                 projects {
                   id
                   name
                   links {
                     _page
+                  }
+                  projectIndicators {
+                    categories {
+                      categoryStats {
+                        category {
+                          id
+                          name
+                        }
+                        stats {
+                          count
+                          avg
+                          avgRating
+                        }
+                      }
+                    }
                   }
                 }
               }
