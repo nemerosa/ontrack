@@ -572,7 +572,10 @@ angular.module('ontrack.extension.indicators', [
                     name
                   }
                   stats {
+                    total
                     count
+                    minCount
+                    minRating
                     avg
                     avgRating
                   }
@@ -591,7 +594,10 @@ angular.module('ontrack.extension.indicators', [
                           name
                         }
                         stats {
+                          total
                           count
+                          minCount
+                          minRating
                           avg
                           avgRating
                         }
@@ -633,15 +639,33 @@ angular.module('ontrack.extension.indicators', [
 
                 // Filtering projecct categories out
                 $scope.portfolio.projects.forEach((project) => {
-                    project.projectIndicators.categories.forEach((category) => {
-                        let portfolioCategory = $scope.portfolio.categoryStats.find((stats) => stats.category.id === category.id);
-                        category.enabled = !!portfolioCategory;
-                        if (category.categoryStats.stats.avg === undefined) {
-                            category.categoryStats.stats.avg = 0;
-                            category.categoryStats.stats.avgRating = '-';
+                    project.projectIndicators.categories.forEach((projectCategory) => {
+                        let portfolioCategory = $scope.portfolio.categoryStats.find((stats) => stats.category.id === projectCategory.categoryStats.category.id);
+                        projectCategory.enabled = !!portfolioCategory;
+                        if (projectCategory.categoryStats.stats.avg === undefined) {
+                            projectCategory.stats = {
+                                compliance: 0,
+                                rating: '-'
+                            };
+                        } else {
+                            projectCategory.stats = {
+                                compliance: projectCategory.categoryStats.stats.avg,
+                                rating: projectCategory.categoryStats.stats.avgRating
+                            };
                         }
                     });
                     project.projectIndicators.categories = project.projectIndicators.categories.filter((category) => category.enabled);
+                });
+
+                // Filling portfolio stats when not available
+                $scope.portfolio.categoryStats.forEach((categoryStats) => {
+                    if (categoryStats.stats.avg === undefined) {
+                        categoryStats.compliance = 0;
+                        categoryStats.rating = '-';
+                    } else {
+                        categoryStats.compliance = categoryStats.stats.avg;
+                        categoryStats.rating = categoryStats.stats.avgRating;
+                    }
                 });
 
             }).finally(() => {

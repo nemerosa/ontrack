@@ -39,13 +39,33 @@
         </div>
     </div>
 
-    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0" class="table table-bordered">
+    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0" class="table table-striped">
         <thead>
         <tr>
-            <th>Projects</th>
-            <th ng-repeat="categoryStats in portfolio.categoryStats">
-                {{categoryStats.category.name}}
-            </th>
+            <td><b>Projects</b></td>
+            <td ng-repeat-start="categoryStats in portfolio.categoryStats" style="width: 36px;">
+                <ot-extension-indicators-status status="categoryStats" size="md"></ot-extension-indicators-status>
+            </td>
+            <td ng-repeat-end>
+                <p><b>{{categoryStats.category.name}}</b></p>
+                <p ng-if="categoryStats.stats.total > 0">
+                    {{categoryStats.stats.count}}/{{categoryStats.stats.total}} indicator<span
+                        ng-if="categoryStats.stats.count > 1">s</span> <span
+                        ng-if="categoryStats.stats.count > 1">are</span><span
+                        ng-if="categoryStats.stats.count <= 1">is</span> rated.
+                </p>
+                <p ng-if="categoryStats.stats.total == 0">
+                    No indicator has been rated for this portfolio.
+                </p>
+                <p ng-if="categoryStats.stats.minRating != categoryStats.stats.avgRating">
+                    {{categoryStats.stats.minCount}} indicator<span ng-if="categoryStats.stats.minCount > 1">s</span>
+                    <span ng-if="categoryStats.stats.minCount > 1">are</span><span
+                        ng-if="categoryStats.stats.minCount <= 1">is</span> rated
+                    <ot-extension-indicators-status
+                            status="{compliance: categoryStats.stats.min, rating: categoryStats.stats.minRating }"
+                            size="sm"></ot-extension-indicators-status>
+                </p>
+            </td>
         </tr>
         </thead>
         <tbody>
@@ -54,22 +74,13 @@
                 <a href="{{project.links._page}}" title="Project page">{{project.name}}</a>
                 <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Manage the project indicators for the {{project.name}} project"><span class="fa fa-pencil ot-command"></span></a>
             </td>
-            <td ng-repeat="projectCategory in project.projectIndicators.categories">
-                <ot-extension-indicators-status status="{
-                    compliance: projectCategory.categoryStats.stats.avg,
-                    rating: projectCategory.categoryStats.stats.avgRatin
-                }" size="md"></ot-extension-indicators-status>
+            <td ng-repeat-start="projectCategory in project.projectIndicators.categories" style="width: 36px;">
+                <ot-extension-indicators-status status="projectCategory.stats" size="md"></ot-extension-indicators-status>
+            </td>
+            <td ng-repeat-end>
             </td>
         </tr>
         </tbody>
-        <tfoot>
-        <tr class="active">
-            <td>Average</td>
-            <td ng-repeat="type in types">
-                <ot-extension-indicators-status status="type.stats" size="md"></ot-extension-indicators-status>
-            </td>
-        </tr>
-        </tfoot>
     </table>
 
 </ot-view>
