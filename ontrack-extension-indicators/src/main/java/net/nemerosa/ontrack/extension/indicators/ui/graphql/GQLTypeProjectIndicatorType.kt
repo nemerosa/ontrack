@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component
 class GQLTypeProjectIndicatorType(
         private val indicatorTypeService: IndicatorTypeService,
         private val indicatorValueType: GQLTypeIndicatorValueType,
+        private val indicatorSource: GQLTypeIndicatorSource,
         private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
@@ -27,6 +28,17 @@ class GQLTypeProjectIndicatorType(
             .stringField("shortName", "Short name for the indicator type")
             .stringField("name", "Long name for the indicator type")
             .stringField("link", "Link to the definition of the indicator")
+            // Source
+            .field {
+                it.name(IndicatorType<*, *>::source.name)
+                        .description("Source for this type")
+                        .type(indicatorSource.typeRef)
+                        .dataFetcher { env ->
+                            val typeRef = env.getSource<ProjectIndicatorType>()
+                            val type = indicatorTypeService.getTypeById(typeRef.id)
+                            type.source
+                        }
+            }
             // Category
             .field {
                 it.name(ProjectIndicatorType::category.name)

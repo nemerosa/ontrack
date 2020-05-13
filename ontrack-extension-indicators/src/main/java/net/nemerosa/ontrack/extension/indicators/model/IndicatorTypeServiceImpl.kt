@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 @Transactional
@@ -65,7 +64,8 @@ class IndicatorTypeServiceImpl(
                     link = stored.link,
                     valueType = valueType,
                     valueConfig = valueConfig,
-                    valueComputer = null
+                    valueComputer = null,
+                    source = null
             )
         } else {
             null
