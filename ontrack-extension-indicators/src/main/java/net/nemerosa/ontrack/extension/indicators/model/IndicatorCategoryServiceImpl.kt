@@ -1,30 +1,81 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
+import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
+import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-class IndicatorCategoryServiceImpl : IndicatorCategoryService {
+@Transactional
+class IndicatorCategoryServiceImpl(
+        private val securityService: SecurityService,
+        private val storageService: StorageService
+) : IndicatorCategoryService {
 
-    companion object {
-        const val SERVICES = "f3ac284c-6da6-477b-8887-1569b59e397b"
-        const val DELIVERY = "c6dfaf82-0739-46a2-85b8-0964d596b5d8"
-        const val HELM = "da5bdef6-b7e9-4c30-a1fe-ee671bec466c"
+    override fun createCategory(input: IndicatorForm): IndicatorCategory {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        val type = findCategoryById(input.id)
+        if (type != null) {
+            throw IndicatorCategoryIdAlreadyExistsException(input.id)
+        } else {
+            return updateCategory(input)
+        }
     }
 
-    private val categories = listOf(
-            IndicatorCategory(id = SERVICES, name = "Services principles", source = null),
-            IndicatorCategory(id = DELIVERY, name = "Delivery principles", source = null),
-            IndicatorCategory(id = HELM, name = "Helm principles", source = null)
-    ).associateBy { it.id }
+    override fun updateCategory(input: IndicatorForm): IndicatorCategory {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        val stored = StoredIndicatorCategory(
+                id = input.id,
+                name = input.name
+        )
+        storageService.store(
+                STORE,
+                input.id,
+                stored
+        )
+        return getCategory(input.id)
+    }
 
-    override fun findCategoryById(id: String): IndicatorCategory? = categories[id]
+    override fun deleteCategory(id: String): Ack {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+        storageService.delete(STORE, id)
+        return Ack.OK
+    }
+
+    override fun findCategoryById(id: String): IndicatorCategory? =
+            storageService.retrieve(STORE, id, StoredIndicatorCategory::class.java)
+                    .getOrNull()
+                    ?.let { fromStorage(it) }
 
     override fun getCategory(id: String): IndicatorCategory {
         return findCategoryById(id) ?: throw IndicatorCategoryNotFoundException(id)
     }
 
     override fun findAll(): List<IndicatorCategory> {
-        return categories.values.sortedBy { it.name }
+        return storageService.getKeys(STORE).mapNotNull { key ->
+            storageService.retrieve(STORE, key, StoredIndicatorCategory::class.java).getOrNull()
+        }.mapNotNull {
+            fromStorage(it)
+        }.sortedBy { it.name }
+    }
+
+    private fun fromStorage(stored: StoredIndicatorCategory): IndicatorCategory? =
+            IndicatorCategory(
+                    id = stored.id,
+                    name = stored.name,
+                    source = null
+            )
+
+    private class StoredIndicatorCategory(
+            val id: String,
+            val name: String
+    )
+
+    companion object {
+        private val STORE: String = IndicatorCategory::class.java.name
     }
 
 }

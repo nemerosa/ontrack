@@ -73,6 +73,7 @@ class IndicatorTypeServiceImpl(
     }
 
     override fun createType(input: CreateTypeForm): IndicatorType<*, *> {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val type = findTypeById(input.id)
         if (type != null) {
             throw IndicatorTypeIdAlreadyExistsException(input.id)
@@ -82,6 +83,7 @@ class IndicatorTypeServiceImpl(
     }
 
     override fun deleteType(id: String): Ack {
+        securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         storageService.delete(STORE, id)
         return Ack.OK
     }
