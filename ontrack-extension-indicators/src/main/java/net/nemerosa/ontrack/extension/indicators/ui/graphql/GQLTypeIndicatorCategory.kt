@@ -4,8 +4,10 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorType
+import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
@@ -14,7 +16,8 @@ import org.springframework.stereotype.Component
 class GQLTypeIndicatorCategory(
         private val indicatorType: GQLTypeProjectIndicatorType,
         private val indicatorSource: GQLTypeIndicatorSource,
-        private val indicatorTypeService: IndicatorTypeService
+        private val indicatorTypeService: IndicatorTypeService,
+        private val fieldContributors: List<GQLFieldContributor>
 ) : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
@@ -41,6 +44,8 @@ class GQLTypeIndicatorCategory(
                             }
                         }
             }
+            // Links
+            .fields(IndicatorCategory::class.java.graphQLFieldContributions(fieldContributors))
             // OK
             .build()
 
