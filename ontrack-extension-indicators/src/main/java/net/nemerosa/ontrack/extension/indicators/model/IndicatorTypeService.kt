@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants.INDICATOR_ID_PATTERN
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.exceptions.NotFoundException
@@ -30,10 +31,8 @@ class IndicatorTypeIdAlreadyExistsException(id: String) : InputException("Indica
 
 class IndicatorTypeIdMismatchException(expectedId: String, actualId: String) : InputException("Indicator type ID mismatch. Expected $expectedId, got $actualId")
 
-const val CREATE_TYPE_FORM_ID_PATTERN = "[a-z0-9-]+"
-
 class CreateTypeForm(
-        @get:Pattern(regexp = CREATE_TYPE_FORM_ID_PATTERN)
+        @get:Pattern(regexp = INDICATOR_ID_PATTERN)
         val id: String,
         val category: String,
         val shortName: String,

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.ui
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants.INDICATOR_ID_PATTERN
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -77,7 +78,7 @@ class IndicatorTypeController(
                 .with(
                         Text.of("id")
                                 .label("ID")
-                                .regex(CREATE_TYPE_FORM_ID_PATTERN)
+                                .regex(INDICATOR_ID_PATTERN)
                                 .readOnly(type != null)
                                 .value(type?.id)
                 )
