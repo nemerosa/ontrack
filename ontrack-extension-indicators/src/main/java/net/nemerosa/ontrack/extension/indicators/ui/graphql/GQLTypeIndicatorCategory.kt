@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeIndicatorCategory(
         private val indicatorType: GQLTypeProjectIndicatorType,
+        private val indicatorSource: GQLTypeIndicatorSource,
         private val indicatorTypeService: IndicatorTypeService
 ) : GQLType {
 
@@ -22,6 +23,12 @@ class GQLTypeIndicatorCategory(
             // Core fields
             .stringField("id", "Indicator category ID")
             .stringField("name", "Indicator category name")
+            // Source
+            .field {
+                it.name(IndicatorCategory::source.name)
+                        .description("Source for this category")
+                        .type(indicatorSource.typeRef)
+            }
             // List of types in this category
             .field {
                 it.name("types")
@@ -40,6 +47,6 @@ class GQLTypeIndicatorCategory(
     override fun getTypeName(): String = INDICATOR_CATEGORY
 
     companion object {
-        val INDICATOR_CATEGORY =  IndicatorCategory::class.java.simpleName
+        val INDICATOR_CATEGORY = IndicatorCategory::class.java.simpleName
     }
 }

@@ -12,9 +12,9 @@ class IndicatorCategoryServiceImpl : IndicatorCategoryService {
     }
 
     private val categories = listOf(
-            IndicatorCategory(id = SERVICES, name = "Services principles"),
-            IndicatorCategory(id = DELIVERY, name = "Delivery principles"),
-            IndicatorCategory(id = HELM, name = "Helm principles")
+            IndicatorCategory(id = SERVICES, name = "Services principles", source = null),
+            IndicatorCategory(id = DELIVERY, name = "Delivery principles", source = null),
+            IndicatorCategory(id = HELM, name = "Helm principles", source = null)
     ).associateBy { it.id }
 
     override fun findCategoryById(id: String): IndicatorCategory? = categories[id]
