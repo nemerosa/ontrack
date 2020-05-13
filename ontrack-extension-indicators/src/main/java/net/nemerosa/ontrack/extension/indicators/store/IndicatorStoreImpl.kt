@@ -75,6 +75,15 @@ class IndicatorStoreImpl(
         return Ack.validate(existing != null)
     }
 
+    override fun deleteIndicatorByType(typeId: String) {
+        entityDataStore.deleteByFilter(
+                EntityDataStoreFilter(null)
+                        .withCategory(STORE_CATEGORY)
+                        .withName(typeId)
+                        .withCount(Int.MAX_VALUE)
+        )
+    }
+
     companion object {
         private val STORE_CATEGORY = Indicator::class.java.name
     }

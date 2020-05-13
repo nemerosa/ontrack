@@ -11,4 +11,6 @@ interface IndicatorStore {
 
     fun deleteIndicator(project: Project, typeId: String): Ack
 
+    fun deleteIndicatorByType(typeId: String)
+
 }
