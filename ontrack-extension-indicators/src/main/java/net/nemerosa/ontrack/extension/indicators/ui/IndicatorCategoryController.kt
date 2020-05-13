@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorForm
+import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -12,6 +10,7 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import javax.validation.Valid
@@ -56,6 +55,24 @@ class IndicatorCategoryController(
                     indicatorCategoryService.getCategory(id),
                     uri(on(this::class.java).getCategoryById(id))
             )
+
+    @GetMapping("{id}/update")
+    fun getUpdateForm(@PathVariable id: String): Form {
+        val category = indicatorCategoryService.getCategory(id)
+        return getCategoryForm(category)
+    }
+
+    @PutMapping("{id}/update")
+    fun updateCategory(@PathVariable id: String, @RequestBody @Valid input: IndicatorForm): Resource<IndicatorCategory> {
+        if (id != input.id) {
+            throw IndicatorCategoryIdMismatchException(id, input.id)
+        }
+        return getCategoryById(indicatorCategoryService.updateCategory(input).id)
+    }
+
+    @DeleteMapping("{id}/delete")
+    fun deleteCategory(@PathVariable id: String): ResponseEntity<Ack> =
+            ResponseEntity.ok(indicatorCategoryService.deleteCategory(id))
 
 
     private fun getCategoryForm(category: IndicatorCategory? = null): Form {
