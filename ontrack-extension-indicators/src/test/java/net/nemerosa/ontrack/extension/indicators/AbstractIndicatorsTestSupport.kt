@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
 
@@ -72,6 +74,36 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
                     value = value,
                     comment = null
             )
+        }
+    }
+
+    protected fun <T> Project.checkIndicator(
+            type: IndicatorType<T, *>,
+            code: (Indicator<T>) -> Unit
+    ) {
+        asAdmin {
+            val indicator = indicatorService.getProjectIndicator(project, type)
+            code(indicator)
+        }
+    }
+
+    protected fun <T: Any> Project.assertIndicatorValue(
+            type: IndicatorType<T, *>,
+            code: (T) -> Unit
+    ) {
+        checkIndicator(type) { i ->
+            val indicatorValue = i.value
+            assertNotNull(indicatorValue, "Indicator value must be set") { value: T ->
+                code(value)
+            }
+        }
+    }
+
+    protected fun <T> Project.assertIndicatorNoValue(
+            type: IndicatorType<T, *>
+    ) {
+        checkIndicator(type) { i ->
+            assertNull(i.value, "Indicator value must not be set")
         }
     }
 

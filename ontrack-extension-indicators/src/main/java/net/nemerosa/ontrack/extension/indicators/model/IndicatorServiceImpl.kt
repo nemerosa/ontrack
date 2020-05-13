@@ -25,7 +25,7 @@ class IndicatorServiceImpl(
     }
 
     override fun onTypeDeleted(type: IndicatorType<*, *>) {
-        TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun getProjectIndicators(project: Project, all: Boolean): List<Indicator<*>> {
