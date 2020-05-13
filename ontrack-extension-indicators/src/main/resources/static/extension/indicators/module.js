@@ -715,16 +715,22 @@ angular.module('ontrack.extension.indicators', [
                 });
 
                 // Collecting the averages
-                let averages = {};
                 $scope.portfolio.globalStats.forEach((stats) => {
-                    if (stats.stats.count > 0 && stats.stats.avg) {
-                        averages[stats.type.id] = {
-                            compliance: stats.stats.avg,
-                            rating: stats.stats.avgRating
-                        };
+                    let type = types.find((t) => t.id === stats.type.id);
+                    if (type) {
+                        if (stats.stats.count > 0 && stats.stats.avg) {
+                            type.stats = {
+                                compliance: stats.stats.avg,
+                                rating: stats.stats.avgRating
+                            };
+                        } else {
+                            type.stats = {
+                                compliance: 0,
+                                rating: '-'
+                            };
+                        }
                     }
                 });
-                $scope.averages = averages;
 
             }).finally(() => {
                 $scope.loadingPortfolio = false;
@@ -749,21 +755,6 @@ angular.module('ontrack.extension.indicators', [
          */
         $scope.indicator = (project, type) => {
             return project.types[type.id];
-        };
-
-        /**
-         * Gets the average status for this given type
-         */
-        $scope.averageStatus = (type) => {
-            let stats = $scope.averages[type.id];
-            if (stats) {
-                return stats;
-            } else {
-                return {
-                    compliance: 0,
-                    rating: '-'
-                };
-            }
         };
 
     })
