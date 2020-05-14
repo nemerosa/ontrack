@@ -113,6 +113,6 @@ class BooleanIndicatorValueType(
                     ?: BooleanIndicatorValueTypeConfig(required = true)
 }
 
-class BooleanIndicatorValueTypeConfig(
+data class BooleanIndicatorValueTypeConfig(
         val required: Boolean
 )

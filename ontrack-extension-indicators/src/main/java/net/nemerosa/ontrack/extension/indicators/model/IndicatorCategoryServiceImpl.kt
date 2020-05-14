@@ -27,7 +27,7 @@ class IndicatorCategoryServiceImpl(
         if (type != null) {
             throw IndicatorCategoryIdAlreadyExistsException(input.id)
         } else {
-            return updateCategory(input)
+            return updateCategory(input, source)
         }
     }
 

@@ -20,7 +20,7 @@ val IndicatorSourceProvider.id: String get() = this::class.java.name
 /**
  * Indicator source provider description
  */
-class IndicatorSourceProviderDescription(
+data class IndicatorSourceProviderDescription(
         val id: String,
         val name: String
 )
@@ -30,7 +30,7 @@ val IndicatorSourceProvider.description get() = IndicatorSourceProviderDescripti
 /**
  * Source of a [category][IndicatorCategory] or a [type][IndicatorType].
  */
-class IndicatorSource(
+data class IndicatorSource(
         /**
          * Source provider
          */
