@@ -80,7 +80,7 @@ class IndicatorTypeServiceImpl(
                     valueType = valueType,
                     valueConfig = valueConfig,
                     valueComputer = null,
-                    source = null
+                    source = stored.source
             )
         } else {
             null
@@ -97,7 +97,15 @@ class IndicatorTypeServiceImpl(
         }
     }
 
-    override fun <T, C> createType(id: String, category: IndicatorCategory, name: String, link: String?, valueType: IndicatorValueType<T, C>, valueConfig: C): IndicatorType<T, C> {
+    override fun <T, C> createType(
+            id: String,
+            category: IndicatorCategory,
+            name: String,
+            link: String?,
+            valueType: IndicatorValueType<T, C>,
+            valueConfig: C,
+            source: IndicatorSource?
+    ): IndicatorType<T, C> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val type = findTypeById(id)
         if (type != null) {
@@ -109,7 +117,8 @@ class IndicatorTypeServiceImpl(
                     name,
                     link,
                     valueType,
-                    valueConfig
+                    valueConfig,
+                    source
             )
         }
     }
@@ -139,7 +148,8 @@ class IndicatorTypeServiceImpl(
                 name = input.name,
                 link = input.link,
                 valueType = valueType.id,
-                valueConfig = valueConfig
+                valueConfig = valueConfig,
+                source = null
         )
         storageService.store(
                 STORE,
@@ -155,7 +165,8 @@ class IndicatorTypeServiceImpl(
             name: String,
             link: String?,
             valueType: IndicatorValueType<T, C>,
-            valueConfig: C
+            valueConfig: C,
+            source: IndicatorSource?
     ): IndicatorType<T, C> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val stored = StoredIndicatorType(
@@ -164,7 +175,8 @@ class IndicatorTypeServiceImpl(
                 name = name,
                 link = link,
                 valueType = valueType.id,
-                valueConfig = valueType.toConfigStoredJson(valueConfig)
+                valueConfig = valueType.toConfigStoredJson(valueConfig),
+                source = source
         )
         storageService.store(
                 STORE,
@@ -181,7 +193,8 @@ class IndicatorTypeServiceImpl(
             val name: String,
             val link: String?,
             val valueType: String,
-            val valueConfig: JsonNode
+            val valueConfig: JsonNode,
+            val source: IndicatorSource?
     )
 
     companion object {

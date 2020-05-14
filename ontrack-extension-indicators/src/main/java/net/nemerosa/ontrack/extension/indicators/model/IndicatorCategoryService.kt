@@ -15,9 +15,9 @@ interface IndicatorCategoryService {
 
     fun findAll(): List<IndicatorCategory>
 
-    fun createCategory(input: IndicatorForm): IndicatorCategory
+    fun createCategory(input: IndicatorForm, source: IndicatorSource? = null): IndicatorCategory
 
-    fun updateCategory(input: IndicatorForm): IndicatorCategory
+    fun updateCategory(input: IndicatorForm, source: IndicatorSource? = null): IndicatorCategory
 
     fun deleteCategory(id: String): Ack
 

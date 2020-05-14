@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
 /**
- * Source of a [category][IndicatorCategory] or a [type][IndicatorType].
+ * [Source][IndicatorSource] provider
  */
-interface IndicatorSource {
+interface IndicatorSourceProvider {
 
     /**
      * Display name
@@ -13,6 +13,43 @@ interface IndicatorSource {
 }
 
 /**
+ * ID of an [IndicatorSourceProvider] is its FQCN.
+ */
+val IndicatorSourceProvider.id: String get() = this::class.java.name
+
+/**
+ * Indicator source provider description
+ */
+class IndicatorSourceProviderDescription(
+        val id: String,
+        val name: String
+)
+
+val IndicatorSourceProvider.description get() = IndicatorSourceProviderDescription(id, name)
+
+/**
+ * Source of a [category][IndicatorCategory] or a [type][IndicatorType].
+ */
+class IndicatorSource(
+        /**
+         * Source provider
+         */
+        val provider: IndicatorSourceProviderDescription,
+        /**
+         * Display name
+         */
+        val name: String
+)
+
+/**
  * ID of an [IndicatorSource] is its FQCN.
  */
 val IndicatorSource.id: String get() = this::class.java.name
+
+/**
+ * Creates a source
+ */
+fun IndicatorSourceProvider.createSource(name: String) = IndicatorSource(
+        description,
+        name
+)

@@ -21,7 +21,7 @@ class IndicatorCategoryServiceImpl(
         listeners += listener
     }
 
-    override fun createCategory(input: IndicatorForm): IndicatorCategory {
+    override fun createCategory(input: IndicatorForm, source: IndicatorSource?): IndicatorCategory {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val type = findCategoryById(input.id)
         if (type != null) {
@@ -31,11 +31,12 @@ class IndicatorCategoryServiceImpl(
         }
     }
 
-    override fun updateCategory(input: IndicatorForm): IndicatorCategory {
+    override fun updateCategory(input: IndicatorForm, source: IndicatorSource?): IndicatorCategory {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val stored = StoredIndicatorCategory(
                 id = input.id,
-                name = input.name
+                name = input.name,
+                source = source
         )
         storageService.store(
                 STORE,
@@ -78,12 +79,13 @@ class IndicatorCategoryServiceImpl(
             IndicatorCategory(
                     id = stored.id,
                     name = stored.name,
-                    source = null
+                    source = stored.source
             )
 
     private class StoredIndicatorCategory(
             val id: String,
-            val name: String
+            val name: String,
+            val source: IndicatorSource?
     )
 
     companion object {
