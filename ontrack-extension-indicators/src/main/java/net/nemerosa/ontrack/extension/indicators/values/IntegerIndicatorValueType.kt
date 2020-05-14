@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
-import net.nemerosa.ontrack.extension.indicators.support.Percentage
-import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
+import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.form.Form
 import org.springframework.stereotype.Component
@@ -13,54 +12,54 @@ import org.springframework.stereotype.Component
 @Component
 class IntegerIndicatorValueType(
         extension: IndicatorsExtensionFeature
-) : AbstractExtension(extension), IndicatorValueType<Percentage, PercentageThreshold> {
+) : AbstractExtension(extension), IndicatorValueType<Int, IntegerThresholds> {
 
-    override val name: String = "Integer"
+    override val name: String = "Number"
 
-    override fun status(config: PercentageThreshold, value: Percentage): IndicatorCompliance =
+    override fun form(config: IntegerThresholds, value: Int?): Form {
+        TODO("Not yet implemented")
+    }
+
+    override fun status(config: IntegerThresholds, value: Int): IndicatorCompliance =
             IndicatorCompliance(config.getCompliance(value).value)
 
-    override fun form(config: PercentageThreshold, value: Percentage?): Form {
+    override fun toClientJson(config: IntegerThresholds, value: Int): JsonNode {
         TODO("Not yet implemented")
     }
 
-    override fun toClientJson(config: PercentageThreshold, value: Percentage): JsonNode {
+    override fun fromClientJson(config: IntegerThresholds, value: JsonNode): Int? {
         TODO("Not yet implemented")
     }
 
-    override fun fromClientJson(config: PercentageThreshold, value: JsonNode): Percentage? {
+    override fun fromStoredJson(valueConfig: IntegerThresholds, value: JsonNode): Int? {
         TODO("Not yet implemented")
     }
 
-    override fun fromStoredJson(valueConfig: PercentageThreshold, value: JsonNode): Percentage? {
+    override fun toStoredJson(config: IntegerThresholds, value: Int): JsonNode {
         TODO("Not yet implemented")
     }
 
-    override fun toStoredJson(config: PercentageThreshold, value: Percentage): JsonNode {
+    override fun configForm(config: IntegerThresholds?): Form {
         TODO("Not yet implemented")
     }
 
-    override fun configForm(config: PercentageThreshold?): Form {
+    override fun toConfigForm(config: IntegerThresholds): JsonNode {
         TODO("Not yet implemented")
     }
 
-    override fun toConfigForm(config: PercentageThreshold): JsonNode {
+    override fun fromConfigForm(config: JsonNode): IntegerThresholds {
         TODO("Not yet implemented")
     }
 
-    override fun fromConfigForm(config: JsonNode): PercentageThreshold {
+    override fun toConfigClientJson(config: IntegerThresholds): JsonNode {
         TODO("Not yet implemented")
     }
 
-    override fun toConfigClientJson(config: PercentageThreshold): JsonNode {
+    override fun toConfigStoredJson(config: IntegerThresholds): JsonNode {
         TODO("Not yet implemented")
     }
 
-    override fun toConfigStoredJson(config: PercentageThreshold): JsonNode {
-        TODO("Not yet implemented")
-    }
-
-    override fun fromConfigStoredJson(config: JsonNode): PercentageThreshold {
+    override fun fromConfigStoredJson(config: JsonNode): IntegerThresholds {
         TODO("Not yet implemented")
     }
 }

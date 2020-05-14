@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.extension.sonarqube.indicators
 
 import net.nemerosa.ontrack.extension.indicators.computing.AbstractBranchIndicatorComputer
 import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
 import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
 import net.nemerosa.ontrack.extension.indicators.support.percent
+import net.nemerosa.ontrack.extension.indicators.values.IntegerIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValueType
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresCollectionService
@@ -18,6 +20,7 @@ class SonarQubeIndicatorComputer(
         structureService: StructureService,
         sonarQubeIndicatorSourceProvider: SonarQubeIndicatorSourceProvider,
         percentageIndicatorValueType: PercentageIndicatorValueType,
+        integerIndicatorValueType: IntegerIndicatorValueType,
         private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
 ) : AbstractBranchIndicatorComputer(extension, structureService) {
 
@@ -75,11 +78,14 @@ class SonarQubeIndicatorComputer(
                             id = "sonarqube-blocker-violations",
                             name = "SonarQube blocker issues",
                             link = null,
-                            // FIXME Integer with thresholds
-                            valueType = percentageIndicatorValueType,
-                            valueConfig = PercentageThreshold(threshold = 80.percent(), higherIsBetter = true)
+                            valueType = integerIndicatorValueType,
+                            valueConfig = IntegerThresholds(
+                                    min = 0,
+                                    max = 10,
+                                    higherIsBetter = false
+                            )
                     ),
-                    toValueConverter = { m -> m.toInt().percent() }
+                    toValueConverter = { m -> m.toInt() }
             )
     )
 
