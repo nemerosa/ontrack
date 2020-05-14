@@ -18,12 +18,12 @@ data class PercentageThreshold(
                 getCompliance(
                         threshold = threshold.invert().value,
                         value = value.invert().value
-                ).percent().invert()
+                ).percent()
             }
 
     private fun getCompliance(threshold: Int, value: Int): Int =
             when {
                 value >= threshold -> 100 // True if threshold = 0
-                else -> (value - 0) / threshold
+                else -> (value * 100) / threshold
             }
 }
