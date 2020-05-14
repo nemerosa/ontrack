@@ -216,7 +216,7 @@ pipeline {
                             --project-name local \\
                             --file docker-compose.yml \\
                             --file docker-compose-jacoco.yml \\
-                            logs > docker-compose-acceptance.log
+                            logs ontrack > docker-compose-acceptance-ontrack.log
                     '''
                     archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance.log", allowEmptyArchive: true)
                     sh '''
