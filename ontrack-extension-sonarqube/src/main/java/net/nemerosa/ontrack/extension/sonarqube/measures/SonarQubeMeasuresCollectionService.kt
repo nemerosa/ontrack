@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.sonarqube.measures
 
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
-import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 
@@ -13,6 +13,14 @@ interface SonarQubeMeasuresCollectionService {
      * Checks if the [build] is eligible for SonarQube collection.
      */
     fun matches(build: Build, property: SonarQubeProperty): Boolean
+
+    /**
+     * Gets the measures of the last build scanned by SonarQube.
+     *
+     * @param branch Branch
+     * @return Measures for the last build, if any
+     */
+    fun getLastMeasures(branch: Branch): SonarQubeMeasures?
 
     /**
      * Collects SonarQube metrics for an individual build
