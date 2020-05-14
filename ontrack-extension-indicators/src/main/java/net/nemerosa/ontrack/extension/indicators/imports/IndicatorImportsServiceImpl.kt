@@ -20,13 +20,43 @@ class IndicatorImportsServiceImpl(
 
     override fun imports(data: IndicatorImports) {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
+
         val source = importsIndicatorSourceProvider.createSource(data.source)
+
         data.categories.forEach { categoryData ->
             val category = importCategory(categoryData, source)
             categoryData.types.forEach { typeData ->
                 importType(category, typeData, source)
             }
         }
+
+        // Cleanup of orphans
+        cleanupOrphanCategories(data, source)
+        cleanupOrphanTypes(data, source)
+    }
+
+    private fun cleanupOrphanCategories(data: IndicatorImports, source: IndicatorSource) {
+        indicatorCategoryService
+                .findAll()
+                .filter {
+                    source sameAs it.source &&
+                            it !in data
+                }
+                .forEach {
+                    indicatorCategoryService.deleteCategory(it.id)
+                }
+    }
+
+    private fun cleanupOrphanTypes(data: IndicatorImports, source: IndicatorSource) {
+        indicatorTypeService
+                .findAll()
+                .filter {
+                    source sameAs it.source &&
+                            it !in data
+                }
+                .forEach {
+                    indicatorTypeService.deleteType(it.id)
+                }
     }
 
     private fun importType(category: IndicatorCategory, typeData: IndicatorImportsType, source: IndicatorSource) {
@@ -75,3 +105,11 @@ class IndicatorImportsServiceImpl(
     }
 
 }
+
+private operator fun IndicatorImports.contains(type: IndicatorType<*, *>): Boolean =
+        categories.any { cat ->
+            cat.types.any { it.id == type.id }
+        }
+
+private operator fun IndicatorImports.contains(category: IndicatorCategory): Boolean =
+        categories.any { it.id == category.id }

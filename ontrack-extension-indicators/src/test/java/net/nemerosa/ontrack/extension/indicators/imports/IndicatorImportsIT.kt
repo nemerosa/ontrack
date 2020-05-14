@@ -11,6 +11,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class IndicatorImportsIT : AbstractIndicatorsTestSupport() {
 
@@ -80,6 +81,119 @@ class IndicatorImportsIT : AbstractIndicatorsTestSupport() {
             assertEquals(BooleanIndicatorValueTypeConfig(true), type.valueConfig)
             assertEquals(expectedSource, type.source)
         }
+    }
+
+    @Test
+    fun `Management of orphans using the source of the import`() {
+        val source = uid("S")
+        val prefix = uid("P")
+        val data = IndicatorImports(
+                source = source,
+                categories = listOf(
+                        IndicatorImportCategory(
+                                id = "$prefix-cat-one",
+                                name = "Category 1",
+                                types = listOf(
+                                        IndicatorImportsType(
+                                                id = "$prefix-type-one",
+                                                name = "Type 1",
+                                                link = null,
+                                                required = false
+                                        ),
+                                        IndicatorImportsType(
+                                                id = "$prefix-type-two",
+                                                name = "Type 2",
+                                                link = "https://github.com/nemerosa/ontrack",
+                                                required = true
+                                        )
+                                )
+                        ),
+                        IndicatorImportCategory(
+                                id = "$prefix-cat-two",
+                                name = "Category 2",
+                                types = listOf(
+                                        IndicatorImportsType(
+                                                id = "$prefix-type-three",
+                                                name = "Type 3",
+                                                link = null,
+                                                required = false
+                                        ),
+                                        IndicatorImportsType(
+                                                id = "$prefix-type-four",
+                                                name = "Type 4",
+                                                link = "https://github.com/nemerosa/ontrack",
+                                                required = true
+                                        )
+                                )
+                        )
+                )
+        )
+        asAdmin {
+            indicatorImportsService.imports(data)
+        }
+
+        // Checks the imported data
+        assertNotNull(indicatorCategoryService.findCategoryById("$prefix-cat-one"))
+        assertNotNull(indicatorTypeService.findTypeById("$prefix-type-one"))
+        assertNotNull(indicatorTypeService.findTypeById("$prefix-type-two"))
+
+        assertNotNull(indicatorCategoryService.findCategoryById("$prefix-cat-two"))
+        assertNotNull(indicatorTypeService.findTypeById("$prefix-type-three"))
+        assertNotNull(indicatorTypeService.findTypeById("$prefix-type-four"))
+
+        // Removes some types, adds some types and categories
+        val newData = IndicatorImports(
+                source = source,
+                categories = listOf(
+                        IndicatorImportCategory(
+                                id = "$prefix-cat-one",
+                                name = "Category 1",
+                                types = listOf(
+                                        IndicatorImportsType(
+                                                id = "$prefix-type-two",
+                                                name = "Type 2",
+                                                link = "https://github.com/nemerosa/ontrack",
+                                                required = true
+                                        ),
+                                        IndicatorImportsType(
+                                                id = "$prefix-type-five",
+                                                name = "Type 5",
+                                                link = "https://github.com/nemerosa/ontrack",
+                                                required = true
+                                        )
+                                )
+                        ),
+                        IndicatorImportCategory(
+                                id = "$prefix-cat-three",
+                                name = "Category 3",
+                                types = listOf(
+                                        IndicatorImportsType(
+                                                id = "$prefix-type-six",
+                                                name = "Type 6",
+                                                link = null,
+                                                required = false
+                                        )
+                                )
+                        )
+                )
+        )
+        asAdmin {
+            indicatorImportsService.imports(newData)
+        }
+
+        // Checks the imported data
+        assertNotNull(indicatorCategoryService.findCategoryById("$prefix-cat-one"))
+        assertNull(indicatorTypeService.findTypeById("$prefix-type-one"), "Type should be gone")
+        assertNotNull(indicatorTypeService.findTypeById("$prefix-type-two"))
+        assertNotNull(indicatorTypeService.findTypeById("$prefix-type-five"))
+
+        assertNull(indicatorCategoryService.findCategoryById("$prefix-cat-two"), "Category should be gone")
+        assertNull(indicatorTypeService.findTypeById("$prefix-type-three"), "Type should be gone")
+        assertNull(indicatorTypeService.findTypeById("$prefix-type-four"), "Type should be gone")
+
+        assertNotNull(indicatorCategoryService.findCategoryById("$prefix-cat-three"))
+        assertNotNull(indicatorTypeService.findTypeById("$prefix-type-six"))
+
     }
 
 }

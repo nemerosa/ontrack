@@ -39,7 +39,12 @@ data class IndicatorSource(
          * Display name
          */
         val name: String
-)
+) {
+
+    infix fun sameAs (source: IndicatorSource?) =
+            source != null && source.name == name && source.provider.id == provider.id
+
+}
 
 /**
  * Creates a source
