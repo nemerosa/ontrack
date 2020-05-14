@@ -23,8 +23,6 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Description</th>
-            <th>Link</th>
             <th>Source</th>
             <th>Type</th>
             <th>Configuration</th>
@@ -33,7 +31,7 @@
         </thead>
         <tbody ng-repeat="category in categories">
         <tr class="info">
-            <th colspan="8">
+            <th colspan="6">
                 <a href="#/extension/indicators/categories" title="Goes to the list of categories">{{category.name}}</a>
             </th>
         </tr>
@@ -42,13 +40,7 @@
                 <code>{{type.id}}</code>
             </td>
             <td>
-                {{type.shortName}}
-            </td>
-            <td>
-                {{type.name}}
-            </td>
-            <td>
-                <a href="{{type.link}}" ng-if="type.link">{{type.link}}</a>
+                <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
             </td>
             <td>
                 <span ng-if="type.source">{{type.source.name}}</span>

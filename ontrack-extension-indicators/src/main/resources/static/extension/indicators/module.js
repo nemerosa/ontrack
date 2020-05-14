@@ -109,7 +109,6 @@ angular.module('ontrack.extension.indicators', [
                 }
                 types {
                   id
-                  shortName
                   name
                   link
                   source {
@@ -449,7 +448,6 @@ angular.module('ontrack.extension.indicators', [
                   name
                   types {
                     id
-                    shortName
                     name
                     link
                   }
@@ -734,8 +732,7 @@ angular.module('ontrack.extension.indicators', [
             restrict: 'E',
             templateUrl: 'extension/indicators/directive.indicators-type-name.tpl.html',
             scope: {
-                type: '=',
-                shortName: '@'
+                type: '='
             }
         };
     })

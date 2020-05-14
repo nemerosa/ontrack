@@ -31,14 +31,12 @@ class BooleanIndicatorValueType(
             }
 
     override fun form(
-            nameDescription: NameDescription,
             config: BooleanIndicatorValueTypeConfig,
             value: Boolean?
     ): Form = Form.create()
             .with(
                     Selection.of("value")
-                            .label(nameDescription.name)
-                            .help(nameDescription.description)
+                            .label("Value")
                             .items(
                                     listOf(
                                             Description("", "n/a", "Not applicable"),

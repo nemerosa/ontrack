@@ -7,6 +7,7 @@ import javax.validation.constraints.Pattern
  * Structure which defines categories & type to import.
  */
 class IndicatorImports(
+        val source: String,
         val categories: List<IndicatorImportCategory>
 )
 
@@ -20,8 +21,7 @@ class IndicatorImportCategory(
 class IndicatorImportsType(
         @get:Pattern(regexp = IndicatorConstants.INDICATOR_ID_PATTERN)
         val id: String,
-        val shortName: String,
-        val longName: String,
+        val name: String,
         val link: String?,
         val required: Boolean?
 )

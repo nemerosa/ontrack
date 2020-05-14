@@ -24,8 +24,7 @@ interface IndicatorTypeService {
     fun <T, C> createType(
             id: String,
             category: IndicatorCategory,
-            shortName: String,
-            longName: String,
+            name: String,
             link: String?,
             valueType: IndicatorValueType<T, C>,
             valueConfig: C
@@ -36,8 +35,7 @@ interface IndicatorTypeService {
     fun <T, C> updateType(
             id: String,
             category: IndicatorCategory,
-            shortName: String,
-            longName: String,
+            name: String,
             link: String?,
             valueType: IndicatorValueType<T, C>,
             valueConfig: C
@@ -57,8 +55,7 @@ class CreateTypeForm(
         @get:Pattern(regexp = INDICATOR_ID_PATTERN)
         val id: String,
         val category: String,
-        val shortName: String,
-        val longName: String,
+        val name: String,
         val link: String?,
         val valueType: ServiceConfiguration
 )

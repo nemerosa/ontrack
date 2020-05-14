@@ -43,7 +43,7 @@ class IndicatorTypeServiceImpl(
         }.sortedWith(
                 compareBy(
                         { it.category.name },
-                        { it.shortName }
+                        { it.name }
                 )
         )
     }
@@ -62,7 +62,7 @@ class IndicatorTypeServiceImpl(
         }.sortedWith(
                 compareBy(
                         { it.category.name },
-                        { it.shortName }
+                        { it.name }
                 )
         )
     }
@@ -75,8 +75,7 @@ class IndicatorTypeServiceImpl(
             IndicatorType(
                     id = stored.id,
                     category = category,
-                    shortName = stored.shortName,
-                    longName = stored.longName,
+                    name = stored.name,
                     link = stored.link,
                     valueType = valueType,
                     valueConfig = valueConfig,
@@ -98,7 +97,7 @@ class IndicatorTypeServiceImpl(
         }
     }
 
-    override fun <T, C> createType(id: String, category: IndicatorCategory, shortName: String, longName: String, link: String?, valueType: IndicatorValueType<T, C>, valueConfig: C): IndicatorType<T, C> {
+    override fun <T, C> createType(id: String, category: IndicatorCategory, name: String, link: String?, valueType: IndicatorValueType<T, C>, valueConfig: C): IndicatorType<T, C> {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         val type = findTypeById(id)
         if (type != null) {
@@ -107,8 +106,7 @@ class IndicatorTypeServiceImpl(
             return updateType(
                     id,
                     category,
-                    shortName,
-                    longName,
+                    name,
                     link,
                     valueType,
                     valueConfig
@@ -138,8 +136,7 @@ class IndicatorTypeServiceImpl(
         val stored = StoredIndicatorType(
                 id = input.id,
                 category = category.id,
-                shortName = input.shortName,
-                longName = input.longName,
+                name = input.name,
                 link = input.link,
                 valueType = valueType.id,
                 valueConfig = valueConfig
@@ -155,8 +152,7 @@ class IndicatorTypeServiceImpl(
     override fun <T, C> updateType(
             id: String,
             category: IndicatorCategory,
-            shortName: String,
-            longName: String,
+            name: String,
             link: String?,
             valueType: IndicatorValueType<T, C>,
             valueConfig: C
@@ -165,8 +161,7 @@ class IndicatorTypeServiceImpl(
         val stored = StoredIndicatorType(
                 id = id,
                 category = category.id,
-                shortName = shortName,
-                longName = longName,
+                name = name,
                 link = link,
                 valueType = valueType.id,
                 valueConfig = valueType.toConfigStoredJson(valueConfig)
@@ -183,8 +178,7 @@ class IndicatorTypeServiceImpl(
     private class StoredIndicatorType(
             val id: String,
             val category: String,
-            val shortName: String,
-            val longName: String,
+            val name: String,
             val link: String?,
             val valueType: String,
             val valueConfig: JsonNode

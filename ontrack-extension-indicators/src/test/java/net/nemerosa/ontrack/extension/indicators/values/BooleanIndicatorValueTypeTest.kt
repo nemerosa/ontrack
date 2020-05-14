@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.model.structure.NameDescription
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -29,13 +28,11 @@ class BooleanIndicatorValueTypeTest {
 
         fun assertForm(required: Boolean, value: Boolean?, expectedValue: String?) {
             val form = type.form(
-                    NameDescription.nd("my-name", "My description"),
                     BooleanIndicatorValueTypeConfig(required),
                     value
             )
             assertNotNull(form.getField("value")) {
-                assertEquals("my-name", it.label)
-                assertEquals("My description", it.help)
+                assertEquals("Value", it.label)
                 assertEquals(expectedValue, it.value)
             }
         }

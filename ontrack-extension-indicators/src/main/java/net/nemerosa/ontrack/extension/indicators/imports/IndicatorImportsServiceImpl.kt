@@ -36,8 +36,7 @@ class IndicatorImportsServiceImpl(
             indicatorTypeService.updateType(
                     id = typeData.id,
                     category = category,
-                    shortName = typeData.shortName,
-                    longName = typeData.longName,
+                    name = typeData.name,
                     link = typeData.link,
                     valueType = booleanIndicatorValueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = typeData.required ?: true)
@@ -46,8 +45,7 @@ class IndicatorImportsServiceImpl(
             indicatorTypeService.createType(
                     id = typeData.id,
                     category = category,
-                    shortName = typeData.shortName,
-                    longName = typeData.longName,
+                    name = typeData.name,
                     link = typeData.link,
                     valueType = booleanIndicatorValueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = typeData.required ?: true)

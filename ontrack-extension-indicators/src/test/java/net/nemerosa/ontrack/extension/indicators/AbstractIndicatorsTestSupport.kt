@@ -55,8 +55,7 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
         indicatorTypeService.createType(
                 id = id,
                 category = this,
-                shortName = id,
-                longName = name,
+                name = name,
                 link = null,
                 valueType = booleanIndicatorValueType,
                 valueConfig = BooleanIndicatorValueTypeConfig(required)

@@ -91,14 +91,9 @@ class IndicatorTypeController(
                                 .value(type?.category?.id)
                 )
                 .with(
-                        Text.of(CreateTypeForm::shortName.name)
-                                .label("Short name")
-                                .value(type?.shortName)
-                )
-                .with(
-                        Text.of(CreateTypeForm::longName.name)
-                                .label("Long name")
-                                .value(type?.longName)
+                        Text.of(CreateTypeForm::name.name)
+                                .label("Name")
+                                .value(type?.name)
                 )
                 .with(
                         Url.of(CreateTypeForm::link.name)
