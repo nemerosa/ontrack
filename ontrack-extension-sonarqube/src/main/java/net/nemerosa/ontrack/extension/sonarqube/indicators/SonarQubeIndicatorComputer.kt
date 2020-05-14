@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValueType
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresCollectionService
+import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -50,10 +51,10 @@ class SonarQubeIndicatorComputer(
 
     private val sonarTypes: List<SonarQubeIndicatorType<*>> = listOf(
             SonarQubeIndicatorType(
-                    measure = "coverage",
+                    measure = SonarQubeMeasuresSettings.COVERAGE,
                     type = IndicatorComputedType(
                             category = sonarCategory,
-                            id = "sonarquve-coverage",
+                            id = "sonarqube-coverage",
                             name = "SonarQube coverage",
                             link = null,
                             valueType = percentageIndicatorValueType,
@@ -66,6 +67,19 @@ class SonarQubeIndicatorComputer(
                             else -> m.toInt().percent()
                         }
                     }
+            ),
+            SonarQubeIndicatorType(
+                    measure = SonarQubeMeasuresSettings.BLOCKER_VIOLATIONS,
+                    type = IndicatorComputedType(
+                            category = sonarCategory,
+                            id = "sonarqube-blocker-violations",
+                            name = "SonarQube blocker issues",
+                            link = null,
+                            // FIXME Integer with thresholds
+                            valueType = percentageIndicatorValueType,
+                            valueConfig = PercentageThreshold(threshold = 80.percent(), higherIsBetter = true)
+                    ),
+                    toValueConverter = { m -> m.toInt().percent() }
             )
     )
 
