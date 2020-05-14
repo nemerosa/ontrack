@@ -218,7 +218,7 @@ pipeline {
                             --file docker-compose-jacoco.yml \\
                             logs > docker-compose-acceptance.log
                     '''
-                    archiveArtifacts(artifacts: "docker-compose-acceptance.log", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-acceptance/src/main/compose/docker-compose-acceptance.log", allowEmptyArchive: true)
                     sh '''
                         rm -rf build/acceptance
                         mkdir -p build
