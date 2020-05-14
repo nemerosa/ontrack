@@ -5,5 +5,5 @@ import org.springframework.stereotype.Component
 
 @Component
 class ImportsIndicatorSourceProvider : IndicatorSourceProvider {
-    override val name: String = "Bulk import"
+    override val name: String = "Import"
 }

@@ -42,11 +42,6 @@ class IndicatorSource(
 )
 
 /**
- * ID of an [IndicatorSource] is its FQCN.
- */
-val IndicatorSource.id: String get() = this::class.java.name
-
-/**
  * Creates a source
  */
 fun IndicatorSourceProvider.createSource(name: String) = IndicatorSource(

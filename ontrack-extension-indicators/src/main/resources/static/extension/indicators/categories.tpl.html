@@ -37,8 +37,7 @@
                 {{category.name}}
             </td>
             <td>
-                <span ng-if="category.source">{{category.source.name}}</span>
-                <span ng-if="!category.source"><i title="This category has been provisioned manually">Manual</i></span>
+                <ot-extension-indicators-source source="category.source"></ot-extension-indicators-source>
             </td>
             <td>
                 {{category.types.length}}

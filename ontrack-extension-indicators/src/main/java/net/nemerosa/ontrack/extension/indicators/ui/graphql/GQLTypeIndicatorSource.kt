@@ -8,18 +8,24 @@ import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
 @Component
-class GQLTypeIndicatorSource : GQLType {
+class GQLTypeIndicatorSource(
+        private val indicatorSourceProviderDescription: GQLTypeIndicatorSourceProviderDescription
+) : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
             .name(typeName)
             .description("Indicator source")
-            .stringField("id", "Indicator source ID")
-            .stringField("name", "Indicator source name")
+            .stringField(IndicatorSource::name, "Indicator source name")
+            .field {
+                it.name(IndicatorSource::provider.name)
+                        .description("Indicator source provider")
+                        .type(indicatorSourceProviderDescription.typeRef)
+            }
             .build()
 
     override fun getTypeName(): String = INDICATOR_SOURCE
 
     companion object {
-        val INDICATOR_SOURCE = IndicatorSource::class.java.simpleName
+        val INDICATOR_SOURCE: String = IndicatorSource::class.java.simpleName
     }
 }

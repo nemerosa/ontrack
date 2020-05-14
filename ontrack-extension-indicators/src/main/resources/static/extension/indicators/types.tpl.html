@@ -43,8 +43,7 @@
                 <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
             </td>
             <td>
-                <span ng-if="type.source">{{type.source.name}}</span>
-                <span ng-if="!type.source"><i title="This type has been provisioned manually">Manual</i></span>
+                <ot-extension-indicators-source source="type.source"></ot-extension-indicators-source>
             </td>
             <td>
                 {{type.valueType.name}}

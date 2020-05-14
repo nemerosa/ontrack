@@ -23,7 +23,10 @@ angular.module('ontrack.extension.indicators', [
                   id
                   name
                   source {
-                    id
+                    provider {
+                        id
+                        name
+                    }
                     name
                   }
                   links {
@@ -112,7 +115,10 @@ angular.module('ontrack.extension.indicators', [
                   name
                   link
                   source {
-                    id
+                    provider {
+                        id
+                        name
+                    }
                     name
                   }
                   category {
@@ -743,6 +749,15 @@ angular.module('ontrack.extension.indicators', [
             scope: {
                 stats: '=',
                 item: '@'
+            }
+        };
+    })
+    .directive('otExtensionIndicatorsSource', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-source.tpl.html',
+            scope: {
+                source: '='
             }
         };
     })
