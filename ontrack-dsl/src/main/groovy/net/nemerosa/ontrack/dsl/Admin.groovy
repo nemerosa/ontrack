@@ -123,54 +123,52 @@ class Admin {
         }
     }
 
-    /**
-     * Gets the list of LDAP mappings
-     */
-    @DSLMethod("Gets the list of LDAP mappings.")
-    List<GroupMapping> getLdapMappings() {
-        ontrack.get('extension/ldap/ldap-mapping').resources.collect { node ->
+    @DSLMethod("Gets the list of mappings for a given source.")
+    List<GroupMapping> getMappedGroups(
+            String provider,
+            String source
+    ) {
+        ontrack.get("rest/group-mappings/${provider}/${source}").collect { node ->
             new GroupMapping(ontrack, node)
         }
     }
 
     /**
-     * Creates or updates a LDAP mapping
-     * @param name LDAP group name
+     * Creates or updates a mapping between a provided group and an actual Ontrack group
+     *
+     * @param provider ID of the provider
+     * @param source Name of the source in the provided
+     * @param name Provided group name
      * @param groupName Group to map to
      * @return Mapping
      */
-    @DSLMethod("Creates or updates a LDAP mapping.")
-    GroupMapping ldapMapping(String name, String groupName) {
-        def mappings = ontrack.get('extension/ldap/ldap-mapping')
+    @DSLMethod("Creates or updates a mapping between a provided group and an actual Ontrack group.")
+    GroupMapping setGroupMapping(
+            String provider,
+            String source,
+            String name,
+            String groupName
+    ) {
+        def mappings = getMappedGroups(provider, source)
         // Group ID from the name
         AccountGroup group = findGroupByName(groupName)
         // Looks for an existing mapping
-        def mapping = mappings.resources.find { it.name == name }
+        def mapping = mappings.find { it.name == name }
         if (mapping != null) {
-            // Update
-            new GroupMapping(
-                    ontrack,
-                    ontrack.put(
-                            mapping._update as String,
-                            [
-                                    name : name,
-                                    group: group.id
-                            ]
-                    )
-            )
-        } else {
-            // Creation
-            new GroupMapping(
-                    ontrack,
-                    ontrack.post(
-                            mappings._create as String,
-                            [
-                                    name : name,
-                                    group: group.id
-                            ]
-                    )
-            )
+            // Delete first
+            ontrack.delete("rest/group-mappings/${provider}/${source}/${mapping.id}" as String)
         }
+        // Creation
+        new GroupMapping(
+                ontrack,
+                ontrack.post(
+                        "rest/group-mappings/${provider}/${source}" as String,
+                        [
+                                name : name,
+                                group: group.id
+                        ]
+                )
+        )
     }
 
     protected AccountGroup findGroupByName(String groupName) {
@@ -214,11 +212,11 @@ class Admin {
         ontrack.get("rest/accounts/permissions/globals").resources
                 .findAll { it.target.type == 'ACCOUNT' && it.target.id == account.id }
                 .collect {
-            new Role(
-                    ontrack,
-                    it.role
-            )
-        }
+                    new Role(
+                            ontrack,
+                            it.role
+                    )
+                }
     }
 
     /**
@@ -248,11 +246,11 @@ class Admin {
         ontrack.get("rest/accounts/permissions/projects/${project.id}").resources
                 .findAll { it.target.type == 'ACCOUNT' && it.target.id == account.id }
                 .collect {
-            new Role(
-                    ontrack,
-                    it.role
-            )
-        }
+                    new Role(
+                            ontrack,
+                            it.role
+                    )
+                }
     }
 
     /**
@@ -280,11 +278,11 @@ class Admin {
         ontrack.get("rest/accounts/permissions/globals").resources
                 .findAll { it.target.type == 'GROUP' && it.target.id == group.id }
                 .collect {
-            new Role(
-                    ontrack,
-                    it.role
-            )
-        }
+                    new Role(
+                            ontrack,
+                            it.role
+                    )
+                }
     }
 
     /**
@@ -314,10 +312,10 @@ class Admin {
         ontrack.get("rest/accounts/permissions/projects/${project.id}").resources
                 .findAll { it.target.type == 'GROUP' && it.target.id == group.id }
                 .collect {
-            new Role(
-                    ontrack,
-                    it.role
-            )
-        }
+                    new Role(
+                            ontrack,
+                            it.role
+                    )
+                }
     }
 }

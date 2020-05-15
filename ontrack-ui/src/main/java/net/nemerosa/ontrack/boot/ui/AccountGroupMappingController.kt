@@ -19,6 +19,15 @@ class AccountGroupMappingController(
 ) : AbstractResourceController() {
 
     /**
+     * Gets the list of mappings for a provider and a source
+     */
+    @GetMapping("{provider}/{source}")
+    fun getMappings(@PathVariable provider: String, @PathVariable source: String): ResponseEntity<List<AccountGroupMapping>> {
+        val authenticationSource = authenticationSourceRepository.getRequiredAuthenticationSource(provider, source)
+        return ResponseEntity.ok(accountGroupMappingService.getMappings(authenticationSource))
+    }
+
+    /**
      * Creates a mapping
      */
     @PostMapping("{provider}/{source}")

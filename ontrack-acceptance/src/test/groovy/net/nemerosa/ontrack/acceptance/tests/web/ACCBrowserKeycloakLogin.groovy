@@ -30,7 +30,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
     @Test
     void 'Login with Keycloak and sets as admin'() {
-        withKeycloakConfigured { realm, userAdmin, _ ->
+        withKeycloakConfigured { String realm, userAdmin, _ ->
             browser { browser ->
                 // Initial login
                 def loginPage = goTo(LoginPage, [:])
@@ -39,7 +39,9 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
                 def homePage = keycloakLoginPage.login(userAdmin, "secret")
                 def userName = homePage.header.userName
                 assert userName == "Admin ${userAdmin}"
-                // TODO Setup of group mappings
+                // Setup of group mappings
+                ontrack.admin.setGroupMapping("oidc", realm, "ontrack-admin", "Administrators")
+                ontrack.admin.setGroupMapping("oidc", realm, "ontrack-user", "Read-Only")
                 // TODO Re-login
                 // TODO Check the group
             }
