@@ -47,7 +47,14 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
                 // Re-login
                 assert loginPage.hasExtension(realm): "OIDC extension is present"
                 homePage = loginPage.useExtension(realm, HomePage) // We are already authenticated in Keycloak, going directly to the Home page
-                // TODO Check the group
+                // Checks the user can create a project
+                def projectName = uid('P')
+                homePage.createProject {
+                    name = projectName
+                    description = "Project ${projectName}"
+                }
+                // Checks the project is visible in the list
+                assert homePage.isProjectPresent(projectName)
             }
         }
     }
