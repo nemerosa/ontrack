@@ -26,21 +26,26 @@ class AccountJdbcRepository(
                 params("name", username)
                         .addValue("provider", BuiltinAuthenticationSourceProvider.ID)
         ) { rs: ResultSet, _: Int ->
-            BuiltinAccount(
-                    toAccount(rs),
-                    rs.getString("password")
-            )
+            toAccount(rs)?.let { account ->
+                BuiltinAccount(
+                        account,
+                        rs.getString("password")
+                )
+            }
         }
     }
 
-    private fun toAccount(rs: ResultSet): Account {
-        return of(
-                rs.getString("name"),
-                rs.getString("fullName"),
-                rs.getString("email"),
-                getEnum(SecurityRole::class.java, rs, "role"),
-                rs.getAuthenticationSource(authenticationSourceRepository)
-        ).withId(id(rs))
+    private fun toAccount(rs: ResultSet): Account? {
+        val authenticationSource = rs.getAuthenticationSource(authenticationSourceRepository)
+        return authenticationSource?.let {
+            of(
+                    rs.getString("name"),
+                    rs.getString("fullName"),
+                    rs.getString("email"),
+                    getEnum(SecurityRole::class.java, rs, "role"),
+                    authenticationSource
+            ).withId(id(rs))
+        }
     }
 
     override fun findAll(): Collection<Account> {
@@ -108,6 +113,21 @@ class AccountJdbcRepository(
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         } ?: throw AccountNotFoundException(accountId.value)
+    }
+
+    override fun deleteAccountBySource(source: AuthenticationSource) {
+        namedParameterJdbcTemplate!!.update(
+                "DELETE FROM ACCOUNTS WHERE PROVIDER = :provider AND SOURCE = :source",
+                source.asParams()
+        )
+    }
+
+    override fun doesAccountIdExist(id: ID): Boolean {
+        return getFirstItem(
+                "SELECT ID FROM ACCOUNTS WHERE ID = :id",
+                params("id", id.value),
+                Int::class.java
+        ) != null
     }
 
     override fun findByNameToken(token: String): List<Account> {

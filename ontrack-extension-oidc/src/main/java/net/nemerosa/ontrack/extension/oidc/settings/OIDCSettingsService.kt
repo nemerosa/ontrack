@@ -10,6 +10,11 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 interface OIDCSettingsService {
 
     /**
+     * Adds a listener to events around OIDC providers.
+     */
+    fun addOidcProviderListener(oidcProviderListener: OIDCProviderListener)
+
+    /**
      * Gets the list of providers
      */
     val providers: List<OntrackOIDCProvider>

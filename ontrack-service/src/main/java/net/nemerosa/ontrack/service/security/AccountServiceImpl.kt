@@ -387,6 +387,16 @@ class AccountServiceImpl(
         return accountRepository.findAccountByName(username)
     }
 
+    override fun doesAccountIdExist(id: ID): Boolean {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        return accountRepository.doesAccountIdExist(id)
+    }
+
+    override fun deleteAccountBySource(source: AuthenticationSource) {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        accountRepository.deleteAccountBySource(source)
+    }
+
     private fun getGroupACL(group: AccountGroup): Authorisations =
             Authorisations()
                     // Global role

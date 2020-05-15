@@ -3,9 +3,9 @@ package net.nemerosa.ontrack.model.security;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,8 @@ public interface AccountService {
      * @param raw Account without authorisations
      * @return Account with authorisations
      */
-    @NotNull OntrackAuthenticatedUser withACL(@NotNull OntrackUser raw);
+    @NotNull
+    OntrackAuthenticatedUser withACL(@NotNull OntrackUser raw);
 
     /**
      * List of accounts
@@ -36,7 +37,7 @@ public interface AccountService {
     /**
      * Creates an account and allows for further customisation
      *
-     * @param input                    Account data
+     * @param input                Account data
      * @param authenticationSource Authentication source
      */
     Account create(AccountInput input, AuthenticationSource authenticationSource);
@@ -226,4 +227,16 @@ public interface AccountService {
      */
     @Nullable
     Account findAccountByName(@NotNull String username);
+
+    /**
+     * Checks if an account ID exists
+     */
+    boolean doesAccountIdExist(@NotNull ID id);
+
+    /**
+     * Deletes all accounts having the given source.
+     *
+     * @param source Source to delete accounts from
+     */
+    void deleteAccountBySource(@NotNull AuthenticationSource source);
 }

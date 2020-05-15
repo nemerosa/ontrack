@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.structure.ID
 
 interface AccountRepository {
@@ -60,4 +61,16 @@ interface AccountRepository {
      * Finds an account using its name only.
      */
     fun findAccountByName(username: String): Account?
+
+    /**
+     * Checks if an account ID exists
+     */
+    fun doesAccountIdExist(id: ID): Boolean
+
+    /**
+     * Deletes all accounts having the given source.
+     *
+     * @param source Source to delete accounts from
+     */
+    fun deleteAccountBySource(source: AuthenticationSource)
 }

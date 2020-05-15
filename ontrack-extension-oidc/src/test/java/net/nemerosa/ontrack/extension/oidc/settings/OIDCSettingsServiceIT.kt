@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import net.nemerosa.ontrack.extension.oidc.OidcAuthenticationSourceProvider
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProviderFixtures.testProvider
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.After
 import org.junit.Test
@@ -145,6 +147,33 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
             service.deleteProvider(id)
             val checkAgain = service.cachedProviders
             assertNotSame(check, checkAgain, "New cached list")
+        }
+    }
+
+    @Test
+    fun `Cleanup of accounts after a provider is deleted`() {
+        asAdmin {
+            // Provider
+            val id = uid("I")
+            val provider = service.createProvider(testProvider(id))
+            // Associated account
+            val name = uid("U")
+            val account = accountService.create(
+                    AccountInput(
+                            name = name,
+                            fullName = "Test $name",
+                            email = "$name@nemerosa.net",
+                            password = null,
+                            groups = null
+                    ),
+                    OidcAuthenticationSourceProvider.Companion.asSource(provider)
+            )
+            // Removes the provider
+            service.deleteProvider(provider.id)
+            // Checks the account is gone
+            assertNull(accountService.findAccountByName(name), "Account is gone")
+            // ... really gone
+            assertFalse(accountService.doesAccountIdExist(account.id), "Account is gone")
         }
     }
 

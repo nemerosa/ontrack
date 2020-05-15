@@ -12,8 +12,8 @@ fun AuthenticationSource.asParams() = MapSqlParameterSource(
         )
 )
 
-fun ResultSet.getAuthenticationSource(authenticationSourceRepository: AuthenticationSourceRepository): AuthenticationSource {
+fun ResultSet.getAuthenticationSource(authenticationSourceRepository: AuthenticationSourceRepository): AuthenticationSource? {
     val provider: String = getString("PROVIDER")
     val source: String = getString("SOURCE")
-    return authenticationSourceRepository.getRequiredAuthenticationSource(provider, source)
+    return authenticationSourceRepository.getAuthenticationSource(provider, source)
 }

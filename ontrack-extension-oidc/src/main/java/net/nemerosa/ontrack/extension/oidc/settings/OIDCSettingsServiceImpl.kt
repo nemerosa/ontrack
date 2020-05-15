@@ -23,6 +23,11 @@ class OIDCSettingsServiceImpl(
 ) : OIDCSettingsService {
 
     /**
+     * Provider listeners
+     */
+    private val providerListeners = mutableListOf<OIDCProviderListener>()
+
+    /**
      * Settings listeners
      */
     private val listeners = mutableListOf<OIDCSettingsListener>()
@@ -66,13 +71,24 @@ class OIDCSettingsServiceImpl(
 
     override fun deleteProvider(id: String): Ack {
         securityService.checkGlobalFunction(GlobalSettings::class.java)
-        return if (storageService.exists(OIDC_PROVIDERS_STORE, id)) {
+        val provider = getProviderById(id)
+        return if (provider != null) {
+            // Cleanup
+            cleanupForProvider(provider)
+            // Actual deletion
             storageService.delete(OIDC_PROVIDERS_STORE, id)
             clearCache()
             Ack.OK
         } else {
             Ack.NOK
         }
+    }
+
+    /**
+     * Cleanup of accounts and group mappings.
+     */
+    private fun cleanupForProvider(provider: OntrackOIDCProvider) {
+        providerListeners.forEach { it.onOIDCProviderDeleted(provider) }
     }
 
     override fun getProviderById(id: String): OntrackOIDCProvider? {
@@ -133,10 +149,10 @@ class OIDCSettingsServiceImpl(
 
     private fun clearCache() {
         providersCache.clear()
-        notifyListeners()
+        notifySettingsListeners()
     }
 
-    private fun notifyListeners() {
+    private fun notifySettingsListeners() {
         listeners.forEach {
             it.onOidcSettingsChanged()
         }
@@ -144,6 +160,10 @@ class OIDCSettingsServiceImpl(
 
     override fun addOidcSettingsListener(listener: OIDCSettingsListener) {
         listeners += listener
+    }
+
+    override fun addOidcProviderListener(oidcProviderListener: OIDCProviderListener) {
+        providerListeners += oidcProviderListener
     }
 
     companion object {
