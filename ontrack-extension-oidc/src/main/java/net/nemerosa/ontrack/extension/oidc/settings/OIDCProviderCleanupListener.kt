@@ -1,13 +1,18 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
 import net.nemerosa.ontrack.extension.oidc.OidcAuthenticationSourceProvider
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.model.security.AccountService
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-@Component
+@Service
+@Transactional
 class OIDCProviderCleanupListener(
         oidcSettingsService: OIDCSettingsService,
-        private val accountService: AccountService
+        private val accountService: AccountService,
+        private val accountGroupMappingService: AccountGroupMappingService
 ) : OIDCProviderListener {
 
     init {
@@ -15,8 +20,8 @@ class OIDCProviderCleanupListener(
     }
 
     override fun onOIDCProviderDeleted(provider: OntrackOIDCProvider) {
-        accountService.deleteAccountBySource(
-                OidcAuthenticationSourceProvider.asSource(provider)
-        )
+        val source = OidcAuthenticationSourceProvider.asSource(provider)
+        accountService.deleteAccountBySource(source)
+        accountGroupMappingService.deleteMappingsBySource(source)
     }
 }

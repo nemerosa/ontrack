@@ -42,6 +42,13 @@ class AccountGroupMappingJdbcRepository(
                 }
     }
 
+    override fun deleteMappingsBySource(source: AuthenticationSource) {
+        namedParameterJdbcTemplate!!.update(
+                "DELETE FROM ACCOUNT_GROUP_MAPPING WHERE PROVIDER = :provider AND SOURCE = :source",
+                source.asParams()
+        )
+    }
+
     override fun findAll(): List<AccountGroupMapping> {
         return jdbcTemplate!!.query(
                 "SELECT * FROM ACCOUNT_GROUP_MAPPING ORDER BY ORIGIN, PROVIDER, SOURCE"

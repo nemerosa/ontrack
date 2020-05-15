@@ -49,4 +49,8 @@ class AccountGroupMappingServiceImpl(
         return accountGroupMappingRepository.getMappingsForGroup(group)
     }
 
+    override fun deleteMappingsBySource(source: AuthenticationSource) {
+        accountGroupMappingRepository.deleteMappingsBySource(source)
+    }
+
 }

@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.oidc.settings
 import net.nemerosa.ontrack.extension.oidc.OidcAuthenticationSourceProvider
 import net.nemerosa.ontrack.extension.oidc.settings.OntrackOIDCProviderFixtures.testProvider
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.After
@@ -14,6 +16,9 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var service: OIDCSettingsService
+
+    @Autowired
+    private lateinit var accountGroupMappingService: AccountGroupMappingService
 
     @After
     fun cleanup() {
@@ -174,6 +179,32 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
             assertNull(accountService.findAccountByName(name), "Account is gone")
             // ... really gone
             assertFalse(accountService.doesAccountIdExist(account.id), "Account is gone")
+        }
+    }
+
+    @Test
+    fun `Cleanup of group mappings after a provider is deleted`() {
+        asAdmin {
+            // Provider
+            val id = uid("I")
+            val provider = service.createProvider(testProvider(id))
+            val source = OidcAuthenticationSourceProvider.asSource(provider)
+            // Creating a group
+            val group = doCreateAccountGroup()
+            // Creating a group mapping
+            accountGroupMappingService.newMapping(
+                    source,
+                    AccountGroupMappingInput(
+                            "my-mapping",
+                            group.id
+                    )
+            )
+            // Checks the group mapping is there
+            assertTrue(accountGroupMappingService.getMappings(source).isNotEmpty(), "Group mappings are present")
+            // Removes the provider
+            service.deleteProvider(provider.id)
+            // Checks the account group mapping is gone
+            assertTrue(accountGroupMappingService.getMappings(source).isEmpty(), "Group mappings are gone")
         }
     }
 

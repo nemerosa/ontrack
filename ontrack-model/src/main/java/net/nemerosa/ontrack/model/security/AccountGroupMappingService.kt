@@ -76,4 +76,9 @@ interface AccountGroupMappingService {
      */
     fun getMappingsForGroup(group: AccountGroup): List<AccountGroupMapping>
 
+    /**
+     * Deletes all mappings associated to this [source].
+     */
+    fun deleteMappingsBySource(source: AuthenticationSource)
+
 }
