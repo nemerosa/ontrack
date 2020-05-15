@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance.tests.web
 
 import net.nemerosa.ontrack.acceptance.AcceptanceTestClient
+import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
 import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
@@ -39,10 +40,13 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
                 def homePage = keycloakLoginPage.login(userAdmin, "secret")
                 def userName = homePage.header.userName
                 assert userName == "Admin ${userAdmin}"
+                loginPage = homePage.logout()
                 // Setup of group mappings
                 ontrack.admin.setGroupMapping("oidc", realm, "ontrack-admin", "Administrators")
                 ontrack.admin.setGroupMapping("oidc", realm, "ontrack-user", "Read-Only")
-                // TODO Re-login
+                // Re-login
+                assert loginPage.hasExtension(realm): "OIDC extension is present"
+                homePage = loginPage.useExtension(realm, HomePage) // We are already authenticated in Keycloak, going directly to the Home page
                 // TODO Check the group
             }
         }
