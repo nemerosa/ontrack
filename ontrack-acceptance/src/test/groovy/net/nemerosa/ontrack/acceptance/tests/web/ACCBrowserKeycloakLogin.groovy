@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
+import org.keycloak.admin.client.resource.RoleScopeResource
 import org.keycloak.admin.client.resource.UsersResource
 import org.keycloak.representations.idm.*
 
@@ -76,33 +77,39 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         representation.enabled = true
         adminClient.realms().create(representation)
 
+        def realmClient = adminClient.realm(realm)
+
         try {
 
             // Creates three roles
-            def roles = adminClient.realm(realm).roles()
-            ["ontrack-admin", "ontrack-user", "other-role"].each { role ->
+            def roles = realmClient.roles()
+            Map<String, String> roleIds = ["ontrack-admin", "ontrack-user", "other-role"].collectEntries { role ->
                 def rep = new RoleRepresentation()
                 rep.setName(role)
                 roles.create(rep)
+                String id = roles.list().find { it.name == role }.id
+                [role, id]
             }
 
             // Creates two users
-            def users = adminClient.realm(realm).users()
+            def users = realmClient.users()
 
             def userAdmin = createUser(
                     users,
                     "Admin",
-                    ["ontrack-admin", "ontrack-user", "other-role"]
+                    ["ontrack-admin", "ontrack-user", "other-role"],
+                    roleIds
             )
 
             def userSimple = createUser(
                     users,
                     "User",
-                    ["ontrack-user", "other-role"]
+                    ["ontrack-user", "other-role"],
+                    roleIds
             )
 
             // Creates an application
-            def clientAdmin = adminClient.realm(realm).clients()
+            def clientAdmin = realmClient.clients()
             def clientId = uid("C")
             def client = new ClientRepresentation()
             client.protocol = "openid-connect"
@@ -136,7 +143,7 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
         } finally {
             if (configRule.config.keycloakCleanup) {
-                adminClient.realm(realm).remove()
+                realmClient.remove()
             }
         }
     }
@@ -144,7 +151,8 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
     private static String createUser(
             UsersResource users,
             String firstName,
-            List<String> roles
+            List<String> roles,
+            Map<String, String> roleIds
     ) {
 
         def username = uid("U")
@@ -154,7 +162,6 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
         user.username = username
         user.firstName = firstName
         user.lastName = username
-        user.realmRoles = roles
         user.email = "${username}@nemerosa.net"
         user.emailVerified = true
         user.enabled = true
@@ -162,6 +169,15 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
 
         def userId = users.search(username).first().id
         def userClient = users.get(userId)
+
+        def roleMappingClient = userClient.roles().realmLevel()
+        def roleRepresentations = roles.collect { String role ->
+            def roleRep = new RoleRepresentation()
+            roleRep.setId(roleIds[role])
+            roleRep.setName(role)
+            roleRep
+        }
+        roleMappingClient.add(roleRepresentations)
 
         def credentials = new CredentialRepresentation()
         credentials.type = CredentialRepresentation.PASSWORD
