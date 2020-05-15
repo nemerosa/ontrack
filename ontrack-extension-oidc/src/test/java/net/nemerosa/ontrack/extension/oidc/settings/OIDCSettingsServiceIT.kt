@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.model.security.AccountInput
+import net.nemerosa.ontrack.model.security.ProvidedGroupsService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.After
 import org.junit.Test
@@ -19,6 +20,9 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var accountGroupMappingService: AccountGroupMappingService
+
+    @Autowired
+    private lateinit var providedGroupsService: ProvidedGroupsService
 
     @After
     fun cleanup() {
@@ -171,7 +175,7 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
                             password = null,
                             groups = null
                     ),
-                    OidcAuthenticationSourceProvider.Companion.asSource(provider)
+                    OidcAuthenticationSourceProvider.asSource(provider)
             )
             // Removes the provider
             service.deleteProvider(provider.id)
@@ -179,6 +183,40 @@ class OIDCSettingsServiceIT : AbstractDSLTestSupport() {
             assertNull(accountService.findAccountByName(name), "Account is gone")
             // ... really gone
             assertFalse(accountService.doesAccountIdExist(account.id), "Account is gone")
+        }
+    }
+
+    @Test
+    fun `Cleanup of provided groups after a provider is deleted`() {
+        asAdmin {
+            // Provider
+            val id = uid("I")
+            val provider = service.createProvider(testProvider(id))
+            val source = OidcAuthenticationSourceProvider.asSource(provider)
+            // Associated account
+            val name = uid("U")
+            val account = accountService.create(
+                    AccountInput(
+                            name = name,
+                            fullName = "Test $name",
+                            email = "$name@nemerosa.net",
+                            password = null,
+                            groups = null
+                    ),
+                    source
+            )
+            // Associated provider group
+            providedGroupsService.saveProvidedGroups(
+                    account.id(),
+                    source,
+                    setOf("my-group")
+            )
+            // Checks the group is saved
+            assertTrue(providedGroupsService.getProvidedGroups(account.id(), source).isNotEmpty(), "Provided groups are saved")
+            // Removes the provider
+            service.deleteProvider(provider.id)
+            // Checks the group is gone
+            assertTrue(providedGroupsService.getProvidedGroups(account.id(), source).isEmpty(), "Provided groups are gone")
         }
     }
 
