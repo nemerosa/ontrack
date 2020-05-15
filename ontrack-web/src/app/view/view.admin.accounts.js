@@ -14,6 +14,16 @@ angular.module('ot.view.admin.accounts', [
         var view = ot.view();
         view.title = "Account management";
 
+        $scope.activeTab = 'accounts';
+
+        $scope.selectAccountsTab = () => {
+            $scope.activeTab = 'accounts';
+        };
+
+        $scope.selectAccountGroupsTab = () => {
+            $scope.activeTab = 'account-groups';
+        };
+
         // Loading the accounts
         function load() {
             ot.call($http.get('rest/accounts')).then(function (accounts) {

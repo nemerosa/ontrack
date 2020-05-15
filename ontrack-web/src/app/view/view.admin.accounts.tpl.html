@@ -1,6 +1,20 @@
 <ot-view>
 
-    <div class="panel panel-default">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a ng-click="selectAccountsTab()" aria-controls="accounts" role="tab">Accounts</a></li>
+        <li role="presentation"><a ng-click="selectAccountGroupsTab()" aria-controls="account-groups" role="tab">Account groups</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="accounts">
+
+        </div>
+        <div role="tabpanel" class="tab-pane" id="account-groups">
+
+        </div>
+    </div>
+
+    <div class="panel panel-default" ng-show="activeTab == 'accounts'">
         <div class="panel-heading">
             <div class="panel-title form-inline">
                 <div class="form-group">
@@ -69,7 +83,7 @@
         </table>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-default" ng-show="activeTab == 'account-groups'">
         <div class="panel-heading">
             <div class="panel-title form-inline">
                 <div class="form-group">
