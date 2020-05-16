@@ -1,30 +1,22 @@
 <ot-view>
 
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a ng-click="selectAccountsTab()" aria-controls="accounts" role="tab">Accounts</a></li>
-        <li role="presentation"><a ng-click="selectAccountGroupsTab()" aria-controls="account-groups" role="tab">Account groups</a></li>
+        <li role="presentation" ng-class="{'active': activeTab == 'accounts'}"><a ng-click="selectAccountsTab()" aria-controls="accounts" role="tab">Accounts</a></li>
+        <li role="presentation" ng-class="{'active': activeTab == 'account-groups'}"><a ng-click="selectAccountGroupsTab()" aria-controls="account-groups" role="tab">Account groups</a></li>
     </ul>
-
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="accounts">
-
-        </div>
-        <div role="tabpanel" class="tab-pane" id="account-groups">
-
-        </div>
-    </div>
 
     <div class="panel panel-default" ng-show="activeTab == 'accounts'">
         <div class="panel-heading">
             <div class="panel-title form-inline">
                 <div class="form-group">
-                    <label>Accounts</label>
-                    <input
+                    <label>
+                        <input
                             id="accountFilter"
                             class="form-control input-sm"
                             ng-model="accountFilter.account"
                             type="text"
                             placeholder="Filter (name, email, group, ...)"/>
+                    </label>
                 </div>
                 <span class="pull-right">
                     <button id="admin-accounts-create" class="form-control btn btn-default btn-xs" ng-click="createAccount()">Create account...</button>
@@ -87,13 +79,14 @@
         <div class="panel-heading">
             <div class="panel-title form-inline">
                 <div class="form-group">
-                    <label>Account groups</label>
-                    <input
+                    <label>
+                        <input
                             id="accountGroupFilter"
                             class="form-control input-sm"
                             ng-model="accountFilter.group"
                             type="text"
                             placeholder="Filter (name, description)"/>
+                    </label>
                 </div>
                 <span class="pull-right">
                     <button class="form-control btn btn-default btn-xs" ng-click="createGroup()">Create group...</button>
