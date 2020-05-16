@@ -78,6 +78,11 @@
                     <span ng-if="account.token && !account.token.valid"
                           class="fa fa-times text-danger"
                           title="Token expired"></span>
+                    <span class="fa fa-trash text-warning ot-command"
+                          title="Revoke token"
+                          ng-if="account.token && account.links._revokeToken"
+                          ng-click="revokeToken(account)"
+                          ></span>
                 </td>
                 <td>
                 <span class="ot-command ot-command-update"

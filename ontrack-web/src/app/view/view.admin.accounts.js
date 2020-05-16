@@ -146,7 +146,16 @@ angular.module('ot.view.admin.accounts', [
             }).then(function () {
                 ot.call($http.delete(group.links._delete)).then(load);
             });
+        };
 
+        // Revoking a token
+        $scope.revokeToken = (account) => {
+            otAlertService.confirm({
+                title: "Token revocation",
+                message: "Do you really want to revoke this token?"
+            }).then(function () {
+                return ot.pageCall($http.post(account.links._revokeToken));
+            }).then(load);
         };
 
     })
