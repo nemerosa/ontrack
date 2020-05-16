@@ -4,6 +4,8 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.booleanField
+import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountGroup
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
@@ -30,7 +32,9 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
                 .name(ACCOUNT_GROUP)
                 .field(GraphqlUtils.idField())
                 .field(GraphqlUtils.nameField())
-                .field(GraphqlUtils.descriptionField()) // Associated accounts
+                .field(GraphqlUtils.descriptionField())
+                .booleanField(AccountGroup::autoJoin)
+                // Associated accounts
                 .field { field: GraphQLFieldDefinition.Builder ->
                     field.name(ACCOUNTS_FIELD)
                             .description("List of associated accounts")

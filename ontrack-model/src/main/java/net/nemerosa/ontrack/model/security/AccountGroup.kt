@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.model.security
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescription
 import java.io.Serializable
 
 /**
@@ -12,6 +12,7 @@ data class AccountGroup(
         override val id: ID,
         val name: String,
         val description: String?,
+        @APIDescription("If `true`, any new account is automatically associated to this group.")
         val autoJoin: Boolean
 ) : Entity, Serializable {
 
