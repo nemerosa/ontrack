@@ -158,6 +158,16 @@ angular.module('ot.view.admin.accounts', [
             }).then(load);
         };
 
+        // Revoking all tokens
+        $scope.revokeAll = (account) => {
+            otAlertService.confirm({
+                title: "Token revocation",
+                message: "Do you really want to revoke all the tokens?"
+            }).then(function () {
+                return ot.pageCall($http.post('/rest/tokens/revokeAll'));
+            }).then(load);
+        };
+
     })
 
 ;

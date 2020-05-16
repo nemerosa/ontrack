@@ -19,7 +19,14 @@
                     </label>
                 </div>
                 <span class="pull-right">
-                    <button id="admin-accounts-create" class="form-control btn btn-default btn-xs" ng-click="createAccount()">Create account</button>
+                    <button id="admin-accounts-create" class="form-control btn btn-info btn-xs" ng-click="createAccount()">
+                        <span class="fa fa-plus"></span>
+                        Create account
+                    </button>
+                    <button id="admin-accounts-revoke-all" class="form-control btn btn-warning btn-xs" ng-click="revokeAll()">
+                        <span class="fa fa-ban"></span>
+                        Revoke all tokens
+                    </button>
                 </span>
             </div>
         </div>
