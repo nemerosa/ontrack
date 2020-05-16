@@ -1,101 +1,77 @@
-package net.nemerosa.ontrack.graphql.schema;
+package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountGroup;
-import net.nemerosa.ontrack.model.security.AccountGroupMappingService;
-import net.nemerosa.ontrack.model.security.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static graphql.schema.GraphQLObjectType.newObject;
-import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.fetcher;
-import static net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList;
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService
+import net.nemerosa.ontrack.model.security.AccountService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
 /**
  * @see AccountGroup
  */
 @Component
-public class GQLTypeAccountGroup implements GQLType {
+class GQLTypeAccountGroup(private val accountService: AccountService,
+                          private val accountGroupMappingService: AccountGroupMappingService,
+                          private val globalRole: GQLTypeGlobalRole,
+                          private val authorizedProject: GQLTypeAuthorizedProject,
+                          private val accountGroupMapping: GQLTypeAccountGroupMapping,
+                          private val fieldContributors: List<GQLFieldContributor>
+) : GQLType {
 
-    public static final String ACCOUNT_GROUP = "AccountGroup";
+    override fun getTypeName(): String = ACCOUNT_GROUP
 
-    public static final String ACCOUNTS_FIELD = "accounts";
-
-    private final AccountService accountService;
-    private final AccountGroupMappingService accountGroupMappingService;
-    private final GQLTypeGlobalRole globalRole;
-    private final GQLTypeAuthorizedProject authorizedProject;
-    private final GQLTypeAccountGroupMapping accountGroupMapping;
-
-    @Autowired
-    public GQLTypeAccountGroup(AccountService accountService,
-                               AccountGroupMappingService accountGroupMappingService,
-                               GQLTypeGlobalRole globalRole,
-                               GQLTypeAuthorizedProject authorizedProject,
-                               GQLTypeAccountGroupMapping accountGroupMapping
-    ) {
-        this.accountService = accountService;
-        this.accountGroupMappingService = accountGroupMappingService;
-        this.globalRole = globalRole;
-        this.authorizedProject = authorizedProject;
-        this.accountGroupMapping = accountGroupMapping;
-    }
-
-    @Override
-    public String getTypeName() {
-        return ACCOUNT_GROUP;
-    }
-
-    @Override
-    public GraphQLObjectType createType(GQLTypeCache cache) {
-        return newObject()
+    override fun createType(cache: GQLTypeCache): GraphQLObjectType {
+        return GraphQLObjectType.newObject()
                 .name(ACCOUNT_GROUP)
                 .field(GraphqlUtils.idField())
                 .field(GraphqlUtils.nameField())
-                .field(GraphqlUtils.descriptionField())
-                // Associated accounts
-                .field(field -> field.name(ACCOUNTS_FIELD)
-                        .description("List of associated accounts")
-                        .type(stdList(new GraphQLTypeReference(GQLTypeAccount.ACCOUNT)))
-                        .dataFetcher(fetcher(AccountGroup.class, this::getAccountsForGroup))
-                )
-                // Global role
-                .field(field -> field.name("globalRole")
-                        .description("Global role for the account group")
-                        .type(globalRole.getTypeRef())
-                        .dataFetcher(fetcher(
-                                AccountGroup.class,
-                                group -> accountService.getGlobalRoleForAccountGroup(group).orElse(null)
-                        ))
-                )
-                // Authorised projects
-                .field(field -> field.name("authorizedProjects")
-                        .description("List of authorized projects")
-                        .type(stdList(authorizedProject.getTypeRef()))
-                        .dataFetcher(fetcher(
-                                AccountGroup.class,
-                                accountService::getProjectPermissionsForAccountGroup
-                        ))
-                )
-                // Mappings
-                .field(field -> field.name("mappings")
-                        .description("Mappings for this group")
-                        .type(stdList(accountGroupMapping.getTypeRef()))
-                        .dataFetcher(fetcher(
-                                AccountGroup.class,
-                                accountGroupMappingService::getMappingsForGroup
-                        ))
-                )
+                .field(GraphqlUtils.descriptionField()) // Associated accounts
+                .field { field: GraphQLFieldDefinition.Builder ->
+                    field.name(ACCOUNTS_FIELD)
+                            .description("List of associated accounts")
+                            .type(GraphqlUtils.stdList(GraphQLTypeReference(GQLTypeAccount.ACCOUNT)))
+                            .dataFetcher(GraphqlUtils.fetcher(AccountGroup::class.java) { accountGroup: AccountGroup -> getAccountsForGroup(accountGroup) })
+                } // Global role
+                .field { field: GraphQLFieldDefinition.Builder ->
+                    field.name("globalRole")
+                            .description("Global role for the account group")
+                            .type(globalRole.typeRef)
+                            .dataFetcher(GraphqlUtils.fetcher(
+                                    AccountGroup::class.java
+                            ) { group: AccountGroup? -> accountService.getGlobalRoleForAccountGroup(group).orElse(null) })
+                } // Authorised projects
+                .field { field: GraphQLFieldDefinition.Builder ->
+                    field.name("authorizedProjects")
+                            .description("List of authorized projects")
+                            .type(GraphqlUtils.stdList(authorizedProject.typeRef))
+                            .dataFetcher(GraphqlUtils.fetcher(
+                                    AccountGroup::class.java) { group: AccountGroup? -> accountService.getProjectPermissionsForAccountGroup(group) })
+                } // Mappings
+                .field { field: GraphQLFieldDefinition.Builder ->
+                    field.name("mappings")
+                            .description("Mappings for this group")
+                            .type(GraphqlUtils.stdList(accountGroupMapping.typeRef))
+                            .dataFetcher(GraphqlUtils.fetcher(
+                                    AccountGroup::class.java) { group: AccountGroup? -> accountGroupMappingService.getMappingsForGroup(group!!) })
+                }
+                // Links
+                .fields(AccountGroup::class.java.graphQLFieldContributions(fieldContributors))
                 // OK
-                .build();
+                .build()
     }
 
-    private List<Account> getAccountsForGroup(AccountGroup accountGroup) {
-        return accountService.getAccountsForGroup(accountGroup);
+    private fun getAccountsForGroup(accountGroup: AccountGroup): List<Account> {
+        return accountService.getAccountsForGroup(accountGroup)
     }
+
+    companion object {
+        const val ACCOUNT_GROUP = "AccountGroup"
+        const val ACCOUNTS_FIELD = "accounts"
+    }
+
 }

@@ -1,33 +1,27 @@
-package net.nemerosa.ontrack.boot.resources;
+package net.nemerosa.ontrack.boot.resources
 
-import net.nemerosa.ontrack.boot.ui.AccountController;
-import net.nemerosa.ontrack.model.security.AccountGroup;
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import net.nemerosa.ontrack.boot.ui.AccountController
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AccountManagement
+import net.nemerosa.ontrack.ui.resource.*
+import org.springframework.stereotype.Component
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
-public class AccountGroupResourceDecorator extends AbstractResourceDecorator<AccountGroup> {
+class AccountGroupResourceDecorator : AbstractLinkResourceDecorator<AccountGroup>(AccountGroup::class.java) {
 
-    public AccountGroupResourceDecorator() {
-        super(AccountGroup.class);
-    }
+    override fun getLinkDefinitions(): Iterable<LinkDefinition<AccountGroup>> = listOf(
+            Link.SELF linkTo { group ->
+                on(AccountController::class.java).getGroup(group.id)
+            },
 
-    @Override
-    public List<Link> links(AccountGroup group, ResourceContext resourceContext) {
-        return resourceContext.links()
-                // Self
-                .self(on(AccountController.class).getGroup(group.getId()))
-                        // Update
-                .link(Link.UPDATE, on(AccountController.class).getGroupUpdateForm(group.getId()))
-                        // Delete
-                .link(Link.DELETE, on(AccountController.class).deleteGroup(group.getId()))
-                        // OK
-                .build();
-    }
+            Link.UPDATE linkTo { group: AccountGroup ->
+                on(AccountController::class.java).getGroupUpdateForm(group.id)
+            } linkIfGlobal AccountManagement::class,
+
+            Link.DELETE linkTo { group: AccountGroup ->
+                on(AccountController::class.java).deleteGroup(group.id)
+            } linkIfGlobal AccountManagement::class
+    )
+    
 }
