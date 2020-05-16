@@ -71,7 +71,7 @@ angular.module('ot.view.admin.accounts', [
             $scope.loading = true;
             otGraphqlService.pageGraphQLCall(query).then((data) => {
                 $scope.accounts = data.accounts;
-                $scope.groups = data.accountGrouss;
+                $scope.groups = data.accountGroups;
                 // Commands
                 view.commands = [
                     // Global permissions
@@ -134,7 +134,7 @@ angular.module('ot.view.admin.accounts', [
 
         // Updating a group
         $scope.updateGroup = function (group) {
-            otFormService.update(group.link._update, "Updating group").then(load);
+            otFormService.update(group.links._update, "Updating group").then(load);
         };
 
         // Deleting a group
@@ -143,7 +143,7 @@ angular.module('ot.view.admin.accounts', [
                 title: "Account group deletion",
                 message: "Do you really want to delete this group?"
             }).then(function () {
-                ot.call($http.delete(group.link._delete)).then(load);
+                ot.call($http.delete(group.links._delete)).then(load);
             });
 
         };
