@@ -46,11 +46,11 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     @Autowired
     protected lateinit var rolesService: RolesService
 
-    protected fun doCreateAccountGroup(): AccountGroup {
+    protected fun doCreateAccountGroup(autoJoin: Boolean = false): AccountGroup {
         return asUser().with(AccountGroupManagement::class.java).call {
             val name = uid("G")
             accountService.createGroup(
-                    AccountGroupInput(name, "", false)
+                    AccountGroupInput(name, "", autoJoin)
             )
         }
     }
