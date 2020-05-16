@@ -56,6 +56,7 @@ angular.module('ot.view.admin.accounts', [
                 id
                 name
                 description
+                autoJoin
                 links {
                   _update
                   _delete
