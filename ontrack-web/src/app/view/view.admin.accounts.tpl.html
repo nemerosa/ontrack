@@ -36,6 +36,7 @@
                 <th>Source</th>
                 <th>Role</th>
                 <th>Groups</th>
+                <th>Token</th>
                 <th>&nbsp;</th>
             </tr>
             </thead>
@@ -63,6 +64,20 @@
                         {{accountGroup.name}}
                     </span>
                     <span ng-hide="account.groups" class="ot-description">No group</span>
+                </td>
+                <td>
+                    <span ng-if="!account.token"
+                          class="fa fa-ban text-muted"
+                          title="No token for this account"></span>
+                    <span ng-if="account.token && account.token.valid && account.token.validUntil"
+                          class="fa fa-check text-success"
+                          title="Token valid until {{ account.token.validUntil | date:'fullDate'}} {{ account.token.validUntil | date:'mediumTime'}}"></span>
+                    <span ng-if="account.token && account.token.valid && !account.token.validUntil"
+                          class="fa fa-check text-success"
+                          title="Token cannot expire"></span>
+                    <span ng-if="account.token && !account.token.valid"
+                          class="fa fa-times text-danger"
+                          title="Token expired"></span>
                 </td>
                 <td>
                 <span class="ot-command ot-command-update"
