@@ -565,6 +565,7 @@ class CoreResourceModuleTest {
     @Test
     @Throws(JsonProcessingException::class)
     fun account_group_links() {
+        `when`(securityService.isGlobalFunctionGranted(AccountManagement::class.java)).thenReturn(true)
         assertResourceJson(
                 mapper,
                 `object`()
