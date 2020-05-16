@@ -19,14 +19,15 @@
                     </label>
                 </div>
                 <span class="pull-right">
-                    <button id="admin-accounts-create" class="form-control btn btn-default btn-xs" ng-click="createAccount()">Create account...</button>
+                    <button id="admin-accounts-create" class="form-control btn btn-default btn-xs" ng-click="createAccount()">Create account</button>
                 </span>
             </div>
         </div>
-        <div class="panel-body" ng-hide="accounts.resources">
-            Loading the accounts
+        <div class="panel-body" ng-show="loading">
+            <span class="ot-loading-indicator"></span>
+            Loading the accounts...
         </div>
-        <table class="table table-hover" ng-if="accounts.resources">
+        <table class="table table-hover" ng-if="accounts">
             <thead>
             <tr>
                 <th>Name</th>
@@ -39,7 +40,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="account in accounts.resources | filter:accountFilter.account">
+            <tr ng-repeat="account in accounts | filter:accountFilter.account">
                 <td>
                     <b>{{account.name}}</b>
                 </td>
@@ -51,23 +52,25 @@
                     <span ng-if="!account.email" class="ot-description">No email</span>
                 </td>
                 <td>
-                    {{account.authenticationSource.name}}
+                    {{sourceDisplayName(account.authenticationSource)}}
                 </td>
                 <td>
-                    <span class="ot-description" ng-if="account.defaultAdmin">Built-in administrator</span>
-                    <span ng-if="!account.defaultAdmin">Normal user</span>
+                    <span class="ot-description" ng-if="account.role == 'ADMINISTRATOR'">Built-in administrator</span>
+                    <span ng-if="account.role != 'ADMINISTRATOR'">Normal user</span>
                 </td>
                 <td>
-                <span class="ot-admin-account-group" ng-repeat="accountGroup in account.accountGroups">
-                    {{accountGroup.name}}
-                </span>
-                    <span ng-hide="account.accountGroups" class="ot-description">No group</span>
+                    <span class="ot-admin-account-group" ng-repeat="accountGroup in account.groups">
+                        {{accountGroup.name}}
+                    </span>
+                    <span ng-hide="account.groups" class="ot-description">No group</span>
                 </td>
                 <td>
-                <span class="ot-command ot-command-update" title="Update account {{account.name}}"
+                <span class="ot-command ot-command-update"
+                      title="Update account {{account.name}}"
+                      ng-if="account.links._update"
                       ng-click="updateAccount(account)"></span>
                 <span class="ot-command ot-command-delete" title="Delete account {{account.name}}"
-                      ng-if="account._delete"
+                      ng-if="account.links._delete"
                       ng-click="deleteAccount(account)"></span>
                 </td>
             </tr>

@@ -1,6 +1,7 @@
 angular.module('ot.view.admin.accounts', [
     'ui.router',
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.graphql'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-accounts', {
@@ -10,7 +11,7 @@ angular.module('ot.view.admin.accounts', [
         });
     })
 
-    .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
+    .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otGraphqlService) {
         var view = ot.view();
         view.title = "Account management";
 
@@ -24,10 +25,53 @@ angular.module('ot.view.admin.accounts', [
             $scope.activeTab = 'account-groups';
         };
 
-        // Loading the accounts
-        function load() {
-            ot.call($http.get('rest/accounts')).then(function (accounts) {
-                $scope.accounts = accounts;
+        const query = `
+            {
+              accounts {
+                id
+                name
+                fullName
+                email
+                role
+                authenticationSource {
+                  key
+                  provider
+                  name
+                }
+                groups {
+                  name
+                }
+                token {
+                  creation
+                  valid
+                  validUntil
+                }
+                links {
+                  _update
+                  _delete
+                  _revokeToken
+                }
+              }
+              accountGroups {
+                id
+                name
+                description
+                links {
+                  _update
+                  _delete
+                }
+              }
+            }
+        `;
+
+        $scope.loading = false;
+
+        // Loading the data
+        const load = () => {
+            $scope.loading = true;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                $scope.accounts = data.accounts;
+                $scope.groups = data.accountGrouss;
                 // Commands
                 view.commands = [
                     // Global permissions
@@ -44,28 +88,32 @@ angular.module('ot.view.admin.accounts', [
                         cls: 'ot-command-admin-action',
                         link: '/admin-group-mappings'
                     },
-                    // API for this page
-                    ot.viewApiCommand(accounts._self),
                     ot.viewCloseCommand('/home')
                 ];
-                // Loads the groups
-                return ot.call($http.get('rest/accounts/groups'));
-            }).then(function (groups) {
-                $scope.groups = groups;
+            }).finally(() => {
+                $scope.loading = false;
             });
-        }
+        };
 
         // Initialisation
         load();
 
+        $scope.sourceDisplayName = (source) => {
+            if (source.key) {
+                return `${source.name} (${source.provider})`;
+            } else {
+                return source.name;
+            }
+        };
+
         // Creating an account
         $scope.createAccount = function () {
-            otFormService.create($scope.accounts._create, "Account creation").then(load);
+            otFormService.create('/rest/accounts/create', "Account creation").then(load);
         };
 
         // Updating an account
         $scope.updateAccount = function (account) {
-            otFormService.update(account._update, "Updating account").then(load);
+            otFormService.update(account.links._update, "Updating account").then(load);
         };
 
         // Deleting an account
@@ -74,19 +122,19 @@ angular.module('ot.view.admin.accounts', [
                 title: "Account deletion",
                 message: "Do you really want to delete this account?"
             }).then(function () {
-                ot.call($http.delete(account._delete)).then(load);
+                ot.call($http.delete(account.links._delete)).then(load);
             });
 
         };
 
         // Creating a group
         $scope.createGroup = function () {
-            otFormService.create($scope.groups._create, "Account group creation").then(load);
+            otFormService.create('/rest/accounts/groups/create', "Account group creation").then(load);
         };
 
         // Updating a group
         $scope.updateGroup = function (group) {
-            otFormService.update(group._update, "Updating group").then(load);
+            otFormService.update(group.link._update, "Updating group").then(load);
         };
 
         // Deleting a group
@@ -95,7 +143,7 @@ angular.module('ot.view.admin.accounts', [
                 title: "Account group deletion",
                 message: "Do you really want to delete this group?"
             }).then(function () {
-                ot.call($http.delete(group._delete)).then(load);
+                ot.call($http.delete(group.link._delete)).then(load);
             });
 
         };
