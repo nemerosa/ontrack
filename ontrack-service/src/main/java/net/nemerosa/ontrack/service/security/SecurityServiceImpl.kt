@@ -56,7 +56,15 @@ class SecurityServiceImpl : SecurityService {
         get() {
             val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
             return if (settings.isGrantProjectViewToAll) {
-                setOf(ProjectView::class)
+                if (settings.isGrantProjectParticipationToAll) {
+                    setOf(
+                            ProjectView::class,
+                            ValidationRunStatusChange::class,
+                            ValidationRunStatusCommentEditOwn::class
+                    )
+                }  else {
+                    setOf(ProjectView::class)
+                }
             } else {
                 emptySet()
             }
