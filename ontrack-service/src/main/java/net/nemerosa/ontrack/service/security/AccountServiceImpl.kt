@@ -136,7 +136,7 @@ class AccountServiceImpl(
     override fun createGroup(input: AccountGroupInput): AccountGroup {
         securityService.checkGlobalFunction(AccountGroupManagement::class.java)
         // Creates the account group
-        val group = AccountGroup(ID.NONE, input.name, input.description, input.autoJoin)
+        val group = AccountGroup(ID.NONE, input.name, input.description)
         // Saves it
         return accountGroupRepository.newAccountGroup(group)
     }

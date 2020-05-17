@@ -119,12 +119,6 @@ class AccountController(
     fun getGroupCreationForm(): Form = create()
             .name()
             .description()
-            .with(
-                    YesNo.of("autoJoin")
-                            .label("Auto join")
-                            .help("If checked, any new account is automatically added to this group.")
-                            .value(true)
-            )
 
     /**
      * Creation of an account group
@@ -151,7 +145,6 @@ class AccountController(
         return getGroupCreationForm()
                 .fill("name", accountGroup.name)
                 .fill("description", accountGroup.description)
-                .fill("autoJoin", accountGroup.autoJoin)
     }
 
     /**

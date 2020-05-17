@@ -8,6 +8,5 @@ class AccountGroupInput(
         @get:Size(min = 1, max = 40)
         val name: String,
         @get:Size(min = 0, max = 300)
-        val description: String?,
-        val autoJoin: Boolean
+        val description: String?
 )

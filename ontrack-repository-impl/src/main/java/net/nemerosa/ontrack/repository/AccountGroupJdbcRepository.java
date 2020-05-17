@@ -76,8 +76,7 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
         return new AccountGroup(
                 id(rs),
                 rs.getString("name"),
-                rs.getString("description"),
-                rs.getBoolean("autojoin")
+                rs.getString("description")
         );
     }
 
@@ -95,11 +94,10 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
             return group.withId(
                     ID.of(
                             dbCreate(
-                                    "INSERT INTO ACCOUNT_GROUPS (NAME, DESCRIPTION, AUTOJOIN) " +
-                                            "VALUES (:name, :description, :autoJoin)",
+                                    "INSERT INTO ACCOUNT_GROUPS (NAME, DESCRIPTION) " +
+                                            "VALUES (:name, :description)",
                                     params("name", group.getName())
                                             .addValue("description", group.getDescription())
-                                            .addValue("autoJoin", group.getAutoJoin())
                             )
                     )
             );
@@ -125,11 +123,10 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
     public void update(AccountGroup group) {
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE ACCOUNT_GROUPS SET NAME = :name, DESCRIPTION = :description, AUTOJOIN = :autoJoin " +
+                    "UPDATE ACCOUNT_GROUPS SET NAME = :name, DESCRIPTION = :description " +
                             "WHERE ID = :id",
                     params("name", group.getName())
                             .addValue("description", group.getDescription())
-                            .addValue("autoJoin", group.getAutoJoin())
                             .addValue("id", group.id())
             );
         } catch (DuplicateKeyException ex) {

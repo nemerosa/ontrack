@@ -4,13 +4,10 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
-import net.nemerosa.ontrack.graphql.support.booleanField
-import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountGroup
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.model.security.AccountService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 /**
@@ -33,7 +30,6 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
                 .field(GraphqlUtils.idField())
                 .field(GraphqlUtils.nameField())
                 .field(GraphqlUtils.descriptionField())
-                .booleanField(AccountGroup::autoJoin)
                 // Associated accounts
                 .field { field: GraphQLFieldDefinition.Builder ->
                     field.name(ACCOUNTS_FIELD)

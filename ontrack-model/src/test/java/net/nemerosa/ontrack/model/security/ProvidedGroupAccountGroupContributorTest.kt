@@ -15,13 +15,13 @@ class ProvidedGroupAccountGroupContributorTest {
     private lateinit var contributor: ProvidedGroupAccountGroupContributor
 
     private val adminGroup = AccountGroup(
-            ID.of(1), "Administrators", "", false
+            ID.of(1), "Administrators", ""
     )
     private val readOnlyGroup = AccountGroup(
-            ID.of(2), "Read-Only", "", false
+            ID.of(2), "Read-Only", ""
     )
     private val participantGroup = AccountGroup(
-            ID.of(3), "Participant", "", false
+            ID.of(3), "Participant", ""
     )
 
     @Before

@@ -572,7 +572,6 @@ class CoreResourceModuleTest {
                         .with("id", 1)
                         .with("name", "Admins")
                         .with("description", "Administrators")
-                        .with("autoJoin", false)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroup:1")
                         .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroupUpdateForm:1")
                         .with("_delete", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#deleteGroup:1")

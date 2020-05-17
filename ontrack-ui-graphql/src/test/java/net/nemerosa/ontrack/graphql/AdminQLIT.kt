@@ -50,30 +50,11 @@ class AdminQLIT : AbstractQLKTITSupport() {
             run("""{
                 accountGroups(id: ${g.id}) {
                     id
-                    autoJoin
                 }
             }""")
         }
         assertEquals(1, data["accountGroups"].size())
         assertEquals(g.id(), data["accountGroups"].first()["id"].asInt())
-        assertEquals(false, data["accountGroups"].first()["autoJoin"].asBoolean())
-    }
-
-    @Test
-    fun `Account group auto join property`() {
-        val g = doCreateAccountGroup(autoJoin = true)
-        assertTrue(g.autoJoin, "Group in auto join mode")
-        val data = asUser().with(AccountGroupManagement::class.java).call {
-            run("""{
-                accountGroups(id: ${g.id}) {
-                    id
-                    autoJoin
-                }
-            }""")
-        }
-        assertEquals(1, data["accountGroups"].size())
-        assertEquals(g.id(), data["accountGroups"].first()["id"].asInt())
-        assertEquals(true, data["accountGroups"].first()["autoJoin"].asBoolean())
     }
 
     @Test

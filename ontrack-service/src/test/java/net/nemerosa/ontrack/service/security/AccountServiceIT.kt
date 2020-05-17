@@ -14,8 +14,7 @@ class AccountServiceIT : AbstractDSLTestSupport() {
         asAdmin {
             val id = accountService.createGroup(AccountGroupInput(
                     name = "Nom accentué",
-                    description = "Un nom avec des accents",
-                    autoJoin = false
+                    description = "Un nom avec des accents"
             )).id
             // Loads the group again
             val group = accountService.getAccountGroup(id)
