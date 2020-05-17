@@ -88,7 +88,7 @@ class LDAPAuthenticationIT : AbstractDSLTestSupport() {
         // Creates some Ontrack groups
         val ontrackGroupName = uid("G")
         val ontrackGroup = asAdmin {
-            accountService.createGroup(AccountGroupInput(ontrackGroupName, "", false))
+            accountService.createGroup(AccountGroupInput(ontrackGroupName, ""))
         }
 
         // Creates a mapping between a LDAP group and this group
