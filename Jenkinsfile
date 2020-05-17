@@ -108,7 +108,7 @@ pipeline {
                         --parallel \\
                         --console plain
                 '''
-                sh ''' curl -s https://codecov.io/bash | bash -s -- -c -F build'''
+                // Jacoco report available at build/reports/jacoco/build.xml
                 sh '''
                     echo "(*) Building the test extension..."
                     cd ontrack-extension-test
@@ -190,6 +190,7 @@ pipeline {
                             -x processResources \\
                             -PjacocoExecFile=build/jacoco/acceptance.exec \\
                             -PjacocoReportFile=build/reports/jacoco/acceptance.xml \\
+                            --parallel \\
                             --stacktrace \\
                             --console plain
                     '''
@@ -200,13 +201,9 @@ pipeline {
                             -x processResources \\
                             -PjacocoExecFile=build/jacoco/dsl.exec \\
                             -PjacocoReportFile=build/reports/jacoco/dsl.xml \\
+                            --parallel \\
                             --stacktrace \\
                             --console plain
-                    '''
-                    // Upload to Codecov
-                    sh '''
-                        curl -s https://codecov.io/bash | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
-                        curl -s https://codecov.io/bash | bash -s -- -c -F dsl -f build/reports/jacoco/dsl.xml
                     '''
                 }
                 always {
@@ -293,12 +290,9 @@ pipeline {
                             -x processResources \\
                             -PjacocoExecFile=build/jacoco/extension.exec \\
                             -PjacocoReportFile=build/reports/jacoco/extension.xml \\
+                            --parallel \\
                             --stacktrace \\
                             --console plain
-                    '''
-                    // Upload to Codecov
-                    sh '''
-                        curl -s https://codecov.io/bash | bash -s -- -c -F extension -f build/reports/jacoco/extension.xml
                     '''
                 }
                 always {
@@ -374,12 +368,9 @@ pipeline {
                             -x processResources \\
                             -PjacocoExecFile=build/jacoco/vault.exec \\
                             -PjacocoReportFile=build/reports/jacoco/vault.xml \\
+                            --parallel \\
                             --stacktrace \\
                             --console plain
-                    '''
-                    // Upload to Codecov
-                    sh '''
-                        curl -s https://codecov.io/bash | bash -s -- -c -F vault -f build/reports/jacoco/vault.xml
                     '''
                 }
                 always {
@@ -409,6 +400,20 @@ pipeline {
                             down --volumes
                     '''
                 }
+            }
+        }
+
+        stage('Codecov upload') {
+            steps {
+                // Upload to Codecov
+                sh '''
+                    curl -s https://codecov.io/bash -o codecov.sh
+                    cat codecov.sh | bash -s -- -c -F build -f build/reports/jacoco/build.xml
+                    cat codecov.sh | bash -s -- -c -F acceptance -f build/reports/jacoco/acceptance.xml
+                    cat codecov.sh | bash -s -- -c -F dsl -f build/reports/jacoco/dsl.xml
+                    cat codecov.sh | bash -s -- -c -F extension -f build/reports/jacoco/extension.xml
+                    cat codecov.sh | bash -s -- -c -F vault -f build/reports/jacoco/vault.xml
+                    '''
             }
         }
 
