@@ -37,7 +37,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
     @Test
     fun `List of groups`() {
         asUser().with(AccountGroupManagement::class.java).call {
-            val g = accountService.createGroup(AccountGroupInput(uid("G"), "", false)).id()
+            val g = accountService.createGroup(AccountGroupInput(uid("G"), "")).id()
             val data = run("""{ accountGroups { id name } }""")
             assertNotNull(data["accountGroups"].find { it["id"].asInt() == g })
         }
