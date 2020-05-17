@@ -44,7 +44,6 @@ class ACCBrowserKeycloakLogin extends AcceptanceTestClient {
                 loginPage = homePage.logout()
                 // Setup of group mappings
                 ontrack.admin.setGroupMapping("oidc", realm, "ontrack-admin", "Administrators")
-                ontrack.admin.setGroupMapping("oidc", realm, "ontrack-user", "Read-Only")
                 // Re-login
                 assert loginPage.hasExtension(realm): "OIDC extension is present"
                 homePage = loginPage.useExtension(realm, HomePage) // We are already authenticated in Keycloak, going directly to the Home page
