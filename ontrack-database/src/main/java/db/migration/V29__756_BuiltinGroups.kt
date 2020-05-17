@@ -29,12 +29,9 @@ class V29__756_BuiltinGroups : BaseJavaMigration() {
             logger.info("Not creating built-in account groups since some groups are already defined.")
         } else {
             logger.info("Creating built-in account groups...")
-            val adminId = createGroup(jdbcTemplate, ADMIN_GROUP, "Group of administrators", false)
-            val readOnlyId = createGroup(jdbcTemplate, READ_ONLY_GROUP, "Read-only users", false)
-            val participantId = createGroup(jdbcTemplate, PARTICIPANT_GROUP, "Users which can add comments on validation runs.", false)
+            val adminId = createGroup(jdbcTemplate, ADMIN_GROUP, "Group of administrators")
             logger.info("Creating built-in global permissions...")
             createGlobalPermissions(jdbcTemplate, adminId, Roles.GLOBAL_ADMINISTRATOR)
-            createGlobalPermissions(jdbcTemplate, readOnlyId, Roles.GLOBAL_READ_ONLY)
         }
     }
 
@@ -45,14 +42,13 @@ class V29__756_BuiltinGroups : BaseJavaMigration() {
         }
     }
 
-    private fun createGroup(jdbcTemplate: JdbcTemplate, name: String, description: String, autoJoin: Boolean): Int {
+    private fun createGroup(jdbcTemplate: JdbcTemplate, name: String, description: String): Int {
         logger.info("Creating $name built-in group...")
         val keyHolder = GeneratedKeyHolder()
         val psc = PreparedStatementCreator { con ->
-            con.prepareStatement("INSERT INTO ACCOUNT_GROUPS(NAME, DESCRIPTION, AUTOJOIN) VALUES (?, ?, ?)", arrayOf("id")).apply {
+            con.prepareStatement("INSERT INTO ACCOUNT_GROUPS(NAME, DESCRIPTION) VALUES (?, ?)", arrayOf("id")).apply {
                 setString(1, name)
                 setString(2, description)
-                setBoolean(3, autoJoin)
             }
         }
         jdbcTemplate.update(psc, keyHolder)
