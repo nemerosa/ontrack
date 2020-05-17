@@ -292,26 +292,41 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     /**
      * This must always be called from [withGrantViewToAll] or [withNoGrantViewToAll].
      */
-    private fun grantViewToAll(grantViewToAll: Boolean): Boolean = asUser().with(GlobalSettings::class.java).call {
-        val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java).isGrantProjectViewToAll
-        settingsManagerService.saveSettings(
-                SecuritySettings(isGrantProjectViewToAll = grantViewToAll, isGrantProjectParticipationToAll = false)
-        )
+    private fun securitySettings(settings: SecuritySettings): SecuritySettings = asUser().with(GlobalSettings::class.java).call {
+        val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
+        settingsManagerService.saveSettings(settings)
         old
     }
 
-    private fun <T> withGrantViewToAll(grantViewToAll: Boolean, task: () -> T): T {
-        val old = grantViewToAll(grantViewToAll)
+    private fun <T> withSettings(grantViewToAll: Boolean, grantParticipationToAll: Boolean = true, task: () -> T): T {
+        val old = securitySettings(SecuritySettings(
+                isGrantProjectViewToAll = grantViewToAll,
+                isGrantProjectParticipationToAll = grantParticipationToAll
+        ))
         return try {
             task()
         } finally {
-            grantViewToAll(old)
+            securitySettings(old)
         }
     }
 
-    protected fun <T> withGrantViewToAll(task: () -> T): T = withGrantViewToAll(true, task)
+    protected fun <T> withGrantViewToAll(task: () -> T): T = withSettings(
+            grantViewToAll = true,
+            grantParticipationToAll = true,
+            task = task
+    )
 
-    protected fun <T> withNoGrantViewToAll(task: () -> T): T = withGrantViewToAll(false, task)
+    protected fun <T> withGrantViewAndNOParticipationToAll(task: () -> T): T = withSettings(
+            grantViewToAll = true,
+            grantParticipationToAll = false,
+            task = task
+    )
+
+    protected fun <T> withNoGrantViewToAll(task: () -> T): T = withSettings(
+            grantViewToAll = false,
+            grantParticipationToAll = true,
+            task = task
+    )
 
     protected interface ContextCall {
         fun <T> call(call: () -> T): T

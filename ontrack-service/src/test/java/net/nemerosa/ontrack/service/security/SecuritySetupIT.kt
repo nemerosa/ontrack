@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.security.ProjectCreation
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -88,6 +89,46 @@ class SecuritySetupIT : AbstractDSLTestSupport() {
                 structureService.getBranchesForProject(project.id)
             }
             assertTrue(branches.isNotEmpty(), "Could access the branches")
+        }
+    }
+
+    @Test
+    fun `Participating into a project is granted to all by default`() {
+        withGrantViewToAll {
+            project {
+                asUser {
+                    assertTrue(securityService.isProjectFunctionGranted(this, ProjectView::class.java))
+                    assertTrue(securityService.isProjectFunctionGranted(this, ValidationRunStatusChange::class.java))
+                    assertTrue(securityService.isProjectFunctionGranted(this, ValidationRunStatusCommentEditOwn::class.java))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Participating into a project can be disabled by default`() {
+        withGrantViewAndNOParticipationToAll {
+            project {
+                asUser {
+                    assertTrue(securityService.isProjectFunctionGranted(this, ProjectView::class.java))
+                    assertFalse(securityService.isProjectFunctionGranted(this, ValidationRunStatusChange::class.java))
+                    assertFalse(securityService.isProjectFunctionGranted(this, ValidationRunStatusCommentEditOwn::class.java))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Participating into a project can be disabled by default and restored by project`() {
+        withGrantViewAndNOParticipationToAll {
+            project {
+                val account = doCreateAccountWithProjectRole(this, Roles.PROJECT_PARTICIPANT)
+                asFixedAccount(account) {
+                    assertTrue(securityService.isProjectFunctionGranted(this, ProjectView::class.java))
+                    assertTrue(securityService.isProjectFunctionGranted(this, ValidationRunStatusChange::class.java))
+                    assertTrue(securityService.isProjectFunctionGranted(this, ValidationRunStatusCommentEditOwn::class.java))
+                }
+            }
         }
     }
 
