@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.common.CachedSupplier
-import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.Utils
+import net.nemerosa.ontrack.common.*
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.ValidationRunMetricsExtension
@@ -35,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Predicate
-import java.util.function.Supplier
 
 @Service
 @Transactional
@@ -375,29 +371,29 @@ class StructureServiceImpl(
             val buildViewSupplier = CachedSupplier.of { getBuildView(build, false) }
             // Branch name
             var accept: Boolean
-            accept = !StringUtils.isNotBlank(form.branchName) || Utils.safeRegexMatch(form.branchName, build.branch.name)
+            accept = !isNotBlank(form.branchName) || Utils.safeRegexMatch(form.branchName, build.branch.name)
             // Build name
-            if (accept && StringUtils.isNotBlank(form.buildName)) {
-                if (form.isBuildExactMatch) {
-                    accept = StringUtils.equals(form.buildName, build.name)
+            if (accept && isNotBlank(form.buildName)) {
+                accept = if (form.isBuildExactMatch) {
+                    StringUtils.equals(form.buildName, build.name)
                 } else {
-                    accept = Utils.safeRegexMatch(form.buildName, build.name)
+                    Utils.safeRegexMatch(form.buildName, build.name)
                 }
             }
             // Promotion name
-            if (accept && StringUtils.isNotBlank(form.promotionName)) {
+            if (accept && isNotBlank(form.promotionName)) {
                 val buildView = buildViewSupplier.get()
                 accept = buildView.promotionRuns.stream()
                         .anyMatch { run -> form.promotionName == run.promotionLevel.name }
             }
             // Validation stamp name
-            if (accept && StringUtils.isNotBlank(form.validationStampName)) {
+            if (accept && isNotBlank(form.validationStampName)) {
                 val buildView = buildViewSupplier.get()
                 accept = buildView.validationStampRunViews.stream()
                         .anyMatch { validationStampRunView -> validationStampRunView.hasValidationStamp(form.validationStampName, ValidationRunStatusID.PASSED) }
             }
             // Property & property value
-            if (accept && StringUtils.isNotBlank(form.property)) {
+            if (accept && isNotBlank(form.property)) {
                 accept = PropertyServiceHelper.hasProperty(
                         propertyService,
                         build,
@@ -551,10 +547,10 @@ class StructureServiceImpl(
         // Creation
         val newPromotionLevel = rawNewPromotionLevel(promotionLevel)
         // Checking if there is an associated predefined promotion level
-        return securityService.callAsAdmin {
-            val predefined: PredefinedPromotionLevel? = securityService.callAsAdmin {
-                predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
-            }.orElse(null)
+        return securityService.asAdmin {
+            val predefined: PredefinedPromotionLevel? =
+                    predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
+                            .getOrNull()
             if (predefined != null) {
                 // Description
                 if (promotionLevel.description.isNullOrBlank()) {
@@ -749,18 +745,7 @@ class StructureServiceImpl(
         // Checks the preconditions for the creation of the promotion run
         promotionRunCheckService.checkPromotionRunCreation(promotionRun)
         // If the promotion run's time is not defined, takes the current date
-        val promotionRunToSave: PromotionRun
-        val time = promotionRun.signature.time
-        if (time == null) {
-            promotionRunToSave = PromotionRun.of(
-                    promotionRun.build,
-                    promotionRun.promotionLevel,
-                    promotionRun.signature.withTime(Time.now()),
-                    promotionRun.description
-            )
-        } else {
-            promotionRunToSave = promotionRun
-        }
+        val promotionRunToSave: PromotionRun = promotionRun
         // Actual creation
         val newPromotionRun = structureRepository.newPromotionRun(promotionRunToSave)
         // Event
@@ -812,10 +797,10 @@ class StructureServiceImpl(
         // Raw creation
         val newValidationStamp = rawNewValidationStamp(validationStamp)
         // Checking if there is an associated predefined validation stamp
-        return securityService.callAsAdmin {
-            val predefined: PredefinedValidationStamp? = securityService.callAsAdmin {
+        return securityService.asAdmin {
+            val predefined: PredefinedValidationStamp? =
                 predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name)
-            }.orElse(null)
+                    .getOrNull()
             if (predefined != null) {
                 // Description
                 if (validationStamp.description.isNullOrBlank()) {
@@ -1296,7 +1281,7 @@ class StructureServiceImpl(
 
     override fun newValidationRunStatus(validationRun: ValidationRun, runStatus: ValidationRunStatus): ValidationRun {
         // Entity check
-        Entity.isEntityDefined(validationRun, "Validation run must be defined")
+        isEntityDefined(validationRun, "Validation run must be defined")
         isEntityNew(runStatus, "Validation run status must not have any defined ID.")
         // Security check
         securityService.checkProjectFunction(validationRun.build.branch.project.id(), ValidationRunStatusChange::class.java)
@@ -1349,7 +1334,7 @@ class StructureServiceImpl(
                 // Gets the status's author
                 val statusAuthor = status?.signature?.user?.name
                 // Gets the current user name
-                val currentUserName = securityService.currentSignature?.user?.name
+                val currentUserName = securityService.currentSignature.user.name
                 // Compare both
                 statusAuthor != null && statusAuthor == currentUserName
             }
@@ -1394,19 +1379,20 @@ class StructureServiceImpl(
     @Throws(AccessDeniedException::class)
     override fun findProjectByNameIfAuthorized(project: String): Project? {
         // Looks for the project as admin
-        val o = securityService.asAdmin<Optional<Project>> { findProjectByName(project) }
+        val p = securityService.asAdmin { findProjectByName(project).getOrNull() }
         // If it exists
-        if (o.isPresent) {
-            val p = o.get()
+        return if (p != null) {
             // If it is authorized
-            return if (securityService.isProjectFunctionGranted(p, ProjectView::class.java)) {
+            if (securityService.isProjectFunctionGranted(p, ProjectView::class.java)) {
                 p
             } else {
                 throw AccessDeniedException("Project access not granted.")
             }
-        } else {
-            return null
-        }// If it does not exist
+        }
+        // If it does not exist
+        else {
+            null
+        }
     }
 
     override fun findBranchByName(project: String, branch: String): Optional<Branch> {

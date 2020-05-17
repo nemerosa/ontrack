@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.ID
@@ -22,7 +21,7 @@ class BranchFavouriteServiceImpl(
     override fun getFavouriteBranches(): List<Branch> {
         val accountId = securityService.currentAccount?.account?.id()
         return if (accountId != null) {
-            val branches = securityService.callAsAdmin {
+            val branches = securityService.asAdmin {
                 repository.getFavouriteBranches(accountId)
                         .map { id -> structureService.getBranch(ID.of(id)) }
             }

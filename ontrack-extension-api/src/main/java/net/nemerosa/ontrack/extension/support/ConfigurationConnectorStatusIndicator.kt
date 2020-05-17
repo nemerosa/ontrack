@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.support
 
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.support.*
 
 /**
@@ -13,7 +12,7 @@ abstract class ConfigurationConnectorStatusIndicator<T : UserPasswordConfigurati
 ) : ConnectorStatusIndicator {
 
     override val statuses: List<ConnectorStatus>
-        get() = securityService.callAsAdmin {
+        get() = securityService.asAdmin {
             configurationService.configurations.map { getConnectorStatus(it) }
         }
 

@@ -187,10 +187,10 @@ interface StructureService {
 
     /**
      * Looks for a promotion level using its ID.
-     * @param promotionLevel ID of the promotion level
+     * @param promotionLevelId ID of the promotion level
      * @return Promotion level or `null` if not found
      */
-    fun findPromotionLevelByID(promotionLevel: ID): PromotionLevel?
+    fun findPromotionLevelByID(promotionLevelId: ID): PromotionLevel?
 
     fun getPromotionLevelImage(promotionLevelId: ID): Document
 

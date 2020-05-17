@@ -20,7 +20,7 @@ class ProjectFavouriteServiceImpl(
 ) : ProjectFavouriteService {
 
     override fun getFavouriteProjects(): List<Project> {
-        val accountId = securityService.account.getOrNull()?.id()
+        val accountId = securityService.currentAccount?.id()
         return if (accountId != null) {
             val projects = repository.getFavouriteProjects(accountId)
             projects.filter { securityService.isProjectFunctionGranted(it, ProjectView::class.java) }.map {

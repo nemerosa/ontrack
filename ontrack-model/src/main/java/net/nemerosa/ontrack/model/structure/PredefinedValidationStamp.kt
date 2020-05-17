@@ -1,10 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.experimental.Wither;
 
 /**
  * Validation stamp defined at global level, allowing some projects to create them automatically.

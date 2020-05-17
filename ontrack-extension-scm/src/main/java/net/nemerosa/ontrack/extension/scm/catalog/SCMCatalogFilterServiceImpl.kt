@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.scm.catalog
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Service
@@ -88,7 +87,7 @@ class SCMCatalogFilterServiceImpl(
         val projectFilter: (Project) -> Boolean = projectOrphanProject and projectRegexFilter and projectSecurityFilter
 
         val orphanProjects: () -> Sequence<SCMCatalogEntryOrProject> = {
-            securityService.callAsAdmin {
+            securityService.asAdmin {
                 structureService.projectList
             }.asSequence().filter(projectFilter).map { project ->
                 SCMCatalogEntryOrProject.orphanProject(project)

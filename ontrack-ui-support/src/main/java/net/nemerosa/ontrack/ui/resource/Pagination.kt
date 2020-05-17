@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.ui.resource
 
-import lombok.experimental.Wither
 import net.nemerosa.ontrack.model.support.Page
 import java.net.URI
 
@@ -8,9 +7,7 @@ data class Pagination(
         val offset: Int,
         val limit: Int,
         val total: Int,
-        @Wither
         val prev: URI? = null,
-        @Wither
         val next: URI? = null
 ) {
 

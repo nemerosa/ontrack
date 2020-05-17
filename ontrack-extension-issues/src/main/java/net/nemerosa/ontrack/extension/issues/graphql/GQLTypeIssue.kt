@@ -38,7 +38,7 @@ class GQLTypeIssue(
                             .type(GraphQLString)
                             .dataFetcher { env ->
                                 val issue: Issue = env.getSource()
-                                Time.forStorage(issue.updateTime)
+                                Time.store(issue.updateTime)
                             }
                 }
                 .build()

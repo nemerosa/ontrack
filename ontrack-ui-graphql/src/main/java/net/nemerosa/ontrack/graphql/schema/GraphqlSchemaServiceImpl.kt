@@ -14,7 +14,7 @@ class GraphqlSchemaServiceImpl(
         private val rootQueries: List<GQLRootQuery>
 ) : GraphqlSchemaService {
 
-    private val schemaSupplier = CachedSupplier.of<GraphQLSchema> { this.createSchema() }
+    private val schemaSupplier = CachedSupplier.of { this.createSchema() }
 
     override val schema: GraphQLSchema
         get() = schemaSupplier.get()
@@ -28,7 +28,8 @@ class GraphqlSchemaServiceImpl(
                         inputTypes.map { it.createInputType() }
         return GraphQLSchema.newSchema()
                 .query(createQueryType())
-                .build(dictionary.toSet())
+                .additionalTypes(dictionary.toSet())
+                .build()
     }
 
     private fun createQueryType(): GraphQLObjectType {
@@ -43,8 +44,7 @@ class GraphqlSchemaServiceImpl(
     }
 
     companion object {
-
-        val QUERY = "Query"
+        const val QUERY = "Query"
     }
 
 }

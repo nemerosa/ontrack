@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.metrics.measure
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.slf4j.LoggerFactory
@@ -169,7 +168,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 )
             }
             // Storage of metrics for build
-            securityService.callAsAdmin {
+            securityService.asAdmin {
                 entityDataService.store(
                         build,
                         SonarQubeMeasures::class.java.name,

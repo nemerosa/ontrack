@@ -58,7 +58,7 @@ class RunInfoJdbcRepository(
                 .addValue("sourceUri", input.sourceUri)
                 .addValue("triggerType", input.triggerType)
                 .addValue("triggerData", input.triggerData)
-                .addValue("creation", Time.forStorage(signature.time))
+                .addValue("creation", Time.store(signature.time))
                 .addValue("creator", signature.user.name)
         // If existing, updates it
         if (runInfo != null) {

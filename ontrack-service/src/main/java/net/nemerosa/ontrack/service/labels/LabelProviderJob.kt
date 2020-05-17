@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.labels.LabelProviderService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.callAsAdmin
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -32,7 +31,7 @@ class LabelProviderJob(
         val settings: LabelProviderJobSettings = settingsService.getCachedSettings(LabelProviderJobSettings::class.java)
         return if (settings.enabled) {
             if (settings.perProject) {
-                securityService.callAsAdmin {
+                securityService.asAdmin {
                     structureService.projectList
                             .map { createLabelProviderJobRegistrationForProject(it, settings) }
                             .stream()

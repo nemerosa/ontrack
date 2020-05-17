@@ -80,7 +80,7 @@ public interface EntityDataStore {
      * @param beforeTime Last record BEFORE this time
      * @return A reference to the JSON data together with the associated time and user.
      */
-    Optional<EntityDataStoreRecord> findLastByCategoryAndName(ProjectEntity entity, String category, String name, LocalDateTime beforeTime);
+    Optional<EntityDataStoreRecord> findLastByCategoryAndName(ProjectEntity entity, String category, String name, @Nullable LocalDateTime beforeTime);
 
     /**
      * Retrieves if any, the last data, for an entity, a category, a group and a name

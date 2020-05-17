@@ -145,7 +145,7 @@ class EntityDataStoreJdbcRepository(
         )
     }
 
-    override fun findLastByCategoryAndName(entity: ProjectEntity, category: String, name: String, beforeTime: LocalDateTime): Optional<EntityDataStoreRecord> { // SQL & parameters
+    override fun findLastByCategoryAndName(entity: ProjectEntity, category: String, name: String, beforeTime: LocalDateTime?): Optional<EntityDataStoreRecord> { // SQL & parameters
         var sql = String.format(
                 "SELECT * FROM ENTITY_DATA_STORE " +
                         "WHERE %s = :entityId AND CATEGORY = :category AND NAME = :name ",

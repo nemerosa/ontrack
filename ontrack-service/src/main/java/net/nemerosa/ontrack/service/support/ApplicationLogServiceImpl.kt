@@ -49,7 +49,7 @@ class ApplicationLogServiceImpl(
                         entry.level,
                         entry.type.name,
                         entry.authentication,
-                        Time.forStorage(entry.timestamp),
+                        Time.store(entry.timestamp),
                         entry.detailList.joinToString(",") { nd -> String.format("%s=%s", nd.name, nd.description) },
                         entry.stacktrace
                 )

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.buildfilter.*
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException
@@ -213,9 +214,8 @@ class BuildFilterServiceImpl(
 
     @Throws(BuildFilterNotFoundException::class)
     override fun getEditionForm(branchId: ID, name: String): BuildFilterForm {
-        return securityService.account
-                .flatMap { account -> buildFilterRepository.findByBranchAndName(account.id(), branchId.value, name) }
-                .orElse(null)
+        return securityService.currentAccount
+                ?.let {  account -> buildFilterRepository.findByBranchAndName(account.id(), branchId.value, name).getOrNull() }
                 ?.let { this.getBuildFilterForm<Any>(it) }
                 ?: throw BuildFilterNotLoggedException()
     }

@@ -25,7 +25,7 @@ class LDAPProviderFactoryImpl(
         private val applicationLogService: ApplicationLogService
 ) : LDAPProviderFactory {
 
-    private val authoritiesPopulator = LdapAuthoritiesPopulator { userData: DirContextOperations?, username: String? -> AuthorityUtils.createAuthorityList(SecurityRole.USER.name) }
+    private val authoritiesPopulator = LdapAuthoritiesPopulator { _: DirContextOperations?, _: String? -> AuthorityUtils.createAuthorityList(SecurityRole.USER.name) }
 
     private val cache: MutableMap<String, CachedLdap> = ConcurrentHashMap()
 

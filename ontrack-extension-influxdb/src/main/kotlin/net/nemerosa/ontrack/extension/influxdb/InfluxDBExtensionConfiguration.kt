@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import org.influxdb.BatchOptions
 import org.influxdb.InfluxDB
 import org.influxdb.InfluxDBFactory
+import org.influxdb.dto.Query
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -42,7 +43,7 @@ class InfluxDBExtensionConfiguration(
         )
         influxDB.setDatabase(influxDBExtensionProperties.db)
         if (influxDBExtensionProperties.create) {
-            influxDB.createDatabase(influxDBExtensionProperties.db)
+            influxDB.query(Query("CREATE DATABASE ${influxDBExtensionProperties.db}"))
         }
         influxDB.setLogLevel(influxDBExtensionProperties.log)
         influxDB.enableBatch(BatchOptions.DEFAULTS)

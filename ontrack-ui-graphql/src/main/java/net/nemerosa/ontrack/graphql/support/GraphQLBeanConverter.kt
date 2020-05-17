@@ -141,7 +141,7 @@ object GraphQLBeanConverter {
             null -> return null
             is Map<*, *> -> {
                 val map = argument as Map<*, *>?
-                val o = BeanUtils.instantiate(type)
+                val o = type.getDeclaredConstructor().newInstance()
                 for (descriptor in BeanUtils.getPropertyDescriptors(type)) {
                     val writeMethod = descriptor.writeMethod
                     if (writeMethod != null) {
