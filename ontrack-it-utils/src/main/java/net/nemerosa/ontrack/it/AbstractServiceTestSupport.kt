@@ -295,7 +295,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     private fun grantViewToAll(grantViewToAll: Boolean): Boolean = asUser().with(GlobalSettings::class.java).call {
         val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java).isGrantProjectViewToAll
         settingsManagerService.saveSettings(
-                SecuritySettings(isGrantProjectViewToAll = grantViewToAll)
+                SecuritySettings(isGrantProjectViewToAll = grantViewToAll, isGrantProjectParticipationToAll = false)
         )
         old
     }

@@ -19,6 +19,7 @@ class SecuritySettingsManager(
 
     override fun doSaveSettings(settings: SecuritySettings) {
         settingsRepository.setBoolean(SecuritySettings::class.java, "grantProjectViewToAll", settings.isGrantProjectViewToAll)
+        settingsRepository.setBoolean(SecuritySettings::class.java, "grantProjectParticipationToAll", settings.isGrantProjectParticipationToAll)
     }
 
     override fun getId(): String = "general-security"

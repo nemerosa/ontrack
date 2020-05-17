@@ -13,7 +13,8 @@ class SecuritySettingsProvider(
      * By default, grants view accesses to everybody.
      */
     override fun getSettings(): SecuritySettings = SecuritySettings(
-            settingsRepository.getBoolean(SecuritySettings::class.java, "grantProjectViewToAll", true)
+            settingsRepository.getBoolean(SecuritySettings::class.java, "grantProjectViewToAll", true),
+            settingsRepository.getBoolean(SecuritySettings::class.java, "grantProjectParticipationToAll", true)
     )
 
     override fun getSettingsClass(): Class<SecuritySettings> = SecuritySettings::class.java
