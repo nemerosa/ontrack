@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Collection;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
 @RestController
 @RequestMapping("/rest/user")
 public class UserController extends AbstractResourceController {
@@ -40,11 +38,11 @@ public class UserController extends AbstractResourceController {
         OntrackAuthenticatedUser user = securityService.getCurrentAccount();
         // Account present
         if (user != null) {
-            return toLoggedAccount(user.getAccount());
+            return userMenu(ConnectedAccount.of(user.getAccount()));
         }
         // Not logged
         else {
-            return toAnonymousAccount();
+            return ConnectedAccount.none();
         }
     }
 
@@ -76,15 +74,6 @@ public class UserController extends AbstractResourceController {
     }
 
     // Resource assemblers
-
-    @Deprecated
-    private ConnectedAccount toAnonymousAccount() {
-        return ConnectedAccount.none(true);
-    }
-
-    private ConnectedAccount toLoggedAccount(Account account) {
-        return userMenu(ConnectedAccount.of(true, account));
-    }
 
     private ConnectedAccount userMenu(ConnectedAccount user) {
         // Settings
