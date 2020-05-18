@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
+import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.indicators.computing.IndicatorComputingMetrics.METRIC_ONTRACK_INDICATORS_COMPUTING_MS
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputer
 import net.nemerosa.ontrack.extension.indicators.model.id
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.time
 import org.springframework.stereotype.Component
 import java.util.stream.Stream
 
@@ -13,7 +16,8 @@ import java.util.stream.Stream
 class IndicatorComputingJobs(
         private val structureService: StructureService,
         private val computers: List<IndicatorComputer>,
-        private val indicatorComputingService: IndicatorComputingService
+        private val indicatorComputingService: IndicatorComputingService,
+        private val meterRegistry: MeterRegistry
 ) : JobOrchestratorSupplier {
 
     override fun collectJobRegistrations(): Stream<JobRegistration> {
@@ -80,7 +84,13 @@ class IndicatorComputingJobs(
     }
 
     private fun compute(computer: IndicatorComputer, project: Project) {
-        indicatorComputingService.compute(computer, project)
+        meterRegistry.time(
+                METRIC_ONTRACK_INDICATORS_COMPUTING_MS,
+                "computer" to computer.id,
+                "project" to project.name
+        ) {
+            indicatorComputingService.compute(computer, project)
+        }
     }
 
     private fun getJobType(computer: IndicatorComputer): JobType =

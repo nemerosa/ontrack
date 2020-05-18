@@ -12,6 +12,7 @@ dependencies {
     api(project(":ontrack-ui-graphql"))
 
     implementation(project(":ontrack-repository-support"))
+    implementation("io.micrometer:micrometer-core")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
