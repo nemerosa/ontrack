@@ -79,7 +79,6 @@ class IndicatorTypeServiceImpl(
                     link = stored.link,
                     valueType = valueType,
                     valueConfig = valueConfig,
-                    valueComputer = null,
                     source = stored.source
             )
         } else {

@@ -10,7 +10,6 @@ data class IndicatorType<T, C>(
         val link: String?,
         val valueType: IndicatorValueType<T, C>,
         val valueConfig: C,
-        val valueComputer: IndicatorComputer?,
         val source: IndicatorSource?
 ) {
     fun toClientJson(value: T) = valueType.toClientJson(valueConfig, value)

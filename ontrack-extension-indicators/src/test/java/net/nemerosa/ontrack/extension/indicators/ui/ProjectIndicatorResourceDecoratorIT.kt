@@ -106,7 +106,6 @@ class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport
                     link = null,
                     valueType = valueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = false),
-                    valueComputer = null,
                     source = source
             )
 
