@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
+import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.extension.Extension
 import net.nemerosa.ontrack.model.structure.Project
 
@@ -19,6 +20,13 @@ interface IndicatorComputer : Extension {
      * If `true`, one job per project, if `false`, one job for all projects
      */
     val perProject: Boolean
+
+    /**
+     * Scheduling of the collection.
+     *
+     * Once a day by default.
+     */
+    val schedule: Schedule get() = Schedule.EVERY_DAY
 
     /**
      * Associated source

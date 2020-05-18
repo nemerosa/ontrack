@@ -30,14 +30,14 @@ class IndicatorComputingJobs(
             projects.map { project ->
                 JobRegistration(
                         job = createJob(computer, project),
-                        schedule = Schedule.EVERY_DAY
+                        schedule = computer.schedule
                 )
             }
         } else {
             listOf(
                     JobRegistration(
                             job = createJob(computer, projects),
-                            schedule = Schedule.EVERY_DAY
+                            schedule = computer.schedule
                     )
             )
         }
