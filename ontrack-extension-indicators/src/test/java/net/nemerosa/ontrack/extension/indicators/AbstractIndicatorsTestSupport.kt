@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -88,13 +89,23 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
 
     protected fun <T: Any> Project.assertIndicatorValue(
             type: IndicatorType<T, *>,
-            code: (T) -> Unit
+            code: (T) -> Unit = {}
     ) {
         checkIndicator(type) { i ->
             val indicatorValue = i.value
             assertNotNull(indicatorValue, "Indicator value must be set") { value: T ->
                 code(value)
             }
+        }
+    }
+
+    protected fun <T: Any> Project.assertIndicatorValueIs(
+            type: IndicatorType<T, *>,
+            expectedValue: T?
+    ) {
+        checkIndicator(type) { i ->
+            val indicatorValue = i.value
+            assertEquals(expectedValue, indicatorValue)
         }
     }
 
