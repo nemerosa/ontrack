@@ -19,6 +19,11 @@ class IndicatorRoleContributor : RoleContributor {
          * Indicator management at global level
          */
         const val GLOBAL_INDICATOR_MANAGER = "GLOBAL_INDICATOR_MANAGER"
+
+        /**
+         * Indicator portfolio at global level
+         */
+        const val GLOBAL_INDICATOR_PORTFOLIO_MANAGER = "GLOBAL_INDICATOR_PORTFOLIO_MANAGER"
     }
 
     override fun getProjectRoles(): List<RoleDefinition> =
@@ -36,6 +41,11 @@ class IndicatorRoleContributor : RoleContributor {
                             id = GLOBAL_INDICATOR_MANAGER,
                             name = "Global indicator manager",
                             description = "Can manage and import indicator categories & types. Can manage portfolios. Can manage indicators in all projects."
+                    ),
+                    RoleDefinition(
+                            id = GLOBAL_INDICATOR_PORTFOLIO_MANAGER,
+                            name = "Global indicator portfolio manager",
+                            description = "Can manage portfolios."
                     )
             )
 
@@ -48,6 +58,9 @@ class IndicatorRoleContributor : RoleContributor {
                     GLOBAL_INDICATOR_MANAGER to listOf(
                             IndicatorPortfolioManagement::class.java,
                             IndicatorTypeManagement::class.java
+                    ),
+                    GLOBAL_INDICATOR_PORTFOLIO_MANAGER to listOf(
+                            IndicatorPortfolioManagement::class.java
                     )
             )
 
