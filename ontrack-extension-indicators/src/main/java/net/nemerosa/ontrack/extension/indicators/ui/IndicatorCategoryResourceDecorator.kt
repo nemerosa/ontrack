@@ -13,13 +13,13 @@ class IndicatorCategoryResourceDecorator : AbstractLinkResourceDecorator<Indicat
             Link.UPDATE linkTo { t: IndicatorCategory ->
                 on(IndicatorCategoryController::class.java).getUpdateForm(t.id)
             } linkIf { t: IndicatorCategory, rc: ResourceContext ->
-                t.source != null && rc.isGlobalFunctionGranted(IndicatorTypeManagement::class.java)
+                t.source == null && rc.isGlobalFunctionGranted(IndicatorTypeManagement::class.java)
             },
 
             Link.DELETE linkTo { t: IndicatorCategory ->
                 on(IndicatorCategoryController::class.java).deleteCategory(t.id)
             } linkIf { t: IndicatorCategory, rc: ResourceContext ->
-                t.source != null && rc.isGlobalFunctionGranted(IndicatorTypeManagement::class.java)
+                t.source == null && rc.isGlobalFunctionGranted(IndicatorTypeManagement::class.java)
             }
 
     )

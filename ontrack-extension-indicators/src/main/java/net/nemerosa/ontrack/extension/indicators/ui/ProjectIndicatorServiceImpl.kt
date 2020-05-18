@@ -58,10 +58,6 @@ class ProjectIndicatorServiceImpl(
 
     private fun toProjectIndicator(project: Project, indicator: Indicator<*>) = ProjectIndicator(
             project = project,
-            type = ProjectIndicatorType(indicator.type),
-            value = indicator.toClientJson(),
-            compliance = indicator.compliance,
-            comment = indicator.comment,
-            signature = indicator.signature
+            indicator = indicator
     )
 }
