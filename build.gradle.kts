@@ -370,13 +370,13 @@ val codeCoverageReport by tasks.registering(JacocoReport::class) {
 configure(javaProjects) {
     tasks.named("test") test@{
         codeCoverageReport {
-            dependsOn(this@test)
+            mustRunAfter(this@test)
         }
     }
     val integrationTest = tasks.findByName("integrationTest")
     if (integrationTest != null) {
         codeCoverageReport {
-            dependsOn(integrationTest)
+            mustRunAfter(integrationTest)
         }
     }
 }
