@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValue
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresCollectionService
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -19,9 +20,10 @@ class SonarQubeIndicatorComputer(
         extension: SonarQubeExtensionFeature,
         structureService: StructureService,
         sonarQubeIndicatorSourceProvider: SonarQubeIndicatorSourceProvider,
-        percentageIndicatorValueType: PercentageIndicatorValueType,
-        integerIndicatorValueType: IntegerIndicatorValueType,
-        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
+        private val percentageIndicatorValueType: PercentageIndicatorValueType,
+        private val integerIndicatorValueType: IntegerIndicatorValueType,
+        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService,
+        private val cachedSettingsService: CachedSettingsService
 ) : AbstractBranchIndicatorComputer(extension, structureService) {
 
     override val name: String = "SonarQube metric indicators"
@@ -52,42 +54,45 @@ class SonarQubeIndicatorComputer(
             name = "SonarQube metrics"
     )
 
-    private val sonarTypes: List<SonarQubeIndicatorType<*>> = listOf(
-            SonarQubeIndicatorType(
-                    measure = SonarQubeMeasuresSettings.COVERAGE,
-                    type = IndicatorComputedType(
-                            category = sonarCategory,
-                            id = "sonarqube-coverage",
-                            name = "SonarQube coverage",
-                            link = null,
-                            valueType = percentageIndicatorValueType,
-                            valueConfig = PercentageThreshold(threshold = 80.percent(), higherIsBetter = true)
-                    ),
-                    toValueConverter = { m ->
-                        when {
-                            m < 0 -> 0.percent()
-                            m > 100 -> 100.percent()
-                            else -> m.toInt().percent()
+    private val sonarTypes: List<SonarQubeIndicatorType<*>> get() {
+        val settings = cachedSettingsService.getCachedSettings(SonarQubeMeasuresSettings::class.java)
+        return listOf(
+                SonarQubeIndicatorType(
+                        measure = SonarQubeMeasuresSettings.COVERAGE,
+                        type = IndicatorComputedType(
+                                category = sonarCategory,
+                                id = "sonarqube-coverage",
+                                name = "SonarQube coverage",
+                                link = null,
+                                valueType = percentageIndicatorValueType,
+                                valueConfig = PercentageThreshold(threshold = settings.coverageThreshold.percent(), higherIsBetter = true)
+                        ),
+                        toValueConverter = { m ->
+                            when {
+                                m < 0 -> 0.percent()
+                                m > 100 -> 100.percent()
+                                else -> m.toInt().percent()
+                            }
                         }
-                    }
-            ),
-            SonarQubeIndicatorType(
-                    measure = SonarQubeMeasuresSettings.BLOCKER_VIOLATIONS,
-                    type = IndicatorComputedType(
-                            category = sonarCategory,
-                            id = "sonarqube-blocker-violations",
-                            name = "SonarQube blocker issues",
-                            link = null,
-                            valueType = integerIndicatorValueType,
-                            valueConfig = IntegerThresholds(
-                                    min = 0,
-                                    max = 10,
-                                    higherIsBetter = false
-                            )
-                    ),
-                    toValueConverter = { m -> m.toInt() }
-            )
-    )
+                ),
+                SonarQubeIndicatorType(
+                        measure = SonarQubeMeasuresSettings.BLOCKER_VIOLATIONS,
+                        type = IndicatorComputedType(
+                                category = sonarCategory,
+                                id = "sonarqube-blocker-violations",
+                                name = "SonarQube blocker issues",
+                                link = null,
+                                valueType = integerIndicatorValueType,
+                                valueConfig = IntegerThresholds(
+                                        min = 0,
+                                        max = settings.blockerThreshold,
+                                        higherIsBetter = false
+                                )
+                        ),
+                        toValueConverter = { m -> m.toInt() }
+                )
+        )
+    }
 
     class SonarQubeIndicatorType<T>(
             val measure: String,
