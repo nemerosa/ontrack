@@ -5,9 +5,17 @@ import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
+import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
+import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.YesNo
 import org.springframework.stereotype.Component
+
+typealias IntField = net.nemerosa.ontrack.model.form.Int
 
 @Component
 class IntegerIndicatorValueType(
@@ -16,50 +24,72 @@ class IntegerIndicatorValueType(
 
     override val name: String = "Number"
 
-    override fun form(config: IntegerThresholds, value: Int?): Form {
-        TODO("Not yet implemented")
-    }
+    override fun form(config: IntegerThresholds, value: Int?): Form =
+            Form.create()
+                    .with(
+                            IntField.of("value")
+                                    .label("Value")
+                                    .min(0)
+                                    .value(value)
+                    )
 
     override fun status(config: IntegerThresholds, value: Int): IndicatorCompliance =
             IndicatorCompliance(config.getCompliance(value).value)
 
-    override fun toClientJson(config: IntegerThresholds, value: Int): JsonNode {
-        TODO("Not yet implemented")
-    }
+    override fun toClientJson(config: IntegerThresholds, value: Int): JsonNode =
+            mapOf("value" to value).asJson()
 
     override fun fromClientJson(config: IntegerThresholds, value: JsonNode): Int? {
-        TODO("Not yet implemented")
+        val i = JsonUtils.getInt(value, "value", -1)
+        return if (i < 0) {
+            null
+        } else {
+            i
+        }
     }
 
-    override fun fromStoredJson(valueConfig: IntegerThresholds, value: JsonNode): Int? {
-        TODO("Not yet implemented")
-    }
+    override fun fromStoredJson(valueConfig: IntegerThresholds, value: JsonNode): Int? =
+            if (value.isInt) {
+                value.asInt()
+            } else {
+                null
+            }
 
-    override fun toStoredJson(config: IntegerThresholds, value: Int): JsonNode {
-        TODO("Not yet implemented")
-    }
+    override fun toStoredJson(config: IntegerThresholds, value: Int): JsonNode =
+            value.asJson()
 
-    override fun configForm(config: IntegerThresholds?): Form {
-        TODO("Not yet implemented")
-    }
+    override fun configForm(config: IntegerThresholds?): Form =
+            Form.create()
+                    .with(
+                            IntField.of(IntegerThresholds::min.name)
+                                    .label("Min")
+                                    .min(0)
+                                    .value(config?.min)
+                    )
+                    .with(
+                            IntField.of(IntegerThresholds::max.name)
+                                    .label("Max")
+                                    .min(0)
+                                    .value(config?.max)
+                    )
+                    .with(
+                            YesNo.of(IntegerThresholds::higherIsBetter.name)
+                                    .label("Higher is better")
+                                    .value(config?.higherIsBetter ?: true)
+                    )
 
-    override fun toConfigForm(config: IntegerThresholds): JsonNode {
-        TODO("Not yet implemented")
-    }
+    override fun toConfigForm(config: IntegerThresholds): JsonNode =
+            config.asJson()
 
-    override fun fromConfigForm(config: JsonNode): IntegerThresholds {
-        TODO("Not yet implemented")
-    }
+    override fun fromConfigForm(config: JsonNode): IntegerThresholds =
+            config.parse()
 
-    override fun toConfigClientJson(config: IntegerThresholds): JsonNode {
-        TODO("Not yet implemented")
-    }
+    override fun toConfigClientJson(config: IntegerThresholds): JsonNode =
+            config.asJson()
 
-    override fun toConfigStoredJson(config: IntegerThresholds): JsonNode {
-        TODO("Not yet implemented")
-    }
+    override fun toConfigStoredJson(config: IntegerThresholds): JsonNode =
+            config.asJson()
 
-    override fun fromConfigStoredJson(config: JsonNode): IntegerThresholds {
-        TODO("Not yet implemented")
-    }
+    override fun fromConfigStoredJson(config: JsonNode): IntegerThresholds =
+            config.parse()
 }
