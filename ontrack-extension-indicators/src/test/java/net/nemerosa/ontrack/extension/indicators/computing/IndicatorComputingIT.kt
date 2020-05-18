@@ -158,6 +158,8 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
 
         override val perProject: Boolean = true
 
+        override fun isProjectEligible(project: Project): Boolean = true
+
         override val source: IndicatorSource = IndicatorSource(
                 IndicatorSourceProviderDescription("test", "Test"),
                 "Testing"
