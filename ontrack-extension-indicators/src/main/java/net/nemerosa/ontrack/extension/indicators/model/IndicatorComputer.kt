@@ -44,6 +44,11 @@ interface IndicatorComputer : Extension {
      */
     fun computeIndicators(project: Project): List<IndicatorComputedValue<*, *>>
 
+    /**
+     * Is a project eligible for those computed indicators?
+     */
+    fun isProjectEligible(project: Project): Boolean
+
 }
 
 /**

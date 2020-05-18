@@ -27,12 +27,14 @@ class IndicatorComputingJobs(
 
     private fun createJobRegistrations(computer: IndicatorComputer, projects: List<Project>): List<JobRegistration> {
         return if (computer.perProject) {
-            projects.map { project ->
-                JobRegistration(
-                        job = createJob(computer, project),
-                        schedule = computer.schedule
-                )
-            }
+            projects
+                    .filter { computer.isProjectEligible(it) }
+                    .map { project ->
+                        JobRegistration(
+                                job = createJob(computer, project),
+                                schedule = computer.schedule
+                        )
+                    }
         } else {
             listOf(
                     JobRegistration(
@@ -67,9 +69,13 @@ class IndicatorComputingJobs(
                 "Computing indicator values by ${computer.name} for all projects"
 
         override fun getTask() = JobRun {
-            projects.forEach { project ->
-                compute(computer, project)
-            }
+            projects
+                    .filter {
+                        computer.isProjectEligible(it)
+                    }
+                    .forEach { project ->
+                        compute(computer, project)
+                    }
         }
     }
 

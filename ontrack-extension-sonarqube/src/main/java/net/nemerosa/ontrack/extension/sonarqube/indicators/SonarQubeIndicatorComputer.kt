@@ -10,8 +10,10 @@ import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValue
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresCollectionService
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
+import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
@@ -20,6 +22,7 @@ class SonarQubeIndicatorComputer(
         extension: SonarQubeExtensionFeature,
         structureService: StructureService,
         sonarQubeIndicatorSourceProvider: SonarQubeIndicatorSourceProvider,
+        private val propertyService: PropertyService,
         private val percentageIndicatorValueType: PercentageIndicatorValueType,
         private val integerIndicatorValueType: IntegerIndicatorValueType,
         private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService,
@@ -31,6 +34,9 @@ class SonarQubeIndicatorComputer(
     override val perProject = true
 
     override val source: IndicatorSource = sonarQubeIndicatorSourceProvider.createSource("")
+
+    override fun isBranchEligible(branch: Branch): Boolean =
+            propertyService.hasProperty(branch.project, SonarQubePropertyType::class.java)
 
     override fun computeIndicators(branch: Branch): List<IndicatorComputedValue<*, *>> {
         val measures = sonarQubeMeasuresCollectionService.getLastMeasures(branch)

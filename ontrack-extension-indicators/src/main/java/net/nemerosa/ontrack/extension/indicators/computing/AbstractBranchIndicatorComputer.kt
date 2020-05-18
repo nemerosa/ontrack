@@ -25,6 +25,13 @@ abstract class AbstractBranchIndicatorComputer(
         }
     }
 
+    override fun isProjectEligible(project: Project): Boolean =
+            getMainBranch(project)?.let {
+                isBranchEligible(it)
+            } ?: false
+
+    abstract fun isBranchEligible(branch: Branch): Boolean
+
     abstract fun computeIndicators(branch: Branch): List<IndicatorComputedValue<*, *>>
 
     private fun getMainBranch(project: Project): Branch? {
