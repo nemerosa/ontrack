@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.acl
 
-import net.nemerosa.ontrack.model.security.GlobalFunction
-import net.nemerosa.ontrack.model.security.ProjectFunction
-import net.nemerosa.ontrack.model.security.RoleContributor
-import net.nemerosa.ontrack.model.security.Roles
+import net.nemerosa.ontrack.model.security.*
 import org.springframework.stereotype.Component
 
 /**
@@ -12,9 +9,43 @@ import org.springframework.stereotype.Component
 @Component
 class IndicatorRoleContributor : RoleContributor {
 
+    companion object {
+        /**
+         * Indicator management at project level
+         */
+        const val PROJECT_INDICATOR_MANAGER = "PROJECT_INDICATOR_MANAGER"
+
+        /**
+         * Indicator management at global level
+         */
+        const val GLOBAL_INDICATOR_MANAGER = "GLOBAL_INDICATOR_MANAGER"
+    }
+
+    override fun getProjectRoles(): List<RoleDefinition> =
+            listOf(
+                    RoleDefinition(
+                            id = PROJECT_INDICATOR_MANAGER,
+                            name = "Project indicator manager",
+                            description = "Can manage the indicators of a project, by editing or removing indicator values"
+                    )
+            )
+
+    override fun getGlobalRoles(): List<RoleDefinition> =
+            listOf(
+                    RoleDefinition(
+                            id = GLOBAL_INDICATOR_MANAGER,
+                            name = "Global indicator manager",
+                            description = "Can manage and import indicator categories & types. Can manage portfolios. Can manage indicators in all projects."
+                    )
+            )
+
     override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
             mapOf(
                     Roles.GLOBAL_ADMINISTRATOR to listOf(
+                            IndicatorPortfolioManagement::class.java,
+                            IndicatorTypeManagement::class.java
+                    ),
+                    GLOBAL_INDICATOR_MANAGER to listOf(
                             IndicatorPortfolioManagement::class.java,
                             IndicatorTypeManagement::class.java
                     )
@@ -23,6 +54,9 @@ class IndicatorRoleContributor : RoleContributor {
     override fun getProjectFunctionContributionsForGlobalRoles(): Map<String, List<Class<out ProjectFunction>>> =
             mapOf(
                     Roles.GLOBAL_ADMINISTRATOR to listOf(
+                            IndicatorEdit::class.java
+                    ),
+                    GLOBAL_INDICATOR_MANAGER to listOf(
                             IndicatorEdit::class.java
                     )
             )
@@ -33,6 +67,9 @@ class IndicatorRoleContributor : RoleContributor {
                             IndicatorEdit::class.java
                     ),
                     Roles.PROJECT_OWNER to listOf(
+                            IndicatorEdit::class.java
+                    ),
+                    PROJECT_INDICATOR_MANAGER to listOf(
                             IndicatorEdit::class.java
                     )
             )

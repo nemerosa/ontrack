@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.model
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import net.nemerosa.ontrack.extension.indicators.acl.IndicatorEdit
 import net.nemerosa.ontrack.extension.indicators.store.IndicatorStore
 import net.nemerosa.ontrack.extension.indicators.store.StoredIndicator
 import net.nemerosa.ontrack.model.Ack
@@ -49,6 +50,7 @@ class IndicatorServiceImpl(
     }
 
     override fun <T> updateProjectIndicator(project: Project, typeId: String, input: JsonNode): Indicator<T> {
+        securityService.checkProjectFunction(project, IndicatorEdit::class.java)
         @Suppress("UNCHECKED_CAST")
         val type = indicatorTypeService.getTypeById(typeId) as IndicatorType<T, *>
         // Parsing
