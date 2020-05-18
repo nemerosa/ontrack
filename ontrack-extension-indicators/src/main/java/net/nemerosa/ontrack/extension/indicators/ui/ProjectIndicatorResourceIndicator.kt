@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
-import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator
-import net.nemerosa.ontrack.ui.resource.Link
-import net.nemerosa.ontrack.ui.resource.LinkDefinition
-import net.nemerosa.ontrack.ui.resource.linkTo
+import net.nemerosa.ontrack.extension.indicators.acl.IndicatorEdit
+import net.nemerosa.ontrack.ui.resource.*
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
@@ -16,6 +14,8 @@ class ProjectIndicatorResourceIndicator : AbstractLinkResourceDecorator<ProjectI
                         i.project.id,
                         i.type.id
                 )
+            } linkIf { i, rc ->
+                i.type.source != null && rc.isProjectFunctionGranted(i.project, IndicatorEdit::class.java)
             },
 
             Link.DELETE linkTo { i: ProjectIndicator ->
@@ -23,6 +23,8 @@ class ProjectIndicatorResourceIndicator : AbstractLinkResourceDecorator<ProjectI
                         i.project.id,
                         i.type.id
                 )
+            } linkIf { i, rc ->
+                i.type.source != null && rc.isProjectFunctionGranted(i.project, IndicatorEdit::class.java)
             }
     )
 }

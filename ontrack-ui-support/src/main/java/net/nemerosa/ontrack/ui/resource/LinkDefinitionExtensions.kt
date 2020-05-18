@@ -18,6 +18,8 @@ infix fun <T, G : GlobalFunction> LinkDefinition<T>.linkIfGlobal(fn: KClass<G>):
     rc.isGlobalFunctionGranted(fn.java)
 }
 
+infix fun <T> LinkDefinition<T>.linkIf(condition: (T, ResourceContext) -> Boolean): LinkDefinition<T> = addCheckFn(condition)
+
 private fun <T> LinkDefinition<T>.addCheckFn(fn: (T, ResourceContext) -> Boolean) = object : LinkDefinition<T> {
     override val name: String = this@addCheckFn.name
     override val checkFn: (T, ResourceContext) -> Boolean = fn
