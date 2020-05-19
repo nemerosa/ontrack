@@ -436,7 +436,7 @@ angular.module('ontrack.extension.indicators', [
             'portfolios', '#/extension/indicators/portfolios'
         ]);
         view.commands = [
-            ot.viewCloseCommand(`/extension/indicators/portfolios/`)
+            ot.viewCloseCommand(`/extension/indicators/portfolios`)
         ];
 
         const query = `
@@ -490,6 +490,14 @@ angular.module('ontrack.extension.indicators', [
             ot.pageCall($http.put($scope.indicatorPortfolioOfPortfolios.links._globalIndicators, {
                 categories: selectedCategories
             }));
+        };
+
+        $scope.unfold = (category) => {
+            category.unfolded = true;
+        };
+
+        $scope.fold = (category) => {
+            category.unfolded = false;
         };
 
     })
@@ -625,6 +633,14 @@ angular.module('ontrack.extension.indicators', [
             ot.pageCall($http.put($scope.portfolio.links._update, {
                 categories: selectedCategories
             }));
+        };
+
+        $scope.unfold = (category) => {
+            category.unfolded = true;
+        };
+
+        $scope.fold = (category) => {
+            category.unfolded = false;
         };
 
     })

@@ -74,9 +74,11 @@
             </td>
             <td>
                 {{category.name}}
+                <span class="fa fa-caret-right ot-action" title="Show associated types" ng-hide="category.unfolded" ng-click="unfold(category)"></span>
+                <span class="fa fa-caret-down ot-action" title="Hide associated types" ng-show="category.unfolded" ng-click="fold(category)"></span>
             </td>
         </tr>
-        <tr ng-repeat="type in category.types">
+        <tr ng-repeat="type in category.types" ng-show="category.unfolded">
             <td colspan="2">
                 <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
             </td>
