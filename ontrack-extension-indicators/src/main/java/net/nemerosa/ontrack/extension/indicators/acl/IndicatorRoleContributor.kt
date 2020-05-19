@@ -52,10 +52,12 @@ class IndicatorRoleContributor : RoleContributor {
     override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
             mapOf(
                     Roles.GLOBAL_ADMINISTRATOR to listOf(
+                            IndicatorPortfolioIndicatorManagement::class.java,
                             IndicatorPortfolioManagement::class.java,
                             IndicatorTypeManagement::class.java
                     ),
                     GLOBAL_INDICATOR_MANAGER to listOf(
+                            IndicatorPortfolioIndicatorManagement::class.java,
                             IndicatorPortfolioManagement::class.java,
                             IndicatorTypeManagement::class.java
                     ),
