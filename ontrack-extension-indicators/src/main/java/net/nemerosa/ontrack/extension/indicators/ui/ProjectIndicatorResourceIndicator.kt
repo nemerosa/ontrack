@@ -15,7 +15,7 @@ class ProjectIndicatorResourceIndicator : AbstractLinkResourceDecorator<ProjectI
                         i.type.id
                 )
             } linkIf { i, rc ->
-                i.type.source == null && rc.isProjectFunctionGranted(i.project, IndicatorEdit::class.java)
+                !i.type.computed && rc.isProjectFunctionGranted(i.project, IndicatorEdit::class.java)
             },
 
             Link.DELETE linkTo { i: ProjectIndicator ->
@@ -24,7 +24,7 @@ class ProjectIndicatorResourceIndicator : AbstractLinkResourceDecorator<ProjectI
                         i.type.id
                 )
             } linkIf { i, rc ->
-                i.type.source == null && rc.isProjectFunctionGranted(i.project, IndicatorEdit::class.java)
+                !i.type.computed && rc.isProjectFunctionGranted(i.project, IndicatorEdit::class.java)
             }
     )
 }

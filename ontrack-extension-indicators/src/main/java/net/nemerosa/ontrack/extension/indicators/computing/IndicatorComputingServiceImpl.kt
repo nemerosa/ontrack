@@ -109,7 +109,8 @@ class IndicatorComputingServiceImpl(
                             type.link,
                             type.valueType,
                             type.valueConfig,
-                            source
+                            source,
+                            computed = true
                     )
                 }
 
@@ -126,7 +127,8 @@ class IndicatorComputingServiceImpl(
                             type.link,
                             type.valueType,
                             type.valueConfig,
-                            source
+                            source,
+                            computed = true
                     )
                 }
 

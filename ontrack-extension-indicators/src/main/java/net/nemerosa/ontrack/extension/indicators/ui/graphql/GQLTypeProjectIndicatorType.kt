@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
+import net.nemerosa.ontrack.graphql.support.booleanField
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
@@ -27,6 +28,8 @@ class GQLTypeProjectIndicatorType(
             .stringField(ProjectIndicatorType::id.name, "Unique ID for the type")
             .stringField(ProjectIndicatorType::name.name, "Name for the indicator type")
             .stringField(ProjectIndicatorType::link.name, "Link to the definition of the indicator")
+            // Computed flag
+            .booleanField(ProjectIndicatorType::computed)
             // Source
             .field {
                 it.name(IndicatorType<*, *>::source.name)

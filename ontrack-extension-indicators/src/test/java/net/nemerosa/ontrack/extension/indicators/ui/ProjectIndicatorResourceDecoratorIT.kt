@@ -20,12 +20,23 @@ class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport
     private lateinit var valueType: BooleanIndicatorValueType
 
     @Test
-    fun `Update and deletion not allowed when source is present even if allowed`() {
-        val indicator = indicator(source)
+    fun `Update and deletion not allowed when computed even if allowed`() {
+        val indicator = indicator(computed = true)
         asAdmin {
             indicator.decorate(decorator) {
                 assertLinkNotPresent(Link.UPDATE)
                 assertLinkNotPresent(Link.DELETE)
+            }
+        }
+    }
+
+    @Test
+    fun `Update and deletion allowed when source is present and if allowed`() {
+        val indicator = indicator(source)
+        asAdmin {
+            indicator.decorate(decorator) {
+                assertLinkPresent(Link.UPDATE)
+                assertLinkPresent(Link.DELETE)
             }
         }
     }
@@ -85,11 +96,11 @@ class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport
         }
     }
 
-    private fun indicator(source: IndicatorSource? = null) = project<ProjectIndicator> {
+    private fun indicator(source: IndicatorSource? = null, computed: Boolean = false) = project<ProjectIndicator> {
         ProjectIndicator(
                 project = this,
                 indicator = Indicator(
-                        type = type(source),
+                        type = type(source, computed),
                         value = true,
                         compliance = null,
                         comment = null,
@@ -98,7 +109,7 @@ class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport
         )
     }
 
-    private fun type(source: IndicatorSource? = null) =
+    private fun type(source: IndicatorSource? = null, computed: Boolean = false) =
             IndicatorType(
                     id = "test",
                     category = category,
@@ -106,7 +117,8 @@ class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport
                     link = null,
                     valueType = valueType,
                     valueConfig = BooleanIndicatorValueTypeConfig(required = false),
-                    source = source
+                    source = source,
+                    computed = computed
             )
 
     private val category = IndicatorCategory(

@@ -17,7 +17,7 @@ class ProjectIndicatorTypeResourceDecoratorIT : AbstractResourceDecoratorTestSup
 
     @Test
     fun `Update and deletion not allowed when source is present even if allowed`() {
-        val type = ProjectIndicatorType("test", "Testing", null, category, source)
+        val type = ProjectIndicatorType("test", "Testing", null, category, source, false)
         asAdmin {
             type.decorate(decorator) {
                 assertLinkNotPresent(Link.UPDATE)
@@ -28,7 +28,7 @@ class ProjectIndicatorTypeResourceDecoratorIT : AbstractResourceDecoratorTestSup
 
     @Test
     fun `Update and deletion not allowed when not allowed`() {
-        val type = ProjectIndicatorType("test", "Testing", null, category, null)
+        val type = ProjectIndicatorType("test", "Testing", null, category, null, false)
         asUser().call {
             type.decorate(decorator) {
                 assertLinkNotPresent(Link.UPDATE)
@@ -39,7 +39,7 @@ class ProjectIndicatorTypeResourceDecoratorIT : AbstractResourceDecoratorTestSup
 
     @Test
     fun `Update and deletion allowed when admin`() {
-        val type = ProjectIndicatorType("test", "Testing", null, category, null)
+        val type = ProjectIndicatorType("test", "Testing", null, category, null, false)
         asAdmin {
             type.decorate(decorator) {
                 assertLinkPresent(Link.UPDATE)
@@ -50,7 +50,7 @@ class ProjectIndicatorTypeResourceDecoratorIT : AbstractResourceDecoratorTestSup
 
     @Test
     fun `Update and deletion allowed when function granted`() {
-        val type = ProjectIndicatorType("test", "Testing", null, category, null)
+        val type = ProjectIndicatorType("test", "Testing", null, category, null, false)
         asUserWith<IndicatorTypeManagement> {
             type.decorate(decorator) {
                 assertLinkPresent(Link.UPDATE)
@@ -61,7 +61,7 @@ class ProjectIndicatorTypeResourceDecoratorIT : AbstractResourceDecoratorTestSup
 
     @Test
     fun `Update and deletion allowed when role granted`() {
-        val type = ProjectIndicatorType("test", "Testing", null, category, null)
+        val type = ProjectIndicatorType("test", "Testing", null, category, null, false)
         asAccountWithGlobalRole(IndicatorRoleContributor.GLOBAL_INDICATOR_MANAGER) {
             type.decorate(decorator) {
                 assertLinkPresent(Link.UPDATE)

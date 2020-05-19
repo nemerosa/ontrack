@@ -28,7 +28,8 @@ interface IndicatorTypeService {
             link: String?,
             valueType: IndicatorValueType<T, C>,
             valueConfig: C,
-            source: IndicatorSource? = null
+            source: IndicatorSource? = null,
+            computed: Boolean = false
     ): IndicatorType<T, C>
 
     fun updateType(input: CreateTypeForm): IndicatorType<*, *>
@@ -40,7 +41,8 @@ interface IndicatorTypeService {
             link: String?,
             valueType: IndicatorValueType<T, C>,
             valueConfig: C,
-            source: IndicatorSource? = null
+            source: IndicatorSource? = null,
+            computed: Boolean = false
     ): IndicatorType<T, C>
 
     fun deleteType(id: String): Ack

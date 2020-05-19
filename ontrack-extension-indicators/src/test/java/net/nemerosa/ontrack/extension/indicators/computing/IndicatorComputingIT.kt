@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
 
@@ -201,6 +202,7 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
         fun assertTypeIsPresent(type: IndicatorComputedType<*, *>) {
             assertNotNull(indicatorTypeService.findTypeById(type.id)) {
                 assertEquals(source, it.source)
+                assertTrue(it.computed, "Computed flag is ON")
             }
         }
 
