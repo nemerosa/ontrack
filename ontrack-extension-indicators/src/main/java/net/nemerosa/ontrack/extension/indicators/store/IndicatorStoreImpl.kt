@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.store
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
 import org.springframework.stereotype.Service
+import java.time.Duration
 
 @Service
 class IndicatorStoreImpl(
@@ -17,12 +19,13 @@ class IndicatorStoreImpl(
         private val securityService: SecurityService
 ) : IndicatorStore {
 
-    override fun loadIndicator(project: Project, type: String): StoredIndicator? {
+    override fun loadIndicator(project: Project, type: String, previous: Duration?): StoredIndicator? {
         return entityDataStore.getByFilter(
                 EntityDataStoreFilter(project)
                         .withCategory(STORE_CATEGORY)
                         .withName(type)
                         .withCount(1)
+                        .withBeforeTime(previous?.let { Time.now() - it })
         )
                 .firstOrNull()
                 ?.let { record ->

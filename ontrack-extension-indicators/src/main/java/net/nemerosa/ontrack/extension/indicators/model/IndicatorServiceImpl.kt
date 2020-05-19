@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.Signature
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 
 @Service
 @Transactional
@@ -45,8 +46,8 @@ class IndicatorServiceImpl(
         return loadIndicator(project, type)
     }
 
-    override fun <T> getProjectIndicator(project: Project, type: IndicatorType<T, *>): Indicator<T> {
-        return loadIndicator(project, type)
+    override fun <T> getProjectIndicator(project: Project, type: IndicatorType<T, *>, previous: Duration?): Indicator<T> {
+        return loadIndicator(project, type, previous)
     }
 
     override fun <T> updateProjectIndicator(project: Project, typeId: String, input: JsonNode): Indicator<T> {
@@ -89,8 +90,8 @@ class IndicatorServiceImpl(
         return indicatorStore.deleteIndicator(project, typeId)
     }
 
-    private fun <T, C> loadIndicator(project: Project, type: IndicatorType<T, C>): Indicator<T> {
-        val stored = indicatorStore.loadIndicator(project, type.id)
+    private fun <T, C> loadIndicator(project: Project, type: IndicatorType<T, C>, previous: Duration? = null): Indicator<T> {
+        val stored = indicatorStore.loadIndicator(project, type.id, previous)
         return if (stored != null && !stored.value.isNull) {
             val value = type.fromStoredJson(stored.value)
             Indicator(

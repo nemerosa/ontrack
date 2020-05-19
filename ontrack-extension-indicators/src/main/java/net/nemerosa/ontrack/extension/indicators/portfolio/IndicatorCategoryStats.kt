@@ -7,5 +7,6 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
  */
 class IndicatorCategoryStats(
         val category: IndicatorCategory,
-        val stats: IndicatorStats
+        val stats: IndicatorStats,
+        val previousStats: IndicatorPreviousStats?
 )
