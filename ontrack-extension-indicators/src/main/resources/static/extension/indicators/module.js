@@ -121,6 +121,7 @@ angular.module('ontrack.extension.indicators', [
                     }
                     name
                   }
+                  computed
                   category {
                     id
                     name

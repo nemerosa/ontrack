@@ -24,6 +24,7 @@
             <th>ID</th>
             <th>Name</th>
             <th>Source</th>
+            <th>Computed?</th>
             <th>Type</th>
             <th>Configuration</th>
             <th>&nbsp;</th>
@@ -44,6 +45,9 @@
             </td>
             <td>
                 <ot-extension-indicators-source source="type.source"></ot-extension-indicators-source>
+            </td>
+            <td>
+                <ot-yes-no value="type.computed"></ot-yes-no>
             </td>
             <td>
                 {{type.valueType.name}}
