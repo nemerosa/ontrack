@@ -332,6 +332,7 @@ angular.module('ontrack.extension.indicators', [
               indicatorPortfolioOfPortfolios {
                 links {
                   _create
+                  _globalIndicators
                 }
                 portfolios {
                   id
@@ -387,6 +388,13 @@ angular.module('ontrack.extension.indicators', [
                             cls: 'ot-command-new',
                             action: $scope.createPortfolio
                         },
+                        {
+                            condition: () => $scope.portfolioOfPortolios.links._globalIndicators,
+                            id: 'portfolio-global-indicators',
+                            name: "Global indicators",
+                            cls: "ot-command-update",
+                            link: "/extension/indicators/portfolios/global-indicators"
+                        },
                         ot.viewCloseCommand('/home')
                     ];
                     viewInitialized = true;
@@ -410,6 +418,80 @@ angular.module('ontrack.extension.indicators', [
                 return ot.pageCall($http.delete(portfolio.links._delete));
             }).then(loadPortfolios);
         };
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('portfolio-global-indicators', {
+            url: '/extension/indicators/portfolios/global-indicators',
+            templateUrl: 'extension/indicators/portfolio-global-indicators.tpl.html',
+            controller: 'PortfolioGlobalIndicatorsCtrl'
+        });
+    })
+    .controller('PortfolioGlobalIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+        $scope.loadingPortfolioGlobalIndicators = true;
+
+        const view = ot.view();
+        view.title = "Portfolio global indicators";
+        view.description = "Selection of categories to display for all portfolios.";
+        view.breadcrumbs = ot.homeBreadcrumbs().push([
+            'portfolios', '#/extension/indicators/portfolios'
+        ]);
+        view.commands = [
+            ot.viewCloseCommand(`/extension/indicators/portfolios/`)
+        ];
+
+        const query = `
+            {
+              indicatorPortfolioOfPortfolios {
+                links {
+                  _globalIndicators
+                }
+                categories {
+                  id
+                }
+              }
+              indicatorCategories {
+                categories {
+                  id
+                  name
+                  types {
+                    id
+                    name
+                    link
+                  }
+                }
+              }
+            }
+        `;
+
+        const loadGlobalIndicators = () => {
+            $scope.loadingPortfolioGlobalIndicators = true;
+            otGraphqlService.pageGraphQLCall(query).then((data) => {
+                $scope.indicatorPortfolioOfPortfolios = data.indicatorPortfolioOfPortfolios;
+                $scope.categories = data.indicatorCategories.categories;
+                $scope.categories.forEach((category => {
+                    category.selected = $scope.indicatorPortfolioOfPortfolios.categories.find((c) => {
+                        return c.id === category.id;
+                    }) !== undefined;
+                }));
+            }).finally(() => {
+                $scope.loadingPortfolioGlobalIndicators = false;
+            });
+        };
+
+        loadGlobalIndicators();
+
+        $scope.updateCategories = () => {
+            let selectedCategories = [];
+            $scope.categories.forEach((category) => {
+                if (category.selected) {
+                    selectedCategories.push(category.id);
+                }
+            });
+            ot.pageCall($http.put($scope.indicatorPortfolioOfPortfolios.links._globalIndicators, {
+                categories: selectedCategories
+            }));
+        };
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-edit', {

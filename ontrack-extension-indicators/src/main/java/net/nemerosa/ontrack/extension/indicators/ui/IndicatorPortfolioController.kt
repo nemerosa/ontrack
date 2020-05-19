@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
-import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
+import net.nemerosa.ontrack.extension.indicators.portfolio.*
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
@@ -57,6 +55,15 @@ class IndicatorPortfolioController(
             )
         }
     }
+
+    /**
+     * Updating the global indicators
+     */
+    @PutMapping("global-indicators/update")
+    fun updatePortfolioGlobalIndicators(@RequestBody input: PortfolioGlobalIndicators): ResponseEntity<IndicatorPortfolioOfPortfolios> =
+            ResponseEntity.ok(
+                    indicatorPortfolioService.savePortfolioOfPortfolios(input)
+            )
 
     /**
      * Deleting a portfolio

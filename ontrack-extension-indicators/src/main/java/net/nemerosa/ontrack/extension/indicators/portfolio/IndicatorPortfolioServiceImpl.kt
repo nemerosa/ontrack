@@ -112,14 +112,18 @@ class IndicatorPortfolioServiceImpl(
         structureService.projectList
         return storageService.retrieve(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, IndicatorPortfolioOfPortfolios::class.java)
                 .orElse(IndicatorPortfolioOfPortfolios(
-                        // TODO Replace by empty when edition of global categories is ready
-                        categories = indicatorCategoryService.findAll().map { it.id }
+                        categories = emptyList()
                 ))
     }
 
-    override fun savePortfolioOfPortfolios(input: IndicatorPortfolioOfPortfolios): IndicatorPortfolioOfPortfolios {
-        storageService.store(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, input)
-        return input
+    override fun savePortfolioOfPortfolios(input: PortfolioGlobalIndicators): IndicatorPortfolioOfPortfolios {
+        val portfolio = IndicatorPortfolioOfPortfolios(
+                input.categories.filter {
+                    indicatorCategoryService.findCategoryById(it) != null
+                }
+        )
+        storageService.store(STORE_PORTFOLIO_OF_PORTFOLIOS, PORTFOLIO_OF_PORTFOLIOS, portfolio)
+        return portfolio
     }
 
     companion object {

@@ -51,6 +51,6 @@ interface IndicatorPortfolioService {
     /**
      * Saves the portfolio of portfolios
      */
-    fun savePortfolioOfPortfolios(input: IndicatorPortfolioOfPortfolios): IndicatorPortfolioOfPortfolios
+    fun savePortfolioOfPortfolios(input: PortfolioGlobalIndicators): IndicatorPortfolioOfPortfolios
 
 }
