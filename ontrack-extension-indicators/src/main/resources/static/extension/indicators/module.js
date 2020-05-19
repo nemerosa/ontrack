@@ -246,6 +246,7 @@ angular.module('ontrack.extension.indicators', [
                             id
                           }
                         }
+                        computed
                       }
                       value
                       compliance
