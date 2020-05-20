@@ -683,9 +683,17 @@ pipeline {
             }
             when {
                 beforeAgent true
-                anyOf {
-                    branch 'release/*'
-                    branch 'develop'
+                allOf {
+                    not {
+                        anyOf {
+                            branch '*alpha'
+                            branch '*beta'
+                        }
+                    }
+                    anyOf {
+                        branch 'release/*'
+                        branch 'develop'
+                    }
                 }
             }
             steps {
