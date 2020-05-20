@@ -1,28 +1,43 @@
 <ot-view>
-    <div class="row" ng-repeat="form in forms">
-        <div class="col-md-12">
-            <ot-section-title>{{form.title}}</ot-section-title>
-            <div class="well">
-                <table class="ot-form-view">
-                    <tbody>
-                    <tr ng-repeat="field in form.form.fields" ng-if="isFieldVisible(form.form, field)">
-                        <td>
-                            {{field.label}}
-                        </td>
-                        <td>
-                            <ot-field-value field="field"></ot-field-value>
-                        </td>
-                    </tr>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td colspan="2">
-                            <button type="button" class="btn btn-info" ng-click="editSettings(form)">Edit</button>
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
+
+    <div class="row">
+        <div class="col-md-2 ot-settings-list">
+            <p ng-repeat="form in forms">
+                <span ng-show="form.active" class="ot-settings-selected"><span class="fa fa-caret-right"></span>&nbsp;{{form.title}}</span>
+                <a ng-hide="form.active"
+                   ng-click="showSettings(form)"
+                   class="ot-settings-unselected">{{form.title}}</a>
+            </p>
+        </div>
+        <div class="col-md-10 ot-settings-container">
+            <div class="row"
+                 ng-show="form.active"
+                 ng-repeat="form in forms">
+                <div class="col-md-12">
+                    <table class="ot-form-view">
+                        <tbody>
+                        <tr ng-repeat="field in form.form.fields" ng-if="isFieldVisible(form.form, field)">
+                            <td>
+                                {{field.label}}
+                            </td>
+                            <td>
+                                <ot-field-value field="field"></ot-field-value>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="2">
+                                <button type="button" class="btn btn-info" ng-click="editSettings(form)">Edit
+                                </button>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+
 </ot-view>

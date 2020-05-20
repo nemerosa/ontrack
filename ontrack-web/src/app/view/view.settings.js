@@ -13,10 +13,9 @@ angular.module('ot.view.settings', [
     .controller('SettingsCtrl', function ($scope, $http, ot, otFormService) {
         var view = ot.view();
         view.title = "Settings";
-        view.description = "General settings for the ontrack application";
 
         // Loading of the settings
-        function loadSettings() {
+        function loadSettings(activeId) {
             ot.call($http.get('rest/settings')).then(function (forms) {
                 view.commands = [
                     ot.viewApiCommand(forms._self),
@@ -25,6 +24,7 @@ angular.module('ot.view.settings', [
                 // Preparation of all forms
                 angular.forEach(forms.resources, function (describedForm) {
                     describedForm.data = otFormService.prepareForDisplay(describedForm.form);
+                    describedForm.active = activeId && describedForm.id === activeId;
                 });
                 // Displays the forms
                 $scope.forms = forms.resources;
@@ -32,7 +32,13 @@ angular.module('ot.view.settings', [
         }
 
         // Initialisation
-        loadSettings();
+        loadSettings("general-security");
+
+        // Displays some settings
+        $scope.showSettings = (describedForm) => {
+            $scope.forms.forEach((it) => it.active = false);
+            describedForm.active = true;
+        };
 
         // Editing some settings
         $scope.editSettings = function (describedForm) {
@@ -43,7 +49,9 @@ angular.module('ot.view.settings', [
                 submit: function (data) {
                     return ot.call($http.put(describedForm.uri, data));
                 }
-            }).then(loadSettings);
+            }).then(() => {
+                loadSettings(describedForm.id);
+            });
         };
 
         // Visibility of the fields
