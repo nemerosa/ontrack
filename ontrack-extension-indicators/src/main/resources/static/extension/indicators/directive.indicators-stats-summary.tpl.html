@@ -7,6 +7,23 @@
 <p ng-if="stats.total == 0">
     No indicator has been rated for this {{item}}.
 </p>
+<p ng-if="previousStats && previousStats.avgTrend">
+    <span ng-if="previousStats.avgTrend == 'GROWTH'" class="fa fa-arrow-up text-success" title="Growth"></span>
+    <span ng-if="previousStats.avgTrend == 'SAME'" class="fa fa-arrows-h text-muted" title="No change"></span>
+    <span ng-if="previousStats.avgTrend == 'DECREASE'" class="fa fa-arrow-down text-danger" title="Decrease"></span>
+    <span ng-if="previousStats.avgTrend == 'SAME'">
+        No change in
+        <ot-duration duration="previousStats.durationSeconds" detail="false"></ot-duration>
+    </span>
+    <span ng-if="previousStats.avgTrend != 'SAME'">
+        Was
+        <ot-extension-indicators-status
+                status="{compliance: previousStats.stats.avg, rating: previousStats.stats.avgRating }"
+                size="sm"></ot-extension-indicators-status>
+        <ot-duration duration="previousStats.durationSeconds" detail="false"></ot-duration>
+        ago
+    </span>
+</p>
 <p ng-if="stats.minRating != stats.avgRating">
     {{stats.minCount}} indicator<span ng-if="stats.minCount > 1">s</span>
     <span ng-if="stats.minCount > 1">are</span><span

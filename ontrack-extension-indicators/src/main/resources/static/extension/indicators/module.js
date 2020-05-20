@@ -330,7 +330,7 @@ angular.module('ontrack.extension.indicators', [
         view.breadcrumbs = ot.homeBreadcrumbs();
 
         const query = `
-            {
+            query LoadPortfolioOfPortfolios($trendDuration: Int) {
               indicatorPortfolioOfPortfolios {
                 links {
                   _create
@@ -346,7 +346,7 @@ angular.module('ontrack.extension.indicators', [
                     color
                     description
                   }
-                  globalStats {
+                  globalStats(duration: $trendDuration) {
                     category {
                       id
                       name
@@ -363,6 +363,14 @@ angular.module('ontrack.extension.indicators', [
                       maxCount
                       maxRating
                     }
+                    previousStats {
+                      stats {
+                        avg
+                        avgRating
+                      }
+                      avgTrend
+                      durationSeconds
+                    }
                   }
                   links {
                     _update
@@ -373,11 +381,19 @@ angular.module('ontrack.extension.indicators', [
             }
         `;
 
+        const queryVariables = {
+            trendDuration: undefined
+        };
+
+        $scope.pageModel = {
+            trendDuration: undefined
+        };
+
         let viewInitialized = false;
 
         const loadPortfolios = () => {
             $scope.loadingPortfolios = true;
-            otGraphqlService.pageGraphQLCall(query).then((data) => {
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
                 $scope.portfolioOfPortolios = data.indicatorPortfolioOfPortfolios;
                 $scope.portfolios = data.indicatorPortfolioOfPortfolios.portfolios;
 
@@ -419,6 +435,15 @@ angular.module('ontrack.extension.indicators', [
             }).then(() => {
                 return ot.pageCall($http.delete(portfolio.links._delete));
             }).then(loadPortfolios);
+        };
+
+        $scope.selectTrend = () => {
+            if ($scope.pageModel.trendDuration) {
+                queryVariables.trendDuration = Number($scope.pageModel.trendDuration);
+            } else {
+                queryVariables.trendDuration = undefined;
+            }
+            loadPortfolios();
         };
     })
     .config(function ($stateProvider) {
@@ -848,6 +873,7 @@ angular.module('ontrack.extension.indicators', [
             templateUrl: 'extension/indicators/directive.indicators-stats-summary.tpl.html',
             scope: {
                 stats: '=',
+                previousStats: '=',
                 item: '@'
             }
         };

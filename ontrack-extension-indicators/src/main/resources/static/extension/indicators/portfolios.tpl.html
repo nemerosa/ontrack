@@ -26,9 +26,10 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
-                    <select id="trend-selection" class="form-control">
+                    <select id="trend-selection" class="form-control" ng-model="pageModel.trendDuration" ng-change="selectTrend()">
                         <option value="">No trend</option>
                         <option value="60">1 minute</option>
+                        <option value="1800">30 minutes</option>
                         <option value="3600">1 hour</option>
                         <option value="86400">1 day</option>
                         <option value="604800">1 week</option>
@@ -80,7 +81,7 @@
                         </div>
                         <div class="col-md-9" style="border-right: solid 1px gray;">
                             <p><strong>{{categoryStats.category.name}}</strong></p>
-                            <ot-extension-indicators-stats-summary stats="categoryStats.stats" item="portfolio and category"></ot-extension-indicators-stats-summary>
+                            <ot-extension-indicators-stats-summary stats="categoryStats.stats" previous-stats="categoryStats.previousStats" item="portfolio and category"></ot-extension-indicators-stats-summary>
                         </div>
                     </div>
                 </div>
