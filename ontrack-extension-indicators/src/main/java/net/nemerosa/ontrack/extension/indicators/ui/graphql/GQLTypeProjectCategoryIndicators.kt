@@ -28,9 +28,15 @@ class GQLTypeProjectCategoryIndicators(
                 it.name("categoryStats")
                         .description("Indicator stats for this project and category")
                         .type(indicatorCategoryStats.typeRef)
+                        .durationArgument()
                         .dataFetcher { env ->
+                            val duration = env.getDurationArgument()
                             val projectCategoryIndicators: ProjectCategoryIndicators = env.getSource()
-                            indicatorStatsService.getStatsForCategoryAndProject(projectCategoryIndicators.category, projectCategoryIndicators.project)
+                            indicatorStatsService.getStatsForCategoryAndProject(
+                                    projectCategoryIndicators.category,
+                                    projectCategoryIndicators.project,
+                                    duration
+                            )
                         }
             }
             .field {

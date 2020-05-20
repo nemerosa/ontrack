@@ -65,9 +65,11 @@ class GQLTypeIndicatorPortfolio(
                         it.name("categoryStats")
                                 .description("Stats per category")
                                 .type(stdList(indicatorCategoryStats.typeRef))
+                                .durationArgument()
                                 .dataFetcher { env ->
+                                    val duration = env.getDurationArgument()
                                     val portfolio: IndicatorPortfolio = env.getSource()
-                                    indicatorStatsService.getStatsPortfolio(portfolio)
+                                    indicatorStatsService.getStatsPortfolio(portfolio, duration)
                                 }
                     }
                     // Stats
@@ -75,9 +77,11 @@ class GQLTypeIndicatorPortfolio(
                         it.name("globalStats")
                                 .description("Global indicator stats")
                                 .type(stdList(indicatorCategoryStats.typeRef))
+                                .durationArgument()
                                 .dataFetcher { env ->
+                                    val duration = env.getDurationArgument()
                                     val portfolio: IndicatorPortfolio = env.getSource()
-                                    indicatorStatsService.getGlobalStats(portfolio)
+                                    indicatorStatsService.getGlobalStats(portfolio, duration)
                                 }
                     }
                     // Links
