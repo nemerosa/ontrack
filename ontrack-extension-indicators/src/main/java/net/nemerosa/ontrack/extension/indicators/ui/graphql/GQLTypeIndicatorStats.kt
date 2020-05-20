@@ -18,7 +18,7 @@ class GQLTypeIndicatorStats : GQLType {
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
             GraphQLObjectType.newObject()
                     .name(typeName)
-                    .description("Aggregation of ratins over several items.")
+                    .description("Aggregation of ratings over several items.")
                     .intField(IndicatorStats::total, "Total number of items used for this stat")
                     .intField(IndicatorStats::count, "Number of items having an actual usable value for stat computation")
                     .statField(IndicatorStats::min, "Minimal value (undefined if no stat available)")

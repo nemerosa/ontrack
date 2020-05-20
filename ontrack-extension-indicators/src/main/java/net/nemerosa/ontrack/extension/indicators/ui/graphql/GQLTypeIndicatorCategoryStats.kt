@@ -5,11 +5,13 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorCategoryStat
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorTypeStats
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.field
 import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeIndicatorCategoryStats(
         private val indicatorStats: GQLTypeIndicatorStats,
+        private val indicatorPreviousStats: GQLTypeIndicatorPreviousStats,
         private val indicatorCategory: GQLTypeIndicatorCategory
 ) : GQLType {
 
@@ -27,6 +29,9 @@ class GQLTypeIndicatorCategoryStats(
                                 .description("Statistics")
                                 .type(indicatorStats.typeRef)
                     }
+                    // Previous stats
+                    .field(IndicatorCategoryStats::previousStats, indicatorPreviousStats)
+                    // OK
                     .build()
 
     override fun getTypeName(): String = IndicatorCategoryStats::class.java.simpleName
