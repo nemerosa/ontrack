@@ -5,7 +5,7 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorStatsService
+import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStatsService
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.graphql.support.stringField

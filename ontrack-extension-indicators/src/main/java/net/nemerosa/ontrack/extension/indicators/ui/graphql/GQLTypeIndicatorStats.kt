@@ -5,7 +5,7 @@ import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.indicators.model.Rating
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorStats
+import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStats
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.intField

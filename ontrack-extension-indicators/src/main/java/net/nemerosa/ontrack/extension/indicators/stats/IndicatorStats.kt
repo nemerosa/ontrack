@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.indicators.portfolio
+package net.nemerosa.ontrack.extension.indicators.stats
 
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 

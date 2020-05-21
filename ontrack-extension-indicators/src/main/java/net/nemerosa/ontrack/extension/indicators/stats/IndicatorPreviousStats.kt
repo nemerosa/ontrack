@@ -1,5 +1,7 @@
-package net.nemerosa.ontrack.extension.indicators.portfolio
+package net.nemerosa.ontrack.extension.indicators.stats
 
+import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStats
+import net.nemerosa.ontrack.extension.indicators.stats.IndicatorTrend
 import java.time.Duration
 
 class IndicatorPreviousStats(

@@ -6,7 +6,7 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.model.Rating
-import net.nemerosa.ontrack.extension.indicators.portfolio.trendBetween
+import net.nemerosa.ontrack.extension.indicators.stats.trendBetween
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorService
 import net.nemerosa.ontrack.graphql.schema.*

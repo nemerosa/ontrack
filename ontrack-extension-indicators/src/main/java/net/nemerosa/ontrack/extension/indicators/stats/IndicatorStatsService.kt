@@ -1,6 +1,8 @@
-package net.nemerosa.ontrack.extension.indicators.portfolio
+package net.nemerosa.ontrack.extension.indicators.stats
 
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorCategoryStats
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.model.structure.Project
 import java.time.Duration
 

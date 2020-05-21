@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.Scalars.GraphQLInt
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPreviousStats
+import net.nemerosa.ontrack.extension.indicators.stats.IndicatorPreviousStats
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.enumAsStringField

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorStatsService
+import net.nemerosa.ontrack.extension.indicators.stats.IndicatorStatsService
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectCategoryIndicators
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
