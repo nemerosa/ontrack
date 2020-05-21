@@ -4,6 +4,7 @@ import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.model.Rating
 import net.nemerosa.ontrack.extension.indicators.portfolio.trendBetween
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
@@ -14,6 +15,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import org.springframework.stereotype.Component
+import java.time.Duration
 
 @Component
 class GQLTypeProjectIndicator(
@@ -69,6 +71,17 @@ class GQLTypeProjectIndicator(
                         .description("Signature for the indicator")
                         .type(signature.typeRef)
                         .dataFetcher(GQLTypeCreation.dataFetcher(ProjectIndicator::signature))
+            }
+            // Duration since
+            .field {
+                it.name("durationSecondsSince")
+                        .description("Time elapsed (in seconds) since the indicator value was set.")
+                        .type(GraphQLInt)
+                        .dataFetcher { env ->
+                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val time = projectIndicator.signature.time
+                            (Duration.between(time, Time.now()).toMillis() / 1000).toInt()
+                        }
             }
             // Rating
             .field {
