@@ -687,7 +687,7 @@ angular.module('ontrack.extension.indicators', [
         view.breadcrumbs = ot.homeBreadcrumbs();
 
         const query = `
-            query LoadPortfolio($id: String!) {
+            query LoadPortfolio($id: String!, $duration: Int) {
               indicatorPortfolios(id: $id) {
                 id
                 name
@@ -695,7 +695,7 @@ angular.module('ontrack.extension.indicators', [
                   _update
                   _delete
                 }
-                categoryStats {
+                categoryStats(duration: $duration) {
                   category {
                     id
                     name
@@ -708,6 +708,14 @@ angular.module('ontrack.extension.indicators', [
                     avg
                     avgRating
                   }
+                  previousStats {
+                    stats {
+                      avg
+                      avgRating
+                    }
+                    avgTrend
+                    durationSeconds
+                  }
                 }
                 projects {
                   id
@@ -717,7 +725,7 @@ angular.module('ontrack.extension.indicators', [
                   }
                   projectIndicators {
                     categories {
-                      categoryStats {
+                      categoryStats(duration: $duration) {
                         category {
                           id
                           name
@@ -730,6 +738,14 @@ angular.module('ontrack.extension.indicators', [
                           avg
                           avgRating
                         }
+                        previousStats {
+                          stats {
+                            avg
+                            avgRating
+                          }
+                          avgTrend
+                          durationSeconds
+                        }
                       }
                     }
                   }
@@ -739,7 +755,12 @@ angular.module('ontrack.extension.indicators', [
         `;
 
         const queryVariables = {
-            id: portfolioId
+            id: portfolioId,
+            duration: undefined
+        };
+
+        $scope.pageModel = {
+            duration: undefined
         };
 
         const loadPortfolio = () => {
@@ -803,6 +824,15 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadPortfolio();
+
+        $scope.selectTrend = () => {
+            if ($scope.pageModel.duration) {
+                queryVariables.duration = Number($scope.pageModel.duration);
+            } else {
+                queryVariables.duration = undefined;
+            }
+            loadPortfolio();
+        };
 
         const deletePortfolio = () => {
             otAlertService.confirm({

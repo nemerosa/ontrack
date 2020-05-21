@@ -42,13 +42,29 @@
     <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0" class="table table-striped">
         <thead>
         <tr>
-            <td><b>Projects</b></td>
+            <td>
+                <b>Projects</b>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <!--suppress XmlInvalidId -->
+                        <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
+                        <ot-extension-indicators-trend-selection
+                                select-id="trend-selection"
+                                model="pageModel.duration"
+                                on-trend-change="selectTrend()"
+                        ></ot-extension-indicators-trend-selection>
+                    </div>
+                </form>
+            </td>
             <td ng-repeat-start="categoryStats in portfolio.categoryStats" style="width: 36px;">
                 <ot-extension-indicators-status status="categoryStats" size="md"></ot-extension-indicators-status>
             </td>
             <td ng-repeat-end>
                 <p><b>{{categoryStats.category.name}}</b></p>
-                <ot-extension-indicators-stats-summary stats="categoryStats.stats" item="portfolio and category"></ot-extension-indicators-stats-summary>
+                <ot-extension-indicators-stats-summary
+                        stats="categoryStats.stats"
+                        previous-stats="categoryStats.previousStats"
+                        item="portfolio and category"></ot-extension-indicators-stats-summary>
             </td>
         </tr>
         </thead>
@@ -62,7 +78,10 @@
                 <ot-extension-indicators-status status="projectCategory.stats" size="md"></ot-extension-indicators-status>
             </td>
             <td ng-repeat-end>
-                <ot-extension-indicators-stats-summary stats="projectCategory.categoryStats.stats" item="project and category"></ot-extension-indicators-stats-summary>
+                <ot-extension-indicators-stats-summary
+                        stats="projectCategory.categoryStats.stats"
+                        previous-stats="projectCategory.categoryStats.previousStats"
+                        item="project and category"></ot-extension-indicators-stats-summary>
             </td>
         </tr>
         </tbody>
