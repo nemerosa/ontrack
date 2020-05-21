@@ -75,7 +75,7 @@ class IndicatorComputingJobs(
         override fun getTask() = JobRun {
             projects
                     .filter {
-                        computer.isProjectEligible(it)
+                        !it.isDisabled && computer.isProjectEligible(it)
                     }
                     .forEach { project ->
                         compute(computer, project)
