@@ -223,7 +223,7 @@ angular.module('ontrack.extension.indicators', [
         view.title = "";
 
         const query = `
-            query Indicators($project: Int!, $duration: Int) {
+            query Indicators($project: Int!) {
               projects(id: $project) {
                 id
                 name
@@ -231,16 +231,6 @@ angular.module('ontrack.extension.indicators', [
                   categories {
                     category {
                       name
-                    }
-                    categoryStats(duration: $duration) {
-                      previousStats {
-                        stats {
-                          avg
-                          avgRating
-                        }
-                        avgTrend
-                        durationSeconds
-                      }
                     }
                     indicators {
                       links {
@@ -259,6 +249,17 @@ angular.module('ontrack.extension.indicators', [
                         computed
                       }
                       value
+                      previousValue {
+                        value
+                        compliance
+                        rating
+                        signature {
+                          user
+                          time
+                        }
+                        durationSecondsSince
+                      }
+                      trendSincePrevious
                       compliance
                       rating
                       comment
@@ -272,16 +273,10 @@ angular.module('ontrack.extension.indicators', [
                 }
               }
             }
-
-        `;
+`;
 
         const queryVars = {
-            project: projectId,
-            duration: undefined
-        };
-
-        $scope.pageModel = {
-            duration: undefined
+            project: projectId
         };
 
         let viewInitialized = false;
@@ -311,15 +306,6 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadIndicators();
-
-        $scope.selectTrend = () => {
-            if ($scope.pageModel.duration) {
-                queryVars.duration = Number($scope.pageModel.duration);
-            } else {
-                queryVars.duration = undefined;
-            }
-            loadIndicators();
-        };
 
         $scope.editIndicator = (indicator) => {
             otFormService.update(indicator.links._update, "Edit indicator value").then(loadIndicators);
@@ -951,6 +937,19 @@ angular.module('ontrack.extension.indicators', [
                 model: '=',
                 onTrendChange: '&'
             }
+        };
+    })
+    .directive('otExtensionIndicatorsTrendDisplay', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-trend-display.tpl.html',
+            scope: {
+                trend: '=',
+                secondsSince: '=',
+                previousCompliance: '=',
+                previousRating: '='
+            },
+            transclude: true
         };
     })
 

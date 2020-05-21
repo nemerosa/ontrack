@@ -9,22 +9,6 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <form class="form-inline">
-                <div class="form-group">
-                    <!--suppress XmlInvalidId -->
-                    <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
-                    <ot-extension-indicators-trend-selection
-                            select-id="trend-selection"
-                            model="pageModel.duration"
-                            on-trend-change="selectTrend()"
-                    ></ot-extension-indicators-trend-selection>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <table class="table table-bordered table-hover">
         <tbody ng-repeat="categoryIndicators in projectIndicators.categories">
         <tr class="info">
@@ -33,6 +17,7 @@
         <tr class="text-muted">
             <td>Type</td>
             <td>Status</td>
+            <td>Trend</td>
             <td>Value</td>
             <td>Comment</td>
             <td>Signature</td>
@@ -44,6 +29,19 @@
             </td>
             <td>
                 <ot-extension-indicators-status status="indicator" size="sm"></ot-extension-indicators-status>
+            </td>
+            <td>
+                <p ng-if="indicator.trendSincePrevious && indicator.previousValue.value">
+                    <ot-extension-indicators-trend-display
+                            trend="indicator.trendSincePrevious"
+                            seconds-since="indicator.previousValue.durationSecondsSince"
+                            previous-compliance="indicator.previousValue.compliance"
+                            previous-rating="indicator.previousValue.rating">
+                        <span>
+                            <ot-creation creation="indicator.previousValue.signature"></ot-creation>
+                        </span>
+                    </ot-extension-indicators-trend-display>
+                </p>
             </td>
             <td>
                 <span ng-if="indicator.value">
