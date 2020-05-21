@@ -3,8 +3,20 @@ package net.nemerosa.ontrack.extension.indicators.model
 import net.nemerosa.ontrack.extension.indicators.model.Rating.Companion.asRating
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class RatingTest {
+
+    @Test
+    fun order() {
+        assertTrue(Rating.A > Rating.B)
+        assertTrue(Rating.B > Rating.C)
+        assertTrue(Rating.C > Rating.D)
+        assertTrue(Rating.D > Rating.E)
+        assertTrue(Rating.E > Rating.F)
+        // ---
+        assertTrue(Rating.A > Rating.F)
+    }
 
     @Test
     fun conversions() {

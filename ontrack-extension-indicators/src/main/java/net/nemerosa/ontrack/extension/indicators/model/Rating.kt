@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.model
 
 enum class Rating {
 
-    A, B, C, D, E, F;
+    F, E, D, C, B, A;
 
     companion object {
 
