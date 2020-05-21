@@ -5,6 +5,7 @@ import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.Rating
+import net.nemerosa.ontrack.extension.indicators.portfolio.trendBetween
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorService
 import net.nemerosa.ontrack.graphql.schema.*
@@ -88,6 +89,20 @@ class GQLTypeProjectIndicator(
                         .dataFetcher { env ->
                             val projectIndicator = env.getSource<ProjectIndicator>()
                             projectIndicatorService.getPreviousIndicator(projectIndicator)
+                        }
+            }
+            // Previous value trend
+            .field {
+                it.name("trendSincePrevious")
+                        .description("Trend since the previous value (if any)")
+                        .type(GraphQLString)
+                        .dataFetcher { env ->
+                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val previousIndicator = projectIndicatorService.getPreviousIndicator(projectIndicator)
+                            trendBetween(
+                                    previousIndicator.compliance,
+                                    projectIndicator.compliance
+                            )
                         }
             }
             // Links
