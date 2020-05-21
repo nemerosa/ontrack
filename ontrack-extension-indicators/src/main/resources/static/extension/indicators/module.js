@@ -887,5 +887,16 @@ angular.module('ontrack.extension.indicators', [
             }
         };
     })
+    .directive('otExtensionIndicatorsTrendSelection', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-trend-selection.tpl.html',
+            scope: {
+                selectId: '@',
+                model: '=',
+                onTrendChange: '&'
+            }
+        };
+    })
 
 ;
