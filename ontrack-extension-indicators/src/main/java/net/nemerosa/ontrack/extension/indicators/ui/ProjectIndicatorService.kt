@@ -14,5 +14,6 @@ interface ProjectIndicatorService {
 
     fun deleteIndicator(projectId: ID, typeId: String): Ack
 
+    fun getPreviousIndicator(projectIndicator: ProjectIndicator): ProjectIndicator
 
 }

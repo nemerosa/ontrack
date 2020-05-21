@@ -14,4 +14,13 @@ interface IndicatorStore {
 
     fun deleteIndicatorByType(typeId: String)
 
+    /**
+     * Gets the _previous_ value for the indicator of a given [project] and [type][typeId].
+     *
+     * @param project Project
+     * @param typeId ID of the indicator type
+     * @return `null` if no previous value is available
+     */
+    fun loadPreviousIndicator(project: Project, typeId: String): StoredIndicator?
+
 }

@@ -90,8 +90,17 @@ class IndicatorServiceImpl(
         return indicatorStore.deleteIndicator(project, typeId)
     }
 
+    override fun <T> getPreviousProjectIndicator(project: Project, type: IndicatorType<T, *>): Indicator<T> {
+        val stored = indicatorStore.loadPreviousIndicator(project, type.id)
+        return toIndicator(stored, type)
+    }
+
     private fun <T, C> loadIndicator(project: Project, type: IndicatorType<T, C>, previous: Duration? = null): Indicator<T> {
         val stored = indicatorStore.loadIndicator(project, type.id, previous)
+        return toIndicator(stored, type)
+    }
+
+    private fun <C, T> toIndicator(stored: StoredIndicator?, type: IndicatorType<T, C>): Indicator<T> {
         return if (stored != null && !stored.value.isNull) {
             val value = type.fromStoredJson(stored.value)
             Indicator(

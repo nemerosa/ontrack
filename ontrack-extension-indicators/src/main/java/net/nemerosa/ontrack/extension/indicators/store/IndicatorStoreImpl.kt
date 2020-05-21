@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
+import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecord
 import org.springframework.stereotype.Service
 import java.time.Duration
 
@@ -29,18 +30,35 @@ class IndicatorStoreImpl(
         )
                 .firstOrNull()
                 ?.let { record ->
-                    val rep = record.data.parse<StoredIndicatorRepresentation>()
-                    if (rep.value != null) {
-                        StoredIndicator(
-                                value = rep.value,
-                                comment = rep.comment,
-                                signature = record.signature
-                        )
-                    } else {
-                        null
-                    }
+                    toStoredIndicator(record)
                 }
     }
+
+    private fun toStoredIndicator(record: EntityDataStoreRecord): StoredIndicator? {
+        val rep = record.data.parse<StoredIndicatorRepresentation>()
+        return if (rep.value != null) {
+            StoredIndicator(
+                    value = rep.value,
+                    comment = rep.comment,
+                    signature = record.signature
+            )
+        } else {
+            null
+        }
+    }
+
+    override fun loadPreviousIndicator(project: Project, typeId: String): StoredIndicator? =
+            entityDataStore.getByFilter(
+                    EntityDataStoreFilter(project)
+                            .withCategory(STORE_CATEGORY)
+                            .withName(typeId)
+                            .withCount(2)
+            )
+                    .drop(1)
+                    .firstOrNull()
+                    ?.let {
+                        toStoredIndicator(it)
+                    }
 
     override fun storeIndicator(project: Project, type: String, indicator: StoredIndicator) {
         // Gets the last version of the indicator

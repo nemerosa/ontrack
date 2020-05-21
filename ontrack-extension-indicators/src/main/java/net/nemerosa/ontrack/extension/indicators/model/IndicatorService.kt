@@ -11,6 +11,13 @@ interface IndicatorService {
 
     fun <T> getProjectIndicator(project: Project, type: IndicatorType<T, *>, previous: Duration? = null): Indicator<T>
 
+    /**
+     * Gets the indicator which was previously entered for this [project] and this [type].
+     *
+     * The returned value is never `null` but its [value][Indicator.value] might be.
+     */
+    fun <T> getPreviousProjectIndicator(project: Project, type: IndicatorType<T, *>): Indicator<T>
+
     fun getProjectIndicator(project: Project, typeId: String): Indicator<*>
 
     fun <T> updateProjectIndicator(project: Project, typeId: String, input: JsonNode): Indicator<T>

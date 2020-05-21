@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 import graphql.Scalars.GraphQLInt
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.indicators.model.Rating
 import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicator
+import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorService
 import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
 import net.nemerosa.ontrack.model.structure.Project
@@ -17,7 +19,8 @@ class GQLTypeProjectIndicator(
         private val projectIndicatorType: GQLTypeProjectIndicatorType,
         private val signature: GQLTypeCreation,
         private val fieldContributors: List<GQLFieldContributor>,
-        private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+        private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+        private val projectIndicatorService: ProjectIndicatorService
 ) : GQLType {
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
@@ -75,6 +78,16 @@ class GQLTypeProjectIndicator(
                             env.getSource<ProjectIndicator>().compliance?.let { compliance ->
                                 Rating.asRating(compliance.value)
                             }
+                        }
+            }
+            // Previous indicator value
+            .field {
+                it.name("previousValue")
+                        .description("Previous value for this indicator")
+                        .type(GraphQLTypeReference(typeName))
+                        .dataFetcher { env ->
+                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            projectIndicatorService.getPreviousIndicator(projectIndicator)
                         }
             }
             // Links
