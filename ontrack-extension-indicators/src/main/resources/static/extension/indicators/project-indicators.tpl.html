@@ -9,10 +9,34 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div class="form-group">
+                    <!--suppress XmlInvalidId -->
+                    <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
+                    <ot-extension-indicators-trend-selection
+                            select-id="trend-selection"
+                            model="pageModel.duration"
+                            on-trend-change="selectTrend()"
+                    ></ot-extension-indicators-trend-selection>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <table class="table table-bordered table-hover">
         <tbody ng-repeat="categoryIndicators in projectIndicators.categories">
         <tr class="info">
             <th colspan="6">{{categoryIndicators.category.name}}</th>
+        </tr>
+        <tr class="text-muted">
+            <td>Type</td>
+            <td>Status</td>
+            <td>Value</td>
+            <td>Comment</td>
+            <td>Signature</td>
+            <td>&nbsp;</td>
         </tr>
         <tr ng-repeat="indicator in categoryIndicators.indicators">
             <td>
