@@ -592,6 +592,7 @@ pipeline {
                             ./gradlew \\
                                 publishToMavenCentral \\
                                 -Pdocumentation \\
+                                -PbowerOptions='--allow-root' \\
                                 -Psigning.keyId=${GPG_KEY_USR} \\
                                 -Psigning.password=${GPG_KEY_PSW} \\
                                 -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
