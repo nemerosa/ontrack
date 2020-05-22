@@ -7,6 +7,13 @@ services:
       POSTGRES_DB      : ontrack
       POSTGRES_USER    : ontrack
       POSTGRES_PASSWORD: ontrack
+   elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+      ports:
+         - "9200:9200"
+         - "9300:9300"
+      environment:
+         - "discovery.type=single-node"
    ontrack:
       build:
         context: "./os/centos/7/docker"
@@ -14,8 +21,11 @@ services:
       command: "/bin/cat"
       environment:
          SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+         SPRING_ELASTICSEARCH_REST_URIS: "http://elasticsearch:9200"
       depends_on:
          postgres:
+            condition: service_started
+         elasticsearch:
             condition: service_started
    selenium:
       image: "selenium/standalone-chrome:3.11.0"
