@@ -1,11 +1,11 @@
 # Base
-FROM centos:7.1.1503
+FROM centos:7.8.2003
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
 
 # JDK installation
-RUN yum install -y java-1.8.0-openjdk-devel.x86_64
+RUN yum install -y java-11-openjdk-devel.x86_64
 
 # Exposing the ports
 EXPOSE 8080

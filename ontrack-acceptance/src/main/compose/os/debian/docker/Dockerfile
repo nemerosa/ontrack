@@ -1,11 +1,11 @@
 # Base
-FROM ubuntu:xenial
+FROM ubuntu:focal
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
 
 # JDK installation
-RUN apt-get update && apt-get install -y openjdk-8-jdk
+RUN apt-get update && apt-get install -y openjdk-11-jdk
 
 # Exposing the ports
 EXPOSE 8080
