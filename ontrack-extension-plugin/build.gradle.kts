@@ -32,3 +32,7 @@ tasks.named<ProcessResources>("processResources") {
             )
     )
 }
+
+gradlePlugin {
+    isAutomatedPublishing = false
+}
