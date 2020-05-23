@@ -108,13 +108,3 @@ tasks.named<Test>("test") {
 tasks.named<Javadoc>("javadoc") {
     enabled = false
 }
-
-// Publications
-
-configure<PublishingExtension> {
-    publications {
-        named<MavenPublication>("mavenCustom") {
-            setArtifacts(listOf(bootJar))
-        }
-    }
-}

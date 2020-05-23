@@ -104,7 +104,7 @@ val preIntegrationTest by tasks.registering {
         val port = tasks.named<ComposeUp>("integrationTestComposeUp").get().servicesInfos["db"]?.firstContainer?.tcpPort!!
         val url = "jdbc:postgresql://$host:$port/ontrack"
         val jdbcUrl: String by rootProject.extra(url)
-        logger.info("Pre integration test JDBC URL = ${jdbcUrl}")
+        logger.info("Pre integration test JDBC URL = $jdbcUrl")
     }
 }
 
@@ -120,6 +120,10 @@ val postIntegrationTest by tasks.registering {
 
 val javaProjects = subprojects.filter {
     it.path != ":ontrack-web"
+}
+
+val exportedProjects = javaProjects.filter {
+    it.path != ":ontrack-acceptance"
 }
 
 val coreProjects = javaProjects.filter {
@@ -139,6 +143,10 @@ configure(javaProjects) p@{
 
     // Java level
     java.sourceCompatibility = JavaVersion.VERSION_11
+
+}
+
+configure(exportedProjects) p@ {
 
     // Documentation
 
@@ -605,7 +613,7 @@ val publishToMavenCentral by tasks.registering {
     dependsOn(tasks.closeAndReleaseRepository)
 }
 
-configure(javaProjects) {
+configure(exportedProjects) {
     val publishToSonatype = tasks.named("publishToSonatype")
     rootProject.tasks.closeRepository {
         dependsOn(publishToSonatype)
