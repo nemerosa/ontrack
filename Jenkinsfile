@@ -589,6 +589,7 @@ pipeline {
                     }
                     steps {
                         sh '''
+                            git status
                             ./gradlew \\
                                 publishToMavenCentral \\
                                 -Pdocumentation \\
