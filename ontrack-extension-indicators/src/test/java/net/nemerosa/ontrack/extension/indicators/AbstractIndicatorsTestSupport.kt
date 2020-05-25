@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
@@ -90,7 +91,7 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
         }
     }
 
-    protected fun <T: Any> Project.assertIndicatorValue(
+    protected fun <T : Any> Project.assertIndicatorValue(
             type: IndicatorType<T, *>,
             code: (T) -> Unit = {}
     ) {
@@ -102,7 +103,7 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
         }
     }
 
-    protected fun <T: Any> Project.assertIndicatorValueIs(
+    protected fun <T : Any> Project.assertIndicatorValueIs(
             type: IndicatorType<T, *>,
             expectedValue: T?
     ) {
@@ -121,18 +122,20 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
     }
 
     protected fun portfolio(
-            categories: List<IndicatorCategory> = emptyList()
+            categories: List<IndicatorCategory> = emptyList(),
+            label: Label? = null
     ): IndicatorPortfolio = asAdmin {
         val id = uid("P")
-        val portfolio = indicatorPortfolioService.createPortfolio(
+        var portfolio = indicatorPortfolioService.createPortfolio(
                 id = id,
                 name = "$id portfolio"
         )
-        if (categories.isNotEmpty()) {
-            indicatorPortfolioService.updatePortfolio(
+        if (categories.isNotEmpty() || label != null) {
+            portfolio = indicatorPortfolioService.updatePortfolio(
                     id,
                     PortfolioUpdateForm(
-                            categories = categories.map { it.id }
+                            categories = categories.map { it.id },
+                            label = label?.id
                     )
             )
         }

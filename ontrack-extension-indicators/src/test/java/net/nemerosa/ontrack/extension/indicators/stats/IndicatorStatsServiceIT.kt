@@ -143,4 +143,70 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
         }
     }
 
+    @Test
+    fun `Stats for portfolio`() {
+        // Categories & types
+        val category1 = category()
+        val type11 = category1.booleanType()
+        val type12 = category1.booleanType()
+        val category2 = category()
+        val type21 = category2.booleanType()
+        val type22 = category2.booleanType()
+        // Label to use
+        val label = label()
+        // Portfolio definition
+        val portfolio = portfolio(
+                categories = listOf(category1, category2),
+                label = label
+        )
+        // Projects, labels & indicator values
+        project {
+            labels = listOf(label)
+            indicator(type11, false)
+            indicator(type12, false)
+            indicator(type21, false)
+            indicator(type22, true)
+        }
+        project {
+            labels = listOf(label)
+            indicator(type11, true)
+            indicator(type12, true)
+            indicator(type21, false)
+            indicator(type22, true)
+        }
+        project {
+            labels = listOf(label)
+            // Partial indicators only
+            indicator(type11, true)
+            indicator(type21, false)
+        }
+        // Gets the stats for this portfolio
+        val categoryStats = indicatorStatsService.getStatsPortfolio(portfolio)
+        assertEquals(2, categoryStats.size)
+        // First category
+        categoryStats[0].apply {
+            assertEquals(category1, category)
+            assertNull(previousStats)
+            assertEquals(6, stats.total)
+            assertEquals(5, stats.count)
+            assertEquals(0, stats.min?.value)
+            assertEquals(60, stats.avg?.value)
+            assertEquals(100, stats.max?.value)
+            assertEquals(2, stats.minCount)
+            assertEquals(3, stats.maxCount)
+        }
+        // Second category
+        categoryStats[1].apply {
+            assertEquals(category2, category)
+            assertNull(previousStats)
+            assertEquals(6, stats.total)
+            assertEquals(5, stats.count)
+            assertEquals(0, stats.min?.value)
+            assertEquals(40, stats.avg?.value)
+            assertEquals(100, stats.max?.value)
+            assertEquals(3, stats.minCount)
+            assertEquals(2, stats.maxCount)
+        }
+    }
+
 }
