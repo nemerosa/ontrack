@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.BooleanNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
+import net.nemerosa.ontrack.extension.indicators.IndicatorsTestFixtures
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
@@ -13,7 +14,7 @@ import kotlin.test.assertNotNull
 
 class BooleanIndicatorValueTypeTest {
 
-    private val type = BooleanIndicatorValueType(IndicatorsExtensionFeature())
+    private val type = BooleanIndicatorValueType(IndicatorsTestFixtures.indicatorsExtensionFeature())
 
     @Test
     fun status() {

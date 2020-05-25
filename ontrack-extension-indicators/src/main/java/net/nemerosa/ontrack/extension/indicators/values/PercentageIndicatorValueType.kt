@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.form.YesNo
@@ -65,19 +66,19 @@ class PercentageIndicatorValueType(
                                     .label("Threshold")
                                     .min(0)
                                     .max(100)
-                                    .value(config?.threshold?.value ?: 50)
+                                    .value(config?.threshold?.value ?: DEFAULT.threshold.value)
                     )
                     .with(
                             YesNo.of(PercentageThreshold::higherIsBetter.name)
                                     .label("Higher is better")
-                                    .value(config?.higherIsBetter ?: true)
+                                    .value(config?.higherIsBetter ?: DEFAULT.higherIsBetter)
                     )
 
     override fun toConfigForm(config: PercentageThreshold): JsonNode =
             config.asJson()
 
     override fun fromConfigForm(config: JsonNode): PercentageThreshold =
-            config.parse()
+            config.parseOrNull() ?: DEFAULT
 
     override fun toConfigClientJson(config: PercentageThreshold): JsonNode =
             config.asJson()
@@ -86,5 +87,12 @@ class PercentageIndicatorValueType(
             config.asJson()
 
     override fun fromConfigStoredJson(config: JsonNode): PercentageThreshold =
-            config.parse()
+            config.parseOrNull() ?: DEFAULT
+
+    companion object {
+        private val DEFAULT = PercentageThreshold(
+                threshold = 50.percent(),
+                higherIsBetter = true
+        )
+    }
 }
