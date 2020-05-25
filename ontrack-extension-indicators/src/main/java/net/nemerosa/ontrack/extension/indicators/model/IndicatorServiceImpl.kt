@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.model.structure.Signature
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -73,9 +74,13 @@ class IndicatorServiceImpl(
         return updateProjectIndicator(project, type, value, comment)
     }
 
-    override fun <T> updateProjectIndicator(project: Project, type: IndicatorType<T, *>, value: T?, comment: String?): Indicator<T> {
+    override fun <T> updateProjectIndicator(project: Project, type: IndicatorType<T, *>, value: T?, comment: String?, time: LocalDateTime?): Indicator<T> {
         // Signature
-        val signature = securityService.currentSignature
+        val signature = if(time != null) {
+            securityService.currentSignature.withTime(time)
+        } else {
+            securityService.currentSignature
+        }
         // Storing the indicator
         indicatorStore.storeIndicator(project, type.id, StoredIndicator(
                 value = value?.run { type.toStoredJson(this) } ?: NullNode.instance,

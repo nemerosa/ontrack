@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.indicators.stats
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.Duration
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
@@ -80,6 +83,62 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
                 assertEquals(IndicatorCompliance(100), max)
                 assertEquals(1, minCount)
                 assertEquals(1, maxCount)
+            }
+        }
+    }
+
+    @Test
+    fun `Previous stats for a category and project`() {
+        val category = category()
+        val type = category.booleanType()
+        project {
+            val duration = Duration.ofDays(7)
+            val lastTime = Time.now() - Duration.ofDays(1)
+            val pastTime = lastTime - duration
+            // Past value
+            indicator(type, true, pastTime)
+            // Recent value
+            indicator(type, false, lastTime)
+            // Getting the previous stats
+            val stats = indicatorStatsService.getStatsForCategoryAndProject(category, this, duration)
+            assertEquals(category, stats.category)
+            assertNotNull(stats.previousStats, "Previous state is filled in") {
+                assertEquals(1, it.stats.total)
+                assertEquals(1, it.stats.count)
+                assertEquals(IndicatorCompliance(100), it.stats.avg)
+                assertEquals(IndicatorTrend.DECREASE, it.avgTrend)
+                assertEquals(Duration.ofDays(7), it.period)
+            }
+            stats.stats.apply {
+                assertEquals(1, total)
+                assertEquals(1, count)
+                assertEquals(IndicatorCompliance(0), avg)
+            }
+        }
+    }
+
+    @Test
+    fun `Previous stats for a category and project are not filled in when not available`() {
+        val category = category()
+        val type = category.booleanType()
+        project {
+            val duration = Duration.ofDays(7)
+            // Current value
+            indicator(type, false)
+            // Getting the previous stats
+            val stats = indicatorStatsService.getStatsForCategoryAndProject(category, this, duration)
+            assertEquals(category, stats.category)
+            assertNotNull(stats.previousStats, "Previous state is filled in") {
+                assertEquals(1, it.stats.total)
+                assertEquals(0, it.stats.count)
+                assertNull(it.stats.avg)
+                assertNull(it.avgTrend)
+                assertEquals(Duration.ofDays(7), it.period)
+            }
+            stats.stats.apply {
+                assertEquals(1, total)
+                assertEquals(1, count)
+                assertEquals(IndicatorCompliance(0), avg)
             }
         }
     }

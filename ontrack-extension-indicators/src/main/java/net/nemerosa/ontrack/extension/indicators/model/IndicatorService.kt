@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.Project
 import java.time.Duration
+import java.time.LocalDateTime
 
 interface IndicatorService {
 
@@ -22,7 +23,10 @@ interface IndicatorService {
 
     fun <T> updateProjectIndicator(project: Project, typeId: String, input: JsonNode): Indicator<T>
 
-    fun <T> updateProjectIndicator(project: Project, type: IndicatorType<T, *>, value: T?, comment: String?): Indicator<T>
+    /**
+     * @param time Time to set for the indicator (used only for tests)
+     */
+    fun <T> updateProjectIndicator(project: Project, type: IndicatorType<T, *>, value: T?, comment: String?, time: LocalDateTime? = null): Indicator<T>
 
     fun deleteProjectIndicator(project: Project, typeId: String): Ack
 

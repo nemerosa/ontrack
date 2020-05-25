@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -65,14 +66,16 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
 
     protected fun <T> Project.indicator(
             type: IndicatorType<T, *>,
-            value: T?
+            value: T?,
+            time: LocalDateTime? = null
     ) {
         asAdmin {
             indicatorService.updateProjectIndicator(
                     project = project,
                     type = type,
                     value = value,
-                    comment = null
+                    comment = null,
+                    time = time
             )
         }
     }
