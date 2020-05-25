@@ -13,6 +13,7 @@ class GQLRootQueryIndicatorPortfolioOfPortfoliosIT : AbstractIndicatorsTestSuppo
     @Test
     fun `List of all portfolios with their global stats and trends`() {
         clearIndicators()
+        clearPortfolios()
         // Trend times
         val duration = Duration.ofDays(7)
         val lastTime = Time.now() - Duration.ofDays(1)

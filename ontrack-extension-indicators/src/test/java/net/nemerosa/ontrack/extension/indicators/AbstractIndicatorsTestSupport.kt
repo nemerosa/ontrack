@@ -41,6 +41,14 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
         }
     }
 
+    protected fun clearPortfolios() {
+        asAdmin {
+            indicatorPortfolioService.findAll().forEach { portfolio ->
+                indicatorPortfolioService.deletePortfolio(portfolio.id)
+            }
+        }
+    }
+
     protected fun category(id: String = uid("C"), name: String = id, source: IndicatorSource? = null) = asAdmin {
         indicatorCategoryService.createCategory(
                 IndicatorForm(
