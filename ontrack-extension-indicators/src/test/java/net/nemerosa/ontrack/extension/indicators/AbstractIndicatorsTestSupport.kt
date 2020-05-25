@@ -41,19 +41,21 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
         }
     }
 
-    protected fun category(id: String = uid("C"), name: String = id) = asAdmin {
+    protected fun category(id: String = uid("C"), name: String = id, source: IndicatorSource? = null) = asAdmin {
         indicatorCategoryService.createCategory(
                 IndicatorForm(
                         id,
                         name
-                )
+                ),
+                source = source
         )
     }
 
     protected fun IndicatorCategory.booleanType(
             id: String = uid("T"),
             name: String = "$id description",
-            required: Boolean = true
+            required: Boolean = true,
+            source: IndicatorSource? = null
     ): IndicatorType<Boolean, BooleanIndicatorValueTypeConfig> = asAdmin {
         indicatorTypeService.createType(
                 id = id,
@@ -61,7 +63,8 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
                 name = name,
                 link = null,
                 valueType = booleanIndicatorValueType,
-                valueConfig = BooleanIndicatorValueTypeConfig(required)
+                valueConfig = BooleanIndicatorValueTypeConfig(required),
+                source = source
         )
     }
 
@@ -123,14 +126,12 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
     }
 
     protected fun portfolio(
+            id: String = uid("P"),
+            name: String = "$id portfolio",
             categories: List<IndicatorCategory> = emptyList(),
             label: Label? = null
     ): IndicatorPortfolio = asAdmin {
-        val id = uid("P")
-        var portfolio = indicatorPortfolioService.createPortfolio(
-                id = id,
-                name = "$id portfolio"
-        )
+        var portfolio = indicatorPortfolioService.createPortfolio(id = id, name = name)
         if (categories.isNotEmpty() || label != null) {
             portfolio = indicatorPortfolioService.updatePortfolio(
                     id,
