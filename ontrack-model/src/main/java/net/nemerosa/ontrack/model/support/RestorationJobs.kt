@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service
+package net.nemerosa.ontrack.model.support
 
 import net.nemerosa.ontrack.job.JobCategory
 

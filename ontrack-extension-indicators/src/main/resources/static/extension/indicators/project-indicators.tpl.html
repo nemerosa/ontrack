@@ -1,0 +1,67 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingIndicators">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicators for the project...
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <tbody ng-repeat="categoryIndicators in projectIndicators.categories">
+        <tr class="info">
+            <th colspan="7">{{categoryIndicators.category.name}}</th>
+        </tr>
+        <tr class="text-muted">
+            <td>Type</td>
+            <td>Status</td>
+            <td>Trend</td>
+            <td>Value</td>
+            <td>Comment</td>
+            <td>Signature</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr ng-repeat="indicator in categoryIndicators.indicators">
+            <td>
+                <ot-extension-indicators-type-name type="indicator.type"></ot-extension-indicators-type-name>
+            </td>
+            <td>
+                <ot-extension-indicators-status status="indicator" size="sm"></ot-extension-indicators-status>
+            </td>
+            <td>
+                <p ng-if="indicator.trendSincePrevious && indicator.previousValue.value">
+                    <ot-extension-indicators-trend-display
+                            trend="indicator.trendSincePrevious"
+                            seconds-since="indicator.previousValue.durationSecondsSince"
+                            previous-compliance="indicator.previousValue.compliance"
+                            previous-rating="indicator.previousValue.rating">
+                    </ot-extension-indicators-trend-display>
+                </p>
+            </td>
+            <td>
+                <span ng-if="indicator.value">
+                    <ot-include value="indicator.value" template="extension/{{indicator.type.valueType.feature.id}}/indicators/{{indicator.type.valueType.id}}.tpl.html"></ot-include>
+                </span>
+            </td>
+            <td>
+                <span ng-bind-html="indicator.annotatedComment"></span>
+            </td>
+            <td>
+                <span ng-if="indicator.value">
+                    <ot-creation creation="indicator.signature"></ot-creation>
+                </span>
+            </td>
+            <td>
+                <span ng-if="indicator.links._update" class="fa fa-pencil ot-command" title="Edit value" ng-click="editIndicator(indicator)"></span>
+                <span ng-if="indicator.links._delete" class="fa fa-trash ot-command" title="Remove value" ng-click="deleteIndicator(indicator)"></span>
+                <span ng-if="indicator.type.computed" class="text-muted" title="This indicator is computed and cannot be edited."><span class="fa fa-cog"></span>&nbsp;<i>Computed</i></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

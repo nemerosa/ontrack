@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.springframework.stereotype.Component
 
+typealias IntField = net.nemerosa.ontrack.model.form.Int
+
 @Component
 class SonarQubeMeasuresSettingsManager(
         cachedSettingsService: CachedSettingsService,
@@ -36,6 +38,16 @@ class SonarQubeMeasuresSettingsManager(
                     "disabled",
                     settings.disabled
             )
+            settingsRepository.setInt(
+                    SonarQubeMeasuresSettings::class.java,
+                    SonarQubeMeasuresSettings::coverageThreshold.name,
+                    settings.coverageThreshold
+            )
+            settingsRepository.setInt(
+                    SonarQubeMeasuresSettings::class.java,
+                    SonarQubeMeasuresSettings::blockerThreshold.name,
+                    settings.blockerThreshold
+            )
         }
     }
 
@@ -52,6 +64,21 @@ class SonarQubeMeasuresSettingsManager(
                                 .help("Check to disable the collection of SonarQube measures")
                                 .label("Disable collection")
                                 .value(settings?.disabled ?: false)
+                )
+                .with(
+                        IntField.of(SonarQubeMeasuresSettings::coverageThreshold.name)
+                                .help("Coverage to reach to get A rating indicator")
+                                .label("Coverage threshold")
+                                .min(0)
+                                .max(100)
+                                .value(settings?.coverageThreshold ?: 80)
+                )
+                .with(
+                        IntField.of(SonarQubeMeasuresSettings::blockerThreshold.name)
+                                .help("Maximum number of blocker issues")
+                                .label("Blocker issues")
+                                .min(1)
+                                .value(settings?.blockerThreshold ?: 5)
                 )
     }
 }

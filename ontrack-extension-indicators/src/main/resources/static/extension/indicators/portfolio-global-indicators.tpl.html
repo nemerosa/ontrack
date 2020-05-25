@@ -1,0 +1,34 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingPortfolioGlobalIndicators">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the global indicators...
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tbody ng-repeat="category in categories">
+        <tr class="info">
+            <td style="width: 30px;">
+                <input type="checkbox" ng-model="category.selected" ng-change="updateCategories()">
+            </td>
+            <td>
+                {{category.name}}
+                <span class="fa fa-caret-right ot-action" title="Show associated types" ng-hide="category.unfolded" ng-click="unfold(category)"></span>
+                <span class="fa fa-caret-down ot-action" title="Hide associated types" ng-show="category.unfolded" ng-click="fold(category)"></span>
+            </td>
+        </tr>
+        <tr ng-repeat="type in category.types" ng-show="category.unfolded">
+            <td colspan="2">
+                <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

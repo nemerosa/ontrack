@@ -30,7 +30,11 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
     }
 
     public F readOnly() {
-        this.readOnly = true;
+        return readOnly(true);
+    }
+
+    public F readOnly(boolean readOnly) {
+        this.readOnly = readOnly;
         //noinspection unchecked
         return (F) this;
     }

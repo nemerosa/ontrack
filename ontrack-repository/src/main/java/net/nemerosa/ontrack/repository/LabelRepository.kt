@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelForm
 
 interface LabelRepository {
@@ -14,6 +15,11 @@ interface LabelRepository {
      * Creates an automated label, overriding any manual one
      */
     fun overrideLabel(form: LabelForm, providerId: String): LabelRecord
+
+    /**
+     * Gets a label using its ID, returning `null` if not found
+     */
+    fun findLabelById(labelId: Int): LabelRecord?
 
     /**
      * Gets a label by its ID

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.sonarqube.measures
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.createBranch
@@ -22,7 +23,7 @@ class SonarQubeMeasuresInformationExtensionTest {
     fun setup() {
         sonarQubeMeasuresCollectionService = mock()
         informationExtension = SonarQubeMeasuresInformationExtension(
-                extensionFeature = SonarQubeExtensionFeature(),
+                extensionFeature = SonarQubeExtensionFeature(IndicatorsExtensionFeature()),
                 sonarQubeMeasuresCollectionService = sonarQubeMeasuresCollectionService
         )
     }

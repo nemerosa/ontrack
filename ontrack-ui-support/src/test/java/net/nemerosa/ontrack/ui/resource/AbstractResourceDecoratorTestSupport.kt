@@ -1,11 +1,7 @@
-package net.nemerosa.ontrack.boot.resources
+package net.nemerosa.ontrack.ui.resource
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
-import net.nemerosa.ontrack.ui.resource.DefaultResourceContext
-import net.nemerosa.ontrack.ui.resource.Link
-import net.nemerosa.ontrack.ui.resource.ResourceContext
-import net.nemerosa.ontrack.ui.resource.ResourceDecorator
 import org.junit.Before
 import kotlin.test.assertTrue
 

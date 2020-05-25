@@ -41,6 +41,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation("org.codehaus.groovy:groovy")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
@@ -61,6 +62,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-influxdb"))
     runtimeOnly(project(":ontrack-extension-sonarqube"))
     runtimeOnly(project(":ontrack-extension-elasticsearch"))
+    runtimeOnly(project(":ontrack-extension-indicators"))
 }
 
 /**

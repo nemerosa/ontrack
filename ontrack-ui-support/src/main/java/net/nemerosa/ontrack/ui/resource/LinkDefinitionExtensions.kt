@@ -14,11 +14,13 @@ infix fun <T : ProjectEntity, P : ProjectFunction> LinkDefinition<T>.linkIf(fn: 
     rc.isProjectFunctionGranted(t, fn.java)
 }
 
-infix fun <T : ProjectEntity, G : GlobalFunction> LinkDefinition<T>.linkIfGlobal(fn: KClass<G>): LinkDefinition<T> = addCheckFn { _, rc ->
+infix fun <T, G : GlobalFunction> LinkDefinition<T>.linkIfGlobal(fn: KClass<G>): LinkDefinition<T> = addCheckFn { _, rc ->
     rc.isGlobalFunctionGranted(fn.java)
 }
 
-private fun <T : ProjectEntity> LinkDefinition<T>.addCheckFn(fn: (T, ResourceContext) -> Boolean) = object : LinkDefinition<T> {
+infix fun <T> LinkDefinition<T>.linkIf(condition: (T, ResourceContext) -> Boolean): LinkDefinition<T> = addCheckFn(condition)
+
+private fun <T> LinkDefinition<T>.addCheckFn(fn: (T, ResourceContext) -> Boolean) = object : LinkDefinition<T> {
     override val name: String = this@addCheckFn.name
     override val checkFn: (T, ResourceContext) -> Boolean = fn
     override fun addLink(linksBuilder: LinksBuilder, resource: T, resourceContext: ResourceContext): LinksBuilder =

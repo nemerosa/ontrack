@@ -1,0 +1,91 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingPortfolio">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the portfolio...
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form>
+                ID: <code>{{portfolio.id}}</code>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input id="portfolioName" class="form-control" ng-model="portfolioForm.name"
+                               ng-readonly="!portfolioForm.nameEdited"/>
+                        <span class="input-group-btn">
+                    <button ng-if="!portfolioForm.nameEdited" class="btn btn-default" type="button"
+                            ng-click="startPortfolioNameEdition()"
+                            title="Edit the portfolio name"><span class="fa fa-pencil"></span></button>
+                    <button ng-if="portfolioForm.nameEdited" class="btn btn-primary" type="button"
+                            ng-click="validatePortfolioNameEdition()"
+                            title="Validate the edition of the portfolio name"><span
+                            class="fa fa-check"></span></button>
+                    <button ng-if="portfolioForm.nameEdited" class="btn btn-default" type="button"
+                            ng-click="cancelPortfolioNameEdition()"
+                            title="Cancels the edition of the portfolio name"><span class="fa fa-ban"></span></button>
+                </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="label">Label selector</label>
+                    <div class="dropdown input-group">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="label" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="true">
+                            <ot-project-label label="portfolioForm.label" color-box="true"></ot-project-label>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="label">
+                            <li class="ot-action" ng-repeat="label in labels">
+                                <a ng-click="selectLabel(label)">
+                                    <ot-project-label label="label" color-box="true"></ot-project-label>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tbody ng-repeat="category in categories">
+        <tr class="info">
+            <td style="width: 30px;">
+                <input type="checkbox" ng-model="category.selected" ng-change="updateCategories()">
+            </td>
+            <td>
+                {{category.name}}
+                <span class="fa fa-caret-right ot-action" title="Show associated types" ng-hide="category.unfolded" ng-click="unfold(category)"></span>
+                <span class="fa fa-caret-down ot-action" title="Hide associated types" ng-show="category.unfolded" ng-click="fold(category)"></span>
+            </td>
+        </tr>
+        <tr ng-repeat="type in category.types" ng-show="category.unfolded">
+            <td colspan="2">
+                <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

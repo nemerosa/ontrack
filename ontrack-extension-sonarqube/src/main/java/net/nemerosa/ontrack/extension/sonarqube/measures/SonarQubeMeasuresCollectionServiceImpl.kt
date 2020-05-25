@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.sonarqube.client.SonarQubeClientFactory
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.metrics.measure
@@ -27,6 +28,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
         private val structureService: StructureService,
         private val propertyService: PropertyService,
         private val branchModelMatcherService: BranchModelMatcherService,
+        private val buildFilterService: BuildFilterService,
         private val cachedSettingsService: CachedSettingsService,
         private val securityService: SecurityService
 ) : SonarQubeMeasuresCollectionService {
@@ -66,6 +68,29 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 true
             }
         }
+    }
+
+    override fun getLastMeasures(branch: Branch): SonarQubeMeasures? {
+        // Gets the SonarQube property of the project
+        val property = propertyService.getProperty(branch.project, SonarQubePropertyType::class.java).value
+        if (property != null) {
+            // Gets the validation stamp for this branch
+            val vs = structureService.getValidationStampListForBranch(branch.id)
+                    .find { it.name == property.validationStamp }
+            if (vs != null) {
+                // Gets the latest build for this branch having a scan
+                val build = buildFilterService.standardFilterProviderData(1)
+                        .withWithValidationStamp(vs.name)
+                        .withWithValidationStampStatus(ValidationRunStatusID.PASSED)
+                        .build()
+                        .filterBranchBuilds(branch)
+                        .firstOrNull()
+                if (build != null) {
+                    return getMeasures(build)
+                }
+            }
+        }
+        return null
     }
 
     override fun matches(build: Build, property: SonarQubeProperty): Boolean {
