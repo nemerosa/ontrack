@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.model
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
+import net.nemerosa.ontrack.json.asJson
 import org.junit.Test
 import java.time.Duration
 import kotlin.test.assertEquals
@@ -111,6 +112,77 @@ class IndicatorIT : AbstractIndicatorsTestSupport() {
             // Checks the indicator is not set any longer
             assertIndicatorNoValue(type)
             assertIndicatorNoValue(type2)
+        }
+    }
+
+    @Test
+    fun `No comment in input`() {
+        val category = category()
+        val type = category.booleanType()
+        project {
+            asAdmin {
+                indicatorService.updateProjectIndicator<Boolean>(this, type.id, mapOf(
+                        "value" to "true"
+                ).asJson())
+                checkIndicator(type) { i ->
+                    assertEquals(true, i.value)
+                    assertNull(i.comment)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Null comment in input`() {
+        val category = category()
+        val type = category.booleanType()
+        project {
+            asAdmin {
+                indicatorService.updateProjectIndicator<Boolean>(this, type.id, mapOf(
+                        "value" to "true",
+                        "comment" to null
+                ).asJson())
+                checkIndicator(type) { i ->
+                    assertEquals(true, i.value)
+                    assertNull(i.comment)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Blank comment in input`() {
+        val category = category()
+        val type = category.booleanType()
+        project {
+            asAdmin {
+                indicatorService.updateProjectIndicator<Boolean>(this, type.id, mapOf(
+                        "value" to "true",
+                        "comment" to ""
+                ).asJson())
+                checkIndicator(type) { i ->
+                    assertEquals(true, i.value)
+                    assertEquals("", i.comment)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Comment in input`() {
+        val category = category()
+        val type = category.booleanType()
+        project {
+            asAdmin {
+                indicatorService.updateProjectIndicator<Boolean>(this, type.id, mapOf(
+                        "value" to "true",
+                        "comment" to "Some comment"
+                ).asJson())
+                checkIndicator(type) { i ->
+                    assertEquals(true, i.value)
+                    assertEquals("Some comment", i.comment)
+                }
+            }
         }
     }
 
