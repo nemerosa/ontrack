@@ -44,6 +44,17 @@ class IndicatorServiceImpl(
         }
     }
 
+    override fun getProjectIndicatorHistory(project: Project): List<Indicator<*>> {
+        // Gets all the types
+        val types = indicatorTypeService.findAll()
+        // Gets the values
+        return types.flatMap { type ->
+            indicatorStore.loadIndicatorHistory(project, type.id).map { stored ->
+                toIndicator(stored, type)
+            }
+        }
+    }
+
     override fun getProjectIndicator(project: Project, typeId: String): Indicator<*> {
         val type = indicatorTypeService.getTypeById(typeId)
         return loadIndicator(project, type)
@@ -78,7 +89,7 @@ class IndicatorServiceImpl(
 
     override fun <T> updateProjectIndicator(project: Project, type: IndicatorType<T, *>, value: T?, comment: String?, time: LocalDateTime?): Indicator<T> {
         // Signature
-        val signature = if(time != null) {
+        val signature = if (time != null) {
             securityService.currentSignature.withTime(time)
         } else {
             securityService.currentSignature

@@ -30,4 +30,11 @@ interface IndicatorService {
 
     fun deleteProjectIndicator(project: Project, typeId: String): Ack
 
+    /**
+     * Gets all indicators with their history.
+     *
+     * @param project Project to get history for
+     */
+    fun getProjectIndicatorHistory(project: Project): List<Indicator<*>>
+
 }

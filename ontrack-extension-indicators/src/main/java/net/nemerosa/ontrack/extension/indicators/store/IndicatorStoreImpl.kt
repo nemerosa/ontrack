@@ -34,6 +34,14 @@ class IndicatorStoreImpl(
                 }
     }
 
+    override fun loadIndicatorHistory(project: Project, type: String): List<StoredIndicator> {
+        return entityDataStore.getByFilter(
+                EntityDataStoreFilter(project)
+                        .withCategory(STORE_CATEGORY)
+                        .withName(type)
+        ).mapNotNull { record -> toStoredIndicator(record) }
+    }
+
     private fun toStoredIndicator(record: EntityDataStoreRecord): StoredIndicator? {
         val rep = record.data.parse<StoredIndicatorRepresentation>()
         return if (rep.value != null) {

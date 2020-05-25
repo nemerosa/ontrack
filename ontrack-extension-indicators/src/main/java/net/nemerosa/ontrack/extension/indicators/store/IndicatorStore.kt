@@ -8,6 +8,8 @@ interface IndicatorStore {
 
     fun loadIndicator(project: Project, type: String, previous: Duration? = null): StoredIndicator?
 
+    fun loadIndicatorHistory(project: Project, type: String): List<StoredIndicator>
+
     fun storeIndicator(project: Project, type: String, indicator: StoredIndicator)
 
     fun deleteIndicator(project: Project, typeId: String): Ack
