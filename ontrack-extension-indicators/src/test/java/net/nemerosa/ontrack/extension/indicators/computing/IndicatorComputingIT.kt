@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.computing
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
+import net.nemerosa.ontrack.extension.indicators.IndicatorsTestFixtures
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.support.Percentage
 import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
@@ -10,14 +11,12 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValueType
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
 
@@ -92,6 +91,74 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
                 computer.assertIndicatorValueIs(this, computer.typeCoverage, null)
                 computer.assertIndicatorValueIs(this, computer.typeSpringBoot, true)
                 computer.assertIndicatorValueIs(this, computer.typeDocker, false)
+            }
+        }
+    }
+
+    @Test
+    fun `Branch computed indicators when no branch`() {
+        val computer = TestBranchIndicatorComputer()
+        project {
+            branch(name = "any-other-name")
+            asAdmin {
+                indicatorComputingService.compute(computer, this)
+                // No indicator for this project
+                computer.assertTypeIsNotPresent()
+            }
+        }
+    }
+
+    @Test
+    fun `Branch not eligible`() {
+        val computer = TestBranchIndicatorComputer(
+                branchTest = { false }
+        )
+        project {
+            branch(name = "master")
+            asAdmin {
+                indicatorComputingService.compute(computer, this)
+                // No indicator for this project
+                computer.assertTypeIsNotPresent()
+            }
+        }
+    }
+
+    @Test
+    fun `Branch computed indicators`() {
+        val computer = TestBranchIndicatorComputer()
+        project {
+            branch(name = "master")
+            asAdmin {
+                indicatorComputingService.compute(computer, this)
+                // Indicator set for this project
+                computer.assertIndicatorValueIs(this, true)
+            }
+        }
+    }
+
+    @Test
+    fun `Branch based project eligibility`() {
+        project {
+            branch(name = "any-other-name")
+            asAdmin {
+                val computer = TestBranchIndicatorComputer()
+                assertFalse(computer.isProjectEligible(project))
+            }
+        }
+        project {
+            branch(name = "master")
+            asAdmin {
+                val computer = TestBranchIndicatorComputer(
+                        branchTest = { false }
+                )
+                assertFalse(computer.isProjectEligible(project))
+            }
+        }
+        project {
+            branch(name = "master")
+            asAdmin {
+                val computer = TestBranchIndicatorComputer()
+                assertTrue(computer.isProjectEligible(project))
             }
         }
     }
@@ -220,6 +287,54 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
             project.assertIndicatorValueIs(type, expectedValue)
         }
 
+    }
+
+    private inner class TestBranchIndicatorComputer(
+            private val branchTest: (Branch) -> Boolean = { true }
+    ) : AbstractBranchIndicatorComputer(
+            IndicatorsTestFixtures.indicatorsExtensionFeature(),
+            structureService
+    ) {
+
+        private val prefix = uid("C")
+        private val typeId = "$prefix-test-branch"
+
+        override fun isBranchEligible(branch: Branch): Boolean = branchTest(branch)
+
+        override fun computeIndicators(branch: Branch): List<IndicatorComputedValue<*, *>> = listOf(
+                IndicatorComputedValue(
+                        type = IndicatorComputedType(
+                                category = IndicatorComputedCategory(
+                                        id = "$prefix-test-branch",
+                                        name = "Test branch"
+                                ),
+                                id = typeId,
+                                name = "Test branch",
+                                link = null,
+                                valueType = booleanValueType,
+                                valueConfig = BooleanIndicatorValueTypeConfig(required = true)
+                        ),
+                        value = true,
+                        comment = null
+                )
+        )
+
+        override val name: String = "Testing branches"
+        override val perProject: Boolean = true
+        override val source = IndicatorSource(
+                IndicatorSourceProviderDescription("test", "Test"),
+                "Testing branches"
+        )
+
+        fun assertTypeIsNotPresent() {
+            assertNull(indicatorTypeService.findTypeById(typeId))
+        }
+
+        fun assertIndicatorValueIs(project: Project, expectedValue: Boolean?) {
+            @Suppress("UNCHECKED_CAST")
+            val type = indicatorTypeService.getTypeById(typeId) as IndicatorType<Boolean, *>
+            project.assertIndicatorValueIs(type, expectedValue)
+        }
     }
 
 }

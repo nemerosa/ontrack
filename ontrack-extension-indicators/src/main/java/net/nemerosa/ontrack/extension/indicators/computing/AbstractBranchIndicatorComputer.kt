@@ -16,7 +16,7 @@ abstract class AbstractBranchIndicatorComputer(
 
     override fun computeIndicators(project: Project): List<IndicatorComputedValue<*, *>> {
         // Gets the main branch for this project
-        val branch = getMainBranch(project)
+        val branch = getMainBranch(project)?.takeIf { isBranchEligible(it) }
         // If there is branch, launches the computation
         return if (branch != null) {
             computeIndicators(branch)
