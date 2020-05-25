@@ -1,0 +1,103 @@
+[[extension-indicators]]
+=== Project indicators
+
+Project indicators are set at <<model,project>> level to hold values about different
+_types_ of information.
+
+Those types of information are grouped into _categories_ and can have a specific _value
+type_, like a boolean (yes/no), a percentage, a numeric value, etc. Types can be entered
+manually, imported or computed.
+
+Every of those indicator values have a level of _compliance_ which computed as a
+percentage (from 0% - very bad - to 100% - very good) according to the configuration
+of the type. The compliance is also associated with a rating, from `F` (very bad) to
+`A` (very good).
+
+The indicator values can be entered manually at project level or be computed.
+
+Projects can be grouped together in _portfolios_ which are also associated with
+a subset of categories. And a global view of all portfolios is associated with a
+specific subset of categories.
+
+Finally, the history of indicators is retained by Ontrack and can be used to compute
+trends at the different levels (at project level, at portfolio level or globally).
+
+[[extension-indicators-acl]]
+==== Indicators authorization model
+
+Having access to a project grants automatically access to viewing the associated indicators.
+
+However, managing indicators, types & portfolios is granted according to the following matrix:
+
+|===
+| Function | Administrator | Global indicator manager | Global indicator portfolio manager | Project manager/owner | Project indicator manager |
+
+| Global indicators | Yes | Yes | No | No | No |
+
+| Type and category management (1) | Yes | Yes | No | No | No |
+
+| Portfolio management | Yes | Yes | Yes | No | No |
+
+| Indicator edition (2) | Yes | Yes | No | Yes | Yes |
+|===
+
+(1) Imported types & categories are not open to edition.
+(2) Computed indicators are not open to manual edition.
+
+[[extension-indicators-types]]
+==== Indicator types management
+
+Categories & types can be managed manually by an authorized used using the following user menus:
+
+* _Indicator categories_
+* _Indicator types_
+
+A _category_ must have the following attributes:
+
+* _id_ - unique ID for this category among all the categories
+* _name_ - display name for this category
+
+A _type_ must have the following attributes:
+
+* _id_ - unique ID for this type among all the type
+* _name_ - display name for this type
+* _link_ - optional URL for more information about this type
+* _value type_ - type of indicator value this type. For example, a percentage or a boolean
+* _value config_ - configuration for the _value type_, used to compute the indicator compliance and rating
+
+Categories and types can also be <<extension-indicators-import,imported>> or
+<<extension-indicators-computing,computed>>. In such a case, both the category and the type
+are associated with a _source_ and they cannot be edited.
+
+[[extension-indicators-projects]]
+==== Indicator edition
+
+An authorized user can edit the indicator for a project by going to the _Tools_ menu
+and select _Project indicators_.
+
+All available types are displayed, grouped by categories, and each indicator value is shown
+together with its value, its rating. Note that selecting a time range allows to compute
+and display the trend for each indicator.
+
+If the indicator is open to edition, the user can click on the pencil icon to edit the
+value according to the value type. Upon validation, a _new_ indicator value is stored ; the
+old value is kept for history and trend computation.
+
+An authorized user can also _delete_ the indicator ; this actually register a new _null_
+value for the indicator. The historical values are kept.
+
+[[extension-indicators-portfolios]]
+==== Indicator portfolios
+
+TODO
+
+[[extension-indicators-import]]
+==== Importing categories and types
+
+TODO
+
+[[extension-indicators-computing]]
+==== Computing indicators
+
+TODO
+

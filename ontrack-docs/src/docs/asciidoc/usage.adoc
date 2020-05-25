@@ -29,3 +29,5 @@ include::usage-subversion.adoc[]
 include::changelogs.adoc[]
 
 include::searching.adoc[]
+
+include::extension-indicators.adoc[]
