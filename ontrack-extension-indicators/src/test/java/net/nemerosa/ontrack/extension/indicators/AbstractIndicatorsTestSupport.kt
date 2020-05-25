@@ -68,14 +68,15 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
     protected fun <T> Project.indicator(
             type: IndicatorType<T, *>,
             value: T?,
-            time: LocalDateTime? = null
+            time: LocalDateTime? = null,
+            comment: String? = null
     ) {
         asAdmin {
             indicatorService.updateProjectIndicator(
                     project = project,
                     type = type,
                     value = value,
-                    comment = null,
+                    comment = comment,
                     time = time
             )
         }
