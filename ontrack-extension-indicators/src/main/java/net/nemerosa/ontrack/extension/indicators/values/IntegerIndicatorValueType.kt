@@ -5,12 +5,10 @@ import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
-import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
-import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.YesNo
 import org.springframework.stereotype.Component
@@ -64,25 +62,25 @@ class IntegerIndicatorValueType(
                             IntField.of(IntegerThresholds::min.name)
                                     .label("Min")
                                     .min(0)
-                                    .value(config?.min)
+                                    .value(config?.min ?: DEFAULT.min)
                     )
                     .with(
                             IntField.of(IntegerThresholds::max.name)
                                     .label("Max")
                                     .min(0)
-                                    .value(config?.max)
+                                    .value(config?.max ?: DEFAULT.max)
                     )
                     .with(
                             YesNo.of(IntegerThresholds::higherIsBetter.name)
                                     .label("Higher is better")
-                                    .value(config?.higherIsBetter ?: true)
+                                    .value(config?.higherIsBetter ?: DEFAULT.higherIsBetter)
                     )
 
     override fun toConfigForm(config: IntegerThresholds): JsonNode =
             config.asJson()
 
     override fun fromConfigForm(config: JsonNode): IntegerThresholds =
-            config.parse()
+            config.parseOrNull() ?: DEFAULT
 
     override fun toConfigClientJson(config: IntegerThresholds): JsonNode =
             config.asJson()
@@ -91,5 +89,13 @@ class IntegerIndicatorValueType(
             config.asJson()
 
     override fun fromConfigStoredJson(config: JsonNode): IntegerThresholds =
-            config.parse()
+            config.parseOrNull() ?: DEFAULT
+
+    companion object {
+        private val DEFAULT = IntegerThresholds(
+                min = 0,
+                max = 10,
+                higherIsBetter = false
+        )
+    }
 }
