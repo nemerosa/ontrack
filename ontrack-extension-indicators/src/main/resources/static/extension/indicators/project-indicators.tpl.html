@@ -1,5 +1,7 @@
 <ot-view>
 
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
     <div class="row" ng-show="loadingIndicators">
         <div class="col-md-12">
             <div class="alert alert-info">
@@ -12,7 +14,7 @@
     <table class="table table-bordered table-hover">
         <tbody ng-repeat="categoryIndicators in projectIndicators.categories">
         <tr class="info">
-            <th colspan="6">{{categoryIndicators.category.name}}</th>
+            <th colspan="7">{{categoryIndicators.category.name}}</th>
         </tr>
         <tr class="text-muted">
             <td>Type</td>

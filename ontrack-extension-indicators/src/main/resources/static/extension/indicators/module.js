@@ -952,5 +952,13 @@ angular.module('ontrack.extension.indicators', [
             transclude: true
         };
     })
+    .directive('otExtensionIndicatorsMessage', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'extension/indicators/directive.indicators-message.tpl.html',
+            scope: {
+            }
+        };
+    })
 
 ;

@@ -1,5 +1,7 @@
 <ot-view>
 
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
     <div class="row" ng-show="loadingPortfolios">
         <div class="col-md-12">
             <div class="alert alert-info">
@@ -21,7 +23,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" ng-if="portfolios.length > 0">
         <div class="col-md-12">
             <form class="form-inline">
                 <div class="form-group">
