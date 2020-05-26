@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.boot.PROJECT_SEARCH_INDEX
+import net.nemerosa.ontrack.boot.PROJECT_SEARCH_RESULT_TYPE
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -23,6 +24,27 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
             assertEquals(candidate.entityDisplayName, title)
             assertEquals(candidate.description, description)
         }
+    }
+
+    @Test
+    fun `Searching for a project using part of its name`() {
+        val commonPart = uid("P")
+        val candidates = (1..6).map {
+            project(name = NameDescription.nd("$commonPart-${uid("X")}", ""))
+        }
+        // Searches for the candidate projects
+        val results = searchService.paginatedSearch(SearchRequest(
+                token = commonPart,
+                type = PROJECT_SEARCH_RESULT_TYPE,
+                size = 50
+        )).items
+        val foundNames = results.map { it.title }
+        val candidateNames = candidates.map { it.entityDisplayName }
+        // Checks that all candidates have been found
+        assertTrue(
+                foundNames.containsAll(candidateNames),
+                "All candidates have been found"
+        )
     }
 
     @Test
