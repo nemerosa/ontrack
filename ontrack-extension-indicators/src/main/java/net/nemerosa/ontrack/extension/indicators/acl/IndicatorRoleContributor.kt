@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.acl
 
+import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import net.nemerosa.ontrack.model.security.*
 import org.springframework.stereotype.Component
 
@@ -72,7 +73,11 @@ class IndicatorRoleContributor : RoleContributor {
                             IndicatorEdit::class.java
                     ),
                     GLOBAL_INDICATOR_MANAGER to listOf(
-                            IndicatorEdit::class.java
+                            IndicatorEdit::class.java,
+                            ProjectLabelManagement::class.java
+                    ),
+                    GLOBAL_INDICATOR_PORTFOLIO_MANAGER to listOf(
+                            ProjectLabelManagement::class.java
                     )
             )
 
