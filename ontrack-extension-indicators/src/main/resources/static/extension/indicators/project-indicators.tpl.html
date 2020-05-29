@@ -32,6 +32,7 @@
                 <span ng-if="indicator.value">
                     <ot-include value="indicator.value" template="extension/{{indicator.type.valueType.feature.id}}/indicators/{{indicator.type.valueType.id}}.tpl.html"></ot-include>
                 </span>
+                <a ng-if="indicator.value" class="fa fa-history ot-command" title="History for this indicator" href="#/extension/indicators/project-indicators/{{project.id}}/{{indicator.type.id}}/history"></a>
                 <span ng-if="indicator.links._update" class="fa fa-pencil ot-command" title="Edit value" ng-click="editIndicator(indicator)"></span>
                 <span ng-if="indicator.links._delete" class="fa fa-trash ot-command" title="Remove value" ng-click="deleteIndicator(indicator)"></span>
                 <span ng-if="indicator.type.computed" class="text-muted" title="This indicator is computed and cannot be edited."><span class="fa fa-cog"></span>&nbsp;<i>Computed</i></span>

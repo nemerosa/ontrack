@@ -238,6 +238,7 @@ angular.module('ontrack.extension.indicators', [
                         _delete
                       }
                       type {
+                        id
                         name
                         link
                         valueType {
@@ -318,6 +319,118 @@ angular.module('ontrack.extension.indicators', [
             }).then(() => {
                 return ot.pageCall($http.delete(indicator.links._delete));
             }).then(loadIndicators);
+        };
+
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('project-indicator-history', {
+            url: '/extension/indicators/project-indicators/{project}/{type}/history',
+            templateUrl: 'extension/indicators/project-indicator-history.tpl.html',
+            controller: 'ProjectIndicatorHistoryCtrl'
+        });
+    })
+    .controller('ProjectIndicatorHistoryCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+
+        const projectId = $stateParams.project;
+        const typeId = $stateParams.type;
+        $scope.loadingIndicatorHistory = true;
+
+        const view = ot.view();
+        view.title = "";
+
+        const query = `
+            query IndicatorHistory($project: Int!, $type: String!, $offset: Int!, $size: Int!) {
+              projects(id: $project) {
+                id
+                name
+                projectIndicators {
+                  indicators(type: $type) {
+                    type {
+                      id
+                      name
+                      link
+                      valueType {
+                        id
+                        feature {
+                          id
+                        }
+                      }
+                      category {
+                        id
+                        name
+                      }
+                    }
+                    history(offset: $offset, size: $size) {
+                      pageInfo {
+                        totalSize
+                        nextPage {
+                          offset
+                          size
+                        }
+                        previousPage {
+                          offset
+                          size
+                        }
+                      }
+                      pageItems {
+                        value
+                        compliance
+                        rating
+                        annotatedComment
+                        signature {
+                          user
+                          time
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+`;
+
+        const pageSize = 10;
+        const queryVars = {
+            project: projectId,
+            type: typeId,
+            offset: 0,
+            size: pageSize
+        };
+
+        let viewInitialized = false;
+
+        const loadIndicatorHistory = () => {
+            $scope.loadingIndicatorHistory = true;
+            otGraphqlService.pageGraphQLCall(query, queryVars).then((data) => {
+
+                $scope.project = data.projects[0];
+                $scope.indicator = $scope.project.projectIndicators.indicators[0];
+                $scope.history = $scope.indicator.history;
+
+                if (!viewInitialized) {
+                    // Title
+                    view.title = `Project indicator for ${$scope.project.name}`;
+                    // View configuration
+                    view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
+                    // Commands
+                    view.commands = [
+                        ot.viewCloseCommand(`/extension/indicators/project-indicators/${projectId}`)
+                    ];
+                    // OK
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingIndicatorHistory = false;
+            });
+        };
+
+        loadIndicatorHistory();
+
+        // Switching the page
+        $scope.switchPage = (pageRequest) => {
+            queryVars.offset = pageRequest.offset;
+            queryVars.size = pageSize;
+            loadIndicatorHistory();
         };
 
     })

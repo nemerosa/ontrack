@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.model
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
+import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.json.asJson
 import org.junit.Test
 import java.time.Duration
@@ -181,6 +182,57 @@ class IndicatorIT : AbstractIndicatorsTestSupport() {
                 checkIndicator(type) { i ->
                     assertEquals(true, i.value)
                     assertEquals("Some comment", i.comment)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Paginated history of an indicator`() {
+        val category = category()
+        val type = category.percentageType()
+        project {
+            // Creates an history of indicator, from 0 to 100
+            (0..100).forEach { p ->
+                indicator(type, p.percent())
+            }
+            // Gets the first pages of history
+            asUserWithView {
+                // First page
+                indicatorService.getProjectIndicatorHistory(this, type, 0, 10).apply {
+                    assertEquals(101, total)
+                    assertEquals(0, offset)
+                    assertEquals(10, items.size)
+                    items.forEachIndexed { i, indicator ->
+                        assertEquals(
+                                100 - i,
+                                indicator.value?.value
+                        )
+                    }
+                }
+                // Second page
+                indicatorService.getProjectIndicatorHistory(this, type, 10, 10).apply {
+                    assertEquals(101, total)
+                    assertEquals(10, offset)
+                    assertEquals(10, items.size)
+                    items.forEachIndexed { i, indicator ->
+                        assertEquals(
+                                90 - i,
+                                indicator.value?.value
+                        )
+                    }
+                }
+                // Last extended page
+                indicatorService.getProjectIndicatorHistory(this, type, 90, 20).apply {
+                    assertEquals(101, total)
+                    assertEquals(90, offset)
+                    assertEquals(11, items.size)
+                    items.forEachIndexed { i, indicator ->
+                        assertEquals(
+                                10 - i,
+                                indicator.value?.value
+                        )
+                    }
                 }
             }
         }

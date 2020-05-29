@@ -34,13 +34,22 @@ class IndicatorStoreImpl(
                 }
     }
 
-    override fun loadIndicatorHistory(project: Project, type: String): List<StoredIndicator> {
+    override fun loadIndicatorHistory(project: Project, type: String, offset: Int, size: Int): List<StoredIndicator> {
         return entityDataStore.getByFilter(
                 EntityDataStoreFilter(project)
                         .withCategory(STORE_CATEGORY)
                         .withName(type)
+                        .withOffset(offset)
+                        .withCount(size)
         ).mapNotNull { record -> toStoredIndicator(record) }
     }
+
+    override fun getCountIndicatorHistory(project: Project, typeId: String): Int =
+            entityDataStore.getCountByFilter(
+                    EntityDataStoreFilter(project)
+                            .withCategory(STORE_CATEGORY)
+                            .withName(typeId)
+            )
 
     private fun toStoredIndicator(record: EntityDataStoreRecord): StoredIndicator? {
         val rep = record.data.parse<StoredIndicatorRepresentation>()

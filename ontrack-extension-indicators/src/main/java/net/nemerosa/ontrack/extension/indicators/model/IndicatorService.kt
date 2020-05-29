@@ -35,6 +35,18 @@ interface IndicatorService {
      *
      * @param project Project to get history for
      */
-    fun getProjectIndicatorHistory(project: Project): List<Indicator<*>>
+    fun getAllProjectIndicators(project: Project): List<Indicator<*>>
+
+    /**
+     * Gets the history of a given indicator.
+     *
+     * @param project Project to get history for
+     * @param type Project indicator type to get history for
+     * @param offset History offset
+     * @param size History size
+     * @return History of this indicator
+     */
+    fun <T> getProjectIndicatorHistory(project: Project, type: IndicatorType<T, *>, offset: Int, size: Int): IndicatorHistory<T>
+
 
 }

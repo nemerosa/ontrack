@@ -4,8 +4,14 @@ import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolio
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
+import net.nemerosa.ontrack.extension.indicators.support.IntegerThresholds
+import net.nemerosa.ontrack.extension.indicators.support.Percentage
+import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
+import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
+import net.nemerosa.ontrack.extension.indicators.values.IntegerIndicatorValueType
+import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValueType
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.structure.Project
@@ -20,6 +26,12 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var booleanIndicatorValueType: BooleanIndicatorValueType
+
+    @Autowired
+    protected lateinit var integerIndicatorValueType: IntegerIndicatorValueType
+
+    @Autowired
+    protected lateinit var percentageIndicatorValueType: PercentageIndicatorValueType
 
     @Autowired
     protected lateinit var indicatorCategoryService: IndicatorCategoryService
@@ -72,6 +84,43 @@ abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
                 link = null,
                 valueType = booleanIndicatorValueType,
                 valueConfig = BooleanIndicatorValueTypeConfig(required),
+                source = source
+        )
+    }
+
+    protected fun IndicatorCategory.integerType(
+            id: String = uid("T"),
+            name: String = "$id description",
+            min: Int = 0,
+            max: Int = 10,
+            higherIsBetter: Boolean = false,
+            source: IndicatorSource? = null
+    ): IndicatorType<Int, IntegerThresholds> = asAdmin {
+        indicatorTypeService.createType(
+                id = id,
+                category = this,
+                name = name,
+                link = null,
+                valueType = integerIndicatorValueType,
+                valueConfig = IntegerThresholds(min, max, higherIsBetter),
+                source = source
+        )
+    }
+
+    protected fun IndicatorCategory.percentageType(
+            id: String = uid("T"),
+            name: String = "$id description",
+            threshold: Int = 50,
+            higherIsBetter: Boolean = true,
+            source: IndicatorSource? = null
+    ): IndicatorType<Percentage, PercentageThreshold> = asAdmin {
+        indicatorTypeService.createType(
+                id = id,
+                category = this,
+                name = name,
+                link = null,
+                valueType = percentageIndicatorValueType,
+                valueConfig = PercentageThreshold(threshold.percent(), higherIsBetter),
                 source = source
         )
     }

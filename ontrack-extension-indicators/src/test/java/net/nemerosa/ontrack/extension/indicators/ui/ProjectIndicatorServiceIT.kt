@@ -22,8 +22,8 @@ class ProjectIndicatorServiceIT : AbstractIndicatorsTestSupport() {
         project project@{
             asAdmin {
                 // No indicator yet
-                projectIndicatorService.getProjectIndicators(id, false).apply {
-                    assertTrue(categories.isEmpty(), "No indicator yet")
+                projectIndicatorService.getProjectCategoryIndicators(id, false).apply {
+                    assertTrue(isEmpty(), "No indicator yet")
                 }
                 // Sets an indicator
                 projectIndicatorService.updateIndicator(id, type.id, mapOf(
@@ -36,9 +36,9 @@ class ProjectIndicatorServiceIT : AbstractIndicatorsTestSupport() {
                 ).asJson())
                 assertIndicatorValueIs(type, true)
                 // Gets the list of indicators
-                projectIndicatorService.getProjectIndicators(id, false).apply {
-                    assertEquals(1, categories.size)
-                    categories.first().apply {
+                projectIndicatorService.getProjectCategoryIndicators(id, false).apply {
+                    assertEquals(1, size)
+                    first().apply {
                         assertEquals(category, this.category)
                         assertEquals(this@project, this.project)
                         assertEquals(1, this.indicators.size)
@@ -52,8 +52,8 @@ class ProjectIndicatorServiceIT : AbstractIndicatorsTestSupport() {
                 }
                 // Deletes the indicator
                 projectIndicatorService.deleteIndicator(id, type.id)
-                projectIndicatorService.getProjectIndicators(id, false).apply {
-                    assertTrue(categories.isEmpty(), "No indicator yet")
+                projectIndicatorService.getProjectCategoryIndicators(id, false).apply {
+                    assertTrue(isEmpty(), "No indicator yet")
                 }
             }
         }
@@ -74,7 +74,7 @@ class ProjectIndicatorServiceIT : AbstractIndicatorsTestSupport() {
             indicator(type, true, lastTime)
             // Gets a previous indicator
             asAdmin {
-                val indicator = projectIndicatorService.getProjectIndicators(id, false).categories.first().indicators.first()
+                val indicator = projectIndicatorService.getProjectCategoryIndicators(id, false).first().indicators.first()
                 assertEquals(mapOf("value" to "true").asJson(), indicator.value)
                 val previousIndicator = projectIndicatorService.getPreviousIndicator(indicator)
                 assertEquals(this, previousIndicator.project)

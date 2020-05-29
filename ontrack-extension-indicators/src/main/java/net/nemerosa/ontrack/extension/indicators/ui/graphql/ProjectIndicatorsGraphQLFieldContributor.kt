@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicatorService
+import net.nemerosa.ontrack.extension.indicators.ui.ProjectIndicators
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
-import net.nemerosa.ontrack.graphql.support.GraphqlUtils.stdList
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -11,8 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class ProjectIndicatorsGraphQLFieldContributor(
-        private val projectIndicators: GQLTypeProjectIndicators,
-        private val projectIndicatorService: ProjectIndicatorService
+        private val projectIndicators: GQLTypeProjectIndicators
 ) : GQLProjectEntityFieldContributor {
 
     override fun getFields(projectEntityClass: Class<out ProjectEntity>, projectEntityType: ProjectEntityType): List<GraphQLFieldDefinition>? {
@@ -24,7 +22,7 @@ class ProjectIndicatorsGraphQLFieldContributor(
                             .type(projectIndicators.typeRef)
                             .dataFetcher { env ->
                                 val project: Project = env.getSource()
-                                projectIndicatorService.getProjectIndicators(project.id, true)
+                                ProjectIndicators(project)
                             }
                             .build()
             )

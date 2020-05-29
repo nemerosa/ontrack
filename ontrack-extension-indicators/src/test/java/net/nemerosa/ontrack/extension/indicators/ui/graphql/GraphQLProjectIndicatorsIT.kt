@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
+import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.isNullOrNullNode
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class GraphQLProjectIndicatorsIT : AbstractIndicatorsTestSupport() {
 
@@ -154,6 +157,98 @@ class GraphQLProjectIndicatorsIT : AbstractIndicatorsTestSupport() {
                     ).asJson(),
                     data
             )
+        }
+    }
+
+    @Test
+    fun `Indicator history`() {
+
+        val category = category()
+        val type = category.percentageType()
+        project {
+            // Creates an history of indicator, from 0 to 100
+            (0..100).forEach { p ->
+                indicator(type, p.percent())
+            }
+            // Gets the first pages of history
+            asUserWithView {
+                val params = mutableMapOf("project" to id(), "type" to type.id)
+                val query = """
+                    query IndicatorHistory(${'$'}project: Int!, ${'$'}type: String!, ${'$'}offset: Int!, ${'$'}size: Int!) {
+                        projects(id: ${'$'}project) {
+                            projectIndicators {
+                                indicators(type: ${'$'}type) {
+                                    type { id }
+                                    value
+                                    history(offset: ${'$'}offset, size: ${'$'}size) {
+                                        pageInfo {
+                                            totalSize
+                                            currentOffset
+                                            currentSize
+                                            previousPage { offset size }
+                                            nextPage { offset size }
+                                        }
+                                        pageItems {
+                                            type { id }
+                                            value
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """
+                // First page
+                run(query, params + ("offset" to 0) + ("size" to 10)).apply {
+                    val indicators = get("projects")[0]["projectIndicators"]["indicators"]
+                    assertEquals(1, indicators.size())
+                    val indicator = indicators[0]
+                    assertEquals(type.id, indicator["type"]["id"].asText())
+                    assertEquals(mapOf("value" to 100).asJson(), indicator["value"])
+                    // Checks the history
+                    val history = indicator["history"]
+                    history["pageInfo"].apply {
+                        assertEquals(101, get("totalSize").asInt())
+                        assertEquals(0, get("currentOffset").asInt())
+                        assertEquals(10, get("currentSize").asInt())
+                        assertTrue(get("previousPage").isNullOrNullNode())
+                        get("nextPage").apply {
+                            assertEquals(10, get("offset").asInt())
+                            assertEquals(10, get("size").asInt())
+                        }
+                    }
+                    // Checks the items
+                    history["pageItems"].forEachIndexed { i, item ->
+                        assertEquals(type.id, item["type"]["id"].asText())
+                        assertEquals(mapOf("value" to (100 - i)).asJson(), item["value"])
+                    }
+                }
+                // Last page (with more being requested than available)
+                run(query, params + ("offset" to 90) + ("size" to 20)).apply {
+                    val indicators = get("projects")[0]["projectIndicators"]["indicators"]
+                    assertEquals(1, indicators.size())
+                    val indicator = indicators[0]
+                    assertEquals(type.id, indicator["type"]["id"].asText())
+                    assertEquals(mapOf("value" to 100).asJson(), indicator["value"])
+                    // Checks the history
+                    val history = indicator["history"]
+                    history["pageInfo"].apply {
+                        assertEquals(101, get("totalSize").asInt())
+                        assertEquals(90, get("currentOffset").asInt())
+                        assertEquals(11, get("currentSize").asInt())
+                        assertTrue(get("nextPage").isNullOrNullNode())
+                        get("previousPage").apply {
+                            assertEquals(70, get("offset").asInt())
+                            assertEquals(20, get("size").asInt())
+                        }
+                    }
+                    // Checks the items
+                    history["pageItems"].forEachIndexed { i, item ->
+                        assertEquals(type.id, item["type"]["id"].asText())
+                        assertEquals(mapOf("value" to (10 - i)).asJson(), item["value"])
+                    }
+                }
+            }
         }
     }
 

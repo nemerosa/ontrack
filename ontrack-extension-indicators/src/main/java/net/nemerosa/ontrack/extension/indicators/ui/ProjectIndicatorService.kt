@@ -6,7 +6,8 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.ID
 
 interface ProjectIndicatorService {
-    fun getProjectIndicators(projectId: ID, all: Boolean): ProjectIndicators
+
+    fun getProjectCategoryIndicators(projectId: ID, all: Boolean): List<ProjectCategoryIndicators>
 
     fun getUpdateFormForIndicator(projectId: ID, typeId: String): Form
 
@@ -15,5 +16,11 @@ interface ProjectIndicatorService {
     fun deleteIndicator(projectId: ID, typeId: String): Ack
 
     fun getPreviousIndicator(projectIndicator: ProjectIndicator): ProjectIndicator
+
+    fun getHistory(projectIndicator: ProjectIndicator, offset: Int, size: Int): ProjectIndicatorHistory
+
+    fun getProjectIndicators(projectId: ID): List<ProjectIndicator>
+
+    fun findProjectIndicatorByType(projectId: ID, typeId: String): ProjectIndicator?
 
 }
