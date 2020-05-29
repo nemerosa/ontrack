@@ -54,6 +54,22 @@
             </td>
         </tr>
         </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="2" align="left">
+                <button class="btn btn-link" ng-show="history.pageInfo.previousPage" ng-click="switchPage(history.pageInfo.previousPage)">
+                    <span class="fa fa-step-backward"></span>
+                    Newer ones
+                </button>
+            </td>
+            <td colspan="2" align="right">
+                <button class="btn btn-link" ng-show="history.pageInfo.nextPage" ng-click="switchPage(history.pageInfo.nextPage)">
+                    <span class="fa fa-step-forward"></span>
+                    Older ones
+                </button>
+            </td>
+        </tr>
+        </tfoot>
     </table>
 
 </ot-view>

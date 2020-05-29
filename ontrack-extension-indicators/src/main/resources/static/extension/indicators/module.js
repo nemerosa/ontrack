@@ -339,7 +339,7 @@ angular.module('ontrack.extension.indicators', [
         view.title = "";
 
         const query = `
-            query IndicatorHistory($project: Int!, $type: String!) {
+            query IndicatorHistory($project: Int!, $type: String!, $offset: Int!, $size: Int!) {
               projects(id: $project) {
                 id
                 name
@@ -360,7 +360,7 @@ angular.module('ontrack.extension.indicators', [
                         name
                       }
                     }
-                    history(offset: 0, size: 10) {
+                    history(offset: $offset, size: $size) {
                       pageInfo {
                         totalSize
                         nextPage {
@@ -389,9 +389,12 @@ angular.module('ontrack.extension.indicators', [
             }
 `;
 
+        const pageSize = 10;
         const queryVars = {
             project: projectId,
-            type: typeId
+            type: typeId,
+            offset: 0,
+            size: pageSize
         };
 
         let viewInitialized = false;
@@ -422,6 +425,13 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadIndicatorHistory();
+
+        // Switching the page
+        $scope.switchPage = (pageRequest) => {
+            queryVars.offset = pageRequest.offset;
+            queryVars.size = pageSize;
+            loadIndicatorHistory();
+        };
 
     })
     .config(function ($stateProvider) {
