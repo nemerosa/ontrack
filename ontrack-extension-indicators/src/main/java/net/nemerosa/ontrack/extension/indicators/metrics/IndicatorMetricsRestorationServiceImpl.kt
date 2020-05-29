@@ -23,7 +23,7 @@ class IndicatorMetricsRestorationServiceImpl(
     private fun restore(project: Project, logger: (String) -> Unit) {
         logger("Restoring indicators for project ${project.name}")
         // Gets all the indicators (past included) of this project
-        indicatorService.getProjectIndicatorHistory(project).forEach { indicator ->
+        indicatorService.getAllProjectIndicators(project).forEach { indicator ->
             indicatorMetricsService.saveMetrics(project, indicator)
         }
     }

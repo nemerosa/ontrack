@@ -49,6 +49,21 @@ class ProjectIndicatorServiceImpl(
         )
     }
 
+    override fun getHistory(projectIndicator: ProjectIndicator, offset: Int, size: Int): ProjectIndicatorHistory {
+        // Gets the indicator type
+        val type = indicatorTypeService.getTypeById(projectIndicator.type.id)
+        // Gets the history of the indicator
+        val history = indicatorService.getAllProjectIndicators(projectIndicator.project, type, offset, size)
+        // Translates it
+        return ProjectIndicatorHistory(
+                items = history.items.map { indicator ->
+                    toProjectIndicator(projectIndicator.project, indicator)
+                },
+                offset = history.offset,
+                total = history.total
+        )
+    }
+
     override fun getUpdateFormForIndicator(projectId: ID, typeId: String): Form {
         val project = structureService.getProject(projectId)
         val indicator = indicatorService.getProjectIndicator(project, typeId)

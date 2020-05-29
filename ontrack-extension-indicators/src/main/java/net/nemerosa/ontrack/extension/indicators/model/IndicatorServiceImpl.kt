@@ -44,7 +44,7 @@ class IndicatorServiceImpl(
         }
     }
 
-    override fun getProjectIndicatorHistory(project: Project): List<Indicator<*>> {
+    override fun getAllProjectIndicators(project: Project): List<Indicator<*>> {
         // Gets all the types
         val types = indicatorTypeService.findAll()
         // Gets the values
@@ -53,6 +53,18 @@ class IndicatorServiceImpl(
                 toIndicator(stored, type)
             }
         }
+    }
+
+    override fun <T> getAllProjectIndicators(project: Project, type: IndicatorType<T, *>, offset: Int, size: Int): IndicatorHistory<T> {
+        val indicators = indicatorStore.loadIndicatorHistory(project, type.id, offset, size).map { stored ->
+            toIndicator(stored, type)
+        }
+        val total = indicatorStore.getCountIndicatorHistory(project, type.id)
+        return IndicatorHistory(
+                items = indicators,
+                offset = offset,
+                total = total
+        )
     }
 
     override fun getProjectIndicator(project: Project, typeId: String): Indicator<*> {

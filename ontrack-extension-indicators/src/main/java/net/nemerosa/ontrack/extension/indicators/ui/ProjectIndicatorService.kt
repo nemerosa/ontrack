@@ -16,4 +16,6 @@ interface ProjectIndicatorService {
 
     fun getPreviousIndicator(projectIndicator: ProjectIndicator): ProjectIndicator
 
+    fun getHistory(projectIndicator: ProjectIndicator, offset: Int, size: Int): ProjectIndicatorHistory
+
 }
