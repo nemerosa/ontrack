@@ -20,25 +20,34 @@ class ProjectIndicatorServiceImpl(
         private val indicatorTypeService: IndicatorTypeService
 ) : ProjectIndicatorService {
 
-    override fun getProjectIndicators(projectId: ID, all: Boolean): ProjectIndicators {
+    override fun getProjectCategoryIndicators(projectId: ID, all: Boolean): List<ProjectCategoryIndicators> {
         val project = structureService.getProject(projectId)
         val indicators = indicatorService.getProjectIndicators(project, all)
-        return ProjectIndicators(
-                project = project,
-                categories = indicators.groupBy(
-                        keySelector = { indicator ->
-                            indicator.type.category
-                        }
-                ).map { (category, indicators) ->
-                    ProjectCategoryIndicators(
-                            project = project,
-                            category = category,
-                            indicators = indicators.map { indicator ->
-                                toProjectIndicator(project, indicator)
-                            }
-                    )
+        return indicators.groupBy(
+                keySelector = { indicator ->
+                    indicator.type.category
                 }
-        )
+        ).map { (category, indicators) ->
+            ProjectCategoryIndicators(
+                    project = project,
+                    category = category,
+                    indicators = indicators.map { indicator ->
+                        toProjectIndicator(project, indicator)
+                    }
+            )
+        }
+    }
+
+    override fun getProjectIndicators(projectId: ID): List<ProjectIndicator> {
+        val project = structureService.getProject(projectId)
+        val indicators = indicatorService.getProjectIndicators(project, all = true)
+        return indicators.map { toProjectIndicator(project, it) }
+    }
+
+    override fun findProjectIndicatorByType(projectId: ID, typeId: String): ProjectIndicator? {
+        val project = structureService.getProject(projectId)
+        val indicator = indicatorService.getProjectIndicator(project, typeId)
+        return toProjectIndicator(project, indicator)
     }
 
     override fun getPreviousIndicator(projectIndicator: ProjectIndicator): ProjectIndicator {

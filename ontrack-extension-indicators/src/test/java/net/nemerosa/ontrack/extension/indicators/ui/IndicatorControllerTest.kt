@@ -28,12 +28,6 @@ class IndicatorControllerTest {
     }
 
     @Test
-    fun getAllProjectIndicators() {
-        controller.getAllProjectIndicators(ID.of(1))
-        verify(projectIndicatorService).getProjectIndicators(ID.of(1), true)
-    }
-
-    @Test
     fun getUpdateFormForIndicator() {
         val form = Form.create()
         whenever(projectIndicatorService.getUpdateFormForIndicator(ID.of(1), "type")).thenReturn(form)
