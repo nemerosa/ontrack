@@ -55,7 +55,7 @@ class IndicatorServiceImpl(
         }
     }
 
-    override fun <T> getAllProjectIndicators(project: Project, type: IndicatorType<T, *>, offset: Int, size: Int): IndicatorHistory<T> {
+    override fun <T> getProjectIndicatorHistory(project: Project, type: IndicatorType<T, *>, offset: Int, size: Int): IndicatorHistory<T> {
         val indicators = indicatorStore.loadIndicatorHistory(project, type.id, offset, size).map { stored ->
             toIndicator(stored, type)
         }

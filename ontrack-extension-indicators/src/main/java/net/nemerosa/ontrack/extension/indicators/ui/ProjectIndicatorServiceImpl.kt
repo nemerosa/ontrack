@@ -53,7 +53,7 @@ class ProjectIndicatorServiceImpl(
         // Gets the indicator type
         val type = indicatorTypeService.getTypeById(projectIndicator.type.id)
         // Gets the history of the indicator
-        val history = indicatorService.getAllProjectIndicators(projectIndicator.project, type, offset, size)
+        val history = indicatorService.getProjectIndicatorHistory(projectIndicator.project, type, offset, size)
         // Translates it
         return ProjectIndicatorHistory(
                 items = history.items.map { indicator ->

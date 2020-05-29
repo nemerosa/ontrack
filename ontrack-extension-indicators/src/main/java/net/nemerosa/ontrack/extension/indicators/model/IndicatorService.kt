@@ -46,7 +46,7 @@ interface IndicatorService {
      * @param size History size
      * @return History of this indicator
      */
-    fun <T> getAllProjectIndicators(project: Project, type: IndicatorType<T, *>, offset: Int, size: Int): IndicatorHistory<T>
+    fun <T> getProjectIndicatorHistory(project: Project, type: IndicatorType<T, *>, offset: Int, size: Int): IndicatorHistory<T>
 
 
 }
