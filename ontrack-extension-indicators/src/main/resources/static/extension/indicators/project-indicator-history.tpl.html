@@ -1,0 +1,59 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingIndicatorHistory">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicator history...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="history.pageInfo.totalSize == 0">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                No history available... Wrong link perhaps?
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover" ng-if="history.pageInfo.totalSize > 0">
+        <thead>
+        <tr>
+            <th colspan="4">
+                <ot-extension-indicators-type-name type="indicator.type"></ot-extension-indicators-type-name>
+                ({{indicator.type.category.name}})
+            </th>
+        </tr>
+        <tr class="text-muted">
+            <td>Value</td>
+            <td>Status</td>
+            <td>Comment</td>
+            <td>Signature</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in history.pageItems">
+            <td>
+                <span ng-if="item.value">
+                    <ot-include value="item.value" template="extension/{{indicator.type.valueType.feature.id}}/indicators/{{indicator.type.valueType.id}}.tpl.html"></ot-include>
+                </span>
+            </td>
+            <td>
+                <ot-extension-indicators-status status="item" size="sm"></ot-extension-indicators-status>
+            </td>
+            <td>
+                <span ng-bind-html="item.annotatedComment"></span>
+            </td>
+            <td>
+                <span ng-if="item.value">
+                    <ot-creation creation="item.signature"></ot-creation>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

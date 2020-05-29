@@ -323,6 +323,108 @@ angular.module('ontrack.extension.indicators', [
 
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('project-indicator-history', {
+            url: '/extension/indicators/project-indicators/{project}/{type}/history',
+            templateUrl: 'extension/indicators/project-indicator-history.tpl.html',
+            controller: 'ProjectIndicatorHistoryCtrl'
+        });
+    })
+    .controller('ProjectIndicatorHistoryCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+
+        const projectId = $stateParams.project;
+        const typeId = $stateParams.type;
+        $scope.loadingIndicatorHistory = true;
+
+        const view = ot.view();
+        view.title = "";
+
+        const query = `
+            query IndicatorHistory($project: Int!, $type: String!) {
+              projects(id: $project) {
+                id
+                name
+                projectIndicators {
+                  indicators(type: $type) {
+                    type {
+                      id
+                      name
+                      link
+                      valueType {
+                        id
+                        feature {
+                          id
+                        }
+                      }
+                      category {
+                        id
+                        name
+                      }
+                    }
+                    history(offset: 0, size: 10) {
+                      pageInfo {
+                        totalSize
+                        nextPage {
+                          offset
+                          size
+                        }
+                        previousPage {
+                          offset
+                          size
+                        }
+                      }
+                      pageItems {
+                        value
+                        compliance
+                        rating
+                        annotatedComment
+                        signature {
+                          user
+                          time
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+`;
+
+        const queryVars = {
+            project: projectId,
+            type: typeId
+        };
+
+        let viewInitialized = false;
+
+        const loadIndicatorHistory = () => {
+            $scope.loadingIndicatorHistory = true;
+            otGraphqlService.pageGraphQLCall(query, queryVars).then((data) => {
+
+                $scope.project = data.projects[0];
+                $scope.indicator = $scope.project.projectIndicators.indicators[0];
+                $scope.history = $scope.indicator.history;
+
+                if (!viewInitialized) {
+                    // Title
+                    view.title = `Project indicator for ${$scope.project.name}`;
+                    // View configuration
+                    view.breadcrumbs = ot.projectBreadcrumbs($scope.project);
+                    // Commands
+                    view.commands = [
+                        ot.viewCloseCommand(`/extension/indicators/project-indicators/${projectId}`)
+                    ];
+                    // OK
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingIndicatorHistory = false;
+            });
+        };
+
+        loadIndicatorHistory();
+
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('portfolios', {
             url: '/extension/indicators/portfolios',
             templateUrl: 'extension/indicators/portfolios.tpl.html',
