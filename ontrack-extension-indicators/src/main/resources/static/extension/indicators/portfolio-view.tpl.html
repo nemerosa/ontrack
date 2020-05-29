@@ -45,7 +45,6 @@
         <thead>
         <tr>
             <td>
-                <b>Projects</b>
                 <form class="form-inline">
                     <div class="form-group">
                         <!--suppress XmlInvalidId -->
@@ -73,8 +72,7 @@
         <tbody>
         <tr ng-repeat="project in portfolio.projects">
             <td>
-                <a href="{{project.links._page}}" title="Project page">{{project.name}}</a>
-                <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Manage the project indicators for the {{project.name}} project"><span class="fa fa-pencil ot-command"></span></a>
+                <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Manage the project indicators for the {{project.name}} project">{{project.name}}</a>
             </td>
             <td ng-repeat-start="projectCategory in project.projectIndicators.categories" style="width: 36px;">
                 <ot-extension-indicators-status status="projectCategory.stats" size="md"></ot-extension-indicators-status>
