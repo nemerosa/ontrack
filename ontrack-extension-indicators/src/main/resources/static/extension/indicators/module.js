@@ -238,6 +238,7 @@ angular.module('ontrack.extension.indicators', [
                         _delete
                       }
                       type {
+                        id
                         name
                         link
                         valueType {
