@@ -75,6 +75,45 @@ class IndicatorIT : AbstractIndicatorsTestSupport() {
     }
 
     @Test
+    fun `Previous indicator, ignoring items when value does not change`() {
+        val category = category()
+        val type = category.percentageType()
+        project {
+            // Setting a sequence indicators, changing only the comment in between
+            indicator(type, 40.percent(), comment = "Not very good") // Initial value
+            indicator(type, 60.percent()) // Setting a new value
+            indicator(type, 60.percent(), comment = "We did better") // Changing only the comment, not the value
+            // Gets a previous indicator
+            asAdmin {
+                indicatorService.getPreviousProjectIndicator(project, type).apply {
+                    assertEquals(type.id, this.type.id)
+                    // Checks this is the old value
+                    assertEquals(40, value?.value)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Previous indicator, ignoring items when value does not change and no previous different value`() {
+        val category = category()
+        val type = category.integerType()
+        project {
+            // Setting a sequence indicators, changing only the comment in between
+            indicator(type, 8) // Setting a new value
+            indicator(type, 8, comment = "Adjusting the comment") // Changing only the comment, not the value
+            // Gets a previous indicator
+            asAdmin {
+                indicatorService.getPreviousProjectIndicator(project, type).apply {
+                    assertEquals(type.id, this.type.id)
+                    // Checks that there is no value
+                    assertNull(value, "No previous value")
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Deleting a type deletes the associated indicators`() {
         val category = category()
         val type = category.booleanType()
