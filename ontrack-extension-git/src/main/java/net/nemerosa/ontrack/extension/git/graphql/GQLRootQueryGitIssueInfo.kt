@@ -4,18 +4,19 @@ import graphql.Scalars.GraphQLString
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNonNull
+import net.nemerosa.ontrack.extension.git.GitIssueSearchExtension
 import net.nemerosa.ontrack.extension.git.model.OntrackGitIssueInfo
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
-import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.SearchRequest
+import net.nemerosa.ontrack.model.structure.SearchService
 import org.springframework.stereotype.Component
 
 @Component
 class GQLRootQueryGitIssueInfo(
         private val ontrackGitIssueInfo: OntrackGitIssueInfoGQLType,
-        private val structureService: StructureService,
+        private val searchService: SearchService,
         private val gitService: GitService
 ) : GQLRootQuery {
 
@@ -28,34 +29,30 @@ class GQLRootQueryGitIssueInfo(
                                 .description("Issue key")
                                 .type(GraphQLNonNull(GraphQLString))
                     }
-                    .argument {
-                        it.name(ARG_PROJECT)
-                                .description("Name of the project where to restrict the search " +
-                                        "(optional, but giving this information will improve the performances")
-                                .type(GraphQLString)
-                    }
                     .type(ontrackGitIssueInfo.typeRef)
                     .dataFetcher { env -> getOntrackGitIssueInfo(env) }
                     .build()
 
     private fun getOntrackGitIssueInfo(env: DataFetchingEnvironment): OntrackGitIssueInfo? {
         val issue: String = env.getArgument(ARG_ISSUE)
-        val projectName: String? = env.getArgument(ARG_PROJECT)
+        // Looking for the project based on the commit only
+        val results = searchService.paginatedSearch(SearchRequest(
+                token = issue,
+                type = GitIssueSearchExtension.GIT_ISSUE_SEARCH_RESULT_TYPE
+        ))
         // Getting the project
-        val project: Project = if (projectName != null) {
-            structureService.findProjectByNameIfAuthorized(projectName)
-                    ?: throw ProjectNotFoundException(projectName)
-        }
-        // If project is not given as a hint, we need to identify the project first
-        else {
-            TODO("Getting the project from a Git commit")
+        val project: Project? = if (results.items.isEmpty() || results.items.size > 1) {
+            null
+        } else {
+            val result = results.items.first()
+            val data = result.data
+            data?.get(GitIssueSearchExtension.GIT_ISSUE_SEARCH_RESULT_DATA_PROJECT) as? Project?
         }
         // Calling the Git service
-        return gitService.getIssueProjectInfo(project.id, issue)
+        return project?.let { gitService.getIssueProjectInfo(it.id, issue) }
     }
 
     companion object {
         const val ARG_ISSUE = "issue"
-        const val ARG_PROJECT = "project"
     }
 }
