@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.repository.support.store
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import java.time.LocalDateTime
 
-class EntityDataStoreFilter
+data class EntityDataStoreFilter
 @JvmOverloads
 constructor(
         val entity: ProjectEntity? = null,
@@ -11,6 +11,8 @@ constructor(
         val name: String? = null,
         val group: String? = null,
         val beforeTime: LocalDateTime? = null,
+        val jsonFilter: String? = null,
+        val jsonFilterCriterias: Map<String, String>? = null,
         val offset: Int = 0,
         val count: Int = 20
 ) {
@@ -20,6 +22,8 @@ constructor(
             name,
             group,
             beforeTime,
+            jsonFilter,
+            jsonFilterCriterias,
             offset,
             count
     )
@@ -30,6 +34,8 @@ constructor(
             name,
             group,
             beforeTime,
+            jsonFilter,
+            jsonFilterCriterias,
             offset,
             count
     )
@@ -40,6 +46,8 @@ constructor(
             name,
             group,
             beforeTime,
+            jsonFilter,
+            jsonFilterCriterias,
             offset,
             count
     )
@@ -50,6 +58,8 @@ constructor(
             name,
             group,
             beforeTime,
+            jsonFilter,
+            jsonFilterCriterias,
             offset,
             count
     )
@@ -60,6 +70,8 @@ constructor(
             name,
             group,
             beforeTime,
+            jsonFilter,
+            jsonFilterCriterias,
             offset,
             count
     )
@@ -70,6 +82,8 @@ constructor(
             name,
             group,
             beforeTime,
+            jsonFilter,
+            jsonFilterCriterias,
             offset,
             count
     )
@@ -80,35 +94,22 @@ constructor(
             name,
             group,
             beforeTime,
+            jsonFilter,
+            jsonFilterCriterias,
             offset,
             count
     )
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is EntityDataStoreFilter) return false
-
-        if (entity != other.entity) return false
-        if (category != other.category) return false
-        if (name != other.name) return false
-        if (group != other.group) return false
-        if (beforeTime != other.beforeTime) return false
-        if (offset != other.offset) return false
-        if (count != other.count) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = entity?.hashCode() ?: 0
-        result = 31 * result + (category?.hashCode() ?: 0)
-        result = 31 * result + (name?.hashCode() ?: 0)
-        result = 31 * result + (group?.hashCode() ?: 0)
-        result = 31 * result + (beforeTime?.hashCode() ?: 0)
-        result = 31 * result + offset
-        result = 31 * result + count
-        return result
-    }
-
+    fun withJsonFilter(jsonFilter: String, vararg criterias: Pair<String, String>) = EntityDataStoreFilter(
+            entity,
+            category,
+            name,
+            group,
+            beforeTime,
+            jsonFilter,
+            mapOf(*criterias),
+            offset,
+            count
+    )
 
 }

@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import net.nemerosa.ontrack.repository.support.store.*
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -66,7 +65,7 @@ class EntityDataStoreJdbcRepository(
         )
         // Existing record
         return if (id != null) {
-            namedParameterJdbcTemplate.update(
+            namedParameterJdbcTemplate!!.update(
                     "UPDATE ENTITY_DATA_STORE SET " +
                             "CREATION = :creation, " +
                             "CREATOR = :creator, " +
@@ -95,7 +94,7 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun getRecordAudit(id: Int): List<EntityDataStoreRecordAudit> {
-        return namedParameterJdbcTemplate.query(
+        return namedParameterJdbcTemplate!!.query(
                 "SELECT * FROM ENTITY_DATA_STORE_AUDIT " +
                         "WHERE RECORD_ID = :recordId " +
                         "ORDER BY ID DESC",
@@ -109,7 +108,7 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun deleteByName(entity: ProjectEntity, category: String, name: String) {
-        namedParameterJdbcTemplate.update(String.format(
+        namedParameterJdbcTemplate!!.update(String.format(
                 "DELETE FROM ENTITY_DATA_STORE " +
                         "WHERE %s = :entityId " +
                         "AND CATEGORY = :category " +
@@ -123,7 +122,7 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun deleteByGroup(entity: ProjectEntity, category: String, groupName: String) {
-        namedParameterJdbcTemplate.update(String.format(
+        namedParameterJdbcTemplate!!.update(String.format(
                 "DELETE FROM ENTITY_DATA_STORE " +
                         "WHERE %s = :entityId " +
                         "AND CATEGORY = :category " +
@@ -137,7 +136,7 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun deleteByCategoryBefore(category: String, beforeTime: LocalDateTime) {
-        namedParameterJdbcTemplate.update(
+        namedParameterJdbcTemplate!!.update(
                 "DELETE FROM ENTITY_DATA_STORE " +
                         "WHERE CATEGORY = :category " +
                         "AND CREATION <= :beforeTime",
@@ -171,7 +170,7 @@ class EntityDataStoreJdbcRepository(
 
     override fun findLastByCategoryAndGroupAndName(entity: ProjectEntity, category: String, groupName: String, name: String): Optional<EntityDataStoreRecord> {
         return getLastByName(
-                namedParameterJdbcTemplate.query(String.format(
+                namedParameterJdbcTemplate!!.query(String.format(
                         "SELECT * FROM ENTITY_DATA_STORE " +
                                 "WHERE %s = :entityId " +
                                 "AND CATEGORY = :category " +
@@ -189,7 +188,7 @@ class EntityDataStoreJdbcRepository(
 
     override fun findLastRecordsByNameInCategory(entity: ProjectEntity, category: String): List<EntityDataStoreRecord> {
         return getLastByName(
-                namedParameterJdbcTemplate.query(String.format(
+                namedParameterJdbcTemplate!!.query(String.format(
                         "SELECT * FROM ENTITY_DATA_STORE " +
                                 "WHERE %s = :entityId " +
                                 "AND CATEGORY = :category " +
@@ -264,7 +263,7 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun getByCategoryAndName(entity: ProjectEntity, category: String, name: String, offset: Int, page: Int): List<EntityDataStoreRecord> {
-        return namedParameterJdbcTemplate.query(String.format(
+        return namedParameterJdbcTemplate!!.query(String.format(
                 "SELECT * FROM ENTITY_DATA_STORE " +
                         "WHERE %s = :entityId " +
                         "AND CATEGORY = :category " +
@@ -282,7 +281,7 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun getByCategory(entity: ProjectEntity, category: String, offset: Int, page: Int): List<EntityDataStoreRecord> {
-        return namedParameterJdbcTemplate.query(String.format(
+        return namedParameterJdbcTemplate!!.query(String.format(
                 "SELECT * FROM ENTITY_DATA_STORE " +
                         "WHERE %s = :entityId " +
                         "AND CATEGORY = :category " +
@@ -298,7 +297,7 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun getCountByCategoryAndName(entity: ProjectEntity, category: String, name: String): Int {
-        return namedParameterJdbcTemplate.queryForObject(String.format(
+        return namedParameterJdbcTemplate!!.queryForObject(String.format(
                 "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
                         "WHERE %s = :entityId " +
                         "AND CATEGORY = :category " +
@@ -309,11 +308,11 @@ class EntityDataStoreJdbcRepository(
                         .addValue("category", category)
                         .addValue("name", name),
                 Int::class.java
-        )
+        ) ?: 0
     }
 
     override fun getCountByCategory(entity: ProjectEntity, category: String): Int {
-        return namedParameterJdbcTemplate.queryForObject(String.format(
+        return namedParameterJdbcTemplate!!.queryForObject(String.format(
                 "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
                         "WHERE %s = :entityId " +
                         "AND CATEGORY = :category ",
@@ -322,11 +321,11 @@ class EntityDataStoreJdbcRepository(
                 params("entityId", entity.id())
                         .addValue("category", category),
                 Int::class.java
-        )
+        ) ?: 0
     }
 
     override fun deleteAll() {
-        jdbcTemplate.update(
+        jdbcTemplate!!.update(
                 "DELETE FROM ENTITY_DATA_STORE"
         )
     }
@@ -338,14 +337,14 @@ class EntityDataStoreJdbcRepository(
         val params = MapSqlParameterSource()
         buildCriteria(entityDataStoreFilter, critera, params)
         // Runs the query
-        return namedParameterJdbcTemplate.query(String.format(
-                "SELECT * FROM ENTITY_DATA_STORE " +
-                        "WHERE 1 = 1 " +
-                        " %s " +
-                        "ORDER BY CREATION DESC, ID DESC " +
-                        "LIMIT :page OFFSET :offset",
-                critera
-        ),
+        return namedParameterJdbcTemplate!!.query(
+                """
+                    SELECT * 
+                    FROM ENTITY_DATA_STORE 
+                    WHERE 1 = 1  
+                    $critera 
+                    ORDER BY CREATION DESC, ID DESC 
+                    LIMIT :page OFFSET :offset""",
                 params
                         .addValue("offset", entityDataStoreFilter.offset)
                         .addValue("page", entityDataStoreFilter.count)
@@ -357,7 +356,7 @@ class EntityDataStoreJdbcRepository(
         val params = MapSqlParameterSource()
         buildCriteria(entityDataStoreFilter, critera, params)
         // Runs the query
-        return namedParameterJdbcTemplate.queryForObject(String.format(
+        return namedParameterJdbcTemplate!!.queryForObject(String.format(
                 "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
                         "WHERE 1 = 1 " +
                         " %s " +
@@ -368,7 +367,7 @@ class EntityDataStoreJdbcRepository(
                         .addValue("offset", entityDataStoreFilter.offset)
                         .addValue("page", entityDataStoreFilter.count),
                 Int::class.java
-        )
+        ) ?: 0
     }
 
     override fun deleteByFilter(entityDataStoreFilter: EntityDataStoreFilter): Int { // SQL criterias
@@ -376,7 +375,7 @@ class EntityDataStoreJdbcRepository(
         val params = MapSqlParameterSource()
         buildCriteria(entityDataStoreFilter, critera, params)
         // Runs the query
-        return namedParameterJdbcTemplate.update(
+        return namedParameterJdbcTemplate!!.update(
                 "DELETE FROM ENTITY_DATA_STORE WHERE 1 = 1 $critera",
                 params
         )
@@ -387,7 +386,7 @@ class EntityDataStoreJdbcRepository(
         val params = MapSqlParameterSource()
         buildCriteria(entityDataStoreFilter, critera, params)
         // Runs the query
-        return namedParameterJdbcTemplate.update("""
+        return namedParameterJdbcTemplate!!.update("""
                 DELETE FROM ENTITY_DATA_STORE
                 WHERE ctid IN (
                     SELECT ctid
@@ -429,10 +428,19 @@ class EntityDataStoreJdbcRepository(
             criteria.append(" AND CREATION <= :beforeTime")
             params.addValue("beforeTime", dateTimeForDB(filter.beforeTime))
         }
+        // JSON filter
+        if (!filter.jsonFilter.isNullOrBlank()) {
+            criteria.append(" AND ${filter.jsonFilter}")
+            filter.jsonFilterCriterias?.apply {
+                forEach { (name, value) ->
+                    params.addValue(name, value)
+                }
+            }
+        }
     }
 
     private fun audit(type: EntityDataStoreRecordAuditType, recordId: Int, signature: Signature) {
-        namedParameterJdbcTemplate.update(
+        namedParameterJdbcTemplate!!.update(
                 "INSERT INTO ENTITY_DATA_STORE_AUDIT(RECORD_ID, AUDIT_TYPE, TIMESTAMP, CREATOR) " +
                         "VALUES (:recordId, :auditType, :timestamp, :user)",
                 params("recordId", recordId)

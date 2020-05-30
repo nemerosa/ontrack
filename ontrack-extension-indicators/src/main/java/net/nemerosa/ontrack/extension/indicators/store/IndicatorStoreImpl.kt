@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.asJsonString
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -64,18 +65,24 @@ class IndicatorStoreImpl(
         }
     }
 
-    override fun loadPreviousIndicator(project: Project, typeId: String): StoredIndicator? =
-            entityDataStore.getByFilter(
-                    EntityDataStoreFilter(project)
-                            .withCategory(STORE_CATEGORY)
-                            .withName(typeId)
-                            .withCount(2)
-            )
-                    .drop(1)
-                    .firstOrNull()
-                    ?.let {
-                        toStoredIndicator(it)
-                    }
+    override fun loadPreviousIndicator(project: Project, typeId: String): StoredIndicator? {
+        // We need the current value
+        val current = loadIndicator(project, typeId) ?: return null
+        // Gets its JSON value
+        val json = current.value.asJsonString()
+        // Getting the first indicator whose value if different than the current one
+        return entityDataStore.getByFilter(
+                EntityDataStoreFilter(project)
+                        .withCategory(STORE_CATEGORY)
+                        .withName(typeId)
+                        .withCount(2)
+                        .withJsonFilter("json::jsonb->'value' <> CAST(:json AS JSONB)", "json" to json)
+        )
+                .firstOrNull()
+                ?.let {
+                    toStoredIndicator(it)
+                }
+    }
 
     override fun storeIndicator(project: Project, type: String, indicator: StoredIndicator) {
         // Gets the last version of the indicator
