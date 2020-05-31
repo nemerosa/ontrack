@@ -33,12 +33,17 @@ class IndicatorComputingServiceImpl(
     private fun <T, C> saveIndicator(project: Project, indicator: IndicatorComputedValue<T, C>) {
         @Suppress("UNCHECKED_CAST")
         val type = indicatorTypeService.getTypeById(indicator.type.id) as IndicatorType<T, C>
-        indicatorService.updateProjectIndicator(
-                project,
-                type,
-                indicator.value,
-                indicator.comment
-        )
+        // Gets current value
+        val current = indicatorService.getProjectIndicator(project, type)
+        // If value is different, then stores the value value
+        if (indicator.value != current.value) {
+            indicatorService.updateProjectIndicator(
+                    project,
+                    type,
+                    indicator.value,
+                    indicator.comment
+            )
+        }
     }
 
     private fun prepareTypes(source: IndicatorSource, indicators: List<IndicatorComputedValue<*, *>>) {
