@@ -96,6 +96,68 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
     }
 
     @Test
+    fun `No change, no record`() {
+        // Values to set
+        val computer = testIndicatorComputer(
+                valueCoverage = 70.percent(),
+                valueSpringBoot = null,
+                valueDocker = null
+        )
+        project {
+            asAdmin {
+                // Computing...
+                indicatorComputingService.compute(computer, this)
+                computer.assertIndicatorValueIs(this, computer.typeCoverage, 70.percent())
+                // Computing again...
+                indicatorComputingService.compute(computer, this)
+                computer.assertIndicatorValueIs(this, computer.typeCoverage, 70.percent())
+                // Checks that there is only one item in the history
+                asUserWithView {
+                    val history = indicatorService.getProjectIndicatorHistory(
+                            this,
+                            indicatorTypeService.getTypeById(computer.typeCoverage.id),
+                            offset = 0, size = 10
+                    )
+                    assertEquals(1, history.total)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Recording history`() {
+        // Values to set
+        val computer = testIndicatorComputer(
+                valueCoverage = 70.percent(),
+                valueSpringBoot = null,
+                valueDocker = null
+        )
+        project {
+            asAdmin {
+                // Computing...
+                indicatorComputingService.compute(computer, this)
+                computer.assertIndicatorValueIs(this, computer.typeCoverage, 70.percent())
+                // Computing again, with a different value
+                computer.valueCoverage = 55.percent()
+                indicatorComputingService.compute(computer, this)
+                computer.assertIndicatorValueIs(this, computer.typeCoverage, 55.percent())
+                // Checks the history
+                asUserWithView {
+                    val history = indicatorService.getProjectIndicatorHistory(
+                            this,
+                            indicatorTypeService.getTypeById(computer.typeCoverage.id),
+                            offset = 0, size = 10
+                    )
+                    assertEquals(
+                            listOf(55, 70),
+                            history.items.map { (it.value as Percentage).value }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Branch computed indicators when no branch`() {
         val computer = TestBranchIndicatorComputer()
         project {
@@ -183,7 +245,7 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
             private val coverage: Boolean,
             private val springBoot: Boolean,
             private val docker: Boolean,
-            private val valueCoverage: Percentage?,
+            var valueCoverage: Percentage?,
             private val valueSpringBoot: Boolean?,
             private val valueDocker: Boolean?
     ) : IndicatorComputer {
