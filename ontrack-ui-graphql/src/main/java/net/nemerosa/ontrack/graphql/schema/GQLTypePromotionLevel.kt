@@ -5,10 +5,16 @@ import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.graphql.support.GraphqlUtils
+import net.nemerosa.ontrack.graphql.support.dateTimeArgument
+import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
+import net.nemerosa.ontrack.graphql.support.stringArgument
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class GQLTypePromotionLevel(
@@ -17,6 +23,8 @@ class GQLTypePromotionLevel(
         private val promotionRun: GQLTypePromotionRun,
         projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
         private val projectEntityInterface: GQLProjectEntityInterface,
+        private val paginatedListFactory: GQLPaginatedListFactory,
+        private val buildDisplayNameService: BuildDisplayNameService,
         freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : AbstractGQLProjectEntity<PromotionLevel>(
         PromotionLevel::class.java,
@@ -47,11 +55,63 @@ class GQLTypePromotionLevel(
             // Promotion runs
             .field {
                 it.name("promotionRuns")
+                        .deprecate("Use the paginated promotion runs with the `promotionRunsPaginated` field.")
                         .description("List of runs for this promotion")
                         .type(GraphqlUtils.stdList(promotionRun.typeRef))
                         .argument(GraphqlUtils.stdListArguments())
                         .dataFetcher(promotionLevelPromotionRunsFetcher())
             }
+            // Paginated promotion runs
+            .field(
+                    paginatedListFactory.createPaginatedField<PromotionLevel, PromotionRun>(
+                            cache = cache,
+                            fieldName = "promotionRunsPaginated",
+                            fieldDescription = "Paginated list of promotion runs",
+                            itemType = promotionRun,
+                            arguments = listOf(
+                                    dateTimeArgument(ARG_BEFORE_DATE, "Keeps only runs before this data / time"),
+                                    dateTimeArgument(ARG_AFTER_DATE, "Keeps only runs after this data / time"),
+                                    stringArgument(ARG_NAME, "Regular expression on the name of the build name"),
+                                    stringArgument(ARG_VERSION, "Regular expression on the release property attached to the build name")
+                            ),
+                            itemPaginatedListProvider = { env, promotionLevel, offset, size ->
+                                val beforeDate: LocalDateTime? = env.getArgument(ARG_BEFORE_DATE)
+                                val afterDate: LocalDateTime? = env.getArgument(ARG_AFTER_DATE)
+                                val name: String? = env.getArgument(ARG_NAME)
+                                val version: String? = env.getArgument(ARG_VERSION)
+                                // Promotion run filter
+                                var filter: (PromotionRun) -> Boolean = { true }
+                                if (beforeDate != null) {
+                                    filter = filter and { run ->
+                                        run.signature.time <= beforeDate
+                                    }
+                                }
+                                if (afterDate != null) {
+                                    filter = filter and { run ->
+                                        run.signature.time >= afterDate
+                                    }
+                                }
+                                if (!name.isNullOrBlank()) {
+                                    val r = name.toRegex()
+                                    filter = filter and { run ->
+                                        run.build.name.matches(r)
+                                    }
+                                }
+                                if (!version.isNullOrBlank()) {
+                                    val r = version.toRegex()
+                                    filter = filter and { run ->
+                                        val version = buildDisplayNameService.getBuildDisplayName(run.build)
+                                        version.matches(r)
+                                    }
+                                }
+                                // Gets the filtered list of promotion runs
+                                val runs = structureService.getPromotionRunsForPromotionLevel(promotionLevel.id)
+                                        .filter(filter)
+                                // Pagination
+                                PaginatedList.Companion.create(runs, offset, size)
+                            }
+                    )
+            )
             // OK
             .build()
 
@@ -70,6 +130,13 @@ class GQLTypePromotionLevel(
 
     companion object {
         const val PROMOTION_LEVEL = "PromotionLevel"
+
+        // Filtering for the paginated promotion runs
+
+        const val ARG_AFTER_DATE = "afterDate"
+        const val ARG_BEFORE_DATE = "beforeDate"
+        const val ARG_NAME = "name"
+        const val ARG_VERSION = "version"
     }
 
 }
