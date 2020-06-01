@@ -100,8 +100,8 @@ class GQLTypePromotionLevel(
                                 if (!version.isNullOrBlank()) {
                                     val r = version.toRegex()
                                     filter = filter and { run ->
-                                        val version = buildDisplayNameService.getBuildDisplayName(run.build)
-                                        version.matches(r)
+                                        val buildVersion = buildDisplayNameService.getBuildDisplayName(run.build)
+                                        buildVersion.matches(r)
                                     }
                                 }
                                 // Gets the filtered list of promotion runs
