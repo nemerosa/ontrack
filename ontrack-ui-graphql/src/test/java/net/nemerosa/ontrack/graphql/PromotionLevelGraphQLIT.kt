@@ -82,4 +82,52 @@ class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Paginated list of promotion runs filter by build name`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                (5..25).forEach { no ->
+                    build(name = "1.$no") {
+                        promote(pl)
+                    }
+                }
+                // Getting a paginated list of promotion runs, filtered by build name
+                val query = """
+                    query PromotionRuns(${'$'}id: Int!, ${'$'}name: String!) {
+                        promotionLevel(id: ${'$'}id) {
+                            promotionRunsPaginated(name: ${'$'}name, size: 5) {
+                                pageInfo {
+                                    totalSize
+                                    previousPage { offset size }
+                                    nextPage { offset size }
+                                }
+                                pageItems {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """
+                // Getting the first page
+                run(query, mapOf("id" to pl.id(), "name" to "1\\.1.*")).apply {
+                    val field = path("promotionLevel").path("promotionRunsPaginated")
+                    assertEquals(10, field["pageInfo"]["totalSize"].asInt())
+                    assertTrue(field["pageInfo"]["previousPage"].isNullOrNullNode())
+                    assertNotNull(field["pageInfo"]["nextPage"]) {
+                        assertEquals(5, it["offset"].asInt())
+                        assertEquals(5, it["size"].asInt())
+                    }
+                    val items = field["pageItems"]
+                    assertEquals(5, items.size())
+                    items.forEachIndexed { index, item ->
+                        assertEquals("1.1${9 - index}", item["build"]["name"].asText())
+                    }
+                }
+            }
+        }
+    }
+
 }
