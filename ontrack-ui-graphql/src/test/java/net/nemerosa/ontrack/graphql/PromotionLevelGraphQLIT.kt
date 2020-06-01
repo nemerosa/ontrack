@@ -1,14 +1,20 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.json.isNullOrNullNode
+import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.Test
+import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
+import kotlin.time.days
+import kotlin.time.toJavaDuration
 
 /**
  * Integration tests around the `promotionLevel` root query.
@@ -179,6 +185,59 @@ class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
                     items.forEachIndexed { index, item ->
                         assertEquals("1.1${9 - index}", item["build"]["releaseProperty"]["value"]["name"].asText())
                         assertEquals("1${9 - index}", item["build"]["name"].asText())
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Paginated list of promotion runs filter by date`() {
+        val refTime = Time.now()
+        project {
+            branch {
+                val pl = promotionLevel()
+                (1..20).forEach { no ->
+                    build(name = "$no") {
+                        promote(pl, signature = Signature.of(refTime - Duration.ofDays((20 - no).toLong()), "test"))
+                    }
+                }
+                // Getting a paginated list of promotion runs, filtered by date
+                val query = """
+                    query PromotionRuns(${'$'}id: Int!, ${'$'}beforeDate: LocalDateTime, ${'$'}afterDate: LocalDateTime) {
+                        promotionLevel(id: ${'$'}id) {
+                            promotionRunsPaginated(beforeDate: ${'$'}beforeDate, afterDate: ${'$'}afterDate, size: 5) {
+                                pageInfo {
+                                    totalSize
+                                    previousPage { offset size }
+                                    nextPage { offset size }
+                                }
+                                pageItems {
+                                    build {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """
+                // Getting the first page
+                run(query, mapOf(
+                        "id" to pl.id(),
+                        "afterDate" to (refTime - Duration.ofDays(15L)),
+                        "beforeDate" to (refTime - Duration.ofDays(5L))
+                )).apply {
+                    val field = path("promotionLevel").path("promotionRunsPaginated")
+                    assertEquals(11, field["pageInfo"]["totalSize"].asInt())
+                    assertTrue(field["pageInfo"]["previousPage"].isNullOrNullNode())
+                    assertNotNull(field["pageInfo"]["nextPage"]) {
+                        assertEquals(5, it["offset"].asInt())
+                        assertEquals(5, it["size"].asInt())
+                    }
+                    val items = field["pageItems"]
+                    assertEquals(5, items.size())
+                    items.forEachIndexed { index, item ->
+                        assertEquals("${15 - index}", item["build"]["name"].asText())
                     }
                 }
             }

@@ -237,12 +237,21 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
     }
 
     protected PromotionRun doPromote(Build build, PromotionLevel promotionLevel, String description) throws Exception {
+        return doPromote(
+                build,
+                promotionLevel,
+                description,
+                Signature.of("test")
+        );
+    }
+
+    protected PromotionRun doPromote(Build build, PromotionLevel promotionLevel, String description, Signature signature) throws Exception {
         return asUser().with(build.projectId(), PromotionRunCreate.class).call(() ->
                 structureService.newPromotionRun(
                         PromotionRun.of(
                                 build,
                                 promotionLevel,
-                                Signature.of("test"),
+                                signature,
                                 description
                         )
                 )
