@@ -1018,7 +1018,8 @@ angular.module('ontrack.extension.indicators', [
             templateUrl: 'extension/indicators/directive.indicators-type-name.tpl.html',
             scope: {
                 type: '='
-            }
+            },
+            transclude: true
         };
     })
     .directive('otExtensionIndicatorsStatsSummary', function () {
