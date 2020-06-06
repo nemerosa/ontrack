@@ -796,6 +796,42 @@ angular.module('ontrack.extension.indicators', [
 
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('portfolio-category-edit', {
+            url: '/extension/indicators/portfolios/{portfolioId}/category/{categoryId}',
+            templateUrl: 'extension/indicators/portfolio-category.tpl.html',
+            controller: 'PortfolioCategoryCtrl'
+        });
+    })
+    .controller('PortfolioCategoryCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+        const portfolioId = $stateParams.categoryId;
+        const categoryId = $stateParams.categoryId;
+        $scope.loadingPortfolioCategory = true;
+
+        const view = ot.view();
+        view.title = "Portfolio category";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+
+        const query = ``;
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('portfolio-type-edit', {
+            url: '/extension/indicators/portfolios/{portfolioId}/type/{typeId}',
+            templateUrl: 'extension/indicators/portfolio-type.tpl.html',
+            controller: 'PortfolioTypeCtrl'
+        });
+    })
+    .controller('PortfolioTypeCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+        const portfolioId = $stateParams.portfolioId;
+        const typeId = $stateParams.typeId;
+        $scope.loadingPortfolioType = true;
+
+        const view = ot.view();
+        view.title = "Portfolio type";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+
+        const query = ``;
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('portfolio-view', {
             url: '/extension/indicators/portfolios/{portfolioId}',
             templateUrl: 'extension/indicators/portfolio-view.tpl.html',

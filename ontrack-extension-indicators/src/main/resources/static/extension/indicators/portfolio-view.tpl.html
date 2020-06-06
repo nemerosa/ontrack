@@ -61,7 +61,7 @@
                 <ot-extension-indicators-status status="categoryStats" size="md"></ot-extension-indicators-status>
             </td>
             <td ng-repeat-end>
-                <p><b>{{categoryStats.category.name}}</b></p>
+                <p><b><a href="#/extension/indicators/portfolios/{{portfolio.id}}/category/{{categoryStats.category.id}}">{{categoryStats.category.name}}</a></b></p>
                 <ot-extension-indicators-stats-summary
                         stats="categoryStats.stats"
                         previous-stats="categoryStats.previousStats"
