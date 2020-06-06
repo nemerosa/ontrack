@@ -802,7 +802,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'PortfolioCategoryCtrl'
         });
     })
-    .controller('PortfolioCategoryCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+    .controller('PortfolioCategoryCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
         const portfolioId = $stateParams.portfolioId;
         const categoryId = $stateParams.categoryId;
         $scope.loadingPortfolioCategory = true;
@@ -878,6 +878,14 @@ angular.module('ontrack.extension.indicators', [
                         project.indicatorsPerType[indicator.type.id] = indicator;
                     });
                 });
+                // View commands
+                if (!viewInitialized) {
+                    view.title = `Portfolio category: ${$scope.category.name}`;
+                    view.commands = [
+                        ot.viewCloseCommand(`/extension/indicators/portfolios/${portfolioId}`)
+                    ];
+                    viewInitialized = true;
+                }
             }).finally(() => {
                 $scope.loadingPortfolioCategory = false;
             });
