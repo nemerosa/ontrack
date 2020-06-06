@@ -31,19 +31,28 @@ class GQLTypeProjectIndicators(
                         .description("List of indicators")
                         .type(stdList(projectIndicator.typeRef))
                         .argument { arg ->
+                            arg.name(ARG_CATEGORY)
+                                    .description("Restriction on the indicator category")
+                                    .type(GraphQLString)
+                        }
+                        .argument { arg ->
                             arg.name(ARG_TYPE)
                                     .description("Restriction on the indicator type")
                                     .type(GraphQLString)
                         }
                         .dataFetcher { env ->
                             val project = env.getSource<ProjectIndicators>().project
+                            val category: String? = env.getArgument(ARG_CATEGORY)
                             val type: String? = env.getArgument(ARG_TYPE)
-                            if (type.isNullOrBlank()) {
-                                projectIndicatorService.getProjectIndicators(project.id)
-                            } else {
+                            if (!type.isNullOrBlank()) {
                                 listOfNotNull(
                                         projectIndicatorService.findProjectIndicatorByType(project.id, type)
                                 )
+                            } else if (!category.isNullOrBlank()) {
+                                projectIndicatorService.getProjectIndicators(project.id)
+                                        .filter { indicator -> indicator.type.category.id == category }
+                            } else {
+                                projectIndicatorService.getProjectIndicators(project.id)
                             }
                         }
             }
@@ -63,5 +72,6 @@ class GQLTypeProjectIndicators(
 
     companion object {
         const val ARG_TYPE = "type"
+        const val ARG_CATEGORY = "category"
     }
 }
