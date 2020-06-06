@@ -803,7 +803,7 @@ angular.module('ontrack.extension.indicators', [
         });
     })
     .controller('PortfolioCategoryCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
-        const portfolioId = $stateParams.categoryId;
+        const portfolioId = $stateParams.portfolioId;
         const categoryId = $stateParams.categoryId;
         $scope.loadingPortfolioCategory = true;
 
@@ -811,7 +811,80 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Portfolio category";
         view.breadcrumbs = ot.homeBreadcrumbs();
 
-        const query = ``;
+        const query = `
+            query PortfolioCategory($portfolio: String!, $category: String!) {
+              indicatorCategories {
+                categories(id: $category) {
+                  id
+                  name
+                  types {
+                    id
+                    name
+                    link
+                    valueType {
+                      id
+                      feature {
+                        id
+                      }
+                    }
+                    valueConfig
+                  }
+                }
+              }
+              indicatorPortfolios(id: $portfolio) {
+                id
+                name
+                projects {
+                  id
+                  name
+                  projectIndicators {
+                    indicators(category: $category) {
+                      type {
+                        id
+                      }
+                      value
+                      compliance
+                      rating
+                      comment
+                      links {
+                        _update
+                        _delete
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        `;
+
+        const queryVariables = {
+            portfolio: portfolioId,
+            category: categoryId
+        };
+
+        let viewInitialized = false;
+
+        const loadPortfolioCategory = () => {
+            $scope.loadingPortfolioCategory = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.category = data.indicatorCategories.categories[0];
+                $scope.types = $scope.category.types;
+                $scope.portfolio = data.indicatorPortfolios[0];
+                $scope.projects = $scope.portfolio.projects;
+                // Indexation of project indicators per type ID
+                $scope.projects.forEach((project) => {
+                    project.indicatorsPerType = {};
+                    project.projectIndicators.indicators.forEach((indicator) => {
+                        project.indicatorsPerType[indicator.type.id] = indicator;
+                    });
+                });
+            }).finally(() => {
+                $scope.loadingPortfolioCategory = false;
+            });
+        };
+
+        loadPortfolioCategory();
+
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-type-edit', {
