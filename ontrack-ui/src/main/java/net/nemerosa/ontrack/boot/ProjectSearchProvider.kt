@@ -46,7 +46,7 @@ class ProjectSearchProvider(
     override val indexName: String = PROJECT_SEARCH_INDEX
 
     override val indexMapping: SearchIndexMapping = indexMappings<ProjectSearchItem> {
-        +ProjectSearchItem::name to keyword { scoreBoost = 3.0 }
+        +ProjectSearchItem::name to keyword { scoreBoost = 4.0 } to text { scoreBoost = 3.0 }
         +ProjectSearchItem::description to text()
     }
 

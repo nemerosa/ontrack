@@ -717,7 +717,12 @@ class SonarQubeIT : AbstractDSLTestSupport() {
             // Sets the settings
             asAdmin {
                 settingsManagerService.saveSettings(
-                        SonarQubeMeasuresSettings(measures, disabled)
+                        SonarQubeMeasuresSettings(
+                                measures = measures,
+                                disabled = disabled,
+                                coverageThreshold = 80,
+                                blockerThreshold = 5
+                        )
                 )
             }
             // Runs the code

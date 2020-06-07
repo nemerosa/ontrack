@@ -337,14 +337,14 @@ class EntityDataStoreJdbcRepository(
         val params = MapSqlParameterSource()
         buildCriteria(entityDataStoreFilter, critera, params)
         // Runs the query
-        return namedParameterJdbcTemplate!!.query(String.format(
-                "SELECT * FROM ENTITY_DATA_STORE " +
-                        "WHERE 1 = 1 " +
-                        " %s " +
-                        "ORDER BY CREATION DESC, ID DESC " +
-                        "LIMIT :page OFFSET :offset",
-                critera
-        ),
+        return namedParameterJdbcTemplate!!.query(
+                """
+                    SELECT * 
+                    FROM ENTITY_DATA_STORE 
+                    WHERE 1 = 1  
+                    $critera 
+                    ORDER BY CREATION DESC, ID DESC 
+                    LIMIT :page OFFSET :offset""",
                 params
                         .addValue("offset", entityDataStoreFilter.offset)
                         .addValue("page", entityDataStoreFilter.count)
@@ -427,6 +427,15 @@ class EntityDataStoreJdbcRepository(
         if (filter.beforeTime != null) {
             criteria.append(" AND CREATION <= :beforeTime")
             params.addValue("beforeTime", dateTimeForDB(filter.beforeTime))
+        }
+        // JSON filter
+        if (!filter.jsonFilter.isNullOrBlank()) {
+            criteria.append(" AND ${filter.jsonFilter}")
+            filter.jsonFilterCriterias?.apply {
+                forEach { (name, value) ->
+                    params.addValue(name, value)
+                }
+            }
         }
     }
 

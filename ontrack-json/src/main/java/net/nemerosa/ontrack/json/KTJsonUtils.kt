@@ -77,3 +77,9 @@ fun JsonNode.getInt(field: String): Int? =
  */
 inline fun <reified E : Enum<E>> JsonNode.getRequiredEnum(field: String): E =
         getEnum<E>(field) ?: throw JsonMissingFieldException(field)
+
+/**
+ * Checks if a JSON node can be considered as null, either by being `null` itself
+ * or by being an instance of the [null node][JsonNode.isNull].
+ */
+fun JsonNode?.isNullOrNullNode() = this == null || this.isNull

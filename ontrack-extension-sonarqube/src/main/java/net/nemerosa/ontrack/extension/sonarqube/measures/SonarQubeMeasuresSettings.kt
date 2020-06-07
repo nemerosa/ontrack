@@ -9,14 +9,20 @@ import net.nemerosa.ontrack.extension.sonarqube.SonarQubeMeasuresList
  */
 class SonarQubeMeasuresSettings(
         override val measures: List<String>,
-        val disabled: Boolean
+        val disabled: Boolean,
+        val coverageThreshold: Int,
+        val blockerThreshold: Int
 ) : SonarQubeMeasuresList {
 
     companion object {
+        val BLOCKER_VIOLATIONS = "blocker_violations"
+        val COVERAGE = "coverage"
+
         val DEFAULT_MEASURES = listOf(
-                "critical_violations",
-                "coverage"
+                BLOCKER_VIOLATIONS,
+                COVERAGE
         )
+
     }
 
 }

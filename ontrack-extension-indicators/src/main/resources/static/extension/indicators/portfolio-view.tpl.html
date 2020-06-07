@@ -1,0 +1,90 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingPortfolio">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the portfolio...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="portfolio && portfolio.projects.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                This portfolio does not contain any project.
+                <span ng-if="portfolio.links._update && !portfolio.label">
+                    In order to associate projects to this portfolio, you need
+                    to <a href="#/extension/indicators/portfolios/{{portfolio.id}}/edit">edit this portfolio</a>,
+                    set a label and associate some projects to this label.
+                </span>
+                <span ng-if="portfolio.links._update && portfolio.label">
+                    In order to associate projects to this portfolio, you need to associate some projects to
+                    the <ot-project-label label="portfolio.label"></ot-project-label> label.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                This portfolio does not contain any category.
+                <span ng-if="portfolio.links._update">
+                    In order to associate projects to this portfolio, you need
+                    to <a href="#/extension/indicators/portfolios/{{portfolio.id}}/edit">edit this portfolio</a>
+                    and associate some categories with it.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <table ng-if="portfolio && portfolio.projects.length > 0 && portfolio.categoryStats.length > 0" class="table table-striped">
+        <thead>
+        <tr>
+            <td>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <!--suppress XmlInvalidId -->
+                        <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
+                        <ot-extension-indicators-trend-selection
+                                select-id="trend-selection"
+                                model="pageModel.duration"
+                                on-trend-change="selectTrend()"
+                        ></ot-extension-indicators-trend-selection>
+                    </div>
+                </form>
+            </td>
+            <td ng-repeat-start="categoryStats in portfolio.categoryStats" style="width: 36px;">
+                <ot-extension-indicators-status status="categoryStats" size="md"></ot-extension-indicators-status>
+            </td>
+            <td ng-repeat-end>
+                <p><b>{{categoryStats.category.name}}</b></p>
+                <ot-extension-indicators-stats-summary
+                        stats="categoryStats.stats"
+                        previous-stats="categoryStats.previousStats"
+                        item="portfolio and category"></ot-extension-indicators-stats-summary>
+            </td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="project in portfolio.projects">
+            <td>
+                <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Manage the project indicators for the {{project.name}} project">{{project.name}}</a>
+            </td>
+            <td ng-repeat-start="projectCategory in project.projectIndicators.categories" style="width: 36px;">
+                <ot-extension-indicators-status status="projectCategory.stats" size="md"></ot-extension-indicators-status>
+            </td>
+            <td ng-repeat-end>
+                <ot-extension-indicators-stats-summary
+                        stats="projectCategory.categoryStats.stats"
+                        previous-stats="projectCategory.categoryStats.previousStats"
+                        item="project and category"></ot-extension-indicators-stats-summary>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

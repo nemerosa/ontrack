@@ -38,6 +38,9 @@ class LabelManagementServiceImpl(
         return labelRepository.newLabel(form).toLabel()
     }
 
+    override fun findLabelById(labelId: Int): Label? =
+            labelRepository.findLabelById(labelId)?.toLabel()
+
     override fun getLabel(labelId: Int): Label =
             labelRepository.getLabel(labelId).toLabel()
 

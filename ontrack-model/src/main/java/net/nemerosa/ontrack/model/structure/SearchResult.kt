@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.model.structure
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.net.URI
 
 /**
  * Result for a research
  */
-class SearchResult(
+class SearchResult
+@JvmOverloads
+constructor(
         /**
          * Short title
          */
@@ -29,5 +32,14 @@ class SearchResult(
         /**
          * Type of result
          */
-        val type: SearchResultType
-)
+        val type: SearchResultType,
+        /**
+         * Meta-data which can be used internally
+         */
+        @get:JsonIgnore
+        val data: Map<String, *>? = null
+) {
+    companion object {
+        const val SEARCH_RESULT_ITEM = "item"
+    }
+}

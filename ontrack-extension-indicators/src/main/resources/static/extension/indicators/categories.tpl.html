@@ -1,0 +1,61 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingCategories">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading indicator categories...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="!loadingCategories && categories.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No indicator category is defined yet. <span ng-if="indicatorCategories.links._create">Create one by clicking on this
+                <a class="ot-action" ng-click="createCategory()">link</a>.</span>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-hover table-bordered" ng-if="categories">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Source</th>
+            <th><a href="#/extension/indicators/types" title="Goes to the list of types">Types</a> #</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="category in categories">
+            <td>
+                <code>{{category.id}}</code>
+            </td>
+            <td>
+                {{category.name}}
+            </td>
+            <td>
+                <ot-extension-indicators-source source="category.source"></ot-extension-indicators-source>
+            </td>
+            <td>
+                {{category.types.length}}
+            </td>
+            <td>
+                <a ng-if="category.links._update"
+                   ng-click="editCategory(category)"
+                   title="Edit this category"
+                   ><span class="fa fa-pencil ot-command"></span></a>
+                <a ng-if="category.links._delete"
+                   ng-click="deleteCategory(category)"
+                   title="Deletes this category"
+                   ><span class="fa fa-trash ot-command"></span></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

@@ -1,0 +1,25 @@
+<p ng-if="stats.total > 0">
+    {{stats.count}}/{{stats.total}} indicator<span
+        ng-if="stats.count > 1">s</span> <span
+        ng-if="stats.count > 1">are</span><span
+        ng-if="stats.count <= 1">is</span> rated.
+</p>
+<p ng-if="stats.total == 0">
+    No indicator has been rated for this {{item}}.
+</p>
+<p ng-if="previousStats && previousStats.avgTrend">
+    <ot-extension-indicators-trend-display
+            trend="previousStats.avgTrend"
+            seconds-since="previousStats.durationSeconds"
+            previous-compliance="previousStats.stats.avg"
+            previous-rating="previousStats.stats.avgRating"
+    ></ot-extension-indicators-trend-display>
+</p>
+<p ng-if="stats.minRating != stats.avgRating">
+    {{stats.minCount}} indicator<span ng-if="stats.minCount > 1">s</span>
+    <span ng-if="stats.minCount > 1">are</span><span
+        ng-if="stats.minCount <= 1">is</span> rated
+    <ot-extension-indicators-status
+            status="{compliance: stats.min, rating: stats.minRating }"
+            size="sm"></ot-extension-indicators-status>
+</p>

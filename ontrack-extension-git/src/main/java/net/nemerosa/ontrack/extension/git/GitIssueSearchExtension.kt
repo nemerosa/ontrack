@@ -26,6 +26,11 @@ class GitIssueSearchExtension(
         private val searchIndexService: SearchIndexService
 ) : AbstractExtension(extensionFeature), SearchIndexer<GitIssueSearchItem> {
 
+    companion object {
+        const val GIT_ISSUE_SEARCH_RESULT_TYPE = "git-issue"
+        const val GIT_ISSUE_SEARCH_RESULT_DATA_PROJECT = "project"
+    }
+
     private val logger: Logger = LoggerFactory.getLogger(GitIssueSearchExtension::class.java)
 
 
@@ -72,7 +77,7 @@ class GitIssueSearchExtension(
 
     override val searchResultType = SearchResultType(
             feature = extensionFeature.featureDescription,
-            id = "git-issue",
+            id = GIT_ISSUE_SEARCH_RESULT_TYPE,
             name = "Git Issue",
             description = "Issue key, as present in Git commit messages"
     )
@@ -95,7 +100,11 @@ class GitIssueSearchExtension(
                     uri = uriBuilder.build(on(GitController::class.java).issueProjectInfo(project.id, item.key)),
                     page = uriBuilder.page("extension/git/${project.id}/issue/${item.key}"),
                     accuracy = score,
-                    type = searchResultType
+                    type = searchResultType,
+                    data = mapOf(
+                            GIT_ISSUE_SEARCH_RESULT_DATA_PROJECT to project,
+                            SearchResult.SEARCH_RESULT_ITEM to item
+                    )
             )
         } else null
     }

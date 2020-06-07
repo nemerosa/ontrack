@@ -194,8 +194,8 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     protected fun <T, P : PropertyType<T>> ProjectEntity.property(type: KClass<P>): T? =
             propertyService.getProperty(this, type.java).value
 
-    fun Build.promote(promotionLevel: PromotionLevel) {
-        doPromote(this, promotionLevel, "")
+    fun Build.promote(promotionLevel: PromotionLevel, description: String = "", signature: Signature = Signature.of("test")) {
+        doPromote(this, promotionLevel, description, signature)
     }
 
     /**

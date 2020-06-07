@@ -11,14 +11,31 @@
     <table class="table table-condensed table-hover">
         <thead>
             <tr>
-                <th>Build</th>
+                <th>
+                    Build
+                    <button class="btn btn-link" ng-show="promotionLevel.promotionRuns.pageInfo.previousPage" ng-click="switchPage(promotionLevel.promotionRuns.pageInfo.previousPage)">
+                        <span class="fa fa-step-backward"></span>
+                        Newer ones
+                    </button>
+                    <button class="btn btn-link" ng-show="promotionLevel.promotionRuns.pageInfo.nextPage" ng-click="switchPage(promotionLevel.promotionRuns.pageInfo.nextPage)">
+                        <span class="fa fa-step-forward"></span>
+                        Older ones
+                    </button>
+                    <span ng-show="loadingPromotionLevel">
+                        <span class="ot-loading-indicator"></span>
+                        Loading data...
+                    </span>
+                </th>
                 <th colspan="2">Promotion</th>
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="promotionRun in promotionLevel.promotionRuns">
+        <tr ng-repeat="promotionRun in promotionLevel.promotionRuns.pageItems">
             <td>
-                <a href="#/build/{{promotionRun.build.links._page}}">{{promotionRun.build.name}}</a>
+                <a href="{{promotionRun.build.links._page}}">{{promotionRun.build.name}}</a>
+                <span class="ot-decoration-list">
+                    <ot-entity-embedded-decorations decorations="promotionRun.build.decorations"></ot-entity-embedded-decorations>
+                </span>
             </td>
             <td>
                 <ot-signature value="{time: promotionRun.creation.time, user: {name: promotionRun.creation.user}}" user="true" time="true"></ot-signature>

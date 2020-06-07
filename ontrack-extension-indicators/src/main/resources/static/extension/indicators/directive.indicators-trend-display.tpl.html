@@ -1,0 +1,16 @@
+<span ng-if="trend == 'GROWTH'" class="fa fa-arrow-up text-success" title="Growth"></span>
+<span ng-if="trend == 'SAME'" class="fa fa-arrows-h text-muted" title="No change"></span>
+<span ng-if="trend == 'DECREASE'" class="fa fa-arrow-down text-danger" title="Decrease"></span>
+<span ng-if="trend == 'SAME'">
+        No change in
+        <ot-duration duration="secondsSince" detail="false"></ot-duration>
+    </span>
+<span ng-if="trend != 'SAME'">
+        Was
+        <ot-extension-indicators-status
+                status="{compliance: previousCompliance, rating: previousRating }"
+                size="sm"></ot-extension-indicators-status>
+        <ot-duration duration="secondsSince" detail="false"></ot-duration>
+        ago
+    </span>
+<span ng-transclude></span>

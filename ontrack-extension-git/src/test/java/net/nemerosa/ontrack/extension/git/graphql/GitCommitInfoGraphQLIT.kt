@@ -1,14 +1,97 @@
 package net.nemerosa.ontrack.extension.git.graphql
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.AbstractGitSearchTestSupport
+import net.nemerosa.ontrack.extension.git.GitCommitSearchExtension
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
 
-class GitCommitInfoGraphQLIT : AbstractGitTestSupport() {
+class GitCommitInfoGraphQLIT : AbstractGitSearchTestSupport() {
+
+    @Autowired
+    protected lateinit var gitCommitSearchExtension: GitCommitSearchExtension
 
     @Test
     fun `Getting commit info`() {
+        createRepo {
+            sequenceWithPauses(
+                    (1..10)
+            )
+        } and { repo, commits: Map<Int, String> ->
+            project {
+                gitProject(repo)
+                // Setup
+                branch("master") {
+                    gitBranch("master") {
+                        commitAsProperty()
+                    }
+                    // Creates some builds on this branch, for some commits only
+                    build(1, commits)
+                    build(3, commits)
+                    build(5, commits)
+                    build(9, commits)
+                }
+                // Re-indexes the commits
+                searchIndexService.index(gitCommitSearchExtension)
+                // Getting commit info
+                val data = asUserWithView {
+                    run("""
+                        query CommitInfo(${'$'}commit: String!) {
+                            gitCommitInfo(commit: ${'$'}commit) {
+                                uiCommit {
+                                    annotatedMessage
+                                }
+                                branchInfosList {
+                                    type
+                                    branchInfoList {
+                                        branch {
+                                            name
+                                        }
+                                        firstBuild {
+                                            name
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    """, mapOf(
+                            "commit" to commits.getValue(2)
+                    ))
+                }
+                val gitCommitInfo = data["gitCommitInfo"]
+
+                assertEquals(
+                        mapOf(
+                                "uiCommit" to mapOf(
+                                        "annotatedMessage" to "Commit 2"
+                                ),
+                                "branchInfosList" to listOf(
+                                        mapOf(
+                                                "type" to "Development",
+                                                "branchInfoList" to listOf(
+                                                        mapOf(
+                                                                "branch" to mapOf(
+                                                                        "name" to "master"
+                                                                ),
+                                                                "firstBuild" to mapOf(
+                                                                        "name" to "3"
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        ).asJson(),
+                        gitCommitInfo
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Getting commit info for a project`() {
         createRepo {
             sequenceWithPauses(
                     (1..3),

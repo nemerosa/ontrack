@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.support.JobProvider
+import net.nemerosa.ontrack.model.support.RestorationJobs
 import org.springframework.stereotype.Component
 
 /**

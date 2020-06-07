@@ -1,0 +1,93 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingPortfolios">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading portfolios...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="!loadingPortfolios && portfolios.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No indicator portfolio is set yet.
+                <span ng-if="portfolioOfPortolios.links._create">
+                    Create one by clicking on this
+                    <a class="ot-action" ng-click="createPortfolio()">link</a>.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="portfolios.length > 0">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div class="form-group">
+                    <!--suppress XmlInvalidId -->
+                    <label for="trend-selection"><span class="fa fa-line-chart"></span> Trend period</label>
+                    <ot-extension-indicators-trend-selection
+                            select-id="trend-selection"
+                            model="pageModel.trendDuration"
+                            on-trend-change="selectTrend()"
+                    ></ot-extension-indicators-trend-selection>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row" ng-repeat="portfolio in portfolios">
+        <div class="col-md-12">
+            <h4>
+                <a href="#/extension/indicators/portfolios/{{portfolio.id}}" title="Portfolio details">
+                    <span class="fa fa-folder-open-o"></span>
+                    {{portfolio.name}}
+                </a>
+                <a ng-click="portfolioProjects(portfolio)"
+                   title="Displays the list of projects for this portfolio"><span
+                        class="fa fa-arrow-right ot-command"></span></a>
+                <a ng-if="portfolio.links._update"
+                   href="#/extension/indicators/portfolios/{{portfolio.id}}/edit"
+                   title="Edit the content of the {{portfolio.name}} portfolio"><span
+                        class="fa fa-pencil ot-command"></span></a>
+                <a ng-if="portfolio.links._delete"
+                   ng-click="deletePortfolio(portfolio)"
+                   title="Delete the {{portfolio.name}} portfolio"><span class="fa fa-trash ot-command"></span></a>
+            </h4>
+        </div>
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-2" ng-repeat="categoryStats in portfolio.globalStats">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <span ng-if="categoryStats.stats.count == 0" title="Not enough data.">
+                                <ot-extension-indicators-status
+                                        status="{compliance: 0, rating: '-' }"
+                                        size="lg"
+                                ></ot-extension-indicators-status>
+                            </span>
+                            <span ng-if="categoryStats.stats.count > 0"
+                                  title="Average status over {{categoryStats.stats.count}} indicator(s).">
+                                <ot-extension-indicators-status
+                                        status="{compliance: categoryStats.stats.avg, rating: categoryStats.stats.avgRating }"
+                                        size="lg"
+                                ></ot-extension-indicators-status>
+                            </span>
+                        </div>
+                        <div class="col-md-9" style="border-right: solid 1px gray;">
+                            <p><strong>{{categoryStats.category.name}}</strong></p>
+                            <ot-extension-indicators-stats-summary stats="categoryStats.stats" previous-stats="categoryStats.previousStats" item="portfolio and category"></ot-extension-indicators-stats-summary>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12" style="margin-bottom: 30px;">
+            <hr>
+        </div>
+    </div>
+
+</ot-view>

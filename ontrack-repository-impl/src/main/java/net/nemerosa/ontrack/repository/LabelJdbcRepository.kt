@@ -153,15 +153,15 @@ class LabelJdbcRepository(
         )
     }
 
+    override fun findLabelById(labelId: Int): LabelRecord? {
+        return getFirstItem(
+                "SELECT * FROM LABEL WHERE ID = :id",
+                params("id", labelId)
+        ) { rs, _ -> rsConversion(rs) }
+    }
+
     override fun getLabel(labelId: Int): LabelRecord {
-        try {
-            return namedParameterJdbcTemplate!!.queryForObject(
-                    "SELECT * FROM LABEL WHERE ID = :id",
-                    params("id", labelId)
-            ) { rs, _ -> rsConversion(rs) } ?: throw LabelIdNotFoundException(labelId)
-        } catch (_: EmptyResultDataAccessException) {
-            throw LabelIdNotFoundException(labelId)
-        }
+        return findLabelById(labelId) ?: throw LabelIdNotFoundException(labelId)
     }
 
     override val labels: List<LabelRecord>

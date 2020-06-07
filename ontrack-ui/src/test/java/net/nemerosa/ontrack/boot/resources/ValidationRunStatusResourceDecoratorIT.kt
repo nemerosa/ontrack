@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.model.security.Roles
-import net.nemerosa.ontrack.model.structure.ValidationRunRequest
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import org.junit.Test

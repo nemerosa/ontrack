@@ -33,13 +33,18 @@ class GitCommitSearchExtension(
         private val gitIssueSearchExtension: GitIssueSearchExtension
 ) : AbstractExtension(extensionFeature), SearchIndexer<GitCommitSearchItem> {
 
+    companion object {
+        const val GIT_COMMIT_SEARCH_RESULT_TYPE = "git-commit"
+        const val GIT_COMMIT_SEARCH_RESULT_DATA_PROJECT = "project"
+    }
+
     private val logger: Logger = LoggerFactory.getLogger(GitCommitSearchExtension::class.java)
 
     private val shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}")
 
     override val searchResultType = SearchResultType(
             extensionFeature.featureDescription,
-            "git-commit",
+            GIT_COMMIT_SEARCH_RESULT_TYPE,
             "Git Commit",
             "Commit hash (abbreviated or not)"
     )
@@ -119,7 +124,11 @@ class GitCommitSearchExtension(
                     ),
                     page = uriBuilder.page("extension/git/${project.id}/commit/${item.commit}"),
                     accuracy = score,
-                    type = searchResultType
+                    type = searchResultType,
+                    data = mapOf(
+                            GIT_COMMIT_SEARCH_RESULT_DATA_PROJECT to project,
+                            SearchResult.SEARCH_RESULT_ITEM to item
+                    )
             )
         } else null
     }
