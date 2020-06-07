@@ -214,7 +214,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'ProjectIndicatorsCtrl'
         });
     })
-    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otExtensionIndicatorsService) {
 
         const projectId = $stateParams.project;
         $scope.loadingIndicators = true;
@@ -309,16 +309,11 @@ angular.module('ontrack.extension.indicators', [
         loadIndicators();
 
         $scope.editIndicator = (indicator) => {
-            otFormService.update(indicator.links._update, "Edit indicator value").then(loadIndicators);
+            otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);
         };
 
         $scope.deleteIndicator = (indicator) => {
-            otAlertService.confirm({
-                title: "Indicator deletion",
-                message: "Do you want to delete this indicator? History will be kept."
-            }).then(() => {
-                return ot.pageCall($http.delete(indicator.links._delete));
-            }).then(loadIndicators);
+            otExtensionIndicatorsService.deleteIndicator(indicator).then(loadIndicators);
         };
 
     })
@@ -901,7 +896,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'PortfolioTypeCtrl'
         });
     })
-    .controller('PortfolioTypeCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService) {
+    .controller('PortfolioTypeCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otExtensionIndicatorsService) {
         const portfolioId = $stateParams.portfolioId;
         const typeId = $stateParams.typeId;
         $scope.loadingPortfolioType = true;
@@ -1001,6 +996,14 @@ angular.module('ontrack.extension.indicators', [
         };
 
         loadPortfolioType();
+
+        $scope.editIndicator = (indicator) => {
+            otExtensionIndicatorsService.editIndicator(indicator).then(loadPortfolioType);
+        };
+
+        $scope.deleteIndicator = (indicator) => {
+            otExtensionIndicatorsService.deleteIndicator(indicator).then(loadPortfolioType);
+        };
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-view', {
@@ -1280,6 +1283,19 @@ angular.module('ontrack.extension.indicators', [
             scope: {
             }
         };
+    })
+    .service('otExtensionIndicatorsService', function ($http, ot, otAlertService, otFormService) {
+        const self = {};
+
+        self.editIndicator = (indicator) => otFormService.update(indicator.links._update, "Edit indicator value");
+
+        self.deleteIndicator = (indicator) =>
+            otAlertService.confirm({
+                title: "Indicator deletion",
+                message: "Do you want to delete this indicator? History will be kept."
+            }).then(() => ot.pageCall($http.delete(indicator.links._delete)));
+
+        return self;
     })
 
 ;
