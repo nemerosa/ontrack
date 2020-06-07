@@ -105,7 +105,7 @@
 <!-- Management of redirection. See LoginSuccessHandler -->
 <script type="text/javascript">
     var hash = window.location.hash;
-    document.cookie = "hashPart=" + window.btoa(hash);
+    document.cookie = "hashPart=" + window.btoa(hash) + "; samesite=strict";
 </script>
 
 </body>
