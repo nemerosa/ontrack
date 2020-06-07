@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.boot.support
 
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache
+import org.springframework.security.web.savedrequest.RequestCache
 import org.springframework.util.Base64Utils
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
 class LoginSuccessHandler : SimpleUrlAuthenticationSuccessHandler() {
+
+    private val requestCache: RequestCache = HttpSessionRequestCache()
 
     companion object {
         /**
@@ -18,7 +22,14 @@ class LoginSuccessHandler : SimpleUrlAuthenticationSuccessHandler() {
     }
 
     override fun determineTargetUrl(request: HttpServletRequest, response: HttpServletResponse): String {
-        var targetUrl = super.determineTargetUrl(request, response)
+        val savedRequest = requestCache.getRequest(request, response)
+
+        // Base URL
+        var targetUrl = savedRequest
+                ?.redirectUrl
+                ?: super.determineTargetUrl(request, response)
+
+        // Hash part
         for (cookie in request.cookies) {
             if (cookie.name == COOKIE_HASH_PART) {
                 val value = cookie.value
@@ -31,6 +42,8 @@ class LoginSuccessHandler : SimpleUrlAuthenticationSuccessHandler() {
                 break
             }
         }
+
+        // URL to redirect to
         logger.debug("Login target URL = $targetUrl")
         return targetUrl
     }
