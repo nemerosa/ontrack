@@ -182,7 +182,7 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
             indicator(type21, false)
         }
         // Gets the stats for this portfolio
-        val categoryStats = indicatorStatsService.getStatsPortfolio(portfolio)
+        val categoryStats = asAdmin { indicatorStatsService.getStatsPortfolio(portfolio) }
         assertEquals(2, categoryStats.size)
         // First category
         categoryStats[0].apply {
@@ -268,7 +268,7 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
             indicator(type21, false, lastTime)
         }
         // Gets the stats for this portfolio and period
-        val categoryStats = indicatorStatsService.getStatsPortfolio(portfolio, duration)
+        val categoryStats = asAdmin { indicatorStatsService.getStatsPortfolio(portfolio, duration) }
         assertEquals(2, categoryStats.size)
         // First category
         categoryStats[0].apply {
@@ -355,7 +355,7 @@ class IndicatorStatsServiceIT : AbstractIndicatorsTestSupport() {
             indicator(type21, false, lastTime)
         }
         // Gets the stats for this portfolio and period
-        val categoryStats = indicatorStatsService.getGlobalStats(portfolio, duration)
+        val categoryStats = asAdmin { indicatorStatsService.getGlobalStats(portfolio, duration) }
         assertEquals(2, categoryStats.size)
         // First category
         categoryStats[0].apply {
