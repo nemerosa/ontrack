@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLSchema
@@ -12,7 +13,8 @@ class GraphqlSchemaServiceImpl(
         private val types: List<GQLType>,
         private val inputTypes: List<GQLInputType<*>>,
         private val interfaces: List<GQLInterface>,
-        private val rootQueries: List<GQLRootQuery>
+        private val rootQueries: List<GQLRootQuery>,
+        private val mutationProviders: List<MutationProvider>
 ) : GraphqlSchemaService {
 
     private val schemaSupplier = CachedSupplier.of { this.createSchema() }
@@ -27,9 +29,11 @@ class GraphqlSchemaServiceImpl(
         dictionary.addAll(types.map { it.createType(cache) })
         dictionary.addAll(interfaces.map { it.createInterface() })
         dictionary.addAll(inputTypes.map { it.createInputType() })
+        val mutationType = createMutationType(dictionary)
         return GraphQLSchema.newSchema()
-                .query(createQueryType())
                 .additionalTypes(dictionary)
+                .query(createQueryType())
+                .mutation(mutationType)
                 .build()
     }
 
@@ -44,8 +48,26 @@ class GraphqlSchemaServiceImpl(
                 .build()
     }
 
+    private fun createMutationType(dictionary: MutableSet<GraphQLType>): GraphQLObjectType {
+        return newObject()
+                .name(MUTATION)
+                // Root mutations
+                .fields(
+                        mutationProviders.flatMap { provider ->
+                            provider.mutations.map { mutation -> createMutation(mutation, dictionary) }
+                        }
+                )
+                // OK
+                .build()
+    }
+
+    private fun createMutation(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLFieldDefinition {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         const val QUERY = "Query"
+        const val MUTATION = "Mutation"
     }
 
 }

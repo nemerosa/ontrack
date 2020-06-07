@@ -2,11 +2,7 @@ package net.nemerosa.ontrack.graphql.support
 
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
-import graphql.schema.GraphQLInputObjectType
-import graphql.schema.GraphQLInputObjectType.newInputObject
-import graphql.schema.GraphQLInputType
-import graphql.schema.GraphQLObjectType
-import graphql.schema.GraphQLScalarType
+import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.lang3.reflect.FieldUtils
@@ -24,9 +20,8 @@ object GraphQLBeanConverter {
             "class"
     )
 
-    fun asInputType(type: Class<*>): GraphQLInputType {
-        var builder: GraphQLInputObjectType.Builder = newInputObject()
-                .name(type.simpleName)
+    fun asInputFields(type: Class<*>): List<GraphQLInputObjectField> {
+        val fields = mutableListOf<GraphQLInputObjectField>()
         // Gets the properties for the type
         for (descriptor in BeanUtils.getPropertyDescriptors(type)) {
             if (descriptor.readMethod != null) {
@@ -34,17 +29,23 @@ object GraphQLBeanConverter {
                 val description = getDescription(type, descriptor)
                 val scalarType = getScalarType(descriptor.propertyType)
                 if (scalarType != null) {
-                    builder = builder.field { field ->
-                        field
-                                .name(name)
-                                .description(description)
-                                .type(scalarType)
-                    }
+                    fields += GraphQLInputObjectField.newInputObjectField()
+                            .name(name)
+                            .description(description)
+                            .type(scalarType)
+                            .build()
                 }
             }
         }
         // OK
-        return builder.build()
+        return fields
+    }
+
+    fun asInputType(type: Class<*>): GraphQLInputType {
+        return GraphQLInputObjectType.newInputObject()
+                .name(type.simpleName)
+                .fields(asInputFields(type))
+                .build()
     }
 
     private fun getDescription(type: Class<*>, descriptor: PropertyDescriptor): String? {

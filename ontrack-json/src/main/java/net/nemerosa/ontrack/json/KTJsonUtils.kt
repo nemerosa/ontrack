@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.json
 
 import com.fasterxml.jackson.databind.JsonNode
+import kotlin.reflect.KClass
 
 /**
  * Parses a string as JSON
@@ -34,6 +35,12 @@ fun JsonNode.asJsonString(): String = JsonUtils.toJSONString(this)
  */
 inline fun <reified T> JsonNode.parse(): T =
         JsonUtils.parse(this, T::class.java)
+
+/**
+ * Parses any node into an object.
+ */
+inline fun <T : Any> JsonNode.parseInto(type: KClass<T>): T =
+        JsonUtils.parse(this, type.java)
 
 /**
  * Formatting a JSON node as a string
