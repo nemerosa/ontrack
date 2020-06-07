@@ -910,7 +910,97 @@ angular.module('ontrack.extension.indicators', [
         view.title = "Portfolio type";
         view.breadcrumbs = ot.homeBreadcrumbs();
 
-        const query = ``;
+        const query = `
+            query PortfolioType($portfolio: String!, $type: String!) {
+              indicatorTypes {
+                types(id: $type) {
+                  id
+                  name
+                  link
+                  category {
+                    id
+                    name
+                  }
+                  valueType {
+                    id
+                    feature {
+                      id
+                    }
+                  }
+                  valueConfig
+                }
+              }
+              indicatorPortfolios(id: $portfolio) {
+                id
+                name
+                projects {
+                  id
+                  name
+                  projectIndicators {
+                    indicators(type: $type) {
+                      value
+                      previousValue {
+                        value
+                        compliance
+                        rating
+                        signature {
+                          user
+                          time
+                        }
+                        durationSecondsSince
+                      }
+                      trendSincePrevious
+                      compliance
+                      rating
+                      comment
+                      annotatedComment
+                      signature {
+                        user
+                        time
+                      }
+                      links {
+                        _update
+                        _delete
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        `;
+
+        const queryVariables = {
+            portfolio: portfolioId,
+            type: typeId
+        };
+
+        let viewInitialized = false;
+
+        const loadPortfolioType = () => {
+            $scope.loadingPortfolioType = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.type = data.indicatorTypes.types[0];
+                $scope.portfolio = data.indicatorPortfolios[0];
+                $scope.projects = $scope.portfolio.projects;
+
+                $scope.projects.forEach((project) => {
+                    project.indicator = project.projectIndicators.indicators[0];
+                    project.indicator.type = $scope.type;
+                });
+
+                if (!viewInitialized) {
+                    view.title = `Portfolio type: ${$scope.type.name}`;
+                    view.commands = [
+                        ot.viewCloseCommand(`/extension/indicators/portfolios/${portfolioId}/category/${$scope.type.category.id}`)
+                    ];
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingPortfolioType = false;
+            });
+        };
+
+        loadPortfolioType();
     })
     .config(function ($stateProvider) {
         $stateProvider.state('portfolio-view', {
