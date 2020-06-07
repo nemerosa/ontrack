@@ -228,7 +228,7 @@ class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
                         "beforeDate" to (refTime - Duration.ofDays(5L))
                 )).apply {
                     val field = path("promotionLevel").path("promotionRunsPaginated")
-                    assertEquals(11, field["pageInfo"]["totalSize"].asInt())
+                    assertEquals(10, field["pageInfo"]["totalSize"].asInt())
                     assertTrue(field["pageInfo"]["previousPage"].isNullOrNullNode())
                     assertNotNull(field["pageInfo"]["nextPage"]) {
                         assertEquals(5, it["offset"].asInt())
