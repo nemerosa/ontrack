@@ -1,0 +1,73 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingPortfolioType">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the portfolio type...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="type.link">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="fa fa-info-circle"></span>
+                <a href="{{type.link}}">{{type.link}}</a>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Project</th>
+            <td>Value</td>
+            <td>Status</td>
+            <td>Trend</td>
+            <td>Comment</td>
+            <td>Signature</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="project in projects">
+            <td>
+                <a href="#/extension/indicators/project-indicators/{{project.id}}" title="Manage the project indicators for the {{project.name}} project">{{project.name}}</a>
+            </td>
+            <td>
+                <span ng-if="project.indicator.value">
+                    <ot-include value="project.indicator.value" template="extension/{{project.indicator.type.valueType.feature.id}}/indicators/{{project.indicator.type.valueType.id}}.tpl.html"></ot-include>
+                </span>
+                <a ng-if="project.indicator.value" class="fa fa-history ot-command" title="History for this indicator" href="#/extension/indicators/project-indicators/{{project.id}}/{{project.indicator.type.id}}/history"></a>
+                <span ng-if="project.indicator.links._update" class="fa fa-pencil ot-command" title="Edit value" ng-click="editIndicator(project.indicator)"></span>
+                <span ng-if="project.indicator.links._delete" class="fa fa-trash ot-command" title="Remove value" ng-click="deleteIndicator(project.indicator)"></span>
+                <span ng-if="project.indicator.type.computed" class="text-muted" title="This indicator is computed and cannot be edited."><span class="fa fa-cog"></span>&nbsp;<i>Computed</i></span>
+            </td>
+            <td>
+                <ot-extension-indicators-status status="project.indicator" size="sm"></ot-extension-indicators-status>
+            </td>
+            <td>
+                <p ng-if="project.indicator.trendSincePrevious && project.indicator.previousValue.value">
+                    <ot-extension-indicators-trend-display
+                            trend="project.indicator.trendSincePrevious"
+                            seconds-since="project.indicator.previousValue.durationSecondsSince"
+                            previous-compliance="project.indicator.previousValue.compliance"
+                            previous-rating="project.indicator.previousValue.rating">
+                    </ot-extension-indicators-trend-display>
+                </p>
+            </td>
+            <td>
+                <span ng-bind-html="project.indicator.annotatedComment"></span>
+            </td>
+            <td>
+                <span ng-if="project.indicator.value">
+                    <ot-creation creation="project.indicator.signature"></ot-creation>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

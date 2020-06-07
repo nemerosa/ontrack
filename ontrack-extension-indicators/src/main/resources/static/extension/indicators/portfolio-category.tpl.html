@@ -1,0 +1,42 @@
+<ot-view>
+
+    <ot-extension-indicators-message></ot-extension-indicators-message>
+
+    <div class="row" ng-show="loadingPortfolioCategory">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the portfolio category...
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th ng-repeat="project in projects" style="writing-mode: vertical-lr; min-width: 50px;">
+                <a href="#/extension/indicators/project-indicators/{{project.id}}">{{project.name}}</a>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="type in types">
+            <td>
+                <ot-extension-indicators-type-name type="type">
+                    <a class="fa fa-file-text-o ot-command"
+                       href="#/extension/indicators/portfolios/{{portfolio.id}}/type/{{type.id}}"
+                       title="See value for all projects in this portfolio for this type"></a>
+                </ot-extension-indicators-type-name>
+            </td>
+            <td ng-repeat="project in projects">
+                <ot-extension-indicators-status
+                        size="md"
+                        status="project.indicatorsPerType[type.id]"
+                ></ot-extension-indicators-status>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</ot-view>

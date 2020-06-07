@@ -214,7 +214,7 @@ angular.module('ontrack.extension.indicators', [
             controller: 'ProjectIndicatorsCtrl'
         });
     })
-    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otFormService, otAlertService) {
+    .controller('ProjectIndicatorsCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otExtensionIndicatorsService) {
 
         const projectId = $stateParams.project;
         $scope.loadingIndicators = true;
@@ -309,16 +309,11 @@ angular.module('ontrack.extension.indicators', [
         loadIndicators();
 
         $scope.editIndicator = (indicator) => {
-            otFormService.update(indicator.links._update, "Edit indicator value").then(loadIndicators);
+            otExtensionIndicatorsService.editIndicator(indicator).then(loadIndicators);
         };
 
         $scope.deleteIndicator = (indicator) => {
-            otAlertService.confirm({
-                title: "Indicator deletion",
-                message: "Do you want to delete this indicator? History will be kept."
-            }).then(() => {
-                return ot.pageCall($http.delete(indicator.links._delete));
-            }).then(loadIndicators);
+            otExtensionIndicatorsService.deleteIndicator(indicator).then(loadIndicators);
         };
 
     })
@@ -796,6 +791,221 @@ angular.module('ontrack.extension.indicators', [
 
     })
     .config(function ($stateProvider) {
+        $stateProvider.state('portfolio-category-edit', {
+            url: '/extension/indicators/portfolios/{portfolioId}/category/{categoryId}',
+            templateUrl: 'extension/indicators/portfolio-category.tpl.html',
+            controller: 'PortfolioCategoryCtrl'
+        });
+    })
+    .controller('PortfolioCategoryCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService) {
+        const portfolioId = $stateParams.portfolioId;
+        const categoryId = $stateParams.categoryId;
+        $scope.loadingPortfolioCategory = true;
+
+        const view = ot.view();
+        view.title = "Portfolio category";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+
+        const query = `
+            query PortfolioCategory($portfolio: String!, $category: String!) {
+              indicatorCategories {
+                categories(id: $category) {
+                  id
+                  name
+                  types {
+                    id
+                    name
+                    link
+                    valueType {
+                      id
+                      feature {
+                        id
+                      }
+                    }
+                    valueConfig
+                  }
+                }
+              }
+              indicatorPortfolios(id: $portfolio) {
+                id
+                name
+                projects {
+                  id
+                  name
+                  projectIndicators {
+                    indicators(category: $category) {
+                      type {
+                        id
+                      }
+                      value
+                      compliance
+                      rating
+                      comment
+                      links {
+                        _update
+                        _delete
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        `;
+
+        const queryVariables = {
+            portfolio: portfolioId,
+            category: categoryId
+        };
+
+        let viewInitialized = false;
+
+        const loadPortfolioCategory = () => {
+            $scope.loadingPortfolioCategory = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.category = data.indicatorCategories.categories[0];
+                $scope.types = $scope.category.types;
+                $scope.portfolio = data.indicatorPortfolios[0];
+                $scope.projects = $scope.portfolio.projects;
+                // Indexation of project indicators per type ID
+                $scope.projects.forEach((project) => {
+                    project.indicatorsPerType = {};
+                    project.projectIndicators.indicators.forEach((indicator) => {
+                        project.indicatorsPerType[indicator.type.id] = indicator;
+                    });
+                });
+                // View commands
+                if (!viewInitialized) {
+                    view.title = `Portfolio category: ${$scope.category.name}`;
+                    view.commands = [
+                        ot.viewCloseCommand(`/extension/indicators/portfolios/${portfolioId}`)
+                    ];
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingPortfolioCategory = false;
+            });
+        };
+
+        loadPortfolioCategory();
+
+    })
+    .config(function ($stateProvider) {
+        $stateProvider.state('portfolio-type-edit', {
+            url: '/extension/indicators/portfolios/{portfolioId}/type/{typeId}',
+            templateUrl: 'extension/indicators/portfolio-type.tpl.html',
+            controller: 'PortfolioTypeCtrl'
+        });
+    })
+    .controller('PortfolioTypeCtrl', function ($stateParams, $scope, $http, ot, otGraphqlService, otExtensionIndicatorsService) {
+        const portfolioId = $stateParams.portfolioId;
+        const typeId = $stateParams.typeId;
+        $scope.loadingPortfolioType = true;
+
+        const view = ot.view();
+        view.title = "Portfolio type";
+        view.breadcrumbs = ot.homeBreadcrumbs();
+
+        const query = `
+            query PortfolioType($portfolio: String!, $type: String!) {
+              indicatorTypes {
+                types(id: $type) {
+                  id
+                  name
+                  link
+                  category {
+                    id
+                    name
+                  }
+                  valueType {
+                    id
+                    feature {
+                      id
+                    }
+                  }
+                  valueConfig
+                }
+              }
+              indicatorPortfolios(id: $portfolio) {
+                id
+                name
+                projects {
+                  id
+                  name
+                  projectIndicators {
+                    indicators(type: $type) {
+                      value
+                      previousValue {
+                        value
+                        compliance
+                        rating
+                        signature {
+                          user
+                          time
+                        }
+                        durationSecondsSince
+                      }
+                      trendSincePrevious
+                      compliance
+                      rating
+                      comment
+                      annotatedComment
+                      signature {
+                        user
+                        time
+                      }
+                      links {
+                        _update
+                        _delete
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        `;
+
+        const queryVariables = {
+            portfolio: portfolioId,
+            type: typeId
+        };
+
+        let viewInitialized = false;
+
+        const loadPortfolioType = () => {
+            $scope.loadingPortfolioType = true;
+            otGraphqlService.pageGraphQLCall(query, queryVariables).then((data) => {
+                $scope.type = data.indicatorTypes.types[0];
+                $scope.portfolio = data.indicatorPortfolios[0];
+                $scope.projects = $scope.portfolio.projects;
+
+                $scope.projects.forEach((project) => {
+                    project.indicator = project.projectIndicators.indicators[0];
+                    project.indicator.type = $scope.type;
+                });
+
+                if (!viewInitialized) {
+                    view.title = `Portfolio type: ${$scope.type.name}`;
+                    view.commands = [
+                        ot.viewCloseCommand(`/extension/indicators/portfolios/${portfolioId}/category/${$scope.type.category.id}`)
+                    ];
+                    viewInitialized = true;
+                }
+            }).finally(() => {
+                $scope.loadingPortfolioType = false;
+            });
+        };
+
+        loadPortfolioType();
+
+        $scope.editIndicator = (indicator) => {
+            otExtensionIndicatorsService.editIndicator(indicator).then(loadPortfolioType);
+        };
+
+        $scope.deleteIndicator = (indicator) => {
+            otExtensionIndicatorsService.deleteIndicator(indicator).then(loadPortfolioType);
+        };
+    })
+    .config(function ($stateProvider) {
         $stateProvider.state('portfolio-view', {
             url: '/extension/indicators/portfolios/{portfolioId}',
             templateUrl: 'extension/indicators/portfolio-view.tpl.html',
@@ -1018,7 +1228,8 @@ angular.module('ontrack.extension.indicators', [
             templateUrl: 'extension/indicators/directive.indicators-type-name.tpl.html',
             scope: {
                 type: '='
-            }
+            },
+            transclude: true
         };
     })
     .directive('otExtensionIndicatorsStatsSummary', function () {
@@ -1072,6 +1283,19 @@ angular.module('ontrack.extension.indicators', [
             scope: {
             }
         };
+    })
+    .service('otExtensionIndicatorsService', function ($http, ot, otAlertService, otFormService) {
+        const self = {};
+
+        self.editIndicator = (indicator) => otFormService.update(indicator.links._update, "Edit indicator value");
+
+        self.deleteIndicator = (indicator) =>
+            otAlertService.confirm({
+                title: "Indicator deletion",
+                message: "Do you want to delete this indicator? History will be kept."
+            }).then(() => ot.pageCall($http.delete(indicator.links._delete)));
+
+        return self;
     })
 
 ;

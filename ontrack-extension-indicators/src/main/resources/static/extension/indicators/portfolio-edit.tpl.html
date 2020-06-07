@@ -82,7 +82,11 @@
         </tr>
         <tr ng-repeat="type in category.types" ng-show="category.unfolded">
             <td colspan="2">
-                <ot-extension-indicators-type-name type="type"></ot-extension-indicators-type-name>
+                <ot-extension-indicators-type-name type="type">
+                    <a class="fa fa-file-text-o ot-command"
+                       href="#/extension/indicators/portfolios/{{portfolio.id}}/type/{{type.id}}"
+                       title="See value for all projects in this portfolio"></a>
+                </ot-extension-indicators-type-name>
             </td>
         </tr>
         </tbody>
