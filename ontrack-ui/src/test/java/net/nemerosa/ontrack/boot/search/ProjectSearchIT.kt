@@ -33,11 +33,11 @@ class ProjectSearchIT : AbstractSearchTestSupport() {
             project(name = NameDescription.nd("$commonPart-${uid("X")}", ""))
         }
         // Searches for the candidate projects
-        val results = searchService.paginatedSearch(SearchRequest(
+        val results = asUser { searchService.paginatedSearch(SearchRequest(
                 token = commonPart,
                 type = PROJECT_SEARCH_RESULT_TYPE,
                 size = 50
-        )).items
+        )).items }
         val foundNames = results.map { it.title }
         val candidateNames = candidates.map { it.entityDisplayName }
         // Checks that all candidates have been found
