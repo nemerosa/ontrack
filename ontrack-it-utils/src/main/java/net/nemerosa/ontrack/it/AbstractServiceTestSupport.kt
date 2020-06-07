@@ -230,13 +230,14 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     }
 
-    protected fun doPromote(build: Build, promotionLevel: PromotionLevel, description: String?): PromotionRun {
+    @JvmOverloads
+    protected fun doPromote(build: Build, promotionLevel: PromotionLevel, description: String?, signature: Signature = of("test")): PromotionRun {
         return asUser().with(build.projectId(), PromotionRunCreate::class.java).call {
             structureService.newPromotionRun(
                     of(
                             build,
                             promotionLevel,
-                            of("test"),
+                            signature,
                             description
                     )
             )

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
-import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.IndicatorsTestFixtures
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.support.Percentage
@@ -250,6 +249,8 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
             private val valueDocker: Boolean?
     ) : IndicatorComputer {
 
+        override val feature: ExtensionFeature = IndicatorsTestFixtures.indicatorsExtensionFeature()
+
         private val prefix = uid("C")
 
         val category = IndicatorComputedCategory(
@@ -325,8 +326,6 @@ class IndicatorComputingIT : AbstractIndicatorsTestSupport() {
 
             return indicators.toList()
         }
-
-        override fun getFeature(): ExtensionFeature = IndicatorsExtensionFeature()
 
         fun assertTypeIsPresent(type: IndicatorComputedType<*, *>) {
             assertNotNull(indicatorTypeService.findTypeById(type.id)) {

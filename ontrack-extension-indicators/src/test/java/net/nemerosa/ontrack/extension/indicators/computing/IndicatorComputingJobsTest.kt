@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorComputer
 import net.nemerosa.ontrack.extension.indicators.model.id
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.Schedule
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.Before

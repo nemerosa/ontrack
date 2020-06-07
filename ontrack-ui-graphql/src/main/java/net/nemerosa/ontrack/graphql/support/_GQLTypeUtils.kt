@@ -2,8 +2,11 @@ package net.nemerosa.ontrack.graphql.support
 
 import graphql.Scalars.*
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.findAnnotation
 
 typealias TypeBuilder = GraphQLObjectType.Builder
 
@@ -24,7 +27,11 @@ fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectTyp
             it.name(name).description(description).type(GraphQLString)
         }
 
-fun TypeBuilder.dateField(name: String, description: String): GraphQLObjectType.Builder =
+fun TypeBuilder.dateField(name: String, description: String): GraphQLObjectType.Builder = field {
+    it.name(name)
+            .description(description)
+            .type(GQLScalarLocalDateTime.INSTANCE)
+}
 
 fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? = null): GraphQLObjectType.Builder =
         field {

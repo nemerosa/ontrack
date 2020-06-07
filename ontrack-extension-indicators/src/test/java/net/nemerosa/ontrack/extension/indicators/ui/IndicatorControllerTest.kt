@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescription.nd
+import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.Before
