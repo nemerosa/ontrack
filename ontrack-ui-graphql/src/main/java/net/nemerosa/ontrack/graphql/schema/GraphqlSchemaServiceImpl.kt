@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLSchema
+import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.common.CachedSupplier
 import org.springframework.stereotype.Service
 
@@ -22,13 +23,13 @@ class GraphqlSchemaServiceImpl(
     private fun createSchema(): GraphQLSchema {
         // All types
         val cache = GQLTypeCache()
-        val dictionary =
-                types.map { it.createType(cache) } +
-                        interfaces.map { it.createInterface() } +
-                        inputTypes.map { it.createInputType() }
+        val dictionary = mutableSetOf<GraphQLType>()
+        dictionary.addAll(types.map { it.createType(cache) })
+        dictionary.addAll(interfaces.map { it.createInterface() })
+        dictionary.addAll(inputTypes.map { it.createInputType() })
         return GraphQLSchema.newSchema()
                 .query(createQueryType())
-                .additionalTypes(dictionary.toSet())
+                .additionalTypes(dictionary)
                 .build()
     }
 

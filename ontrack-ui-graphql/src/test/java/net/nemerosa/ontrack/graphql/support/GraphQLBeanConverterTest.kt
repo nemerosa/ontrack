@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.graphql.support
 
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLNamedType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import org.junit.Before
 import org.junit.Test
@@ -19,7 +21,7 @@ class GraphQLBeanConverterTest {
     fun `Simple type`() {
         val type = GraphQLBeanConverter.asObjectType(Person::class.java, cache)
         assertEquals("Person", type.name)
-        val fields = type.fieldDefinitions.associate { it.name to it.type.name }
+        val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
                 mapOf(
                         "name" to "String",
@@ -47,7 +49,7 @@ class GraphQLBeanConverterTest {
     fun `Composite type`() {
         val type = GraphQLBeanConverter.asObjectType(Account::class.java, cache)
         assertEquals("Account", type.name)
-        val fields = type.fieldDefinitions.associate { it.name to it.type.name }
+        val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
                 mapOf(
                         "username" to "String",
@@ -62,7 +64,7 @@ class GraphQLBeanConverterTest {
     fun `Composite type with three levels`() {
         val type = GraphQLBeanConverter.asObjectType(OnBehalf::class.java, cache)
         assertEquals("OnBehalf", type.name)
-        val fields = type.fieldDefinitions.associate { it.name to it.type.name }
+        val fields = fieldToTypeNames(type.fieldDefinitions)
         assertEquals(
                 mapOf(
                         "delegate" to "Account",
@@ -71,5 +73,10 @@ class GraphQLBeanConverterTest {
                 fields
         )
     }
+
+    private fun fieldToTypeNames(fields: List<GraphQLFieldDefinition>): Map<String, String> =
+            fields.associate {
+                it.name to (it.type as GraphQLNamedType).name
+            }
 
 }
