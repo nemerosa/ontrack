@@ -1,9 +1,8 @@
-package net.nemerosa.ontrack.model.exceptions;
+package net.nemerosa.ontrack.model.exceptions
 
-import net.nemerosa.ontrack.common.BaseException;
+import net.nemerosa.ontrack.common.UserException
 
-public abstract class InputException extends BaseException {
-    public InputException(String pattern, Object... parameters) {
-        super(pattern, parameters);
-    }
-}
+abstract class InputException(
+        pattern: String,
+        vararg parameters: Any
+) : UserException(String.format(pattern, *parameters))

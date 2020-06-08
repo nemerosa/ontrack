@@ -1,7 +1,8 @@
-package net.nemerosa.ontrack.model.exceptions;
+package net.nemerosa.ontrack.model.exceptions
 
-public abstract class NotFoundException extends InputException {
-    public NotFoundException(String pattern, Object... parameters) {
-        super(pattern, parameters);
-    }
-}
+import net.nemerosa.ontrack.common.UserException
+
+abstract class NotFoundException(
+        pattern: String,
+        vararg parameters: Any
+) : UserException(String.format(pattern, *parameters))

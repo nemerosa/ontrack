@@ -1,19 +1,71 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var branchFavouriteService: BranchFavouriteService
+
+    @Test
+    fun `Creating a project`() {
+        asAdmin {
+            val name = uid("P")
+            val data = run("""
+                mutation CreateProject(${'$'}name: String!) {
+                    createProject(input: {name: ${'$'}name}) {
+                        project {
+                            id
+                            name
+                        }
+                    }
+                }
+            """, mapOf("name" to name))
+            // Checks the project has been created
+            assertNotNull(
+                    structureService.findProjectByName(name).getOrNull(),
+                    "Project has been created"
+            )
+            // Checks the data
+            val project = data["createProject"]["project"]
+            assertTrue(project["id"].asInt() > 0, "ID is set")
+            assertEquals(name, project["name"].asText(), "Name is OK")
+        }
+    }
+
+    @Test
+    fun `Creating a project but name already exist`() {
+        asAdmin {
+            project {
+                val data = run("""
+                    mutation CreateProject(${'$'}name: String!) {
+                        createProject(input: {name: ${'$'}name}) {
+                            project {
+                                id
+                                name
+                            }
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """, mapOf("name" to name))
+                // Checks the errors
+                val message = data["createProject"]["errors"][0]["message"].asText()
+                assertEquals("Project name already exists: $name", message)
+                assertTrue(data["createProject"]["project"].isNullOrNullNode(), "Project not returned")
+            }
+        }
+    }
 
     @Test
     fun `Favourite branches for project`() {

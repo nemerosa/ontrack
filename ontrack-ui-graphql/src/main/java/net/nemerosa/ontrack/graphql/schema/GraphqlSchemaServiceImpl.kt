@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.*
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.CachedSupplier
+import net.nemerosa.ontrack.common.UserException
 import org.springframework.stereotype.Service
 
 @Service
@@ -64,7 +65,7 @@ class GraphqlSchemaServiceImpl(
         // Create the mutation output type
         val outputType = createMutationOutputType(mutation, dictionary)
         // Create the mutation field
-        val field = GraphQLFieldDefinition.newFieldDefinition()
+        return GraphQLFieldDefinition.newFieldDefinition()
                 .name(mutation.name)
                 .description(mutation.description)
                 .argument {
@@ -73,29 +74,37 @@ class GraphqlSchemaServiceImpl(
                             .type(inputType)
                 }
                 .type(outputType)
+                .dataFetcher { env -> mutationFetcher(mutation, env) }
                 .build()
-        // Data fetching
-        GraphQLCodeRegistry.newCodeRegistry()
-                .dataFetcher(outputType, field) { env -> mutationFetcher(mutation, env) }
-                .build()
-        // OK
-        return field
     }
 
     private fun mutationFetcher(mutation: Mutation, env: DataFetchingEnvironment): Any {
         return try {
             mutation.fetch(env)
         } catch (ex: Exception) {
-            TODO("Management of errors")
+            if (ex is UserException) {
+                val error = UserError(
+                        message = ex.message ?: ex::class.java.name
+                )
+                mapOf("errors" to listOf(error))
+            } else {
+                throw ex
+            }
         }
     }
 
     private fun createMutationOutputType(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLObjectType =
-            GraphQLObjectType.newObject()
+            newObject()
                     .name("${mutation.typePrefix}Payload")
                     .description("Output type for the ${mutation.name} mutation.")
                     .fields(mutation.outputFields)
-                    // TODO Error management fields
+                    // Error management fields
+                    .field {
+                        it.name("errors")
+                                .description("List of errors")
+                                .type(GraphQLList(GraphQLTypeReference(GQLTypeUserError.USER_ERROR)))
+                    }
+                    // OK
                     .build()
                     .apply { dictionary.add(this) }
 

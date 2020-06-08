@@ -65,8 +65,12 @@ fun <R, T> TypeBuilder.intField(property: KProperty1<R, T?>, description: String
                     }
         }
 
-fun TypeBuilder.stringField(property: KProperty<String?>, description: String): GraphQLObjectType.Builder =
-        field { it.name(property.name).description(description).type(GraphQLString) }
+fun TypeBuilder.stringField(property: KProperty<String?>, description: String? = null): GraphQLObjectType.Builder =
+        field {
+            it.name(property.name)
+                    .description(getPropertyDescription(property, description))
+                    .type(GraphQLString)
+        }
 
 fun TypeBuilder.creationField(name: String, description: String): GraphQLObjectType.Builder =
         field {
