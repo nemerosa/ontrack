@@ -284,6 +284,25 @@ According to your rights, you can edit and delete indicator values from this pag
 [[extension-indicators-portfolios-edition]]
 ===== Portfolio edition
 
+The portfolio edition page allows you to:
+
+* edit the portfolio display name (not the ID)
+* set a label to select the associated projects
+* select the categories associated with this portfolio
+
+image::images/extension-indicators-portfolio-edition.png[Portfolio edition]
+
+The label allows a portfolio to be associated to all projects which
+have this label. See <<projects-labels>> for more information on how
+to manage labels.
+
+[NOTE]
+====
+<<extension-indicators-acl,"Global indicator portfolio managers">> and
+<<extension-indicators-acl,"Global indicator managers">> can associate
+existing labels to projects but cannot create new labels.
+====
+
 [[extension-indicators-import]]
 ==== Importing categories and types
 
