@@ -1,12 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.DataFetchingEnvironment
-import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLInputObjectField
-import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
-import net.nemerosa.ontrack.graphql.support.listField
-import net.nemerosa.ontrack.graphql.support.mutationInput
 import net.nemerosa.ontrack.graphql.support.simpleMutation
+import net.nemerosa.ontrack.graphql.support.unitMutation
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescriptionState
@@ -50,23 +45,8 @@ class ProjectMutations(
             /**
              * Deleting a project
              */
-            object : Mutation {
-                override val name: String = "deleteProject"
-                override val description: String = "Deletes an existing project"
-
-                override val inputFields: List<GraphQLInputObjectField> = GraphQLBeanConverter.asInputFields(DeleteProjectInput::class)
-
-                override val outputFields: List<GraphQLFieldDefinition> = listOf(
-                        listField("projects", "List of remaining projects") {
-                            structureService.projectList
-                        }
-                )
-
-                override fun fetch(env: DataFetchingEnvironment): Any {
-                    val input = mutationInput<DeleteProjectInput>(env)
-                    structureService.deleteProject(ID(input.id))
-                    return Unit // Not used
-                }
+            unitMutation<DeleteProjectInput>("deleteProject", "Deletes an existing project") { input ->
+                structureService.deleteProject(ID(input.id))
             }
     )
 

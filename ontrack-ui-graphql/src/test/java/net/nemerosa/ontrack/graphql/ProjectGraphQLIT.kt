@@ -205,9 +205,6 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 val data = run("""
                     mutation DeleteProject {
                         deleteProject(input: {id: $id}) {
-                            projects {
-                                id
-                            }
                             errors {
                                 message
                                 exception
@@ -218,8 +215,6 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 // Checks the project has been deleted
                 assertNotPresent(structureService.findProjectByName(name))
                 // Checks the data
-                val projects = data["deleteProject"]["projects"].map { it["id"].asInt() }
-                assertTrue(id() !in projects, "Project not present")
                 assertTrue(data["deleteProject"]["errors"].isNullOrNullNode(), "No error")
             }
         }
