@@ -142,18 +142,30 @@ for examples.
 ==== Indicator edition
 
 An authorized user can edit the indicator for a project by going to the _Tools_ menu
-and select _Project indicators_.
+and select _Project indicators_:
+
+image::images/extension-indicators-project-tool.png[Project tool,200]
 
 All available types are displayed, grouped by categories, and each indicator value is shown
-together with its value, its rating. Note that selecting a time range allows to compute
-and display the trend for each indicator.
+together with its value, its rating:
+
+image::images/extension-indicators-project-indicators.png[Project indicators]
+
+If the indicator has a previous value, its previous rating is displayed.
 
 If the indicator is open to edition, the user can click on the pencil icon to edit the
 value according to the value type. Upon validation, a _new_ indicator value is stored ; the
 old value is kept for history and trend computation.
 
+Comments can be associated with an indicator values. Links & issue references will
+be rendered as links.
+
 An authorized user can also _delete_ the indicator ; this actually register a new _null_
 value for the indicator. The historical values are kept.
+
+The history of an indicator can be accessed by clicking on the _History_ icon:
+
+image::images/extension-indicators-project-indicator-history.png[Indicator history]
 
 [[extension-indicators-portfolios]]
 ==== Indicator portfolios
