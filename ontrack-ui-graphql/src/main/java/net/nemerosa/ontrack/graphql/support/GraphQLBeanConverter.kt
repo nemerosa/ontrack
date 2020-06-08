@@ -13,6 +13,11 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaType
+import kotlin.reflect.typeOf
 
 object GraphQLBeanConverter {
 
@@ -20,6 +25,31 @@ object GraphQLBeanConverter {
             "class"
     )
 
+    fun asInputFields(type: KClass<*>): List<GraphQLInputObjectField> {
+        val fields = mutableListOf<GraphQLInputObjectField>()
+        // Gets the properties for the type
+        type.memberProperties.forEach { property ->
+            val name = getPropertyName(property)
+            val description = getPropertyDescription(property)
+            val scalarType = getScalarType(property.returnType)
+            if (scalarType != null) {
+                val actualType: GraphQLInputType = if (property.returnType.isMarkedNullable) {
+                    scalarType
+                } else {
+                    GraphQLNonNull(scalarType)
+                }
+                fields += GraphQLInputObjectField.newInputObjectField()
+                        .name(name)
+                        .description(description)
+                        .type(actualType)
+                        .build()
+            }
+        }
+        // OK
+        return fields
+    }
+
+    @Deprecated("Use method with KClass")
     fun asInputFields(type: Class<*>): List<GraphQLInputObjectField> {
         val fields = mutableListOf<GraphQLInputObjectField>()
         // Gets the properties for the type
@@ -41,6 +71,7 @@ object GraphQLBeanConverter {
         return fields
     }
 
+    @Deprecated("No replacement yet, but Java class must be avoided")
     fun asInputType(type: Class<*>): GraphQLInputType {
         return GraphQLInputObjectType.newInputObject()
                 .name(type.simpleName)
@@ -48,29 +79,12 @@ object GraphQLBeanConverter {
                 .build()
     }
 
-    private fun getDescription(type: Class<*>, descriptor: PropertyDescriptor): String? {
-        val readMethod: Method? = descriptor.readMethod
-        if (readMethod != null) {
-            val annotation: APIDescription? = readMethod.getAnnotation(APIDescription::class.java)
-            if (annotation != null) {
-                return annotation.value
-            }
-        }
-        val field: Field? = FieldUtils.getField(type, descriptor.name, true)
-        if (field != null) {
-            val annotation = field.getAnnotation(APIDescription::class.java)
-            if (annotation != null) {
-                return annotation.value
-            }
-        }
-        return descriptor.shortDescription
-    }
-
     @JvmOverloads
     fun asObjectType(type: Class<*>, cache: GQLTypeCache, exclusions: Set<String>? = null): GraphQLObjectType {
         return asObjectTypeBuilder(type, cache, exclusions).build()
     }
 
+    @Deprecated("Use Kotlin equivalent")
     fun asObjectTypeBuilder(type: Class<*>, cache: GQLTypeCache, exclusions: Set<String>?): GraphQLObjectType.Builder {
         var builder: GraphQLObjectType.Builder = GraphQLObjectType.newObject()
                 .name(type.simpleName)
@@ -129,11 +143,20 @@ object GraphQLBeanConverter {
             Long::class.java.isAssignableFrom(type) -> GraphQLLong
             Double::class.java.isAssignableFrom(type) -> GraphQLFloat
             Float::class.java.isAssignableFrom(type) -> GraphQLFloat
-            Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
+            java.lang.Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
             String::class.java.isAssignableFrom(type) -> GraphQLString
             JsonNode::class.java.isAssignableFrom(type) -> GQLScalarJSON.INSTANCE
             LocalDateTime::class.java.isAssignableFrom(type) -> GQLScalarLocalDateTime.INSTANCE
             else -> null
+        }
+    }
+
+    fun getScalarType(type: KType): GraphQLScalarType? {
+        val javaType = type.javaType
+        return if (javaType is Class<*>) {
+            getScalarType(javaType)
+        } else {
+            null
         }
     }
 
@@ -164,4 +187,22 @@ object GraphQLBeanConverter {
             else -> throw IllegalArgumentException("Argument is expected to be a map")
         }
     }
+}
+
+private fun getDescription(type: Class<*>, descriptor: PropertyDescriptor): String? {
+    val readMethod: Method? = descriptor.readMethod
+    if (readMethod != null) {
+        val annotation: APIDescription? = readMethod.getAnnotation(APIDescription::class.java)
+        if (annotation != null) {
+            return annotation.value
+        }
+    }
+    val field: Field? = FieldUtils.getField(type, descriptor.name, true)
+    if (field != null) {
+        val annotation = field.getAnnotation(APIDescription::class.java)
+        if (annotation != null) {
+            return annotation.value
+        }
+    }
+    return descriptor.shortDescription
 }

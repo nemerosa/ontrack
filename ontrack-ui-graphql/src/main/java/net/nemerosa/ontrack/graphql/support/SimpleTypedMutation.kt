@@ -17,7 +17,7 @@ class SimpleTypedMutation<I : Any, T : Any>(
         private val fetcher: (I) -> T
 ) : Mutation {
 
-    override val inputFields: List<GraphQLInputObjectField> = asInputFields(input.java)
+    override val inputFields: List<GraphQLInputObjectField> = asInputFields(input)
 
     override val outputFields: List<GraphQLFieldDefinition> = listOf(
             objectField(outputType, outputName, outputDescription)

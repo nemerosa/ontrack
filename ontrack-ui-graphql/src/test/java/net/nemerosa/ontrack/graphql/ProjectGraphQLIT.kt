@@ -34,10 +34,9 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 }
             """, mapOf("name" to name))
             // Checks the project has been created
-            assertNotNull(
-                    structureService.findProjectByName(name).getOrNull(),
-                    "Project has been created"
-            )
+            assertNotNull(structureService.findProjectByName(name).getOrNull(), "Project has been created") {
+                assertFalse(it.isDisabled, "Project is not disabled")
+            }
             // Checks the data
             val project = data["createProject"]["project"]
             assertTrue(project["id"].asInt() > 0, "ID is set")
@@ -69,6 +68,131 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals("Project name already exists: $name", error["message"].asText())
                 assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException", error["exception"].asText())
                 assertTrue(data["createProject"]["project"].isNullOrNullNode(), "Project not returned")
+            }
+        }
+    }
+
+    @Test
+    fun `Updating a project's name`() {
+        asAdmin {
+            project {
+                val newName = uid("P")
+                val data = run("""
+                    mutation UpdateProject(${'$'}name: String!) {
+                        updateProject(input: {id: $id, name: ${'$'}name}) {
+                            project {
+                                id
+                                name
+                            }
+                            errors {
+                                message
+                                exception
+                            }
+                        }
+                    }
+                """, mapOf("name" to newName))
+                // Checks the project has been created
+                structureService.getProject(id).apply {
+                    assertEquals(newName, name)
+                }
+                // Checks the data
+                val project = data["updateProject"]["project"]
+                assertTrue(project["id"].asInt() > 0, "ID is set")
+                assertEquals(newName, project["name"].asText(), "Name is OK")
+                assertTrue(data["updateProject"]["errors"].isNullOrNullNode(), "No error")
+            }
+        }
+    }
+
+    @Test
+    fun `Updating a project's description`() {
+        asAdmin {
+            project {
+                val newDescription = uid("P")
+                val data = run("""
+                    mutation UpdateProject(${'$'}description: String!) {
+                        updateProject(input: {description: ${'$'}description}) {
+                            project {
+                                id
+                                name
+                                description
+                            }
+                            errors {
+                                message
+                                exception
+                            }
+                        }
+                    }
+                """, mapOf("description" to newDescription))
+                // Checks the project has been created
+                structureService.getProject(id).apply {
+                    assertEquals(newDescription, description)
+                }
+                // Checks the data
+                val project = data["updateProject"]["project"]
+                assertTrue(project["id"].asInt() > 0, "ID is set")
+                assertEquals(newDescription, project["description"].asText(), "Description is OK")
+                assertTrue(data["updateProject"]["errors"].isNullOrNullNode(), "No error")
+            }
+        }
+    }
+
+    @Test
+    fun `Updating a project's state`() {
+        asAdmin {
+            project {
+                val data = run("""
+                    mutation UpdateProject {
+                        updateProject(input: {disabled: true}) {
+                            project {
+                                id
+                                name
+                                disabled
+                            }
+                            errors {
+                                message
+                                exception
+                            }
+                        }
+                    }
+                """)
+                // Checks the project has been created
+                structureService.getProject(id).apply {
+                    assertTrue(isDisabled)
+                }
+                // Checks the data
+                val project = data["updateProject"]["project"]
+                assertTrue(project["id"].asInt() > 0, "ID is set")
+                assertTrue(project["disabled"].asBoolean(), "State is OK")
+                assertTrue(data["updateProject"]["errors"].isNullOrNullNode(), "No error")
+            }
+        }
+    }
+
+    @Test
+    fun `Updating a project fails before of duplicated name`() {
+        asAdmin {
+            val existingName = project().name
+            project {
+                val data = run("""
+                    mutation UpdateProject(${'$'}name: String!) {
+                        updateProject(input: {name: ${'$'}name}) {
+                            project {
+                                id
+                                name
+                            }
+                            errors {
+                                message
+                                exception
+                            }
+                        }
+                    }
+                """, mapOf("name" to existingName))
+                // Checks the errors
+                val error = data["updateProject"]["errors"][0]
+                assertEquals("Project name already exists: $name", error["message"].asText())
+                assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException", error["exception"].asText())
+                assertTrue(data["updateProject"]["project"].isNullOrNullNode(), "Project not returned")
             }
         }
     }

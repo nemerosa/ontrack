@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.graphql.support
 
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNamedType
+import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.schema.UpdateProjectInput
+import net.nemerosa.ontrack.model.structure.NameDescriptionState
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -72,6 +75,50 @@ class GraphQLBeanConverterTest {
                 ),
                 fields
         )
+    }
+
+    @Test
+    fun `Input fields for NameDescriptionState`() {
+        val fields = GraphQLBeanConverter.asInputFields(NameDescriptionState::class).associateBy { it.name }
+        assertNotNull(fields["name"]) {
+            assertEquals("String!", typeName(it.type))
+            assertEquals("name field", it.description)
+        }
+        assertNotNull(fields["description"]) {
+            assertEquals("String", typeName(it.type))
+            assertEquals("description field", it.description)
+        }
+        assertNotNull(fields["disabled"]) {
+            assertEquals("Boolean!", typeName(it.type))
+            assertEquals("disabled field", it.description)
+        }
+    }
+
+    @Test
+    fun `Input fields for UpdateProjectInput`() {
+        val fields = GraphQLBeanConverter.asInputFields(UpdateProjectInput::class).associateBy { it.name }
+        assertNotNull(fields["id"]) {
+            assertEquals("Int!", typeName(it.type))
+            assertEquals("Project ID", it.description)
+        }
+        assertNotNull(fields["name"]) {
+            assertEquals("String", typeName(it.type))
+            assertEquals("Project name (leave null to not change)", it.description)
+        }
+        assertNotNull(fields["description"]) {
+            assertEquals("String", typeName(it.type))
+            assertEquals("Project description (leave null to not change)", it.description)
+        }
+        assertNotNull(fields["disabled"]) {
+            assertEquals("Boolean", typeName(it.type))
+            assertEquals("Project state (leave null to not change)", it.description)
+        }
+    }
+
+    private fun typeName(type: GraphQLType): String = if (type is GraphQLNamedType) {
+        type.name
+    } else {
+        type.toString()
     }
 
     private fun fieldToTypeNames(fields: List<GraphQLFieldDefinition>): Map<String, String> =

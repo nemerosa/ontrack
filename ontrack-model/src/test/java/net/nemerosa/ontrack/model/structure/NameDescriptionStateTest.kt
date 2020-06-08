@@ -8,6 +8,18 @@ import kotlin.test.assertEquals
 class NameDescriptionStateTest {
 
     @Test
+    fun `To JSON`() {
+        assertEquals(
+                mapOf(
+                        "name" to "My name",
+                        "description" to "My description",
+                        "disabled" to true
+                ).asJson(),
+                NameDescriptionState("My name", "My description", true).asJson()
+        )
+    }
+
+    @Test
     fun `From JSON with disabled set to true`() {
         val state = mapOf(
                 "name" to "my-name",
