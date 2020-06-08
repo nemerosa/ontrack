@@ -68,6 +68,11 @@ class ProjectMutations(
                 val project = structureService.getProject(ID(input.id))
                 structureService.enableProject(project)
             }
+
+            // TODO New project form
+            // TODO Update project form
+            // TODO Mark a project as favourite
+            // TODO Unmark a project as favourite
     )
 
 }
