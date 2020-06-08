@@ -13,11 +13,12 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.jvm.internal.Reflection
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaType
-import kotlin.reflect.typeOf
 
 object GraphQLBeanConverter {
 
@@ -79,7 +80,55 @@ object GraphQLBeanConverter {
                 .build()
     }
 
+    fun asObjectType(type: KClass<*>, cache: GQLTypeCache): GraphQLObjectType {
+        return GraphQLObjectType.newObject()
+                .name(type.java.simpleName)
+                .description(getTypeDescription(type))
+                .fields(asObjectFields(type, cache))
+                .build()
+    }
+
+    fun asObjectFields(type: KClass<*>, cache: GQLTypeCache): List<GraphQLFieldDefinition> {
+        val fields = mutableListOf<GraphQLFieldDefinition>()
+        type.memberProperties.forEach { property ->
+            val name = getPropertyName(property)
+            val description = getPropertyDescription(property)
+            val nullable = property.returnType.isMarkedNullable
+            // Field builder
+            val field = GraphQLFieldDefinition.newFieldDefinition()
+                    .name(name)
+                    .description(description)
+            // Deprecation
+            property.findAnnotation<Deprecated>()?.let {
+                field.deprecate(it.message)
+            }
+            // Property type (JVM)
+            val propertyType = property.returnType.javaType
+            if (propertyType is Class<*>) {
+                // Tries as scalar first
+                val scalarType = getScalarType(propertyType)
+                // Type
+                val actualType: GraphQLOutputType = if (scalarType != null) {
+                    scalarType
+                } else if (propertyType is Map<*, *> || propertyType is Collection<*>) {
+                    throw IllegalArgumentException("Maps and collections are not supported yet: ${property.name} in ${type.simpleName}")
+                } else {
+                    // Property type as Kotlin
+                    val propertyKClass = Reflection.createKotlinClass(propertyType)
+                    // Tries to convert to an object type
+                    cache.getOrCreate(
+                            propertyType.simpleName
+                    ) { asObjectType(propertyKClass, cache) }
+                }
+                // Assignment
+                fields += field.type(nullableType(actualType, nullable)).build()
+            }
+        }
+        return fields
+    }
+
     @JvmOverloads
+    @Deprecated("Use Kotlin equivalent")
     fun asObjectType(type: Class<*>, cache: GQLTypeCache, exclusions: Set<String>? = null): GraphQLObjectType {
         return asObjectTypeBuilder(type, cache, exclusions).build()
     }
@@ -144,6 +193,7 @@ object GraphQLBeanConverter {
             Double::class.java.isAssignableFrom(type) -> GraphQLFloat
             Float::class.java.isAssignableFrom(type) -> GraphQLFloat
             java.lang.Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
+            Boolean::class.java.isAssignableFrom(type) -> GraphQLBoolean
             String::class.java.isAssignableFrom(type) -> GraphQLString
             JsonNode::class.java.isAssignableFrom(type) -> GQLScalarJSON.INSTANCE
             LocalDateTime::class.java.isAssignableFrom(type) -> GQLScalarLocalDateTime.INSTANCE

@@ -11,30 +11,37 @@ import kotlin.reflect.KClass
 inline fun <reified T : Any> objectField(
         name: String,
         description: String? = null,
-        nullable: Boolean = true
-) = objectField(T::class, name, description, nullable)
+        nullable: Boolean = true,
+        noinline fetcher: ((DataFetchingEnvironment) -> T?)? = null
+) = objectField(T::class, name, description, nullable, fetcher)
 
 fun <T : Any> objectField(
         type: KClass<T>,
         name: String,
         description: String? = null,
-        nullable: Boolean = true
+        nullable: Boolean = true,
+        fetcher: ((DataFetchingEnvironment) -> T?)? = null
 ) = objectField(
         type = type.toTypeRef(),
         name = name,
         description = description,
-        nullable = nullable
+        nullable = nullable,
+        fetcher = fetcher
 )
 
-fun objectField(
+fun <T> objectField(
         type: GraphQLOutputType,
         name: String,
         description: String? = null,
-        nullable: Boolean = true
+        nullable: Boolean = true,
+        fetcher: ((DataFetchingEnvironment) -> T?)? = null
 ): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
         .name(name)
         .description(description)
         .type(nullableType(type, nullable))
+        .apply {
+            fetcher?.let { dataFetcher(it) }
+        }
         .build()
 
 // ============================================================================

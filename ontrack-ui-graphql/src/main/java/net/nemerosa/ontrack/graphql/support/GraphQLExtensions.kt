@@ -3,8 +3,23 @@ package net.nemerosa.ontrack.graphql.support
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
+
+/**
+ * Getting the description for a class.
+ *
+ * Will use by order to priority:
+ *
+ * # the provided [description] if any
+ * # the [APIDescription] annotation if any
+ * # a generated string based on the type name
+ */
+fun getTypeDescription(type: KClass<*>, description: String? = null): String =
+        description
+                ?: type.findAnnotation<APIDescription>()?.value
+                ?: type.java.simpleName
 
 /**
  * Getting the description for a property.

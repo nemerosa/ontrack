@@ -115,15 +115,19 @@ class GraphQLBeanConverterTest {
         }
     }
 
-    private fun typeName(type: GraphQLType): String = if (type is GraphQLNamedType) {
-        type.name
-    } else {
-        type.toString()
-    }
+    companion object {
 
-    private fun fieldToTypeNames(fields: List<GraphQLFieldDefinition>): Map<String, String> =
-            fields.associate {
-                it.name to (it.type as GraphQLNamedType).name
-            }
+        fun typeName(type: GraphQLType): String = if (type is GraphQLNamedType) {
+            type.name
+        } else {
+            type.toString()
+        }
+
+        fun fieldToTypeNames(fields: List<GraphQLFieldDefinition>): Map<String, String> =
+                fields.associate {
+                    it.name to typeName(it.type)
+                }
+
+    }
 
 }
