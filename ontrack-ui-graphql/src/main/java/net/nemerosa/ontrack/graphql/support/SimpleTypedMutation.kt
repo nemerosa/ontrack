@@ -11,7 +11,7 @@ class SimpleTypedMutation<I : Any, T : Any>(
         override val name: String,
         override val description: String,
         private val input: KClass<I>,
-        outputName: String,
+        private val outputName: String,
         outputDescription: String,
         outputType: KClass<T>,
         private val fetcher: (I) -> T
@@ -26,7 +26,7 @@ class SimpleTypedMutation<I : Any, T : Any>(
     override fun fetch(env: DataFetchingEnvironment): Any {
         val input = mutationInput(input, env)
         // TODO Validate
-        return fetcher(input)
+        return mapOf(outputName to fetcher(input))
     }
 }
 

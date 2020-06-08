@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLObjectType
+import graphql.schema.*
 import graphql.schema.GraphQLObjectType.newObject
-import graphql.schema.GraphQLSchema
-import graphql.schema.GraphQLType
 import net.nemerosa.ontrack.common.CachedSupplier
 import org.springframework.stereotype.Service
 
@@ -62,8 +59,55 @@ class GraphqlSchemaServiceImpl(
     }
 
     private fun createMutation(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLFieldDefinition {
-        TODO("Not yet implemented")
+        // Create the mutation input type
+        val inputType = createMutationInputType(mutation, dictionary)
+        // Create the mutation output type
+        val outputType = createMutationOutputType(mutation, dictionary)
+        // Create the mutation field
+        val field = GraphQLFieldDefinition.newFieldDefinition()
+                .name(mutation.name)
+                .description(mutation.description)
+                .argument {
+                    it.name("input")
+                            .description("Input for the mutation")
+                            .type(inputType)
+                }
+                .type(outputType)
+                .build()
+        // Data fetching
+        GraphQLCodeRegistry.newCodeRegistry()
+                .dataFetcher(outputType, field) { env -> mutationFetcher(mutation, env) }
+                .build()
+        // OK
+        return field
     }
+
+    private fun mutationFetcher(mutation: Mutation, env: DataFetchingEnvironment): Any {
+        return try {
+            mutation.fetch(env)
+        } catch (ex: Exception) {
+            TODO("Management of errors")
+        }
+    }
+
+    private fun createMutationOutputType(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLObjectType =
+            GraphQLObjectType.newObject()
+                    .name("${mutation.typePrefix}Payload")
+                    .description("Output type for the ${mutation.name} mutation.")
+                    .fields(mutation.outputFields)
+                    // TODO Error management fields
+                    .build()
+                    .apply { dictionary.add(this) }
+
+    private fun createMutationInputType(mutation: Mutation, dictionary: MutableSet<GraphQLType>): GraphQLInputType =
+            GraphQLInputObjectType.newInputObject()
+                    .name("${mutation.typePrefix}Input")
+                    .description("Input type for the ${mutation.name} mutation.")
+                    .fields(mutation.inputFields)
+                    .build()
+                    .apply { dictionary.add(this) }
+
+    private val Mutation.typePrefix: String get() = name.capitalize()
 
     companion object {
         const val QUERY = "Query"
