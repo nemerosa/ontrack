@@ -4,6 +4,8 @@
 Project indicators are set at <<model,project>> level to hold values about different
 _types_ of information.
 
+image::images/extension-indicators-portfolio-overview.png[Portfolio overview]
+
 Those types of information are grouped into _categories_ and can have a specific _value
 type_, like a boolean (yes/no), a percentage, a numeric value, etc. Types can be entered
 manually, imported or computed.
@@ -69,6 +71,73 @@ Categories and types can also be <<extension-indicators-import,imported>> or
 <<extension-indicators-computing,computed>>. In such a case, both the category and the type
 are associated with a _source_ and they cannot be edited.
 
+[[extension-indicators-value-types]]
+===== Value types
+
+The following value types are available in Ontrack:
+
+|===
+| Type | Description | Configuration | Example
+
+| Yes/No
+| Value which can be either _Yes_ (`true`) or _No_ (`false`)
+| `required` - flag to indicate if the indicator _must_ be _Yes_ in order
+  for the project to be fully compliant. If `required` is `false`, the rating will
+  be `A` is the value is set to _Yes_  and `D` if the value is _No_. For a
+  _No_ value on a _required_ indicator, the rating would be `F`.
+| "Project should be build with Gradle" - because of the "should", the indicator
+  _required_ value is set to `false`.
+
+| Percentage
+| Integer value between `0` and `100` inclusive
+| `threshold` - pivot value (see example)
+
+  `higherIsBetter` - a higher percentage in the value of the indicator indicates
+  a better quality (see example)
+| "Test coverage" is expressed as a percentage and `higherIsBetter` will be
+  set to `true`. If `threshold` is set to 80:
+
+  * any value >= 80% has a rating of `A`
+  * for values below 80%, the rating is computed proportionally, with 0% having
+    a rating of `F`
+
+  "Duplicated code" can also be expressed as a percentage, but this time
+  with `higherIsBetter` being set to `false`. If `threshold` is set to 10:
+
+  * any value <= 10% has a rating of `A`
+  * for values above 10%, the rating is computed proportionally, with 100% having
+    a rating of `F`
+
+| Number
+| Integer value >= 0
+| `min` - pivot value (see example)
+
+  `max` - secondary pivot value (see example)
+
+  `higherIsBetter` - a higher value of the indicator indicates
+  a better quality (see example)
+| "Number of blocking issues" is expressed as a number with `higherIsBetter`
+  being set to `false`. If `min` is 0 and `max` is 10:
+
+* any value set to 0 has a rating of `A`
+* any value >= 10 has a rating of `F`
+* for any value in between, the rating is computed proportionally
+
+A "Number of tests" could be expressed as a number with `higherIsBetter`
+being set to `true`. If `min` is 100 and `max` is 1000:
+
+* any value <= 100 has a rating of `F`
+* any value >= 1000 has a rating of `A`
+* for any value in between, the rating is computed proportionally
+|===
+
+[NOTE]
+====
+Additional value types can be created by registering an <<extending,extension>>
+implementing the `IndicatorValueType` interface. See existing value types
+for examples.
+====
+
 [[extension-indicators-projects]]
 ==== Indicator edition
 
@@ -89,7 +158,10 @@ value for the indicator. The historical values are kept.
 [[extension-indicators-portfolios]]
 ==== Indicator portfolios
 
-TODO
+Portfolios are available in the _Indicator portfolios_ user menu and the
+associated page displays the list of already created portfolios.
+
+
 
 [[extension-indicators-import]]
 ==== Importing categories and types
