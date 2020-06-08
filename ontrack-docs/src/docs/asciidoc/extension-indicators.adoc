@@ -373,6 +373,8 @@ Upon import:
 * existing categories & types are updated and associated indicators are left untouched
 * removed categories & types are deleted, and associated indicators are deleted
 
+NOTE: Imported categories & types cannot be edited.
+
 [[extension-indicators-computing]]
 ==== Computing indicators
 
@@ -387,3 +389,6 @@ See the documentation of those two types for more information.
 
 The `SonarQubeIndicatorComputer` extension is an example of such an
 implementation.
+
+NOTE: Computed categories & types cannot be edited, and their values cannot
+      be edited manually.
