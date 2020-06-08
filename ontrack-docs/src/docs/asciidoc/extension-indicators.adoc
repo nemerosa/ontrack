@@ -306,7 +306,72 @@ existing labels to projects but cannot create new labels.
 [[extension-indicators-import]]
 ==== Importing categories and types
 
-TODO
+While indicator categories and types can be <<extension-indicators-types,entered manually>>,
+it is also possible to import lists of categories and their associated types.
+
+****
+In a company, a number of "principles" have been created for projects
+to comply with. They have been written as Asciidoc and are published as a browsable
+web site. The associated principles, grouped in pages, have been imported
+as types (and categories) in Ontrack, by parsing the Asciidoc.
+****
+
+To import categories & types in Ontrack, you need a user allowed
+to <<extension-indicators-acl,manage types>> and you can use the
+`POST /extension/indicators/imports` end point, passing a JSON as payload.
+
+For example, with Curl:
+
+[source,bash]
+----
+curl --user <user> \
+  -H "Content-Type: application/json" \
+  -X POST \
+  http://ontrack/extension/indicators/imports \
+  --data @payload.json
+----
+
+where:
+
+[source,json]
+.payload.json
+----
+{
+  "source": "principles",
+  "categories": [
+    {
+      "id": "service-principles",
+      "name": "Service Principles",
+      "types": [
+        {
+          "id": "java-spring-boot",
+          "name": "SHOULD Use Java & spring boot stack",
+          "required": false,
+          "link": "https://example.com/architecture-principles/latest/service_principles.html#java-spring-boot"
+        }
+      ]
+    }
+  ]
+}
+----
+
+The `source` is an ID identifying the nature of this list.
+
+Each category must have an `id` (unique in Ontrack) and a display `name`.
+
+Each type must have:
+
+* an `id` (unique in Ontrack)
+* a display `name`
+* a `required` flag - as of now, only "Yes/No" <<extension-indicators-value-types,value types>>
+  are supported
+* an optional `link` to some external documentation
+
+Upon import:
+
+* new existing & types are created
+* existing categories & types are updated and associated indicators are left untouched
+* removed categories & types are deleted, and associated indicators are deleted
 
 [[extension-indicators-computing]]
 ==== Computing indicators
