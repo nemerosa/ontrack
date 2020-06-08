@@ -250,6 +250,37 @@ NOTE: The deletion of a portfolio _does not_ delete any indicator in any project
 [[extension-indicators-portfolios-view]]
 ===== Portfolio page
 
+By clicking on the portfolio name in the portfolio overview, you get to
+a page displaying:
+
+* the list of projects associated with this portfolio
+* the list of categories associated with this portfolio
+* the average indicator rating for project and for each category
+
+image::images/extension-indicators-portfolio-view.png[Portfolio view]
+
+NOTE: As for the portfolio overview, the average rating is computed only using the
+indicators which are actually set, and the ratio filled vs. total is displayed.
+
+The trend period selector allows you to check the past average values and the
+associated trends.
+
+Clicking on a project name goes to the <<extension-indicators-projects,project indicators page>>.
+
+Clicking on a category name goes to a page displaying a detailed view
+of indicators for all the types in this category and for all the projects
+of this portfolio:
+
+image::images/extension-indicators-portfolio-category.png[Portfolio category]
+
+In this view, clicking on the icon right to the type name will bring up
+a page displaying the indicator values for this type for all the projects
+of this portfolio:
+
+image::images/extension-indicators-portfolio-type.png[Portfolio type]
+
+According to your rights, you can edit and delete indicator values from this page.
+
 [[extension-indicators-portfolios-edition]]
 ===== Portfolio edition
 
