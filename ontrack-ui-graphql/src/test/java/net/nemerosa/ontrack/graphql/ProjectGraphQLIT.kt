@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertNotPresent
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
@@ -194,6 +195,55 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException", error["exception"].asText())
                 assertTrue(data["updateProject"]["project"].isNullOrNullNode(), "Project not returned")
             }
+        }
+    }
+
+    @Test
+    fun `Deleting a project`() {
+        asAdmin {
+            project {
+                val data = run("""
+                    mutation DeleteProject {
+                        deleteProject(input: {id: $id}) {
+                            projects {
+                                id
+                            }
+                            errors {
+                                message
+                                exception
+                            }
+                        }
+                    }
+                """)
+                // Checks the project has been deleted
+                assertNotPresent(structureService.findProjectByName(name))
+                // Checks the data
+                val projects = data["deleteProject"]["projects"].map { it["id"].asInt() }
+                assertTrue(id() !in projects, "Project not present")
+                assertTrue(data["deleteProject"]["errors"].isNullOrNullNode(), "No error")
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting a non existingproject`() {
+        asAdmin {
+            val project = project()
+            structureService.deleteProject(project.id)
+            val data = run("""
+                    mutation DeleteProject {
+                        deleteProject(input: {id: ${project.id}}) {
+                            errors {
+                                message
+                                exception
+                            }
+                        }
+                    }
+                """)
+            // Checks the errors
+            val error = data["deleteProject"]["errors"][0]
+            assertEquals("Project ID not found: ${project.id}", error["message"].asText())
+            assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException", error["exception"].asText())
         }
     }
 

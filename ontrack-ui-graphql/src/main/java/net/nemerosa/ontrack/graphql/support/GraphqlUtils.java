@@ -89,7 +89,10 @@ public final class GraphqlUtils {
 
     /**
      * Returns a non-null list of non-null types
+     *
+     * @deprecated Use the Kotlin form
      */
+    @Deprecated
     public static GraphQLOutputType stdList(GraphQLType type) {
         return new GraphQLNonNull(
                 new GraphQLList(
