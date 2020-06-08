@@ -258,7 +258,10 @@ pipeline {
             when {
                 beforeAgent true
                 not {
-                    branch "master"
+                    anyOf {
+                        branch "master"
+                        changeRequest()
+                    }
                 }
             }
             steps {
@@ -336,7 +339,10 @@ pipeline {
             when {
                 beforeAgent true
                 not {
-                    branch "master"
+                    anyOf {
+                        branch "master"
+                        changeRequest()
+                    }
                 }
             }
             steps {
@@ -404,6 +410,15 @@ pipeline {
         }
 
         stage('Codecov upload') {
+            when {
+                beforeAgent true
+                not {
+                    anyOf {
+                        branch "master"
+                        changeRequest()
+                    }
+                }
+            }
             steps {
                 // Upload to Codecov
                 sh '''
