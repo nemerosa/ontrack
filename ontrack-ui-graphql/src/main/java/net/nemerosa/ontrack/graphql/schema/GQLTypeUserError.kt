@@ -18,6 +18,7 @@ class GQLTypeUserError: GQLType {
                     .name(typeName)
                     .description("Representation of an error.")
                     .stringField(UserError::message)
+                    .stringField(UserError::exception)
                     .build()
 
     companion object {
@@ -31,5 +32,7 @@ class GQLTypeUserError: GQLType {
 
 data class UserError(
         @APIDescription("The error message")
-        val message: String
+        val message: String,
+        @APIDescription("Programmatic code to be used by client. Usually the FQCN of the corresponding exception.")
+        val exception: String
 )

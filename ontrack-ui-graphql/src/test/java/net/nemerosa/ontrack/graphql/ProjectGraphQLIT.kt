@@ -59,13 +59,15 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                             errors {
                                 message
+                                exception
                             }
                         }
                     }
                 """, mapOf("name" to name))
                 // Checks the errors
-                val message = data["createProject"]["errors"][0]["message"].asText()
-                assertEquals("Project name already exists: $name", message)
+                val error = data["createProject"]["errors"][0]
+                assertEquals("Project name already exists: $name", error["message"].asText())
+                assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException", error["exception"].asText())
                 assertTrue(data["createProject"]["project"].isNullOrNullNode(), "Project not returned")
             }
         }

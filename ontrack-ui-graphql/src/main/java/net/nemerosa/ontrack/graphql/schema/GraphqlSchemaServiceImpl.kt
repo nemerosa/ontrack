@@ -83,8 +83,10 @@ class GraphqlSchemaServiceImpl(
             mutation.fetch(env)
         } catch (ex: Exception) {
             if (ex is UserException) {
+                val exception = ex::class.java.name
                 val error = UserError(
-                        message = ex.message ?: ex::class.java.name
+                        message = ex.message ?: exception,
+                        exception = exception
                 )
                 mapOf("errors" to listOf(error))
             } else {
