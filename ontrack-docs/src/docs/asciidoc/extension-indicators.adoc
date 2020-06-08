@@ -376,5 +376,14 @@ Upon import:
 [[extension-indicators-computing]]
 ==== Computing indicators
 
-TODO
+It is possible to define some types whose value is not entered manually but
+is computed by Ontrack itself.
 
+You do so by registering an <<extending,extension>> which implements
+the `IndicatorComputer` interface, or the `AbstractBranchIndicatorComputer`
+class when the value must be computed from the "main branch" of a project.
+
+See the documentation of those two types for more information.
+
+The `SonarQubeIndicatorComputer` extension is an example of such an
+implementation.
