@@ -4,7 +4,11 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
+import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.internal.storage.file.FileRepository
+import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayOutputStream
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -12,6 +16,17 @@ import kotlin.test.assertNotNull
  * Integration tests for getting a diff from a Git change log.
  */
 class GitDiffIT : AbstractGitTestSupport() {
+
+    private lateinit var oldPrefix: String
+    private lateinit var newPrefix: String
+
+    @Before
+    fun `Load user git diff config`() {
+        val userGitDiffFormat = DiffFormatter(ByteArrayOutputStream())
+        userGitDiffFormat.setRepository(FileRepository(""))
+        oldPrefix = userGitDiffFormat.oldPrefix
+        newPrefix = userGitDiffFormat.newPrefix
+    }
 
     @Test
     fun `File change indicator`() {
@@ -50,33 +65,33 @@ class GitDiffIT : AbstractGitTestSupport() {
         changeLog {
             val diff = gitService.diff(this, emptyList())
             assertEquals("""
-diff --git a/file1 b/file1
+diff --git ${oldPrefix}file1 ${newPrefix}file1
 index 3be9c81..6ad36e5 100644
---- a/file1
-+++ b/file1
+--- ${oldPrefix}file1
++++ ${newPrefix}file1
 @@ -1 +1,3 @@
  Line 1
 +Line 2
 +Line 3
-diff --git a/file2 b/file2
+diff --git ${oldPrefix}file2 ${newPrefix}file2
 index 3be9c81..c82de6a 100644
---- a/file2
-+++ b/file2
+--- ${oldPrefix}file2
++++ ${newPrefix}file2
 @@ -1 +1,2 @@
  Line 1
 +Line 2
-diff --git a/file3 b/file3
+diff --git ${oldPrefix}file3 ${newPrefix}file3
 new file mode 100644
 index 0000000..c82de6a
 --- /dev/null
-+++ b/file3
++++ ${newPrefix}file3
 @@ -0,0 +1,2 @@
 +Line 1
 +Line 2
-diff --git a/file4 b/file4
+diff --git ${oldPrefix}file4 ${newPrefix}file4
 deleted file mode 100644
 index 3be9c81..0000000
---- a/file4
+--- ${oldPrefix}file4
 +++ /dev/null
 @@ -1 +0,0 @@
 -Line 1
@@ -89,10 +104,10 @@ index 3be9c81..0000000
         changeLog {
             val diff = gitService.diff(this, listOf("file1"))
             assertEquals("""
-diff --git a/file1 b/file1
+diff --git ${oldPrefix}file1 ${newPrefix}file1
 index 3be9c81..6ad36e5 100644
---- a/file1
-+++ b/file1
+--- ${oldPrefix}file1
++++ ${newPrefix}file1
 @@ -1 +1,3 @@
  Line 1
 +Line 2
