@@ -173,7 +173,85 @@ image::images/extension-indicators-project-indicator-history.png[Indicator histo
 Portfolios are available in the _Indicator portfolios_ user menu and the
 associated page displays the list of already created portfolios.
 
+Each portfolio is associated with a list of selected _global categories_
+and each of those categories is associated with the average rating for all
+the projects and all the types of this category.
 
+image::images/extension-indicators-portfolio-overview.png[Portfolio overview]
+
+NOTE: Only indicators having an actual value are used to compute the
+average rating. The indicators which are not set are not used for
+the computation and the ratio "number of indicators being set" to the
+"number of total indicators" is also displayed. This gives an idea
+about the trust we can have in this average rating.
+
+NOTE: The minimum ratings are also mentioned if they diverge from
+the average.
+
+The trend period allows to display the average value from the past, and
+to compare it with the current value.
+
+[WARNING]
+====
+The trend computation is currently not correct -
+see the https://github.com/nemerosa/ontrack/issues/793[#793] issue.
+====
+
+[[extension-indicators-portfolios-global-indicators]]
+===== Global indicators
+
+<<extension-indicators-acl,Authorized users>> can edit the list
+of categories which are displayed on the portfolio overview by clicking
+on the _Global indicators_ command:
+
+image::images/extension-indicators-global-indicators-command.png[Global indicators command,300]
+
+On the associated page, the user can select / unselect the categories which
+must be displayed for _all portfolios_:
+
+image::images/extension-indicators-global-indicators-page.png[Global indicators,300]
+
+Closing this page goes back to the portfolio overview.
+
+[[extension-indicators-portfolios-management]]
+===== Management of portfolios
+
+<<extension-indicators-acl,Authorized users>> can create, edit and delete portfolios.
+
+Creating a portfolio is done using the _Create portfolio_ command:
+
+image::images/extension-indicators-portfolio-create-command.png[Create portfolio command,300]
+
+The portfolio creation dialog requires:
+
+* an ID - must be unique amont all the portfolios and will be used as an
+  identifier. It must therefore comply with the following regular expression:
+  `[a-z0-9:-]+` (lowercase letters, digits, `:` colon or `-` dashes). The ID
+  cannot be modified later on.
+* a display name
+
+image::images/extension-indicators-portfolio-create-dialog.png[Create portfolio dialog,400]
+
+Once created, the portfolio appears on the portfolio overview and can edited or
+deleted using the appropriate icons:
+
+image::images/extension-indicators-portfolio-commands.png[Portfolio commands]
+
+* the portfolio name is actually a link going to
+  the detailed <<extension-indicators-portfolios-view,portfolio view>>
+* the arrow icon goes to the home page and displays only the projects
+  associated to this portfolio
+* the edition icon goes to the <<extension-indicators-portfolios-edition,portfolio edition page>>
+* the deletion icon displays a warning and allows the user to delete the
+  portfolio.
+
+NOTE: The deletion of a portfolio _does not_ delete any indicator in any project.
+
+[[extension-indicators-portfolios-view]]
+===== Portfolio page
+
+[[extension-indicators-portfolios-edition]]
+===== Portfolio edition
 
 [[extension-indicators-import]]
 ==== Importing categories and types
