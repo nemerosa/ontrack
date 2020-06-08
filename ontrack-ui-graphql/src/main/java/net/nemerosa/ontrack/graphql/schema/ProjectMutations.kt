@@ -18,8 +18,8 @@ class ProjectMutations(
             /**
              * Creating a project
              */
-            simpleMutation("createProject", "Creates a new project",
-                    NameDescriptionState::class,
+            simpleMutation(
+                    "createProject", "Creates a new project", NameDescriptionState::class,
                     "project", "Created project", Project::class
             ) { input ->
                 structureService.newProject(Project.of(input))
@@ -27,8 +27,8 @@ class ProjectMutations(
             /**
              * Updating a project
              */
-            simpleMutation("updateProject", "Updates an existing project",
-                    UpdateProjectInput::class,
+            simpleMutation(
+                    "updateProject", "Updates an existing project", UpdateProjectInput::class,
                     "project", "Updated project", Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
@@ -47,6 +47,26 @@ class ProjectMutations(
              */
             unitMutation<DeleteProjectInput>("deleteProject", "Deletes an existing project") { input ->
                 structureService.deleteProject(ID(input.id))
+            },
+            /**
+             * Disables a project
+             */
+            simpleMutation(
+                    "disableProject", "Disables an existing project", DisableProjectInput::class,
+                    "project", "Updated project", Project::class
+            ) { input ->
+                val project = structureService.getProject(ID(input.id))
+                structureService.disableProject(project)
+            },
+            /**
+             * Enables a project
+             */
+            simpleMutation(
+                    "enableProject", "Enables an existing project", EnableProjectInput::class,
+                    "project", "Updated project", Project::class
+            ) { input ->
+                val project = structureService.getProject(ID(input.id))
+                structureService.enableProject(project)
             }
     )
 
@@ -63,8 +83,17 @@ data class UpdateProjectInput(
         val disabled: Boolean?
 )
 
-
 data class DeleteProjectInput(
+        @APIDescription("Project ID")
+        val id: Int
+)
+
+data class DisableProjectInput(
+        @APIDescription("Project ID")
+        val id: Int
+)
+
+data class EnableProjectInput(
         @APIDescription("Project ID")
         val id: Int
 )

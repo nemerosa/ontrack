@@ -221,6 +221,49 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Disabling a project`() {
+        asAdmin {
+            project {
+                val data = run("""
+                    mutation DisableProject {
+                        disableProject(input: {id: $id}) {
+                            project {
+                                disabled
+                            }
+                        }
+                    }
+                """)
+                // Checks the project has been disabled
+                assertTrue(structureService.getProject(id).isDisabled)
+                // Checks the data
+                assertTrue(data["disableProject"]["project"]["disabled"].asBoolean())
+            }
+        }
+    }
+
+    @Test
+    fun `Enabling a project`() {
+        asAdmin {
+            project {
+                structureService.disableProject(this)
+                val data = run("""
+                    mutation EnableProject {
+                        enableProject(input: {id: $id}) {
+                            project {
+                                disabled
+                            }
+                        }
+                    }
+                """)
+                // Checks the project has been enabled
+                assertFalse(structureService.getProject(id).isDisabled)
+                // Checks the data
+                assertFalse(data["enableProject"]["project"]["disabled"].asBoolean())
+            }
+        }
+    }
+
+    @Test
     fun `Deleting a non existingproject`() {
         asAdmin {
             val project = project()
