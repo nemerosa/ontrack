@@ -27,6 +27,9 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             id
                             name
                         }
+                        errors {
+                            message
+                        }
                     }
                 }
             """, mapOf("name" to name))
@@ -39,6 +42,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             val project = data["createProject"]["project"]
             assertTrue(project["id"].asInt() > 0, "ID is set")
             assertEquals(name, project["name"].asText(), "Name is OK")
+            assertTrue(data["createProject"]["errors"].isNullOrNullNode(), "No error")
         }
     }
 
