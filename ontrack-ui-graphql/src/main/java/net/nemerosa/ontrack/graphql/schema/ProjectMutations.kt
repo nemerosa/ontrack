@@ -31,7 +31,7 @@ class ProjectMutations(
                         isDisabled = input.disabled ?: project.isDisabled
                 )
                 // TODO Validation of the state
-                val updatedProject = Project.of(state)
+                val updatedProject = project.update(state)
                 structureService.saveProject(updatedProject)
                 updatedProject
             }

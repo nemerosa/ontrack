@@ -111,7 +111,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 val newDescription = uid("P")
                 val data = run("""
                     mutation UpdateProject(${'$'}description: String!) {
-                        updateProject(input: {description: ${'$'}description}) {
+                        updateProject(input: {id: $id, description: ${'$'}description}) {
                             project {
                                 id
                                 name
@@ -143,7 +143,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             project {
                 val data = run("""
                     mutation UpdateProject {
-                        updateProject(input: {disabled: true}) {
+                        updateProject(input: {id: $id, disabled: true}) {
                             project {
                                 id
                                 name
@@ -176,7 +176,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             project {
                 val data = run("""
                     mutation UpdateProject(${'$'}name: String!) {
-                        updateProject(input: {name: ${'$'}name}) {
+                        updateProject(input: {id: $id, name: ${'$'}name}) {
                             project {
                                 id
                                 name
@@ -190,7 +190,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 """, mapOf("name" to existingName))
                 // Checks the errors
                 val error = data["updateProject"]["errors"][0]
-                assertEquals("Project name already exists: $name", error["message"].asText())
+                assertEquals("Project name already exists: $existingName", error["message"].asText())
                 assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException", error["exception"].asText())
                 assertTrue(data["updateProject"]["project"].isNullOrNullNode(), "Project not returned")
             }
