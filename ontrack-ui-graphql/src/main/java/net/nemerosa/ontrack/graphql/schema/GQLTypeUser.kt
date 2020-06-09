@@ -32,6 +32,7 @@ class GQLTypeUser(
                         it.name("userRootActions")
                                 .description("List of actions authorized to the user")
                                 .type(userRootActions.typeRef)
+                                .deprecate("Security grants are given through GraphQL mutations")
                                 .dataFetcher { Unit } // Place holder object
                     }
                     // OK
