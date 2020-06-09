@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.*
 import graphql.schema.GraphQLObjectType.newObject
-import net.nemerosa.ontrack.common.CachedSupplier
 import net.nemerosa.ontrack.common.UserException
 import org.springframework.stereotype.Service
 
@@ -15,10 +14,9 @@ class GraphqlSchemaServiceImpl(
         private val mutationProviders: List<MutationProvider>
 ) : GraphqlSchemaService {
 
-    private val schemaSupplier = CachedSupplier.of { this.createSchema() }
-
-    override val schema: GraphQLSchema
-        get() = schemaSupplier.get()
+    override val schema: GraphQLSchema by lazy {
+        createSchema()
+    }
 
     private fun createSchema(): GraphQLSchema {
         // All types
