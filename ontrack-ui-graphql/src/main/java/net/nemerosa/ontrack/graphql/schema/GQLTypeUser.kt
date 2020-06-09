@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.support.objectField
-import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
@@ -24,7 +23,7 @@ class GQLTypeUser(
                     .description("Representation of the current user")
                     // Account representation
                     .field(
-                            objectField<Account>("account", "Account associated to the user") {
+                            objectField("account", "Account associated to the user") {
                                 securityService.currentAccount?.account
                             }
                     )
