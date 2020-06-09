@@ -13,6 +13,6 @@ class GQLRootQueryUser(
                     .name("user")
                     .description("Gets the current user")
                     .type(user.typeRef)
-                    .dataFetcher { GQLTypeUser.Data() }
+                    .dataFetcher { RootUser.INSTANCE }
                     .build()
 }

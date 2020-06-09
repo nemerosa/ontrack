@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema.authorizations
 
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.model.security.GlobalFunction
 import net.nemerosa.ontrack.model.security.ProjectFunction
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -16,3 +17,6 @@ fun <T : Any> GraphQLObjectType.Builder.authorizations(authorizationsService: Au
 
 inline fun <reified F : ProjectFunction> SecurityService.isProjectFunctionGranted(e: ProjectEntity) =
         isProjectFunctionGranted(e, F::class.java)
+
+inline fun <reified F : GlobalFunction> SecurityService.isGlobalFunctionGranted() =
+        isGlobalFunctionGranted(F::class.java)

@@ -1,14 +1,17 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.graphql.schema.authorizations.*
 import net.nemerosa.ontrack.graphql.support.objectField
+import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class GQLTypeUser(
         private val securityService: SecurityService,
-        private val userRootActions: GQLTypeUserRootActions
+        private val authorizationsService: AuthorizationsService
 ) : GQLType {
 
     companion object {
@@ -27,20 +30,36 @@ class GQLTypeUser(
                                 securityService.currentAccount?.account
                             }
                     )
-                    // User actions
-                    .field {
-                        it.name("userRootActions")
-                                .description("List of actions authorized to the user")
-                                .type(userRootActions.typeRef)
-                                .deprecate("Security grants are given through GraphQL mutations")
-                                .dataFetcher { Unit } // Place holder object
-                    }
+                    // Authorizations
+                    .authorizations(authorizationsService, RootUser::class)
                     // OK
                     .build()
 
-    /**
-     * Pseudo item associated to the user type
-     */
-    class Data
+}
+
+/**
+ * Pseudo item associated to the root user type
+ */
+class RootUser private constructor() {
+    companion object {
+        val INSTANCE = RootUser()
+    }
+}
+
+/**
+ * Root authorizations
+ */
+@Component
+class RootUserAuthorizations(
+        private val securityService: SecurityService
+) : Authorizations<RootUser> {
+
+    override val targetType: KClass<RootUser> = RootUser::class
+
+    override val authorizations: List<Authorization<RootUser>> = listOf(
+            Authorization("createProject", "Creating a project") {
+                securityService.isGlobalFunctionGranted<ProjectCreation>()
+            }
+    )
 
 }

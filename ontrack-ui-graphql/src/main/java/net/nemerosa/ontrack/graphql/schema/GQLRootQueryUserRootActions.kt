@@ -18,7 +18,7 @@ constructor(
             GraphQLFieldDefinition.newFieldDefinition()
                     .name("userRootActions")
                     .description("List of actions authorized to the user")
-                    .deprecate("Use the `actions` field in the `User` type accessible through the `user` root query.")
+                    .deprecate("Use the `authorizations` field in the `User` type accessible through the `user` root query.")
                     .type(userRootActions.typeRef)
                     .dataFetcher { Unit } // Place holder object
                     .build()
