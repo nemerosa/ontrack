@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeUser(
-        private val securityService: SecurityService
+        private val securityService: SecurityService,
+        private val userRootActions: GQLTypeUserRootActions
 ) : GQLType {
 
     companion object {
@@ -27,6 +28,13 @@ class GQLTypeUser(
                                 securityService.currentAccount?.account
                             }
                     )
+                    // User actions
+                    .field {
+                        it.name("userRootActions")
+                                .description("List of actions authorized to the user")
+                                .type(userRootActions.typeRef)
+                                .dataFetcher { Unit } // Place holder object
+                    }
                     // OK
                     .build()
 

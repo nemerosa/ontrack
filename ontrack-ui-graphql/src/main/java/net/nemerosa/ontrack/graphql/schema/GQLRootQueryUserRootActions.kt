@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars
 import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLObjectType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -13,35 +11,16 @@ import org.springframework.stereotype.Component
 class GQLRootQueryUserRootActions
 @Autowired
 constructor(
-        private val contributors: List<GQLRootUserActionContributor>
+        private val userRootActions: GQLTypeUserRootActions
 ) : GQLRootQuery {
 
     override fun getFieldDefinition(): GraphQLFieldDefinition =
             GraphQLFieldDefinition.newFieldDefinition()
                     .name("userRootActions")
                     .description("List of actions authorized to the user")
-                    .type(GraphQLObjectType.newObject()
-                            .name("UserRootActions")
-                            .fields(
-                                    contributors
-                                            .flatMap { it.userRootActions }
-                                            .map { uriDef ->
-                                                GraphQLFieldDefinition.newFieldDefinition()
-                                                        .name(uriDef.name)
-                                                        .type(Scalars.GraphQLString)
-                                                        .dataFetcher({
-                                                            if (uriDef.securityCheck()) {
-                                                                uriDef.uri()
-                                                            } else {
-                                                                null
-                                                            }
-                                                        })
-                                                        .build()
-                                            }
-                            )
-                            .build()
-                    )
-                    .dataFetcher({ "" }) // Place holder object
+                    .deprecate("Use the `actions` field in the `User` type accessible through the `user` root query.")
+                    .type(userRootActions.typeRef)
+                    .dataFetcher { Unit } // Place holder object
                     .build()
 
 }
