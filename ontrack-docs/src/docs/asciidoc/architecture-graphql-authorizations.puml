@@ -1,0 +1,40 @@
+@startuml
+
+class User <<type>>
+User --> RootActions: rootActions
+
+class RootActions <<type>> {
+    createProject: Boolean!
+}
+
+class RootActionsContributor<User>
+RootActionsContributor --|> ActionsContributor
+RootActionsContributor .right.> RootActions: contributes
+
+class Project <<type>>
+Project --> ProjectActions: actions
+
+class ProjectActions <<type>> {
+    updateProject: Boolean!
+    deleteProject: Boolean!
+    disableProject: Boolean!
+    enableProject: Boolean!
+    createBranch: Boolean!
+}
+
+class ProjectActionsContributor<Project>
+ProjectActionsContributor --|> ActionsContributor
+ProjectActionsContributor .left.> ProjectActions: contributes
+
+interface ActionsContributor<T>
+
+interface Mutation<T>
+
+class CreateProject <<mutation>>
+
+class UpdateProject <<mutation>>
+
+CreateProject --|> Mutation
+UpdateProject --|> Mutation
+
+@enduml
